@@ -88,10 +88,10 @@ NTSTATUS
 HPCALL
 LeNtQuerySystemInformation(
     HPARGS
-    IN  SYSTEM_INFORMATION_CLASS    SystemInformationClass,
-    OUT PVOID                       SystemInformation,
-    IN  ULONG_PTR                   SystemInformationLength,
-    OUT PULONG                      ReturnLength OPTIONAL
+    SYSTEM_INFORMATION_CLASS    SystemInformationClass,
+    PVOID                       SystemInformation,
+    ULONG_PTR                   SystemInformationLength,
+    PULONG                      ReturnLength OPTIONAL
 )
 {
     NTSTATUS Status = 0;
