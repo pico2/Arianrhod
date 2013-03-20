@@ -127,6 +127,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     LONG        Offset;
     PLEPEB      TargetLePeb, LePeb;
     HANDLE      Section;
+    BYTE        Backup[LDR_LOAD_DLL_BACKUP_SIZE];
 
     // Process = CurrentProcess;
 
@@ -164,14 +165,12 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     PVOID ooxxAddress = LePeb->LdrLoadDllAddress;
     BYTE ooxxBuffer[16];
 
-    Status = ReadMemory(Process, ooxxAddress, LePeb->LdrLoadDllBackup, LDR_LOAD_DLL_BACKUP_SIZE);
+    Status = ReadMemory(Process, ooxxAddress, Backup, LDR_LOAD_DLL_BACKUP_SIZE);
     if (NT_FAILED(Status))
     {
         Mm::FreeVirtualMemory(SelfShadow, Process);
         return Status;
     }
-
-    LePeb->LdrLoadDllBackupSize = LDR_LOAD_DLL_BACKUP_SIZE;
 
     ShadowLoadFirstDll = PtrAdd(LoadFirstDll, PtrOffset(SelfShadow, &__ImageBase));
     Offset = PtrOffset(ShadowLoadFirstDll, PtrAdd(ooxxAddress, 5));
@@ -193,6 +192,8 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     Section = TargetLePeb->Section;
     *TargetLePeb = *LePeb;
     TargetLePeb->Section = Section;
+    CopyStruct(TargetLePeb->LdrLoadDllBackup, Backup, LDR_LOAD_DLL_BACKUP_SIZE);
+    TargetLePeb->LdrLoadDllBackupSize = LDR_LOAD_DLL_BACKUP_SIZE;
 
     CloseLePeb(TargetLePeb);
 
