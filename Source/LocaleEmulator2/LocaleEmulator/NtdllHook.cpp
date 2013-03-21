@@ -365,11 +365,11 @@ LeNtQueryValueKey(
 
     GlobalData = (PLeGlobalData)HPARG_FLTINFO->FilterContext;
 
-    if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.CodePageKey, TRUE))
+    if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.Ntdll.CodePageKey, TRUE))
     {
         KeyType = CodePageKeyHandle;
     }
-    else if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.LanguageKey, TRUE))
+    else if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.Ntdll.LanguageKey, TRUE))
     {
         KeyType = LanguageKeyHandle;
     }
@@ -498,7 +498,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Gdi32)
         Status = ZwOpenKey(&CodePageKey, KEY_QUERY_VALUE, &ObjectAttributes);
         FAIL_BREAK(Status);
 
-        Status = QueryRegKeyFullPath(CodePageKey, &HookRoutineData.CodePageKey);
+        Status = QueryRegKeyFullPath(CodePageKey, &HookRoutineData.Ntdll.CodePageKey);
         ZwClose(CodePageKey);
         FAIL_BREAK(Status);
 
@@ -506,7 +506,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Gdi32)
         Status = ZwOpenKey(&LanguageKey, KEY_QUERY_VALUE, &ObjectAttributes);
         FAIL_BREAK(Status);
 
-        Status = QueryRegKeyFullPath(LanguageKey, &HookRoutineData.LanguageKey);
+        Status = QueryRegKeyFullPath(LanguageKey, &HookRoutineData.Ntdll.LanguageKey);
         ZwClose(LanguageKey);
         FAIL_BREAK(Status);
 

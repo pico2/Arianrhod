@@ -18,6 +18,7 @@ UserMessageCall(INLPCREATESTRUCT)
     CREATESTRUCTA   CreateStructA;
 
     CreateStructW = (LPCREATESTRUCTW)lParam;
+    CreateStructW->lpCreateParams = ((PCBT_CREATE_PARAM)CreateStructW->lpCreateParams)->CreateParams;
 
     CreateStructA.lpszClass = NULL;
     CreateStructA.lpszName = NULL;
@@ -398,7 +399,7 @@ KernelMessageCall(INCBOXSTRING)
 }
 
 KernelMessageCall(OUTCBOXSTRING)
-{    
+{
     LRESULT Length, OutputSize;
     PWSTR   Unicode;
     PSTR    OutputBuffer;
@@ -537,27 +538,54 @@ LeNtUserDefSetText(
     return Success;
 }
 
+BOOL VerifyWindowParam(PCBT_CREATE_PARAM CbtCreateParam, PCBT_PROC_PARAM CbtParam)
+{
+    SEH_TRY
+    {
+        return CbtCreateParam->StackPointer == CbtParam->StackPointer;
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
 LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    PCBT_PROC_PARAM CbtParam = (PCBT_PROC_PARAM)FindThreadFrame(CBT_PROC_PARAM_CONTEXT);
+    PCBT_PROC_PARAM     CbtParam = (PCBT_PROC_PARAM)FindThreadFrame(CBT_PROC_PARAM_CONTEXT);
+    LPCBT_CREATEWND     CreateWnd;
+    PCBT_CREATE_PARAM   CreateParam;
 
     if (nCode == HCBT_CREATEWND) LOOP_ONCE
     {
-        HWND    hWnd;
-        WNDPROC OriginalProcA, OriginalProcW;
-        PLeGlobalData GlobalData;
+        BOOL            UnicodeWindow;
+        HWND            hWnd;
+        WNDPROC         OriginalProcA, OriginalProcW;
+        PLeGlobalData   GlobalData;
 
-        hWnd = (HWND)wParam;
+        hWnd        = (HWND)wParam;
+        CreateWnd   = (LPCBT_CREATEWND)lParam;
+        CreateParam = (PCBT_CREATE_PARAM)CreateWnd->lpcs->lpCreateParams;
 
-        if (IsWindowUnicode(hWnd))
+        if (!VerifyWindowParam(CreateParam, CbtParam))
             break;
+
+        CreateWnd->lpcs->lpCreateParams = CreateParam->CreateParams;
 
         GlobalData = CbtParam->GlobalData;
 
         if (GlobalData->GetWindowDataA(hWnd) != NULL)
             break;
 
+//        UnicodeWindow = IsWindowUnicode(hWnd);
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
+//        OriginalProcW = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
+/*
+        if (UnicodeWindow && PtrAnd(0xFFFF0000, OriginalProcA) == 0xFFFF0000)
+        {
+            break;
+        }
+*/
         OriginalProcW = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProcW);
 
         GlobalData->SetWindowDataA(hWnd, OriginalProcA);
@@ -592,6 +620,7 @@ LeNtUserCreateWindowEx_Win7(
     LARGE_UNICODE_STRING    UnicodeWindowName;
     PLeGlobalData           GlobalData;
     CBT_PROC_PARAM          CbtParam;
+    CBT_CREATE_PARAM        CreateParam;
 
     GlobalData = LeGetGlobalData();
 
@@ -614,34 +643,39 @@ LeNtUserCreateWindowEx_Win7(
         if (CbtParam.Hook != NULL)
         {
             CbtParam.GlobalData = GlobalData;
+            CbtParam.StackPointer = _AddressOfReturnAddress();
             CbtParam.Push();
+
+            CreateParam.StackPointer = CbtParam.StackPointer;
+            CreateParam.CreateParams = Param;
+            Param = &CreateParam;
         }
     }
 
     hWnd = GlobalData->NtUserCreateWindowEx_Win7(
-            ExStyle,
-            ClassName,
-            ClassVersion,
-            WindowName,
-            Style,
-            X,
-            Y,
-            Width,
-            Height,
-            ParentWnd,
-            Menu,
-            Instance,
-            Param,
-            ShowMode,
-            Unknown
-        );
+                ExStyle,
+                ClassName,
+                ClassVersion,
+                WindowName,
+                Style,
+                X,
+                Y,
+                Width,
+                Height,
+                ParentWnd,
+                Menu,
+                Instance,
+                Param,
+                ShowMode,
+                Unknown
+            );
 
     LastError = RtlGetLastWin32Error();
 
     if (CbtParam.Hook != NULL)
     {
-        CbtParam.Pop();
         UnhookWindowsHookEx(CbtParam.Hook);
+        CbtParam.Pop();
     }
 
     FreeLargeString(&UnicodeWindowName);
@@ -704,23 +738,23 @@ LeNtUserCreateWindowEx_Win8(
     }
 
     hWnd = GlobalData->NtUserCreateWindowEx_Win8(
-            ExStyle,
-            ClassName,
-            ClassVersion,
-            WindowName,
-            Style,
-            X,
-            Y,
-            Width,
-            Height,
-            ParentWnd,
-            Menu,
-            Instance,
-            Param,
-            ShowMode,
-            Unknown,
-            Unknown2
-        );
+                ExStyle,
+                ClassName,
+                ClassVersion,
+                WindowName,
+                Style,
+                X,
+                Y,
+                Width,
+                Height,
+                ParentWnd,
+                Menu,
+                Instance,
+                Param,
+                ShowMode,
+                Unknown,
+                Unknown2
+            );
 
     LastError = RtlGetLastWin32Error();
 
@@ -1240,6 +1274,9 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
     NtUserDefSetText = FindNtUserDefSetText(User32);
     if (NtUserDefSetText == NULL)
         return STATUS_NOT_FOUND;
+
+    HookRoutineData.User32.DefWindowProcA = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcA);
+    HookRoutineData.User32.DefWindowProcW = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcW);
 
     HookNtUserCreateWindowEx = Ps::CurrentPeb()->OSBuildNumber > 7700 ? (PVOID)LeNtUserCreateWindowEx_Win8 : LeNtUserCreateWindowEx_Win7;
 

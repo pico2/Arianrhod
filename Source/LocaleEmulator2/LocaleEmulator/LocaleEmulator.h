@@ -72,6 +72,13 @@ inline VOID InitDefaultLeb(PLEB Leb)
     Leb->LocaleID        = 0x411;
     Leb->DefaultCharset  = SHIFTJIS_CHARSET;
 
+#if 1
+    Leb->AnsiCodePage    = CP_GB2312;
+    Leb->OemCodePage     = CP_GB2312;
+    Leb->LocaleID        = 0x804;
+    Leb->DefaultCharset  = GB2312_CHARSET;
+#endif
+
     CopyStruct(Leb->DefaultFaceName, FaceName, sizeof(FaceName));
 
     Leb->Timezone.Bias = -540;
@@ -251,12 +258,23 @@ public:
     {
         ~HookRoutineData()
         {
-            RtlFreeUnicodeString(&CodePageKey);
-            RtlFreeUnicodeString(&LanguageKey);
+            RtlFreeUnicodeString(&Ntdll.CodePageKey);
+            RtlFreeUnicodeString(&Ntdll.LanguageKey);
         }
 
-        UNICODE_STRING CodePageKey;
-        UNICODE_STRING LanguageKey;
+        struct
+        {
+            UNICODE_STRING CodePageKey;
+            UNICODE_STRING LanguageKey;
+
+        } Ntdll;
+
+        struct
+        {
+            PVOID DefWindowProcA;
+            PVOID DefWindowProcW;
+
+        } User32;
 
     } HookRoutineData;
 

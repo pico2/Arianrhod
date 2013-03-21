@@ -563,12 +563,74 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
+WCHAR szAppName[] = L"sssssssss";
+CHAR szAppNameA[] = "sssssssss";
+
+LRESULT CALLBACK FUCK(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+    return DefWindowProcA(hWnd, Message, wParam, lParam);
+}
+
+void reg()
+{
+    HWND         hwnd;
+    MSG          msg;
+    WNDCLASSEXA   wndclassex = {0};
+
+    wndclassex.cbSize        = sizeof(WNDCLASSEX);
+    wndclassex.style         = CS_HREDRAW | CS_VREDRAW;
+    wndclassex.lpfnWndProc   = DefWindowProcA;
+    wndclassex.cbClsExtra    = 0;
+    wndclassex.cbWndExtra    = 0;
+    wndclassex.hInstance     = (HINSTANCE)GetExeModuleHandle();
+    wndclassex.hIcon         = LoadIcon (NULL, IDI_APPLICATION);
+    wndclassex.hCursor       = LoadCursor (NULL, IDC_ARROW);
+    wndclassex.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH);
+    wndclassex.lpszMenuName  = NULL;
+    wndclassex.lpszClassName = szAppNameA;
+    wndclassex.hIconSm       = wndclassex.hIcon;
+
+    RegisterClassExA(&wndclassex);
+}
+
+#include <CommCtrl.h>
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    ULONG Priority = -1;
+    WNDCLASSEXW cls;
+    WNDCLASSEXA clsA;
 
-    NtSetInformationProcess(CurrentProcess, ProcessPriorityBoost, &Priority, sizeof(Priority));
-    PauseConsole();
+    reg();
+
+    GetClassInfoExW((HINSTANCE)GetExeModuleHandle(), szAppName, &cls);
+    GetClassInfoExA((HINSTANCE)GetExeModuleHandle(), szAppNameA, &clsA);
+
+    HWND hwnd = CreateWindowExA(0, szAppNameA, 0, 0, 0, 0, 1000, 1000, 0, 0, 0, 0);
+    HWND lv = CreateWindowExA(0, WC_LISTVIEWA, 0, WS_VISIBLE, 0, 0, 1000, 1000, hwnd, 0, 0, 0);
+
+    LVCOLUMNW   lvc;
+    LVITEMW     lvitem;
+    ULONG_PTR   Index;
+    WCHAR       Path[MAX_NTPATH];
+
+    ShowWindow(lv, SW_SHOW);
+
+    lvc.mask = LVCF_TEXT | LVCF_WIDTH;
+    lvc.cx = 80;
+    lvc.pszText = L"Base";
+    ListView_InsertColumn(lv, 0, &lvc);
+    SendMessageA(lv, LVM_INSERTCOLUMNA, 0, (LPARAM)&lvc);
+
+    IsWindowUnicode(hwnd);
+
+    MSG msg;
+    while (GetMessageA(&msg, 0, 0, 0) > 0)
+    {
+        TranslateMessage(&msg);
+        DispatchMessageA(&msg);
+    }
+
+    Ps::ExitProcess(0);
 
     return;
 

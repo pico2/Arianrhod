@@ -7,8 +7,9 @@
 
 typedef struct CBT_PROC_PARAM : public TEB_ACTIVE_FRAME
 {
-    HHOOK Hook;
-    PLeGlobalData GlobalData;
+    HHOOK           Hook;
+    PLeGlobalData   GlobalData;
+    PVOID           StackPointer;
 
     CBT_PROC_PARAM()
     {
@@ -17,6 +18,13 @@ typedef struct CBT_PROC_PARAM : public TEB_ACTIVE_FRAME
     }
 
 } CBT_PROC_PARAM, *PCBT_PROC_PARAM;
+
+typedef struct
+{
+    PVOID CreateParams;
+    PVOID StackPointer;
+
+} CBT_CREATE_PARAM, *PCBT_CREATE_PARAM;
 
 typedef union
 {

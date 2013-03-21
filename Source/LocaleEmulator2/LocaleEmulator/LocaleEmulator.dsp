@@ -97,15 +97,6 @@ SOURCE=.\Runtime.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SharedData.cpp
-# ADD CPP /Yu"stdafx.h"
-# End Source File
-# Begin Source File
-
-SOURCE=.\SharedData.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\stdafx.cpp
 # ADD CPP /Yc"stdafx.h"
 # End Source File
