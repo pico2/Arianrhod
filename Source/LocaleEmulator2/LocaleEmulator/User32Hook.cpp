@@ -577,22 +577,45 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
         if (GlobalData->GetWindowDataA(hWnd) != NULL)
             break;
 
-//        UnicodeWindow = IsWindowUnicode(hWnd);
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
-//        OriginalProcW = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
-/*
-        if (UnicodeWindow && PtrAnd(0xFFFF0000, OriginalProcA) == 0xFFFF0000)
-        {
-            break;
-        }
-*/
         OriginalProcW = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProcW);
-
         GlobalData->SetWindowDataA(hWnd, OriginalProcA);
-        // GlobalData->SetWindowDataW(hWnd, OriginalProcW);
     }
 
     return CallNextHookEx(CbtParam->Hook, nCode, wParam, lParam);
+}
+
+BOOL
+InstallCbtHook(
+    PLeGlobalData       GlobalData,
+    PCBT_PROC_PARAM     CbtParam,
+    PCBT_CREATE_PARAM   CreateParam,
+    PVOID               StackPointer,
+    PVOID&              Param
+)
+{
+    CbtParam->Hook = SetWindowsHookExA(WH_CBT, CBTProc, NULL, CurrentTid());
+    if (CbtParam->Hook == NULL)
+        return FALSE;
+
+    CbtParam->GlobalData = GlobalData;
+    CbtParam->StackPointer = StackPointer;
+    CbtParam->Push();
+
+    CreateParam->StackPointer = StackPointer;
+    CreateParam->CreateParams = Param;
+    Param = CreateParam;
+
+    return TRUE;
+}
+
+VOID UninstallCbtHook(PCBT_PROC_PARAM CbtParam)
+{
+    if (CbtParam->Hook == NULL)
+        return;
+
+    UnhookWindowsHookEx(CbtParam->Hook);
+    CbtParam->Pop();
 }
 
 HWND
@@ -639,17 +662,7 @@ LeNtUserCreateWindowEx_Win7(
 
         WindowName = &UnicodeWindowName;
 
-        CbtParam.Hook = SetWindowsHookExA(WH_CBT, CBTProc, NULL, CurrentTid());
-        if (CbtParam.Hook != NULL)
-        {
-            CbtParam.GlobalData = GlobalData;
-            CbtParam.StackPointer = _AddressOfReturnAddress();
-            CbtParam.Push();
-
-            CreateParam.StackPointer = CbtParam.StackPointer;
-            CreateParam.CreateParams = Param;
-            Param = &CreateParam;
-        }
+        InstallCbtHook(GlobalData, &CbtParam, &CreateParam, _AddressOfReturnAddress(), Param);
     }
 
     hWnd = GlobalData->NtUserCreateWindowEx_Win7(
@@ -671,15 +684,8 @@ LeNtUserCreateWindowEx_Win7(
             );
 
     LastError = RtlGetLastWin32Error();
-
-    if (CbtParam.Hook != NULL)
-    {
-        UnhookWindowsHookEx(CbtParam.Hook);
-        CbtParam.Pop();
-    }
-
+    UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
-
     RtlSetLastWin32Error(LastError);
 
     return hWnd;
@@ -711,6 +717,7 @@ LeNtUserCreateWindowEx_Win8(
     LARGE_UNICODE_STRING    UnicodeWindowName;
     PLeGlobalData           GlobalData;
     CBT_PROC_PARAM          CbtParam;
+    CBT_CREATE_PARAM        CreateParam;
 
     GlobalData = LeGetGlobalData();
 
@@ -729,12 +736,7 @@ LeNtUserCreateWindowEx_Win8(
 
         WindowName = &UnicodeWindowName;
 
-        CbtParam.Hook = SetWindowsHookExA(WH_CBT, CBTProc, NULL, CurrentTid());
-        if (CbtParam.Hook != NULL)
-        {
-            CbtParam.GlobalData = GlobalData;
-            CbtParam.Push();
-        }
+        InstallCbtHook(GlobalData, &CbtParam, &CreateParam, _AddressOfReturnAddress(), Param);
     }
 
     hWnd = GlobalData->NtUserCreateWindowEx_Win8(
@@ -757,15 +759,8 @@ LeNtUserCreateWindowEx_Win8(
             );
 
     LastError = RtlGetLastWin32Error();
-
-    if (CbtParam.Hook != NULL)
-    {
-        CbtParam.Pop();
-        UnhookWindowsHookEx(CbtParam.Hook);
-    }
-
+    UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
-
     RtlSetLastWin32Error(LastError);
 
     return hWnd;

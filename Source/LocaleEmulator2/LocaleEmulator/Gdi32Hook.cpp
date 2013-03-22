@@ -23,31 +23,77 @@ HFONT NTAPI LeCreateFontIndirectExW(PENUMLOGFONTEXDVW penumlfex)
     return GlobalData->CreateFontIndirectExW(penumlfex);
 }
 
-HDC NTAPI LeCreateCompatibleDC(HDC hDC)
+HFONT ChangeFontCharset(PLeGlobalData GlobalData, HDC hDC)
 {
-    HFONT           Font;
-    LOGFONTW        LogFont;
-    PLeGlobalData   GlobalData = LeGetGlobalData();
-
-    hDC = GlobalData->CreateCompatibleDC(hDC);
-    if (hDC == NULL)
-        return hDC;
+    HFONT       Font;
+    LOGFONTW    LogFont;
 
     Font = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
     if (Font == NULL)
-        return hDC;
+        return NULL;
 
     if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
-        return hDC;
+        return NULL;
 
     LogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
-    CopyStruct(&LogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, sizeof(LogFont.lfFaceName));
     Font = CreateFontIndirectW(&LogFont);
-    if (Font == NULL)
+
+    return Font;
+}
+
+HDC NTAPI LeCreateCompatibleDC(HDC hDC)
+{
+    HFONT           Font, DCFont, DCFontOrigial;
+    LOGFONTW        LogFont;
+    PLeGlobalData   GlobalData = LeGetGlobalData();
+
+    DCFont = NULL;
+    DCFontOrigial = NULL;
+
+    if (hDC != NULL)
+    {
+        DCFont = ChangeFontCharset(GlobalData, hDC);
+        DCFontOrigial = (HFONT)SelectObject(hDC, DCFont);
+    }
+
+    hDC = GlobalData->CreateCompatibleDC(hDC);
+    if (DCFontOrigial != NULL)
+    {
+        SelectObject(hDC, DCFontOrigial);
+        DeleteObject(DCFont);
+    }
+
+    if (hDC == NULL)
         return hDC;
 
-    SelectObject(hDC, Font);
-    DeleteObject(Font);
+    if (DCFontOrigial == NULL)
+    {
+        Font = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
+        if (Font == NULL)
+            return hDC;
+
+        if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
+            return hDC;
+
+        LogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
+        CopyStruct(&LogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, sizeof(LogFont.lfFaceName));
+
+        Font = CreateFontIndirectW(&LogFont);
+        if (Font == NULL)
+            return hDC;
+
+        SelectObject(hDC, Font);
+        DeleteObject(Font);
+    }
+
+    if (DCFontOrigial != NULL)
+    {
+        ULONG (NTAPI *GetCodePage)(HDC hDC);
+
+        *(PVOID *)&GetCodePage = GetRoutineAddress(FindLdrModuleByName(&WCS2US(L"GDI32.dll"))->DllBase, "GetCodePage");
+        if (GetCodePage != NULL)
+            GetCodePage(hDC);
+    }
 
     return hDC;
 }
