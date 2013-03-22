@@ -14,7 +14,6 @@
 #define REGKEY_DEFAULT_LANGUAGE     L"Default"
 
 #define PROP_WINDOW_ANSI_PROC       L"Asuna"
-#define PROP_WINDOW_UNICODE_PROC    L"½Y³ÇÃ÷ÈÕÄÎ"
 
 #define FORMAT_LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK   L"Local\\LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK_SECTION_%p"
 
@@ -63,20 +62,27 @@ inline NTSTATUS CloseLePeb(PLEPEB LePeb)
 
 inline VOID InitDefaultLeb(PLEB Leb)
 {
-    static WCHAR FaceName[]     = L"MS Gothic";
     static WCHAR StandardName[] = L"@tzres.dll,-632";
     static WCHAR DaylightName[] = L"@tzres.dll,-631";
+
+#if 0
+
+    static WCHAR FaceName[]     = L"MS Gothic";
 
     Leb->AnsiCodePage    = CP_SHIFTJIS;
     Leb->OemCodePage     = CP_SHIFTJIS;
     Leb->LocaleID        = 0x411;
     Leb->DefaultCharset  = SHIFTJIS_CHARSET;
 
-#if 1
+#else
+
+    static WCHAR FaceName[]     = L"Microsoft YaHei";
+
     Leb->AnsiCodePage    = CP_GB2312;
     Leb->OemCodePage     = CP_GB2312;
     Leb->LocaleID        = 0x804;
     Leb->DefaultCharset  = GB2312_CHARSET;
+
 #endif
 
     CopyStruct(Leb->DefaultFaceName, FaceName, sizeof(FaceName));
@@ -237,6 +243,8 @@ public:
         API_POINTER(IsWindowUnicode)            StubIsWindowUnicode;
         API_POINTER(GetClipboardData)           StubGetClipboardData;
         API_POINTER(SetClipboardData)           StubSetClipboardData;
+        API_POINTER(GetDC)                      StubGetDC;
+        API_POINTER(GetWindowDC)                StubGetWindowDC;
 
         union
         {
@@ -245,10 +253,13 @@ public:
             API_POINTER(::NtUserCreateWindowEx_Win8)    StubNtUserCreateWindowEx_Win8;
         };
 
+        API_POINTER(GetStockObject)             StubGetStockObject;
         API_POINTER(CreateFontIndirectExW)      StubCreateFontIndirectExW;
         API_POINTER(CreateCompatibleDC)         StubCreateCompatibleDC;
         API_POINTER(EnumFontFamiliesExA)        StubEnumFontFamiliesExA;
         API_POINTER(EnumFontFamiliesExW)        StubEnumFontFamiliesExW;
+        API_POINTER(EnumFontsA)                 StubEnumFontsA;
+        API_POINTER(EnumFontsW)                 StubEnumFontsW;
 
     } HookStub;
 
@@ -260,6 +271,7 @@ public:
         {
             RtlFreeUnicodeString(&Ntdll.CodePageKey);
             RtlFreeUnicodeString(&Ntdll.LanguageKey);
+            RtlDeleteCriticalSection(&Gdi32.GdiLock);
         }
 
         struct
@@ -275,6 +287,16 @@ public:
             PVOID DefWindowProcW;
 
         } User32;
+
+        struct
+        {
+            BOOLEAN StockObjectInitialized : 1;
+
+            RTL_CRITICAL_SECTION GdiLock;
+
+            HGDIOBJ StockObject[STOCK_LAST + 1];
+
+        } Gdi32;
 
     } HookRoutineData;
 
@@ -382,6 +404,16 @@ public:
         return HookStub.StubGetClipboardData(Format);
     }
 
+    HDC GetDC(HWND hWnd)
+    {
+        return HookStub.StubGetDC(hWnd);
+    }
+
+    HDC GetWindowDC(HWND hWnd)
+    {
+        return HookStub.StubGetWindowDC(hWnd);
+    }
+
     LRESULT NtUserMessageCall(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam, ULONG_PTR xParam, DWORD xpfnProc, ULONG Flags)
     {
         return HookStub.StubNtUserMessageCall(hWnd, Message, wParam, lParam, xParam, xpfnProc, Flags);
@@ -405,6 +437,21 @@ public:
     /************************************************************************
       gdi32
     ************************************************************************/
+
+    int EnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpFontFunc, LPARAM lParam)
+    {
+        return HookStub.StubEnumFontsA(hdc, lpFaceName, lpFontFunc, lParam);
+    }
+
+    int EnumFontsW(HDC hdc, PCWSTR lpFaceName, FONTENUMPROCW lpFontFunc, LPARAM lParam)
+    {
+        return HookStub.StubEnumFontsW(hdc, lpFaceName, lpFontFunc, lParam);
+    }
+
+    HGDIOBJ GetStockObject(LONG Object)
+    {
+        return HookStub.StubGetStockObject(Object);
+    }
 
     HFONT CreateFontIndirectExW(PENUMLOGFONTEXDVW penumlfex)
     {

@@ -2,6 +2,13 @@
 #include "mlns.h"
 #include "MessageTable.h"
 
+VOID ResetDCCharset(PLeGlobalData GlobalData, HWND hWnd);
+
+ForceInline VOID CheckDC(HDC hDC)
+{
+    // if (GdiGetCodePage(hDC) == 0x3A4) _asm ud2;
+}
+
 /************************************************************************
   ansi to unicode
 ************************************************************************/
@@ -22,6 +29,8 @@ UserMessageCall(INLPCREATESTRUCT)
 
     CreateStructA.lpszClass = NULL;
     CreateStructA.lpszName = NULL;
+
+    // ResetDCCharset(LeGetGlobalData(), Window);
 
     LOOP_ONCE
     {
@@ -550,6 +559,31 @@ BOOL VerifyWindowParam(PCBT_CREATE_PARAM CbtCreateParam, PCBT_PROC_PARAM CbtPara
     }
 }
 
+VOID ResetDCCharset(PLeGlobalData GlobalData, HWND hWnd)
+{
+
+    HDC hDC;
+    HFONT Font;
+
+    hDC = GetDC(hWnd);
+    Font = GetFontFromDC(GlobalData, hDC);
+    SelectObject(hDC, Font);
+    //DeleteObject(Font);
+
+    CheckDC(hDC);
+
+    ReleaseDC(hWnd, hDC);
+
+    hDC = GetWindowDC(hWnd);
+    Font = GetFontFromDC(GlobalData, hDC);
+    SelectObject(hDC, Font);
+
+    CheckDC(hDC);
+
+    //DeleteObject(Font);
+    ReleaseDC(hWnd, hDC);
+}
+
 LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     PCBT_PROC_PARAM     CbtParam = (PCBT_PROC_PARAM)FindThreadFrame(CBT_PROC_PARAM_CONTEXT);
@@ -578,11 +612,33 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
 
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
+        if (PtrAnd(0xFFFF0000, OriginalProcA) == 0xFFFF0000)
+            break;
+
         OriginalProcW = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProcW);
         GlobalData->SetWindowDataA(hWnd, OriginalProcA);
+
+        ResetDCCharset(GlobalData, hWnd);
     }
 
     return CallNextHookEx(CbtParam->Hook, nCode, wParam, lParam);
+}
+
+LRESULT CALLBACK CBTProcU(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    LRESULT             Result;
+    PCBT_PROC_PARAM     CbtParam = (PCBT_PROC_PARAM)FindThreadFrame(CBT_PROC_PARAM_CONTEXT);
+    LPCBT_CREATEWND     CreateWnd;
+    PCBT_CREATE_PARAM   CreateParam;
+
+    Result = CallNextHookEx(CbtParam->Hook, nCode, wParam, lParam);
+
+    if (nCode == HCBT_CREATEWND) LOOP_ONCE
+    {
+        ResetDCCharset(CbtParam->GlobalData, (HWND)wParam);
+    }
+
+    return Result;
 }
 
 BOOL
@@ -605,6 +661,22 @@ InstallCbtHook(
     CreateParam->StackPointer = StackPointer;
     CreateParam->CreateParams = Param;
     Param = CreateParam;
+
+    return TRUE;
+}
+
+BOOL
+InstallUnicodeCbtHook(
+    PLeGlobalData       GlobalData,
+    PCBT_PROC_PARAM     CbtParam
+)
+{
+    CbtParam->Hook = SetWindowsHookExA(WH_CBT, CBTProcU, NULL, CurrentTid());
+    if (CbtParam->Hook == NULL)
+        return FALSE;
+
+    CbtParam->GlobalData = GlobalData;
+    CbtParam->Push();
 
     return TRUE;
 }
@@ -652,7 +724,10 @@ LeNtUserCreateWindowEx_Win7(
     LOOP_ONCE
     {
         if (!FLAG_ON(ExStyle, WS_EX_ANSI))
+        {
+            InstallUnicodeCbtHook(GlobalData, &CbtParam);
             break;
+        }
 
         if (WindowName != NULL)
         {
@@ -684,8 +759,27 @@ LeNtUserCreateWindowEx_Win7(
             );
 
     LastError = RtlGetLastWin32Error();
+
+    if (hWnd != NULL)
+    {
+        HDC hDC;
+
+        hDC= GetDC(hWnd);
+
+        CheckDC(hDC);
+
+        ReleaseDC(hWnd, hDC);
+
+        hDC= GetWindowDC(hWnd);
+
+        CheckDC(hDC);
+
+        ReleaseDC(hWnd, hDC);
+    }
+
     UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
+
     RtlSetLastWin32Error(LastError);
 
     return hWnd;
@@ -903,6 +997,46 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
     }
 
     return GlobalData->GetClipboardData(Format);
+}
+
+HDC NTAPI LeGetDC(HWND hWnd)
+{
+    HDC             DC;
+    HFONT           Font;
+    PLeGlobalData   GlobalData = LeGetGlobalData();
+
+    DC = GlobalData->GetDC(hWnd);
+    if (hWnd == NULL)
+    {
+        Font = GetFontFromDC(GlobalData, DC);
+        if (Font != NULL)
+        {
+            SelectObject(DC, Font);
+            DeleteObject(Font);
+        }
+    }
+
+    return DC;
+}
+
+HDC NTAPI LeGetWindowDC(HWND hWnd)
+{
+    HDC             DC;
+    HFONT           Font;
+    PLeGlobalData   GlobalData = LeGetGlobalData();
+
+    DC = GlobalData->GetWindowDC(hWnd);
+    if (hWnd == NULL)
+    {
+        Font = GetFontFromDC(GlobalData, DC);
+        if (Font != NULL)
+        {
+            SelectObject(DC, Font);
+            DeleteObject(Font);
+        }
+    }
+
+    return DC;
 }
 
 /************************************************************************
@@ -1286,6 +1420,9 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         EAT_HOOK_JUMP_HASH(User32, USER32_IsWindowUnicode,  LeIsWindowUnicode,  HookStub.StubIsWindowUnicode),
         EAT_HOOK_JUMP_HASH(User32, USER32_GetClipboardData, LeGetClipboardData, HookStub.StubGetClipboardData),
         EAT_HOOK_JUMP_HASH(User32, USER32_SetClipboardData, LeSetClipboardData, HookStub.StubSetClipboardData),
+
+        EAT_HOOK_JUMP_HASH(User32, USER32_GetDC,            LeGetDC,            HookStub.StubGetDC),
+        EAT_HOOK_JUMP_HASH(User32, USER32_GetWindowDC,      LeGetWindowDC,      HookStub.StubGetWindowDC),
     };
 
     return Nt_PatchMemory(NULL, 0, f, countof(f), User32);

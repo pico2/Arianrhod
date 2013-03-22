@@ -49,7 +49,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 mylib_nt.lib undoc_ntdll.lib ntdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"LocaleEmulator.dll" /ltcg /DELAYLOAD:USER32.dll /DELAYLOAD:DBGHELP.dll /DELAYLOAD:GDI32.dll /DELAYLOAD:KERNEL32.dll
+# ADD LINK32 mylib_nt.lib undoc_ntdll.lib ntdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"LocaleEmulator.dll" /ltcg /DELAYLOAD:USER32.dll /DELAYLOAD:DBGHELP.dll /DELAYLOAD:GDI32.dll /DELAYLOAD:KERNEL32.dll /DELAYLOAD:ADVAPI32.dll
 # SUBTRACT LINK32 /pdb:none /debug
 # Begin Target
 
@@ -61,7 +61,12 @@ SOURCE=.\Gdi32Hook.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Gdi32Hook.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Kernel32Hook.cpp
+# ADD CPP /Yu"stdafx.h"
 # End Source File
 # Begin Source File
 

@@ -6,7 +6,9 @@
 #include "LocaleEmulator.h"
 #include "Hook.h"
 #include "User32Hook.h"
+#include "Gdi32Hook.h"
 #include "Runtime.h"
+#include "SectionProtector.h"
 
 #include "HookPort.h"
 

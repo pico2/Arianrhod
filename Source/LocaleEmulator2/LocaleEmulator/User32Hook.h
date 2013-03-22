@@ -4,6 +4,7 @@
 #include "LocaleEmulator.h"
 
 #define CBT_PROC_PARAM_CONTEXT  TAG4('CPPC')
+#define CBTU_PROC_PARAM_CONTEXT TAG4('CUPC')
 
 typedef struct CBT_PROC_PARAM : public TEB_ACTIVE_FRAME
 {
