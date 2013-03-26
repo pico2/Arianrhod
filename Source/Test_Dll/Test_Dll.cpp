@@ -148,21 +148,60 @@ BOOL THISCALL LolPacket::RecvPacket(ULONG unk, ULONG type1, ULONG type2, ULONG l
     return (this->*StubRecvPacket)(unk, type1, type2, len, buf);
 }
 
+VOID WriteBin(NtFileDisk &file, PVOID buf, ULONG_PTR len)
+{
+    SEH_TRY
+    {
+        file.Write(buf, len);
+    }
+    SEH_EXCEPT(1)
+    {
+    }
+}
+
+EXTC LRESULT NTAPI LbSendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+    NTSTATUS st;
+    LRESULT Result;
+    LARGE_INTEGER cnt;
+    WCHAR file[MAX_NTPATH];
+
+    Result = SendMessageW(hWnd, Msg, wParam, lParam);
+
+    switch (Msg)
+    {
+        case 0x159C:
+        {
+            if (Result == 0x63)
+                break;
+
+                RtlQueryPerformanceCounter(&cnt);
+                swprintf(file, L"C:\\lelog\\%I64d", cnt.QuadPart);
+
+                NtFileDisk bin;
+
+                st = bin.Create(file);
+                FAIL_BREAK(st);
+
+                WriteBin(bin, (PVOID)lParam, HIWORD(wParam));
+        }
+        break;
+    }
+
+    return Result;
+}
+
+#pragma comment(linker, "/EXPORT:SendMessageW=_LbSendMessageW@16")
+#pragma comment(linker, "/EXPORT:FindWindowA=USER32.FindWindowA")
+#pragma comment(linker, "/EXPORT:CallWindowProcW=USER32.CallWindowProcW")
+#pragma comment(linker, "/EXPORT:SetWindowLongW=USER32.SetWindowLongW")
+#pragma comment(linker, "/EXPORT:FindWindowW=USER32.FindWindowW")
+#pragma comment(linker, "/EXPORT:PostMessageW=USER32.PostMessageW")
+#pragma comment(linker, "/EXPORT:RegisterWindowMessageA=USER32.RegisterWindowMessageA")
+
 BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
-
-    NTSTATUS Status;
-
-    if (BaseAddress != NULL)
-        return TRUE;
-
-    MEMORY_FUNCTION_PATCH f[] =
-    {
-        INLINE_HOOK_JUMP(0xABFDA0, (PVOID)PtrAdd(NULL, &LolPacket::RecvPacket), StubRecvPacket),
-    };
-
-    Nt_PatchMemory(NULL, 0, f, countof(f));
 
     return TRUE;
 }
@@ -188,6 +227,8 @@ BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 
     return TRUE;
 }
+
+#if 0
 
 #pragma comment(linker, "/EXPORT:Direct3DCreate9=_Direct3DCreate9@4")
 #pragma comment(linker, "/EXPORT:D3DPERF_SetMarker=_D3DPERF_SetMarker@8")
@@ -273,3 +314,5 @@ EXTC int WINAPI D3DPERF_EndEvent( void )
 
     return EndEvent();
 }
+
+#endif

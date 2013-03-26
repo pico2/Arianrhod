@@ -578,7 +578,27 @@ HFONT ChangeFontCharsetForFont(HFONT Font)
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PrintConsoleW(L"%d\n", IsWindowUnicode((HWND)0x00160466));
+    HWND hwnd = FindWindowW(L"#32770", L"¶àÍæÓ¢ÐÛÁªÃËºÐ×Ó");
+
+    EnumDirectoryFiles(NULL, L"*.*", 0, L"C:\\lelog", NULL, 
+        [] (PVOID, PWIN32_FIND_DATAW fd, ULONG_PTR wnd) -> LONG_PTR
+        {
+            Ps::Sleep(50);
+            PrintConsoleW(L"%s\n", fd->cFileName);
+            // PauseConsole();
+
+            NtFileMemory file;
+
+            file.Open(fd->cFileName);
+
+            SendMessageW((HWND)wnd, 0x159C, MAKEWPARAM(CurrentPid(), file.GetSize32()), (LPARAM)file.GetBuffer());
+
+            return 0;
+        },
+        (ULONG_PTR)hwnd, 0
+    );
+
+    PauseConsole();
 
     return;
 
