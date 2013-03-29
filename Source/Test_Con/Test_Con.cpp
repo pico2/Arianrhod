@@ -563,42 +563,13 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
-HFONT ChangeFontCharsetForFont(HFONT Font)
-{
-    LOGFONTW LogFont;
-
-    if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
-        return NULL;
-
-    LogFont.lfCharSet = GB2312_CHARSET;
-    Font = CreateFontIndirectW(&LogFont);
-
-    return Font;
-}
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    HWND hwnd = FindWindowW(L"#32770", L"¶àÍæÓ¢ÐÛÁªÃËºÐ×Ó");
+    HFONT fnt = CreateFontW(INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, (PWSTR)main2);
 
-    EnumDirectoryFiles(NULL, L"*.*", 0, L"C:\\lelog", NULL, 
-        [] (PVOID, PWIN32_FIND_DATAW fd, ULONG_PTR wnd) -> LONG_PTR
-        {
-            Ps::Sleep(50);
-            PrintConsoleW(L"%s\n", fd->cFileName);
-            // PauseConsole();
+    LOGFONTW lf;
 
-            NtFileMemory file;
-
-            file.Open(fd->cFileName);
-
-            SendMessageW((HWND)wnd, 0x159C, MAKEWPARAM(CurrentPid(), file.GetSize32()), (LPARAM)file.GetBuffer());
-
-            return 0;
-        },
-        (ULONG_PTR)hwnd, 0
-    );
-
-    PauseConsole();
+    GetObjectW(fnt, sizeof(lf), &lf);
 
     return;
 
