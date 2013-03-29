@@ -191,17 +191,29 @@ EXTC LRESULT NTAPI LbSendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
     return Result;
 }
 
-#pragma comment(linker, "/EXPORT:SendMessageW=_LbSendMessageW@16")
-#pragma comment(linker, "/EXPORT:FindWindowA=USER32.FindWindowA")
-#pragma comment(linker, "/EXPORT:CallWindowProcW=USER32.CallWindowProcW")
-#pragma comment(linker, "/EXPORT:SetWindowLongW=USER32.SetWindowLongW")
-#pragma comment(linker, "/EXPORT:FindWindowW=USER32.FindWindowW")
-#pragma comment(linker, "/EXPORT:PostMessageW=USER32.PostMessageW")
-#pragma comment(linker, "/EXPORT:RegisterWindowMessageA=USER32.RegisterWindowMessageA")
+#pragma comment(linker, "/EXPORT:__TrackMouseEvent=COMCTL32._TrackMouseEvent")
+
+HFONT NTAPI gCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement, _In_ int cOrientation, _In_ int cWeight, _In_ DWORD bItalic, _In_ DWORD bUnderline, _In_ DWORD bStrikeOut, _In_ DWORD iCharSet, _In_ DWORD iOutPrecision, _In_ DWORD iClipPrecision, _In_ DWORD iQuality, _In_ DWORD iPitchAndFamily, _In_opt_ LPCWSTR pszFaceName)
+{
+/*
+    cHeight -= 28;
+    if (cHeight <= 0)
+        cHeight = 8;
+*/
+    return CreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, L"ºÚÌå");
+}
 
 BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
+
+    MEMORY_PATCH p[] =
+    {
+        PATCH_MEMORY(gCreateFontW, 4, 0x166044),
+        PATCH_MEMORY(0x75FF0E, 4, 0x78744),
+    };
+
+    Nt_PatchMemory(p, countof(p), 0, 0, GetExeModuleHandle());
 
     return TRUE;
 }
