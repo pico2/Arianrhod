@@ -565,12 +565,6 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    HFONT fnt = CreateFontW(INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, (PWSTR)main2);
-
-    LOGFONTW lf;
-
-    GetObjectW(fnt, sizeof(lf), &lf);
-
     return;
 
     ULONG_PTR param[5];

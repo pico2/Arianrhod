@@ -1,4 +1,5 @@
 from syslib import *
+from misc import *
 # from FileStream import *
 
 def TryInvoke(method, values = None):
