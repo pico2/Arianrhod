@@ -131,9 +131,6 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
     SelectObject(NewDC, Font);
     DeleteObject(Font);
 
-    if (GdiGetCodePage != NULL)
-        GdiGetCodePage(NewDC);
-
     return NewDC;
 }
 
