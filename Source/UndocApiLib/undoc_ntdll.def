@@ -26,3 +26,4 @@ EXPORTS
     LdrRegisterDllNotification
     LdrUnregisterDllNotification
     NtInitializeNlsFiles
+    _vscwprintf

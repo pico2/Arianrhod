@@ -1,9 +1,17 @@
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
 
-#include "NativeApi.h"
+#include "MyLibrary.h"
 
 _MY_C_HEAD_
+
+int __cdecl _vscwprintf (
+        const wchar_t *format,
+        va_list ap
+        )
+{
+    return 0;
+}
 
 NTSTATUS
 NTAPI
@@ -123,7 +131,7 @@ ULONG NTAPI RtlRemoveVectoredContinueHandler(IN PVOID Handler)
     return 0;
 }
 
-ULONG NTAPI NtGetTickCount()
+ULONG64 NTAPI NtGetTickCount()
 {
     return 0;
 }

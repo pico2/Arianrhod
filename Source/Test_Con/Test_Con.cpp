@@ -565,6 +565,7 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    GetFormatedSize(L"%wZ", &WCS2US(L"FUCK"));
     return;
 
     ULONG_PTR param[5];

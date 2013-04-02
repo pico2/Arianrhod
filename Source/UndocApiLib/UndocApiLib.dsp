@@ -540,6 +540,23 @@ SOURCE=.\ucidec.def
 # Begin Source File
 
 SOURCE=.\undoc_user32.cpp
+
+!IF  "$(CFG)" == "UndocApiLib - Win32 ntdll"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "UndocApiLib - Win32 apphelp"
+
+!ELSEIF  "$(CFG)" == "UndocApiLib - Win32 ws2_32"
+
+!ELSEIF  "$(CFG)" == "UndocApiLib - Win32 zlib"
+
+!ELSEIF  "$(CFG)" == "UndocApiLib - Win32 ucidec"
+
+!ELSEIF  "$(CFG)" == "UndocApiLib - Win32 user32"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
