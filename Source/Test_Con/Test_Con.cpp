@@ -563,9 +563,44 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
+LONG_PTR NTAPI GetWindowProcCrossProcessA(HWND hWnd, ULONG Index)
+{
+    ULONG       Pid, Tid;
+    CLIENT_ID   OriginalCid;
+    PTEB_BASE   Teb;
+    WNDPROC     WndProc;
+
+    TYPE_OF(GetWindowLongPtrW)* GetWindowLongRoutine;
+
+    Tid = GetWindowThreadProcessId(hWnd, &Pid);
+    if (Tid == 0)
+        return 0;
+
+    Teb = CurrentTeb();
+
+    OriginalCid = Teb->ClientId;
+    Teb->ClientId.UniqueThread = (HANDLE)Tid;
+    Teb->ClientId.UniqueProcess = (HANDLE)Pid;
+
+    GetWindowLongRoutine = IsWindowUnicode(hWnd) ? GetWindowLongPtrW : GetWindowLongPtrA;
+
+    WndProc = (WNDPROC)GetWindowLongRoutine(hWnd, Index);
+
+    Teb->ClientId = OriginalCid;
+
+    return (LONG_PTR)WndProc;
+}
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    GetFormatedSize(L"%wZ", &WCS2US(L"FUCK"));
+    HWND hwnd = FindWindowW(NULL, L"QQKart_INSTALL_MONITOR_WINDOW");
+
+    GetWindowProcCrossProcessA(hwnd, GWL_WNDPROC);
+
+    ULONG pid;
+    GetWindowThreadProcessId(hwnd, &pid);
+    PidToHandle(pid);
+
     return;
 
     ULONG_PTR param[5];
