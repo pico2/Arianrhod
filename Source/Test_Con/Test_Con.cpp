@@ -593,13 +593,9 @@ LONG_PTR NTAPI GetWindowProcCrossProcessA(HWND hWnd, ULONG Index)
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    HWND hwnd = FindWindowW(NULL, L"QQKart_INSTALL_MONITOR_WINDOW");
+    auto x = [&] () { NtClose((HANDLE)argc); };
 
-    GetWindowProcCrossProcessA(hwnd, GWL_WNDPROC);
-
-    ULONG pid;
-    GetWindowThreadProcessId(hwnd, &pid);
-    PidToHandle(pid);
+    LambdaWrapper<TYPE_OF(x)> lw(x);
 
     return;
 
