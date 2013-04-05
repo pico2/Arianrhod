@@ -7,6 +7,12 @@ class Register:
     def reg(self):
         return self._reg
 
+    def __int__(self):
+        return self._reg
+
+    def __eq__(self, y):
+        return y == self._reg
+
     def astr(self):
         return imm.readString(self._reg)
 
@@ -33,6 +39,39 @@ class Register:
         byte = imm.readMemory(self._reg, 1)
         return ord(byte)
 
+
+def astr(addr):
+    addr = int(addr)
+    return Register(imm.readString(addr))
+
+def wstr(addr):
+    addr = int(addr)
+    return Register(imm.readWString(addr))
+
+def u64(addr):
+    addr = int(addr)
+    _u64 = imm.readMemory(addr, 8)
+    if len(_u64) == 8:
+        try:
+            return Register(immutils.str2int64_swapped(_u64))
+        except ValueError:
+            raise Exception, "failed to gather a u64 at 0x%08x" % addr
+    else:
+        raise Exception, "failed to gather a u64 at 0x%08x" % addr
+
+def u32(addr):
+    addr = int(addr)
+    return Register(imm.readLong(addr))
+
+def u16(addr):
+    addr = int(addr)
+    return Register(imm.readShort(addr))
+
+def u8(addr):
+    addr = int(addr)
+    byte = imm.readMemory(addr, 1)
+    return Register(ord(byte))
+
 class BpCondition(LogBpHook):
     def __init__(self, addr, cond):
         LogBpHook.__init__(self)
@@ -51,7 +90,11 @@ class BpCondition(LogBpHook):
         edi = Register(regs['EDI'])
         eip = Register(regs['EIP'])
 
-        result = eval(self.condvm)
+        try:
+            result = eval(self.condvm)
+        except:
+            result = False
+
         imm.log('%s: result = %s' % (self.cond, result))
         imm.log('%X' % eax.u32())
 

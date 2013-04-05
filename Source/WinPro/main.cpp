@@ -151,6 +151,16 @@ protected:
     AntiDebug2  m_ad;
 
 public:
+    Dialog()
+    {
+        CoInitialize(NULL);
+    }
+
+    ~Dialog()
+    {
+        CoUninitialize();
+    }
+
     BOOL OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
     {
         UNREFERENCED_PARAMETER(hWnd);
@@ -171,6 +181,10 @@ public:
 
         m_Edit = GetDlgItem(IDC_EDIT);
         Edit_LimitText(m_Edit, 200);
+
+        //PVOID Shell32 = LoadDll(L"SHELL32.dll");
+        //SendMessageW(m_Edit, EM_SETWORDBREAKPROC, 0, (LPARAM)Shell32 + 0x03CE5E4);
+        SHAutoComplete(m_Edit, SHACF_DEFAULT);
 
         return TRUE;
     }

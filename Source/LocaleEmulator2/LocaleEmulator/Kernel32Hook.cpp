@@ -19,19 +19,19 @@ PVOID LeGetGetCurrentNlsCache()
 
 NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
 {
-    PVOID KernelBase, GetUserDefaultLCID, GetCurrentNlsCache;
+    PVOID KernelBase, GetUserDefaultLocaleName, GetCurrentNlsCache;
 
     WriteLog(L"hook k32");
 
     KernelBase = FindLdrModuleByName(&WCS2US(L"KERNELBASE.dll"))->DllBase;
 
-    GetUserDefaultLCID = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLCID);
-    if (GetUserDefaultLCID == NULL)
+    GetUserDefaultLocaleName = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLocaleName);
+    if (GetUserDefaultLocaleName == NULL)
         return STATUS_NOT_FOUND;
 
     GetCurrentNlsCache = NULL;
 
-    WalkOpCodeT(GetUserDefaultLCID, 0x10,
+    WalkOpCodeT(GetUserDefaultLocaleName, 0x30,
         WalkOpCodeM(Buffer, OpLength, Ret)
         {
             switch (Buffer[0])

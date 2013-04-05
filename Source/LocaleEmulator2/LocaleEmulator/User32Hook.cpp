@@ -1404,6 +1404,11 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
     if (NtUserDefSetText == NULL)
         return STATUS_NOT_FOUND;
 
+    HDC DC;
+    DC = ::GetDC(NULL);
+    GetLePeb()->OriginalCharset = GetTextCharset(DC);
+    ReleaseDC(NULL, DC);
+
     HookRoutineData.User32.DefWindowProcA = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcA);
     HookRoutineData.User32.DefWindowProcW = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcW);
 

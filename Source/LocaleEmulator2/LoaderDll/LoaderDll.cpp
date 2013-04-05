@@ -65,7 +65,7 @@ LeCreateProcess(
         LePeb = OpenOrCreateLePeb(ProcessInfo.dwProcessId, TRUE);
         if (LePeb == NULL)
         {
-            Status = STATUS_UNSUCCESSFUL;
+            Status = STATUS_NONE_MAPPED;
             break;
         }
 

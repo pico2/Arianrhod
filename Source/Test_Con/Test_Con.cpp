@@ -593,9 +593,21 @@ LONG_PTR NTAPI GetWindowProcCrossProcessA(HWND hWnd, ULONG Index)
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    auto x = [&] () { NtClose((HANDLE)argc); };
+    LOGFONTW lf;
 
-    LambdaWrapper<TYPE_OF(x)> lw(x);
+    ZeroMemory(&lf, sizeof(lf));
+    lf.lfCharSet = 0;
+
+    EnumFontFamiliesExW(GetDC(NULL), &lf, 
+        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
+        {
+            LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)lf;
+            PrintConsoleA("%X, %S\n", lf->lfCharSet, elf->elfFullName);
+            PauseConsole();
+            return TRUE;
+        },
+        0, 0
+    );
 
     return;
 
