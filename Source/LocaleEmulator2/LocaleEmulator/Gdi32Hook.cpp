@@ -146,6 +146,40 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
     return NewDC;
 }
 
+template
+<
+    typename ElfLogFontType,
+    typename TextMetricType,
+    typename CallbackType
+>
+BOOL
+NTAPI
+EnumFontFamiliesCallback(
+    ElfLogFontType*         ElfLogFont,
+    TextMetricType*         TextMetric,
+    ULONG                   FontType,
+    PGDI_ENUM_FONT_PARAM    EnumParam
+)
+{
+    if (ElfLogFont->elfLogFont.lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+    {
+        ElfLogFont->elfLogFont.lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
+
+        switch (sizeof(ElfLogFont->elfScript[0]))
+        {
+            case sizeof(CHAR):
+                CopyStruct(ElfLogFont->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameA, sizeof(ElfLogFont->elfScript));
+                break;
+
+            case sizeof(WCHAR):
+                CopyStruct(ElfLogFont->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameW, sizeof(ElfLogFont->elfScript));
+                break;
+        }
+    }
+
+    return ((CallbackType)EnumParam->Callback)(&ElfLogFont->elfLogFont, TextMetric, FontType, EnumParam->lParam);
+}
+
 int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam, DWORD dwFlags)
 {
     ULONG_PTR           Charset;
@@ -170,21 +204,7 @@ int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpP
                 Param.lParam        = lParam;
 
                 lParam = (LPARAM)&Param;
-                lpProc = [] (CONST LOGFONTA *LogFont, CONST TEXTMETRICA *TextMetric, DWORD FontType, LPARAM Param)
-                        {
-                            PGDI_ENUM_FONT_PARAM EnumParam;
-                            LPENUMLOGFONTEXA elf = (LPENUMLOGFONTEXA)LogFont;
-
-                            EnumParam = (PGDI_ENUM_FONT_PARAM)Param;
-
-                            if (LogFont->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
-                            {
-                                *(PBYTE)&LogFont->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
-                                CopyStruct(elf->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameA, sizeof(elf->elfScript));
-                            }
-
-                            return ((FONTENUMPROCA)EnumParam->Callback)(LogFont, TextMetric, FontType, Param);
-                        };
+                lpProc = (FONTENUMPROCA)EnumFontFamiliesCallback<ENUMLOGFONTEXA, TEXTMETRICA, FONTENUMPROCA>;
                 break;
         }
     }
@@ -216,21 +236,7 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
                 Param.lParam        = lParam;
 
                 lParam = (LPARAM)&Param;
-                lpProc = [] (CONST LOGFONTW *LogFont, CONST TEXTMETRICW *TextMetric, DWORD FontType, LPARAM Param)
-                        {
-                            PGDI_ENUM_FONT_PARAM EnumParam;
-                            LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)LogFont;
-
-                            EnumParam = (PGDI_ENUM_FONT_PARAM)Param;
-
-                            if (LogFont->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
-                            {
-                                *(PBYTE)&LogFont->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
-                                CopyStruct(elf->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameW, sizeof(elf->elfScript));
-                            }
-
-                            return ((FONTENUMPROCW)EnumParam->Callback)(LogFont, TextMetric, FontType, Param);
-                        };
+                lpProc = (FONTENUMPROCW)EnumFontFamiliesCallback<ENUMLOGFONTEXW, TEXTMETRICW, FONTENUMPROCW>;
                 break;
         }
     }

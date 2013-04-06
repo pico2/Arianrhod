@@ -596,13 +596,13 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     LOGFONTW lf;
 
     ZeroMemory(&lf, sizeof(lf));
-    lf.lfCharSet = 0;
+    lf.lfCharSet = 1;
 
     EnumFontFamiliesExW(GetDC(NULL), &lf, 
         [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
         {
             LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)lf;
-            PrintConsoleA("%X, %S\n", lf->lfCharSet, elf->elfScript);
+            PrintConsoleA("%X, %S, %S\n", lf->lfCharSet, lf->lfFaceName, elf->elfScript);
             //PauseConsole();
             Ps::Sleep(50);
             return TRUE;
