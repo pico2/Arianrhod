@@ -602,8 +602,9 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
         {
             LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)lf;
-            PrintConsoleA("%X, %S\n", lf->lfCharSet, elf->elfFullName);
-            PauseConsole();
+            PrintConsoleA("%X, %S\n", lf->lfCharSet, elf->elfScript);
+            //PauseConsole();
+            Ps::Sleep(50);
             return TRUE;
         },
         0, 0

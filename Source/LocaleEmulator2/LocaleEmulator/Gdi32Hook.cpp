@@ -165,19 +165,23 @@ int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpP
                 break;
 
             case DEFAULT_CHARSET:
-                Param.Callback = lpProc;
-                Param.GlobalData = GlobalData;
-                Param.lParam = lParam;
-                lParam = (LPARAM)&Param;
+                Param.Callback      = lpProc;
+                Param.GlobalData    = GlobalData;
+                Param.lParam        = lParam;
 
+                lParam = (LPARAM)&Param;
                 lpProc = [] (CONST LOGFONTA *LogFont, CONST TEXTMETRICA *TextMetric, DWORD FontType, LPARAM Param)
                         {
                             PGDI_ENUM_FONT_PARAM EnumParam;
+                            LPENUMLOGFONTEXA elf = (LPENUMLOGFONTEXA)LogFont;
 
                             EnumParam = (PGDI_ENUM_FONT_PARAM)Param;
 
                             if (LogFont->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+                            {
                                 *(PBYTE)&LogFont->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
+                                CopyStruct(elf->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameA, sizeof(elf->elfScript));
+                            }
 
                             return ((FONTENUMPROCA)EnumParam->Callback)(LogFont, TextMetric, FontType, Param);
                         };
@@ -207,19 +211,23 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
                 break;
 
             case DEFAULT_CHARSET:
-                Param.Callback = lpProc;
-                Param.GlobalData = GlobalData;
-                Param.lParam = lParam;
-                lParam = (LPARAM)&Param;
+                Param.Callback      = lpProc;
+                Param.GlobalData    = GlobalData;
+                Param.lParam        = lParam;
 
+                lParam = (LPARAM)&Param;
                 lpProc = [] (CONST LOGFONTW *LogFont, CONST TEXTMETRICW *TextMetric, DWORD FontType, LPARAM Param)
                         {
                             PGDI_ENUM_FONT_PARAM EnumParam;
+                            LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)LogFont;
 
                             EnumParam = (PGDI_ENUM_FONT_PARAM)Param;
 
                             if (LogFont->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+                            {
                                 *(PBYTE)&LogFont->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
+                                CopyStruct(elf->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameW, sizeof(elf->elfScript));
+                            }
 
                             return ((FONTENUMPROCW)EnumParam->Callback)(LogFont, TextMetric, FontType, Param);
                         };
@@ -332,6 +340,11 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
     // *(PVOID *)&GdiGetCodePage = GetRoutineAddress(Gdi32, "GdiGetCodePage");
 
     RtlInitializeCriticalSectionAndSpinCount(&HookRoutineData.Gdi32.GdiLock, 4000);
+
+    if (HookStub.StubNtUserCreateWindowEx != NULL)
+    {
+        InitFontCharsetInfo();
+    }
 
     MEMORY_FUNCTION_PATCH f[] =
     {

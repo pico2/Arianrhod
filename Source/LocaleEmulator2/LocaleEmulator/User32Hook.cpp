@@ -1055,7 +1055,7 @@ PVOID FindNtUserMessageCall(PVOID User32)
             {
                 case CALL:
                     Buffer = GetCallDestination(Buffer);
-                    if (Buffer[0] != 0xB8)
+                    if (!IsSystemCall(Buffer))
                         break;
 
                     Ret = Buffer;
@@ -1119,7 +1119,7 @@ PVOID FindNtUserMessageCall2(PVOID User32)
                             SEH_TRY
                             {
                                 Buffer = GetCallDestination(Buffer);
-                                if (Buffer[0] != 0xB8)
+                                if (!IsSystemCall(Buffer))
                                     break;
                             }
                             SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
@@ -1178,7 +1178,7 @@ PVOID FindNtUserCreateWindowEx(PVOID User32)
                     {
                         case 0xE8:
                             Buffer = GetCallDestination(Buffer);
-                            if (Buffer[0] != 0xB8)
+                            if (!IsSystemCall(Buffer))
                                 break;
 
                             NtUserCreateWindowEx = Buffer;
@@ -1305,7 +1305,7 @@ PVOID FindNtUserDefSetText(PVOID User32)
             {
                 case CALL:
                     Buffer = GetCallDestination(Buffer);
-                    if (Buffer[0] != 0xB8)
+                    if (!IsSystemCall(Buffer))
                         break;
 
                     NtUserDefSetText = Buffer;
@@ -1404,10 +1404,10 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
     if (NtUserDefSetText == NULL)
         return STATUS_NOT_FOUND;
 
-    HDC DC;
-    DC = ::GetDC(NULL);
-    GetLePeb()->OriginalCharset = GetTextCharset(DC);
-    ReleaseDC(NULL, DC);
+    if (HookStub.StubEnumFontFamiliesExW != NULL)
+    {
+        InitFontCharsetInfo();
+    }
 
     HookRoutineData.User32.DefWindowProcA = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcA);
     HookRoutineData.User32.DefWindowProcW = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcW);

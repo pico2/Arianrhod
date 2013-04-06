@@ -77,4 +77,9 @@ CaptureAnsiWindowName(
     PLARGE_UNICODE_STRING UnicodeWindowName
 );
 
+BOOL
+IsSystemCall(
+    PVOID Routine
+);
+
 #endif // _RUNTIME_H_c7568f49_2cb3_4dbb_8cd3_a913c77cddcc_

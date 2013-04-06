@@ -226,3 +226,22 @@ PLARGE_UNICODE_STRING CaptureAnsiWindowName(PLARGE_UNICODE_STRING WindowName, PL
 
     return LargeStringAnsiToUnicode(WindowName, UnicodeWindowName);
 }
+
+BOOL IsSystemCall(PVOID Routine)
+{
+    PBYTE Buffer;
+
+    Buffer = (PBYTE)Routine;
+
+    if (Buffer[0] == 0xB8)
+        return TRUE;
+
+    for (ULONG_PTR Count = 1; Count != 0; --Count)
+    {
+        Buffer += GetOpCodeSize(Buffer);
+        if (Buffer[0] == 0xB8)
+            return TRUE;
+    }
+
+    return FALSE;
+}

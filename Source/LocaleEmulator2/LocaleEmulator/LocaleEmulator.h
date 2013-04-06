@@ -36,6 +36,8 @@ typedef struct
 {
     LEB         Leb;
     ULONG_PTR   OriginalCharset;
+    CHAR        ScriptNameA[LF_FACESIZE];
+    WCHAR       ScriptNameW[LF_FACESIZE];
 
     HANDLE      Section;
     PVOID       LdrLoadDllAddress;
@@ -321,6 +323,40 @@ public:
     PLEB GetLeb()
     {
         return &LePeb.Leb;
+    }
+
+    VOID InitFontCharsetInfo()
+    {
+        HDC DC;
+        LOGFONTW lf;
+
+        DC = HookStub.StubGetDC == NULL ? ::GetDC(NULL) : GetDC(NULL);
+        GetLePeb()->OriginalCharset = GetTextCharset(DC);
+
+        lf.lfCharSet = GetLeb()->DefaultCharset;
+        lf.lfFaceName[0] = 0;
+
+        auto EnumFontCallback = [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM Param)
+            {
+                LeGlobalData *GlobalData = (LeGlobalData *)Param;
+                LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)lf;
+
+                CopyStruct(GlobalData->GetLePeb()->ScriptNameW, elf->elfScript, sizeof(elf->elfScript));
+                UnicodeToAnsi(GlobalData->GetLePeb()->ScriptNameA, countof(GlobalData->GetLePeb()->ScriptNameA), GlobalData->GetLePeb()->ScriptNameW);
+
+                return FALSE;
+            };
+
+        if (HookStub.StubEnumFontFamiliesExW == NULL)
+        {
+            ::EnumFontFamiliesExW(DC, &lf, EnumFontCallback, (LPARAM)this, 0);
+        }
+        else
+        {
+            EnumFontFamiliesExW(DC, &lf, EnumFontCallback, (LPARAM)this, 0);
+        }
+
+        ReleaseDC(NULL, DC);
     }
 
     NTSTATUS Initialize();
