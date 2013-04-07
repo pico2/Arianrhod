@@ -95,8 +95,9 @@ ForceInline Void main2(Int argc, WChar **argv)
         mask[Ordinal] = true;
 
         //Buffer += sprintf(Buffer, "    %s @%d NONAME\n", PtrAdd(*AddressOfNames, PeBuffer), Ordinal + 1);
-        Buffer += sprintf(Buffer, "    %s = winsta_shadow.%s\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
+        //Buffer += sprintf(Buffer, "    %s = zlib2.%s\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
         // Buffer += sprintf(Buffer, "    VOID %s() {}\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
+        Buffer += sprintf(Buffer, "#pragma comment(linker, \"/EXPORT:%s=zlib2.%s\")\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
 
 #else
 
@@ -132,5 +133,5 @@ int __cdecl main(LongPtr argc, wchar_t **argv)
     getargsW(&argc, &argv);
     main2(argc, argv);
     ReleaseArgv(argv);
-    return Nt_ExitProcess(0);
+    Nt_ExitProcess(0);
 }
