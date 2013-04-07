@@ -178,8 +178,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         Nt_PatchMemory(NULL, 0, f, countof(f));
 
-        Ps::CreateThreadT(
-            [](ULONG) -> ULONG
+        Ps::CreateThread(
+            (PTHREAD_START_ROUTINE)([](PVOID) -> ULONG
             {
                 LARGE_INTEGER   Interval;
                 SOCKADDR_IN     Address;
@@ -216,14 +216,14 @@ BOOL Initialize(PVOID BaseAddress)
                             closesocket(Sock);
                         };
 
-                while (!Exiting)
+                do
                 {
-                    NtDelayExecution(FALSE, &Interval);
                     SendAlivePacket();
-                }
+                    NtDelayExecution(FALSE, &Interval);
+                } while (!Exiting);
 
                 return 0;
-            },
+            }),
             0
         );
     }
