@@ -211,7 +211,7 @@ BOOL Initialize(PVOID BaseAddress)
                             ++GlobalPacket.Index;
                             sendto(Sock, (PCHAR)&GlobalPacket, SendLength, 0, (PSOCKADDR)&Address, sizeof(Address));
 
-                            Thunk.Pop();
+                            //Thunk.Pop();
 
                             closesocket(Sock);
                         };
