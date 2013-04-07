@@ -563,79 +563,9 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
-LONG_PTR NTAPI GetWindowProcCrossProcessA(HWND hWnd, ULONG Index)
-{
-    ULONG       Pid, Tid;
-    CLIENT_ID   OriginalCid;
-    PTEB_BASE   Teb;
-    WNDPROC     WndProc;
-
-    TYPE_OF(GetWindowLongPtrW)* GetWindowLongRoutine;
-
-    Tid = GetWindowThreadProcessId(hWnd, &Pid);
-    if (Tid == 0)
-        return 0;
-
-    Teb = CurrentTeb();
-
-    OriginalCid = Teb->ClientId;
-    Teb->ClientId.UniqueThread = (HANDLE)Tid;
-    Teb->ClientId.UniqueProcess = (HANDLE)Pid;
-
-    GetWindowLongRoutine = IsWindowUnicode(hWnd) ? GetWindowLongPtrW : GetWindowLongPtrA;
-
-    WndProc = (WNDPROC)GetWindowLongRoutine(hWnd, Index);
-
-    Teb->ClientId = OriginalCid;
-
-    return (LONG_PTR)WndProc;
-}
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    LOGFONTW lf;
-
-    ZeroMemory(&lf, sizeof(lf));
-    lf.lfCharSet = 1;
-
-    EnumFontFamiliesExW(GetDC(NULL), &lf, 
-        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
-        {
-            LPENUMLOGFONTEXW elf = (LPENUMLOGFONTEXW)lf;
-            PrintConsoleA("%X, %S, %S\n", lf->lfCharSet, lf->lfFaceName, elf->elfScript);
-            //PauseConsole();
-            Ps::Sleep(50);
-            return TRUE;
-        },
-        0, 0
-    );
-
-    return;
-
-    ULONG_PTR param[5];
-
-    param[0] = (ULONG_PTR)RtlExitUserThread;
-    param[1] = NULL;
-    param[2] = NULL;
-    param[3] = (ULONG_PTR)&GetNtdllLdrModule()->FullDllName;
-    param[4] = (ULONG_PTR)&param[4];
-
-    HANDLE Thread;
-
-    CreateThread(PTHREAD_START_ROUTINE(
-        [] (PVOID) -> ULONG
-        {
-            return 0;
-        }),
-        NULL,
-        TRUE,
-        CurrentProcess,
-        &Thread
-    );
-
-    RtlRemoteCall(CurrentProcess, Thread, LdrLoadDll, countof(param), param, FALSE, TRUE);
-    NtResumeThread(Thread, NULL);
-    NtClose(Thread);
+    *(volatile int *)&argc = IOCTL_AFD_SEND_DATAGRAM;
 
     return;
 
