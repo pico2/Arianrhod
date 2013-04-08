@@ -10,8 +10,29 @@ class Register:
     def __int__(self):
         return self._reg
 
+    def __float__(self):
+        return float(self._reg)
+
+    def __hex__(self):
+        return '%X' % self._reg
+
     def __eq__(self, y):
+        if type(y) == str:
+            return y == self.astr()
+
         return y == self._reg
+
+    def __add__(self, y):
+        return Register(self._reg + y)
+
+    def __sub__(self, y):
+        return Register(self._reg - y)
+
+    def __mul__(self, y):
+        return Register(self._reg * y)
+
+    def __truediv__(self, y):
+        return Register(self._reg / y)
 
     def astr(self):
         return imm.readString(self._reg)
@@ -23,30 +44,30 @@ class Register:
         _u64 = imm.readMemory(self._reg, 8)
         if len(_u64) == 8:
             try:
-                return immutils.str2int64_swapped(_u64) 
+                return Register(immutils.str2int64_swapped(_u64) )
             except ValueError:
                 raise Exception, "failed to gather a _u64 at 0x%08x" % self._reg
         else:
             raise Exception, "failed to gather a _u64 at 0x%08x" % self._reg
 
     def u32(self):
-        return imm.readLong(self._reg)
+        return Register(imm.readLong(self._reg))
 
     def u16(self):
-        return imm.readShort(self._reg)
+        return Register(imm.readShort(self._reg))
 
     def u8(self):
         byte = imm.readMemory(self._reg, 1)
-        return ord(byte)
+        return Register(ord(byte))
 
 
 def astr(addr):
     addr = int(addr)
-    return Register(imm.readString(addr))
+    return imm.readString(addr)
 
 def wstr(addr):
     addr = int(addr)
-    return Register(imm.readWString(addr))
+    return imm.readWString(addr)
 
 def u64(addr):
     addr = int(addr)
@@ -72,6 +93,7 @@ def u8(addr):
     byte = imm.readMemory(addr, 1)
     return Register(ord(byte))
 
+
 class BpCondition(LogBpHook):
     def __init__(self, addr, cond):
         LogBpHook.__init__(self)
@@ -95,13 +117,13 @@ class BpCondition(LogBpHook):
         except:
             result = False
 
-        imm.log('%s: result = %s' % (self.cond, result))
-        imm.log('%X' % eax.u32())
+        imm.log('%s: %s' % (self.cond, result))
+        #imm.log('%s' % (esp+8).u32().astr())
 
         if result == False:
             return
 
-        imm.log('%08X, %08X' % (self.addr, eip.reg()))
+        #imm.log('%08X, %08X' % (self.addr, eip.reg()))
         imm.setTemporaryBreakpoint(self.addr)
 
 def main(args):
@@ -122,6 +144,6 @@ def main(args):
 
     bpc = BpCondition(addr, args[1])
     imm.log('addr = %08X, cond = %s' % (addr, args[1]))
-    bpc.add2('condition bp at %08X' % addr, addr)
+    bpc.add2('condition bp at %08X' % addr, addr, replace = True)
 
     return ''

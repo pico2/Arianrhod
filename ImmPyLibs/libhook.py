@@ -388,7 +388,7 @@ class BpHook(Hook):
             self.UnHook2(desc)
         self.descdict.clear()
 
-    def add2(self, description, address = 0, replace = False):
+    def add2(self, description, address = 0, replace = True):
 
         if self.type == HookTypes["ORDINARY_BP_HOOK"]:
             debugger.set_breakpoint(address,0x200L,"")
