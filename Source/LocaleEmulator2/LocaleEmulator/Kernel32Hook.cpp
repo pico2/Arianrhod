@@ -25,7 +25,7 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
 
     KernelBase = FindLdrModuleByName(&WCS2US(L"KERNELBASE.dll"))->DllBase;
 
-    GetUserDefaultLocaleName = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLocaleName);
+    GetUserDefaultLocaleName = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLCID);
     if (GetUserDefaultLocaleName == NULL)
         return STATUS_NOT_FOUND;
 

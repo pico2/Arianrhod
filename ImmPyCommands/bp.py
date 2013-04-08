@@ -2,7 +2,7 @@ from immdbg import *
 
 class Register:
     def __init__(self, reg):
-        self._reg = reg
+        self._reg = int(reg)
 
     def reg(self):
         return self._reg
@@ -34,6 +34,9 @@ class Register:
     def __truediv__(self, y):
         return Register(self._reg / y)
 
+    def buf(self, size):
+        return imm.readMemory(self._reg, int(size))
+
     def astr(self):
         return imm.readString(self._reg)
 
@@ -44,11 +47,11 @@ class Register:
         _u64 = imm.readMemory(self._reg, 8)
         if len(_u64) == 8:
             try:
-                return Register(immutils.str2int64_swapped(_u64) )
+                return Register(immutils.str2int64_swapped(_u64))
             except ValueError:
-                raise Exception, "failed to gather a _u64 at 0x%08x" % self._reg
+                raise Exception, "failed to gather a u64 at 0x%08x" % self._reg
         else:
-            raise Exception, "failed to gather a _u64 at 0x%08x" % self._reg
+            raise Exception, "failed to gather a u64 at 0x%08x" % self._reg
 
     def u32(self):
         return Register(imm.readLong(self._reg))
@@ -60,6 +63,8 @@ class Register:
         byte = imm.readMemory(self._reg, 1)
         return Register(ord(byte))
 
+def buf(addr, size):
+    return imm.readMemory(int(addr), int(size))
 
 def astr(addr):
     addr = int(addr)
@@ -95,13 +100,40 @@ def u8(addr):
 
 
 class BpCondition(LogBpHook):
-    def __init__(self, addr, cond):
+    def __init__(self, addr, args):
         LogBpHook.__init__(self)
-        self.cond   = cond
-        self.condvm = compile(cond, '', 'eval')
-        self.addr   = addr
+        self.addr = addr
 
-    def run(self, regs):
+        if args[0][0] == '#':
+            self.run = self.run_pyfile
+            self.pyfile = args[0][1:]
+
+            pypath = os.path.dirname(self.pyfile)
+            self.pyfile = os.path.basename(self.pyfile)
+            name, ext = os.path.splitext(self.pyfile)
+            if ext.lower() == '.py':
+                self.pyfile = name
+
+            if pypath != '':
+                sys.path.insert(0, pypath)
+
+            try:
+                self.mod = __import__(self.pyfile, globals=globals())
+            except Exception as e:
+                if pypath != '':
+                    del sys.path[0]
+
+                raise e
+
+            if pypath != '':
+                del sys.path[0]
+
+        else:
+            self.run = self.run_expression
+            self.cond   = args[0]
+            self.condvm = compile(self.cond, '', 'eval')
+
+    def run_expression(self, regs):
         eax = Register(regs['EAX'])
         ecx = Register(regs['ECX'])
         edx = Register(regs['EDX'])
@@ -114,16 +146,38 @@ class BpCondition(LogBpHook):
 
         try:
             result = eval(self.condvm)
-        except:
+        except Exception as e:
+            imm.log(e)
             result = False
 
         imm.log('%s: %s' % (self.cond, result))
-        #imm.log('%s' % (esp+8).u32().astr())
 
-        if result == False:
+        if result != True:
             return
 
         #imm.log('%08X, %08X' % (self.addr, eip.reg()))
+        imm.setTemporaryBreakpoint(self.addr)
+
+    def run_pyfile(self, regs):
+        try:
+            _regs = {}
+            _regs['EAX'] = Register(regs['EAX'])
+            _regs['ECX'] = Register(regs['ECX'])
+            _regs['EDX'] = Register(regs['EDX'])
+            _regs['EBX'] = Register(regs['EBX'])
+            _regs['ESP'] = Register(regs['ESP'])
+            _regs['EBP'] = Register(regs['EBP'])
+            _regs['ESI'] = Register(regs['ESI'])
+            _regs['EDI'] = Register(regs['EDI'])
+            _regs['EIP'] = Register(regs['EIP'])
+            result = self.mod.main(_regs)
+        except Exception as e:
+            imm.log(e)
+            result = False
+
+        if result != True:
+            return
+
         imm.setTemporaryBreakpoint(self.addr)
 
 def main(args):
@@ -142,7 +196,7 @@ def main(args):
         imm.setBreakpoint(addr)
         return ''
 
-    bpc = BpCondition(addr, args[1])
+    bpc = BpCondition(addr, args[1:])
     imm.log('addr = %08X, cond = %s' % (addr, args[1]))
     bpc.add2('condition bp at %08X' % addr, addr, replace = True)
 
