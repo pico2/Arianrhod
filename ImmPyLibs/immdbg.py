@@ -1,6 +1,6 @@
 import pefile
 import debugger
-import os, sys, struct
+import os, sys, struct, traceback
 import immutils
 from immlib2 import *
 from libhook import *
@@ -19,3 +19,11 @@ def gbk(text):
 
 def sjis(text):
     return text.decode('932') if not is_unicode(text) else text
+
+def FormatException(e = None):
+    return traceback.format_exception(*sys.exc_info())
+
+def PrintException(e = None):
+    excinfo = FormatException(e)
+    for line in excinfo:
+        imm.log(line)

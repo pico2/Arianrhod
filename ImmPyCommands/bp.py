@@ -95,33 +95,60 @@ class BpCondition(LogBpHook):
         self.addr = addr
 
         if args[0][0] == '#':
-            self.run = self.run_pyfile
-            self.pyfile = args[0][1:]
-
-            pypath = os.path.dirname(self.pyfile)
-            self.pyfile = os.path.basename(self.pyfile)
-            name, ext = os.path.splitext(self.pyfile)
-            if ext.lower() == '.py':
-                self.pyfile = name
-
-            if pypath != '':
-                sys.path.insert(0, pypath)
-
-            try:
-                self.mod = __import__(self.pyfile, globals=globals())
-            except Exception as e:
-                if pypath != '':
-                    del sys.path[0]
-
-                raise e
-
-            if pypath != '':
-                del sys.path[0]
-
+            self.run        = self.run_pyfile
+            self.modname    = args[0][1:]
+            self.entry      = 'main' if len(args) == 1 else args[1]
+            self.mod        = self.loadmod(self.modname)
         else:
             self.run = self.run_expression
             self.cond   = gbk(args[0])
             self.condvm = compile(self.cond, '', 'eval')
+
+    def loadmod(self, modname):
+        pypath = os.path.dirname(modname)
+        pyfile = os.path.basename(modname)
+        name, ext = os.path.splitext(pyfile)
+        ext = ext.lower()
+        if ext == '.py' or ext == '.pyc':
+            pyfile = name
+
+        if pypath != '':
+            sys.path.insert(0, pypath)
+
+        try:
+            mod = __import__(pyfile, globals=globals())
+        except Exception as e:
+            if pypath != '':
+                del sys.path[0]
+            raise e
+
+        if pypath != '':
+            del sys.path[0]
+
+        return mod
+
+    def reloadmod(self, module):
+        modname = module.__file__
+        pypath = os.path.dirname(modname)
+        pyfile = os.path.basename(modname)
+        name, ext = os.path.splitext(pyfile)
+        if ext.lower() == '.py':
+            pyfile = name
+
+        if pypath != '':
+            sys.path.insert(0, pypath)
+
+        try:
+            mod = reload(module)
+        except Exception as e:
+            if pypath != '':
+                del sys.path[0]
+            raise e
+
+        if pypath != '':
+            del sys.path[0]
+
+        return mod
 
     def run_expression(self, regs):
         eax = Register(regs['EAX'])
@@ -137,8 +164,8 @@ class BpCondition(LogBpHook):
         try:
             result = eval(self.condvm)
         except Exception as e:
-            imm.log(e)
             result = False
+            PrintException()
 
         imm.log('%s: %s' % (self.cond, result))
 
@@ -150,6 +177,10 @@ class BpCondition(LogBpHook):
 
     def run_pyfile(self, regs):
         try:
+            if not hasattr(self, 'mod'):
+                self.mod = self.loadmod(self.modname)
+                self.mod = self.reloadmod(self.mod)
+
             _regs = {}
             _regs['EAX'] = Register(regs['EAX'])
             _regs['ECX'] = Register(regs['ECX'])
@@ -160,15 +191,22 @@ class BpCondition(LogBpHook):
             _regs['ESI'] = Register(regs['ESI'])
             _regs['EDI'] = Register(regs['EDI'])
             _regs['EIP'] = Register(regs['EIP'])
-            result = self.mod.main(_regs)
+            entry = getattr(self.mod, self.entry)
+            result = entry(_regs)
         except Exception as e:
-            imm.log(e)
             result = False
+            if hasattr(self, 'mod'):
+                del self.mod
+
+            PrintException()
 
         if result != True:
             return
 
         imm.setTemporaryBreakpoint(self.addr)
+
+    def run_stub(self, regs):
+        pass
 
 def main(args):
     #debugger.pyresetall()
