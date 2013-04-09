@@ -208,13 +208,31 @@ class BpCondition(LogBpHook):
     def run_stub(self, regs):
         pass
 
+import re
+
+def ResolveAddress(expr):
+    expr = gbk(expr)
+    modulelist = re.findall(u'!\w+', expr, flags=re.DOTALL)
+    if len(modulelist) == 0:
+        return expr
+
+    for module in modulelist:
+        mod = imm.findModuleByName(mbcs(module[1:]))
+        if mod == None:
+            continue
+
+        expr = expr.replace(module, u'%08X' % mod.getBaseAddress())
+
+    return mbcs(expr)
+
 def main(args):
     #debugger.pyresetall()
 
     if len(args) == 0:
         return 'usage: bp addr "py exp"'
 
-    addr = imm.getAddress(args[0])
+    addr = imm.getAddress(ResolveAddress(args[0]))
+
     if addr == -3:
         return 'invalid address: %s' % args[0]
     elif addr == -1:

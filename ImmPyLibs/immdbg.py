@@ -11,6 +11,9 @@ imm = Debugger2()
 def is_unicode(text):
     return type(text) == unicode
 
+def mbcs(text):
+    return text.encode('936') if is_unicode(text) else text
+
 def utf8(text):
     return text.decode('utf8') if not is_unicode(text) else text
 

@@ -1249,7 +1249,7 @@ class Debugger(object):
             @rtype:  LIST
             @return: A list of tuples with process information (pid, name, path, services, tcp list, udp list)
             """
-        return debugger.ps()        
+        return debugger.ps()
 
     def getSehChain(self):
         """
@@ -1518,11 +1518,11 @@ class Debugger(object):
 
             """
 
-        found=False
+        found=None
         for name,mod in self.getAllModules().iteritems():
             if modname.lower() in name.lower():
-                if found != False: #name is ambiguous
-                    return False
+                if found != None: #name is ambiguous
+                    return None
                 found=mod
 
         return found
