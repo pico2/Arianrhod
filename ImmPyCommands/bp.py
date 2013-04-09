@@ -22,7 +22,7 @@ class Register:
         elif type(y) == unicode:
             return self.wstr() == y
 
-        return y == self._reg
+        return self._reg == y
 
     def __add__(self, y):
         return Register(self._reg + y)
