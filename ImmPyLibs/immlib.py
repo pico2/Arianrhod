@@ -2179,11 +2179,6 @@ class Debugger(object):
             """
         wstring = self.readUntil(address, "\x00\x00")
 
-        if len(string) < 2:
-            return '\x00\x00'
-
-        if 
-
         if not wstring.endswith("\x00"):
             wstring = wstring + "\x00"
 

@@ -56,5 +56,43 @@ class Debugger2(Debugger):
     def refreshModules(self):
         debugger.RefreshModules()
 
+    def readWString2(self,address):
+        """
+            Read a unicode string from the remote process
+
+            @type  address: DWORD
+            @param address: Address of the unicode string
+
+            @rtype:  str
+            @return: Unicode String
+            """
+
+        blocksize = 64
+        wstring = ""
+        while True:
+            read = self.readMemory(address, blocksize)
+            if len(read) < 2:
+                break
+
+            address += blocksize
+            if (len(read) & 1) != 0:
+                read = read[0:-1]
+
+            index = 0
+            while index < len(read):
+                if read[index:index + 2] == '\x00\x00':
+                    break
+
+                index += 2
+
+            if index != len(read):
+                wstring += read[0:index]
+                break
+
+            wstring += read
+
+        return wstring
+
     log = asuna_log
     Detach = Detach2
+    readWString = readWString2

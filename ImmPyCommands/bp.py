@@ -43,7 +43,7 @@ class Register:
         return gbk(imm.readString(self._reg))
 
     def wstr(self):
-        return imm.readWString(self._reg)
+        return imm.readWString(self._reg).decode('U16')
 
     def u64(self):
         _u64 = imm.readMemory(self._reg, 8)
@@ -74,7 +74,7 @@ def astr(addr):
 
 def wstr(addr):
     addr = int(addr)
-    return imm.readWString(addr)
+    return imm.readWString(addr).decode('U16')
 
 def u64(addr):
     return Register(addr).u64()
