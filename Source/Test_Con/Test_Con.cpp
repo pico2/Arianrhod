@@ -565,7 +565,10 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    *(volatile int *)&argc = IOCTL_AFD_SEND_DATAGRAM;
+    LOOP_FOREVER
+    {
+        SetWindowTextA(NULL, "≤‚ ‘");
+    }
 
     return;
 

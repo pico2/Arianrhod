@@ -34,7 +34,11 @@ class Debugger2(Debugger):
             """
         if gray and not highlight:
             highlight = -1
-        return debugger.add_to_list( address, int(highlight), str(msg)[:255], focus)
+
+        if type(msg) == unicode:
+            msg = msg.encode('936')
+
+        return debugger.add_to_list(address, int(highlight), str(msg)[:255], focus)
 
     def deleteHbIndex(self, index):
         return debugger.DeleteHardBreakpointByIndex(index)

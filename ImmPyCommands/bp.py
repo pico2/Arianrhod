@@ -18,7 +18,9 @@ class Register:
 
     def __eq__(self, y):
         if type(y) == str:
-            return y == self.astr()
+            return self.astr() == gbk(y)
+        elif type(y) == unicode:
+            return self.wstr() == y
 
         return y == self._reg
 
@@ -38,7 +40,7 @@ class Register:
         return imm.readMemory(self._reg, int(size))
 
     def astr(self):
-        return imm.readString(self._reg)
+        return gbk(imm.readString(self._reg))
 
     def wstr(self):
         return imm.readWString(self._reg)
@@ -49,9 +51,9 @@ class Register:
             try:
                 return Register(immutils.str2int64_swapped(_u64))
             except ValueError:
-                raise Exception, "failed to gather a u64 at 0x%08x" % self._reg
+                raise Exception("failed to gather a u64 at 0x%08x" % self._reg)
         else:
-            raise Exception, "failed to gather a u64 at 0x%08x" % self._reg
+            raise Exception("failed to gather a u64 at 0x%08x" % self._reg)
 
     def u32(self):
         return Register(imm.readLong(self._reg))
@@ -68,35 +70,23 @@ def buf(addr, size):
 
 def astr(addr):
     addr = int(addr)
-    return imm.readString(addr)
+    return gbk(imm.readString(addr))
 
 def wstr(addr):
     addr = int(addr)
     return imm.readWString(addr)
 
 def u64(addr):
-    addr = int(addr)
-    _u64 = imm.readMemory(addr, 8)
-    if len(_u64) == 8:
-        try:
-            return Register(immutils.str2int64_swapped(_u64))
-        except ValueError:
-            raise Exception, "failed to gather a u64 at 0x%08x" % addr
-    else:
-        raise Exception, "failed to gather a u64 at 0x%08x" % addr
+    return Register(addr).u64()
 
 def u32(addr):
-    addr = int(addr)
-    return Register(imm.readLong(addr))
+    return Register(addr).u32()
 
 def u16(addr):
-    addr = int(addr)
-    return Register(imm.readShort(addr))
+    return Register(addr).u16()
 
 def u8(addr):
-    addr = int(addr)
-    byte = imm.readMemory(addr, 1)
-    return Register(ord(byte))
+    return Register(addr).u8()
 
 
 class BpCondition(LogBpHook):
@@ -130,7 +120,7 @@ class BpCondition(LogBpHook):
 
         else:
             self.run = self.run_expression
-            self.cond   = args[0]
+            self.cond   = gbk(args[0])
             self.condvm = compile(self.cond, '', 'eval')
 
     def run_expression(self, regs):

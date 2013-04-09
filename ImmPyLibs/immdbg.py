@@ -7,3 +7,15 @@ from libhook import *
 from wintypes2 import *
 
 imm = Debugger2()
+
+def is_unicode(text):
+    return type(text) == unicode
+
+def utf8(text):
+    return text.decode('utf8') if not is_unicode(text) else text
+
+def gbk(text):
+    return text.decode('936') if not is_unicode(text) else text
+
+def sjis(text):
+    return text.decode('932') if not is_unicode(text) else text
