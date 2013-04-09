@@ -567,7 +567,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     LOOP_FOREVER
     {
-        SetWindowTextA(NULL, "≤‚ ‘");
+        SetWindowTextW(NULL, L"≤‚ ‘");
     }
 
     return;
