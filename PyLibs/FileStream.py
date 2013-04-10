@@ -42,8 +42,14 @@ class BytesStream:
         self.stream = io.BytesIO(buffer)
         return self
 
+    def seek(self, offset, method = io.SEEK_SET):
+        return self.stream.seek(offset, method)
+
     def read(self, n = -1):
         return self.stream.read(n)
+
+    def tell(self):
+        return self.stream.tell()
 
     def byte(self):
         return ReadByte(self.stream)

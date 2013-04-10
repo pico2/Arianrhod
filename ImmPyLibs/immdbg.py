@@ -1,32 +1,12 @@
-import pefile
-import debugger
-import os, sys, struct, traceback
-import immutils
-from immlib2 import *
-from libhook import *
-from wintypes2 import *
+import os, sys, struct
 
-imm = Debugger2()
+if sys.winver == '2.7':
+    import pefile
+    import debugger
+    import immutils
+    from immlib2 import *
+    from libhook import *
+    from wintypes2 import *
+    from immhelper import *
 
-def is_unicode(text):
-    return type(text) == unicode
-
-def mbcs(text):
-    return text.encode('936') if is_unicode(text) else text
-
-def utf8(text):
-    return text.decode('utf8') if not is_unicode(text) else text
-
-def gbk(text):
-    return text.decode('936') if not is_unicode(text) else text
-
-def sjis(text):
-    return text.decode('932') if not is_unicode(text) else text
-
-def FormatException(e = None):
-    return traceback.format_exception(*sys.exc_info())
-
-def PrintException(e = None):
-    excinfo = FormatException(e)
-    for line in excinfo:
-        imm.log(line)
+    imm = Debugger2()

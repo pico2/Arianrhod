@@ -2,6 +2,11 @@ import pefile, debugger, os, sys, struct, traceback
 from immlib import *
 from wintypes2 import *
 from libhook import *
+from immhelper import *
+
+MODULE_INFO_BASE        = 0
+MODULE_INFO_SIZE        = 1
+MODULE_INFO_ENTRY_POINT = 2
 
 class Debugger2(Debugger):
     def __init__(self):
@@ -92,6 +97,19 @@ class Debugger2(Debugger):
             wstring += read
 
         return wstring
+
+    def QueryAllModules(self):
+        return debugger.get_all_modules()
+
+    def QueryModuleByName(self, modname):
+        found = None
+        modname = mbcs(modname).lower()
+        modulos = self.QueryAllModules()
+        for name, mod in modulos.iteritems():
+            if modname in os.path.splitext(os.path.basename(name))[0].lower():
+                return Module(name, mod[MODULE_INFO_BASE], mod[MODULE_INFO_SIZE], mod[MODULE_INFO_ENTRY_POINT])
+
+        return found
 
     log = asuna_log
     Detach = Detach2
