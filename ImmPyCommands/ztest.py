@@ -155,7 +155,11 @@ class ExportHooks(LogBpHook):
         imm.log('p = %08X, len = %08X' % (addr, size))
 
 def main(args):
-    ExportHooks()
+    bp = __import__('bp')
+
+    bp.main(('ws2_32.send+0x90', '#E:\\Desktop\\fuck.py', 'send'))
+    bp.main(('ws2_32.recv+0x9A', '#E:\\Desktop\\fuck.py', 'recv'))
+
     return ''
 
     global pak

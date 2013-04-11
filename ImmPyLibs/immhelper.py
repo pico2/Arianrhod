@@ -18,11 +18,6 @@ def sjis(text):
 def FormatException(e = None):
     return traceback.format_exception(*sys.exc_info())
 
-def PrintException(e = None):
-    excinfo = FormatException(e)
-    for line in excinfo:
-        imm.log(line)
-
 def loadmod(modname):
     pypath = os.path.dirname(modname)
     pyfile = os.path.basename(modname)

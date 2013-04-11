@@ -46,24 +46,28 @@ class Register:
         return imm.readWString(self._reg).decode('U16')
 
     def u64(self):
-        _u64 = imm.readMemory(self._reg, 8)
-        if len(_u64) == 8:
-            try:
-                return Register(immutils.str2int64_swapped(_u64))
-            except ValueError:
-                raise Exception("failed to gather a u64 at 0x%08x" % self._reg)
-        else:
-            raise Exception("failed to gather a u64 at 0x%08x" % self._reg)
+        return Register(struct.unpack('<Q', self.buf(8))[0])
 
     def u32(self):
-        return Register(imm.readLong(self._reg))
+        return Register(struct.unpack('<I', self.buf(4))[0])
 
     def u16(self):
-        return Register(imm.readShort(self._reg))
+        return Register(struct.unpack('<H', self.buf(2))[0])
 
     def u8(self):
-        byte = imm.readMemory(self._reg, 1)
-        return Register(ord(byte))
+        return Register(struct.unpack('<B', self.buf(1))[0])
+
+    def s64(self):
+        return Register(struct.unpack('<q', self.buf(8))[0])
+
+    def s32(self):
+        return Register(struct.unpack('<i', self.buf(4))[0])
+
+    def s16(self):
+        return Register(struct.unpack('<h', self.buf(2))[0])
+
+    def s8(self):
+        return Register(struct.unpack('<b', self.buf(1))[0])
 
 def buf(addr, size):
     return imm.readMemory(int(addr), int(size))

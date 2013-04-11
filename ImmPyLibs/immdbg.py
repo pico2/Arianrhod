@@ -10,3 +10,9 @@ if sys.winver == '2.7':
     from immhelper import *
 
     imm = Debugger2()
+
+    def PrintException(e = None):
+        excinfo = FormatException(e)
+        for line in excinfo:
+            imm.log(line)
+
