@@ -563,17 +563,11 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
-EXTC_EXPORT BOOL x(ULONG n)
-{
-    return n < 0x80;
-}
+#include "HookPort.cpp"
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    LOOP_FOREVER
-    {
-        SetWindowTextW(NULL, L"²âÊÔ");
-    }
+    PrintConsoleW(L"%d\n", CurrentPeb()->OSBuildNumber);
 
     return;
 
