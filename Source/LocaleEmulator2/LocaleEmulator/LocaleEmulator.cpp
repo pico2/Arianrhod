@@ -1,7 +1,6 @@
 #include "stdafx.h"
-#include "mlns.h"
 
-OVERLOAD_CPP_NEW_WITH_HEAP(MemoryAllocator::GetGlobalHeap())
+ML_OVERLOAD_NEW
 
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")

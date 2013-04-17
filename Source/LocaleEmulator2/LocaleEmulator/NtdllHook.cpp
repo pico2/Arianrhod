@@ -36,9 +36,12 @@ NTSTATUS QueryRegKeyFullPath(HANDLE Key, PUNICODE_STRING KeyFullPath)
     return Status;
 }
 
-NoInline NTSTATUS FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
+NoInline PVOID FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
 {
-    PLEPEB LePeb;
+    PVOID   BaseToFree;
+    PLEPEB  LePeb;
+
+    BaseToFree = NULL;
 
     LOOP_ONCE
     {
@@ -48,7 +51,7 @@ NoInline NTSTATUS FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
         if (LePeb == NULL)
             break;
 
-        LePeb->SelfShadowToFree = &__ImageBase;
+        // LePeb->SelfShadowToFree = &__ImageBase;
 
         WriteProtectMemory(CurrentProcess, LePeb->LdrLoadDllAddress, LePeb->LdrLoadDllBackup, LePeb->LdrLoadDllBackupSize);
 
@@ -65,9 +68,11 @@ NoInline NTSTATUS FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
         *(PULONG_PTR)_AddressOfReturnAddress() += PtrOffset(DllHandle, &__ImageBase);
 
         CloseLePeb(LePeb);
+
+        BaseToFree = &__ImageBase;
     }
 
-    return 0;
+    return BaseToFree;
 }
 
 NTSTATUS
