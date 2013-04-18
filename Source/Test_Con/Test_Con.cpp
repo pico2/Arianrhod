@@ -563,11 +563,11 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
-#include "HookPort.cpp"
+// #include "HookPort.cpp"
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    InstallHookPort();
+    // InstallHookPort();
 
     return;
 

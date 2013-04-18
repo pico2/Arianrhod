@@ -151,14 +151,6 @@
       </AdditionalOptions>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="HookDispatcher.asm">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64.exe /c /Fo "$(IntDir)%(Filename).obj" "%(Filename)%(Extension)"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\%(Filename).obj</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </CustomBuild>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
