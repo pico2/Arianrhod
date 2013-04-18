@@ -262,36 +262,31 @@ BOOL NTAPI DelayInitDllEntry(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 
 VOID LeGlobalData::HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllLoad)
 {
-    TYPE_OF(&LeGlobalData::HookNtdllRoutines)     HookRoutine;
-    TYPE_OF(&LeGlobalData::UnHookNtdllRoutines)   UnHookRoutine;
+    typedef struct
+    {
+        UNICODE_STRING DllName;
+        TYPE_OF(&LeGlobalData::HookNtdllRoutines)     HookRoutine;
+        TYPE_OF(&LeGlobalData::UnHookNtdllRoutines)   UnHookRoutine;
 
-    if (DLL_IS(L"USER32.dll"))
-    {
-        HookRoutine     = &LeGlobalData::HookUser32Routines;
-        UnHookRoutine   = &LeGlobalData::UnHookUser32Routines;
-    }
-    else if (DLL_IS(L"GDI32.dll"))
-    {
-        HookRoutine     = &LeGlobalData::HookGdi32Routines;
-        UnHookRoutine   = &LeGlobalData::UnHookGdi32Routines;
-    }
-    else if (DLL_IS(L"KERNEL32.dll"))
-    {
-/*
-        if (GetLePeb()->SelfShadowToFree != NULL)
-        {
-            Mm::FreeVirtualMemory(GetLePeb()->SelfShadowToFree);
-        }
-*/
-        HookRoutine     = &LeGlobalData::HookKernel32Routines;
-        UnHookRoutine   = &LeGlobalData::UnHookKernel32Routines;
-    }
-    else
-    {
-        return;
-    }
+    } DLL_HOOK_ENTRY, *PDLL_HOOK_ENTRY;
 
-    DllLoad ? (this->*HookRoutine)(DllBase) : (this->*UnHookRoutine)();
+    static DLL_HOOK_ENTRY DllHookEntries[] =
+    {
+        { RTL_CONSTANT_STRING(L"USER32.dll"),    &LeGlobalData::HookUser32Routines,      &LeGlobalData::UnHookUser32Routines },
+        { RTL_CONSTANT_STRING(L"GDI32.dll"),     &LeGlobalData::HookGdi32Routines,       &LeGlobalData::UnHookGdi32Routines },
+        { RTL_CONSTANT_STRING(L"KERNEL32.dll"),  &LeGlobalData::HookKernel32Routines,    &LeGlobalData::UnHookKernel32Routines },
+    };
+
+    PDLL_HOOK_ENTRY Entry;
+
+    FOR_EACH(Entry, DllHookEntries, countof(DllHookEntries))
+    {
+        if (!RtlEqualUnicodeString(DllName, &Entry->DllName, TRUE))
+            continue;
+
+        DllLoad ? (this->*Entry->HookRoutine)(DllBase) : (this->*Entry->UnHookRoutine)();
+        break;
+    }
 }
 
 VOID LeGlobalData::DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICATION_DATA NotificationData)

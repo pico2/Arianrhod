@@ -35,7 +35,7 @@ HFONT GetFontFromDC(PLeGlobalData GlobalData, HDC hDC)
     return GetFontFromFont(GlobalData, Font);
 }
 
-HGDIOBJ NTAPI LeStubGetStockObject(LONG Object)
+HGDIOBJ NTAPI LeGetStockObject(LONG Object)
 {
     HGDIOBJ         StockObject;
     PULONG_PTR      Index;
@@ -354,18 +354,19 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
 
     MEMORY_FUNCTION_PATCH f[] =
     {
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_GetStockObject,         LeStubGetStockObject,       HookStub.StubGetStockObject),
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_CreateFontIndirectExW,  LeCreateFontIndirectExW,    HookStub.StubCreateFontIndirectExW),
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_CreateCompatibleDC,     LeCreateCompatibleDC,       HookStub.StubCreateCompatibleDC),
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_EnumFontFamiliesExA,    LeEnumFontFamiliesExA,      HookStub.StubEnumFontFamiliesExA),
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_EnumFontFamiliesExW,    LeEnumFontFamiliesExW,      HookStub.StubEnumFontFamiliesExW),
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_EnumFontsW,             LeEnumFontsW,               HookStub.StubEnumFontsW),
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_EnumFontsA,             LeEnumFontsA,               HookStub.StubEnumFontsA),
+        LE_EAT_HOOK(Gdi32, GDI32, GetStockObject),
+        LE_EAT_HOOK(Gdi32, GDI32, CreateFontIndirectExW),
+        LE_EAT_HOOK(Gdi32, GDI32, CreateCompatibleDC),
+        LE_EAT_HOOK(Gdi32, GDI32, EnumFontFamiliesExA),
+        LE_EAT_HOOK(Gdi32, GDI32, EnumFontFamiliesExW),
+        LE_EAT_HOOK(Gdi32, GDI32, EnumFontsW),
+        LE_EAT_HOOK(Gdi32, GDI32, EnumFontsA),
+
+        LE_EAT_HOOK_NULL(Gdi32, GDI32, EnumFontFamiliesA),
+        LE_EAT_HOOK_NULL(Gdi32, GDI32, EnumFontFamiliesW),
 
         // EAT_HOOK_JUMP_HASH(Gdi32, GDI32_SelectObject,    LeSelectObject,      StubSelectObject),
 
-        EAT_HOOK_JUMP_HASH_NULL(Gdi32, GDI32_EnumFontFamiliesA, LeEnumFontFamiliesA),
-        EAT_HOOK_JUMP_HASH_NULL(Gdi32, GDI32_EnumFontFamiliesW, LeEnumFontFamiliesW),
     };
 
     return Nt_PatchMemory(NULL, 0, f, countof(f), Gdi32);

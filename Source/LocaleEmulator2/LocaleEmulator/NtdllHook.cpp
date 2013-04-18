@@ -84,8 +84,14 @@ LoadFirstDll(
     PVOID*              DllHandle
 )
 {
+    PVOID BaseToFree;
+
     //ExceptionBox(L"inject");
-    LoadSelfAsFirstDll(_ReturnAddress());
+
+    BaseToFree = LoadSelfAsFirstDll(_ReturnAddress());
+    if (BaseToFree != NULL)
+        Mm::FreeVirtualMemory(BaseToFree);
+
     return LdrLoadDll(PathToFile, DllCharacteristics, ModuleFileName, DllHandle);
 }
 
@@ -482,7 +488,7 @@ LeNtQueryValueKey(
     return Status;
 }
 
-NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Gdi32)
+NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 {
     NTSTATUS            Status;
     HANDLE              RootKey;

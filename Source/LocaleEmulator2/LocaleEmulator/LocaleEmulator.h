@@ -17,6 +17,11 @@
 
 #define FORMAT_LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK   L"Local\\LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK_SECTION_%p"
 
+
+#define LE_EAT_HOOK(_base, _prefix, _name)      EAT_HOOK_JUMP_HASH(_base, _prefix##_##_name, Le##_name, HookStub.Stub##_name)
+#define LE_EAT_HOOK_NULL(_base, _prefix, _name) EAT_HOOK_JUMP_HASH_NULL(_base, _prefix##_##_name, Le##_name)
+#define LE_INLINE_JUMP(_name)                   INLINE_HOOK_JUMP(_name, Le##_name, HookStub.Stub##_name)
+
 typedef struct
 {
     ULONG AnsiCodePage;
@@ -286,9 +291,6 @@ public:
 
         struct
         {
-            PVOID DefWindowProcA;
-            PVOID DefWindowProcW;
-
         } User32;
 
         struct

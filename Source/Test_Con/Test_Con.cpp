@@ -567,19 +567,7 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    LOGFONTW lf;
-
-    lf.lfCharSet = DEFAULT_CHARSET;
-    lf.lfFaceName[0] = 0;
-    EnumFontFamiliesExW(GetDC(NULL), &lf, 
-        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
-        {
-            PrintConsoleW(L"%s\n", lf->lfFaceName);
-            return TRUE;
-        },
-        0,
-        0
-    );
+    InstallHookPort();
 
     return;
 

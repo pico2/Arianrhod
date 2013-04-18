@@ -1409,25 +1409,23 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         InitFontCharsetInfo();
     }
 
-    HookRoutineData.User32.DefWindowProcA = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcA);
-    HookRoutineData.User32.DefWindowProcW = EATLookupRoutineByHashPNoFix(User32, USER32_DefWindowProcW);
-
-    HookNtUserCreateWindowEx = Ps::CurrentPeb()->OSBuildNumber > 7700 ? (PVOID)LeNtUserCreateWindowEx_Win8 : LeNtUserCreateWindowEx_Win7;
+    HookNtUserCreateWindowEx = CurrentPeb()->OSBuildNumber >= 8000 ? (PVOID)LeNtUserCreateWindowEx_Win8 : LeNtUserCreateWindowEx_Win7;
 
     MEMORY_FUNCTION_PATCH f[] =
     {
         INLINE_HOOK_JUMP(NtUserCreateWindowEx,  HookNtUserCreateWindowEx,   HookStub.StubNtUserCreateWindowEx),
-        INLINE_HOOK_JUMP(NtUserMessageCall,     LeNtUserMessageCall,        HookStub.StubNtUserMessageCall),
-        INLINE_HOOK_JUMP(NtUserDefSetText,      LeNtUserDefSetText,         HookStub.StubNtUserDefSetText),
 
-        EAT_HOOK_JUMP_HASH(User32, USER32_SetWindowLongA,   LeSetWindowLongA,   HookStub.StubSetWindowLongA),
-        EAT_HOOK_JUMP_HASH(User32, USER32_GetWindowLongA,   LeGetWindowLongA,   HookStub.StubGetWindowLongA),
-        EAT_HOOK_JUMP_HASH(User32, USER32_IsWindowUnicode,  LeIsWindowUnicode,  HookStub.StubIsWindowUnicode),
-        EAT_HOOK_JUMP_HASH(User32, USER32_GetClipboardData, LeGetClipboardData, HookStub.StubGetClipboardData),
-        EAT_HOOK_JUMP_HASH(User32, USER32_SetClipboardData, LeSetClipboardData, HookStub.StubSetClipboardData),
+        LE_INLINE_JUMP(NtUserMessageCall),
+        LE_INLINE_JUMP(NtUserDefSetText),
 
-        EAT_HOOK_JUMP_HASH(User32, USER32_GetDC,            LeGetDC,            HookStub.StubGetDC),
-        EAT_HOOK_JUMP_HASH(User32, USER32_GetWindowDC,      LeGetWindowDC,      HookStub.StubGetWindowDC),
+        LE_EAT_HOOK(User32, USER32, SetWindowLongA),
+        LE_EAT_HOOK(User32, USER32, GetWindowLongA),
+        LE_EAT_HOOK(User32, USER32, IsWindowUnicode),
+        LE_EAT_HOOK(User32, USER32, GetClipboardData),
+        LE_EAT_HOOK(User32, USER32, SetClipboardData),
+
+        LE_EAT_HOOK(User32, USER32, GetDC),
+        LE_EAT_HOOK(User32, USER32, GetWindowDC),
     };
 
     return Nt_PatchMemory(NULL, 0, f, countof(f), User32);
