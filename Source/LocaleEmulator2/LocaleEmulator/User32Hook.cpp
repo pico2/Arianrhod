@@ -561,7 +561,6 @@ BOOL VerifyWindowParam(PCBT_CREATE_PARAM CbtCreateParam, PCBT_PROC_PARAM CbtPara
 
 VOID ResetDCCharset(PLeGlobalData GlobalData, HWND hWnd)
 {
-
     HDC hDC;
     HFONT Font;
 
@@ -820,7 +819,10 @@ LeNtUserCreateWindowEx_Win8(
     LOOP_ONCE
     {
         if (!FLAG_ON(ExStyle, WS_EX_ANSI))
+        {
+            InstallUnicodeCbtHook(GlobalData, &CbtParam);
             break;
+        }
 
         if (WindowName != NULL)
         {
@@ -853,8 +855,27 @@ LeNtUserCreateWindowEx_Win8(
             );
 
     LastError = RtlGetLastWin32Error();
+
+    if (hWnd != NULL)
+    {
+        HDC hDC;
+
+        hDC= GetDC(hWnd);
+
+        CheckDC(hDC);
+
+        ReleaseDC(hWnd, hDC);
+
+        hDC= GetWindowDC(hWnd);
+
+        CheckDC(hDC);
+
+        ReleaseDC(hWnd, hDC);
+    }
+
     UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
+
     RtlSetLastWin32Error(LastError);
 
     return hWnd;
