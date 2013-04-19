@@ -569,6 +569,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     // InstallHookPort();
 
+    StrMatchExpression(L"find*", L"FINDYOURMOTHER");
+
     return;
 
 #if 0
