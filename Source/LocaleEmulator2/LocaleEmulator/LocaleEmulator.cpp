@@ -6,8 +6,6 @@ ML_OVERLOAD_NEW
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#define DLL_IS(_dllname) RtlEqualUnicodeString(DllName, &WCS2US(_dllname), TRUE)
-
 PLeGlobalData g_GlobalData;
 
 ForceInline VOID LeSetGlobalData(PLeGlobalData GlobalData)
@@ -260,16 +258,16 @@ BOOL NTAPI DelayInitDllEntry(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
     return Success;
 }
 
-VOID LeGlobalData::HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllLoad)
+typedef struct
 {
-    typedef struct
-    {
-        UNICODE_STRING DllName;
-        TYPE_OF(&LeGlobalData::HookNtdllRoutines)     HookRoutine;
-        TYPE_OF(&LeGlobalData::UnHookNtdllRoutines)   UnHookRoutine;
+    UNICODE_STRING DllName;
+    TYPE_OF(&LeGlobalData::HookNtdllRoutines)     HookRoutine;
+    TYPE_OF(&LeGlobalData::UnHookNtdllRoutines)   UnHookRoutine;
 
-    } DLL_HOOK_ENTRY, *PDLL_HOOK_ENTRY;
+} DLL_HOOK_ENTRY, *PDLL_HOOK_ENTRY;
 
+PDLL_HOOK_ENTRY LookupDllHookEntry(PCUNICODE_STRING BaseDllName)
+{
     static DLL_HOOK_ENTRY DllHookEntries[] =
     {
         { RTL_CONSTANT_STRING(L"USER32.dll"),    &LeGlobalData::HookUser32Routines,      &LeGlobalData::UnHookUser32Routines },
@@ -281,12 +279,24 @@ VOID LeGlobalData::HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllL
 
     FOR_EACH(Entry, DllHookEntries, countof(DllHookEntries))
     {
-        if (!RtlEqualUnicodeString(DllName, &Entry->DllName, TRUE))
+        if (!RtlEqualUnicodeString(BaseDllName, &Entry->DllName, TRUE))
             continue;
 
-        DllLoad ? (this->*Entry->HookRoutine)(DllBase) : (this->*Entry->UnHookRoutine)();
-        break;
+        return Entry;
     }
+
+    return NULL;
+}
+
+VOID LeGlobalData::HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllLoad)
+{
+    PDLL_HOOK_ENTRY Entry;
+
+    Entry = LookupDllHookEntry(DllName);
+    if (Entry == NULL)
+        return;
+
+    DllLoad ? (this->*Entry->HookRoutine)(DllBase) : (this->*Entry->UnHookRoutine)();
 }
 
 VOID LeGlobalData::DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICATION_DATA NotificationData)
@@ -301,17 +311,17 @@ VOID LeGlobalData::DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICAT
     switch (NotificationReason)
     {
         case LDR_DLL_NOTIFICATION_REASON_LOADED:
-            DllPath = *NotificationData->Loaded.FullDllName;
-            DllPath.Length -= NotificationData->Loaded.BaseDllName->Length;
             DllName = NotificationData->Loaded.BaseDllName;
             DllBase = NotificationData->Loaded.DllBase;
+            DllPath = *NotificationData->Loaded.FullDllName;
+            DllPath.Length -= DllName->Length;
             break;
 
         case LDR_DLL_NOTIFICATION_REASON_UNLOADED:
-            DllPath = *NotificationData->Unloaded.FullDllName;
-            DllPath.Length -= NotificationData->Unloaded.BaseDllName->Length;
             DllName = NotificationData->Unloaded.BaseDllName;
-            DllBase = NotificationData->Loaded.DllBase;
+            DllBase = NotificationData->Unloaded.DllBase;
+            DllPath = *NotificationData->Unloaded.FullDllName;
+            DllPath.Length -= DllName->Length;
             break;
 
         default:
@@ -321,17 +331,8 @@ VOID LeGlobalData::DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICAT
     if (!RtlEqualUnicodeString(&SystemDirectory, &DllPath, TRUE))
         return;
 
-    if (
-        DLL_IS(L"USER32.dll")  ||
-        DLL_IS(L"GDI32.dll")   ||
-        DLL_IS(L"KERNEL32.dll")
-       )
-    {
-    }
-    else
-    {
+    if (LookupDllHookEntry(DllName) == NULL)
         return;
-    }
 
     Module = FindLdrModuleByHandle(DllBase);
     if (!FLAG_ON(Module->Flags, LDRP_PROCESS_ATTACH_CALLED))

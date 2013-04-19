@@ -21,7 +21,7 @@ PVOID FindGetCurrentNlsCache(PVOID Kernel32)
 {
     PVOID KernelBase, GetUserDefaultLCID, GetCurrentNlsCache;
 
-    KernelBase = FindLdrModuleByName(&WCS2US(L"KERNELBASE.dll"))->DllBase;
+    KernelBase = FindLdrModuleByName(&USTR(L"KERNELBASE.dll"))->DllBase;
 
     GetUserDefaultLCID = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLCID);
     if (GetUserDefaultLCID == NULL)

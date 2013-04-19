@@ -398,11 +398,11 @@ LeNtQueryValueKey(
             return 0;
 
         case CodePageKeyHandle:
-            if (RtlEqualUnicodeString(ValueName, &WCS2US(REGKEY_ACP), TRUE))
+            if (RtlEqualUnicodeString(ValueName, &USTR(REGKEY_ACP), TRUE))
             {
                 BufferLength = swprintf(Buffer, L"%d", GlobalData->GetLeb()->AnsiCodePage);
             }
-            else if (RtlEqualUnicodeString(ValueName, &WCS2US(REGKEY_OEMCP), TRUE))
+            else if (RtlEqualUnicodeString(ValueName, &USTR(REGKEY_OEMCP), TRUE))
             {
                 BufferLength = swprintf(Buffer, L"%d", GlobalData->GetLeb()->OemCodePage);
             }
@@ -413,7 +413,7 @@ LeNtQueryValueKey(
             break;
 
         case LanguageKeyHandle:
-            if (RtlEqualUnicodeString(ValueName, &WCS2US(REGKEY_DEFAULT_LANGUAGE), TRUE))
+            if (RtlEqualUnicodeString(ValueName, &USTR(REGKEY_DEFAULT_LANGUAGE), TRUE))
             {
                 BufferLength = swprintf(Buffer, L"%04x", GlobalData->GetLeb()->LocaleID);
             }
