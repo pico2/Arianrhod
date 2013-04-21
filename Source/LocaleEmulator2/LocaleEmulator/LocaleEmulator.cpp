@@ -188,7 +188,7 @@ NTSTATUS LeGlobalData::Initialize()
 
     WriteLog(L"reset nls");
 
-    Peb = Ps::CurrentPeb();
+    Peb = CurrentPeb();
 
     Peb->AnsiCodePageData       = (PUSHORT)PtrAdd(CodePageMapView, AnsiCodePageOffset);
     Peb->OemCodePageData        = (PUSHORT)PtrAdd(CodePageMapView, OemCodePageOffset);
