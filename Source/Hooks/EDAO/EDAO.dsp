@@ -62,5 +62,9 @@ SOURCE=.\edao.cpp
 
 SOURCE=.\edao.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\edao_vm.h
+# End Source File
 # End Target
 # End Project

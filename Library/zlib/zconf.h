@@ -325,6 +325,8 @@
 #  define ZEXPORTVA
 #endif
 
+#define ZEXPORT CDECL
+
 #ifndef FAR
 #  define FAR
 #endif

@@ -569,13 +569,6 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     // InstallHookPort();
 
-    HANDLE h;
-    WIN32_FIND_DATAW wfd;
-
-    QueryFirstFile(&h, L"E:\\Sync\\ImmPyCommands", &wfd);
-    QueryNextFile(h, &wfd);
-    QueryClose(h);
-
     return;
 
 #if 0

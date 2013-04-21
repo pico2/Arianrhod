@@ -115,6 +115,26 @@ typedef void   (*free_func)  OF((voidpf opaque, voidpf address));
 
 struct internal_state;
 
+/*++
+
+   +0x000 next_in          : Ptr32 UChar
+   +0x004 avail_in         : Uint4B
+   +0x008 total_in         : Uint4B
+   +0x00c next_out         : Ptr32 UChar
+   +0x010 avail_out        : Uint4B
+   +0x014 total_out        : Uint4B
+   +0x018 msg              : Ptr32 Char
+   +0x01c state            : Ptr32 internal_state
+   +0x020 zalloc           : Ptr32     void* 
+   +0x024 zfree            : Ptr32     void 
+   +0x028 opaque           : Ptr32 Void
+   +0x02c data_type        : Int4B
+   +0x030 adler            : Uint4B
+   +0x034 reserved         : Uint4B
+
+
+--*/
+
 typedef struct z_stream_s {
     Bytef    *next_in;  /* next input byte */
     uInt     avail_in;  /* number of bytes available at next_in */

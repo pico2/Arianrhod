@@ -45,6 +45,9 @@ class BytesStream:
     def seek(self, offset, method = io.SEEK_SET):
         return self.stream.seek(offset, method)
 
+    def forward(self, length):
+        return self.stream.seek(length, io.SEEK_CUR)
+
     def read(self, n = -1):
         return self.stream.read(n)
 
