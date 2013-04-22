@@ -14,12 +14,14 @@ VOID THISCALL EDAO::Fade(ULONG Param1, ULONG Param2, ULONG Param3, ULONG Param4,
 }
 
 float Rate = 200.f;
+float fuck = 0.17f;
 
 NAKED VOID FadeInRate()
 {
     INLINE_ASM
     {
-        fld     dword ptr [eax+0x40];
+        //fld     dword ptr [eax+0x40];
+        fld     fuck;
         fmul    Rate;
         ret;
     }
@@ -68,6 +70,7 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x06, 1, 0x410731),    // win
         PATCH_MEMORY(0x06, 1, 0x410AD1),    // win
         PATCH_MEMORY(0x01, 1, 0x40991D),    // cpu
+        PATCH_MEMORY(0x91, 1, 0x2F9EE3),    // one hit
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
     };
