@@ -569,6 +569,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     // InstallHookPort();
 
+    PrintConsoleW(L"%m\n");
+
     return;
 
 #if 0

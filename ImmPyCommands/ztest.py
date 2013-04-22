@@ -1,13 +1,6 @@
 #encoding=utf-8
 
-import pefile
-import debugger
-import os, sys, struct
-from immlib2 import *
-from libhook import *
-from wintypes2 import *
-
-imm = Debugger2()
+from immdbg import *
 
 def ulong(x):
     return x & 0xFFFFFFFF
@@ -155,10 +148,22 @@ class ExportHooks(LogBpHook):
         imm.log('p = %08X, len = %08X' % (addr, size))
 
 def main(args):
-    bp = __import__('bp')
 
-    bp.main(('ws2_32.send+0x90', '#E:\\Desktop\\fuck.py', 'send'))
-    bp.main(('ws2_32.recv+0x9A', '#E:\\Desktop\\fuck.py', 'recv'))
+    debugger.pyreset()
+
+    btntext = Register(0x416198)
+
+    for i in range(0x100):
+        text = btntext + i * 4
+        addr = text.u32()
+        if addr == 0:
+            continue
+
+        text = addr.astr()
+        if text == u'':
+            continue
+
+        imm.log('; %02X: %s' % (i, text))
 
     return ''
 
