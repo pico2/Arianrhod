@@ -27,11 +27,46 @@ NAKED VOID FadeInRate()
     }
 }
 
+BOOL    Turbo;
+WNDPROC WindowProc;
+
+SHORT NTAPI AoGetKeyState(int VirtualKey)
+{
+    switch (VirtualKey)
+    {
+        case VK_SHIFT:
+        case VK_LSHIFT:
+            if (Turbo)
+                return (SHORT)0x8000;
+
+            break;
+    }
+
+    return GetKeyState(VirtualKey);
+}
+
+LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+    switch (Message)
+    {
+        case WM_KEYUP:
+            switch (wParam & 0xFFFF)
+            {
+                case 'T':
+                    Turbo ^= TRUE;
+                    break;
+            }
+    }
+
+    return WindowProc(Window, Message, wParam, lParam);
+}
+
 HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
+    HWND    Window;
     RECT    rcWordArea;
     ULONG   Length;
-    PWSTR  pszClassName, pszWindowName;
+    PWSTR   pszClassName, pszWindowName;
 
     Length = StrLengthA(lpClassName) + 1;
     pszClassName = (PWSTR)AllocStack(Length * sizeof(WCHAR));
@@ -47,7 +82,12 @@ HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lp
         Y = ((rcWordArea.bottom - rcWordArea.top) - nHeight) / 2;
     }
 
-    return CreateWindowExW(dwExStyle, pszClassName, pszWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    Window = CreateWindowExW(dwExStyle, pszClassName, pszWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+
+    if (Window != NULL)
+        WindowProc = (WNDPROC)SetWindowLongPtrA(Window, GWL_WNDPROC, (LONG_PTR)MainWndProc);
+
+    return Window;
 }
 
 LONG64 InitWarningItpTimeStamp()
@@ -66,13 +106,15 @@ BOOL Initialize(PVOID BaseAddress)
 {
     MEMORY_PATCH p[] =
     {
-        PATCH_MEMORY(0xEB, 1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking
-        PATCH_MEMORY(0x06, 1, 0x410731),    // win
-        PATCH_MEMORY(0x06, 1, 0x410AD1),    // win
-        PATCH_MEMORY(0x01, 1, 0x40991D),    // cpu
-        PATCH_MEMORY(0x91, 1, 0x2F9EE3),    // one hit
+        PATCH_MEMORY(0xEB,      1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking
+        PATCH_MEMORY(0x06,      1, 0x410731),    // win
+        PATCH_MEMORY(0x06,      1, 0x410AD1),    // win
+        PATCH_MEMORY(0x01,      1, 0x40991D),    // cpu
+        PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
+        PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
+        PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // CreateWindowExA
     };
 
     MEMORY_FUNCTION_PATCH f[] =
