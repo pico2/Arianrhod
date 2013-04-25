@@ -37,7 +37,7 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
         case VK_SHIFT:
         case VK_LSHIFT:
             if (Turbo)
-                return (SHORT)0x8000;
+                return (SHORT)0xFFFF8001;
 
             break;
     }
