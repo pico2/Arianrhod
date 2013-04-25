@@ -95,6 +95,22 @@ LONG64 InitWarningItpTimeStamp()
     return -1;
 }
 
+BOOL EDAO::CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex)
+{
+    switch (ItemId)
+    {
+        case 0xB7:  // ú—Ä¿
+        case 0xB8:  // ÌìÑÛ
+        case 0xBB:  // Ì½Öª
+            if (EquippedIndex != NULL)
+                *EquippedIndex = 0;
+
+            return TRUE;
+    }
+
+    return (this->*StubCheckItemEquipped)(ItemId, EquippedIndex);
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -132,6 +148,7 @@ BOOL Initialize(PVOID BaseAddress)
         // tweak
 
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
+        INLINE_HOOK_JUMP_RVA(0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
 
         //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
         //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),
