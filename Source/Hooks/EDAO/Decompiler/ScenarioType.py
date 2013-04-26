@@ -5,7 +5,7 @@ version = ED_AO
 
 enum OFFSET_TABLE_INDEX
 {
-    OffsetChip,
+    OffsetCharName,
     OffsetUnknown1,
 };
 
@@ -22,7 +22,7 @@ enum OFFSET_TABLE_INDEX
 /* 0x00000014 */   ULONG   Unknown1;
 /* 0x00000018 */   ULONG   Flags;
 /* 0x0000001C */   ULONG   IncludedScenarioFileIndex[6];
-/* 0x00000034 */   USHORT  OffsetTable[16]; // OFFSET_TABLE_INDEX
+/* 0x00000034 */   USHORT  OffsetTable[8]; // OFFSET_TABLE_INDEX
 
 '''
 

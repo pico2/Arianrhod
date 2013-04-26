@@ -90,6 +90,97 @@ HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lp
     return Window;
 }
 
+
+
+PWCHAR
+GetFileName(
+    PWCHAR  pszHooked,
+    ULONG   HookedBufferCount,
+    PWCHAR  pszOriginal,
+    ULONG   OriginalCount,
+    LPCSTR  lpFileName,
+    BOOL    IsInputUnicode = FALSE
+)
+{
+    ULONG   Length, AppPathLength;
+    PWCHAR  pszFileName;
+
+    static WCHAR szDataPath[]   = L"data\\";
+    static WCHAR szPatch[]      = L"patch\\";
+
+    if (IsInputUnicode)
+    {
+        StrCopyW(pszOriginal, (LPWSTR)lpFileName);
+    }
+    else
+    {
+        AnsiToUnicode(pszOriginal, OriginalCount, (PCHAR)lpFileName, -1);
+    }
+
+    PLDR_MODULE Module;
+
+    Module = FindLdrModuleByHandle(NULL);
+    AppPathLength = (Module->FullDllName.Length - Module->BaseDllName.Length) / sizeof(WCHAR);
+
+    Length = RtlGetFullPathName_U(pszOriginal, HookedBufferCount * sizeof(WCHAR), pszHooked, NULL);
+    Length = Length / sizeof(WCHAR) + 1;
+    pszFileName = pszHooked + AppPathLength;
+    LOOP_ONCE
+    {
+        if (StrNICompareW(pszFileName, szDataPath, countof(szDataPath) - 1) ||
+            StrNICompareW(Module->FullDllName.Buffer, pszHooked, AppPathLength))
+        {
+            pszFileName = pszOriginal;
+            break;
+        }
+
+        pszFileName += countof(szDataPath) - 2;
+        RtlMoveMemory(
+            pszFileName + countof(szPatch) - countof(szDataPath),
+            pszFileName,
+            (Length - (pszFileName - pszHooked)) * sizeof(*pszFileName)
+        );
+
+        pszFileName -= countof(szDataPath) - 2;
+        CopyStruct(pszFileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
+
+        pszFileName = IsPathExists(pszHooked) ? pszHooked : pszOriginal;
+    }
+
+#if CONSOLE_DEBUG
+    PrintConsoleW(L"%s\n", pszFileName);
+#endif
+
+    return pszFileName;
+}
+
+HANDLE
+WINAPI
+AoCreateFileA(
+    LPCSTR                  lpFileName,
+    DWORD                   dwDesiredAccess,
+    DWORD                   dwShareMode,
+    LPSECURITY_ATTRIBUTES   lpSecurityAttributes,
+    DWORD                   dwCreationDisposition,
+    DWORD                   dwFlagsAndAttributes,
+    HANDLE                  hTemplateFile
+)
+{
+    WCHAR szFile[MAX_PATH], szFullPath[MAX_PATH];
+
+    return CreateFileW(
+                GetFileName(szFullPath, countof(szFullPath), szFile, countof(szFile), lpFileName),
+                dwDesiredAccess,
+                dwShareMode,
+                lpSecurityAttributes,
+                dwCreationDisposition,
+                dwFlagsAndAttributes,
+                hTemplateFile
+           );
+}
+
+// [0xC29988]+78f84
+
 LONG64 InitWarningItpTimeStamp()
 {
     return -1;
@@ -130,7 +221,8 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
-        PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // CreateWindowExA
+        PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
+        PATCH_MEMORY(AoCreateFileA,         4, 0x9D576C),       // CreateFileA
     };
 
     MEMORY_FUNCTION_PATCH f[] =
