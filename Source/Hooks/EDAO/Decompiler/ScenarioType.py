@@ -66,19 +66,19 @@ typedef struct
 
 typedef struct
 {
-/* 0x00000000 */   CHAR                     MapName[0xA];                       // %s/%s/%s.it3
-/* 0x0000000A */   CHAR                     Location[0xA];
-/* 0x00000014 */   ULONG                    Unknown1;
-/* 0x00000018 */   ULONG                    Flags;
-/* 0x0000001C */   ULONG                    IncludedScenarioFileIndex[6];
-/* 0x00000034 */   ULONG                    CharNameOffset;
-/* 0x00000038 */   USHORT                   ScnInfoOffset[SCN_INFO_MAXIMUM];
-/* 0x00000042 */   SCENARIO_ENTRY           ScenaSectionTable;
-/* 0x00000046 */   SCENARIO_ENTRY           UnknownEntry1;                      // ???
-/* 0x0000004A */   UCHAR                    Unknown2;
-/* 0x0000004B */   UCHAR                    PreInitSectionIndex;
-/* 0x0000004C */   CHAR                     ScnInfoNumber[SCN_INFO_MAXIMUM];    // followed by 00 FF FF
-/* 0x00000054 */   SCENARIO_INFORMATION     Information;
+/* 0x00 */   CHAR                     MapName[0xA];                       // %s/%s/%s.it3
+/* 0x0A */   CHAR                     Location[0xA];
+/* 0x14 */   ULONG                    Unknown1;
+/* 0x18 */   ULONG                    Flags;
+/* 0x1C */   ULONG                    IncludedScenarioFileIndex[6];
+/* 0x34 */   ULONG                    CharNameOffset;
+/* 0x38 */   USHORT                   ScnInfoOffset[SCN_INFO_MAXIMUM];
+/* 0x42 */   SCENARIO_ENTRY           ScenaSectionTable;
+/* 0x46 */   SCENARIO_ENTRY           UnknownEntry1;                      // ???
+/* 0x4A */   UCHAR                    Unknown2;
+/* 0x4B */   UCHAR                    PreInitSectionIndex;
+/* 0x4C */   CHAR                     ScnInfoNumber[SCN_INFO_MAXIMUM];
+/* 0x54 */   SCENARIO_INFORMATION     Information;
 
 } SCENARIO_HEADER;
 
