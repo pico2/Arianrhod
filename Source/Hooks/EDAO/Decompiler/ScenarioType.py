@@ -66,15 +66,15 @@ typedef struct
 
 typedef struct
 {
-/* 0x00 */   CHAR                     MapName[0xA];                       // %s/%s/%s.it3
+/* 0x00 */   CHAR                     MapName[0xA];                         // %s/%s/%s.it3
 /* 0x0A */   CHAR                     Location[0xA];
 /* 0x14 */   ULONG                    Unknown1;
 /* 0x18 */   ULONG                    Flags;
 /* 0x1C */   ULONG                    IncludedScenarioFileIndex[6];
-/* 0x34 */   ULONG                    CharNameOffset;
+/* 0x34 */   ULONG                    NpcCharNameOffset;                    // multi-sz, max-len = 0x20
 /* 0x38 */   USHORT                   ScnInfoOffset[SCN_INFO_MAXIMUM];
 /* 0x42 */   SCENARIO_ENTRY           ScenaSectionTable;
-/* 0x46 */   SCENARIO_ENTRY           UnknownEntry1;                      // ???
+/* 0x46 */   SCENARIO_ENTRY           UnknownEntry1;                        // ???
 /* 0x4A */   UCHAR                    Unknown2;
 /* 0x4B */   UCHAR                    PreInitSectionIndex;
 /* 0x4C */   CHAR                     ScnInfoNumber[SCN_INFO_MAXIMUM];
