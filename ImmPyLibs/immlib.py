@@ -1759,6 +1759,7 @@ class Debugger(object):
             @rtype:  STRING
             @return: Requested comment
             """
+        address = int(address)
         comment=None
         #First, try to fetch any comment
         if type == 0xFD:
@@ -1806,7 +1807,7 @@ class Debugger(object):
             @type  comment: STRING
             @param comment: Comment to add
             """
-        return debugger.set_comment(address, comment)
+        return debugger.set_comment(int(address), comment)
 
     def setLabel(self, address, label):
         """
@@ -1818,7 +1819,7 @@ class Debugger(object):
             @type  label: STRING
             @param label: Label to add
             """
-        return debugger.set_label(address, label)
+        return debugger.set_label(int(address), label)
 
     def markBegin(self):
         """ 

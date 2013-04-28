@@ -151,19 +151,24 @@ def main(args):
 
     debugger.pyreset()
 
-    btntext = Register(0x416198)
+    functbl = Register(0xBE0E10)
 
     for i in range(0x100):
-        text = btntext + i * 4
-        addr = text.u32()
-        if addr == 0:
+        func = functbl + i * 4
+        func = func.u32()
+        if func == 0:
+            #imm.log('OP_%02X: NULLLLLLLLLLLLLLLLLLLLL' % i)
             continue
 
-        text = addr.astr()
-        if text == u'':
-            continue
+        offset = int((func + 1).u32())
+        func = func + 5 + offset
 
-        imm.log('; %02X: %s' % (i, text))
+        funcname = 'OP_%02X' % i
+
+        imm.setComment(int(func), funcname)
+        imm.setLabel(int(func), funcname)
+
+        imm.log('OP_%02X: %08X' % (i, func), int(func))
 
     return ''
 
