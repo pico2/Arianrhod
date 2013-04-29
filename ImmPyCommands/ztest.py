@@ -165,10 +165,11 @@ def main(args):
 
         funcname = 'OP_%02X' % i
 
-        imm.setComment(int(func), funcname)
-        imm.setLabel(int(func), funcname)
+        #imm.setComment(int(func), funcname)
+        #imm.setLabel(int(func), funcname)
 
         imm.log('OP_%02X: %08X' % (i, func), int(func))
+        #imm.log('OP_%02X            = 0x%02X' % (i, i))
 
     return ''
 

@@ -75,7 +75,7 @@ typedef struct
 /* 0x1C */   ULONG                    IncludedScenarioFileIndex[6];
 /* 0x34 */   ULONG                    NpcNameOffset;                    // multi-sz, max-len = 0x20
 /* 0x38 */   USHORT                   ScnInfoOffset[SCN_INFO_MAXIMUM];
-/* 0x42 */   SCENARIO_ENTRY           ScenaSectionTable;
+/* 0x42 */   SCENARIO_ENTRY           ScenaFunctionTable;
 /* 0x46 */   SCENARIO_ENTRY           UnknownEntry_46;                        // ???
 /* 0x4A */   UCHAR                    Unknown_4A;
 /* 0x4B */   UCHAR                    PreInitSectionIndex;
@@ -170,7 +170,7 @@ class ScenarioInfo:
         self.IncludedScenario           = []
         self.NpcNameOffset              = 0
         self.ScnInfoOffset              = []
-        self.ScenaSectionTable          = ScenarioEntry()
+        self.ScenaFunctionTable         = ScenarioEntry()
         self.UnknownEntry_46            = ScenarioEntry()
         self.Unknown_4A                 = 0
         self.PreInitSectionIndex        = 0
@@ -203,7 +203,7 @@ class ScenarioInfo:
         self.IncludedScenario       = list(struct.unpack('<' + 'I' * NUMBER_OF_INCLUDE_FILE, fs.read(NUMBER_OF_INCLUDE_FILE * 4)))
         self.NpcNameOffset          = fs.ulong()
         self.ScnInfoOffset          = list(struct.unpack('<' + 'H' * SCN_INFO_MAXIMUM, fs.read(SCN_INFO_MAXIMUM * 2)))
-        self.ScenaSectionTable      = ScenarioEntry(fs.ushort(), fs.ushort())
+        self.ScenaFunctionTable     = ScenarioEntry(fs.ushort(), fs.ushort())
         self.UnknownEntry_46        = ScenarioEntry(fs.ushort(), fs.ushort())
         self.Unknown_4A             = fs.byte()
         self.PreInitSectionIndex    = fs.byte()
@@ -233,8 +233,8 @@ class ScenarioInfo:
                 self.ScnInfo[i].append(ScnInfoType(fs))
 
     def InitOtherInfo(self, fs):
-        fs.seek(self.ScenaSectionTable.Offset)
-        self.ScenaSections = list(struct.unpack('<' + 'I' * int(self.ScenaSectionTable.Size / 4), fs.read(self.ScenaSectionTable.Size)))
+        fs.seek(self.ScenaFunctionTable.Offset)
+        self.ScenaSections = list(struct.unpack('<' + 'I' * int(self.ScenaFunctionTable.Size / 4), fs.read(self.ScenaFunctionTable.Size)))
 
         fs.seek(self.UnknownEntry_46.Offset)
         self.UnknownEntry_46_Data = fs.read(self.UnknownEntry_46.Size)
@@ -282,7 +282,7 @@ class ScenarioInfo:
 
         info.append('')
 
-        info.append('ScenaSectionTable      = %04X, %04X' % (self.ScenaSectionTable.Offset, self.ScenaSectionTable.Size))
+        info.append('ScenaFunctionTable     = %04X, %04X' % (self.ScenaFunctionTable.Offset, self.ScenaFunctionTable.Size))
         info.append('UnknownEntry_46        = %04X, %04X' % (self.UnknownEntry_46.Offset, self.UnknownEntry_46.Size))
         info.append('Unknown_4A             = %02X' % (self.Unknown_4A))
         info.append('PreInitSectionIndex    = %02X' % (self.PreInitSectionIndex))
