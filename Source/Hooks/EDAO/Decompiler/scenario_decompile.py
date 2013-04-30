@@ -4,8 +4,7 @@ def main():
     scena = ScenarioInfo()
 
     scena.open('c1100.bin')
-    print(scena)
-
+    #print(scena)
     input()
 
 TryInvoke(main)

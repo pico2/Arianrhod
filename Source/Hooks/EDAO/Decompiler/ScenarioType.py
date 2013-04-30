@@ -1,5 +1,8 @@
 from BaseType import *
 from Assembler import *
+import InstructionTableEDAO as edao
+
+CODE_PAGE = edao.CODE_PAGE
 
 '''
 
@@ -88,8 +91,6 @@ typedef struct
 op count: 227
 
 '''
-
-CODE_PAGE                       = '936'
 
 NUMBER_OF_INCLUDE_FILE          = 6
 
@@ -180,7 +181,7 @@ class ScenarioInfo:
 
         # file header end
 
-        self.ScenaSections  = []
+        self.ScenaFunctions  = []
         self.NpcName        = []
         self.ScnInfo        = []
 
@@ -216,6 +217,18 @@ class ScenarioInfo:
         self.InitScenaInfo(fs)
         self.InitOtherInfo(fs)
 
+        self.DisassembleBlocks(fs)
+
+    def DisassembleBlocks(self, fs):
+        disasm = Disassembler(edao.edao_op_table)
+
+        for func in self.ScenaFunctions:
+            fs.seek(func)
+            codeblocks = disasm.DisasmBlock(fs)
+
+            #print('%08X done' % func)
+            #input()
+
     def InitScenaInfo(self, fs):
         ScnInfoTypes = \
         [
@@ -234,7 +247,7 @@ class ScenarioInfo:
 
     def InitOtherInfo(self, fs):
         fs.seek(self.ScenaFunctionTable.Offset)
-        self.ScenaSections = list(struct.unpack('<' + 'I' * int(self.ScenaFunctionTable.Size / 4), fs.read(self.ScenaFunctionTable.Size)))
+        self.ScenaFunctions = list(struct.unpack('<' + 'I' * int(self.ScenaFunctionTable.Size / 4), fs.read(self.ScenaFunctionTable.Size)))
 
         fs.seek(self.UnknownEntry_46.Offset)
         self.UnknownEntry_46_Data = fs.read(self.UnknownEntry_46.Size)
@@ -293,8 +306,8 @@ class ScenarioInfo:
         info.append('%s' % (self.Information))
         info.append('')
 
-        info.append('ScenaSections:')
-        for sec in self.ScenaSections:
+        info.append('ScenaFunctions:')
+        for sec in self.ScenaFunctions:
             info.append('  %08X' % sec)
         info.append('')
 

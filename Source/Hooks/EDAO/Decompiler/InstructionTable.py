@@ -5,18 +5,29 @@ HANDLER_REASON_WRITE    = 1
 HANDLER_REASON_FORMAT   = 1
 
 class HandlerData:
-    def __init__(self, reason, data = None):
+    def __init__(self, reason, TableEntry = None):
         self.Reason = reason
-
-        if type(data) == BytesStream:
-            self.FileStream = data
-        elif type(data) == Instruction:
-            self.Instruction = data
+        self.FileStream = None
+        self.Instruction = None
 
         # list of OffsetFixupEntry
         self.Labels = []
 
-        self.TableEntry = None
+        self.TableEntry = TableEntry
+
+        self.Disasm = None
+
+    def CreateBranch(self):
+        data = HandlerData(self.Reason)
+
+        data.Reason             = self.Reason
+        data.FileStream         = self.FileStream
+        data.Instruction        = Instruction()
+        data.Labels             = []
+        data.TableEntry         = None
+        data.Disasm             = self.Disasm
+
+        return data
 
 #
 #   def inst_handler(data):
@@ -39,7 +50,10 @@ class HandlerData:
 #       return None
 #
 
-
+class InstructionTable(dict):
+    def __init__(self, GetOpCode, CodePage = '936'):
+        self.GetOpCode  = GetOpCode
+        self.CodePage   = CodePage
 
 NO_OPERAND = ''
 
@@ -50,6 +64,8 @@ class InstructionTableEntry:
         self.Operand    = operand
         self.Flags      = InstructionFlags(flags)
         self.Handler    = handler
+
+        self.Container  = None
 
     def GetAllOperand(self, oprs, fs):
         operand = []
@@ -68,7 +84,7 @@ class InstructionTableEntry:
 
                 string += buf
 
-            return string
+            return string.decode(self.Container.CodePage)
 
         oprtype = \
         {

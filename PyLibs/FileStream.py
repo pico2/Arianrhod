@@ -54,6 +54,13 @@ class BytesStream:
     def tell(self):
         return self.stream.tell()
 
+    def size(self):
+        pos = self.tell()
+        self.seek(0, io.SEEK_END)
+        stmsize = self.tell()
+        self.seek(pos)
+        return stmsize
+
     def byte(self):
         return ReadByte(self.stream)
 

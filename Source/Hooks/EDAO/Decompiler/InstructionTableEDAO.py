@@ -1,5 +1,10 @@
 from InstructionTable import *
 
+CODE_PAGE = '936'
+
+def SplitText(text):
+    return text.split('\x01')
+
 InstructionNames = {}
 
 InstructionNames[0x00]  = 'OP_00'
@@ -84,17 +89,17 @@ InstructionNames[0x51]  = 'OP_51'
 InstructionNames[0x52]  = 'OP_52'
 InstructionNames[0x53]  = 'OP_53'
 InstructionNames[0x54]  = 'OP_54'
-InstructionNames[0x55]  = 'OP_55'
+InstructionNames[0x55]  = 'AnonymousTalk'
 InstructionNames[0x56]  = 'OP_56'
 InstructionNames[0x57]  = 'OP_57'
 InstructionNames[0x58]  = 'OP_58'
 InstructionNames[0x59]  = 'OP_59'
 InstructionNames[0x5A]  = 'OP_5A'
 InstructionNames[0x5B]  = 'OP_5B'
-InstructionNames[0x5C]  = 'OP_5C'
-InstructionNames[0x5D]  = 'OP_5D'
-InstructionNames[0x5E]  = 'OP_5E'
-InstructionNames[0x5F]  = 'OP_5F'
+InstructionNames[0x5C]  = 'ChrTalk'
+InstructionNames[0x5D]  = 'NpcTalk'
+InstructionNames[0x5E]  = 'Menu'
+InstructionNames[0x5F]  = 'MenuEnd'
 InstructionNames[0x60]  = 'OP_60'
 InstructionNames[0x61]  = 'OP_61'
 InstructionNames[0x62]  = 'OP_62'
@@ -234,8 +239,37 @@ for op, name in InstructionNames.items():
     expr = '%s = 0x%08X' % (name, op)
     exec(expr)
 
+class EDAOInstructionTableEntry(InstructionTableEntry):
+    def __init__(self, op, name = '', operand = NO_OPERAND, flags = 0, handler = None):
+        super().__init__(op, name, operand, flags, handler)
+
+    def GetOperand(self, opr, fs):
+        if opr.lower() != 's':
+            return super().GetOperand(opr, fs)
+
+        string = b''
+        while True:
+            buf = fs.read(1)
+            if buf == b'\x07':
+                buf += fs.read(1)
+            elif buf == b'' or buf == b'\x00':
+                break
+
+            string += buf
+
+        return string.decode(self.Container.CodePage)
+
+    def GetOperandSize(self, opr, fs):
+        if opr.lower() != 's':
+            return super().GetOperandSize(opr, fs)
+
+        pos = fs.tell()
+        oprsize = len(self.GetOperand(opr, fs))
+        fs.seek(pos)
+        return oprsize
+
 def inst(op, operand = NO_OPERAND, flags = 0, handler = None):
-    return InstructionTableEntry(op, InstructionNames[op], operand, flags, handler)
+    return EDAOInstructionTableEntry(op, InstructionNames[op], operand, flags, handler)
 
 def instopr(opr, size):
     return InstructionOperand(opr, size)
@@ -281,12 +315,13 @@ EXPRESSION_RAND             = 0x22
 EXPRESSION_23               = 0x23
 
 class ScpExpression:
-    def __init__(self, operation = None, operand = []):
+    def __init__(self, operation = None, operand = None):
         self.Operation = operation
-        self.Operand = operand
+        self.Operand = operand if operand != None else []
 
-def ParseScpExpression(fs):
+def ParseScpExpression(data):
     expr = []
+    fs = data.FileStream
 
     # stack size == 0xB0 ?
 
@@ -336,9 +371,13 @@ def ParseScpExpression(fs):
 
         elif operation == EXPRESSION_EXEC_OP:
 
-            # execute op code in the following bytes
-            # implement later
-            pass
+            # execute one op code
+
+            execdata = data.CreateBranch()
+            execdata.Instruction.OpCode = fs.byte()
+            execdata.TableEntry = data.TableEntry.Container[execdata.Instruction.OpCode]
+            execinst = execdata.Disasm(execdata)
+            scpexpr.Operand.append(execinst)
 
         elif operation == EXPRESSION_1E or \
              operation == EXPRESSION_GET_RESULT:
@@ -368,15 +407,18 @@ def ParseScpExpression(fs):
 
 def scp_if(data):
     # if (expression)
+    #   goto offset
 
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
-        expr = ParseScpExpression(fs)
+        ins = data.Instruction
+        expr = ParseScpExpression(data)
         ins.Operand.append(expr)
+
+        offset = fs.ulong()
+        ins.Operand.append(offset)
+        ins.BranchTargets.append(offset)
 
         return ins
 
@@ -391,21 +433,21 @@ def scp_switch(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
+        ins = data.Instruction
 
-        op = fs.byte()
-
-        expr = ParseScpExpression(fs)
+        expr = ParseScpExpression(data)
         optioncount = fs.byte()
         options = []
 
         for i in range(optioncount):
             optionid, optionoffset = struct.unpack('<HL', fs.read(6))
             options.append((optionid, optionoffset))
+            ins.BranchTargets.append(optionoffset)
 
         defaultoffset = fs.ulong()
 
-        ins = Instruction()
-        ins.OpCode = op
+        ins.BranchTargets.append(defaultoffset)
+
         ins.Operand.append(expr)
         ins.Operand.append(options)
         ins.Operand.append(defaultoffset)
@@ -417,9 +459,7 @@ def scp_battle(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         opr1 = fs.ulong()
         opr2 = fs.ulong()
@@ -454,9 +494,7 @@ def scp_1d(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         opr1 = fs.byte()
         opr2 = fs.byte()
@@ -479,9 +517,7 @@ def scp_29(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         opr1 = fs.ushort()
         opr2 = fs.byte()
@@ -504,9 +540,7 @@ def scp_2a(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         opr1 = fs.ushort()
         opr2 = fs.byte()
@@ -529,9 +563,7 @@ def scp_2b(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         for i in range(0xC):
             opr = fs.ushort()
@@ -546,9 +578,7 @@ def scp_38(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         opr1 = fs.byte()
         opr2 = fs.byte()
@@ -571,10 +601,9 @@ def scp_4e(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
         ins.Operand.append(fs.ushort())
-        ins.Operand.append(ParseScpExpression(fs))
+        ins.Operand.append(ParseScpExpression(data))
 
         return ins
 
@@ -583,10 +612,88 @@ def scp_50(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
         ins.Operand.append(fs.byte())
-        ins.Operand.append(ParseScpExpression(fs))
+        ins.Operand.append(ParseScpExpression(data))
+
+        return ins
+
+def scp_52(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        ins.Operand = data.TableEntry.GetAllOperand('WB', fs)
+        ins.Operand.append(ParseScpExpression(data))
+
+        return ins
+
+def scp_anonymous_talk(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+        fs = data.FileStream
+        ins = data.Instruction
+
+        if fs.tell() == 0x71B1:
+            bp()
+
+        target = fs.ushort()
+        text = data.TableEntry.GetOperand('S', fs)
+        text = SplitText(text)
+
+        ins.Operand.append(target)
+        ins.Operand.append(text)
+
+        return ins
+
+def scp_create_chr_talk(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        # #FACE_INDEX
+        # split by 0x00 0x01 0x03 0x04 0x06 0x07 0x0A 0x1F
+
+        fs = data.FileStream
+        ins = data.Instruction
+        ins.Operand = data.TableEntry.GetAllOperand('W', fs)
+        text = SplitText(data.TableEntry.GetOperand('S', fs))
+        ins.Operand.append(text)
+
+        return ins
+
+def scp_create_npc_talk(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        target = fs.ushort()
+        name = data.TableEntry.GetOperand('S', fs)
+        text = data.TableEntry.GetOperand('S', fs)
+        text = SplitText(text)
+
+        ins.Operand.append(target)
+        ins.Operand.append(name)
+        ins.Operand.append(text)
+
+        return ins
+
+def scp_create_menu(data):
+
+    # max 10 line
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+        ins.Operand = data.TableEntry.GetAllOperand('WWWB', fs)
+        menutext = data.TableEntry.GetOperand('S', fs)
+
+        menuitems = SplitText(menutext)
+        ins.Operand.append(menuitems)
 
         return ins
 
@@ -595,8 +702,7 @@ def scp_76(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         ins.Operand = data.TableEntry.GetAllOperand('BSB', fs)
 
@@ -622,8 +728,7 @@ def scp_9f(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         ins.Operand = data.TableEntry.GetAllOperand('B', fs)
 
@@ -646,8 +751,7 @@ def scp_cf(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         ins.Operand = data.TableEntry.GetAllOperand('BB', fs)
 
@@ -663,7 +767,7 @@ def scp_menu_cmd(data):
         fs = data.FileStream
 
         ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
 
         menutype = fs.byte()
         menu_xxx = fs.byte()
@@ -697,10 +801,9 @@ def scp_d2(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
-        ins.OpCode = GetOpCode(fs)
+        ins = data.Instruction
         ins.Operand.append(fs.byte())
-        ins.Operand.append(ParseScpExpression(fs))
+        ins.Operand.append(ParseScpExpression(data))
 
         return ins
 
@@ -709,9 +812,8 @@ def scp_e4(data):
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
-        ins = Instruction()
+        ins = data.Instruction
 
-        ins.OpCode = GetOpCode(fs)
         opr = fs.byte()
         ins.Operand.append(opr)
 
@@ -733,7 +835,7 @@ edao_op_list = \
 [
     inst(OP_00),
     inst(Return,            NO_OPERAND,         INSTRUCTION_END_BLOCK),
-    inst(If,                NO_OPERAND,         0,                              scp_if),
+    inst(If,                NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_if),
     inst(Jump,              'O',                INSTRUCTION_END_BLOCK),
     inst(Switch,            NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_switch),
     inst(Call,              'BB'),          # included_scp index, func index
@@ -810,20 +912,20 @@ edao_op_list = \
     inst(OP_4F),
     inst(OP_50,             NO_OPERAND,         0,                              scp_50),
     inst(OP_51),
-    inst(OP_52,             'WB'),
+    inst(OP_52,             NO_OPERAND,         0,                              scp_52),
     inst(OP_53,             'W'),
     inst(OP_54,             'W'),
-    inst(OP_55,             'W'),
+    inst(AnonymousTalk,     NO_OPERAND,         0,                              scp_anonymous_talk),
     inst(OP_56),
     inst(OP_57,             'B'),
     inst(OP_58,             'WWWS'),
     inst(OP_59),
     inst(OP_5A),
     inst(OP_5B,             'WWWW'),
-    inst(OP_5C,             'W'),
-    inst(OP_5D,             'WS'),
-    inst(OP_5E,             'WWWB'),
-    inst(OP_5F,             'W'),
+    inst(ChrTalk,           NO_OPERAND,         0,                              scp_create_chr_talk),
+    inst(NpcTalk,           NO_OPERAND,         0,                              scp_create_npc_talk),
+    inst(Menu,              NO_OPERAND,         0,                              scp_create_menu),
+    inst(MenuEnd,           'W'),
     inst(OP_60,             'W'),
     inst(OP_61,             'S'),
     inst(OP_62,             'W'),
@@ -962,10 +1064,11 @@ edao_op_list = \
 
 del inst
 
-edao_op_table = {}
+edao_op_table = InstructionTable(GetOpCode, CODE_PAGE)
 
 for op in edao_op_list:
     edao_op_table[op.OpCode] = op
+    op.Container = edao_op_table
 
 #valid = 0
 #for inst in edao_op_list:
@@ -975,4 +1078,4 @@ for op in edao_op_list:
 #print('handler: %d' % valid)
 #print('%d / %d / 227' % (len(edao_op_list), 227 - len(edao_op_list)))
 
-input()
+#input()
