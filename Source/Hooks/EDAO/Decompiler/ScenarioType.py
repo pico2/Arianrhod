@@ -108,17 +108,26 @@ class ScenarioEntry:
 
 class ScenarioChipInfo:
     # ULONG chipindex
-    def __init__(self, fs):
-        self.chipindex = fs.ulong()
+    def __init__(self, fs = None):
+        if fs == None:
+            return
+
+        self.ChipIndex = fs.ulong()
 
     def __str__(self):
-        return '%08X' % self.chipindex
+        return '0x%08X' % self.ChipIndex
 
     def binary(self):
-        return struct.pack('<L', self.chipindex)
+        return struct.pack('<L', self.ChipIndex)
+
+    def param(self):
+        return self.__str__()
 
 class ScenarioCharInformation:
-    def __init__(self, fs):
+    def __init__(self, fs = None):
+        if fs == None:
+            return
+
         # size = 0x1C
 
         self.X                  = fs.ulong()
@@ -134,28 +143,57 @@ class ScenarioCharInformation:
         self.Unknown4           = fs.ushort()
         self.Unknown5           = fs.ushort()
 
-    #def __str__(self): return str(self.binary())
+    def __str__(self):
+        return str(self.binary())
+
+    def param(self):
+        return '%d, %d, %d, %d, %d, 0x%X, %d, %d, %d, %d, %d, %d' % (
+                    LONG(self.X).value,
+                    LONG(self.Y).value,
+                    LONG(self.Z).value,
+                    LONG(self.Unknown1).value,
+                    LONG(self.Unknown2).value,
+                    ULONG(self.Unknown).value,
+                    LONG(self.InitScenaIndex).value,
+                    LONG(self.InitSectionIndex).value,
+                    LONG(self.TalkScenaIndex).value,
+                    LONG(self.TalkSectionIndex).value,
+                    LONG(self.Unknown4).value,
+                    LONG(self.Unknown5).value
+                )
 
     def binary(self):
         return struct.pack('<LLLHHLBBBBHH', self.X, self.Y, self.Z, self.Unknown1, self.Unknown2, self.Unknown, self.InitScenaIndex, self.InitSectionIndex, self.TalkScenaIndex, self.TalkSectionIndex, self.Unknown4, self.Unknown5)
 
 class ScenarioScpInfo:
     # 0x60 bytes
-    def __init__(self, fs):
+    def __init__(self, fs = None):
+        if fs == None:
+            return
+
         self.buf = fs.read(0x60)
 
     def __str__(self):
         return str(self.buf)
 
+    def param(self):
+        return self.__str__()
+
     def binary(self):
         return self.buf
 
 class ScenarioInfoUnknown1:
-    def __init__(self, fs):
+    def __init__(self, fs = None):
+        if fs == None:
+            return
+
         self.buf = fs.read(0x24)
 
     def __str__(self):
         return str(self.buf)
+
+    def param(self):
+        return self.__str__()
 
     def binary(self):
         return self.buf
@@ -181,12 +219,14 @@ class ScenarioInfo:
 
         # file header end
 
-        self.ScenaFunctions  = []
-        self.NpcName        = []
-        self.ScnInfo        = []
+        self.ScenaFunctions     = []
+        self.NpcName            = []
+        self.ScnInfo            = []
+        self.CodeBlocks         = []
 
         for i in range(SCN_INFO_MAXIMUM):
             self.ScnInfo.append([])
+            self.ScnInfoOffset.append([])
 
     def open(self, buf):
         if type(buf) is str:
@@ -197,8 +237,8 @@ class ScenarioInfo:
 
         # file header
 
-        self.MapName                = fs.read(0xA).decode(CODE_PAGE)
-        self.Location               = fs.read(0xA).decode(CODE_PAGE)
+        self.MapName                = fs.read(0xA).decode(CODE_PAGE).split('\x00', 1)[0]
+        self.Location               = fs.read(0xA).decode(CODE_PAGE).split('\x00', 1)[0]
         self.Unknown_14             = fs.ulong()
         self.Flags                  = fs.ulong()
         self.IncludedScenario       = list(struct.unpack('<' + 'I' * NUMBER_OF_INCLUDE_FILE, fs.read(NUMBER_OF_INCLUDE_FILE * 4)))
@@ -217,17 +257,7 @@ class ScenarioInfo:
         self.InitScenaInfo(fs)
         self.InitOtherInfo(fs)
 
-        self.DisassembleBlocks(fs)
-
-    def DisassembleBlocks(self, fs):
-        disasm = Disassembler(edao.edao_op_table)
-
-        for func in self.ScenaFunctions:
-            fs.seek(func)
-            codeblocks = disasm.DisasmBlock(fs)
-
-            #print('%08X done' % func)
-            #input()
+        self.CodeBlocks = self.DisassembleBlocks(fs)
 
     def InitScenaInfo(self, fs):
         ScnInfoTypes = \
@@ -254,6 +284,135 @@ class ScenarioInfo:
 
         fs.seek(self.NpcNameOffset)
         self.NpcName = fs.read().decode(CODE_PAGE).rstrip('\x00').split('\x00')
+
+    def DisassembleBlocks(self, fs):
+        disasm = Disassembler(edao.edao_op_table)
+
+        codeblocks = []
+        for func in self.ScenaFunctions:
+            fs.seek(func)
+            block = disasm.DisasmBlock(fs)
+            block.Name = 'Function_%X' % block.Offset
+            codeblocks.append(block)
+
+        return codeblocks
+
+    def FormatCodeBlocks(self):
+        disasm = Disassembler(edao.edao_op_table)
+
+        blocks = []
+        for block in self.CodeBlocks:
+            blocks.append(disasm.FormatCodeBlock(block))
+
+        #for x in disasmtbl: print('%08X' % x)
+        #input()
+
+        return blocks
+
+
+    def stub(self):
+
+        hdrstub = '''\
+\
+CreateScena(
+    %s,                                     # MapName
+    %s,                                     # Location
+    0x%08X,                                 # Unknown_14
+    0x%08X,                                 # Flags
+    ('%s', '%s', '%s', '%s', '%s', '%s'),   # IncludedScenarioFileIndex
+                                            # NpcNameOffset (update later)
+                                            # ScnInfoOffset[SCN_INFO_MAXIMUM] (update later)
+                                            # ScenaFunctionTable (update later)
+                                            # UnknownEntry_46 (update later)
+    0x%02X,                                 # Unknown_4A
+    0x%02X,                                 # PreInitSectionIndex
+                                            # ScnInfoNumber[SCN_INFO_MAXIMUM] (update later)
+    %s,                                     # Unknown_51 (3 bytes)
+    %s,                                     # Information (0x40 bytes)
+)
+
+'''
+
+    def GenerateHeader(self):
+        hdr = []
+        hdr.append('from EDAOScenaFile import *')
+        hdr.append('')
+        hdr.append('CreateScenaFile(')
+        hdr.append('    "%s",                    # MapName' % self.MapName)
+        hdr.append('    "%s",                    # Location' % self.Location)
+        hdr.append('    0x%08X,                 # Unknown_14' % self.Unknown_14)
+        hdr.append('    0x%08X,                 # Flags' % self.Flags)
+
+        include = ''
+        for scp in self.IncludedScenario:
+            include += '0x%08X, ' % scp
+
+        hdr.append('    (%s),   # include' % include[:-2])
+        hdr.append('    0x%02X,                       # Unknown_4A' % self.Unknown_4A)
+        hdr.append('    0x%02X,                       # PreInitSectionIndex' % self.PreInitSectionIndex)
+        hdr.append('    %s,            # Unknown_51' % self.Unknown_51)
+        hdr.append('')
+        hdr.append('    # Information')
+        hdr.append('    %s,' % self.Information)
+
+        hdr.append(')')
+        hdr.append('')
+
+        if len(self.ScnInfo[SCN_INFO_CHIP]) != 0:
+            hdr.append('AddCharChip(')
+
+            for chip in self.ScnInfo[SCN_INFO_CHIP]:
+                hdr.append('    %s,' % chip.param())
+
+            hdr.append(')')
+            hdr.append('')
+
+        def AppendScpInfo(info, func):
+            if len(info) == 0:
+                return
+
+            for i in info:
+                hdr.append('%s(%s)' % (func, i.param()))
+
+            hdr.append('')
+
+        AppendScpInfo(self.ScnInfo[SCN_INFO_NPC_POSITION],      'Npc')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_MONSTER_POSITION],  'Monster')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_SCP_INFO],          'ScpInfo')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_UNKNOWN1],          'ScpInfoUnknwon1')
+
+        for block in self.CodeBlocks:
+            hdr.append('ScpFunction("%s")' % block.Name)
+
+        hdr.append('')
+
+        return hdr
+
+    def SaveToFile(self, filename):
+        lines = []
+
+        lines += self.GenerateHeader()
+
+        blocks = self.FormatCodeBlocks()
+
+        for block in blocks:
+            lines += block
+
+        txt = '\r\n'.join(lines)
+
+        lines = txt.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+
+        for i in range(2, len(lines)):
+            if lines[i] != '':
+                lines[i] = '    %s' % lines[i]
+
+        lines.insert(2, 'def main():')
+        lines.append('TryInvoke(main)')
+        lines.append('')
+
+        fs = open(filename, 'wb')
+        fs.write(''.encode('utf_8_sig'))
+        fs.write('\r\n'.join(lines).encode('UTF8'))
 
     def __str__(self):
         info = []

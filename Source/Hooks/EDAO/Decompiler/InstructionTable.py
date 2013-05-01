@@ -1,8 +1,9 @@
 from BaseType import *
 
-HANDLER_REASON_READ     = 0
-HANDLER_REASON_WRITE    = 1
-HANDLER_REASON_FORMAT   = 1
+HANDLER_REASON_READ             = 0
+HANDLER_REASON_WRITE            = 1
+HANDLER_REASON_FORMAT           = 2
+HANDLER_REASON_GET_HANDLER      = 3
 
 class HandlerData:
     def __init__(self, reason, TableEntry = None):
@@ -15,7 +16,9 @@ class HandlerData:
 
         self.TableEntry = TableEntry
 
-        self.Disasm = None
+        self.Disasm     = None
+        self.Format     = None
+        self.Assemble   = None
 
     def CreateBranch(self):
         data = HandlerData(self.Reason)
@@ -50,10 +53,15 @@ class HandlerData:
 #       return None
 #
 
+def DefaultGetLabelName(offset):
+    return 'loc_%X' % offset
+
 class InstructionTable(dict):
-    def __init__(self, GetOpCode, CodePage = '936'):
-        self.GetOpCode  = GetOpCode
-        self.CodePage   = CodePage
+    def __init__(self, GetOpCode, WriteOpCode, GetLabelName = DefaultGetLabelName, CodePage = '936'):
+        self.GetOpCode      = GetOpCode
+        self.WriteOpCode    = WriteOpCode
+        self.GetLabelName   = GetLabelName
+        self.CodePage       = CodePage
 
 NO_OPERAND = ''
 
@@ -64,8 +72,63 @@ class InstructionTableEntry:
         self.Operand    = operand
         self.Flags      = InstructionFlags(flags)
         self.Handler    = handler
-
         self.Container  = None
+
+    def FormatAllOperand(self, oprs, values, flags):
+        if len(oprs) != len(values):
+            raise Exception('operand: does not match values')
+
+        if len(oprs) == 0:
+            return ''
+
+        oprtext = self.FormatOperand(oprs[0], values[0], flags)
+
+        if not flags.ArgNewLine:
+            for i in range(1, len(oprs)):
+                tmp = ', ' + self.FormatOperand(oprs[i], values[i], flags)
+                oprtext += tmp
+
+        return oprtext
+
+    def FormatOperand(self, opr, value, flags):
+        oprtype = \
+        {
+            'c' : lambda : '%d' % value,
+            'C' : lambda : '%d' % value,
+
+            'b' : lambda : '0x%X' % value,
+            'B' : lambda : '0x%X' % value,
+
+            'w' : lambda : '0x%X' % value,
+            'W' : lambda : '0x%X' % value,
+
+            'h' : lambda : '%d' % value,
+            'H' : lambda : '%d' % value,
+
+            'l' : lambda : '0x%X' % value,
+            'L' : lambda : '0x%X' % value,
+
+            'i' : lambda : '%d' % value,
+            'I' : lambda : '%d' % value,
+
+            'q' : lambda : '0x%X' % value,
+            'Q' : lambda : '0x%X' % value,
+
+            'f' : lambda : '%f' % value,
+            'F' : lambda : '%f' % value,
+
+            'd' : lambda : '%f' % value,
+            'D' : lambda : '%f' % value,
+
+            's' : lambda : '"%s"' % value,
+            'S' : lambda : '"%s"' % value,
+
+            'o' : lambda : '"%s"' % DefaultGetLabelName(value),
+            'O' : lambda : '"%s"' % DefaultGetLabelName(value),
+        }
+
+        opr = oprtype[opr]
+        return opr()
 
     def GetAllOperand(self, oprs, fs):
         operand = []
@@ -88,12 +151,18 @@ class InstructionTableEntry:
 
         oprtype = \
         {
+            'c' : lambda : struct.unpack('<b', fs.read(1))[0],
+            'C' : lambda : struct.unpack('<B', fs.read(1))[0],
             'b' : lambda : struct.unpack('<b', fs.read(1))[0],
             'B' : lambda : struct.unpack('<B', fs.read(1))[0],
 
+            'h' : lambda : struct.unpack('<h', fs.read(2))[0],
+            'H' : lambda : struct.unpack('<H', fs.read(2))[0],
             'w' : lambda : struct.unpack('<h', fs.read(2))[0],
             'W' : lambda : struct.unpack('<H', fs.read(2))[0],
 
+            'i' : lambda : struct.unpack('<l', fs.read(4))[0],
+            'I' : lambda : struct.unpack('<L', fs.read(4))[0],
             'l' : lambda : struct.unpack('<l', fs.read(4))[0],
             'L' : lambda : struct.unpack('<L', fs.read(4))[0],
 
@@ -119,12 +188,18 @@ class InstructionTableEntry:
     def GetOperandSize(self, opr, fs):
         oprsize = \
         {
+            'c' : lambda : 1,
+            'C' : lambda : 1,
             'b' : lambda : 1,
             'B' : lambda : 1,
 
+            'h' : lambda : 2,
+            'H' : lambda : 2,
             'w' : lambda : 2,
             'W' : lambda : 2,
 
+            'i' : lambda : 4,
+            'I' : lambda : 4,
             'l' : lambda : 4,
             'L' : lambda : 4,
 
@@ -137,8 +212,8 @@ class InstructionTableEntry:
             'd' : lambda : 8,
             'D' : lambda : 8,
 
-            's' : lambda : len(self.GetOperand(opr, fs)),
-            'S' : lambda : len(self.GetOperand(opr, fs)),
+            's' : lambda : self.GetOperand(opr, fs),
+            'S' : lambda : self.GetOperand(opr, fs),
 
             'o' : lambda : 4,   # offset
             'O' : lambda : 4,   # offset

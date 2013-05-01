@@ -1,21 +1,26 @@
 from InstructionTable import *
 
-CODE_PAGE = '936'
+CODE_PAGE = '932'
 
-def SplitText(text):
-    return text.split('\x01')
+def GetOpCode(fs):
+    return fs.byte()
+
+def WriteOpCode(op):
+    return struct.pack('<B', op)
+
+edao_op_table = InstructionTable(GetOpCode, WriteOpCode, DefaultGetLabelName, CODE_PAGE)
 
 InstructionNames = {}
 
 InstructionNames[0x00]  = 'OP_00'
 InstructionNames[0x01]  = 'Return'
-InstructionNames[0x02]  = 'If'
+InstructionNames[0x02]  = 'Jc'
 InstructionNames[0x03]  = 'Jump'
 InstructionNames[0x04]  = 'Switch'
 InstructionNames[0x05]  = 'Call'
 InstructionNames[0x06]  = 'NewScene'
 InstructionNames[0x07]  = 'OP_07'
-InstructionNames[0x08]  = 'OP_08'
+InstructionNames[0x08]  = 'Sleep'
 InstructionNames[0x09]  = 'SetXXXFlags'
 InstructionNames[0x0A]  = 'ClearXXXFlags'
 InstructionNames[0x0B]  = 'OP_0B'
@@ -93,7 +98,7 @@ InstructionNames[0x55]  = 'AnonymousTalk'
 InstructionNames[0x56]  = 'OP_56'
 InstructionNames[0x57]  = 'OP_57'
 InstructionNames[0x58]  = 'OP_58'
-InstructionNames[0x59]  = 'OP_59'
+InstructionNames[0x59]  = 'CloseMessageWindow'
 InstructionNames[0x5A]  = 'OP_5A'
 InstructionNames[0x5B]  = 'OP_5B'
 InstructionNames[0x5C]  = 'ChrTalk'
@@ -101,7 +106,7 @@ InstructionNames[0x5D]  = 'NpcTalk'
 InstructionNames[0x5E]  = 'Menu'
 InstructionNames[0x5F]  = 'MenuEnd'
 InstructionNames[0x60]  = 'OP_60'
-InstructionNames[0x61]  = 'OP_61'
+InstructionNames[0x61]  = 'SetChrName'
 InstructionNames[0x62]  = 'OP_62'
 InstructionNames[0x63]  = 'OP_63'
 InstructionNames[0x64]  = 'OP_64'
@@ -195,7 +200,7 @@ InstructionNames[0xC4]  = 'OP_C4'
 InstructionNames[0xC5]  = 'OP_C5'
 InstructionNames[0xC7]  = 'OP_C7'
 InstructionNames[0xC9]  = 'OP_C9'
-InstructionNames[0xCA]  = 'OP_CA'
+InstructionNames[0xCA]  = 'CreatePortrait'
 InstructionNames[0xCB]  = 'OP_CB'
 InstructionNames[0xCC]  = 'OP_CC'
 InstructionNames[0xCD]  = 'PlaceName2'
@@ -239,32 +244,169 @@ for op, name in InstructionNames.items():
     expr = '%s = 0x%08X' % (name, op)
     exec(expr)
 
+SCPSTR_CODE_STRING      = -1
+SCPSTR_CODE_ITEM        = 0x1F
+SCPSTR_CODE_LINE_FEED   = 0x01
+SCPSTR_CODE_ENTER       = 0x02
+SCPSTR_CODE_CLEAR       = 0x03
+SCPSTR_CODE_07          = 0x07
+
+class ScpString:
+    def __init__(self, CtrlCode, Value = None):
+        self.CtrlCode   = CtrlCode
+        self.Value      = Value
+
+    def binary(self):
+        pass
+
+    def __str__(self):
+        if self.CtrlCode == SCPSTR_CODE_STRING:
+            return '"%s"' % self.Value
+
+        if self.Value == None:
+            return 'scpstr(0x%X)' % (self.CtrlCode)
+
+        return 'scpstr(0x%X, 0x%X)' % (self.CtrlCode, self.Value)
+
+def BuildStringListFromObjectList(strlist):
+    s = []
+    laststrindex = None
+    for x in strlist:
+        if  x.CtrlCode == SCPSTR_CODE_LINE_FEED or \
+            x.CtrlCode == SCPSTR_CODE_ENTER     or \
+            x.CtrlCode == SCPSTR_CODE_CLEAR     or \
+            x.CtrlCode == SCPSTR_CODE_07:
+
+            if len(s) != laststrindex:
+
+                s.append(str(x))
+
+            else:
+
+                if x.CtrlCode == SCPSTR_CODE_07:
+                    tmp = '\\x%02X\\x%02X' % (x.CtrlCode, x.Value)
+                else:
+                    tmp = '\\x%02X' % x.CtrlCode
+                s[-1] = '"%s%s"' % (s[-1][1:-1], tmp)
+
+        elif x.CtrlCode == SCPSTR_CODE_STRING:
+
+            s.append(str(x))
+            laststrindex = len(s)
+
+        else:
+
+            s.append(str(x))
+
+    return s
+
 class EDAOInstructionTableEntry(InstructionTableEntry):
     def __init__(self, op, name = '', operand = NO_OPERAND, flags = 0, handler = None):
         super().__init__(op, name, operand, flags, handler)
+
+    def FormatOperand(self, opr, value, flags):
+        def formatstr(strlist):
+            s = BuildStringListFromObjectList(strlist)
+
+            if not flags.ArgNewLine:
+                if len(s) == 1:
+                    return s[0]
+
+                return '(' + ', '.join(s) + ')'
+
+            tmp = []
+            tmp.append('(')
+            for arg in s:
+                tmp.append('    %s,' % arg)
+            tmp.append(')')
+
+            return tmp
+
+        oprtype = \
+        {
+            'e' : lambda : FormatExpressionList(value),
+            'E' : lambda : FormatExpressionList(value),
+
+            's' : lambda : formatstr(value),
+            'S' : lambda : formatstr(value),
+        }
+
+        return oprtype[opr]() if opr in oprtype else super().FormatOperand(opr, value, flags)
 
     def GetOperand(self, opr, fs):
         if opr.lower() != 's':
             return super().GetOperand(opr, fs)
 
-        string = b''
-        while True:
-            buf = fs.read(1)
-            if buf == b'\x07':
-                buf += fs.read(1)
-            elif buf == b'' or buf == b'\x00':
-                break
+        def readstr():
+            string = []
+            tmpstr = ''
 
-            string += buf
+            while True:
+                buf = fs.read(1)
 
-        return string.decode(self.Container.CodePage)
+                if buf < b' ':
+                    if tmpstr != '':
+                        string.append(ScpString(SCPSTR_CODE_STRING, tmpstr))
+                        tmpstr = ''
+
+                    code = struct.unpack('<B', buf)[0]
+
+                    if code == 0:
+                        break
+
+                    strobj = ScpString(code)
+
+                    if code == SCPSTR_CODE_07:
+
+                        # dummy byte ?
+                        strobj.Value = fs.byte()
+
+                    elif code == SCPSTR_CODE_LINE_FEED or code == 0x0A:
+
+                        # line feed
+                        pass
+
+                    elif code == SCPSTR_CODE_ENTER:
+
+                        # need press enter
+                        pass
+
+                    elif code == SCPSTR_CODE_CLEAR or code == 0x04:
+
+                        # unknown
+                        pass
+
+                    elif code == 0x06:
+
+                        # unknown
+                        pass
+
+                    elif code == SCPSTR_CODE_ITEM:
+
+                        # item id
+                        strobj.Value = fs.ushort()
+
+                    string.append(strobj)
+
+                    continue
+
+                elif buf >= b'\x80':
+
+                    buf += fs.read(1)
+
+                tmpstr += buf.decode(self.Container.CodePage)
+
+            return string
+
+        return readstr()
 
     def GetOperandSize(self, opr, fs):
         if opr.lower() != 's':
             return super().GetOperandSize(opr, fs)
 
         pos = fs.tell()
-        oprsize = len(self.GetOperand(opr, fs))
+        self.GetOperand(opr, fs)
+        oprsize = fs.tell() - pos
         fs.seek(pos)
         return oprsize
 
@@ -274,50 +416,85 @@ def inst(op, operand = NO_OPERAND, flags = 0, handler = None):
 def instopr(opr, size):
     return InstructionOperand(opr, size)
 
-def GetOpCode(fs):
-    return fs.byte()
+ExpressionOperantions = {}
 
-EXPRESSION_PUSH_LONG        = 0x00
-EXPRESSION_END              = 0x01
-EXPRESSION_EQU              = 0x02
-EXPRESSION_NEQ              = 0x03
-EXPRESSION_LSS              = 0x04
-EXPRESSION_GTR              = 0x05
-EXPRESSION_LEQ              = 0x06
-EXPRESSION_GE               = 0x07
-EXPRESSION_EQUZ             = 0x08
-EXPRESSION_NEQUZ_I64        = 0x09
-EXPRESSION_AND              = 0x0A
-EXPRESSION_OR               = 0x0B
-EXPRESSION_ADD              = 0x0C
-EXPRESSION_SUB              = 0x0D
-EXPRESSION_NEG              = 0x0E
-EXPRESSION_XOR              = 0x0F
-EXPRESSION_IMUL             = 0x10
-EXPRESSION_IDIV             = 0x11
-EXPRESSION_IMOD             = 0x12
-EXPRESSION_STUB             = 0x13
-EXPRESSION_IMUL_SAVE        = 0x14
-EXPRESSION_IDIV_SAVE        = 0x15
-EXPRESSION_IMOD_SAVE        = 0x16
-EXPRESSION_ADD_SAVE         = 0x17
-EXPRESSION_SUB_SAVE         = 0x18
-EXPRESSION_AND_SAVE         = 0x19
-EXPRESSION_XOR_SAVE         = 0x1A
-EXPRESSION_OR_SAVE          = 0x1B
-EXPRESSION_EXEC_OP          = 0x1C
-EXPRESSION_NOT              = 0x1D
-EXPRESSION_1E               = 0x1E
-EXPRESSION_GET_RESULT       = 0x1F
-EXPRESSION_PUSH_VALUE_INDEX = 0x20
-EXPRESSION_GET_CHR_WORK     = 0x21
-EXPRESSION_RAND             = 0x22
-EXPRESSION_23               = 0x23
+ExpressionOperantions[0x00] = 'EXPR_PUSH_LONG'
+ExpressionOperantions[0x01] = 'EXPR_END'
+ExpressionOperantions[0x02] = 'EXPR_EQU'
+ExpressionOperantions[0x03] = 'EXPR_NEQ'
+ExpressionOperantions[0x04] = 'EXPR_LSS'
+ExpressionOperantions[0x05] = 'EXPR_GTR'
+ExpressionOperantions[0x06] = 'EXPR_LEQ'
+ExpressionOperantions[0x07] = 'EXPR_GE'
+ExpressionOperantions[0x08] = 'EXPR_EQUZ'
+ExpressionOperantions[0x09] = 'EXPR_NEQUZ_I64'
+ExpressionOperantions[0x0A] = 'EXPR_AND'
+ExpressionOperantions[0x0B] = 'EXPR_OR'
+ExpressionOperantions[0x0C] = 'EXPR_ADD'
+ExpressionOperantions[0x0D] = 'EXPR_SUB'
+ExpressionOperantions[0x0E] = 'EXPR_NEG'
+ExpressionOperantions[0x0F] = 'EXPR_XOR'
+ExpressionOperantions[0x10] = 'EXPR_IMUL'
+ExpressionOperantions[0x11] = 'EXPR_IDIV'
+ExpressionOperantions[0x12] = 'EXPR_IMOD'
+ExpressionOperantions[0x13] = 'EXPR_STUB'
+ExpressionOperantions[0x14] = 'EXPR_IMUL_SAVE'
+ExpressionOperantions[0x15] = 'EXPR_IDIV_SAVE'
+ExpressionOperantions[0x16] = 'EXPR_IMOD_SAVE'
+ExpressionOperantions[0x17] = 'EXPR_ADD_SAVE'
+ExpressionOperantions[0x18] = 'EXPR_SUB_SAVE'
+ExpressionOperantions[0x19] = 'EXPR_AND_SAVE'
+ExpressionOperantions[0x1A] = 'EXPR_XOR_SAVE'
+ExpressionOperantions[0x1B] = 'EXPR_OR_SAVE'
+ExpressionOperantions[0x1C] = 'EXPR_EXEC_OP'
+ExpressionOperantions[0x1D] = 'EXPR_NOT'
+ExpressionOperantions[0x1E] = 'EXPR_1E'
+ExpressionOperantions[0x1F] = 'EXPR_GET_RESULT'
+ExpressionOperantions[0x20] = 'EXPR_PUSH_VALUE_INDEX'
+ExpressionOperantions[0x21] = 'EXPR_GET_CHR_WORK'
+ExpressionOperantions[0x22] = 'EXPR_RAND'
+ExpressionOperantions[0x23] = 'EXPR_23'
+
+for opr, expr in ExpressionOperantions.items():
+    exec('%s = 0x%X' % (expr, opr))
 
 class ScpExpression:
     def __init__(self, operation = None, operand = None):
         self.Operation = operation
         self.Operand = operand if operand != None else []
+
+    def binary(self):
+        return b''
+
+    def __str__(self):
+        if self.Operation != EXPR_EXEC_OP:
+            txt = 'scpexpr(%s' % ExpressionOperantions[self.Operation]
+            for opr in self.Operand:
+                txt += ', 0x%X' % opr
+
+            txt += ')'
+            return txt
+
+        import Assembler
+
+        asm = Assembler.Disassembler(edao_op_table)
+
+        txt = 'scpexpr(%s' % ExpressionOperantions[self.Operation]
+        for inst in self.Operand:
+            data = HandlerData(HANDLER_REASON_FORMAT)
+            data.Instruction    = inst
+            data.TableEntry     = edao_op_table[inst.OpCode]
+            txt += ', %s' % asm.FormatInstruction(data)
+
+        txt += ')'
+        return txt
+
+def FormatExpressionList(exprlist):
+    exprtxt = '%s' % exprlist[0]
+    for expr in exprlist[1:]:
+        exprtxt += ', %s' % expr
+
+    return '(%s)' % exprtxt
 
 def ParseScpExpression(data):
     expr = []
@@ -330,46 +507,46 @@ def ParseScpExpression(data):
 
         scpexpr = ScpExpression(operation)
 
-        if operation == EXPRESSION_PUSH_LONG:
+        if operation == EXPR_PUSH_LONG:
 
             scpexpr.Operand.append(fs.ulong())
 
-        elif operation == EXPRESSION_END:
+        elif operation == EXPR_END:
 
             break
 
-        elif operation == EXPRESSION_EQU            or \
-             operation == EXPRESSION_NEQ            or \
-             operation == EXPRESSION_LSS            or \
-             operation == EXPRESSION_GTR            or \
-             operation == EXPRESSION_LEQ            or \
-             operation == EXPRESSION_GE             or \
-             operation == EXPRESSION_EQUZ           or \
-             operation == EXPRESSION_NEQUZ_I64      or \
-             operation == EXPRESSION_AND            or \
-             operation == EXPRESSION_OR             or \
-             operation == EXPRESSION_ADD            or \
-             operation == EXPRESSION_SUB            or \
-             operation == EXPRESSION_NEG            or \
-             operation == EXPRESSION_XOR            or \
-             operation == EXPRESSION_IMUL           or \
-             operation == EXPRESSION_IDIV           or \
-             operation == EXPRESSION_IMOD           or \
-             operation == EXPRESSION_STUB           or \
-             operation == EXPRESSION_IMUL_SAVE      or \
-             operation == EXPRESSION_IDIV_SAVE      or \
-             operation == EXPRESSION_IMOD_SAVE      or \
-             operation == EXPRESSION_ADD_SAVE       or \
-             operation == EXPRESSION_SUB_SAVE       or \
-             operation == EXPRESSION_AND_SAVE       or \
-             operation == EXPRESSION_XOR_SAVE       or \
-             operation == EXPRESSION_OR_SAVE        or \
-             operation == EXPRESSION_NOT:
+        elif operation == EXPR_EQU            or \
+             operation == EXPR_NEQ            or \
+             operation == EXPR_LSS            or \
+             operation == EXPR_GTR            or \
+             operation == EXPR_LEQ            or \
+             operation == EXPR_GE             or \
+             operation == EXPR_EQUZ           or \
+             operation == EXPR_NEQUZ_I64      or \
+             operation == EXPR_AND            or \
+             operation == EXPR_OR             or \
+             operation == EXPR_ADD            or \
+             operation == EXPR_SUB            or \
+             operation == EXPR_NEG            or \
+             operation == EXPR_XOR            or \
+             operation == EXPR_IMUL           or \
+             operation == EXPR_IDIV           or \
+             operation == EXPR_IMOD           or \
+             operation == EXPR_STUB           or \
+             operation == EXPR_IMUL_SAVE      or \
+             operation == EXPR_IDIV_SAVE      or \
+             operation == EXPR_IMOD_SAVE      or \
+             operation == EXPR_ADD_SAVE       or \
+             operation == EXPR_SUB_SAVE       or \
+             operation == EXPR_AND_SAVE       or \
+             operation == EXPR_XOR_SAVE       or \
+             operation == EXPR_OR_SAVE        or \
+             operation == EXPR_NOT:
 
             # pop all operand, and push result
             pass
 
-        elif operation == EXPRESSION_EXEC_OP:
+        elif operation == EXPR_EXEC_OP:
 
             # execute one op code
 
@@ -379,25 +556,25 @@ def ParseScpExpression(data):
             execinst = execdata.Disasm(execdata)
             scpexpr.Operand.append(execinst)
 
-        elif operation == EXPRESSION_1E or \
-             operation == EXPRESSION_GET_RESULT:
+        elif operation == EXPR_1E or \
+             operation == EXPR_GET_RESULT:
 
             scpexpr.Operand.append(fs.ushort())
 
-        elif operation == EXPRESSION_PUSH_VALUE_INDEX:
+        elif operation == EXPR_PUSH_VALUE_INDEX:
 
             scpexpr.Operand.append(fs.byte())
 
-        elif operation == EXPRESSION_GET_CHR_WORK:
+        elif operation == EXPR_GET_CHR_WORK:
 
             scpexpr.Operand.append(fs.ushort())
             scpexpr.Operand.append(fs.byte())
 
-        elif operation == EXPRESSION_RAND:
+        elif operation == EXPR_RAND:
 
             pass
 
-        elif operation == EXPRESSION_23:
+        elif operation == EXPR_23:
 
             scpexpr.Operand.append(fs.byte())
 
@@ -420,7 +597,16 @@ def scp_if(data):
         ins.Operand.append(offset)
         ins.BranchTargets.append(offset)
 
+        ins.OperandFormat = 'EO'
+
         return ins
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+        # Jc(expression, 'label')
+        #entry = data.TableEntry
+        #ins = data.Instruction
+        #return '%s(%s, "%s")' % (entry.OpName, FormatExpressionList(ins.Operand[0]), entry.Container.GetLabelName(ins.Operand[1]))
+        pass
 
 def scp_switch(data):
 
@@ -454,6 +640,42 @@ def scp_switch(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_FORMAT:
+        #   switch(
+        #       Expression,
+        #       (CaseID, CaseLabel),
+        #       (CaseID, CaseLabel),
+        #       (CaseID, CaseLabel),
+        #       (-1,    DefaultLabel)
+        #   )
+
+        ins = data.Instruction
+        entry = data.TableEntry
+
+        txt = []
+        txt.append('%s(' % entry.OpName)
+        txt.append('    %s,' % FormatExpressionList(ins.Operand[0]))
+
+        GetLabelName = entry.Container.GetLabelName
+
+        for case in ins.Operand[1]:
+            txt.append('    (%d, "%s"),' % (case[0], GetLabelName(case[1])))
+
+        txt.append('    (-1, "%s"),' % GetLabelName(ins.Operand[-1]))
+        txt.append(')')
+        txt.append('')
+
+        return '\r\n'.join(txt)
+
+'''
+
+typedef struct
+{
+    
+}
+
+'''
+
 def scp_battle(data):
 
     if data.Reason == HANDLER_REASON_READ:
@@ -461,17 +683,25 @@ def scp_battle(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        opr1 = fs.ulong()
+        BattleInfoOffset = fs.ulong()
         opr2 = fs.ulong()
 
-        ins.Operand.append(opr1)
+        ins.Operand.append(BattleInfoOffset)
         ins.Operand.append(opr2)
 
-        if opr1 != 0xFFFFFFFF:
+        if BattleInfoOffset != 0xFFFFFFFF:
+            # size = 0x18 + 0x2C
+            # sizeof(BattleInfo + [0x28]) =  0x10
+            # sizeof(BattleInfo + [0x20]) =  0x20
+
             ins.Operand.append(fs.byte())
             ins.Operand.append(fs.ushort())
             ins.Operand.append(fs.ushort())
             ins.Operand.append(fs.ushort())
+
+            ins.BranchTargets.append(BattleInfoOffset)
+
+            ins.OperandFormat = 'LLBWWW'
 
             return ins
 
@@ -486,6 +716,8 @@ def scp_battle(data):
 
         ins.Operand.append(fs.ushort())
         ins.Operand.append(fs.ushort())
+
+        ins.OperandFormat = 'LL' + ('L' * 4) + ('L' * 8) + 'LL'
 
         return ins
 
@@ -510,6 +742,24 @@ def scp_1d(data):
             operand = 'B'
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'BB' + operand
+
+        return ins
+
+def scp_play_bgm(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        bgm, volume = data.TableEntry.GetAllOperand('HC', fs)
+        ins.Operand.append([ScpString(SCPSTR_CODE_STRING, 'ed7%d' % bgm)])
+        ins.Operand.append(volume)
+
+        ins.OperandFormat = 'SC'
+
         return ins
 
 def scp_29(data):
@@ -533,6 +783,9 @@ def scp_29(data):
             operand = 'B'
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'WB' + operand
+
         return ins
 
 def scp_2a(data):
@@ -542,20 +795,17 @@ def scp_2a(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        opr1 = fs.ushort()
-        opr2 = fs.byte()
+        opr1, opr2 = data.TableEntry.GetAllOperand('WB', fs)
 
         ins.Operand.append(opr1)
         ins.Operand.append(opr2)
 
-        operand = ''
-
-        if opr2 == 1:
-            operand = 'W'
-        else:
-            operand = 'B'
+        operand = 'W' if opr2 == 1 else 'B'
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'WB' + operand
+
         return ins
 
 def scp_2b(data):
@@ -570,6 +820,8 @@ def scp_2b(data):
             ins.Operand.append(opr)
             if opr == 0xFFFF:
                 break
+
+        ins.OperandFormat = 'W' * len(ins.Operand)
 
         return ins
 
@@ -594,6 +846,9 @@ def scp_38(data):
             operand = 'B'
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'BB' + operand
+
         return ins
 
 def scp_4e(data):
@@ -605,6 +860,8 @@ def scp_4e(data):
         ins.Operand.append(fs.ushort())
         ins.Operand.append(ParseScpExpression(data))
 
+        ins.OperandFormat = 'WE'
+
         return ins
 
 def scp_50(data):
@@ -615,6 +872,8 @@ def scp_50(data):
         ins = data.Instruction
         ins.Operand.append(fs.byte())
         ins.Operand.append(ParseScpExpression(data))
+
+        ins.OperandFormat = 'BE'
 
         return ins
 
@@ -628,7 +887,49 @@ def scp_52(data):
         ins.Operand = data.TableEntry.GetAllOperand('WB', fs)
         ins.Operand.append(ParseScpExpression(data))
 
+        ins.OperandFormat = 'WBE'
+
         return ins
+
+# ChrTalk(0x9, ("#01109F嘿嘿，其实我昨天", scpstr(0x1), "买了很多食材～", scpstr(0x2), scpstr(0x3), "虽然今天下雨了，", scpstr(0x1), "但不用再跑出去买东西了～", scpstr(0x2)))
+
+def FormatTalk(data, textcount = 1):
+
+    #   ChrTalk(
+    #       ActorId,
+    #       (
+    #           'text',
+    #       ),
+    #   )
+
+    #bp()
+
+    entry = data.TableEntry
+    ins = data.Instruction
+
+    txt = [ '', '%s(' % entry.OpName ]
+
+    txt.append('    0x%X,' % ins.Operand[0])
+
+    for i in range(1, textcount + 1):
+
+        strlist = BuildStringListFromObjectList(ins.Operand[i])
+        if len(strlist) == 1:
+            s = '    %s' % strlist[0]
+            if i != textcount:
+                s += ','
+            txt.append(s)
+            continue
+
+        txt.append('    (')
+        for s in strlist:
+            txt.append('        %s,' % s)
+        txt.append('    )')
+
+    txt.append(')')
+    txt.append('')
+
+    return '\r\n'.join(txt)
 
 def scp_anonymous_talk(data):
 
@@ -636,32 +937,34 @@ def scp_anonymous_talk(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        if fs.tell() == 0x71B1:
-            bp()
-
-        target = fs.ushort()
-        text = data.TableEntry.GetOperand('S', fs)
-        text = SplitText(text)
+        target, text = data.TableEntry.GetAllOperand('WS', fs)
 
         ins.Operand.append(target)
         ins.Operand.append(text)
 
+        ins.OperandFormat = 'WS'
+
         return ins
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        return FormatTalk(data)
 
 def scp_create_chr_talk(data):
 
     if data.Reason == HANDLER_REASON_READ:
 
-        # #FACE_INDEX
-        # split by 0x00 0x01 0x03 0x04 0x06 0x07 0x0A 0x1F
-
         fs = data.FileStream
         ins = data.Instruction
-        ins.Operand = data.TableEntry.GetAllOperand('W', fs)
-        text = SplitText(data.TableEntry.GetOperand('S', fs))
-        ins.Operand.append(text)
+        ins.Operand = data.TableEntry.GetAllOperand('WS', fs)
+
+        ins.OperandFormat = 'WS'
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        return FormatTalk(data)
 
 def scp_create_npc_talk(data):
 
@@ -670,44 +973,40 @@ def scp_create_npc_talk(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        target = fs.ushort()
-        name = data.TableEntry.GetOperand('S', fs)
-        text = data.TableEntry.GetOperand('S', fs)
-        text = SplitText(text)
+        target, name, text = data.TableEntry.GetAllOperand('WSS', fs)
 
         ins.Operand.append(target)
         ins.Operand.append(name)
         ins.Operand.append(text)
 
+        ins.OperandFormat = 'WSS'
+
         return ins
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        return FormatTalk(data, 2)
 
 def scp_create_menu(data):
 
-    # max 10 line
+    # max 10 line ?
 
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
         ins = data.Instruction
-        ins.Operand = data.TableEntry.GetAllOperand('WWWB', fs)
-        menutext = data.TableEntry.GetOperand('S', fs)
 
-        menuitems = SplitText(menutext)
+        ins.Operand = data.TableEntry.GetAllOperand('WWWB', fs)
+        menuitems = data.TableEntry.GetOperand('S', fs)
         ins.Operand.append(menuitems)
+
+        ins.OperandFormat = 'WWWBS'
 
         return ins
 
 def scp_76(data):
 
-    if data.Reason == HANDLER_REASON_READ:
-
-        fs = data.FileStream
-        ins = data.Instruction
-
-        ins.Operand = data.TableEntry.GetAllOperand('BSB', fs)
-
-        opr3 = ins.Operand[2]
-
+    def getopr(opr3):
         operand = ''
         if opr3 == 0 or \
            opr3 == 1 or \
@@ -719,7 +1018,21 @@ def scp_76(data):
 
             operand = 'S'
 
+        return operand
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        ins.Operand = data.TableEntry.GetAllOperand('BSB', fs)
+
+        opr3 = ins.Operand[2]
+
+        operand = getopr(opr3)
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'BSB' + operand
 
         return ins
 
@@ -734,7 +1047,6 @@ def scp_9f(data):
 
         opr = ins.Operand[0]
 
-        operand = ''
         if opr == 0:
             operand = 'W'
         elif opr == 1:
@@ -743,6 +1055,24 @@ def scp_9f(data):
             operand = 'WLB'
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'B' + operand
+
+        return ins
+
+def scp_a1(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        ins.Operand = data.TableEntry.GetAllOperand('WWB', fs)
+
+        operand = 'B' * ins.Operand[-1]
+        ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'WWB' + operand
 
         return ins
 
@@ -753,10 +1083,14 @@ def scp_cf(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        ins.Operand = data.TableEntry.GetAllOperand('BB', fs)
+        operand = 'BB'
+        ins.Operand = data.TableEntry.GetAllOperand(operand, fs)
 
         if ins.Operand[0] != 0:
             ins.Operand += data.TableEntry.GetAllOperand('B', fs)
+            operand += 'B'
+
+        ins.OperandFormat = operand
 
         return ins
 
@@ -769,8 +1103,7 @@ def scp_menu_cmd(data):
         ins = Instruction()
         ins = data.Instruction
 
-        menutype = fs.byte()
-        menu_xxx = fs.byte()
+        menutype, menu_xxx = data.TableEntry.GetAllOperand('BB', fs)
 
         ins.Operand.append(menutype)
         ins.Operand.append(menu_xxx)
@@ -794,6 +1127,8 @@ def scp_menu_cmd(data):
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
+        ins.OperandFormat = 'BB' + operand
+
         return ins
 
 def scp_d2(data):
@@ -805,6 +1140,8 @@ def scp_d2(data):
         ins.Operand.append(fs.byte())
         ins.Operand.append(ParseScpExpression(data))
 
+        ins.OperandFormat = 'BE'
+
         return ins
 
 def scp_e4(data):
@@ -814,7 +1151,7 @@ def scp_e4(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        opr = fs.byte()
+        opr = data.TableEntry.GetAllOperand('B', fs)
         ins.Operand.append(opr)
 
         operand = ''
@@ -829,19 +1166,21 @@ def scp_e4(data):
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
+        ins.OperandFormat = 'B' + operand
+
         return ins
 
 edao_op_list = \
 [
     inst(OP_00),
     inst(Return,            NO_OPERAND,         INSTRUCTION_END_BLOCK),
-    inst(If,                NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_if),
+    inst(Jc,                NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_if),
     inst(Jump,              'O',                INSTRUCTION_END_BLOCK),
     inst(Switch,            NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_switch),
     inst(Call,              'BB'),          # included_scp index, func index
     inst(NewScene,          'LBB'),
     inst(OP_07,             NO_OPERAND),
-    inst(OP_08,             'W'),
+    inst(Sleep,             'H'),
     inst(SetXXXFlags,       'L'),
     inst(ClearXXXFlags,     'L'),
     inst(OP_0B,             'LLB'),
@@ -862,16 +1201,16 @@ edao_op_list = \
     inst(OP_1B,             'BBW'),
     inst(OP_1C,             'BBBBBBWW'),
     inst(OP_1D,             NO_OPERAND,         0,                              scp_1d),
-    inst(PlayBgm,           'WB'),
+    inst(PlayBgm,           'HC',               0,                              scp_play_bgm),
     inst(OP_1F),
     inst(VolumeBgm,         'BL'),
     inst(OP_21,             'L'),
     inst(OP_22),
-    inst(Sound,             'WBBB'),
+    inst(Sound,             'HCCC'),
     inst(OP_24,             'W'),
     inst(OP_25,             'WB'),
     inst(SoundDistance,     'WLLLLLBL'),
-    inst(SoundLoad,         'W'),
+    inst(SoundLoad,         'H'),
     inst(OP_28),
     inst(OP_29,             NO_OPERAND,         0,                              scp_29),
     inst(OP_2A,             NO_OPERAND,         0,                              scp_2a),
@@ -908,18 +1247,18 @@ edao_op_list = \
     inst(OP_4B,             'WB'),
     inst(OP_4C,             'WB'),
     inst(OP_4D),
-    inst(OP_4E,             NO_OPERAND,         0,                              scp_4e),
+    inst(OP_4E,             'WE',               0,                              scp_4e),
     inst(OP_4F),
-    inst(OP_50,             NO_OPERAND,         0,                              scp_50),
+    inst(OP_50,             'BE',               0,                              scp_50),
     inst(OP_51),
-    inst(OP_52,             NO_OPERAND,         0,                              scp_52),
+    inst(OP_52,             'WBE',              0,                              scp_52),
     inst(OP_53,             'W'),
     inst(OP_54,             'W'),
     inst(AnonymousTalk,     NO_OPERAND,         0,                              scp_anonymous_talk),
     inst(OP_56),
     inst(OP_57,             'B'),
     inst(OP_58,             'WWWS'),
-    inst(OP_59),
+    inst(CloseMessageWindow),
     inst(OP_5A),
     inst(OP_5B,             'WWWW'),
     inst(ChrTalk,           NO_OPERAND,         0,                              scp_create_chr_talk),
@@ -927,7 +1266,7 @@ edao_op_list = \
     inst(Menu,              NO_OPERAND,         0,                              scp_create_menu),
     inst(MenuEnd,           'W'),
     inst(OP_60,             'W'),
-    inst(OP_61,             'S'),
+    inst(SetChrName,        'S'),
     inst(OP_62,             'W'),
     inst(OP_63,             'WLLBBLB'),
     inst(OP_64,             'W'),
@@ -948,7 +1287,7 @@ edao_op_list = \
     inst(OP_73,             'BL'),
     inst(OP_74,             'WB'),
     inst(OP_75,             'BBL'),
-    inst(OP_76,             'BSB',              0,                              scp_76),
+    inst(OP_76,             NO_OPERAND,         0,                              scp_76),
     inst(OP_77,             'BW'),
     inst(OP_78,             'BW'),
     inst(OP_79,             'W'),
@@ -959,7 +1298,7 @@ edao_op_list = \
     inst(OP_83,             'BWWW'),
     inst(OP_84,             'BB'),
     inst(LoadEffect,        'BS'),
-    inst(PlayEffect,        'BBWWLLLWWWLLLWLLLL'),
+    inst(PlayEffect,        'BBWWIIIHHHIIIWIIII'),
     inst(OP_87,             'BBBSWLLLWWWLLLL'),
     inst(OP_88,             'BB'),
     inst(OP_89,             'BB'),
@@ -985,8 +1324,8 @@ edao_op_list = \
     inst(OP_9D,             'WLLLLL'),
     inst(OP_9E,             'WLLLLW'),
     inst(OP_9F,             NO_OPERAND,             0,                          scp_9f),
-    inst(OP_A0,             'WWBB'),
-    inst(OP_A1,             'WWB'),
+    inst(OP_A0,             'WHBB'),
+    inst(OP_A1,             NO_OPERAND,             0,                          scp_a1),
     inst(OP_A2,             'WW'),
     inst(OP_A3,             'WW'),
     inst(OP_A4,             'WW'),
@@ -1021,7 +1360,7 @@ edao_op_list = \
     inst(OP_C5,             'BLLLLLLLL'),
     inst(OP_C7,             'BB'),
     inst(OP_C9,             'BL'),
-    inst(OP_CA,             'BWWWWWWWWWWWWLBS'),
+    inst(CreatePortrait,    'CHHHHHHHHHHHHLBS'),
     inst(OP_CB,             'BBLLLL'),
     inst(OP_CC,             'BBB'),
     inst(PlaceName2,        'WWSBW'),
@@ -1029,7 +1368,7 @@ edao_op_list = \
     inst(OP_CF,             NO_OPERAND,             0,                          scp_cf),
     inst(MenuCmd,           NO_OPERAND,             0,                          scp_menu_cmd),
     inst(OP_D1,             'W'),
-    inst(OP_D2,             NO_OPERAND,             0,                          scp_d2),
+    inst(OP_D2,             'BE',                   0,                          scp_d2),
     inst(OP_D3,             'WBS'),
     inst(OP_D4,             'LL'),
     inst(OP_D5,             'WLLLL'),
@@ -1064,18 +1403,14 @@ edao_op_list = \
 
 del inst
 
-edao_op_table = InstructionTable(GetOpCode, CODE_PAGE)
-
 for op in edao_op_list:
     edao_op_table[op.OpCode] = op
     op.Container = edao_op_table
 
 #valid = 0
 #for inst in edao_op_list:
-#    if inst.Handler != None:
+#    if inst.OpName[:3] != 'OP_':
 #        valid += 1
-
-#print('handler: %d' % valid)
-#print('%d / %d / 227' % (len(edao_op_list), 227 - len(edao_op_list)))
-
+#print('known: %d' % valid)
+#print('total: %d' % len(edao_op_list))
 #input()

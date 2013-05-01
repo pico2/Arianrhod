@@ -3,8 +3,12 @@ from ScenarioType import *
 def main():
     scena = ScenarioInfo()
 
-    scena.open('c1100.bin')
-    #print(scena)
-    input()
+    fn = sys.argv[1] if len(sys.argv) > 1 else 'm4290.bin'
+
+    scena.open(fn)
+    scena.SaveToFile(os.path.splitext(fn)[0] + '.py')
+
+    print('done')
+    #input()
 
 TryInvoke(main)

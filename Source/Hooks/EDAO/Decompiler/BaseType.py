@@ -1,13 +1,16 @@
 from ml import *
 
-INSTRUCTION_END_BLOCK           = 1 << 0
-INSTRUCTION_START_BLOCK         = 1 << 1
+INSTRUCTION_END_BLOCK                   = 1 << 0
+INSTRUCTION_START_BLOCK                 = 1 << 1
+INSTRUCTION_FORMAT_ARG_NEW_LINE         = 1 << 2
+INSTRUCTION_FORMAT_EMPTY_LINE           = 1 << 3
 
 class InstructionFlags:
     def __init__(self, flags):
-        self.Flags = flags
-        self.EndBlock = bool(flags & INSTRUCTION_END_BLOCK)
+        self.Flags      = flags
+        self.EndBlock   = bool(flags & INSTRUCTION_END_BLOCK)
         self.StartBlock = bool(flags & INSTRUCTION_START_BLOCK)
+        self.ArgNewLine = bool(flags & INSTRUCTION_FORMAT_ARG_NEW_LINE)
 
 class InstructionOperand:
     def __init__(self, operand, size):
@@ -21,24 +24,15 @@ class LabelEntry:
 
 class Instruction:
     def __init__(self, op = None, operand = None, flags = 0):
-        self.OpCode         = op
-        self.Operand        = operand if operand != None else []
-        self.BranchTargets  = []
-        self.Flags          = InstructionFlags(flags)
-        self.Labels         = []
-
-    def __str__(self):
-        print('op = %02X' % self.OpCode)
-        print('opr = %s' % self.Operand)
-        print('tgrs = %s' % self.BranchTargets)
-        print('flags = %08X' % self.Flags.Flags)
-        print('labels = %s' % self.Labels)
-        print()
-
-        return ''
-
-    def Disasm(self, buf):
-        return 0
+        self.OpCode             = op
+        self.Operand            = operand if operand != None else []
+        self.OperandFormat      = None
+        self.BranchTargets      = []
+        self.Flags              = InstructionFlags(flags)
+        self.Labels             = []
+        self.RefCount           = 0
+        self.Offset             = -1
+        self.Text               = ''
 
 class CodeBlock:
     def __init__(self, Offset = -1):
@@ -46,7 +40,7 @@ class CodeBlock:
         self.Instructions = []
         self.Parent = None
         self.CodeBlocks = []
-        self.Name = ''
+        self.Name = None
 
     def AddBlock(self, block):
         self.CodeBlocks.append(block)

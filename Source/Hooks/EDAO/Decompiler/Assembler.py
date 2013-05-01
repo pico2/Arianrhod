@@ -6,6 +6,10 @@ def plog(*args):
 
 #plog = print
 
+offsetlist = {}
+disasmtbl = {}
+fuck = False
+
 class Disassembler:
     def __init__(self, InstructionTable):
         self.InstructionTable = InstructionTable
@@ -16,12 +20,19 @@ class Disassembler:
 
         DisasmTable = {}
 
-        return self.DisasmBlockWorker(Stream, InstructionTable, DisasmTable)
+        ret = self.DisasmBlockWorker(Stream, InstructionTable, DisasmTable)
+
+        for offset, inst in DisasmTable.items():
+            disasmtbl[offset] = inst
+
+        return ret
 
     def DefaultDisasmInstruction(self, data):
         inst = data.Instruction
         fs = data.FileStream
         entry = data.TableEntry
+
+        inst.OperandFormat = entry.Operand
 
         for opr in entry.Operand:
             inst.Operand.append(entry.GetOperand(opr, fs))
@@ -35,26 +46,35 @@ class Disassembler:
         entry = data.TableEntry
 
         handler = entry.Handler if entry.Handler != None else self.DefaultDisasmInstruction
-        return handler(data)
+        inst = handler(data)
+        if inst == None:
+            inst = self.DefaultDisasmInstruction(data)
+
+        return inst
 
     def DisasmBlockWorker(self, Stream, InstructionTable, DisasmTable):
+        pos = Stream.tell()
 
-        block = CodeBlock(Stream.tell())
-        if block.Offset in DisasmTable:
+        if pos in DisasmTable:
+            inst = DisasmTable[pos]
+            inst.RefCount += 1
             return None
 
-        plog('block: %08X' % block.Offset)
+        block = CodeBlock(pos)
+        block.Name = 'block_%X' % pos
 
-        DisasmTable[block.Offset] = block
+        plog('block: %08X' % block.Offset)
 
         blockref = {}
 
         while True:
             pos = Stream.tell()
-            print('%08X: ' % pos, end = '')
-            op = InstructionTable.GetOpCode(Stream)
 
-            print('%02X' % op)
+            offsetlist[pos] = True
+
+            #print('%08X: ' % pos, end = '')
+            op = InstructionTable.GetOpCode(Stream)
+            #print('%02X' % op)
 
             entry = InstructionTable[op]
 
@@ -64,12 +84,19 @@ class Disassembler:
 
             data.Instruction        = Instruction(op)
             data.Instruction.Flags  = entry.Flags
+            data.Instruction.Offset = pos
             data.FileStream         = Stream
             data.TableEntry         = entry
             data.Disasm             = self.DisasmInstruction
 
             inst = self.DisasmInstruction(data)
 
+            if inst == None:
+                raise Exception('disasm op %02X @ %08X failed' % (op, pos))
+
+            #for i in range(pos, Stream.tell()): offsetlist[i] = True
+
+            DisasmTable[inst.Offset] = inst
             block.AddInstruction(inst)
 
             targets = []
@@ -90,10 +117,6 @@ class Disassembler:
             inst.BranchTargets = []
             for offset in targets:
                 blockref[offset] = inst
-                #Stream.seek(offset)
-                #newblock = self.DisasmBlockWorker(Stream, InstructionTable, DisasmTable)
-                #if newblock != None:
-                #    inst.BranchTargets.append(newblock)
 
         plog('block end: %08X' % block.Offset)
 
@@ -106,3 +129,62 @@ class Disassembler:
                 inst.BranchTargets.append(newblock)
 
         return block
+
+    def DefaultFormatInstruction(self, data):
+        inst = data.Instruction
+        entry = data.TableEntry
+
+        opname = entry.OpName
+        oprlist = entry.FormatAllOperand(inst.OperandFormat, inst.Operand, inst.Flags)
+
+        return '%s(%s)' % (opname, oprlist)
+
+    def FormatInstruction(self, data):
+        inst = data.Instruction
+        entry = data.TableEntry
+
+        handler = entry.Handler if entry.Handler != None else self.DefaultFormatInstruction
+        inst = handler(data)
+        if inst == None:
+            inst = self.DefaultFormatInstruction(data)
+
+        return inst
+
+    def FormatCodeBlock(self, block, InstructionTable = None):
+        if InstructionTable == None:
+            InstructionTable = self.InstructionTable
+
+        text = []
+
+        def AddLabel(name):
+            text.append('')
+            text.append('label("%s")' % name)
+            text.append('')
+
+        AddLabel(block.Name if block.Name != None else InstructionTable.GetLabelName(block.Offset))
+
+        for inst in block.Instructions:
+
+            data = HandlerData(HANDLER_REASON_FORMAT)
+
+            data.Instruction    = inst
+            data.TableEntry     = InstructionTable[inst.OpCode]
+            data.Format         = self.FormatInstruction
+
+            del disasmtbl[inst.Offset]
+
+            #print('%08X %02X: ' % (inst.Offset, inst.OpCode), end  = '')
+            symbol = self.FormatInstruction(data)
+            #print(symbol)
+
+            if inst.RefCount != 0:
+                AddLabel(InstructionTable.GetLabelName(inst.Offset))
+
+            text.append(symbol)
+
+        text.append('')
+
+        for subblock in block.CodeBlocks:
+            text += self.FormatCodeBlock(subblock, InstructionTable)
+
+        return text
