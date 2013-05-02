@@ -1,6 +1,6 @@
 from InstructionTable import *
 
-CODE_PAGE = '932'
+CODE_PAGE = '936'
 
 def GetOpCode(fs):
     return fs.byte()
@@ -300,6 +300,39 @@ def BuildStringListFromObjectList(strlist):
 
     return s
 
+def FormatFuncString(data, oprfmt):
+
+    entry = data.TableEntry
+    ins = data.Instruction
+
+    txt = [ '', '%s(' % entry.OpName ]
+
+    for i in range(len(oprfmt)):
+        opr = oprfmt[i].lower()
+        if opr != 's':
+            txt.append('    0x%X,' % ins.Operand[i])
+        else:
+            strlist = BuildStringListFromObjectList(ins.Operand[i])
+
+            if len(strlist) == 1:
+                s = '    %s' % strlist[0]
+
+                if i != len(oprfmt):
+                    s += ','
+
+                txt.append(s)
+                continue
+
+            txt.append('    (')
+            for s in strlist:
+                txt.append('        %s,' % s)
+            txt.append('    )')
+
+    txt.append(')')
+    txt.append('')
+
+    return '\r\n'.join(txt)
+
 class EDAOInstructionTableEntry(InstructionTableEntry):
     def __init__(self, op, name = '', operand = NO_OPERAND, flags = 0, handler = None):
         super().__init__(op, name, operand, flags, handler)
@@ -551,7 +584,7 @@ def ParseScpExpression(data):
             # execute one op code
 
             execdata = data.CreateBranch()
-            execdata.Instruction.OpCode = fs.byte()
+            execdata.Instruction.OpCode = data.TableEntry.Container.GetOpCode(fs)
             execdata.TableEntry = data.TableEntry.Container[execdata.Instruction.OpCode]
             execinst = execdata.Disasm(execdata)
             scpexpr.Operand.append(execinst)
@@ -857,7 +890,7 @@ def scp_4e(data):
 
         fs = data.FileStream
         ins = data.Instruction
-        ins.Operand.append(fs.ushort())
+        ins.Operand = data.TableEntry.GetAllOperand('W', fs)
         ins.Operand.append(ParseScpExpression(data))
 
         ins.OperandFormat = 'WE'
@@ -891,46 +924,6 @@ def scp_52(data):
 
         return ins
 
-# ChrTalk(0x9, ("#01109F嘿嘿，其实我昨天", scpstr(0x1), "买了很多食材～", scpstr(0x2), scpstr(0x3), "虽然今天下雨了，", scpstr(0x1), "但不用再跑出去买东西了～", scpstr(0x2)))
-
-def FormatTalk(data, textcount = 1):
-
-    #   ChrTalk(
-    #       ActorId,
-    #       (
-    #           'text',
-    #       ),
-    #   )
-
-    #bp()
-
-    entry = data.TableEntry
-    ins = data.Instruction
-
-    txt = [ '', '%s(' % entry.OpName ]
-
-    txt.append('    0x%X,' % ins.Operand[0])
-
-    for i in range(1, textcount + 1):
-
-        strlist = BuildStringListFromObjectList(ins.Operand[i])
-        if len(strlist) == 1:
-            s = '    %s' % strlist[0]
-            if i != textcount:
-                s += ','
-            txt.append(s)
-            continue
-
-        txt.append('    (')
-        for s in strlist:
-            txt.append('        %s,' % s)
-        txt.append('    )')
-
-    txt.append(')')
-    txt.append('')
-
-    return '\r\n'.join(txt)
-
 def scp_anonymous_talk(data):
 
     if data.Reason == HANDLER_REASON_READ:
@@ -948,7 +941,7 @@ def scp_anonymous_talk(data):
 
     elif data.Reason == HANDLER_REASON_FORMAT:
 
-        return FormatTalk(data)
+        return FormatFuncString(data, data.Instruction.OperandFormat)
 
 def scp_create_chr_talk(data):
 
@@ -964,7 +957,7 @@ def scp_create_chr_talk(data):
 
     elif data.Reason == HANDLER_REASON_FORMAT:
 
-        return FormatTalk(data)
+        return FormatFuncString(data, data.Instruction.OperandFormat)
 
 def scp_create_npc_talk(data):
 
@@ -985,7 +978,7 @@ def scp_create_npc_talk(data):
 
     elif data.Reason == HANDLER_REASON_FORMAT:
 
-        return FormatTalk(data, 2)
+        return FormatFuncString(data, data.Instruction.OperandFormat)
 
 def scp_create_menu(data):
 
@@ -1003,6 +996,10 @@ def scp_create_menu(data):
         ins.OperandFormat = 'WWWBS'
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        return FormatFuncString(data, data.Instruction.OperandFormat)
 
 def scp_76(data):
 
@@ -1151,7 +1148,7 @@ def scp_e4(data):
         fs = data.FileStream
         ins = data.Instruction
 
-        opr = data.TableEntry.GetAllOperand('B', fs)
+        opr = data.TableEntry.GetOperand('B', fs)
         ins.Operand.append(opr)
 
         operand = ''

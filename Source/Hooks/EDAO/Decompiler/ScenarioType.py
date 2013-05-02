@@ -283,6 +283,12 @@ class ScenarioInfo:
         self.UnknownEntry_46_Data = fs.read(self.UnknownEntry_46.Size)
 
         fs.seek(self.NpcNameOffset)
+
+        buf = fs.read()
+        endmz = buf.find(b'\x00\x00')
+        if endmz != -1:
+            buf = buf[:endmz - 1]
+
         self.NpcName = fs.read().decode(CODE_PAGE).rstrip('\x00').split('\x00')
 
     def DisassembleBlocks(self, fs):

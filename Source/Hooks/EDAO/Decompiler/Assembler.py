@@ -72,9 +72,9 @@ class Disassembler:
 
             offsetlist[pos] = True
 
-            #print('%08X: ' % pos, end = '')
+            print('%08X: ' % pos, end = '')
             op = InstructionTable.GetOpCode(Stream)
-            #print('%02X' % op)
+            print('%02X' % op)
 
             entry = InstructionTable[op]
 
@@ -171,7 +171,8 @@ class Disassembler:
             data.TableEntry     = InstructionTable[inst.OpCode]
             data.Format         = self.FormatInstruction
 
-            del disasmtbl[inst.Offset]
+            #print('%08X' % inst.Offset)
+            #del disasmtbl[inst.Offset]
 
             #print('%08X %02X: ' % (inst.Offset, inst.OpCode), end  = '')
             symbol = self.FormatInstruction(data)
