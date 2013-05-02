@@ -734,7 +734,7 @@ def scp_battle(data):
 
             ins.BranchTargets.append(BattleInfoOffset)
 
-            ins.OperandFormat = 'LLBWWW'
+            ins.OperandFormat = 'OLBWWW'
 
             return ins
 

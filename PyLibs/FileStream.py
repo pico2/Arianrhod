@@ -21,6 +21,29 @@ def ReadLong64(fs):
 def ReadULong64(fs):
     return struct.unpack('<Q', fs.read(8))[0]
 
+def ReadAString(fs, cp = '936'):
+    string = b''
+    while True:
+        buf = fs.read(1)
+        if buf == b'' or buf == b'\x00':
+            break
+
+        string += buf
+
+    return string.decode(cp)
+
+def ReadWString(fs):
+    string = b''
+    while True:
+        buf = fs.read(2)
+        if buf == b'' or buf == b'\x00\x00':
+            break
+
+        string += buf
+
+    return string.decode('U16')
+
+
 class BytesStream:
     stream = None
 
@@ -81,4 +104,11 @@ class BytesStream:
 
     def ulong64(self):
         return ReadULong64(self.stream)
+
+    def astr(self):
+        return ReadAString(self.stream)
+
+    def wstr(self):
+        return ReadWString(self.stream)
+
 
