@@ -151,25 +151,27 @@ def main(args):
 
     debugger.pyreset()
 
-    functbl = Register(0xBE0E10)
+    functbl = Register(0xBE1460)
 
-    for i in range(0x100):
-        func = functbl + i * 4
-        func = func.u32()
-        if func == 0:
-            #imm.log('OP_%02X: NULLLLLLLLLLLLLLLLLLLLL' % i)
-            continue
+    try:
+        for i in range(0x100):
+            func = functbl + i * 4
+            func = func.u32()
+            if func == 0:
+                #imm.log('OP_%02X: NULLLLLLLLLLLLLLLLLLLLL' % i)
+                continue
 
-        offset = int((func + 1).u32())
-        func = func + 5 + offset
+            offset = int((func + 1).u32())
+            func = func + 5 + offset
 
-        funcname = 'OP_%02X' % i
+            funcname = 'AS_%02X' % i
 
-        #imm.setComment(int(func), funcname)
-        #imm.setLabel(int(func), funcname)
+            #imm.setComment(int(func), funcname)
+            #imm.setLabel(int(func), funcname)
 
-        imm.log('OP_%02X: %08X' % (i, func), int(func))
-        #imm.log('OP_%02X            = 0x%02X' % (i, i))
+            imm.log('AS_%02X: %08X' % (i, func), int(func))
+    except:
+        pass
 
     return ''
 

@@ -1,7 +1,7 @@
 from BaseType import *
 from Assembler import *
-from ScenarioBase import *
-import InstructionTableEDAO as edao
+from EDAOBase import *
+import ScenaOpTableEDAO as edao
 
 CODE_PAGE = edao.CODE_PAGE
 

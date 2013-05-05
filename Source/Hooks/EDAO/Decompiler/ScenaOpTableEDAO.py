@@ -1,5 +1,5 @@
 from InstructionTable import *
-from ScenarioBase import *
+from EDAOBase import *
 
 CODE_PAGE = '936'
 
@@ -194,8 +194,8 @@ InstructionNames[0xBC]  = 'OP_BC'
 InstructionNames[0xBD]  = 'OP_BD'
 InstructionNames[0xBE]  = 'OP_BE'
 InstructionNames[0xBF]  = 'OP_BF'
-InstructionNames[0xC0]  = 'OP_C0'
-InstructionNames[0xC2]  = 'OP_C2'
+InstructionNames[0xC0]  = 'SetChrChipPat'
+InstructionNames[0xC2]  = 'LoadChrChipPat'
 InstructionNames[0xC3]  = 'OP_C3'
 InstructionNames[0xC4]  = 'OP_C4'
 InstructionNames[0xC5]  = 'OP_C5'
@@ -719,6 +719,8 @@ def scp_if(data):
         data.Instruction.OperandFormat = 'EO'
         return None
 
+SWITCH_DEFAULT  = -1
+
 def scp_switch(data):
 
     # switch (expression)
@@ -773,7 +775,7 @@ def scp_switch(data):
         for case in ins.Operand[1]:
             txt.append('    (%d, "%s"),' % (case[0], GetLabelName(case[1])))
 
-        txt.append('    (-1, "%s"),' % GetLabelName(ins.Operand[-1]))
+        txt.append('    (SWITCH_DEFAULT, "%s"),' % GetLabelName(ins.Operand[-1]))
         #txt.append('    )')
         txt.append(')')
         txt.append('')
@@ -793,7 +795,7 @@ def scp_switch(data):
         opts = []
         defaultoffset = None
         for opt in optlist:
-            if opt[0] == -1:
+            if opt[0] == SWITCH_DEFAULT:
                 if defaultoffset != None:
                     raise Exception('multi default case')
 
@@ -816,7 +818,7 @@ def scp_switch(data):
             fs.wulong(INVALID_OFFSET)
 
         inst.Labels.append(LabelEntry(defaultoffset, fs.tell()))
-        fs.wulong(-1)
+        fs.wulong(INVALID_OFFSET)
 
         return inst
 
@@ -846,17 +848,14 @@ def scp_battle(data):
 
         fs = data.FileStream
         ins = data.Instruction
+        entry = data.TableEntry
 
-        BattleInfoOffset = fs.ulong()
-        opr2 = fs.ulong()
+        BattleInfoOffset, opr2 = entry.GetAllOperand('LL', fs)
 
         ins.Operand.append(BattleInfoOffset)
         ins.Operand.append(opr2)
 
         if BattleInfoOffset != 0xFFFFFFFF:
-            # size = 0x18 + 0x2C
-            # sizeof(BattleInfo + [0x28]) =  0x10
-            # sizeof(BattleInfo + [0x20]) =  0x20
 
             ins.Operand.append(fs.byte())
             ins.Operand.append(fs.ushort())
@@ -869,7 +868,7 @@ def scp_battle(data):
 
             return ins
 
-        name = data.TableEntry.GetOperand('s', fs)
+        name = entry.GetOperand('S', fs)
         ins.Operand.append(name)
 
         for i in range(4):
@@ -881,7 +880,7 @@ def scp_battle(data):
         ins.Operand.append(fs.ushort())
         ins.Operand.append(fs.ushort())
 
-        ins.OperandFormat = 'LL' + ('L' * 4) + ('L' * 8) + 'LL'
+        ins.OperandFormat = 'LLS' + ('L' * 4) + ('L' * 8) + 'LL'
 
         return ins
 
@@ -902,7 +901,7 @@ def scp_battle(data):
 
         ins = data.Instruction
         BattleInfoOffset = data.Arguments[0]
-        ins.OperandFormat = 'OLBWWW' if type(BattleInfoOffset) == str else 'LL' + ('L' * 4) + ('L' * 8) + 'LL'
+        ins.OperandFormat = 'OLBWWW' if type(BattleInfoOffset) == str else 'LLS' + ('L' * 4) + ('L' * 8) + 'LL'
 
 def scp_1d(data):
 
@@ -1638,8 +1637,8 @@ edao_op_list = \
     inst(OP_BD,             'WW'),
     inst(OP_BE,             'BW'),
     inst(OP_BF,             'BB'),
-    inst(OP_C0,             'BBL'),
-    inst(OP_C2),
+    inst(SetChrChipPat,             'BBL'),
+    inst(LoadChrChipPat),
     inst(OP_C3,             'BBWWWBLLLLLL'),
     inst(OP_C4,             'BBWW'),
     inst(OP_C5,             'BLLLLLLLL'),
@@ -1692,10 +1691,11 @@ for op in edao_op_list:
     edao_op_table[op.OpCode] = op
     op.Container = edao_op_table
 
-#valid = 0
-#for inst in edao_op_list:
-#    if inst.OpName[:3] != 'OP_':
-#        valid += 1
-#print('known: %d' % valid)
-#print('total: %d' % len(edao_op_list))
-#input()
+if False:
+    valid = 0
+    for inst in edao_op_list:
+        if inst.OpName[:3] != 'OP_':
+            valid += 1
+    print('known: %d (%d%%)' % (valid, valid / len(edao_op_list) * 100))
+    print('total: %d' % len(edao_op_list))
+    input()

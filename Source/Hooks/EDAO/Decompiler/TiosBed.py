@@ -47,7 +47,7 @@ def ShowMenu():
 
     label('enter_debug_map')
 
-    NewScene('a0000', 0, 0, 0)
+    NewScene('b0101', 0, 0, 0)
     OP_07()
 
     label('menu_return')

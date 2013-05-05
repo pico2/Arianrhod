@@ -1,5 +1,5 @@
-from ScenarioType import *
-from InstructionTableEDAO import *
+from ScenarioScript import *
+from ScenaOpTableEDAO import *
 
 def plog(*value, sep = ' ', end = '\n', file = sys.stdout, flush = False):
     pass
