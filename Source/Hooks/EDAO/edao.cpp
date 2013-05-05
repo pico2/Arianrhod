@@ -166,9 +166,9 @@ AoCreateFileA(
     HANDLE                  hTemplateFile
 )
 {
-    WCHAR szFile[MAX_PATH], szFullPath[MAX_PATH];
+    WCHAR szFile[MAX_NTPATH], szFullPath[MAX_NTPATH];
 
-    return CreateFileW(
+    return NtFileDisk::SimulateCreateFile(
                 GetFileName(szFullPath, countof(szFullPath), szFile, countof(szFile), lpFileName),
                 dwDesiredAccess,
                 dwShareMode,

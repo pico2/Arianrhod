@@ -844,6 +844,9 @@ def scp_new_scene(data):
 
 def scp_battle(data):
 
+    operand_with_battle_info = 'OLBWWW'
+    operand_without_battle_info = 'LLS' + ('L' * 4) + ('L' * 8) + 'WW'
+
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
@@ -864,7 +867,7 @@ def scp_battle(data):
 
             ins.BranchTargets.append(BattleInfoOffset)
 
-            ins.OperandFormat = 'OLBWWW'
+            ins.OperandFormat = operand_with_battle_info
 
             return ins
 
@@ -877,10 +880,9 @@ def scp_battle(data):
         for i in range(8):
             ins.Operand.append(fs.ulong())
 
-        ins.Operand.append(fs.ushort())
-        ins.Operand.append(fs.ushort())
+        ins.Operand += entry.GetAllOperand('WW', fs)
 
-        ins.OperandFormat = 'LLS' + ('L' * 4) + ('L' * 8) + 'LL'
+        ins.OperandFormat = operand_without_battle_info
 
         return ins
 
@@ -901,7 +903,7 @@ def scp_battle(data):
 
         ins = data.Instruction
         BattleInfoOffset = data.Arguments[0]
-        ins.OperandFormat = 'OLBWWW' if type(BattleInfoOffset) == str else 'LLS' + ('L' * 4) + ('L' * 8) + 'LL'
+        ins.OperandFormat = operand_with_battle_info if type(BattleInfoOffset) == str else operand_without_battle_info
 
 def scp_1d(data):
 
@@ -1691,7 +1693,9 @@ for op in edao_op_list:
     edao_op_table[op.OpCode] = op
     op.Container = edao_op_table
 
-if False:
+enable_stat = 0
+
+if enable_stat != 0:
     valid = 0
     for inst in edao_op_list:
         if inst.OpName[:3] != 'OP_':

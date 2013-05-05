@@ -72,6 +72,7 @@ class ScenarioFileIndex:
     def __init__(self, param):
 
         self.FilePrefix = '0atcrmeb'
+        #self.IsIndexZero = bool(param == 0)
 
         if type(param) == int:
 
@@ -123,3 +124,106 @@ class ScenarioFileIndex:
     def Index(self):
         return self.FileIndex
 
+
+class ChipFileIndex:
+
+    def __init__(self, param):
+
+        try:
+            self.IsIndexZero = bool(int(param) == 0)
+        except:
+            self.IsIndexZero = False
+
+        monster ='monster/'
+        apl ='apl/'
+        chr ='chr/'
+
+        if type(param) == int:
+
+            chiptype = param >> 20
+            chipindex = param & 0xFFFFF
+
+            chipdir = monster if chiptype == CHIP_TYPE_MONSTER else apl if chiptype == CHIP_TYPE_APL else chr
+
+            self.ChipName = '%sch%05X.itc' % (chipdir, chipindex)
+            self.ChipIndex = param
+
+        elif type(param) == str:
+
+            if self.IsIndexZero:
+                return
+
+            name = param
+
+            if name[:len(monster)].lower() == monster:
+
+                chiptype = CHIP_TYPE_MONSTER
+                name = name[len(monster):]
+
+            elif name[:len(apl)].lower() == apl:
+
+                chiptype = CHIP_TYPE_APL
+                name = name[len(apl):]
+
+            elif name[:len(chr)].lower() == chr:
+
+                chiptype = CHIP_TYPE_CHAR
+                name = name[len(chr):]
+
+            else:
+
+                raise Exception('unknown chip type')
+
+            chipindex = int(os.path.splitext(name[2:])[0], 16)
+
+            self.ChipIndex = (chiptype << 20) | chipindex
+            self.ChipName = param
+
+        else:
+
+            raise Exception('unsupported input type')
+
+    def IsZero(self):
+        return self.IsIndexZero
+
+    def Name(self):
+        return self.ChipName if not self.IsIndexZero else 0
+
+    def Index(self):
+        return self.ChipIndex if not self.IsIndexZero else 0
+
+
+class SymbolFileIndex:
+
+    def __init__(self, param):
+
+        try:
+            self.IsIndexZero = bool(int(param) == 0)
+        except:
+            self.IsIndexZero = False
+
+        if type(param) == int:
+
+            self.SymbolIndex = param
+            self.SymbolName = 'sy%05x.itp' % (param & 0xFFFFFF)
+
+        elif type(param) == str:
+
+            if self.IsIndexZero:
+                return
+
+            self.SymbolIndex = int(os.path.splitext(os.path.basename(param))[0][2:], 16) | 0x30000000
+            self.SymbolName = param
+
+        else:
+
+            raise Exception('unsupported input type')
+
+    def IsZero(self):
+        return self.IsIndexZero
+
+    def Name(self):
+        return self.SymbolName if not self.IsIndexZero else 0
+
+    def Index(self):
+        return self.SymbolIndex if not self.IsIndexZero else 0
