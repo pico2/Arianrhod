@@ -1,5 +1,7 @@
 from ml import *
 
+INVALID_OFFSET = 0xFFFFABCD
+
 INSTRUCTION_END_BLOCK                   = 1 << 0
 INSTRUCTION_START_BLOCK                 = 1 << 1
 INSTRUCTION_FORMAT_ARG_NEW_LINE         = 1 << 2
@@ -29,10 +31,10 @@ class Instruction:
         self.OperandFormat      = None
         self.BranchTargets      = []
         self.Flags              = InstructionFlags(flags)
-        self.Labels             = []
         self.RefCount           = 0
         self.Offset             = -1
-        self.Text               = ''
+        self.BytesStream        = None
+        self.Labels             = []        # list of LabelEntry(name, offset_in_self)
 
 class CodeBlock:
     def __init__(self, Offset = -1):

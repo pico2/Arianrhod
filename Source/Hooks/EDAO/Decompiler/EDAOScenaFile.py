@@ -1,76 +1,454 @@
 from ScenarioType import *
+from InstructionTableEDAO import *
+
+def plog(*value, sep = ' ', end = '\n', file = sys.stdout, flush = False):
+    pass
+
+#plog = print
 
 class ScenarioInfoPort(ScenarioInfo):
     def __init__(self):
         super().__init__()
 
-        self.fs = None
-        self.Labels = []        # list of LabelEntry
+        self.fs                 = None
+        self.Labels             = {}    # map<name, offset>
+        self.StringListTable    = {}    # map<string_list_item, offset>
+        self.DelayFixLabels     = []    # list of LabelEntry
+        self.DelayFixString     = []    # list of LabelEntry
+        self.PrevousHandlerData = None
 
 scena = ScenarioInfoPort()
 
-'''
-
-
-        self.MapName                    = ''
-        self.Location                   = ''
-        self.Unknown_14                 = 0
-        self.Flags                      = 0
-        self.IncludedScenario           = []
-        self.NpcNameOffset              = 0
-        self.ScnInfoOffset              = []
-        self.ScenaFunctionTable         = ScenarioEntry()
-        self.UnknownEntry_46            = ScenarioEntry()
-        self.Unknown_4A                 = 0
-        self.PreInitSectionIndex        = 0
-        self.ScnInfoNumber              = []
-        self.Unknown_51                 = b''
-        self.Information                = b''
-
-'''
-
-def CreateScenaFile(MapName, Location, Unknown_14, Flags, IncludeList, Unknown_4A, PreInitSectionIndex, Unknown_51, Information):
+def CreateScenaFile(MapName, Location, Unknown_14, Flags, IncludeList, Unknown_4A, PreInitFunctionIndex, Unknown_51, Information):
     scena.MapName               = MapName
     scena.Location              = Location
     scena.Unknown_14            = Unknown_14
     scena.Flags                 = Flags
-    scena.IncludedScenario      = IncludeList
+    scena.IncludedScenario      = list(IncludeList)
     scena.Unknown_4A            = Unknown_4A
-    scena.PreInitSectionIndex   = PreInitSectionIndex
+    scena.PreInitFunctionIndex  = PreInitFunctionIndex
     scena.Unknown_51            = Unknown_51
     scena.Information           = Information
 
-    scena.fs = open(MapName + '.bin2', 'wb+')
+    if len(IncludeList) != 6:
+        raise Exception('incorrect include list length')
+
+    for i in range(len(IncludeList)):
+        scena.IncludedScenario[i] = ScenarioFileIndex(IncludeList[i]).Index()
+
+    scena.fs = BytesStream()
+    scena.fs.open(MapName + '.bin', 'wb+')
     scena.fs.seek(0x94)
 
+    pos = scena.fs.tell()
 
-def Npc(X, Y, Z, Unknown1, Unknown2, Unknown, InitScenaIndex, InitSectionIndex, TalkScenaIndex, TalkSectionIndex, Unknown4, Unknown5):
+    scena.ChipFrameInfoOffset = pos
+    scena.PlaceNameOffset = pos
 
-    chrinfo = ScenarioCharInformation()
+    for i in range(SCN_INFO_MAXIMUM):
+        scena.ScnInfoOffset[i] = pos
+        scena.ScnInfoNumber[i] = 0
 
-    chrinfo.X                  = X
-    chrinfo.Y                  = Y
-    chrinfo.Z                  = Z
-    chrinfo.Unknown1           = Unknown1
-    chrinfo.Unknown2           = Unknown2
-    chrinfo.Unknown            = Unknown
-    chrinfo.InitScenaIndex     = InitScenaIndex
-    chrinfo.InitSectionIndex   = InitSectionIndex
-    chrinfo.TalkScenaIndex     = TalkScenaIndex
-    chrinfo.TalkSectionIndex   = TalkSectionIndex
-    chrinfo.Unknown4           = Unknown4
-    chrinfo.Unknown5           = Unknown5
+def BuildStringList(strlist):
+    scena.StringTable = list(strlist)
 
-    if len(scena.ScnInfo[SCN_INFO_NPC_POSITION]) == 0:
-        scena.ScnInfoOffset[SCN_INFO_NPC_POSITION] = scena.fs.tell()
+def AddStringToStringList(string, offset):
+    scena.DelayFixString.append(LabelEntry(string, offset))
+    if string not in scena.StringTable:
+        scena.StringTable.append(string)
 
-    scena.ScnInfo[SCN_INFO_NPC_POSITION].append(chrinfo)
+def AddScnInfo(index):
+    if len(scena.ScnInfo[index]) == 0:
+        scena.ScnInfo[index].append(0)
+        scena.ScnInfoOffset[index] = scena.fs.tell()
 
-    scena.fs.write(chrinfo.binary())
-
-def ScpFunction(FunctionLabel):
-    scena.ScenaFunctions.append(FunctionLabel)
-    scena.fs.write(struct.pack('<I', 0xFFFFFFFF))
+    scena.ScnInfoNumber[index] += 1
 
 def label(labelname):
-    scena.Labels.append(LabelEntry(labelname, scena.fs.tell()))
+    pos = scena.fs.tell()
+    plog('%08X: %s' % (pos, labelname))
+    if pos in scena.Labels and scena.Labels[labelname] != pos:
+        raise Exception('label name conflict')
+
+    scena.Labels[labelname] = pos
+
+def getlabel(name):
+    return scena.Labels[name]
+
+def ATBonus(name, Nothing, HP_HEAL_10, HP_HEAL_50, EP_HEAL_10, EP_HEAL_50, CP_HEAL_10, CP_HEAL_50, SEPITH, CRITICAL, VANISH, DEATH, GUARD, RUSH, ARTS_GUARD, TEAMRUSH, Unknown):
+    label(name)
+
+    atbonus = BattleATBonus()
+
+    atbonus.Nothing     = Nothing
+    atbonus.HP_HEAL_10  = HP_HEAL_10
+    atbonus.HP_HEAL_50  = HP_HEAL_50
+    atbonus.EP_HEAL_10  = EP_HEAL_10
+    atbonus.EP_HEAL_50  = EP_HEAL_50
+    atbonus.CP_HEAL_10  = CP_HEAL_10
+    atbonus.CP_HEAL_50  = CP_HEAL_50
+    atbonus.SEPITH      = SEPITH
+    atbonus.CRITICAL    = CRITICAL
+    atbonus.VANISH      = VANISH
+    atbonus.DEATH       = DEATH
+    atbonus.GUARD       = GUARD
+    atbonus.RUSH        = RUSH
+    atbonus.ARTS_GUARD  = ARTS_GUARD
+    atbonus.TEAMRUSH    = TEAMRUSH
+    atbonus.Unknown     = Unknown
+
+    scena.fs.write(atbonus.binary())
+
+def Sepith(name, v1, v2, v3, v4, v5, v6, v7):
+    label(name)
+
+    sepith = BattleSepith()
+    sepith.Value[0] = v1
+    sepith.Value[1] = v2
+    sepith.Value[2] = v3
+    sepith.Value[3] = v4
+    sepith.Value[4] = v5
+    sepith.Value[5] = v6
+    sepith.Value[6] = v7
+
+    buf = sepith.binary()
+    buf += b'\x00' * (16 - len(buf) % 16)
+
+    scena.fs.write(buf)
+
+def MonsterBattlePostion(name, x, y, degree):
+    label(name)
+
+    monpos = BattleMonsterPostion()
+    monpos.X        = x
+    monpos.Y        = y
+    monpos.Degree   = degree
+
+    scena.fs.write(monpos.binary())
+
+def BattleInfo(name, Flags, Level, Unknown_04, Vision, MoveRange, CanMove, MoveSpeed, Unknown_0A, BattleMap, SepithName, Probability1, Probability2, Probability3, Probability4, BattleMonsterInfoList):
+    label(name)
+
+    btinfo = ScenarioBattleInfo()
+
+    probability = [ Probability1, Probability2, Probability3, Probability4 ]
+
+    btinfo.Flags            = Flags
+    btinfo.Level            = Level
+    btinfo.Unknown_04       = Unknown_04
+    btinfo.Vision           = Vision
+    btinfo.MoveRange        = MoveRange
+    btinfo.CanMove          = CanMove
+    btinfo.MoveSpeed        = MoveSpeed
+    btinfo.Unknown_0A       = Unknown_0A
+    btinfo.BattleMapOffset  = INVALID_OFFSET
+    btinfo.SepithOffset     = 0 if SepithName == 0 else getlabel(SepithName)
+    btinfo.Probability      = probability
+
+    scena.fs.write(btinfo.binary())
+
+    AddStringToStringList(BattleMap, scena.fs.tell() - 0xC)
+
+    for i in range(len(probability)):
+        if probability[i] == 0:
+            continue
+
+        btmon = BattleMonsterInfoList[i]
+
+        btmoninfo = BattleMonsterInfo()
+
+        # error if not >= 8
+        for i in range(len(btmoninfo.MsFileIndex)):
+            btmoninfo.MsFileIndex[i] = btmon[i]
+
+        normalpos   = btmon[8]
+        enemyadvpos = btmon[9]
+        normalbgm   = int(os.path.splitext(btmon[10])[0][3:], 10)
+        dangerbgm   = int(os.path.splitext(btmon[11])[0][3:], 10)
+        atbonus     = btmon[12]
+
+        btmoninfo.PositionNormalOffset          = getlabel(normalpos)
+        btmoninfo.PositionEnemyAdvantageOffset  = getlabel(enemyadvpos)
+        btmoninfo.BgmNormal                     = normalbgm
+        btmoninfo.BgmDanger                     = dangerbgm
+        btmoninfo.ATBonusOffset                 = getlabel(atbonus)
+
+        scena.fs.write(btmoninfo.binary())
+
+def AddCharChip(*chipindexlist):
+    chiplist = []
+
+    scena.ScnInfoOffset[SCN_INFO_CHIP] = scena.fs.tell()
+    scena.ScnInfoNumber[SCN_INFO_CHIP] = len(chipindexlist)
+
+    plog('chip index: %X' % scena.fs.tell())
+
+    for chip in chipindexlist:
+        chip = ScenarioChipInfo(chip)
+        scena.fs.write(chip.binary())
+
+def Npc(X, Z, Y, Direction, Unknown2, ChipIndex, Unknown_11, NpcIndex, Unknown_14, InitScenaIndex, InitFunctionIndex, TalkScenaIndex, TalkFunctionIndex, Unknown4, Unknown5):
+
+    AddScnInfo(SCN_INFO_NPC)
+
+    npcinfo = ScenarioNpcInfo()
+
+    npcinfo.X                  = X
+    npcinfo.Z                  = Z
+    npcinfo.Y                  = Y
+    npcinfo.Direction          = Direction
+    npcinfo.Unknown2           = Unknown2
+
+    npcinfo.ChipIndex          = ChipIndex
+    npcinfo.Unknown_11         = Unknown_11
+    npcinfo.NpcIndex           = NpcIndex
+    npcinfo.Unknown_14         = Unknown_14
+
+    npcinfo.InitScenaIndex     = InitScenaIndex
+    npcinfo.InitFunctionIndex  = InitFunctionIndex
+    npcinfo.TalkScenaIndex     = TalkScenaIndex
+    npcinfo.TalkFunctionIndex  = TalkFunctionIndex
+    npcinfo.Unknown4           = Unknown4
+    npcinfo.Unknown5           = Unknown5
+
+    scena.fs.write(npcinfo.binary())
+
+def Monster(X, Z, Y, Unknown_0C, BattleInfoName, Unknown_12, ChipIndex, Unknown_16, StandFrameInfoIndex, MoveFrameInfoIndex):
+
+    AddScnInfo(SCN_INFO_MONSTER)
+
+    moninfo = ScenarioMonsterInfo()
+
+    moninfo.X                   = X
+    moninfo.Z                   = Z
+    moninfo.Y                   = Y
+    moninfo.Unknown_0C          = Unknown_0C
+    moninfo.BattleInfoOffset    = getlabel(BattleInfoName)
+    moninfo.Unknown_12          = Unknown_12
+    moninfo.ChipIndex           = ChipIndex
+    moninfo.Unknown_16          = Unknown_16
+    moninfo.StandFrameInfoIndex = StandFrameInfoIndex
+    moninfo.MoveFrameInfoIndex  = MoveFrameInfoIndex
+
+    scena.fs.write(moninfo.binary())
+
+def Event(buf):
+    
+    AddScnInfo(SCN_INFO_EVENT)
+
+    ev = ScenarioEventInfo()
+    ev.Binary = buf
+
+    scena.fs.write(ev.binary())
+
+def Actor(buf):
+
+    AddScnInfo(SCN_INFO_ACTOR)
+
+    actor = ScenarioActorInfo()
+
+    actor.Binary = buf
+
+    scena.fs.write(actor.binary())
+
+def ScpFunction(FunctionLabel):
+
+    if len(scena.ScenaFunctions) == 0:
+        scena.ScenaFunctions.append(0)
+
+        scena.ScenaFunctionTable.Offset = scena.fs.tell()
+
+    scena.ScenaFunctionTable.Size += 4
+    scena.DelayFixLabels.append(LabelEntry(FunctionLabel, scena.fs.tell()))
+
+    scena.fs.write(struct.pack('<I', INVALID_OFFSET))
+
+def PlaceName(X, Z, Y, Flags1, Flags2, Name):
+
+    if len(scena.PlaceName) == 0:
+        scena.PlaceName.append(0)
+        scena.PlaceNameOffset = scena.fs.tell()
+
+    scena.PlaceNameNumber += 1
+
+    place = ScenarioPlaceNameInfo()
+
+    place.X             = X
+    place.Z             = Z
+    place.Y             = Y
+    place.Flags1        = Flags1
+    place.Flags2        = Flags2
+    place.NameOffset    = INVALID_OFFSET
+
+    scena.fs.write(place.binary())
+
+    AddStringToStringList(Name, scena.fs.tell() - 4)
+
+def ChipFrameInfo(speed, reserve, subchipindexlist = None):
+
+    if len(scena.ChipFrameInfo) == 0:
+        scena.ChipFrameInfo.append(0)
+        scena.ChipFrameInfoOffset = scena.fs.tell()
+
+    #bp()
+
+    if subchipindexlist == None:
+        subchipindexlist = []
+
+    frame = ScenarioChipFrameInfo()
+
+    frame.Speed         = speed
+    frame.Reserve       = reserve
+    frame.SubChipCount  = len(subchipindexlist)
+    frame.SubChipIndex  = list(subchipindexlist)
+
+    scena.fs.write(frame.binary())
+
+for op, inst in edao.edao_op_table.items():
+    entry = edao.edao_op_table[inst.OpCode]
+
+    func = []
+    func.append('def %s(*args):' % inst.OpName)
+    func.append('    return OpCodeHandler(0x%02X, args)' % inst.OpCode)
+    func.append('')
+
+    exec('\r\n'.join(func))
+
+    opx = 'OP_%02X' % inst.OpCode
+
+    if inst.OpName != opx:
+        func[0] = 'def %s(*args):' % opx
+        exec('\r\n'.join(func))
+
+def AssembleForExec(expr):
+    return eval(expr)
+
+def DefaultOpCodeHandler(data):
+    entry   = data.TableEntry
+    fs      = data.FileStream
+    inst    = data.Instruction
+    oprs    = inst.OperandFormat
+    values  = data.Arguments
+
+    entry.Container.WriteOpCode(fs, inst.OpCode)
+
+    if len(oprs) != len(values):
+        raise Exception('operand: does not match values')
+
+    for i in range(len(oprs)):
+        entry.WriteOperand(data, oprs[i], values[i])
+
+    return inst
+
+def OpCodeHandlerPrivate(data):
+    op = data.Instruction.OpCode
+    entry = data.TableEntry
+
+    handler = entry.Handler if entry.Handler != None else DefaultOpCodeHandler
+    inst = handler(data)
+
+    if inst == None:
+        inst = DefaultOpCodeHandler(data)
+
+    return inst
+
+def OpCodeHandler(op, args):
+    entry = edao.edao_op_table[op]
+    fs = scena.fs
+
+    data = HandlerData(HANDLER_REASON_GENERATE)
+    data.Instruction    = Instruction(op)
+    data.Arguments      = list(args)
+    data.FileStream     = fs
+    data.TableEntry     = entry
+    data.Assemble       = AssembleForExec
+
+    data.Instruction.OperandFormat = entry.Operand
+
+    UsePrevous = bool(scena.PrevousHandlerData != None)
+
+    if UsePrevous:
+        data.FileStream = scena.PrevousHandlerData.FileStream
+    else:
+        data.FileStream = BytesStream().openmem()
+        scena.PrevousHandlerData = data
+
+    #print(entry.OpName)
+    inst = OpCodeHandlerPrivate(data)
+
+    if UsePrevous:
+        return inst
+
+    scena.PrevousHandlerData = None
+
+    offset = scena.fs.tell()
+    for lb in inst.Labels:
+        scena.DelayFixLabels.append(LabelEntry(lb.Label, lb.Offset + offset))
+
+    data.FileStream.seek(0)
+    scena.fs.write(data.FileStream.read())
+
+    return inst
+
+def scpexpr(operation, *args):
+    return ScpExpression(operation, list(args))
+
+def scpstr(ctrlcode, value = None):
+    if type(ctrlcode) == str:
+        return ctrlcode
+
+    ScpStrCtrlCode = \
+    {
+        SCPSTR_CODE_07          : lambda : '\\x%02X\\x%02X' % (ctrlcode, value),
+        SCPSTR_CODE_LINE_FEED   : lambda : '\\x%02X' % (ctrlcode),
+        0x0A                    : lambda : '\\x%02X' % (ctrlcode),
+        SCPSTR_CODE_ENTER       : lambda : '\\x%02X' % (ctrlcode),
+        SCPSTR_CODE_CLEAR       : lambda : '\\x%02X' % (ctrlcode),
+        0x04                    : lambda : '\\x%02X' % (ctrlcode),
+        0x05                    : lambda : '\\x%02X' % (ctrlcode),
+        0x06                    : lambda : '\\x%02X' % (ctrlcode),
+        0x18                    : lambda : '\\x%02X' % (ctrlcode),
+        SCPSTR_CODE_ITEM        : lambda : '\\x%02X\\x%02X\\x%02X' % (ctrlcode, value & 0xFF, value >> 8),
+    }
+
+    string = ScpStrCtrlCode[ctrlcode]()
+
+    string = eval('b"%s"' % string)
+
+    return string
+
+def SaveToFile():
+    fs = scena.fs
+
+    fs.write(b'\x00' * (16 - fs.tell() % 16))
+
+    scena.StringTableOffset = fs.tell()
+    for string in scena.StringTable:
+        plog('%s <--> %X' % (string, fs.tell()))
+
+        scena.StringListTable[string] = fs.tell()
+        fs.write(string.encode(CODE_PAGE) + b'\x00')
+
+    zerostr = fs.tell() - 1
+
+    for lb in scena.DelayFixLabels:
+        scena.fs.seek(lb.Offset)
+        scena.fs.wulong(getlabel(lb.Label))
+
+    for lb in scena.DelayFixString:
+        scena.fs.seek(lb.Offset)
+        pos = zerostr if lb.Label == '' else scena.StringListTable[lb.Label]
+
+        plog('%X -> %X : %s' % (lb.Offset, pos, lb.Label))
+
+        scena.fs.wulong(pos)
+
+    for i in range(len(scena.ScnInfoOffset)):
+        plog('%04X : %02X' % (scena.ScnInfoOffset[i], scena.ScnInfoNumber[i]))
+
+    fs.seek(0)
+    fs.write(scena.binary())
+
+    print('done')
+
+    #input()

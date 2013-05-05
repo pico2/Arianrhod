@@ -1,12 +1,13 @@
 from InstructionTable import *
+from ScenarioBase import *
 
 CODE_PAGE = '936'
 
 def GetOpCode(fs):
     return fs.byte()
 
-def WriteOpCode(op):
-    return struct.pack('<B', op)
+def WriteOpCode(fs, op):
+    return fs.wbyte(op)
 
 edao_op_table = InstructionTable(GetOpCode, WriteOpCode, DefaultGetLabelName, CODE_PAGE)
 
@@ -23,8 +24,8 @@ InstructionNames[0x07]  = 'OP_07'
 InstructionNames[0x08]  = 'Sleep'
 InstructionNames[0x09]  = 'SetXXXFlags'
 InstructionNames[0x0A]  = 'ClearXXXFlags'
-InstructionNames[0x0B]  = 'OP_0B'
-InstructionNames[0x0C]  = 'OP_0C'
+InstructionNames[0x0B]  = 'FadeToDark'
+InstructionNames[0x0C]  = 'FadeToBright'
 InstructionNames[0x0D]  = 'OP_0D'
 InstructionNames[0x0E]  = 'OP_0E'
 InstructionNames[0x0F]  = 'Battle'
@@ -144,10 +145,10 @@ InstructionNames[0x88]  = 'OP_88'
 InstructionNames[0x89]  = 'OP_89'
 InstructionNames[0x8A]  = 'OP_8A'
 InstructionNames[0x8B]  = 'OP_8B'
-InstructionNames[0x8C]  = 'OP_8C'
+InstructionNames[0x8C]  = 'SetChrChipByIndex'
 InstructionNames[0x8D]  = 'OP_8D'
 InstructionNames[0x8E]  = 'OP_8E'
-InstructionNames[0x8F]  = 'OP_8F'
+InstructionNames[0x8F]  = 'SetChrPos'
 InstructionNames[0x90]  = 'OP_90'
 InstructionNames[0x91]  = 'OP_91'
 InstructionNames[0x92]  = 'OP_92'
@@ -212,7 +213,7 @@ InstructionNames[0xD2]  = 'OP_D2'
 InstructionNames[0xD3]  = 'OP_D3'
 InstructionNames[0xD4]  = 'OP_D4'
 InstructionNames[0xD5]  = 'OP_D5'
-InstructionNames[0xD6]  = 'LoadChr'
+InstructionNames[0xD6]  = 'LoadChrToIndex'
 InstructionNames[0xD7]  = 'OP_D7'
 InstructionNames[0xD8]  = 'OP_D8'
 InstructionNames[0xD9]  = 'OP_D9'
@@ -300,7 +301,7 @@ def BuildStringListFromObjectList(strlist):
 
     return s
 
-def FormatFuncString(data, oprfmt):
+def FormatFuncString(data, oprfmt, mark_number = None):
 
     entry = data.TableEntry
     ins = data.Instruction
@@ -323,9 +324,17 @@ def FormatFuncString(data, oprfmt):
                 txt.append(s)
                 continue
 
+            index = 0
             txt.append('    (')
             for s in strlist:
-                txt.append('        %s,' % s)
+                tmp = '        %s,' % s
+                if mark_number:
+                    tmp = ljust_cn(tmp, mark_number)
+                    tmp += ' # %d' % index
+
+                txt.append(tmp)
+                index += 1
+
             txt.append('    )')
 
     txt.append(')')
@@ -337,12 +346,49 @@ class EDAOInstructionTableEntry(InstructionTableEntry):
     def __init__(self, op, name = '', operand = NO_OPERAND, flags = 0, handler = None):
         super().__init__(op, name, operand, flags, handler)
 
+    def WriteOperand(self, data, opr, value):
+
+        fs = data.FileStream
+        labels = data.Instruction.Labels
+
+        def wexpr(value):
+            for expr in value:
+                expr.WriteExpression(data)
+
+        def wstr(value, recursion = False):
+            if type(value) == str:
+                value = value.encode(CODE_PAGE)
+                if not recursion:
+                    value += b'\x00'
+
+            elif type(value) == tuple:
+                for x in value:
+                    wstr(x, True)
+
+                fs.wbyte(0)
+                return
+
+            fs.write(value)
+
+        oprtype = \
+        {
+            'e' : wexpr,
+            'E' : wexpr,
+
+            's' : wstr,
+            'S' : wstr,
+        }
+
+        return oprtype[opr](value) if opr in oprtype else super().WriteOperand(data, opr, value)
+
     def FormatOperand(self, opr, value, flags):
         def formatstr(strlist):
             s = BuildStringListFromObjectList(strlist)
 
             if not flags.ArgNewLine:
-                if len(s) == 1:
+                if len(s) == 0:
+                    return '""'
+                elif len(s) == 1:
                     return s[0]
 
                 return '(' + ', '.join(s) + ')'
@@ -409,9 +455,17 @@ class EDAOInstructionTableEntry(InstructionTableEntry):
                         # unknown
                         pass
 
+                    elif code == 0x05:
+
+                        pass
+
                     elif code == 0x06:
 
                         # unknown
+                        pass
+
+                    elif code == 0x18:
+
                         pass
 
                     elif code == SCPSTR_CODE_ITEM:
@@ -499,6 +553,30 @@ class ScpExpression:
     def binary(self):
         return b''
 
+    def WriteExpression(self, handlerdata):
+
+        operation = self.Operation
+        fs = handlerdata.FileStream
+
+        def expr_exec():
+            handlerdata.Assemble(self.Operand[0])
+
+        operationmap = \
+        {
+            EXPR_PUSH_LONG          : lambda : fs.wulong(self.Operand[0]),
+            EXPR_1E                 : lambda : fs.wushort(self.Operand[0]),
+            EXPR_GET_RESULT         : lambda : fs.wushort(self.Operand[0]),
+            EXPR_PUSH_VALUE_INDEX   : lambda : fs.wbyte(self.Operand[0]),
+            EXPR_23                 : lambda : fs.wbyte(self.Operand[0]),
+            EXPR_GET_CHR_WORK       : lambda : fs.write(struct.pack('<HB', *self.Operand)),
+            EXPR_EXEC_OP            : expr_exec
+        }
+
+        fs.wbyte(operation)
+
+        if operation in operationmap:
+            operationmap[operation]()
+
     def __str__(self):
         if self.Operation != EXPR_EXEC_OP:
             txt = 'scpexpr(%s' % ExpressionOperantions[self.Operation]
@@ -517,7 +595,7 @@ class ScpExpression:
             data = HandlerData(HANDLER_REASON_FORMAT)
             data.Instruction    = inst
             data.TableEntry     = edao_op_table[inst.OpCode]
-            txt += ', %s' % asm.FormatInstruction(data)
+            txt += ', "%s"' % asm.FormatInstruction(data)
 
         txt += ')'
         return txt
@@ -613,6 +691,8 @@ def ParseScpExpression(data):
 
         expr.append(scpexpr)
 
+    expr.append(scpexpr)
+
     return expr
 
 def scp_if(data):
@@ -634,12 +714,10 @@ def scp_if(data):
 
         return ins
 
-    elif data.Reason == HANDLER_REASON_FORMAT:
-        # Jc(expression, 'label')
-        #entry = data.TableEntry
-        #ins = data.Instruction
-        #return '%s(%s, "%s")' % (entry.OpName, FormatExpressionList(ins.Operand[0]), entry.Container.GetLabelName(ins.Operand[1]))
-        pass
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'EO'
+        return None
 
 def scp_switch(data):
 
@@ -690,24 +768,77 @@ def scp_switch(data):
         txt.append('    %s,' % FormatExpressionList(ins.Operand[0]))
 
         GetLabelName = entry.Container.GetLabelName
+        #txt.append('    (')
 
         for case in ins.Operand[1]:
             txt.append('    (%d, "%s"),' % (case[0], GetLabelName(case[1])))
 
         txt.append('    (-1, "%s"),' % GetLabelName(ins.Operand[-1]))
+        #txt.append('    )')
         txt.append(')')
         txt.append('')
 
         return '\r\n'.join(txt)
 
-'''
+    elif data.Reason == HANDLER_REASON_GENERATE:
 
-typedef struct
-{
-    
-}
+        fs      = data.FileStream
+        args    = data.Arguments
+        entry   = data.TableEntry
+        inst    = data.Instruction
 
-'''
+        exprlist = args[0]
+        optlist = args[1:]
+
+        opts = []
+        defaultoffset = None
+        for opt in optlist:
+            if opt[0] == -1:
+                if defaultoffset != None:
+                    raise Exception('multi default case')
+
+                defaultoffset = opt[1]
+            else:
+                opts.append(opt)
+
+        optlist = opts
+
+        entry.Container.WriteOpCode(fs, inst.OpCode)
+
+        for expr in exprlist:
+            expr.WriteExpression(data)
+
+        entry.WriteOperand(data, 'B', len(optlist))
+
+        for opt in optlist:
+            fs.wushort(opt[0])
+            inst.Labels.append(LabelEntry(opt[1], fs.tell()))
+            fs.wulong(INVALID_OFFSET)
+
+        inst.Labels.append(LabelEntry(defaultoffset, fs.tell()))
+        fs.wulong(-1)
+
+        return inst
+
+def scp_new_scene(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        data.Instruction.OperandFormat = 'LCCC'
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        ins = data.Instruction
+
+        return '%s("%s", %d, %d, %d)' % (
+                    data.TableEntry.OpName, ScenarioFileIndex(ins.Operand[0]).Name(),
+                    ins.Operand[1], ins.Operand[2], ins.Operand[3]
+                )
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Arguments[0] = ScenarioFileIndex(data.Arguments[0]).Index()
+        data.Instruction.OperandFormat = 'LCCC'
 
 def scp_battle(data):
 
@@ -754,19 +885,28 @@ def scp_battle(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        ins = data.Instruction
+        entry = data.TableEntry
+
+        BattleInfoOffset = ins.Operand[0]
+        if BattleInfoOffset == 0xFFFFFFFF:
+            return
+
+        p = '%s("BattleInfo_%X", ' % (entry.OpName, BattleInfoOffset)
+
+        return p + entry.FormatAllOperand(ins.OperandFormat[1:], ins.Operand[1:], ins.Flags) + ')'
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        ins = data.Instruction
+        BattleInfoOffset = data.Arguments[0]
+        ins.OperandFormat = 'OLBWWW' if type(BattleInfoOffset) == str else 'LL' + ('L' * 4) + ('L' * 8) + 'LL'
+
 def scp_1d(data):
 
-    if data.Reason == HANDLER_REASON_READ:
-
-        fs = data.FileStream
-        ins = data.Instruction
-
-        opr1 = fs.byte()
-        opr2 = fs.byte()
-
-        ins.Operand.append(opr1)
-        ins.Operand.append(opr2)
-
+    def getopr(opr1):
         operand = ''
 
         if opr1 == 0:
@@ -774,11 +914,32 @@ def scp_1d(data):
         elif opr1 == 2 or opr1 == 3:
             operand = 'B'
 
+        return operand
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        opr1, opr2 = data.TableEntry.GetAllOperand('BB', fs)
+
+        ins.Operand.append(opr1)
+        ins.Operand.append(opr2)
+
+        operand = getopr(opr1)
+
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
         ins.OperandFormat = 'BB' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        opr1 = data.Arguments[0]
+        operand = getopr(opr1)
+
+        data.Instruction.OperandFormat = 'BB' + operand
 
 def scp_play_bgm(data):
 
@@ -788,26 +949,31 @@ def scp_play_bgm(data):
         ins = data.Instruction
 
         bgm, volume = data.TableEntry.GetAllOperand('HC', fs)
-        ins.Operand.append([ScpString(SCPSTR_CODE_STRING, 'ed7%d' % bgm)])
+        ins.Operand.append([ScpString(SCPSTR_CODE_STRING, 'ed7%d.ogg' % bgm)])
         ins.Operand.append(volume)
 
         ins.OperandFormat = 'SC'
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'HC'
+        bgm = data.Arguments[0]
+
+        if type(bgm) == int:
+            return
+
+        if bgm[:3].lower() != 'ed7':
+            raise Exception('incorrect bgm prefix')
+
+        bgm = bgm[3:]
+
+        data.Arguments[0] = int(os.path.splitext(bgm)[0])
+
 def scp_29(data):
 
-    if data.Reason == HANDLER_REASON_READ:
-
-        fs = data.FileStream
-        ins = data.Instruction
-
-        opr1 = fs.ushort()
-        opr2 = fs.byte()
-
-        ins.Operand.append(opr1)
-        ins.Operand.append(opr2)
-
+    def getopr(opr2):
         operand = ''
 
         if opr2 == 1 or opr2 == 2:
@@ -815,13 +981,7 @@ def scp_29(data):
         elif opr2 == 3 or opr2 == 4:
             operand = 'B'
 
-        ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
-
-        ins.OperandFormat = 'WB' + operand
-
-        return ins
-
-def scp_2a(data):
+        return operand
 
     if data.Reason == HANDLER_REASON_READ:
 
@@ -833,13 +993,44 @@ def scp_2a(data):
         ins.Operand.append(opr1)
         ins.Operand.append(opr2)
 
-        operand = 'W' if opr2 == 1 else 'B'
+        operand = getopr(opr2)
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
         ins.OperandFormat = 'WB' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WB' + getopr(data.Arguments[1])
+
+def scp_2a(data):
+
+    def getopr(opr2): return 'W' if opr2 == 1 else 'B'
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        opr1, opr2 = data.TableEntry.GetAllOperand('WB', fs)
+
+        ins.Operand.append(opr1)
+        ins.Operand.append(opr2)
+
+        operand = getopr(opr2)
+
+        ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
+
+        ins.OperandFormat = 'WB' + operand
+
+        return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        opr2 = data.Arguments[1]
+        data.Instruction.OperandFormat = 'WB' + getopr(opr2)
 
 def scp_2b(data):
 
@@ -858,20 +1049,33 @@ def scp_2b(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'W' * min(0xC, len(data.Arguments))
+
 def scp_38(data):
+
+    def getopr(opr2):
+        operand = ''
+
+        if opr2 == 0x7F:
+            operand = 'B'
+        elif opr2 >= 0x80 and opr2 <= 0x87:
+            operand = 'B'
+
+        return operand
 
     if data.Reason == HANDLER_REASON_READ:
 
         fs = data.FileStream
         ins = data.Instruction
 
-        opr1 = fs.byte()
-        opr2 = fs.byte()
+        opr1, opr2 = data.TableEntry.GetAllOperand('BB', fs)
 
         ins.Operand.append(opr1)
         ins.Operand.append(opr2)
 
-        operand = ''
+        operand = getopr(opr2)
 
         if opr2 == 0x7F:
             operand = 'B'
@@ -883,6 +1087,10 @@ def scp_38(data):
         ins.OperandFormat = 'BB' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'BB' + getopr(data.Arguments[1])
 
 def scp_4e(data):
 
@@ -897,6 +1105,10 @@ def scp_4e(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WE'
+
 def scp_50(data):
 
     if data.Reason == HANDLER_REASON_READ:
@@ -909,6 +1121,10 @@ def scp_50(data):
         ins.OperandFormat = 'BE'
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'BE'
 
 def scp_52(data):
 
@@ -923,6 +1139,10 @@ def scp_52(data):
         ins.OperandFormat = 'WBE'
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WBE'
 
 def scp_anonymous_talk(data):
 
@@ -943,6 +1163,10 @@ def scp_anonymous_talk(data):
 
         return FormatFuncString(data, data.Instruction.OperandFormat)
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WS'
+
 def scp_create_chr_talk(data):
 
     if data.Reason == HANDLER_REASON_READ:
@@ -958,6 +1182,10 @@ def scp_create_chr_talk(data):
     elif data.Reason == HANDLER_REASON_FORMAT:
 
         return FormatFuncString(data, data.Instruction.OperandFormat)
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WS'
 
 def scp_create_npc_talk(data):
 
@@ -980,6 +1208,10 @@ def scp_create_npc_talk(data):
 
         return FormatFuncString(data, data.Instruction.OperandFormat)
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WSS'
+
 def scp_create_menu(data):
 
     # max 10 line ?
@@ -999,7 +1231,11 @@ def scp_create_menu(data):
 
     elif data.Reason == HANDLER_REASON_FORMAT:
 
-        return FormatFuncString(data, data.Instruction.OperandFormat)
+        return FormatFuncString(data, data.Instruction.OperandFormat, 40)
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WWWBS'
 
 def scp_76(data):
 
@@ -1033,7 +1269,24 @@ def scp_76(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        opr3 = data.Arguments[2]
+
+        data.Instruction.OperandFormat = 'BSB' + getopr(opr3)
+
 def scp_9f(data):
+
+    def getopr(opr):
+
+        if opr == 0:
+            operand = 'W'
+        elif opr == 1:
+            operand = 'LLL'
+        else:
+            operand = 'WLB'
+
+        return operand
 
     if data.Reason == HANDLER_REASON_READ:
 
@@ -1043,19 +1296,17 @@ def scp_9f(data):
         ins.Operand = data.TableEntry.GetAllOperand('B', fs)
 
         opr = ins.Operand[0]
-
-        if opr == 0:
-            operand = 'W'
-        elif opr == 1:
-            operand = 'LLL'
-        else:
-            operand = 'WLB'
+        operand = getopr(opr)
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
         ins.OperandFormat = 'B' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'B' + getopr(data.Arguments[0])
 
 def scp_a1(data):
 
@@ -1072,6 +1323,11 @@ def scp_a1(data):
         ins.OperandFormat = 'WWB' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WWB' + 'B' * (len(data.Arguments) - 3)
+        return None
 
 def scp_cf(data):
 
@@ -1091,7 +1347,24 @@ def scp_cf(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'BB' + ('B' if data.Arguments[0] != 0 else '')
+
 def scp_menu_cmd(data):
+
+    def getopr(menutype):
+        operand = ''
+
+        if menutype == 0: pass
+        elif menutype == 1: operand = 'S'
+        elif menutype == 2: operand = 'WWB'
+        elif menutype == 3: operand = 'B'
+        elif menutype == 4: operand = 'B'
+        elif menutype == 5: operand = 'B'
+        elif menutype == 6: pass
+
+        return operand
 
     if data.Reason == HANDLER_REASON_READ:
 
@@ -1105,28 +1378,17 @@ def scp_menu_cmd(data):
         ins.Operand.append(menutype)
         ins.Operand.append(menu_xxx)
 
-        operand = ''
-
-        if menutype == 0:
-            pass
-        elif menutype == 1:
-            operand = 'S'
-        elif menutype == 2:
-            operand = 'WWB'
-        elif menutype == 3:
-            operand = 'B'
-        elif menutype == 4:
-            operand = 'B'
-        elif menutype == 5:
-            operand = 'B'
-        elif menutype == 6:
-            pass
+        operand = getopr(menutype)
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
         ins.OperandFormat = 'BB' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'BB' + getopr(data.Arguments[0])
 
 def scp_d2(data):
 
@@ -1141,7 +1403,37 @@ def scp_d2(data):
 
         return ins
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'BE'
+
+def scp_load_chr(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        data.Instruction.OperandFormat = 'LB'
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        ins = data.Instruction
+
+        return '%s("%s", 0x%X)' % (data.TableEntry.OpName, ScenarioChipInfo(ins.Operand[0]), ins.Operand[1])
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Arguments[0] = ScenarioChipInfo(data.Arguments[0]).fileindex()
+        data.Instruction.OperandFormat = 'LB'
+
 def scp_e4(data):
+
+    def getopr(opr):
+        operand = ''
+        if opr == 0: operand = 'BB'
+        elif opr == 1: operand = 'B'
+        elif opr == 2: operand = 'B'
+        elif opr == 3: pass
+
+        return operand
 
     if data.Reason == HANDLER_REASON_READ:
 
@@ -1151,21 +1443,17 @@ def scp_e4(data):
         opr = data.TableEntry.GetOperand('B', fs)
         ins.Operand.append(opr)
 
-        operand = ''
-        if opr == 0:
-            operand = 'BB'
-        elif opr == 1:
-            operand = 'B'
-        elif opr == 2:
-            operand = 'B'
-        elif opr == 3:
-            pass
+        operand = getopr(opr)
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
         ins.OperandFormat = 'B' + operand
 
         return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'B' + getopr(data.Arguments[0])
 
 edao_op_list = \
 [
@@ -1174,14 +1462,14 @@ edao_op_list = \
     inst(Jc,                NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_if),
     inst(Jump,              'O',                INSTRUCTION_END_BLOCK),
     inst(Switch,            NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_switch),
-    inst(Call,              'BB'),          # included_scp index, func index
-    inst(NewScene,          'LBB'),
+    inst(Call,              'CC'),          # main_scp index, func index
+    inst(NewScene,          NO_OPERAND,         0,                              scp_new_scene),
     inst(OP_07,             NO_OPERAND),
     inst(Sleep,             'H'),
     inst(SetXXXFlags,       'L'),
     inst(ClearXXXFlags,     'L'),
-    inst(OP_0B,             'LLB'),
-    inst(OP_0C,             'LL'),
+    inst(FadeToDark,        'iic'),
+    inst(FadeToBright,      'ii'),
     inst(OP_0D),
     inst(OP_0E,             'L'),
     inst(Battle,            NO_OPERAND,         0,                              scp_battle),
@@ -1198,7 +1486,7 @@ edao_op_list = \
     inst(OP_1B,             'BBW'),
     inst(OP_1C,             'BBBBBBWW'),
     inst(OP_1D,             NO_OPERAND,         0,                              scp_1d),
-    inst(PlayBgm,           'HC',               0,                              scp_play_bgm),
+    inst(PlayBgm,           NO_OPERAND,         0,                              scp_play_bgm),
     inst(OP_1F),
     inst(VolumeBgm,         'BL'),
     inst(OP_21,             'L'),
@@ -1244,11 +1532,11 @@ edao_op_list = \
     inst(OP_4B,             'WB'),
     inst(OP_4C,             'WB'),
     inst(OP_4D),
-    inst(OP_4E,             'WE',               0,                              scp_4e),
+    inst(OP_4E,             NO_OPERAND,         0,                              scp_4e),
     inst(OP_4F),
-    inst(OP_50,             'BE',               0,                              scp_50),
+    inst(OP_50,             NO_OPERAND,         0,                              scp_50),
     inst(OP_51),
-    inst(OP_52,             'WBE',              0,                              scp_52),
+    inst(OP_52,             NO_OPERAND,         0,                              scp_52),
     inst(OP_53,             'W'),
     inst(OP_54,             'W'),
     inst(AnonymousTalk,     NO_OPERAND,         0,                              scp_anonymous_talk),
@@ -1265,7 +1553,7 @@ edao_op_list = \
     inst(OP_60,             'W'),
     inst(SetChrName,        'S'),
     inst(OP_62,             'W'),
-    inst(OP_63,             'WLLBBLB'),
+    inst(OP_63,             'WLIBBLB'),
     inst(OP_64,             'W'),
     inst(OP_65,             'BW'),
     inst(OP_66,             'BW'),
@@ -1301,10 +1589,10 @@ edao_op_list = \
     inst(OP_89,             'BB'),
     inst(OP_8A,             'B'),
     inst(OP_8B,             'W'),
-    inst(OP_8C,             'WB'),
+    inst(SetChrChipByIndex, 'WB'),
     inst(OP_8D,             'WB'),
     inst(OP_8E,             'WS'),
-    inst(OP_8F,             'WLLLW'),
+    inst(SetChrPos,         'WiiiW'),
     inst(OP_90,             'WLLLW'),
     inst(OP_91,             'WWW'),
     inst(OP_92,             'WLLW'),
@@ -1365,11 +1653,11 @@ edao_op_list = \
     inst(OP_CF,             NO_OPERAND,             0,                          scp_cf),
     inst(MenuCmd,           NO_OPERAND,             0,                          scp_menu_cmd),
     inst(OP_D1,             'W'),
-    inst(OP_D2,             'BE',                   0,                          scp_d2),
+    inst(OP_D2,             NO_OPERAND,             0,                          scp_d2),
     inst(OP_D3,             'WBS'),
     inst(OP_D4,             'LL'),
     inst(OP_D5,             'WLLLL'),
-    inst(LoadChr,           'LB'),
+    inst(LoadChrToIndex,    NO_OPERAND,             0,                          scp_load_chr),
     inst(OP_D7,             'B'),
     inst(OP_D8,             'BB'),
     inst(OP_D9,             'BB'),

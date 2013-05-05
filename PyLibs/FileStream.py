@@ -1,4 +1,5 @@
-import struct, io
+from syslib import *
+import io
 
 def ReadByte(fs):
     return struct.unpack('<B', fs.read(1))[0]
@@ -20,6 +21,12 @@ def ReadLong64(fs):
 
 def ReadULong64(fs):
     return struct.unpack('<Q', fs.read(8))[0]
+
+def ReadFloat(fs):
+    return struct.unpack('<f', fs.read(4))[0]
+
+def ReadDouble(fs):
+    return struct.unpack('<d', fs.read(8))[0]
 
 def ReadAString(fs, cp = '936'):
     string = b''
@@ -43,6 +50,35 @@ def ReadWString(fs):
 
     return string.decode('U16')
 
+def WriteByte(fs, b):
+    return fs.write(struct.pack('<B', BYTE(b & 0xFF).value))
+
+def WriteChar(fs, b):
+    return fs.write(CHAR(b & 0xFF).value)
+
+def WriteUShort(fs, ushort):
+    return fs.write(struct.pack('<H', USHORT(ushort).value))
+
+def WriteShort(fs, short):
+    return fs.write(struct.pack('<h', SHORT(short).value))
+
+def WriteULong(fs, ulong):
+    return fs.write(struct.pack('<L', ULONG(ulong).value))
+
+def WriteLong(fs, long):
+    return fs.write(struct.pack('<l', LONG(long).value))
+
+def WriteLong64(fs, l64):
+    return fs.write(struct.pack('<q', LONG64(l64).value))
+
+def WriteULong64(fs, ul64):
+    return fs.write(struct.pack('<Q', ULONG64(ul64).value))
+
+def WriteFloat(fs, flt):
+    return fs.write(struct.pack('<f', FLOAT(flt).value))
+
+def WriteDouble(fs, db):
+    return fs.write(struct.pack('<d', DOUBLE(db).value))
 
 class BytesStream:
     stream = None
@@ -61,7 +97,7 @@ class BytesStream:
         self.stream = open(file, mode, buffering, encoding, errors, newline, closefd, opener)
         return self
 
-    def openmem(self, buffer):
+    def openmem(self, buffer = b''):
         self.stream = io.BytesIO(buffer)
         return self
 
@@ -73,6 +109,9 @@ class BytesStream:
 
     def read(self, n = -1):
         return self.stream.read(n)
+
+    def write(self, buf):
+        return self.stream.write(buf)
 
     def tell(self):
         return self.stream.tell()
@@ -105,10 +144,45 @@ class BytesStream:
     def ulong64(self):
         return ReadULong64(self.stream)
 
+    def float(self):
+        return ReadFloat(self.stream)
+
+    def double(self):
+        return ReadDouble(self.stream)
+
     def astr(self):
         return ReadAString(self.stream)
 
     def wstr(self):
         return ReadWString(self.stream)
 
+    def wchar(self, b):
+        return WriteChar(self.stream, b)
+
+    def wbyte(self, b):
+        return WriteByte(self.stream, b)
+
+    def wshort(self, short):
+        return WriteShort(self.stream, short)
+
+    def wushort(self, ushort):
+        return WriteUShort(self.stream, ushort)
+
+    def wlong(self, l):
+        return WriteLong(self.stream, l)
+
+    def wulong(self, l):
+        return WriteULong(self.stream, l)
+
+    def wlong64(self, l64):
+        return WriteLong64(self.stream, l)
+
+    def wulong64(self, l64):
+        return WriteULong64(self.stream, l)
+
+    def wfloat(self, flt):
+        return WriteFloat(self.stream, flt)
+
+    def wdouble(self, db):
+        return WriteDouble(self.stream, db)
 

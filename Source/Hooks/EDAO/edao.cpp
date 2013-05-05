@@ -211,6 +211,8 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    SetExeDirectoryAsCurrent();
+
     MEMORY_PATCH p[] =
     {
         PATCH_MEMORY(0xEB,      1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking

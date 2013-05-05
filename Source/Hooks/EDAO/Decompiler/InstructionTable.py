@@ -1,20 +1,22 @@
 from BaseType import *
 
-HANDLER_REASON_READ             = 0
-HANDLER_REASON_WRITE            = 1
-HANDLER_REASON_FORMAT           = 2
-HANDLER_REASON_GET_HANDLER      = 3
+HANDLER_REASON_READ         = 0
+HANDLER_REASON_WRITE        = 1
+HANDLER_REASON_FORMAT       = 2
+HANDLER_REASON_FUNCTION     = 3
+HANDLER_REASON_GENERATE     = 4
 
 class HandlerData:
-    def __init__(self, reason, TableEntry = None):
-        self.Reason = reason
-        self.FileStream = None
-        self.Instruction = None
+    def __init__(self, reason):
+        self.Reason         = reason
+        self.FileStream     = None
+        self.Instruction    = None
+        self.Arguments      = None
 
-        # list of OffsetFixupEntry
+        # list of LabelEntry
         self.Labels = []
 
-        self.TableEntry = TableEntry
+        self.TableEntry = None
 
         self.Disasm     = None
         self.Format     = None
@@ -74,6 +76,53 @@ class InstructionTableEntry:
         self.Handler    = handler
         self.Container  = None
 
+    def WriteOperand(self, data, opr, value):
+
+        fs = data.FileStream
+        labels = data.Instruction.Labels
+
+        def wlabel():
+            labels.append(LabelEntry(value, fs.tell()))
+            fs.wulong(INVALID_OFFSET)
+
+        oprtype = \
+        {
+            'c' : lambda : fs.wchar(value),
+            'C' : lambda : fs.wbyte(value),
+
+            'b' : lambda : fs.wchar(value),
+            'B' : lambda : fs.wbyte(value),
+
+            'w' : lambda : fs.wshort(value),
+            'W' : lambda : fs.wushort(value),
+
+            'h' : lambda : fs.wshort(value),
+            'H' : lambda : fs.wushort(value),
+
+            'l' : lambda : fs.wlong(value),
+            'L' : lambda : fs.wulong(value),
+
+            'i' : lambda : fs.wlong(value),
+            'I' : lambda : fs.wulong(value),
+
+            'q' : lambda : fs.wlong64(value),
+            'Q' : lambda : fs.wulong64(value),
+
+            'f' : lambda : fs.wfloat(value),
+            'F' : lambda : fs.wdouble(value),
+
+            'd' : lambda : fs.wfloat(value),
+            'D' : lambda : fs.wdouble(value),
+
+            's' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
+            'S' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
+
+            'o' : wlabel,
+            'O' : wlabel,
+        }
+
+        return oprtype[opr]()
+
     def FormatAllOperand(self, oprs, values, flags):
         if len(oprs) != len(values):
             raise Exception('operand: does not match values')
@@ -87,6 +136,8 @@ class InstructionTableEntry:
             for i in range(1, len(oprs)):
                 tmp = ', ' + self.FormatOperand(oprs[i], values[i], flags)
                 oprtext += tmp
+        else:
+            raise Exception('not implemented')
 
         return oprtext
 

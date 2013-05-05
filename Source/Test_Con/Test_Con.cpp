@@ -567,9 +567,26 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    // InstallHookPort();
+    LOGFONTW lf;
 
-    PrintConsoleW(L"%m\n");
+    SetThreadLocale(0x0411);
+    SetThreadUILanguage(0x411);
+    SetThreadPreferredUILanguages(MUI_LANGUAGE_ID, L"411", NULL);
+
+    lf.lfCharSet = 0x80;
+    lf.lfFaceName[0] = 0;
+
+    EnumFontFamiliesExW(GetDC(NULL), &lf, 
+        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
+        {
+            PrintConsoleW(L"%02X, %s\n", lf->lfCharSet, lf->lfFaceName);
+            return TRUE;
+        },
+        0,
+        0
+    );
+
+    PauseConsole();
 
     return;
 

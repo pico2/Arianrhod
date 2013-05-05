@@ -11,8 +11,9 @@ disasmtbl = {}
 fuck = False
 
 class Disassembler:
-    def __init__(self, InstructionTable):
+    def __init__(self, InstructionTable, DiasmInstructionCallback = None):
         self.InstructionTable = InstructionTable
+        self.DiasmInstructionCallback = DiasmInstructionCallback
 
     def DisasmBlock(self, Stream, InstructionTable = None):
         if InstructionTable == None:
@@ -32,9 +33,7 @@ class Disassembler:
         fs = data.FileStream
         entry = data.TableEntry
 
-        inst.OperandFormat = entry.Operand
-
-        for opr in entry.Operand:
+        for opr in inst.OperandFormat:
             inst.Operand.append(entry.GetOperand(opr, fs))
             if opr.lower() == 'o':
                 inst.BranchTargets.append(inst.Operand[-1])
@@ -45,10 +44,15 @@ class Disassembler:
         inst = data.Instruction
         entry = data.TableEntry
 
+        inst.OperandFormat = entry.Operand
+
         handler = entry.Handler if entry.Handler != None else self.DefaultDisasmInstruction
         inst = handler(data)
         if inst == None:
             inst = self.DefaultDisasmInstruction(data)
+
+        if self.DiasmInstructionCallback:
+            self.DiasmInstructionCallback(inst, data.FileStream)
 
         return inst
 
@@ -61,7 +65,7 @@ class Disassembler:
             return None
 
         block = CodeBlock(pos)
-        block.Name = 'block_%X' % pos
+        block.Name = InstructionTable.GetLabelName(pos)
 
         plog('block: %08X' % block.Offset)
 
@@ -72,9 +76,9 @@ class Disassembler:
 
             offsetlist[pos] = True
 
-            print('%08X: ' % pos, end = '')
+            #print('%08X: ' % pos, end = '')
             op = InstructionTable.GetOpCode(Stream)
-            print('%02X' % op)
+            #print('%02X' % op)
 
             entry = InstructionTable[op]
 
@@ -121,6 +125,7 @@ class Disassembler:
         plog('block end: %08X' % block.Offset)
 
         for offset, inst in blockref.items():
+            #if offset == 0x1380: bp()
             Stream.seek(offset)
             newblock = self.DisasmBlockWorker(Stream, InstructionTable, DisasmTable)
             if newblock != None:
