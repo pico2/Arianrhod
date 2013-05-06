@@ -14,6 +14,24 @@ class CraftTarget:
     def GetFlags(self):
         pass
 
+class CraftAttribute:
+    Chi  = 0
+    Mizu = 1
+    Hono = 3
+    Kaze = 2
+    Toki = 4
+    Sora = 5
+    Gen  = 6
+
+CraftAttributeNames = {}
+
+for attr in dir(CraftAttribute):
+    if attr[:2] == '__' and attr[-2:] == '__':
+        continue
+
+    expr = 'CraftAttributeNames[0x%X] = "CraftAttribute.%s"' % (getattr(CraftAttribute, attr), attr)
+    exec(expr)
+
 class CraftRange:
     Target                     = 0x01
     CircleOnTarget             = 0x02
@@ -31,7 +49,18 @@ class CraftRange:
 
     SelectLocation             = 0x32
 
+CraftRangeNames = {}
+
+for attr in dir(CraftRange):
+    if attr[:2] == '__' and attr[-2:] == '__':
+        continue
+
+    expr = 'CraftRangeNames[0x%X] = "CraftRange.%s"' % (getattr(CraftRange, attr), attr)
+    exec(expr)
+
 class CraftState:
+    NoneState               = 0x00
+
     Physical                = 0x01
     PhysicalForce           = 0x02
     Arts                    = 0x03
@@ -69,7 +98,7 @@ class CraftState:
     HealBanMagic            = 0x22
     HealDarkness            = 0x23
     HealSleep               = 0x24
-    HealChaos               = 0x25
+    HealConfusion           = 0x25
     HealStun                = 0x26
     HealPetrifaction        = 0x27
 
@@ -81,15 +110,28 @@ class CraftState:
 
     QueryMonsterInfo        = 0x50
 
+CraftStateNames = {}
+
+for attr in dir(CraftState):
+    if attr[:2] == '__' and attr[-2:] == '__':
+        continue
+
+    expr = 'CraftStateNames[0x%X] = "CraftState.%s"' % (getattr(CraftState, attr), attr)
+    exec(expr)
+
+
+CUSTOM_CRAFT_INDEX_BASE = 0x3E8
+
 class BattleCraftInfo:
 
     # size = 0x18
 
-    def __init__(self, fs = None):
+    def __init__(self, index = 0, fs = None):
 
         if fs == None:
             return
 
+        self.Index                  = CUSTOM_CRAFT_INDEX_BASE + index
         self.ActionIndex            = fs.ushort()   # 0x00
         self.Target                 = fs.byte()     # 0x02       # in fact, this is an ushort
         self.Unknown_3              = fs.byte()     # 0x03
@@ -111,6 +153,82 @@ class BattleCraftInfo:
         self.Name = fs.astr()
         self.Description = fs.astr()
 
+    def param(self):
+        return '"%s", "%s", 0x%02X, 0x%X, 0x%X, %s, %s, %s, %s, %d, %d, %d, %d, %d, 0x%X, 0x%04X, %d, 0x%04X, %d' % (
+                    self.Name,
+                    self.Description,
+                    self.ActionIndex,
+                    self.Target,
+                    self.Unknown_3,
+                    CraftAttributeNames[self.Attribute],
+                    CraftRangeNames[self.RangeType],
+                    CraftStateNames[self.State1],
+                    CraftStateNames[self.State2],
+                    self.RNG,
+                    self.RangeSize,
+                    self.AriaTime,
+                    self.SkillTime,
+                    self.EP_CP,
+                    self.Unknown_0E,
+                    self.State1Parameter,
+                    self.State1Time,
+                    self.State2Parameter,
+                    self.State2Time
+                )
+
+__CreatedCraftNumber__ = 0
+
+def CreateCraft(
+        Name,
+        Description,
+        ActionIndex,
+        Target,
+        Unknown_3,
+        Attribute,
+        RangeType,
+        State1,
+        State2,
+        RNG,
+        RangeSize,
+        AriaTime,
+        SkillTime,
+        EP_CP,
+        Unknown_0E,
+        State1Parameter,
+        State1Time,
+        State2Parameter,
+        State2Time
+    ):
+
+    global __CreatedCraftNumber__
+
+    info = BattleCraftInfo()
+
+    info.Name               = Name
+    info.Description        = Description
+    info.Index              = __CreatedCraftNumber__ + CUSTOM_CRAFT_INDEX_BASE
+    info.ActionIndex        = ActionIndex
+    info.Target             = Target
+    info.Unknown_3          = Unknown_3
+    info.Attribute          = Attribute
+    info.RangeType          = RangeType
+    info.State1             = State1
+    info.State2             = State2
+    info.RNG                = RNG
+    info.RangeSize          = RangeSize
+    info.AriaTime           = AriaTime
+    info.SkillTime          = SkillTime
+    info.EP_CP              = EP_CP
+    info.Unknown_0E         = Unknown_0E
+    info.State1Parameter    = State1Parameter
+    info.State1Time         = State1Time
+    info.State2Parameter    = State2Parameter
+    info.State2Time         = State2Time
+
+    __CreatedCraftNumber__ += 1
+
+    return info
+
 class BattleCraftAIInfo:
 
     # size = 0x18:
@@ -126,11 +244,40 @@ class BattleCraftAIInfo:
         self.TargetCondition            = fs.byte()
         self.MagicAriaActionIndex       = fs.byte()
         self.ActionIndex                = fs.byte()
-        self.SkillIndex                 = fs.ushort()
-        self.Param                      = [0] * 4
+        self.CraftIndex                 = fs.ushort()
+        self.Parameter                  = [0] * 4
 
-        for i in range(len(self.Param)):
-            self.Param[i] = fs.ulong()
+        for i in range(len(self.Parameter)):
+            self.Parameter[i] = fs.ulong()
+
+    def param(self):
+        return '0x%X, %d, 0x%X, 0x%X, 0x%02X, 0x%02X, 0x%04X, [0x%08X, 0x%08X, 0x%08X, 0x%08X]' % (
+                    self.Condition, self.Probability, self.Target, self.TargetCondition,
+                    self.MagicAriaActionIndex, self.ActionIndex, self.CraftIndex,
+                    self.Parameter[0], self.Parameter[1], self.Parameter[2], self.Parameter[3]
+                )
+
+def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionIndex, ActionIndex, CraftIndex, Parameters):
+    if type(Parameters) != tuple and type(Parameters) != list:
+        raise Exception('Parameters must be list or tuple')
+
+    if len(Parameters) > 4:
+        Parameters = Parameters[:4]
+    elif len(Parameters) < 4:
+        Parameters += (4 - len(Parameters)) * [0]
+
+    ai = BattleCraftAIInfo()
+
+    ai.Condition                = Condition
+    ai.Probability              = Probability
+    ai.Target                   = Target
+    ai.TargetCondition          = TargetCondition
+    ai.MagicAriaActionIndex     = MagicAriaActionIndex
+    ai.ActionIndex              = ActionIndex
+    ai.CraftIndex               = CraftIndex
+    ai.Parameter                = Parameters
+
+    return ai
 
 class BattleMonsterScriptInfo:
 
@@ -183,7 +330,7 @@ class BattleMonsterScriptInfo:
         self.Unknown_53             = 0                     # 0x53
         self.Unknown_54             = 0                     # 0x54
         self.Unknown_55             = 0                     # 0x55
-        self.SymbolIndex            = SymbolFileIndex(0)    # 0x56
+        self.Symbol            = SymbolFileIndex(0)    # 0x56
         self.Resistance             = 0                     # 0x5A  异常状态抵抗
         self.AttributeRate          = [0] * 7               # 0x5E  USHORT [7]
         self.Sepith                 = [0] * 7               # 0x6C  BYTE [7]
@@ -264,7 +411,7 @@ class BattleMonsterScriptInfo:
         self.Unknown_54             = fs.byte()
         self.Unknown_55             = fs.byte()
 
-        self.SymbolIndex            = SymbolFileIndex(fs.ulong())
+        self.Symbol            = SymbolFileIndex(fs.ulong())
         self.Resistance             = fs.ulong()
         self.AttributeRate          = struct.unpack('<HHHHHHH', fs.read(2 * 7))
         self.Sepith                 = list(fs.read(7))
@@ -291,9 +438,12 @@ class BattleMonsterScriptInfo:
         for i in range(self.SupportCraftNumber):
             self.SupportCraft.append(BattleCraftAIInfo(fs))
 
+        index = 0
         self.CraftInfoNumber = fs.byte()
         for i in range(self.CraftInfoNumber):
-            self.CraftInfo.append(BattleCraftInfo(fs))
+            info = BattleCraftInfo(index, fs)
+            self.CraftInfo.append(info)
+            index += 1
 
         self.RunawayType            = fs.byte()
         self.RunawayRate            = fs.byte()
@@ -302,6 +452,126 @@ class BattleMonsterScriptInfo:
 
         self.Name                   = fs.astr()
         self.Description            = fs.astr()
+
+    def SaveTo(self, filename):
+        lines = []
+        header = []
+
+        def add(l):
+            lines.append(l)
+
+        def fmtlist(l, fmt = '%d'):
+            tmp = []
+            for rate in l:
+                tmp.append(fmt % rate)
+
+            return ', '.join(tmp)
+
+        header.append('from %s import *' % os.path.splitext(os.path.basename(__file__))[0])
+        header.append('')
+        header.append('def main():')
+
+        add('Name               = "%s"' % self.Name.replace('\\', '\\\\'))
+        add('Description        = "%s"' % self.Description.replace('\\', '\\\\'))
+        add('ASFile             = "%s"' % self.ASFile.Name())
+        add('Symbol             = "%s"' % self.Symbol.Name())
+        add('')
+        add('Level              = %d' % self.Level)
+        add('MaximumHP          = %d' % self.MaximumHP)
+        add('InitialHP          = %d' % self.InitialHP)
+        add('MaximumEP          = %d' % self.MaximumEP)
+        add('InitialEP          = %d' % self.InitialEP)
+        add('MaximumCP          = %d' % self.MaximumCP)
+        add('InitialCP          = %d' % self.InitialCP)
+        add('')
+        add('SPD                = %d' % self.SPD)
+        add('MoveSPD            = %d' % self.MoveSPD)
+        add('MOV                = %d' % self.MOV)
+        add('STR                = %d' % self.STR)
+        add('DEF                = %d' % self.DEF)
+        add('ATS                = %d' % self.ATS)
+        add('ADF                = %d' % self.ADF)
+        add('DEX                = %d' % self.DEX)
+        add('AGL                = %d' % self.AGL)
+        add('RNG                = %d' % self.RNG)
+        add('')
+        add('Unknown_2A         = 0x%X' % self.Unknown_2A)
+        add('EXP                = %d' % self.EXP)
+        add('Unknown_2E         = 0x%X' % self.Unknown_2E)
+        add('Unknown_30         = 0x%X' % self.Unknown_30)
+        add('AIType             = 0x%X' % self.AIType)
+        add('Unknown_33         = 0x%X' % self.Unknown_33)
+        add('Unknown_35         = 0x%X' % self.Unknown_35)
+        add('Unknown_36         = 0x%X' % self.Unknown_36)
+        add('EnemyFlags         = 0x%04X' % self.EnemyFlags)
+        add('BattleFlags        = 0x%04X' % self.BattleFlags)
+        add('')
+        add('Unknown_3C         = 0x%X' % self.Unknown_3C)
+        add('Unknown_3E         = 0x%X' % self.Unknown_3E)
+        add('Sex                = %d' % self.Sex)
+        add('Unknown_41         = 0x%X' % self.Unknown_41)
+        add('Unknown_42         = 0x%X' % self.Unknown_42)
+        add('Unknown_46         = 0x%X' % self.Unknown_46)
+        add('CharSize           = %d' % self.CharSize)
+        add('Unknown_4E         = 0x%X' % self.Unknown_4E)
+        add('Unknown_52         = 0x%X' % self.Unknown_52)
+        add('Unknown_53         = 0x%X' % self.Unknown_53)
+        add('Unknown_54         = 0x%X' % self.Unknown_54)
+        add('Unknown_55         = 0x%X' % self.Unknown_55)
+        add('Resistance         = 0x%08X' % self.Resistance)
+        add('AttributeRate      = [ %s ]' % fmtlist(self.AttributeRate))
+        add('Sepith             = [ %s ]' % fmtlist(self.Sepith))
+        add('DropItem           = [ %s ]' % fmtlist(self.DropItem, '0x%04X'))
+        add('DropRate           = [ %s ]' % fmtlist(self.DropRate))
+        add('Equipment          = [ %s ]' % fmtlist(self.Equipment, '0x%04X'))
+        add('Orbment            = [ %s ]' % fmtlist(self.Orbment, '0x%04X'))
+        add('')
+        add('RunawayType        = %d' % self.RunawayType)
+        add('RunawayRate        = %d' % self.RunawayRate)
+        add('RunawayParam1      = %d' % self.RunawayParam1)
+        add('Reserve1           = %d' % self.Reserve1)
+        add('')
+
+        def fmtai(ai):
+            s = 'CreateAI(%s)' % ai.param()
+            return s.replace(', 0x%04X, ' % ai.CraftIndex, ', Creaft_%04X.Index, ' % ai.CraftIndex)
+
+        def fmtcraft(cft):
+            return 'CreateCraft(%s)' % cft.param()
+
+        def gencraft(craftlist):
+            for craft in craftlist:
+                #name = craft.Name
+                #if name == '' or name == ' ':
+                name = '%04X' % craft.Index
+
+                add('Creaft_%s = %s' % (name, fmtcraft(craft)))
+
+        def genai(prefix, ailist):
+            index = 0
+            for ai in ailist:
+                add('%s_AI_%d = %s' % (prefix, index, fmtai(ai)))
+                index += 1
+
+        gencraft(self.CraftInfo)
+        add('')
+        genai('Magic', self.Magic)
+        genai('Craft', self.Craft)
+        genai('SCraft', self.SCraft)
+        genai('SupportCraft', self.SupportCraft)
+
+        add('')
+        add('SaveToMS("%s", locals())' % (os.path.splitext(filename)[0] + '.dat'))
+
+        for l in lines:
+            if l != '':
+                l = '    ' + l
+            header.append(l)
+
+        header.append('')
+        header.append('TryInvoke(main)')
+
+        open(filename, 'wb').write('\r\n'.join(header).encode('utf_8_sig'))
 
     def __str__(self):
 
@@ -336,7 +606,7 @@ class BattleMonsterScriptInfo:
         l.append('%s' % self.Description)
         l.append('')
         l.append('%s' % self.ASFile.Name())
-        l.append('%s' % self.SymbolIndex.Name())
+        l.append('%s' % self.Symbol.Name())
         l.append('')
 
         l.append('CraftInfo: %d' % self.CraftInfoNumber)
@@ -345,8 +615,16 @@ class BattleMonsterScriptInfo:
 
         return '\r\n'.join(l)
 
-ms = BattleMonsterScriptInfo()
-ms.open('ms04200.dat' if len(sys.argv) == 1 else sys.argv[1])
+def SaveToMS(filename, locals):
+    pass
 
-print(ms)
-input()
+def main():
+    if len(sys.argv) < 2:
+        return
+
+    ms = BattleMonsterScriptInfo()
+    f = sys.argv[1]
+    ms.open(f)
+    ms.SaveTo(os.path.splitext(f)[0] + '.py')
+
+TryInvoke(main)

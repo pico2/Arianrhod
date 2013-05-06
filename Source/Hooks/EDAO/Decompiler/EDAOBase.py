@@ -1,5 +1,13 @@
 from ml import *
 
+SEPITH_CHI  = 0
+SEPITH_MIZU = 1
+SEPITH_HONO = 3
+SEPITH_KAZE = 2
+SEPITH_TOKI = 4
+SEPITH_SORA = 5
+SEPITH_GEN  = 6
+
 def ljust_cn(string, n):
     cncount = 0
     for ch in string:
