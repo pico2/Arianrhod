@@ -7,7 +7,7 @@
 // AIEditor.h : header file
 //
 
-#include "my_common.h"
+//#include "my_common.h"
 #include "MSFileStruct.h"
 
 /////////////////////////////////////////////////////////////////////////////

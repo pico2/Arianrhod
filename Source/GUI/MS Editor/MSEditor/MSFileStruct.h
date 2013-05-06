@@ -5,8 +5,6 @@
 #pragma once
 #endif
 
-#include "my_headers.h"
-
 #pragma warning(disable:4305)
 #pragma warning(disable:4309)
 

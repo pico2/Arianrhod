@@ -227,3 +227,54 @@ class SymbolFileIndex:
 
     def Index(self):
         return self.SymbolIndex if not self.IsIndexZero else 0
+
+class BattleScriptFileIndex:
+
+    def __init__(self, param = None):
+
+        if param == None:
+            param = 0
+
+        try:
+            self.IsIndexZero = bool(int(param) == 0)
+        except:
+            self.IsIndexZero = False
+
+        if self.IsIndexZero:
+            return
+
+        prefix = [ 'ms', 'as', 'bs' ]
+        datindex = 0x30000000
+
+        if type(param) == int:
+
+            ftype = (param >> 0x14) & 0xF
+            findex = param & 0xFFFFF
+
+            if ftype > len(prefix):
+                raise Exception('unknown file type')
+
+            self.FileIndex = param
+            self.FileName = '%s%05x.dat' % (prefix[ftype], param & 0xFFFFF)
+
+        elif type(param) == str:
+
+            name = os.path.splitext(os.path.basename(param))[0]
+
+            ftype = prefix.index(name[:2])
+
+            self.FileIndex = int(name[2:], 16) | datindex | (ftype << 0x14)
+            self.FileName = param
+
+        else:
+
+            raise Exception('unsupported input type')
+
+    def IsZero(self):
+        return self.IsIndexZero
+
+    def Name(self):
+        return self.FileName if not self.IsIndexZero else 0
+
+    def Index(self):
+        return self.FileIndex if not self.IsIndexZero else 0

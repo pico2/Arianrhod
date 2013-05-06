@@ -28,6 +28,8 @@
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
+#include "MyLibrary.h"
+
 #define bswap(x) __asm mov eax, x \
                  __asm bswap eax \
 				 __asm mov x, eax

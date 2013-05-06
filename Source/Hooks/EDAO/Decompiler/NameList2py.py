@@ -16,11 +16,11 @@ class NameListEntry:
         if self.Id == LAST_CHAR_ID:
             return
 
-        self.NameOffset = fs.ushort()
-        self.WalkChip   = ChipFileIndex(fs.ulong())
-        self.RunChip    = ChipFileIndex(fs.ulong())
-        self.Symbol     = SymbolFileIndex(fs.ulong())
-        self.Unknown_14 = fs.ulong()
+        self.NameOffset     = fs.ushort()
+        self.WalkChip       = ChipFileIndex(fs.ulong())
+        self.RunChip        = ChipFileIndex(fs.ulong())
+        self.BattleScript   = BattleScriptFileIndex(fs.ulong())
+        self.Unknown_14     = fs.ulong()
 
         pos = fs.tell()
         fs.seek(self.NameOffset)
@@ -34,17 +34,17 @@ class NameListEntry:
         run = self.RunChip.Name()
         if not self.RunChip.IsZero(): run = '"%s"' % run
 
-        sym = self.Symbol.Name()
-        if not self.Symbol.IsZero(): sym = '"%s"' % sym
+        sym = self.BattleScript.Name()
+        if not self.BattleScript.IsZero(): sym = '"%s"' % sym
 
         return '0x%04X, "%s", %s, %s, %s, 0x%08X' % (self.Id, self.Name, walk, run, sym, self.Unknown_14)
 
     def binary(self):
-        return struct.pack('<HHLLLL', self.Id, self.NameOffset, self.WalkChip.Index(), self.RunChip.Index(), self.Symbol.Index(), self.Unknown_14)
+        return struct.pack('<HHLLLL', self.Id, self.NameOffset, self.WalkChip.Index(), self.RunChip.Index(), self.BattleScript.Index(), self.Unknown_14)
 
 charlist = []
 
-def AddChar(Id, Name, WalkChip, RunChip, Symbol, Unknown_14):
+def AddChar(Id, Name, WalkChip, RunChip, BattleScript, Unknown_14):
 
     entry = NameListEntry()
 
@@ -54,7 +54,7 @@ def AddChar(Id, Name, WalkChip, RunChip, Symbol, Unknown_14):
     entry.Name          = Name
     entry.WalkChip      = ChipFileIndex(WalkChip)
     entry.RunChip       = ChipFileIndex(RunChip)
-    entry.Symbol        = SymbolFileIndex(Symbol)
+    entry.BattleScript  = BattleScriptFileIndex(BattleScript)
     entry.Unknown_14    = Unknown_14
 
     charlist.append(entry)
@@ -63,12 +63,12 @@ def SaveTo(filename):
     fs = open(filename, 'wb+')
 
     endchar = NameListEntry()
-    endchar.Id          = LAST_CHAR_ID
-    endchar.Name        = ' '
-    endchar.WalkChip    = ChipFileIndex(0)
-    endchar.RunChip     = ChipFileIndex(0)
-    endchar.Symbol      = SymbolFileIndex(0)
-    endchar.Unknown_14  = 0
+    endchar.Id              = LAST_CHAR_ID
+    endchar.Name            = ' '
+    endchar.WalkChip        = ChipFileIndex(0)
+    endchar.RunChip         = ChipFileIndex(0)
+    endchar.BattleScript    = BattleScriptFileIndex(0)
+    endchar.Unknown_14      = 0
 
     charlist.append(endchar)
 

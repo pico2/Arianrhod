@@ -81,16 +81,6 @@ SOURCE=.\MSEditor\MSEditorDlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\MyLib\src\my_api.cpp
-# SUBTRACT CPP /YX /Yc /Yu
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\MyLib\src\my_crtadd.cpp
-# SUBTRACT CPP /YX /Yc /Yu
-# End Source File
-# Begin Source File
-
 SOURCE=.\MSEditor\MyListCtrl.cpp
 # End Source File
 # Begin Source File
