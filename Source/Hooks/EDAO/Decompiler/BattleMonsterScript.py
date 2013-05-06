@@ -177,6 +177,7 @@ class BattleCraftInfo:
                 )
 
 __CreatedCraftNumber__ = 0
+__Craft_List__ = []
 
 def CreateCraft(
         Name,
@@ -225,6 +226,8 @@ def CreateCraft(
     info.State2Parameter    = State2Parameter
     info.State2Time         = State2Time
 
+    __Craft_List__.append(info)
+
     __CreatedCraftNumber__ += 1
 
     return info
@@ -257,6 +260,8 @@ class BattleCraftAIInfo:
                     self.Parameter[0], self.Parameter[1], self.Parameter[2], self.Parameter[3]
                 )
 
+__AI_List__ = []
+
 def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionIndex, ActionIndex, CraftIndex, Parameters):
     if type(Parameters) != tuple and type(Parameters) != list:
         raise Exception('Parameters must be list or tuple')
@@ -276,6 +281,8 @@ def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionInd
     ai.ActionIndex              = ActionIndex
     ai.CraftIndex               = CraftIndex
     ai.Parameter                = Parameters
+
+    __AI_List__.append(ai)
 
     return ai
 
@@ -553,6 +560,7 @@ class BattleMonsterScriptInfo:
                 add('%s_AI_%d = %s' % (prefix, index, fmtai(ai)))
                 index += 1
 
+        add('Crafts = []')
         gencraft(self.CraftInfo)
         add('')
         genai('Magic', self.Magic)
