@@ -14,17 +14,17 @@ class Disassembler:
     def __init__(self, InstructionTable, DiasmInstructionCallback = None):
         self.InstructionTable = InstructionTable
         self.DiasmInstructionCallback = DiasmInstructionCallback
+        self.DisasmTable = {}
 
     def DisasmBlock(self, Stream, InstructionTable = None):
         if InstructionTable == None:
             InstructionTable = self.InstructionTable
 
-        DisasmTable = {}
+        DisasmTable = self.DisasmTable
 
         ret = self.DisasmBlockWorker(Stream, InstructionTable, DisasmTable)
 
-        for offset, inst in DisasmTable.items():
-            disasmtbl[offset] = inst
+        #for offset, inst in DisasmTable.items(): disasmtbl[offset] = inst
 
         return ret
 
@@ -75,8 +75,7 @@ class Disassembler:
 
         while True:
             pos = Stream.tell()
-            if pos in DisasmTable:
-                break
+            #if pos in DisasmTable: break
 
             offsetlist[pos] = True
 
@@ -168,9 +167,12 @@ class Disassembler:
 
         return inst
 
-    def FormatCodeBlock(self, block, InstructionTable = None):
+    def FormatCodeBlock(self, block, InstructionTable = None, LabeledMap = None):
         if InstructionTable == None:
             InstructionTable = self.InstructionTable
+
+        if LabeledMap == None:
+            LabeledMap = {}
 
         text = []
 
@@ -179,11 +181,9 @@ class Disassembler:
             text.append('label("%s")' % name)
             text.append('')
 
-        AddLabel(block.Name if block.Name != None else InstructionTable.GetLabelName(block.Offset))
-
-        LabeledMap = {}
-
-        LabeledMap[block.Offset] = True
+        if block.Offset not in LabeledMap:
+            AddLabel(block.Name if block.Name != None else InstructionTable.GetLabelName(block.Offset))
+            LabeledMap[block.Offset] = block.Name
 
         for inst in block.Instructions:
 
@@ -192,6 +192,7 @@ class Disassembler:
             data.Instruction    = inst
             data.TableEntry     = InstructionTable[inst.OpCode]
             data.Format         = self.FormatInstruction
+            data.LabeledMap     = LabeledMap
 
             #print('%08X' % inst.Offset)
             #del disasmtbl[inst.Offset]
@@ -200,8 +201,10 @@ class Disassembler:
             symbol = self.FormatInstruction(data)
             #print(symbol)
 
-            if inst.RefCount != 0 and inst.Offset not in LabeledMap:
-                AddLabel(InstructionTable.GetLabelName(inst.Offset))
+            if inst.RefCount != 0:
+                name = InstructionTable.GetLabelName(inst.Offset)
+                if inst.Offset not in LabeledMap or name != LabeledMap[inst.Offset]:
+                    AddLabel(name)
 
             text.append(symbol)
 

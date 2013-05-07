@@ -3,6 +3,7 @@ from EDAOBase import *
 import ActionOpTableEDAO as edao
 
 INVALID_ACTION_OFFSET = 0xFFFF
+EMPTY_ACTION    = INVALID_ACTION_OFFSET
 
 class CharacterPositionFactor:
 
@@ -74,13 +75,34 @@ class BattleActionScriptInfo:
 
     def DisassembleCraftActions(self, fs):
 
+        BuiltinCraftNames = \
+        [
+            'SysCraft_MagicEffect',
+            'SysCraft_Stand',
+            'SysCraft_Move',
+            'SysCraft_UnderAttack',
+            'SysCraft_Dead',
+            'SysCraft_NormalAttack',
+            'SysCraft_MagicChant',
+            'SysCraft_MagicCast',
+            'SysCraft_Win',
+            'SysCraft_EnterBattle',
+            'SysCraft_UseItem',
+            'SysCraft_Stun',
+            'SysCraft_Unknown2',
+            'SysCraft_Reserve1',
+            'SysCraft_Reserve2',
+            'SysCraft_Counter',
+        ]
+
         disasm = Disassembler(edao.edao_as_op_table, self.DiasmInstructionCallback)
 
+        index = 0
         codeblocks = []
         blockoffsetmap = {}
         for func in self.ActionList:
             if func == INVALID_ACTION_OFFSET:
-                codeblocks.append(CodeBlock())
+                codeblocks.append(CodeBlock(INVALID_ACTION_OFFSET))
                 continue
 
             if func in blockoffsetmap:
@@ -89,10 +111,12 @@ class BattleActionScriptInfo:
 
             fs.seek(func)
             block = disasm.DisasmBlock(fs)
-            block.Name = 'Craft_%X' % block.Offset
+            block.Name = ('Craft_%X' % block.Offset) if index >= len(BuiltinCraftNames) else BuiltinCraftNames[index]
             codeblocks.append(block)
 
             blockoffsetmap[func] = block
+
+            index += 1
 
         return codeblocks
 
@@ -120,6 +144,32 @@ class BattleActionScriptInfo:
         lines = []
 
         lines.append('from %s import *' % os.path.splitext(os.path.basename(__file__))[0])
+        lines.append('')
+
+        tmp = []
+        for pos in self.ChrPosFactor:
+            tmp.append('(%d, %d)' % (pos.X, pos.Y))
+
+        lines.append('CreateBattleAction("%s", (%s))' % (os.path.splitext(os.path.basename(filename))[0] + '.dat', ', '.join(tmp)))
+        lines.append('')
+        lines.append('AddPreloadChip(')
+
+        index = 0
+        for chip in self.PreloadChipList:
+            x = ('    "%s",' % chip.Name()).ljust(30)
+            x += ' # %02X %d' % (index, index)
+            lines.append(x)
+            index += 1
+
+        lines.append(')')
+        lines.append('')
+
+        index = 0
+        for craft in self.CraftActions:
+            name = ('"%s"'% craft.Name) if craft.Offset != INVALID_ACTION_OFFSET else 'EMPTY_ACTION'
+            lines.append(('CraftAction(%s)' % name).ljust(40) + ('# %02X %d' % (index, index)))
+            index += 1
+
         lines.append('')
 
         blocks = self.FormatCodeBlocks()
