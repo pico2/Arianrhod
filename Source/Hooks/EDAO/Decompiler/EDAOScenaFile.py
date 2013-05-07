@@ -17,6 +17,8 @@ class ScenarioInfoPort(ScenarioInfo):
         self.DelayFixString     = []    # list of LabelEntry
         self.PrevousHandlerData = None
 
+        self.ScpFunctionList    = []
+
 scena = ScenarioInfoPort()
 
 def CreateScenaFile(MapName, Location, Unknown_14, Flags, IncludeList, Unknown_4A, PreInitFunctionIndex, Unknown_51, Information):
@@ -159,7 +161,7 @@ def BattleInfo(name, Flags, Level, Unknown_04, Vision, MoveRange, CanMove, MoveS
 
         # error if not >= 8
         for i in range(len(btmoninfo.MsFileIndex)):
-            btmoninfo.MsFileIndex[i] = btmon[i]
+            btmoninfo.MsFileIndex[i] = BattleScriptFileIndex(btmon[i])
 
         normalpos   = btmon[8]
         enemyadvpos = btmon[9]
@@ -260,6 +262,8 @@ def ScpFunction(FunctionLabel):
 
     scena.ScenaFunctionTable.Size += 4
     scena.DelayFixLabels.append(LabelEntry(FunctionLabel, scena.fs.tell()))
+
+    scena.ScpFunctionList.append(FunctionLabel)
 
     scena.fs.write(struct.pack('<I', INVALID_OFFSET))
 

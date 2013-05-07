@@ -333,16 +333,14 @@ class BattleMonsterInfo:
 
     def __init__(self, fs = None):
         if fs == None:
-            self.MsFileIndex = []
-            for i in range(8):
-                self.MsFileIndex.append(0)
+            self.MsFileIndex = [BattleScriptFileIndex()] * 8
             return
 
         self.Offset = fs.tell()
 
         self.MsFileIndex = []
         for i in range(8):
-            self.MsFileIndex.append(fs.ulong())
+            self.MsFileIndex.append(BattleScriptFileIndex(fs.ulong()))
 
         self.PositionNormalOffset           = fs.ushort()
         self.PositionEnemyAdvantageOffset   = fs.ushort()
@@ -370,7 +368,8 @@ class BattleMonsterInfo:
     def param(self):
         p = ''
         for ms in self.MsFileIndex:
-            p += '0x%08X, ' % ms
+            name = '0' if ms.IsZero() else ('"%s"' % ms.Name())
+            p += '%s, ' % name
 
         return p + '"MonsterBattlePostion_%X", "MonsterBattlePostion_%X", "ed7%d.ogg", "ed7%d.ogg", "ATBonus_%X"' % (
                     self.PositionNormalOffset,
@@ -386,7 +385,7 @@ class BattleMonsterInfo:
 
         buf = b''
         for i in self.MsFileIndex:
-            buf += struct.pack('<L', i)
+            buf += struct.pack('<L', i.Index())
 
         return buf + struct.pack('<HHHHL', self.PositionNormalOffset, self.PositionEnemyAdvantageOffset, self.BgmNormal, self.BgmDanger, self.ATBonusOffset)
 

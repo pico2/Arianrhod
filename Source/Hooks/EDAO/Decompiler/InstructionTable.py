@@ -109,10 +109,7 @@ class InstructionTableEntry:
             'Q' : lambda : fs.wulong64(value),
 
             'f' : lambda : fs.wfloat(value),
-            'F' : lambda : fs.wdouble(value),
-
             'd' : lambda : fs.wfloat(value),
-            'D' : lambda : fs.wdouble(value),
 
             's' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
             'S' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
@@ -166,10 +163,7 @@ class InstructionTableEntry:
             'Q' : lambda : '0x%X' % value,
 
             'f' : lambda : '%f' % value,
-            'F' : lambda : '%f' % value,
-
             'd' : lambda : '%f' % value,
-            'D' : lambda : '%f' % value,
 
             's' : lambda : '"%s"' % value,
             'S' : lambda : '"%s"' % value,
@@ -221,10 +215,7 @@ class InstructionTableEntry:
             'Q' : lambda : struct.unpack('<Q', fs.read(8))[0],
 
             'f' : lambda : struct.unpack('<f', fs.read(4))[0],
-            'F' : lambda : struct.unpack('<f', fs.read(4))[0],
-
             'd' : lambda : struct.unpack('<d', fs.read(8))[0],
-            'D' : lambda : struct.unpack('<d', fs.read(8))[0],
 
             's' : readstr,
             'S' : readstr,
@@ -258,10 +249,7 @@ class InstructionTableEntry:
             'Q' : lambda : 8,
 
             'f' : lambda : 4,
-            'F' : lambda : 4,
-
             'd' : lambda : 8,
-            'D' : lambda : 8,
 
             's' : lambda : self.GetOperand(opr, fs),
             'S' : lambda : self.GetOperand(opr, fs),

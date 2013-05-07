@@ -27,7 +27,7 @@ InstructionNames[0x0A]  = 'ClearXXXFlags'
 InstructionNames[0x0B]  = 'FadeToDark'
 InstructionNames[0x0C]  = 'FadeToBright'
 InstructionNames[0x0D]  = 'OP_0D'
-InstructionNames[0x0E]  = 'OP_0E'
+InstructionNames[0x0E]  = 'Fade'
 InstructionNames[0x0F]  = 'Battle'
 InstructionNames[0x10]  = 'OP_10'
 InstructionNames[0x11]  = 'OP_11'
@@ -78,7 +78,7 @@ InstructionNames[0x40]  = 'OP_40'
 InstructionNames[0x41]  = 'OP_41'
 InstructionNames[0x42]  = 'OP_42'
 InstructionNames[0x43]  = 'OP_43'
-InstructionNames[0x44]  = 'OP_44'
+InstructionNames[0x44]  = 'BeginChrThread'
 InstructionNames[0x45]  = 'OP_45'
 InstructionNames[0x46]  = 'OP_46'
 InstructionNames[0x47]  = 'OP_47'
@@ -136,17 +136,17 @@ InstructionNames[0x7A]  = 'OP_7A'
 InstructionNames[0x7B]  = 'OP_7B'
 InstructionNames[0x7D]  = 'OP_7D'
 InstructionNames[0x82]  = 'OP_82'
-InstructionNames[0x83]  = 'OP_83'
+InstructionNames[0x83]  = 'SetChrChip'
 InstructionNames[0x84]  = 'OP_84'
 InstructionNames[0x85]  = 'LoadEffect'
 InstructionNames[0x86]  = 'PlayEffect'
 InstructionNames[0x87]  = 'OP_87'
-InstructionNames[0x88]  = 'OP_88'
+InstructionNames[0x88]  = 'StopEffect'
 InstructionNames[0x89]  = 'OP_89'
 InstructionNames[0x8A]  = 'OP_8A'
 InstructionNames[0x8B]  = 'OP_8B'
 InstructionNames[0x8C]  = 'SetChrChipByIndex'
-InstructionNames[0x8D]  = 'OP_8D'
+InstructionNames[0x8D]  = 'SetChrSubChip'
 InstructionNames[0x8E]  = 'OP_8E'
 InstructionNames[0x8F]  = 'SetChrPos'
 InstructionNames[0x90]  = 'OP_90'
@@ -1472,7 +1472,7 @@ edao_op_list = \
     inst(FadeToDark,        'iic'),
     inst(FadeToBright,      'ii'),
     inst(OP_0D),
-    inst(OP_0E,             'L'),
+    inst(Fade,              'I'),
     inst(Battle,            NO_OPERAND,         0,                              scp_battle),
     inst(OP_10,             'BB'),
     inst(OP_11,             'BBBLLL'),
@@ -1523,7 +1523,7 @@ edao_op_list = \
     inst(OP_41,             'WB'),
     inst(OP_42,             'BWB'),
     inst(OP_43,             'B'),
-    inst(OP_44,             'WBBB'),
+    inst(BeginChrThread,    'WCCC'),
     inst(OP_45,             'WB'),
     inst(OP_46,             'WBB'),
     inst(OP_47,             'WBB'),
@@ -1559,7 +1559,7 @@ edao_op_list = \
     inst(OP_65,             'BW'),
     inst(OP_66,             'BW'),
     inst(OP_67,             'W'),
-    inst(OP_68,             'LLLL'),
+    inst(OP_68,             'iiii'),
     inst(OP_69,             'BW'),
     inst(OP_6A,             'WL'),
     inst(OP_6B,             'W'),
@@ -1581,17 +1581,17 @@ edao_op_list = \
     inst(OP_7B,             'B'),
     inst(OP_7D,             'BBBBL'),
     inst(OP_82,             'LLLL'),
-    inst(OP_83,             'BWWW'),
+    inst(SetChrChip,        'BWWW'),
     inst(OP_84,             'BB'),
     inst(LoadEffect,        'BS'),
     inst(PlayEffect,        'BBWWIIIHHHIIIWIIII'),
     inst(OP_87,             'BBBSWLLLWWWLLLL'),
-    inst(OP_88,             'BB'),
+    inst(StopEffect,        'BB'),
     inst(OP_89,             'BB'),
     inst(OP_8A,             'B'),
     inst(OP_8B,             'W'),
     inst(SetChrChipByIndex, 'WB'),
-    inst(OP_8D,             'WB'),
+    inst(SetChrSubChip,             'WB'),
     inst(OP_8E,             'WS'),
     inst(SetChrPos,         'WiiiW'),
     inst(OP_90,             'WLLLW'),

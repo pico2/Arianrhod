@@ -286,7 +286,7 @@ def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionInd
 
     return ai
 
-class BattleMonsterScriptInfo:
+class BattleMonsterStatus:
 
     def __init__(self):
 
@@ -630,7 +630,7 @@ def main():
     if len(sys.argv) < 2:
         return
 
-    ms = BattleMonsterScriptInfo()
+    ms = BattleMonsterStatus()
     f = sys.argv[1]
     ms.open(f)
     ms.SaveTo(os.path.splitext(f)[0] + '.py')

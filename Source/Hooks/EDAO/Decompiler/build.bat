@@ -1,7 +1,9 @@
 @echo off
 cd/d "%~dp0"
 
-c0130.bbb.py
+set ms=m4290
+
+%ms%.b.py
 
 move /y *.bin J:\Falcom\ED_AO\patch\scena
 
