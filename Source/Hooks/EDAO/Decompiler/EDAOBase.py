@@ -220,7 +220,7 @@ class SymbolFileIndex:
             if self.IsIndexZero:
                 return
 
-            self.SymbolIndex = int(os.path.splitext(os.path.basename(param))[0][2:], 16) | 0x30000000
+            self.SymbolIndex = int(os.path.splitext(os.path.basename(param))[0][2:], 16) | 0x31000000
             self.SymbolName = param
 
         else:

@@ -1,10 +1,13 @@
 from EDAOBase import *
 
+CODE_PAGE = '936'
+
 INVALID_DROP_ITEM_ID        = 0xFFFF
 MAXIMUM_MAGIC_NUMBER        = 80
 MAXIMUM_CRAFT_NUMBER        = 16
 MAXIMUM_SCRAFT_NUMBER       = 5
 MAXIMUM_CRAFT_INFO_NUMBER   = 16
+MAXIMUM_SUPPORTCRAFT_NUMBER = 3
 
 class CraftTarget:
     def __init__(self):
@@ -153,6 +156,28 @@ class BattleCraftInfo:
         self.Name = fs.astr()
         self.Description = fs.astr()
 
+    def binary(self):
+        return struct.pack('<HBBBBBBBBBBHHHHHH',
+                    self.ActionIndex,
+                    self.Target,
+                    self.Unknown_3,
+                    self.Attribute,
+                    self.RangeType,
+                    self.State1,
+                    self.State2,
+                    self.RNG,
+                    self.RangeSize,
+                    self.AriaTime,
+                    self.SkillTime,
+                    self.EP_CP,
+                    self.Unknown_0E,
+                    self.State1Parameter,
+                    self.State1Time,
+                    self.State2Parameter,
+                    self.State2Time
+
+                ) + (self.Name.encode(CODE_PAGE) + b'\x00') + (self.Description.encode(CODE_PAGE) + b'\x00')
+
     def param(self):
         return '"%s", "%s", 0x%02X, 0x%X, 0x%X, %s, %s, %s, %s, %d, %d, %d, %d, %d, 0x%X, 0x%04X, %d, 0x%04X, %d' % (
                     self.Name,
@@ -177,7 +202,6 @@ class BattleCraftInfo:
                 )
 
 __CreatedCraftNumber__ = 0
-__Craft_List__ = []
 
 def CreateCraft(
         Name,
@@ -226,8 +250,6 @@ def CreateCraft(
     info.State2Parameter    = State2Parameter
     info.State2Time         = State2Time
 
-    __Craft_List__.append(info)
-
     __CreatedCraftNumber__ += 1
 
     return info
@@ -253,14 +275,19 @@ class BattleCraftAIInfo:
         for i in range(len(self.Parameter)):
             self.Parameter[i] = fs.ulong()
 
+    def binary(self):
+        return struct.pack('<BBBBBBHLLLL',
+                    self.Condition, self.Probability, self.Target, self.TargetCondition,
+                    self.MagicAriaActionIndex, self.ActionIndex, self.CraftIndex,
+                    self.Parameter[0], self.Parameter[1], self.Parameter[2], self.Parameter[3]
+                )
+
     def param(self):
         return '0x%X, %d, 0x%X, 0x%X, 0x%02X, 0x%02X, 0x%04X, [0x%08X, 0x%08X, 0x%08X, 0x%08X]' % (
                     self.Condition, self.Probability, self.Target, self.TargetCondition,
                     self.MagicAriaActionIndex, self.ActionIndex, self.CraftIndex,
                     self.Parameter[0], self.Parameter[1], self.Parameter[2], self.Parameter[3]
                 )
-
-__AI_List__ = []
 
 def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionIndex, ActionIndex, CraftIndex, Parameters):
     if type(Parameters) != tuple and type(Parameters) != list:
@@ -281,8 +308,6 @@ def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionInd
     ai.ActionIndex              = ActionIndex
     ai.CraftIndex               = CraftIndex
     ai.Parameter                = Parameters
-
-    __AI_List__.append(ai)
 
     return ai
 
@@ -366,6 +391,59 @@ class BattleMonsterStatus:
         self.Name            = ''
         self.Description     = ''
 
+    def binary(self):
+        asfile = struct.pack('L', self.ASFile.Index())
+        base = struct.pack(
+                    '<HLLHHHH' 'HHHHHHHHHH',
+                    self.Level,
+                    self.MaximumHP, self.InitialHP,
+                    self.MaximumEP, self.InitialEP,
+                    self.MaximumCP, self.InitialCP,
+
+                    self.SPD, self.MoveSPD, self.MOV, self.STR, self.DEF,
+                    self.ATS, self.ADF, self.DEX, self.AGL, self.RNG
+                )
+
+        misc = struct.pack(
+                    '<HHHBHHBHHHHH' 'BBLLLLBBBB' 'LL',
+                    self.Unknown_2A, self.EXP, self.Unknown_2E, self.Unknown_30, self.AIType,
+                    self.Unknown_33, self.Unknown_35, self.Unknown_36, self.EnemyFlags,
+                    self.BattleFlags, self.Unknown_3C, self.Unknown_3E,
+
+                    self.Sex, self.Unknown_41, self.Unknown_42, self.Unknown_46,
+                    self.CharSize, self.Unknown_4E, self.Unknown_52, self.Unknown_53,
+                    self.Unknown_54, self.Unknown_55,
+
+                    self.Symbol.Index(), self.Resistance
+                )
+
+        AttributeRate = struct.pack('<' + 'H' * len(self.AttributeRate), *self.AttributeRate)
+        Sepith = bytes(self.Sepith)
+        DropItem = struct.pack('HHBB', self.DropItem[0], self.DropItem[1], self.DropRate[0], self.DropRate[1])
+
+        EquipmentAndOrbment = self.Equipment + self.Orbment
+        EquipmentAndOrbment = struct.pack('<' + 'H' * len(EquipmentAndOrbment), *EquipmentAndOrbment)
+
+        Crafts = self.Attack.binary()
+
+        def packcraftlist(craftlist):
+            buf = struct.pack('<B', len(craftlist))
+            for craft in craftlist:
+                buf += craft.binary()
+
+            return buf
+
+        Crafts += packcraftlist(self.Magic)
+        Crafts += packcraftlist(self.Craft)
+        Crafts += packcraftlist(self.SCraft)
+        Crafts += packcraftlist(self.SupportCraft)
+        Crafts += packcraftlist(self.CraftInfo)
+
+        Runaway = struct.pack('<BBBB', self.RunawayType, self.RunawayRate, self.RunawayParam1, self.Reserve1)
+
+        NameAndDescription = self.Name.encode(CODE_PAGE) + b'\x00' + self.Description.encode(CODE_PAGE) + b'\x00'
+
+        return asfile + base + misc + AttributeRate + Sepith + DropItem + EquipmentAndOrbment + Crafts + Runaway + NameAndDescription
 
     def open(self, msfilename):
 
@@ -418,7 +496,7 @@ class BattleMonsterStatus:
         self.Unknown_54             = fs.byte()
         self.Unknown_55             = fs.byte()
 
-        self.Symbol            = SymbolFileIndex(fs.ulong())
+        self.Symbol                 = SymbolFileIndex(fs.ulong())
         self.Resistance             = fs.ulong()
         self.AttributeRate          = struct.unpack('<HHHHHHH', fs.read(2 * 7))
         self.Sepith                 = list(fs.read(7))
@@ -541,35 +619,50 @@ class BattleMonsterStatus:
 
         def fmtai(ai):
             s = 'CreateAI(%s)' % ai.param()
-            return s.replace(', 0x%04X, ' % ai.CraftIndex, ', Creaft_%04X.Index, ' % ai.CraftIndex)
+            if ai.CraftIndex >= CUSTOM_CRAFT_INDEX_BASE:
+                s = s.replace(', 0x%04X, ' % ai.CraftIndex, ', Craft_%04X.Index, ' % ai.CraftIndex)
+            return s
 
         def fmtcraft(cft):
             return 'CreateCraft(%s)' % cft.param()
 
         def gencraft(craftlist):
             for craft in craftlist:
-                #name = craft.Name
-                #if name == '' or name == ' ':
-                name = '%04X' % craft.Index
+                add('Craft_%s = %s' % ('%04X' % craft.Index, fmtcraft(craft)))
 
-                add('Creaft_%s = %s' % (name, fmtcraft(craft)))
+            l = []
+            for craft in craftlist:
+                l.append('Craft_%s' % '%04X' % craft.Index)
+
+            add('')
+            add('CraftList = [%s]' % ', '.join(l))
 
         def genai(prefix, ailist):
+            if len(ailist) != 0:
+                index = 0
+                for ai in ailist:
+                    add('%s_AI_%d = %s' % (prefix, index, fmtai(ai)))
+                    index += 1
+                add('')
+
+            l = []
             index = 0
             for ai in ailist:
-                add('%s_AI_%d = %s' % (prefix, index, fmtai(ai)))
+                l.append('%s_AI_%d' % (prefix, index))
                 index += 1
 
-        add('Crafts = []')
+            add('%sAIList = [%s]' % (prefix, ', '.join(l)))
+            add('')
+
+        add('Attack = %s' % fmtai(self.Attack))
+        add('')
         gencraft(self.CraftInfo)
         add('')
         genai('Magic', self.Magic)
         genai('Craft', self.Craft)
         genai('SCraft', self.SCraft)
         genai('SupportCraft', self.SupportCraft)
-
-        add('')
-        add('SaveToMS("%s", locals())' % (os.path.splitext(filename)[0] + '.dat'))
+        add('SaveToMS("%s", locals())' % (os.path.splitext(os.path.basename(filename))[0] + '.dat'))
 
         for l in lines:
             if l != '':
@@ -623,16 +716,96 @@ class BattleMonsterStatus:
 
         return '\r\n'.join(l)
 
-def SaveToMS(filename, locals):
-    pass
+def SaveToMS(filename, local):
+    ms = BattleMonsterStatus()
+
+    ms.Name                 = local['Name']
+    ms.Description          = local['Description']
+    ms.ASFile               = BattleScriptFileIndex(local['ASFile'])
+    ms.Symbol               = SymbolFileIndex(local['Symbol'])
+
+    ms.Level                = local['Level']
+    ms.MaximumHP            = local['MaximumHP']
+    ms.InitialHP            = local['InitialHP']
+    ms.MaximumEP            = local['MaximumEP']
+    ms.InitialEP            = local['InitialEP']
+    ms.MaximumCP            = local['MaximumCP']
+    ms.InitialCP            = local['InitialCP']
+
+    ms.SPD                  = local['SPD']
+    ms.MoveSPD              = local['MoveSPD']
+    ms.MOV                  = local['MOV']
+    ms.STR                  = local['STR']
+    ms.DEF                  = local['DEF']
+    ms.ATS                  = local['ATS']
+    ms.ADF                  = local['ADF']
+    ms.DEX                  = local['DEX']
+    ms.AGL                  = local['AGL']
+    ms.RNG                  = local['RNG']
+
+    ms.Unknown_2A           = local['Unknown_2A']
+    ms.EXP                  = local['EXP']
+    ms.Unknown_2E           = local['Unknown_2E']
+    ms.Unknown_30           = local['Unknown_30']
+    ms.AIType               = local['AIType']
+    ms.Unknown_33           = local['Unknown_33']
+    ms.Unknown_35           = local['Unknown_35']
+    ms.Unknown_36           = local['Unknown_36']
+    ms.EnemyFlags           = local['EnemyFlags']
+    ms.BattleFlags          = local['BattleFlags']
+
+    ms.Unknown_3C           = local['Unknown_3C']
+    ms.Unknown_3E           = local['Unknown_3E']
+    ms.Sex                  = local['Sex']
+    ms.Unknown_41           = local['Unknown_41']
+    ms.Unknown_42           = local['Unknown_42']
+    ms.Unknown_46           = local['Unknown_46']
+    ms.CharSize             = local['CharSize']
+    ms.Unknown_4E           = local['Unknown_4E']
+    ms.Unknown_52           = local['Unknown_52']
+    ms.Unknown_53           = local['Unknown_53']
+    ms.Unknown_54           = local['Unknown_54']
+    ms.Unknown_55           = local['Unknown_55']
+    ms.Resistance           = local['Resistance']
+    ms.AttributeRate        = local['AttributeRate']
+    ms.Sepith               = local['Sepith']
+    ms.DropItem             = local['DropItem']
+    ms.DropRate             = local['DropRate']
+    ms.Equipment            = local['Equipment']
+    ms.Orbment              = local['Orbment']
+
+    ms.RunawayType          = local['RunawayType']
+    ms.RunawayRate          = local['RunawayRate']
+    ms.RunawayParam1        = local['RunawayParam1']
+    ms.Reserve1             = local['Reserve1']
+
+    ms.Attack               = local['Attack']
+    ms.Magic                = local['MagicAIList']
+    ms.Craft                = local['CraftAIList']
+    ms.SCraft               = local['SCraftAIList']
+    ms.SupportCraft         = local['SupportCraftAIList']
+    ms.CraftInfo            = local['CraftList']
+
+    if type(ms.Attack) != BattleCraftAIInfo: raise Exception('incorrect Attack type')
+    if type(ms.Magic) != list: raise Exception(' MagicAIList must be list')
+    if type(ms.Craft) != list: raise Exception(' CraftAIList must be list')
+    if type(ms.SCraft) != list: raise Exception(' SCraftAIList must be list')
+    if type(ms.SupportCraft) != list: raise Exception(' SupportCraftAIList must be list')
+    if type(ms.Craft) != list: raise Exception(' CraftList must be list')
+
+    if len(ms.Magic) > MAXIMUM_MAGIC_NUMBER: raise Exception('magic >= %d' % MAXIMUM_MAGIC_NUMBER)
+    if len(ms.Craft) > MAXIMUM_CRAFT_NUMBER: raise Exception('craft >= %d' % MAXIMUM_CRAFT_NUMBER)
+    if len(ms.SCraft) > MAXIMUM_SCRAFT_NUMBER: raise Exception('scraft >= %d' % MAXIMUM_SCRAFT_NUMBER)
+    if len(ms.SupportCraft) > MAXIMUM_SUPPORTCRAFT_NUMBER: raise Exception('supportcraft >= %d' % MAXIMUM_SUPPORTCRAFT_NUMBER)
+    if len(ms.CraftInfo) > MAXIMUM_CRAFT_INFO_NUMBER: raise Exception('craftinfo >= %d' % MAXIMUM_CRAFT_INFO_NUMBER)
+
+    open(filename, 'wb').write(ms.binary())
 
 def main():
-    if len(sys.argv) < 2:
-        return
-
-    ms = BattleMonsterStatus()
-    f = sys.argv[1]
-    ms.open(f)
-    ms.SaveTo(os.path.splitext(f)[0] + '.py')
+    for f in sys.argv[1:]:
+        ms = BattleMonsterStatus()
+        f = sys.argv[1]
+        ms.open(f)
+        ms.SaveTo(os.path.splitext(f)[0] + '.py')
 
 TryInvoke(main)

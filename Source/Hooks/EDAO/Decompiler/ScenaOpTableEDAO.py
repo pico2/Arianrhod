@@ -1593,7 +1593,7 @@ edao_op_list = \
     inst(SetChrChipByIndex, 'WB'),
     inst(SetChrSubChip,             'WB'),
     inst(OP_8E,             'WS'),
-    inst(SetChrPos,         'WiiiW'),
+    inst(SetChrPos,         'WiiiH'),
     inst(OP_90,             'WLLLW'),
     inst(OP_91,             'WWW'),
     inst(OP_92,             'WLLW'),
