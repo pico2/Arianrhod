@@ -18,19 +18,19 @@ InstructionNames[0x03] = 'AS_03'
 InstructionNames[0x04] = 'AS_04'
 InstructionNames[0x05] = 'AS_05'
 InstructionNames[0x06] = 'Sleep'
-InstructionNames[0x07] = 'AS_07'
+InstructionNames[0x07] = 'Update'
 InstructionNames[0x08] = 'AS_08'
 InstructionNames[0x09] = 'AS_09'
 InstructionNames[0x0A] = 'AS_0A'
 InstructionNames[0x0B] = 'AS_0B'
-InstructionNames[0x0C] = 'AS_0C'
+InstructionNames[0x0C] = 'TurnDirection'
 InstructionNames[0x0D] = 'AS_0D'
 InstructionNames[0x0E] = 'AS_0E'
 InstructionNames[0x0F] = 'AS_0F'
 InstructionNames[0x10] = 'AS_10'
 InstructionNames[0x11] = 'AS_11'
 InstructionNames[0x12] = 'LoadEffect'
-InstructionNames[0x13] = 'AS_13'
+InstructionNames[0x13] = 'FreeEffect'
 InstructionNames[0x14] = 'AS_14'
 InstructionNames[0x15] = 'WaitEffect'
 InstructionNames[0x16] = 'AS_16'
@@ -46,7 +46,7 @@ InstructionNames[0x1F] = 'AS_1F'
 InstructionNames[0x20] = 'AS_20'
 InstructionNames[0x21] = 'AS_21'
 InstructionNames[0x22] = 'BeginChrThread'
-InstructionNames[0x23] = 'AS_23'
+InstructionNames[0x23] = 'WaitChrThread'
 InstructionNames[0x24] = 'AS_24'
 InstructionNames[0x25] = 'AS_25'
 InstructionNames[0x26] = 'AS_26'
@@ -57,8 +57,8 @@ InstructionNames[0x2A] = 'ShowInfoText'
 InstructionNames[0x2B] = 'AS_2B'
 InstructionNames[0x2C] = 'ShowChrTrails'
 InstructionNames[0x2D] = 'HideChrTrails'
-InstructionNames[0x2E] = 'AS_2E'
-InstructionNames[0x2F] = 'AS_2F'
+InstructionNames[0x2E] = 'ShakeChr'
+InstructionNames[0x2F] = 'EndChrThread'
 InstructionNames[0x31] = 'AS_31'
 InstructionNames[0x32] = 'AS_32'
 InstructionNames[0x33] = 'AS_33'
@@ -83,7 +83,7 @@ InstructionNames[0x49] = 'SetControl'
 InstructionNames[0x4A] = 'AS_4A'
 InstructionNames[0x4B] = 'Jc'
 InstructionNames[0x4C] = 'ForeachTarget'
-InstructionNames[0x4D] = 'InitForeachTarget'
+InstructionNames[0x4D] = 'SortTargetChr'
 InstructionNames[0x4E] = 'NextTarget'
 InstructionNames[0x4F] = 'AS_4F'
 InstructionNames[0x50] = 'Call'
@@ -169,11 +169,11 @@ InstructionNames[0xAE] = 'AS_AE'
 InstructionNames[0xAF] = 'AS_AF'
 InstructionNames[0xB0] = 'AS_B0'
 InstructionNames[0xB1] = 'AS_B1'
-InstructionNames[0xB2] = 'AS_B2'
+InstructionNames[0xB2] = 'PlayBgm'
 InstructionNames[0xB3] = 'AS_B3'
 InstructionNames[0xB4] = 'AS_B4'
-InstructionNames[0xB5] = 'AS_B5'
-InstructionNames[0xB6] = 'AS_B6'
+InstructionNames[0xB5] = 'LoadCclm'
+InstructionNames[0xB6] = 'UnlockCclm'
 InstructionNames[0xB7] = 'AS_B7'
 InstructionNames[0xB8] = 'AS_B8'
 
@@ -194,7 +194,7 @@ class ActionTarget:
     Target      = 0xFE
 
 
-def as_0c(data):
+def as_op_0c(data):
     def getopr(target):
         operand = 'WWB'
         if target == 0xFC:
@@ -207,25 +207,41 @@ def as_0c(data):
         inst = data.Instruction
         entry = data.TableEntry
 
-        target, opr2 = entry.GetAllOperand('BB', fs)
+        opr1, target = entry.GetAllOperand('BB', fs)
 
-        inst.Operand = [target, opr2]
+        inst.Operand = [opr1, target]
 
         operand = getopr(target)
         inst.Operand += entry.GetAllOperand(operand, fs)
 
+        inst.OperandFormat = 'BB' + operand
+
         return inst
 
-def as_8e(data):
+def as_load_chr_chip(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        inst = data.Instruction
+        entry = data.TableEntry
+
+        inst.Operand = entry.GetAllOperand('BLB', fs)
+        inst.Operand[1] = ChipFileIndex(inst.Operand[1]).Name()
+
+        inst.OperandFormat = 'BSB'
+
+        return inst
+
+def as_op_8e(data):
 
     def getopr(opr1, opr2):
-        operand = ''
 
         if opr1 == 1:
             operand = 'S'
         else:
             operand = 'LLLL'
-            if opr2 == 0xD:
+            if opr1 == 0xD:
                 operand += 'L'
 
         return operand
@@ -241,9 +257,11 @@ def as_8e(data):
         operand = getopr(opr1, opr2)
         inst.Operand += entry.GetAllOperand(operand, fs)
 
+        inst.OperandFormat = 'BB' + operand
+
         return inst
 
-def as_91(data):
+def as_op_91(data):
 
     if data.Reason == HANDLER_REASON_READ:
 
@@ -260,7 +278,31 @@ def as_91(data):
                 if inst[-1] == 0xFF:
                     break
 
+        inst.OperandFormat = 'B' * len(inst.Operand)
+
         return inst
+
+def as_op_ae(data):
+    
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        inst = data.Instruction
+        entry = data.TableEntry
+
+        inst.Operand = entry.GetAllOperand('BBB', fs)
+        inst.Operand.append(fs.read(inst.Operand[-1] + 1))
+
+        inst.OperandFormat = 'BBBS'
+
+        return inst
+
+    elif data.Reason == HANDLER_REASON_FORMAT:
+
+        inst = data.Instruction
+        entry = data.TableEntry
+
+        #return '%s(0x%X, 0x%X, 0x%X, %s)' % (entry.OpName, inst.Operand[0], inst.Operand[1], inst.Operand[3], inst.Operand[4])
 
 edao_as_op_list = \
 [
@@ -270,20 +312,20 @@ edao_as_op_list = \
     inst(AS_03,             'BW'),
     inst(AS_04,             'BBW'),
     inst(AS_05,             'BBL'),
-    inst(Sleep,             'W'),
-    inst(AS_07,             NO_OPERAND),
-    inst(AS_08,             'BBLLL'),
+    inst(Sleep,             'H'),
+    inst(Update,             NO_OPERAND),
+    inst(AS_08,             'BBiii'),
     inst(AS_09,             'B'),
     inst(AS_0A,             'BBBL'),
     inst(AS_0B,             'WW'),
-    inst(AS_0C,             NO_OPERAND,         0,                              as_0c),
+    inst(TurnDirection,     NO_OPERAND,         0,                              as_op_0c),
     inst(AS_0D,             'BBLLLWW'),
     inst(AS_0E,             'B'),
     inst(AS_0F,             'WW'),
     inst(AS_10,             'WW'),
-    inst(AS_11,             'BBLLLLB'),
+    inst(AS_11,             'BBiiiiB'),
     inst(LoadEffect,        'BS'),
-    inst(AS_13,             'B'),
+    inst(FreeEffect,        'B'),
     inst(AS_14,             'B'),
     inst(WaitEffect,        'BB'),
     inst(AS_16,             'BB'),
@@ -297,9 +339,9 @@ edao_as_op_list = \
     inst(AS_1E,             'L'),
     inst(AS_1F,             'WWB'),
     inst(AS_20,             'BBBLL'),
-    inst(AS_21,             'BBLL'),
-    inst(BeginChrThread,    'BBoB'),
-    inst(AS_23,             'BB'),
+    inst(AS_21,             'BBii'),
+    inst(BeginChrThread,    'BCoB',             INSTRUCTION_START_BLOCK),
+    inst(WaitChrThread,     'BC'),
     inst(AS_24,             'BBW'),
     inst(AS_25,             'BBW'),
     inst(AS_26,             'BBW'),
@@ -310,19 +352,19 @@ edao_as_op_list = \
     inst(AS_2B,             NO_OPERAND),
     inst(ShowChrTrails,     'BWW'),
     inst(HideChrTrails,     'B'),
-    inst(AS_2E,             'BLLL'),
-    inst(AS_2F,             'BB'),
+    inst(ShakeChr,          'Biii'),
+    inst(EndChrThread,      'BC'),
     inst(AS_31,             'BW'),
     inst(AS_32,             'BB'),
     inst(AS_33,             'BB'),
     inst(AS_34,             NO_OPERAND),
-    inst(AS_35,             'BLLLW'),
+    inst(AS_35,             'BiiiH'),
     inst(AS_36,             'B'),
-    inst(AS_39,             'WWWW'),
+    inst(AS_39,             'hhhh'),
     inst(AS_3A,             'WW'),
-    inst(AS_3B,             'LW'),
+    inst(AS_3B,             'ih'),
     inst(AS_3C,             'WW'),
-    inst(AS_3D,             'WWWW'),
+    inst(AS_3D,             'HHHH'),
     inst(AS_3E,             'WW'),
     inst(AS_3F,             'B'),
     inst(AS_40,             'B'),
@@ -336,11 +378,11 @@ edao_as_op_list = \
     inst(AS_4A,             'B'),
     inst(Jc,                'BBLo',             INSTRUCTION_START_BLOCK),
     inst(ForeachTarget,     'o',                INSTRUCTION_START_BLOCK),
-    inst(InitForeachTarget, NO_OPERAND),
-    inst(NextTarget,        'Bo',               INSTRUCTION_END_BLOCK), # combine next instruction: Jump(offset ForeachTarget)
+    inst(SortTargetChr, NO_OPERAND),
+    inst(NextTarget,        NO_OPERAND),
     inst(AS_4F,             NO_OPERAND),
     inst(Call,              'o',                INSTRUCTION_START_BLOCK),   # ret stack size == 4
-    inst(CallReturn,        NO_OPERAND),
+    inst(CallReturn,        NO_OPERAND,         INSTRUCTION_END_BLOCK),
     inst(AS_52,             'B'),
     inst(AS_53,             'B'),
     inst(SendMessage,       'B'),
@@ -357,13 +399,13 @@ edao_as_op_list = \
     inst(AS_5F,             'BB'),
     inst(AS_60,             'B'),
     inst(SetBattleSpeed,    'L'),
-    inst(Voice,             'BIWWWB'),
+    inst(Voice,             'BHWWWB'),
     inst(Sound,             'H'),
     inst(SoundEx,           'HB'),
     inst(AS_66,             'W'),
     inst(AS_67,             'WBB'),
     inst(AS_68,             'BBL'),
-    inst(LoadChrChip,       'BLB'),
+    inst(LoadChrChip,       NO_OPERAND,         0,                              as_load_chr_chip),
     inst(AS_6B,             NO_OPERAND),
     inst(AS_6C,             NO_OPERAND),
     inst(AS_6D,             'L'),
@@ -394,9 +436,9 @@ edao_as_op_list = \
     inst(UseItemBegin,      NO_OPERAND),
     inst(UseItemEnd,        NO_OPERAND),
     inst(AS_8D,             'BLLLL'),
-    inst(AS_8E,             NO_OPERAND,         0,                              as_8e),
+    inst(AS_8E,             NO_OPERAND,         0,                              as_op_8e),
     inst(AS_8F,             'B'),
-    inst(AS_91,             NO_OPERAND,         0,                              as_91),
+    inst(AS_91,             NO_OPERAND,         0,                              as_op_91),
     inst(AS_92,             'BBLLLWL'),
     inst(AS_93,             'BBS'),
     inst(AS_94,             'BSL'),
@@ -418,17 +460,17 @@ edao_as_op_list = \
     inst(AS_A9,             'BBL'),
     inst(AS_AC,             'LL'),
     inst(AS_AD,             'B'),
-    inst(AS_AE,             ''),
-    inst(AS_AF,             ''),
-    inst(AS_B0,             ''),
-    inst(AS_B1,             ''),
-    inst(AS_B2,             ''),
-    inst(AS_B3,             ''),
-    inst(AS_B4,             ''),
-    inst(AS_B5,             ''),
-    inst(AS_B6,             ''),
-    inst(AS_B7,             ''),
-    inst(AS_B8,             ''),
+    inst(AS_AE,             NO_OPERAND,         0,                              as_op_ae),
+    inst(AS_AF,             'W'),
+    inst(AS_B0,             'WW'),
+    inst(AS_B1,             'BSBL'),
+    inst(PlayBgm,           'BW'),
+    inst(AS_B3,             'BW'),
+    inst(AS_B4,             'BB'),
+    inst(LoadCclm,          'LWBB'),
+    inst(UnlockCclm,        'LWBB'),
+    inst(AS_B7,             NO_OPERAND),
+    inst(AS_B8,             'B'),
 ]
 
 del inst
@@ -437,7 +479,7 @@ for op in edao_as_op_list:
     edao_as_op_table[op.OpCode] = op
     op.Container = edao_as_op_table
 
-enable_stat = 10
+enable_stat = 0
 
 if enable_stat != 0:
     valid = 0

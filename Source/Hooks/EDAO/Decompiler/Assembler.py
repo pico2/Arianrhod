@@ -71,14 +71,18 @@ class Disassembler:
 
         blockref = {}
 
+        IsJumpTarget = False
+
         while True:
             pos = Stream.tell()
+            if pos in DisasmTable:
+                break
 
             offsetlist[pos] = True
 
-            #print('%08X: ' % pos, end = '')
+            print('%08X: ' % pos, end = '')
             op = InstructionTable.GetOpCode(Stream)
-            #print('%02X' % op)
+            print('%02X' % op)
 
             entry = InstructionTable[op]
 
@@ -95,10 +99,14 @@ class Disassembler:
 
             inst = self.DisasmInstruction(data)
 
+            if IsJumpTarget:
+                inst.RefCount += 1
+                IsJumpTarget = False
+
             if inst == None:
                 raise Exception('disasm op %02X @ %08X failed' % (op, pos))
 
-            #for i in range(pos, Stream.tell()): offsetlist[i] = True
+            for i in range(pos, Stream.tell()): offsetlist[i] = True
 
             DisasmTable[inst.Offset] = inst
             block.AddInstruction(inst)
@@ -108,10 +116,16 @@ class Disassembler:
             if inst.Flags.EndBlock:
                 if len(inst.BranchTargets) == 0:
                     break
+
                 elif len(inst.BranchTargets) != 1:
                     raise Exception('end block instruction has multiple branch')
 
+                #Stream.seek(inst.BranchTargets[0])
+                #block.Instructions.pop()
+                #IsJumpTarget = True
+                #continue
                 targets = inst.BranchTargets
+
             elif inst.Flags.StartBlock:
                 targets = inst.BranchTargets
 
@@ -125,7 +139,6 @@ class Disassembler:
         plog('block end: %08X' % block.Offset)
 
         for offset, inst in blockref.items():
-            #if offset == 0x1380: bp()
             Stream.seek(offset)
             newblock = self.DisasmBlockWorker(Stream, InstructionTable, DisasmTable)
             if newblock != None:
@@ -168,6 +181,10 @@ class Disassembler:
 
         AddLabel(block.Name if block.Name != None else InstructionTable.GetLabelName(block.Offset))
 
+        LabeledMap = {}
+
+        LabeledMap[block.Offset] = True
+
         for inst in block.Instructions:
 
             data = HandlerData(HANDLER_REASON_FORMAT)
@@ -183,7 +200,7 @@ class Disassembler:
             symbol = self.FormatInstruction(data)
             #print(symbol)
 
-            if inst.RefCount != 0:
+            if inst.RefCount != 0 and inst.Offset not in LabeledMap:
                 AddLabel(InstructionTable.GetLabelName(inst.Offset))
 
             text.append(symbol)

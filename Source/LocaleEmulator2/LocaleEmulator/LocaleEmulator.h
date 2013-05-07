@@ -381,6 +381,18 @@ public:
 
     NTSTATUS InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid);
 
+    VOID SetUnhandledExceptionFilter()
+    {
+        RtlSetUnhandledExceptionFilter(
+            [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG
+            {
+                // ExceptionBox(L"crashed");
+                CreateMiniDump(ExceptionPointers);
+                return ExceptionContinueSearch;
+            }
+        );
+    }
+
     /************************************************************************
       helper func
     ************************************************************************/

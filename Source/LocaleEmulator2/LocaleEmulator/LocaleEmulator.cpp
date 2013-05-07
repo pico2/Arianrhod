@@ -399,14 +399,7 @@ BOOL Initialize(PVOID BaseAddress)
     if (NT_FAILED(Status))
         return FALSE;
 
-    RtlSetUnhandledExceptionFilter(
-        [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG
-        {
-            ExceptionBox(L"crashed");
-            CreateMiniDump(ExceptionPointers);
-            return ExceptionContinueSearch;
-        }
-    );
+    GlobalData->SetUnhandledExceptionFilter();
 
     WriteLog(L"init ret");
 

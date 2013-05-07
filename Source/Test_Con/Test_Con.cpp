@@ -567,6 +567,10 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    PrintConsoleW(L"%d\n", IsRunningInVMWare());
+    PauseConsole();
+    return;
+
     LOGFONTW lf;
 
     SetThreadLocale(0x0411);

@@ -52,6 +52,8 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
 
     WriteLog(L"hook k32");
 
+    this->SetUnhandledExceptionFilter();
+
     GetCurrentNlsCache = FindGetCurrentNlsCache(Kernel32);
     if (GetCurrentNlsCache == NULL)
         return STATUS_NOT_FOUND;
