@@ -85,6 +85,10 @@ class InstructionTableEntry:
             labels.append(LabelEntry(value, fs.tell()))
             fs.wulong(INVALID_OFFSET)
 
+        def wlabelshort():
+            labels.append(LabelEntry(value, fs.tell()))
+            fs.wushort(INVALID_OFFSET)
+
         oprtype = \
         {
             'c' : lambda : fs.wchar(value),
@@ -114,7 +118,7 @@ class InstructionTableEntry:
             's' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
             'S' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
 
-            'o' : wlabel,
+            'o' : wlabelshort,
             'O' : wlabel,
         }
 
@@ -220,7 +224,7 @@ class InstructionTableEntry:
             's' : readstr,
             'S' : readstr,
 
-            'o' : lambda : struct.unpack('<L', fs.read(4))[0],
+            'o' : lambda : struct.unpack('<H', fs.read(2))[0],
             'O' : lambda : struct.unpack('<L', fs.read(4))[0],
         }
 
@@ -254,7 +258,7 @@ class InstructionTableEntry:
             's' : lambda : self.GetOperand(opr, fs),
             'S' : lambda : self.GetOperand(opr, fs),
 
-            'o' : lambda : 4,   # offset
+            'o' : lambda : 2,   # short offset
             'O' : lambda : 4,   # offset
         }
 

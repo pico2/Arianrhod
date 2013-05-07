@@ -1,8 +1,6 @@
 from InstructionTable import *
 from EDAOBase import *
 
-CODE_PAGE = '936'
-
 def GetOpCode(fs):
     return fs.byte()
 
@@ -342,7 +340,7 @@ def FormatFuncString(data, oprfmt, mark_number = None):
 
     return '\r\n'.join(txt)
 
-class EDAOInstructionTableEntry(InstructionTableEntry):
+class EDAOScenaInstructionTableEntry(InstructionTableEntry):
     def __init__(self, op, name = '', operand = NO_OPERAND, flags = 0, handler = None):
         super().__init__(op, name, operand, flags, handler)
 
@@ -498,10 +496,7 @@ class EDAOInstructionTableEntry(InstructionTableEntry):
         return oprsize
 
 def inst(op, operand = NO_OPERAND, flags = 0, handler = None):
-    return EDAOInstructionTableEntry(op, InstructionNames[op], operand, flags, handler)
-
-def instopr(opr, size):
-    return InstructionOperand(opr, size)
+    return EDAOScenaInstructionTableEntry(op, InstructionNames[op], operand, flags, handler)
 
 ExpressionOperantions = {}
 
@@ -1591,7 +1586,7 @@ edao_op_list = \
     inst(OP_8A,             'B'),
     inst(OP_8B,             'W'),
     inst(SetChrChipByIndex, 'WB'),
-    inst(SetChrSubChip,             'WB'),
+    inst(SetChrSubChip,     'WB'),
     inst(OP_8E,             'WS'),
     inst(SetChrPos,         'WiiiH'),
     inst(OP_90,             'WLLLW'),
@@ -1639,7 +1634,7 @@ edao_op_list = \
     inst(OP_BD,             'WW'),
     inst(OP_BE,             'BW'),
     inst(OP_BF,             'BB'),
-    inst(SetChrChipPat,             'BBL'),
+    inst(SetChrChipPat,     'BBL'),
     inst(LoadChrChipPat),
     inst(OP_C3,             'BBWWWBLLLLLL'),
     inst(OP_C4,             'BBWW'),

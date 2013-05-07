@@ -1,5 +1,7 @@
 from ml import *
 
+CODE_PAGE = '936'
+
 SEPITH_CHI  = 0
 SEPITH_MIZU = 1
 SEPITH_HONO = 3
@@ -73,6 +75,10 @@ class ScenarioChipInfo:
     def param(self):
         return '"%s"' % self.__str__()
 
+class FileIndexBase:
+    def __init__(self, param):
+        self.Value = param
+
 class ScenarioFileIndex:
 
     # c1000_2
@@ -137,8 +143,10 @@ class ChipFileIndex:
 
     def __init__(self, param):
 
+        self.Value = param
+
         try:
-            self.IsIndexZero = bool(int(param) == 0)
+            self.IsIndexZero = bool(int(param) == 0 or (int(param) == 0xFFFFFFFF))
         except:
             self.IsIndexZero = False
 
@@ -195,10 +203,10 @@ class ChipFileIndex:
         return self.IsIndexZero
 
     def Name(self):
-        return self.ChipName if not self.IsIndexZero else 0
+        return self.ChipName if not self.IsIndexZero else self.Value
 
     def Index(self):
-        return self.ChipIndex if not self.IsIndexZero else 0
+        return self.ChipIndex if not self.IsIndexZero else self.Value
 
 
 class SymbolFileIndex:

@@ -1,7 +1,5 @@
 from EDAOBase import *
 
-CODE_PAGE = '936'
-
 INVALID_DROP_ITEM_ID        = 0xFFFF
 MAXIMUM_MAGIC_NUMBER        = 80
 MAXIMUM_CRAFT_NUMBER        = 16
