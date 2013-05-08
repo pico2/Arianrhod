@@ -219,7 +219,8 @@ NTSTATUS LeGlobalData::Initialize()
     Kernel32Ldr = GetKernel32Ldr();
     if (Kernel32Ldr != NULL)
     {
-        HookKernel32Routines(Kernel32Ldr->DllBase);
+        Kernel32Ldr->EntryPoint = DelayInitDllEntry;
+        // HookKernel32Routines(Kernel32Ldr->DllBase);
     }
 
     WriteLog(L"init %p", Status);
