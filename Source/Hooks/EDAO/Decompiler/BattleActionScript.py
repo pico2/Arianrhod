@@ -7,7 +7,7 @@ EMPTY_ACTION    = INVALID_ACTION_OFFSET
 
 class CharacterPositionFactor:
 
-    def __init__(self, fs):
+    def __init__(self, fs = None):
         if fs == None:
             return
 
@@ -152,7 +152,7 @@ class BattleActionScriptInfo:
 
         lines.append('CreateBattleAction("%s", (%s))' % (os.path.splitext(os.path.basename(filename))[0] + '.dat', ', '.join(tmp)))
         lines.append('')
-        lines.append('AddPreloadChip(')
+        lines.append('AddPreloadChip((')
 
         index = 0
         for chip in self.PreloadChipList:
@@ -161,21 +161,26 @@ class BattleActionScriptInfo:
             lines.append(x)
             index += 1
 
-        lines.append(')')
+        lines.append('))')
         lines.append('')
 
+        lines.append('CraftAction((')
         index = 0
         for craft in self.CraftActions:
             name = ('"%s"'% craft.Name) if craft.Offset != INVALID_ACTION_OFFSET else 'EMPTY_ACTION'
-            lines.append(('CraftAction(%s)' % name).ljust(40) + ('# %02X %d' % (index, index)))
+            lines.append(('    %s,' % name).ljust(40) + ('# %02X %d' % (index, index)))
             index += 1
 
+        lines.append('))')
         lines.append('')
 
         blocks = self.FormatCodeBlocks()
 
         for block in blocks:
             lines += block
+
+        lines.append('SaveToFile()')
+        lines.append('')
 
         txt = '\r\n'.join(lines)
 
@@ -200,3 +205,173 @@ def main():
         asdat.SaveToFile(os.path.splitext(f)[0] + '.py')
 
 TryInvoke(main)
+
+############################################################################################
+# support functions
+############################################################################################
+
+class BattleActionScriptInfoPort(BattleActionScriptInfo):
+    FileName = ''
+    Labels             = {}    # map<name, offset>
+    DelayFixLabels     = []    # list of LabelEntry
+
+    fs = None
+
+actionfile = None
+
+def IsTupleOrList(val):
+    return type(val) == tuple or type(val) == list
+
+def label(labelname):
+    pos = actionfile.fs.tell()
+    plog('%08X: %s' % (pos, labelname))
+    if pos in actionfile.Labels and actionfile.Labels[labelname] != pos:
+        raise Exception('label name conflict')
+
+    actionfile.Labels[labelname] = pos
+
+def getlabel(name):
+    return actionfile.Labels[name]
+
+def CreateBattleAction(filename, ChrPosFactorList):
+
+    if not IsTupleOrList(ChrPosFactorList):
+        raise Exception('ChrPosFactorList must be list')
+
+    global actionfile
+    actionfile = BattleActionScriptInfoPort()
+
+    actionfile.fs = BytesStream()
+    actionfile.fs.open(filename, 'wb+')
+
+    actionfile.FileName = filename
+    for factor in ChrPosFactorList:
+        f = CharacterPositionFactor()
+        f.X = factor[0]
+        f.Y = factor[1]
+        actionfile.ChrPosFactor.append(f)
+
+def AddPreloadChip(ChipFileList):
+
+    if not IsTupleOrList(ChipFileList):
+        raise Exception('ChipFileList must be list')
+
+    fs = actionfile.fs
+
+    fs.seek(6)
+
+    for chip in ChipFileList:
+        fs.wulong(ChipFileIndex(chip).Index())
+
+    fs.wulong(0xFFFFFFFF)
+    fs.wushort(0)
+
+    actionfile.ChrPosFactorOffset = fs.tell()
+    for factor in actionfile.ChrPosFactor:
+        fs.wbyte(factor.X)
+        fs.wbyte(factor.Y)
+
+    actionfile.ActionListOffset = fs.tell()
+    actionfile.ActionListOffset += 16 - actionfile.ActionListOffset % 16
+
+    fs.seek(0)
+    fs.wushort(actionfile.ActionListOffset)
+    fs.wushort(actionfile.ChrPosFactorOffset)
+    fs.seek(actionfile.ActionListOffset)
+
+def CraftAction(CraftNameList):
+
+    if not IsTupleOrList(CraftNameList):
+        raise Exception('CraftNameList must be list')
+
+    fs = actionfile.fs
+    fs.seek(actionfile.ActionListOffset)
+
+    actionfile.ActionList = list(CraftNameList)
+
+    for craft in CraftNameList:
+        if craft != INVALID_ACTION_OFFSET:
+            actionfile.DelayFixLabels.append(LabelEntry(craft, fs.tell()))
+
+        fs.wushort(INVALID_ACTION_OFFSET)
+
+    fs.write(b'\x00' * (16 - len(CraftNameList) * 2 % 16))
+
+
+for op, inst in edao.edao_as_op_table.items():
+
+    func = []
+    func.append('def %s(*args):' % inst.OpName)
+    func.append('    return OpCodeHandler(0x%02X, args)' % inst.OpCode)
+    func.append('')
+
+    exec('\r\n'.join(func))
+
+    opx = 'AS_%02X' % inst.OpCode
+
+    if inst.OpName != opx:
+        func[0] = 'def %s(*args):' % opx
+        exec('\r\n'.join(func))
+
+
+def DefaultOpCodeHandler(data):
+    entry   = data.TableEntry
+    fs      = data.FileStream
+    inst    = data.Instruction
+    oprs    = inst.OperandFormat
+    values  = data.Arguments
+
+    entry.Container.WriteOpCode(fs, inst.OpCode)
+
+    if len(oprs) != len(values):
+        raise Exception('operand: does not match values')
+
+    for i in range(len(oprs)):
+        entry.WriteOperand(data, oprs[i], values[i])
+
+    return inst
+
+def OpCodeHandlerPrivate(data):
+    op = data.Instruction.OpCode
+    entry = data.TableEntry
+
+    handler = entry.Handler if entry.Handler != None else DefaultOpCodeHandler
+    inst = handler(data)
+
+    if inst == None:
+        inst = DefaultOpCodeHandler(data)
+
+    return inst
+
+def OpCodeHandler(op, args):
+    entry = edao.edao_as_op_table[op]
+    fs = actionfile.fs
+
+    data = HandlerData(HANDLER_REASON_GENERATE)
+    data.Instruction    = Instruction(op)
+    data.Arguments      = list(args)
+    data.FileStream     = fs
+    data.TableEntry     = entry
+
+    data.Instruction.OperandFormat = entry.Operand
+
+    data.FileStream = BytesStream().openmem()
+
+    print(entry.OpName)
+    inst = OpCodeHandlerPrivate(data)
+
+    offset = actionfile.fs.tell()
+    for lb in inst.Labels:
+        actionfile.DelayFixLabels.append(LabelEntry(lb.Label, lb.Offset + offset))
+
+    data.FileStream.seek(0)
+    actionfile.fs.write(data.FileStream.read())
+
+    return inst
+
+def SaveToFile():
+    fs = actionfile.fs
+
+    for lb in actionfile.DelayFixLabels:
+        fs.seek(lb.Offset)
+        fs.wushort(getlabel(lb.Label))

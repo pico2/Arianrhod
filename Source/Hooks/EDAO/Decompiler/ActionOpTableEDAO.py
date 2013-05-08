@@ -218,6 +218,12 @@ def as_op_0c(data):
 
         return inst
 
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        inst = data.Instruction
+        target = data.Arguments[1]
+        inst.OperandFormat = 'BB' + getopr(target)
+
 def as_load_chr_chip(data):
 
     if data.Reason == HANDLER_REASON_READ:
@@ -232,6 +238,13 @@ def as_load_chr_chip(data):
         inst.OperandFormat = 'BSB'
 
         return inst
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        inst = data.Instruction
+        data.Arguments[1] = ChipFileIndex(data.Arguments[1]).Index()
+
+        inst.OperandFormat = 'BLB'
 
 def as_op_8e(data):
 

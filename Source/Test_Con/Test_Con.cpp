@@ -567,8 +567,9 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PrintConsoleW(L"%d\n", IsRunningInVMWare());
-    PauseConsole();
+    int x;
+    PrintConsoleW(L"%d\n", x);
+
     return;
 
     LOGFONTW lf;

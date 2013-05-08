@@ -309,7 +309,6 @@ def ChipFrameInfo(speed, reserve, subchipindexlist = None):
     scena.fs.write(frame.binary())
 
 for op, inst in edao.edao_op_table.items():
-    entry = edao.edao_op_table[inst.OpCode]
 
     func = []
     func.append('def %s(*args):' % inst.OpName)
@@ -436,16 +435,16 @@ def SaveToFile():
     zerostr = fs.tell() - 1
 
     for lb in scena.DelayFixLabels:
-        scena.fs.seek(lb.Offset)
-        scena.fs.wulong(getlabel(lb.Label))
+        fs.seek(lb.Offset)
+        fs.wulong(getlabel(lb.Label))
 
     for lb in scena.DelayFixString:
-        scena.fs.seek(lb.Offset)
+        fs.seek(lb.Offset)
         pos = zerostr if lb.Label == '' else scena.StringListTable[lb.Label]
 
         plog('%X -> %X : %s' % (lb.Offset, pos, lb.Label))
 
-        scena.fs.wulong(pos)
+        fs.wulong(pos)
 
     for i in range(len(scena.ScnInfoOffset)):
         plog('%04X : %02X' % (scena.ScnInfoOffset[i], scena.ScnInfoNumber[i]))
