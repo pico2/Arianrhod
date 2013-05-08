@@ -379,7 +379,11 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
 
         return oprtype[opr](value) if opr in oprtype else super().WriteOperand(data, opr, value)
 
-    def FormatOperand(self, opr, value, flags):
+    def FormatOperand(self, param):
+        value = param.Value
+        opr = param.Operand
+        flags = param.Flags
+
         def formatstr(strlist):
             s = BuildStringListFromObjectList(strlist)
 
@@ -408,7 +412,7 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             'S' : lambda : formatstr(value),
         }
 
-        return oprtype[opr]() if opr in oprtype else super().FormatOperand(opr, value, flags)
+        return oprtype[opr]() if opr in oprtype else super().FormatOperand(param)
 
     def GetOperand(self, opr, fs):
         if opr.lower() != 's':
@@ -581,9 +585,9 @@ class ScpExpression:
             txt += ')'
             return txt
 
-        import Assembler
+        import Assembler2
 
-        asm = Assembler.Disassembler(edao_op_table)
+        asm = Assembler2.Disassembler(edao_op_table)
 
         txt = 'scpexpr(%s' % ExpressionOperantions[self.Operation]
         for inst in self.Operand:
@@ -740,7 +744,7 @@ def scp_switch(data):
 
         defaultoffset = fs.ulong()
 
-        ins.BranchTargets.append(defaultoffset)
+        ins.BranchTargets.insert(0, defaultoffset)
 
         ins.Operand.append(expr)
         ins.Operand.append(options)
@@ -892,7 +896,14 @@ def scp_battle(data):
 
         p = '%s("BattleInfo_%X", ' % (entry.OpName, BattleInfoOffset)
 
-        return p + entry.FormatAllOperand(ins.OperandFormat[1:], ins.Operand[1:], ins.Flags) + ')'
+        paramlist = BuildFormatOperandParameterList(
+                        ins.OperandFormat[1:],
+                        ins.Operand[1:],
+                        ins.Flags,
+                        data.LabelMap
+                    )
+
+        return p + entry.FormatAllOperand(paramlist) + ')'
 
     elif data.Reason == HANDLER_REASON_GENERATE:
 
@@ -1454,12 +1465,12 @@ def scp_e4(data):
 edao_op_list = \
 [
     inst(OP_00),
-    inst(Return,            NO_OPERAND,         INSTRUCTION_END_BLOCK),
-    inst(Jc,                NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_if),
-    inst(Jump,              'O',                INSTRUCTION_END_BLOCK),
-    inst(Switch,            NO_OPERAND,         INSTRUCTION_START_BLOCK,        scp_switch),
+    inst(Return,            NO_OPERAND,             INSTRUCTION_END_BLOCK),
+    inst(Jc,                NO_OPERAND,             INSTRUCTION_START_BLOCK,    scp_if),
+    inst(Jump,              'O',                    INSTRUCTION_JUMP),
+    inst(Switch,            NO_OPERAND,             INSTRUCTION_END_BLOCK,      scp_switch),
     inst(Call,              'CC'),          # main_scp index, func index
-    inst(NewScene,          NO_OPERAND,         0,                              scp_new_scene),
+    inst(NewScene,          NO_OPERAND,             0,                          scp_new_scene),
     inst(OP_07,             NO_OPERAND),
     inst(Sleep,             'H'),
     inst(SetXXXFlags,       'L'),
@@ -1468,7 +1479,7 @@ edao_op_list = \
     inst(FadeToBright,      'ii'),
     inst(OP_0D),
     inst(Fade,              'I'),
-    inst(Battle,            NO_OPERAND,         0,                              scp_battle),
+    inst(Battle,            NO_OPERAND,             0,                          scp_battle),
     inst(OP_10,             'BB'),
     inst(OP_11,             'BBBLLL'),
     inst(OP_12,             'WWB'),
@@ -1481,8 +1492,8 @@ edao_op_list = \
     inst(EventEnd,          'B'),
     inst(OP_1B,             'BBW'),
     inst(OP_1C,             'BBBBBBWW'),
-    inst(OP_1D,             NO_OPERAND,         0,                              scp_1d),
-    inst(PlayBgm,           NO_OPERAND,         0,                              scp_play_bgm),
+    inst(OP_1D,             NO_OPERAND,             0,                          scp_1d),
+    inst(PlayBgm,           NO_OPERAND,             0,                          scp_play_bgm),
     inst(OP_1F),
     inst(VolumeBgm,         'BL'),
     inst(OP_21,             'L'),
@@ -1493,9 +1504,9 @@ edao_op_list = \
     inst(SoundDistance,     'WLLLLLBL'),
     inst(SoundLoad,         'H'),
     inst(OP_28),
-    inst(OP_29,             NO_OPERAND,         0,                              scp_29),
-    inst(OP_2A,             NO_OPERAND,         0,                              scp_2a),
-    inst(OP_2B,             NO_OPERAND,         0,                              scp_2b),
+    inst(OP_29,             NO_OPERAND,             0,                          scp_29),
+    inst(OP_2A,             NO_OPERAND,             0,                          scp_2a),
+    inst(OP_2B,             NO_OPERAND,             0,                          scp_2b),
     inst(OP_2C,             'WW'),
     inst(OP_2D,             'WW'),
     inst(OP_2E,             'BBB'),
@@ -1506,7 +1517,7 @@ edao_op_list = \
     inst(OP_35,             'BW'),
     inst(OP_36,             'BW'),
     inst(OP_37),
-    inst(OP_38,             NO_OPERAND,         0,                              scp_38),
+    inst(OP_38,             NO_OPERAND,             0,                          scp_38),
     inst(OP_39,             'BW'),
     inst(OP_3A,             'BW'),
     inst(OP_3B,             'W'),
@@ -1528,23 +1539,23 @@ edao_op_list = \
     inst(OP_4B,             'WB'),
     inst(OP_4C,             'WB'),
     inst(OP_4D),
-    inst(OP_4E,             NO_OPERAND,         0,                              scp_4e),
+    inst(OP_4E,             NO_OPERAND,             0,                          scp_4e),
     inst(OP_4F),
-    inst(OP_50,             NO_OPERAND,         0,                              scp_50),
+    inst(OP_50,             NO_OPERAND,             0,                          scp_50),
     inst(OP_51),
-    inst(OP_52,             NO_OPERAND,         0,                              scp_52),
+    inst(OP_52,             NO_OPERAND,             0,                          scp_52),
     inst(OP_53,             'W'),
     inst(OP_54,             'W'),
-    inst(AnonymousTalk,     NO_OPERAND,         0,                              scp_anonymous_talk),
+    inst(AnonymousTalk,     NO_OPERAND,             0,                          scp_anonymous_talk),
     inst(OP_56),
     inst(OP_57,             'B'),
     inst(OP_58,             'WWWS'),
     inst(CloseMessageWindow),
     inst(OP_5A),
     inst(OP_5B,             'WWWW'),
-    inst(ChrTalk,           NO_OPERAND,         0,                              scp_create_chr_talk),
-    inst(NpcTalk,           NO_OPERAND,         0,                              scp_create_npc_talk),
-    inst(Menu,              NO_OPERAND,         0,                              scp_create_menu),
+    inst(ChrTalk,           NO_OPERAND,             0,                          scp_create_chr_talk),
+    inst(NpcTalk,           NO_OPERAND,             0,                          scp_create_npc_talk),
+    inst(Menu,              NO_OPERAND,             0,                          scp_create_menu),
     inst(MenuEnd,           'W'),
     inst(OP_60,             'W'),
     inst(SetChrName,        'S'),
@@ -1568,7 +1579,7 @@ edao_op_list = \
     inst(OP_73,             'BL'),
     inst(OP_74,             'WB'),
     inst(OP_75,             'BBL'),
-    inst(OP_76,             NO_OPERAND,         0,                              scp_76),
+    inst(OP_76,             NO_OPERAND,             0,                          scp_76),
     inst(OP_77,             'BW'),
     inst(OP_78,             'BW'),
     inst(OP_79,             'W'),

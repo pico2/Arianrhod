@@ -1,5 +1,5 @@
 from BaseType import *
-from Assembler import *
+from Assembler2 import *
 from EDAOBase import *
 import ScenaOpTableEDAO as edao
 
@@ -1022,19 +1022,21 @@ class ScenarioInfo:
 
         hdr.append('')
 
-        for place in self.PlaceName:
-            s = 'PlaceName(%s)' % place.param()
-            hdr.append(s)
+        if len(self.PlaceName) != 0:
+            for place in self.PlaceName:
+                s = 'PlaceName(%s)' % place.param()
+                hdr.append(s)
 
-        hdr.append('')
+            hdr.append('')
 
-        index = 0
-        for frame in self.ChipFrameInfo:
-            s = ('ChipFrameInfo(%s)' % frame.param()).ljust(50)
-            hdr.append('%s # %d' % (s, index))
-            index += 1
+        if len(self.ChipFrameInfo) != 0:
+            index = 0
+            for frame in self.ChipFrameInfo:
+                s = ('ChipFrameInfo(%s)' % frame.param()).ljust(50)
+                hdr.append('%s # %d' % (s, index))
+                index += 1
 
-        hdr.append('')
+            hdr.append('')
 
         return hdr
 

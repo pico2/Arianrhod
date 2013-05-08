@@ -1,4 +1,4 @@
-from Assembler import *
+from Assembler2 import *
 from EDAOBase import *
 import ActionOpTableEDAO as edao
 
@@ -126,7 +126,7 @@ class BattleActionScriptInfo:
         blocks = []
         blockoffsetmap = {}
         for block in self.CraftActions:
-            if block.Offset == -1:
+            if block.Offset == INVALID_ACTION_OFFSET:
                 continue
 
             if block.Offset in blockoffsetmap:

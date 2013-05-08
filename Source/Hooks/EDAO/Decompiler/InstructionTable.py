@@ -12,6 +12,7 @@ class HandlerData:
         self.FileStream     = None
         self.Instruction    = None
         self.Arguments      = None
+        self.LabelMap       = {}
 
         # list of LabelEntry
         self.Labels = []
@@ -66,6 +67,26 @@ class InstructionTable(dict):
         self.CodePage       = CodePage
 
 NO_OPERAND = ''
+
+class FormatOperandParameter:
+    def __init__(self, Operand = NO_OPERAND, Value = None, Flags = None, LabelMap = None):
+        self.Operand     = Operand
+        self.Value       = Value
+        self.Flags       = Flags
+        self.LabelMap    = LabelMap if LabelMap != None else {}
+
+def BuildFormatOperandParameterList(OperandFormats, ValueList, Flags, LabelMap):
+    oprs = list(OperandFormats)
+    values = ValueList
+
+    if len(oprs) != len(values):
+        raise Exception('operand: does not match values (%d / %d)' % (len(oprs), len(values)))
+
+    paramlist = []
+    for i in range(len(oprs)):
+        paramlist.append(FormatOperandParameter(oprs[i], values[i], Flags, LabelMap))
+
+    return paramlist
 
 class InstructionTableEntry:
     def __init__(self, op, name = '', operand = NO_OPERAND, flags = 0, handler = None):
@@ -124,25 +145,33 @@ class InstructionTableEntry:
 
         return oprtype[opr]()
 
-    def FormatAllOperand(self, oprs, values, flags):
-        if len(oprs) != len(values):
-            raise Exception('operand: does not match values')
+    def FormatAllOperand(self, paramlist):
+        oprs = 0
+        values = 0
+        for param in paramlist:
+            if param.Operand != None: oprs += 1
+            if param.Value   != None: values += 1
 
-        if len(oprs) == 0:
+        if oprs != values:
+            raise Exception('operand: does not match values (%d / %d)' % (oprs, values))
+
+        if oprs == 0:
             return ''
 
-        oprtext = self.FormatOperand(oprs[0], values[0], flags)
+        oprtext = self.FormatOperand(paramlist[0])
 
-        if not flags.ArgNewLine:
-            for i in range(1, len(oprs)):
-                tmp = ', ' + self.FormatOperand(oprs[i], values[i], flags)
-                oprtext += tmp
-        else:
-            raise Exception('not implemented')
+        for i in range(1, len(paramlist)):
+            tmp = ', ' + self.FormatOperand(paramlist[i])
+            oprtext += tmp
 
         return oprtext
 
-    def FormatOperand(self, opr, value, flags):
+    def FormatOperand(self, param):
+
+        labelmap = param.LabelMap
+        value = param.Value
+        opr = param.Operand
+
         oprtype = \
         {
             'c' : lambda : '%d' % value,
@@ -172,8 +201,8 @@ class InstructionTableEntry:
             's' : lambda : '"%s"' % value,
             'S' : lambda : '"%s"' % value,
 
-            'o' : lambda : '"%s"' % DefaultGetLabelName(value),
-            'O' : lambda : '"%s"' % DefaultGetLabelName(value),
+            'o' : lambda : '"%s"' % (labelmap[value] if value in labelmap else DefaultGetLabelName(value)),
+            'O' : lambda : '"%s"' % (labelmap[value] if value in labelmap else DefaultGetLabelName(value)),
         }
 
         opr = oprtype[opr]
