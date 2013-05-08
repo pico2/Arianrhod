@@ -63,10 +63,10 @@ class BattleActionScriptInfo:
 
         return
 
-        for i in range(self.ActionListOffset + len(self.ActionList) * 2, fs.size()):
+        for i in range(0x69, fs.size()):
             if i not in offsetlist:
                 print('%X' % i)
-                input()
+                #input()
 
         input()
 
@@ -97,10 +97,11 @@ class BattleActionScriptInfo:
 
         disasm = Disassembler(edao.edao_as_op_table, self.DiasmInstructionCallback)
 
-        index = 0
+        index = -1
         codeblocks = []
         blockoffsetmap = {}
         for func in self.ActionList:
+            index += 1
             if func == INVALID_ACTION_OFFSET:
                 codeblocks.append(CodeBlock(INVALID_ACTION_OFFSET))
                 continue
@@ -115,8 +116,6 @@ class BattleActionScriptInfo:
             codeblocks.append(block)
 
             blockoffsetmap[func] = block
-
-            index += 1
 
         return codeblocks
 
@@ -150,7 +149,10 @@ class BattleActionScriptInfo:
         for pos in self.ChrPosFactor:
             tmp.append('(%d, %d)' % (pos.X, pos.Y))
 
-        lines.append('CreateBattleAction("%s", (%s))' % (os.path.splitext(os.path.basename(filename))[0] + '.dat', ', '.join(tmp)))
+        name = os.path.splitext(os.path.basename(filename))[0]
+        name = os.path.splitext(name)[0]
+
+        lines.append('CreateBattleAction("%s", (%s))' % (name + '.dat', ', '.join(tmp)))
         lines.append('')
         lines.append('AddPreloadChip((')
 
@@ -202,7 +204,7 @@ def main():
     for f in sys.argv[1:]:
         asdat = BattleActionScriptInfo()
         asdat.open(f)
-        asdat.SaveToFile(os.path.splitext(f)[0] + '.py')
+        asdat.SaveToFile(f + '.py')
 
 TryInvoke(main)
 

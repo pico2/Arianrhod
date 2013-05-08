@@ -307,8 +307,8 @@ def FormatFuncString(data, oprfmt, mark_number = None):
     txt = [ '', '%s(' % entry.OpName ]
 
     for i in range(len(oprfmt)):
-        opr = oprfmt[i].lower()
-        if opr != 's':
+        opr = oprfmt[i]
+        if opr != 'S':
             txt.append('    0x%X,' % ins.Operand[i])
         else:
             strlist = BuildStringListFromObjectList(ins.Operand[i])
@@ -373,7 +373,6 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             'e' : wexpr,
             'E' : wexpr,
 
-            's' : wstr,
             'S' : wstr,
         }
 
@@ -408,14 +407,13 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             'e' : lambda : FormatExpressionList(value),
             'E' : lambda : FormatExpressionList(value),
 
-            's' : lambda : formatstr(value),
             'S' : lambda : formatstr(value),
         }
 
         return oprtype[opr]() if opr in oprtype else super().FormatOperand(param)
 
     def GetOperand(self, opr, fs):
-        if opr.lower() != 's':
+        if opr != 'S':
             return super().GetOperand(opr, fs)
 
         def readstr():
@@ -490,7 +488,7 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
         return readstr()
 
     def GetOperandSize(self, opr, fs):
-        if opr.lower() != 's':
+        if opr != 'S':
             return super().GetOperandSize(opr, fs)
 
         pos = fs.tell()

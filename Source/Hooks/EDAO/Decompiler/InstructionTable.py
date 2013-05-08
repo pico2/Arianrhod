@@ -136,8 +136,8 @@ class InstructionTableEntry:
             'f' : lambda : fs.wfloat(value),
             'd' : lambda : fs.wfloat(value),
 
-            's' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
-            'S' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage)),
+            's' : lambda : fs.write(value),
+            'S' : lambda : fs.write(value.encode(data.TableEntry.Container.CodePage) + b'\x00'),
 
             'o' : wlabelshort,
             'O' : wlabel,
@@ -198,7 +198,7 @@ class InstructionTableEntry:
             'f' : lambda : '%f' % value,
             'd' : lambda : '%f' % value,
 
-            's' : lambda : '"%s"' % value,
+            's' : lambda : '%s' % value,
             'S' : lambda : '"%s"' % value,
 
             'o' : lambda : '"%s"' % (labelmap[value] if value in labelmap else DefaultGetLabelName(value)),
@@ -250,7 +250,7 @@ class InstructionTableEntry:
             'f' : lambda : struct.unpack('<f', fs.read(4))[0],
             'd' : lambda : struct.unpack('<d', fs.read(8))[0],
 
-            's' : readstr,
+            #'s' : readstr,
             'S' : readstr,
 
             'o' : lambda : struct.unpack('<H', fs.read(2))[0],

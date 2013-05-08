@@ -306,7 +306,7 @@ def as_op_ae(data):
         inst.Operand = entry.GetAllOperand('BBB', fs)
         inst.Operand.append(fs.read(inst.Operand[-1] + 1))
 
-        inst.OperandFormat = 'BBBS'
+        inst.OperandFormat = 'BBBs'
 
         return inst
 
@@ -316,6 +316,34 @@ def as_op_ae(data):
         entry = data.TableEntry
 
         #return '%s(0x%X, 0x%X, 0x%X, %s)' % (entry.OpName, inst.Operand[0], inst.Operand[1], inst.Operand[3], inst.Operand[4])
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Arguments[-2] = len(data.Arguments[-1]) - 1
+        data.Instruction.OperandFormat = 'BBBs'
+
+def as_load_cclm(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        inst = data.Instruction
+        entry = data.TableEntry
+
+        inst.Operand = entry.GetAllOperand('LWBB', data.FileStream)
+        inst.Operand[0] = BattleScriptFileIndex(inst.Operand[0]).Name()
+
+        inst.OperandFormat = 'SWBB'
+
+        return inst
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Arguments[0] = BattleScriptFileIndex(data.Arguments[0]).Index()
+        data.Instruction.OperandFormat = 'LWBB'
+
+def as_unlock_cclm(data):
+
+    return as_load_cclm(data)
 
 edao_as_op_list = \
 [
@@ -480,8 +508,8 @@ edao_as_op_list = \
     inst(PlayBgm,           'BW'),
     inst(AS_B3,             'BW'),
     inst(AS_B4,             'BB'),
-    inst(LoadCclm,          'LWBB'),
-    inst(UnlockCclm,        'LWBB'),
+    inst(LoadCclm,          NO_OPERAND,             0,                          as_load_cclm),
+    inst(UnlockCclm,        NO_OPERAND,             0,                          as_unlock_cclm),
     inst(AS_B7,             NO_OPERAND),
     inst(AS_B8,             'B'),
 ]

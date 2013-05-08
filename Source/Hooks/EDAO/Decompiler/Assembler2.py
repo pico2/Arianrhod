@@ -84,13 +84,12 @@ class Disassembler:
         pos = Stream.tell()
 
         if pos in DisasmTable:
-            inst = DisasmTable[pos]
-            inst.RefCount += 1
+            DisasmTable[pos].RefCount += 1
             return None
 
         plog('block: %08X' % block.Offset)
 
-        blockref = {}
+        blockref = []
 
         while True:
             pos = Stream.tell()
@@ -98,9 +97,9 @@ class Disassembler:
 
             offsetlist[pos] = True
 
-            #print('%08X: ' % pos, end = '')
+            print('%08X: ' % pos, end = '')
             op = InstructionTable.GetOpCode(Stream)
-            #print('%02X' % op)
+            print('%02X' % op)
 
             entry = InstructionTable[op]
 
@@ -122,10 +121,12 @@ class Disassembler:
 
             inst.Size = Stream.tell() - pos
 
-            #for i in range(pos, Stream.tell()): offsetlist[i] = True
+            for i in range(pos, Stream.tell()): offsetlist[i] = True
 
             DisasmTable[inst.Offset] = inst
             block.AddInstruction(inst)
+
+            if pos == 0x384: bp()
 
             if not inst.Flags.EndBlock and not inst.Flags.StartBlock:
                 continue
@@ -134,14 +135,16 @@ class Disassembler:
             inst.BranchTargets = []
 
             for offset in targets:
-                blockref[offset] = inst
+                blockref.append((offset, inst))
+                #blockref[offset] = inst
 
             if inst.Flags.EndBlock:
                 break
 
         plog('block end: %08X' % block.Offset)
 
-        for offset, inst in blockref.items():
+        for ref in blockref:
+            offset, inst = ref
             Stream.seek(offset)
             newblock = self.DisasmBlock(Stream, InstructionTable, DisasmTable)
             if newblock == None or len(newblock.Instructions) == 0:
@@ -211,8 +214,7 @@ class Disassembler:
         FormattedBlock      = data.FormattedBlock
         block               = data.Block
 
-        if block.Offset in FormattedBlock:
-            return
+        if block.Offset in FormattedBlock: return
 
         FormattedBlock[block.Offset] = True
 
@@ -229,8 +231,12 @@ class Disassembler:
 
         for inst in block.Instructions:
 
+            #if inst.Offset == 0x65A: bp()
+
             if inst.Offset != block.Offset and inst.Offset in self.FormattedBlock:
-                break
+                continue
+
+            FormattedBlock[inst.Offset] = True
 
             handlerdata = HandlerData(HANDLER_REASON_FORMAT)
 
