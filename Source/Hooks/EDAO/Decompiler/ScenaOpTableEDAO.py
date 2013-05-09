@@ -976,6 +976,25 @@ def scp_play_bgm(data):
 
         data.Arguments[0] = int(os.path.splitext(bgm)[0])
 
+def scp_28(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        if fs.byte() != Jump:
+            raise Exception('op_28 not followed by a Jump @ %X' % fs.tell() - 2)
+
+        fs.seek(-1, io.SEEK_CUR)
+
+        data.Instruction.OperandFormat = 'BO'
+        data.Instruction.Flags.StartBlock = True
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'BO'
+
 def scp_29(data):
 
     def getopr(opr2):
@@ -1096,6 +1115,27 @@ def scp_38(data):
     elif data.Reason == HANDLER_REASON_GENERATE:
 
         data.Instruction.OperandFormat = 'BB' + getopr(data.Arguments[1])
+
+
+def scp_47(data):
+
+    if data.Reason == HANDLER_REASON_READ:
+
+        fs = data.FileStream
+        ins = data.Instruction
+
+        target, opr2, length = data.TableEntry.GetAllOperand('WBB', fs)
+        ins.Operand = [target, opr2, length]
+        fs.seek(length, io.SEEK_CUR)
+
+        ins.OperandFormat = 'WBB'
+
+        return ins
+
+    elif data.Reason == HANDLER_REASON_GENERATE:
+
+        data.Instruction.OperandFormat = 'WBB'
+
 
 def scp_4e(data):
 
@@ -1501,7 +1541,7 @@ edao_op_list = \
     inst(OP_25,             'WB'),
     inst(SoundDistance,     'WLLLLLBL'),
     inst(SoundLoad,         'H'),
-    inst(OP_28),
+    inst(OP_28,             NO_OPERAND,             0,                          scp_28),
     inst(OP_29,             NO_OPERAND,             0,                          scp_29),
     inst(OP_2A,             NO_OPERAND,             0,                          scp_2a),
     inst(OP_2B,             NO_OPERAND,             0,                          scp_2b),
@@ -1530,7 +1570,7 @@ edao_op_list = \
     inst(BeginChrThread,    'WCCC'),
     inst(OP_45,             'WB'),
     inst(OP_46,             'WBB'),
-    inst(OP_47,             'WBB'),
+    inst(OP_47,             NO_OPERAND,             0,                          scp_47),
     inst(OP_48,             'WB'),
     inst(OP_49),
     inst(OP_4A,             'BB'),

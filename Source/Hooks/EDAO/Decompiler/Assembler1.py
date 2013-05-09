@@ -152,7 +152,14 @@ class Disassembler:
         entry = data.TableEntry
 
         opname = entry.OpName
-        oprlist = entry.FormatAllOperand(inst.OperandFormat, inst.Operand, inst.Flags)
+        oprlist = entry.FormatAllOperand(
+                        BuildFormatOperandParameterList(
+                            inst.OperandFormat,
+                            inst.Operand,
+                            inst.Flags,
+                            data.LabelMap
+                        )
+                    )
 
         return '%s(%s)' % (opname, oprlist)
 

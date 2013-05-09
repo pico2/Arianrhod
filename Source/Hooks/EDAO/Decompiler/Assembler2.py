@@ -97,9 +97,9 @@ class Disassembler:
 
             offsetlist[pos] = True
 
-            print('%08X: ' % pos, end = '')
+            #print('%08X: ' % pos, end = '')
             op = InstructionTable.GetOpCode(Stream)
-            print('%02X' % op)
+            #print('%02X' % op)
 
             entry = InstructionTable[op]
 
@@ -125,8 +125,6 @@ class Disassembler:
 
             DisasmTable[inst.Offset] = inst
             block.AddInstruction(inst)
-
-            if pos == 0x384: bp()
 
             if not inst.Flags.EndBlock and not inst.Flags.StartBlock:
                 continue
@@ -225,8 +223,14 @@ class Disassembler:
             text.append('label("%s")' % name)
             text.append('')
 
+        def EndLabel(name):
+            text.append('')
+            text.append('# %s end' % name)
+
+        blockname = None
         if block.Offset not in LabelMap:
-            AddLabel(block.Name if block.Name != None else InstructionTable.GetLabelName(block.Offset))
+            blockname = block.Name if block.Name != None else InstructionTable.GetLabelName(block.Offset)
+            AddLabel(blockname)
             LabelMap[block.Offset] = block.Name
 
         for inst in block.Instructions:
@@ -259,6 +263,9 @@ class Disassembler:
                     LabelMap[inst.Offset] = name
 
             text.append(symbol)
+
+        if blockname != None:
+            EndLabel(blockname)
 
         text.append('')
 

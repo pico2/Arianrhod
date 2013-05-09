@@ -819,6 +819,12 @@ class ScenarioInfo:
 
             blockoffsetmap[func] = block
 
+        for i in range(fs.size()):
+            if i not in offsetlist:
+                print('%X' % i)
+
+        input()
+
         return codeblocks
 
     def FormatCodeBlocks(self):

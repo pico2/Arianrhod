@@ -567,8 +567,7 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    int x;
-    PrintConsoleW(L"%d\n", x);
+    abort();
 
     return;
 
