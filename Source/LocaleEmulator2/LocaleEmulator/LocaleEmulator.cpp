@@ -18,6 +18,37 @@ ForceInline VOID LeReleaseGlobalData()
     SafeDeleteT(g_GlobalData);
 }
 
+BOOL NTAPI DelayInitDllEntry(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
+{
+    BOOL Success;
+    PLDR_MODULE Module = FindLdrModuleByHandle(BaseAddress);
+    PIMAGE_NT_HEADERS NtHeaders;
+
+    NtHeaders = PtrAdd((PIMAGE_NT_HEADERS)BaseAddress, ((PIMAGE_DOS_HEADER)BaseAddress)->e_lfanew);
+    Module->EntryPoint = PtrAdd(BaseAddress, NtHeaders->OptionalHeader.AddressOfEntryPoint);
+
+    Success = ((API_POINTER(DelayInitDllEntry))Module->EntryPoint)(BaseAddress, Reason, Reserved);
+
+    if (Reason == DLL_PROCESS_ATTACH && !Success)
+        return Success;
+
+    switch (Reason)
+    {
+        case DLL_PROCESS_ATTACH:
+            if (!Success)
+                return Success;
+        case DLL_PROCESS_DETACH:
+            break;
+
+        default:
+            return Success;
+    }
+
+    LeGetGlobalData()->HookModule(BaseAddress, &Module->BaseDllName, Reason == DLL_PROCESS_ATTACH);
+
+    return Success;
+}
+
 NTSTATUS GetNlsFile(PUNICODE_STRING NlsFile, ULONG NlsIndex, PCWSTR SubKey)
 {
     BOOL        Success;
@@ -226,37 +257,6 @@ NTSTATUS LeGlobalData::Initialize()
     WriteLog(L"init %p", Status);
 
     return Status;
-}
-
-BOOL NTAPI DelayInitDllEntry(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
-{
-    BOOL Success;
-    PLDR_MODULE Module = FindLdrModuleByHandle(BaseAddress);
-    PIMAGE_NT_HEADERS NtHeaders;
-
-    NtHeaders = PtrAdd((PIMAGE_NT_HEADERS)BaseAddress, ((PIMAGE_DOS_HEADER)BaseAddress)->e_lfanew);
-    Module->EntryPoint = PtrAdd(BaseAddress, NtHeaders->OptionalHeader.AddressOfEntryPoint);
-
-    Success = ((API_POINTER(DelayInitDllEntry))Module->EntryPoint)(BaseAddress, Reason, Reserved);
-
-    if (Reason == DLL_PROCESS_ATTACH && !Success)
-        return Success;
-
-    switch (Reason)
-    {
-        case DLL_PROCESS_ATTACH:
-            if (!Success)
-                return Success;
-        case DLL_PROCESS_DETACH:
-            break;
-
-        default:
-            return Success;
-    }
-
-    LeGetGlobalData()->HookModule(BaseAddress, &Module->BaseDllName, Reason == DLL_PROCESS_ATTACH);
-
-    return Success;
 }
 
 typedef struct
