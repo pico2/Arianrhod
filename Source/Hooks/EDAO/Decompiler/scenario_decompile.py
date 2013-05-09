@@ -3,10 +3,13 @@ from ScenarioScript import *
 def main():
     scena = ScenarioInfo()
 
-    fn = sys.argv[1] if len(sys.argv) > 1 else 'm4290.b'
+    argv = sys.argv[1:]
+    if len(argv) == 0:
+        argv.append('m4290.b')
 
-    scena.open(fn)
-    scena.SaveToFile(fn + '.py')
+    for fn in argv:
+        scena.open(fn)
+        scena.SaveToFile(fn + '.py')
 
     print('done')
     #input()

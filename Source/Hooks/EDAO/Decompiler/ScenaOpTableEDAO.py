@@ -82,11 +82,11 @@ InstructionNames[0x46]  = 'OP_46'
 InstructionNames[0x47]  = 'OP_47'
 InstructionNames[0x48]  = 'OP_48'
 InstructionNames[0x49]  = 'OP_49'
-InstructionNames[0x4A]  = 'OP_4A'
+InstructionNames[0x4A]  = 'Event'
 InstructionNames[0x4B]  = 'OP_4B'
 InstructionNames[0x4C]  = 'OP_4C'
 InstructionNames[0x4D]  = 'OP_4D'
-InstructionNames[0x4E]  = 'OP_4E'
+InstructionNames[0x4E]  = 'RunExpression'
 InstructionNames[0x4F]  = 'OP_4F'
 InstructionNames[0x50]  = 'OP_50'
 InstructionNames[0x51]  = 'OP_51'
@@ -96,7 +96,7 @@ InstructionNames[0x54]  = 'OP_54'
 InstructionNames[0x55]  = 'AnonymousTalk'
 InstructionNames[0x56]  = 'OP_56'
 InstructionNames[0x57]  = 'OP_57'
-InstructionNames[0x58]  = 'OP_58'
+InstructionNames[0x58]  = 'MenuTitle'
 InstructionNames[0x59]  = 'CloseMessageWindow'
 InstructionNames[0x5A]  = 'OP_5A'
 InstructionNames[0x5B]  = 'OP_5B'
@@ -359,7 +359,7 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
                 if not recursion:
                     value += b'\x00'
 
-            elif type(value) == tuple:
+            elif IsTupleOrList(value):
                 for x in value:
                     wstr(x, True)
 
@@ -1573,11 +1573,11 @@ edao_op_list = \
     inst(OP_47,             NO_OPERAND,             0,                          scp_47),
     inst(OP_48,             'WB'),
     inst(OP_49),
-    inst(OP_4A,             'BB'),
+    inst(Event,             'CC'),
     inst(OP_4B,             'WB'),
     inst(OP_4C,             'WB'),
     inst(OP_4D),
-    inst(OP_4E,             NO_OPERAND,             0,                          scp_4e),
+    inst(RunExpression,     NO_OPERAND,             0,                          scp_4e),
     inst(OP_4F),
     inst(OP_50,             NO_OPERAND,             0,                          scp_50),
     inst(OP_51),
@@ -1587,7 +1587,7 @@ edao_op_list = \
     inst(AnonymousTalk,     NO_OPERAND,             0,                          scp_anonymous_talk),
     inst(OP_56),
     inst(OP_57,             'B'),
-    inst(OP_58,             'WWWS'),
+    inst(MenuTitle,         'WWWS'),
     inst(CloseMessageWindow),
     inst(OP_5A),
     inst(OP_5B,             'WWWW'),
@@ -1683,7 +1683,7 @@ edao_op_list = \
     inst(OP_BD,             'WW'),
     inst(OP_BE,             'BW'),
     inst(OP_BF,             'BB'),
-    inst(SetChrChipPat,     'BBL'),
+    inst(SetChrChipPat,     'BBL'),                         # SetChrChipPat(chr_id, func_id, param)
     inst(LoadChrChipPat),
     inst(OP_C3,             'BBWWWBLLLLLL'),
     inst(OP_C4,             'BBWW'),

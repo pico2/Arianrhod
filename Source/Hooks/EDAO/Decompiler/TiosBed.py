@@ -1,56 +1,138 @@
 from EDAOScenaFile import *
+from ScenarioHelper import *
+
+StaticCharList = \
+(
+    '罗伊德',
+    '艾莉',
+    '缇欧',
+    '兰迪',
+    '瓦吉',
+    '银',
+    '诺艾尔上士',
+)
+
+def SelectTargetCharMenu():
+    pass
+
+def ShowChangeMemberMenu():
+
+    CharList = StaticCharList.copy()
+
+    for i in range(len(CharList)):
+        CharList[i] = CharList[i] + '\x01'
+    CharList.append('放弃\x01')
+
+
+    menu_end_label = GenerateUniqueLable()
+    show_menu_label = GenerateUniqueLable()
+
+    RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_END)))
+
+    label(show_menu_label)
+
+    Jc((scpexpr(EXPR_GET_RESULT, 0x0), scpexpr(EXPR_PUSH_LONG, 0xFF), scpexpr(EXPR_NEQ), scpexpr(EXPR_END)), menu_end_label)
+
+    MenuTitle(0xFFFF, 0x19, 0x0, "要替换谁")
+    Menu(1, 0xFFFF, 0xFFFF, 1, CharList)
+
+    MenuEnd(0x0)
+    OP_60(1)
+
+    CaseList = []
+    for i in range(len(CharList) - 1):
+        CaseList.append( (i, GenerateUniqueLable()) )
+
+    CaseList.append((SWITCH_DEFAULT, GenerateUniqueLable()))
+
+    expr = (scpexpr(EXPR_GET_RESULT, 0x0), scpexpr(EXPR_END))
+
+    args = CaseList.copy()
+    args.insert(0, expr)
+    Switch(*args)
+
+    for i in range(len(CaseList)):
+        caseid, caselabel = CaseList[i]
+        label(caselabel)
+
+        if caseid == SWITCH_DEFAULT:
+            RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0xFF), scpexpr(EXPR_END)))
+        else:
+            RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0), scpexpr(EXPR_END)))
+
+        Jump(show_menu_label)
+
+    label(menu_end_label)
+
+    RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
 
 def ShowMenu():
     OP_F4(0x3)
     OP_53(0xFF)
-    #FadeToDark(300, 0x0, 0x64)
+
+    RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_END)))
+
+    label('show_menu')
+
+    Jc((scpexpr(EXPR_GET_RESULT, 0x0), scpexpr(EXPR_PUSH_LONG, 0xFF), scpexpr(EXPR_NEQ), scpexpr(EXPR_END)), "menu_return")
+
+    MenuTitle(0xFFFF, 0x19, 0x0, "缇欧的床")
 
     Menu(
-        0x0,
+        0,
         0xFFFF,
         0xFFFF,
         0x1,
         (
-            "在这里休息\x01",                # 0
-            "进入Debug地图\x01",             # 1
-            "放弃\x01",                      # 2
+            "满血满魔满CP\x01",              # 0
+            "换人\x01",                      # 1
+            "进入Debug地图\x01",             # 2
+            "放弃\x01",                      # 3
         )
     )
 
+    MenuCmd(0x4, 0x0, 0x0)
     MenuEnd(0x0)
-    OP_60(0x0)
-    OP_57(0x0)
+    MenuCmd(0x4, 0x0, 0x0)
 
     Switch(
         (scpexpr(EXPR_GET_RESULT, 0x0), scpexpr(EXPR_END)),
         (0, "rest_here"),
-        (1, "enter_debug_map"),
-        (-1, "menu_return"),
+        (1, "change_member"),
+        (2, "enter_debug_map"),
+        (-1, "close_menu"),
     )
 
     label("rest_here")
 
-    SoundLoad(13)
-    OP_21(0xBB8)
-    FadeToDark(1000, 0x0, 0xFF)
-    Sleep(700)
-    Sound(13, 0, 100, 0)
-    OP_0D()
-    OP_32(0xFF, 0xFE, 0x0)
-    OP_6A(0x0, 0x0)
-    OP_31(0x1)
-    Sleep(3500)
-    OP_1F()
-    FadeToBright(1000, 0x0)
-    OP_57(0x0)
-    Jump('menu_return')
+    OP_32(0xFF, 0xFF, 0)
+    RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
+    Jump('show_menu')
+
+
+    label('change_member')
+
+
+    ShowChangeMemberMenu()
+    Jump('show_menu')
+
 
     label('enter_debug_map')
-
-    NewScene('b0101', 0, 0, 0)
+    NewScene('a0000', 0, 0, 0)
     OP_07()
+    RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0xFF), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
+    Jump('show_menu')
+
+
+    label('close_menu')
+    RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0xFF), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
+    Jump('show_menu')
 
     label('menu_return')
 
+    OP_60(0x0)
+    OP_57(0x0)
+    OP_DD()
+    #ClearXXXFlags(0x80)
     OP_54(0xFF)
     Return()

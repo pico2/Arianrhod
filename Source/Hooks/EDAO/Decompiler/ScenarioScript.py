@@ -86,7 +86,9 @@ typedef struct  // 0x24
 
 typedef struct  // 0x40
 {
-/* 0x00 */  UCHAR Dummy[0x3E];
+/* 0x00 */  UCHAR Dummy[0x3C];
+/* 0x3C */  UCHAR InitScenaIndex;
+/* 0x3D */  UCHAR InitFunctionIndex;
 /* 0x3E */  UCHAR EntryScenaIndex;
 /* 0x3F */  UCHAR EntryFunctionIndex;
 
@@ -819,11 +821,8 @@ class ScenarioInfo:
 
             blockoffsetmap[func] = block
 
-        for i in range(fs.size()):
-            if i not in offsetlist:
-                print('%X' % i)
-
-        input()
+        #for i in range(fs.size()): if i not in offsetlist: print('%X' % i)
+        #input()
 
         return codeblocks
 
@@ -965,11 +964,15 @@ class ScenarioInfo:
 
         return lines
 
-    def GenerateHeader(self):
+    def GenerateHeader(self, filename):
+
+        filename = os.path.splitext(os.path.splitext(os.path.basename(filename))[0])[0] + '.bin'
+
         hdr = []
         hdr.append('from EDAOScenaFile import *')
         hdr.append('')
         hdr.append('CreateScenaFile(')
+        hdr.append('    "%s",                # FileName' % filename)
         hdr.append('    "%s",                    # MapName' % self.MapName)
         hdr.append('    "%s",                    # Location' % self.Location)
         hdr.append('    0x%08X,                 # Unknown_14' % self.Unknown_14)
@@ -1015,15 +1018,15 @@ class ScenarioInfo:
 
             hdr.append('')
 
-        AppendScpInfo(self.ScnInfo[SCN_INFO_NPC],       'Npc')
-        AppendScpInfo(self.ScnInfo[SCN_INFO_MONSTER],   'Monster')
-        AppendScpInfo(self.ScnInfo[SCN_INFO_EVENT],     'Event')
-        AppendScpInfo(self.ScnInfo[SCN_INFO_ACTOR],     'Actor')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_NPC],       'DeclNpc')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_MONSTER],   'DeclMonster')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_EVENT],     'DeclEvent')
+        AppendScpInfo(self.ScnInfo[SCN_INFO_ACTOR],     'DeclActor')
 
         index = 0
         for block in self.CodeBlocks:
             s = ('ScpFunction("%s")' % block.Name).ljust(30)
-            hdr.append('%s # %d' % (s, index))
+            hdr.append('%s # %02X, %d' % (s, index, index))
             index += 1
 
         hdr.append('')
@@ -1049,7 +1052,7 @@ class ScenarioInfo:
     def SaveToFile(self, filename):
         lines = []
 
-        lines += self.GenerateHeader()
+        lines += self.GenerateHeader(filename)
 
         blocks = self.FormatCodeBlocks()
 

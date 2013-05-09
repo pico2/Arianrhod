@@ -221,9 +221,6 @@ class BattleActionScriptInfoPort(BattleActionScriptInfo):
 
 actionfile = None
 
-def IsTupleOrList(val):
-    return type(val) == tuple or type(val) == list
-
 def label(labelname):
     pos = actionfile.fs.tell()
     plog('%08X: %s' % (pos, labelname))

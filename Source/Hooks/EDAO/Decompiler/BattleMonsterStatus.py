@@ -288,7 +288,7 @@ class BattleCraftAIInfo:
                 )
 
 def CreateAI(Condition, Probability, Target, TargetCondition, MagicAriaActionIndex, ActionIndex, CraftIndex, Parameters):
-    if type(Parameters) != tuple and type(Parameters) != list:
+    if not IsTupleOrList(Parameters):
         raise Exception('Parameters must be list or tuple')
 
     if len(Parameters) > 4:

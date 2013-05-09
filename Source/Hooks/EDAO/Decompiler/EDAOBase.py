@@ -10,6 +10,9 @@ SEPITH_TOKI = 4
 SEPITH_SORA = 5
 SEPITH_GEN  = 6
 
+def IsTupleOrList(val):
+    return type(val) == tuple or type(val) == list
+
 def ljust_cn(string, n):
     cncount = 0
     for ch in string:

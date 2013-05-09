@@ -21,7 +21,7 @@ class ScenarioInfoPort(ScenarioInfo):
 
 scena = ScenarioInfoPort()
 
-def CreateScenaFile(MapName, Location, Unknown_14, Flags, IncludeList, Unknown_4A, PreInitFunctionIndex, Unknown_51, Information):
+def CreateScenaFile(FileName, MapName, Location, Unknown_14, Flags, IncludeList, Unknown_4A, PreInitFunctionIndex, Unknown_51, Information):
     scena.MapName               = MapName
     scena.Location              = Location
     scena.Unknown_14            = Unknown_14
@@ -39,7 +39,7 @@ def CreateScenaFile(MapName, Location, Unknown_14, Flags, IncludeList, Unknown_4
         scena.IncludedScenario[i] = ScenarioFileIndex(IncludeList[i]).Index()
 
     scena.fs = BytesStream()
-    scena.fs.open(MapName + '.bin', 'wb+')
+    scena.fs.open(FileName, 'wb+')
     scena.fs.seek(0x94)
 
     pos = scena.fs.tell()
@@ -189,7 +189,7 @@ def AddCharChip(*chipindexlist):
         chip = ScenarioChipInfo(chip)
         scena.fs.write(chip.binary())
 
-def Npc(X, Z, Y, Direction, Unknown2, ChipIndex, Unknown_11, NpcIndex, Unknown_14, InitScenaIndex, InitFunctionIndex, TalkScenaIndex, TalkFunctionIndex, Unknown4, Unknown5):
+def DeclNpc(X, Z, Y, Direction, Unknown2, ChipIndex, Unknown_11, NpcIndex, Unknown_14, InitScenaIndex, InitFunctionIndex, TalkScenaIndex, TalkFunctionIndex, Unknown4, Unknown5):
 
     AddScnInfo(SCN_INFO_NPC)
 
@@ -215,7 +215,7 @@ def Npc(X, Z, Y, Direction, Unknown2, ChipIndex, Unknown_11, NpcIndex, Unknown_1
 
     scena.fs.write(npcinfo.binary())
 
-def Monster(X, Z, Y, Unknown_0C, BattleInfoName, Unknown_12, ChipIndex, Unknown_16, StandFrameInfoIndex, MoveFrameInfoIndex):
+def DeclMonster(X, Z, Y, Unknown_0C, BattleInfoName, Unknown_12, ChipIndex, Unknown_16, StandFrameInfoIndex, MoveFrameInfoIndex):
 
     AddScnInfo(SCN_INFO_MONSTER)
 
@@ -234,7 +234,7 @@ def Monster(X, Z, Y, Unknown_0C, BattleInfoName, Unknown_12, ChipIndex, Unknown_
 
     scena.fs.write(moninfo.binary())
 
-def Event(buf):
+def DeclEvent(buf):
     
     AddScnInfo(SCN_INFO_EVENT)
 
@@ -243,7 +243,7 @@ def Event(buf):
 
     scena.fs.write(ev.binary())
 
-def Actor(buf):
+def DeclActor(buf):
 
     AddScnInfo(SCN_INFO_ACTOR)
 
