@@ -56,6 +56,10 @@ LINK32=link.exe
 # Name "EDAO - Win32 Release"
 # Begin Source File
 
+SOURCE=.\Battle.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\edao.cpp
 # End Source File
 # Begin Source File

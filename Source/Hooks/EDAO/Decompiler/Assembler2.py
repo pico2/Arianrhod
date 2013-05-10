@@ -235,8 +235,6 @@ class Disassembler:
 
         for inst in block.Instructions:
 
-            #if inst.Offset == 0x65A: bp()
-
             if inst.Offset != block.Offset and inst.Offset in self.FormattedBlock:
                 continue
 
@@ -248,6 +246,7 @@ class Disassembler:
             handlerdata.TableEntry      = InstructionTable[inst.OpCode]
             handlerdata.Format          = self.FormatInstruction
             handlerdata.LabelMap        = LabelMap
+            handlerdata.CodeBlock       = block
 
             #print('%08X' % inst.Offset)
             #del disasmtbl[inst.Offset]

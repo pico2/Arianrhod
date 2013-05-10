@@ -248,6 +248,19 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_JUMP_RVA(0x273D24, METHOD_PTR(&EDAOFileStream::Uncompress), EDAOFileStream::StubUncompress),
 
+        // hack for boss
+
+        INLINE_HOOK_CALL_RVA_NULL(0x5A36C2, METHOD_PTR(&CBattle::OverWriteBattleStatusWithChrStatus)),
+        INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::GetChrIdForSCraft)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::NakedGetTurnVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedGetPredefinedMagicNumber)),
+
+        INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::NakedGetChrSBreak)),
+
+        INLINE_HOOK_JUMP_RVA(0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
+        INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
+
         //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
         //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),
     };

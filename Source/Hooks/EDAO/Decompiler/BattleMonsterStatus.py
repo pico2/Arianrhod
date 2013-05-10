@@ -360,7 +360,7 @@ class BattleMonsterStatus:
         self.Unknown_53             = 0                     # 0x53
         self.Unknown_54             = 0                     # 0x54
         self.Unknown_55             = 0                     # 0x55
-        self.Symbol            = SymbolFileIndex(0)    # 0x56
+        self.Symbol                 = SymbolFileIndex(0)    # 0x56
         self.Resistance             = 0                     # 0x5A  异常状态抵抗
         self.AttributeRate          = [0] * 7               # 0x5E  USHORT [7]
         self.Sepith                 = [0] * 7               # 0x6C  BYTE [7]

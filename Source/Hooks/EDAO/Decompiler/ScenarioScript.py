@@ -826,7 +826,18 @@ class ScenarioInfo:
 
         return codeblocks
 
+    def GenerateFunctionLabelList(self, blocks):
+        l = []
+        for block in blocks:
+            l.append(block.Name)
+            l += self.GenerateFunctionLabelList(block.CodeBlocks)
+
+        return l
+
     def FormatCodeBlocks(self):
+
+        edao.edao_op_table.FunctionLabelList = self.GenerateFunctionLabelList(self.CodeBlocks)
+
         disasm = Disassembler(edao.edao_op_table)
 
         blocks = []

@@ -1516,26 +1516,7 @@ VOID Init()
         PATCH_FUNCTION(CALL, 0, 0x5826B2, FixAvatarAngle_Magic93Handler,            2, OldFixAvatarAngle_Magic93Handler),
         PATCH_FUNCTION(CALL, 0, 0x5EF96F, GET_METHOD3(GetSBreak),                   10),
         PATCH_FUNCTION(CALL, 0, 0x47002A, MyFindFirstFileA,                         1),
-/*
-        { JUMP, 0x25B93A, Fade,                                     0, OldFade },
-        { CALL, 0x5CCF32, FadeInRate,                               1 },
-        { JUMP, 0x259FAE, GET_METHOD2(Uncompress),                  0, GET_METHOD2(OldUncompress) },
-        { JUMP, 0x25F5EE, GET_METHOD1(FormatSEPath),                0, GET_METHOD1(OldFormatSEPath) },
-        { JUMP, 0x25F91D, GET_METHOD3(CalcCharStatusData),          0, GET_METHOD3(OldCalcCharStatusData) },
-        { CALL, 0x57165F, GET_METHOD3(GetBFaceIndex),               3 },
-        { CALL, 0x574A42, GET_METHOD3(NakedSkipCopyCharStatusData), 2 },
-        { CALL, 0x542DEA, GET_METHOD3(GetCraftData),                2 },
-        { CALL, 0x5AE65E, GET_METHOD3(NakedGetTurnVoice),           5 },
-        { CALL, 0x5ADEB8, GET_METHOD3(NakedGetUnderAttackVoice),    2 },
-        { JUMP, 0x25D85C, GET_METHOD3(GetMagicInfo),                0 },
-        { JUMP, 0x25B043, GET_METHOD3(GetMagicQueryTable),          0 },
-        { JUMP, 0x25C957, GET_METHOD3(GetMagicDescription),         0 },
-        { CALL, 0x5A1286, NakedAS8DHandler,                         1 },
-        { CALL, 0x5876A6, GET_METHOD3(FindEmptyPosition),           0 },
-        { JUMP, 0x25CDBC, GET_METHOD3(IsAvatarLoaded),              0, GET_METHOD3(OldIsAvatarLoaded) },
-        { CALL, 0x5826B2, FixAvatarAngle_Magic93Handler,            2, OldFixAvatarAngle_Magic93Handler},
-        { CALL, 0x5EF96F, GET_METHOD3(GetSBreak),                  10 },
-*/
+
 //        { CALL, 0x47002A, MyFindFirstFileA, 1 },
 
 #if D3D9_VERSION

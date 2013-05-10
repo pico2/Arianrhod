@@ -356,7 +356,7 @@ def OpCodeHandler(op, args):
 
     data.FileStream = BytesStream().openmem()
 
-    print(entry.OpName)
+    #print(entry.OpName)
     inst = OpCodeHandlerPrivate(data)
 
     offset = actionfile.fs.tell()

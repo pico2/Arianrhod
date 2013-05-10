@@ -267,6 +267,9 @@ def ScpFunction(FunctionLabel):
 
     scena.fs.write(struct.pack('<I', INVALID_OFFSET))
 
+def GetFuntionId(FunctionLabel):
+    return scena.ScpFunctionList.index(FunctionLabel)
+
 def PlaceName(X, Z, Y, Flags1, Flags2, Name):
 
     if len(scena.PlaceName) == 0:

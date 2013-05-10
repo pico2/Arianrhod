@@ -379,9 +379,9 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
         return oprtype[opr](value) if opr in oprtype else super().WriteOperand(data, opr, value)
 
     def FormatOperand(self, param):
-        value = param.Value
-        opr = param.Operand
-        flags = param.Flags
+        value   = param.Value
+        opr     = param.Operand
+        flags   = param.Flags
 
         def formatstr(strlist):
             s = BuildStringListFromObjectList(strlist)
@@ -406,6 +406,8 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
         {
             'e' : lambda : FormatExpressionList(value),
             'E' : lambda : FormatExpressionList(value),
+
+            #'F' : lambda : 'GetFuntionId("%s")' % edao_op_table.FunctionLabelList[value],
 
             'S' : lambda : formatstr(value),
         }
