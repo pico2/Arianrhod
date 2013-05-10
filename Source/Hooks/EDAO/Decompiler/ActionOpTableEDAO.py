@@ -440,7 +440,7 @@ edao_as_op_list = \
     inst(AS_5F,             'BB'),
     inst(AS_60,             'B'),
     inst(SetBattleSpeed,    'L'),
-    inst(Voice,             'BHWWWB'),
+    inst(Voice,             'BHHHHB'),
     inst(Sound,             'H'),
     inst(SoundEx,           'HB'),
     inst(AS_66,             'W'),

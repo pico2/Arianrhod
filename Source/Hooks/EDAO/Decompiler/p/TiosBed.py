@@ -19,6 +19,10 @@ StaticCharList = \
 StaticGodList = \
 (
     CharInfo(0xB0, '阿瑞安赫德'),
+    CharInfo(0xB1, '战鬼西格蒙德'),
+    CharInfo(0xB2, '玛丽亚贝尔'),
+    CharInfo(0xB3, '亚里欧斯长官'),
+    CharInfo(0xB4, '风之剑圣亚里欧斯'),
 )
 
 StaticCharMap = {}

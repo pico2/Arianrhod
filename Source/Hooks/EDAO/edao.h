@@ -97,8 +97,40 @@ typedef union
         USHORT                  LastActionIndex;            // 0x180
         USHORT                  CurrentCraftIndex;          // 0x182
 
-        DUMMY_STRUCT(0x57C - 0x184);
+        DUMMY_STRUCT(0x234 - 0x184);
 
+        ULONG                   MaximumHP;                  // 0x234
+        ULONG                   InitialHP;                  // 0x238
+        USHORT                  Level;                      // 0x23C
+        USHORT                  MaximumEP;                  // 0x23E
+        USHORT                  InitialEP;                  // 0x240
+        USHORT                  InitialCP;                  // 0x242
+        USHORT                  EXP;                        // 0x244
+
+        DUMMY_STRUCT(2);
+
+        USHORT                  STR;                        // 0x248
+        USHORT                  DEF;                        // 0x24A
+        USHORT                  ATS;                        // 0x24C
+        USHORT                  ADF;                        // 0x24E
+        USHORT                  DEX;                        // 0x250
+        USHORT                  AGL;                        // 0x252
+        USHORT                  MOV;                        // 0x254
+        USHORT                  SPD;                        // 0x256
+
+        DUMMY_STRUCT(4);
+
+        USHORT                  MaximumCP;                  // 0x25C
+
+        DUMMY_STRUCT(0x3E);
+
+        USHORT                  MoveSPD;                    // 0x29C
+
+        DUMMY_STRUCT(0x54C - 0x29E);
+
+        USHORT                  Equipment[5];               // 0x54C
+        USHORT                  Orbment[7];                 // 0x556
+        CRAFT_AI_INFO           Attack;                     // 0x564
         CRAFT_AI_INFO           MagicAiInfo[80];            // 0x57C
         CRAFT_AI_INFO           CraftAiInfo[15];            // 0xCFC
         CRAFT_AI_INFO           SCraftAiInfo[5];            // 0xE64
@@ -149,6 +181,11 @@ public:
     EDAO* GetEDAO()
     {
         return *(EDAO **)PtrAdd(this, 0x38D24);
+    }
+
+    PVOID GetMSFileBuffer()
+    {
+        return PtrAdd(this, 0x114ED0);
     }
 
     PMONSTER_STATUS GetMonsterStatus()

@@ -364,7 +364,7 @@ def OpCodeHandler(op, args):
         actionfile.DelayFixLabels.append(LabelEntry(lb.Label, lb.Offset + offset))
 
     data.FileStream.seek(0)
-    actionfile.fs.write(data.FileStream.read())
+    fs.write(data.FileStream.read())
 
     return inst
 

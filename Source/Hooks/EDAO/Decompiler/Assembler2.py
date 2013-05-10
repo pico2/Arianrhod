@@ -91,9 +91,12 @@ class Disassembler:
 
         blockref = []
 
+        fileend = Stream.size()
+
         while True:
             pos = Stream.tell()
             if pos in DisasmTable: break
+            if pos >= fileend: break
 
             offsetlist[pos] = True
 

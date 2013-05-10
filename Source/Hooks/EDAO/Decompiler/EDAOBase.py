@@ -144,7 +144,7 @@ class ScenarioFileIndex:
 
 class ChipFileIndex:
 
-    def __init__(self, param):
+    def __init__(self, param = 0):
 
         self.Value = param
 

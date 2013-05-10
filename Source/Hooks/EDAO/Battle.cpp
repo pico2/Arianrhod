@@ -123,12 +123,14 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
         return;
     }
 
-    Craft = &MSData->SCraftAiInfo[countof(MSData->SCraftAiInfo) - 1];
-    for (ULONG_PTR Count = countof(MSData->SCraftAiInfo); Count; --Craft, --Count)
+    Craft = MSData->SCraftAiInfo;
+    for (ULONG_PTR Count = countof(MSData->SCraftAiInfo); Count; ++Craft, --Count)
     {
-        if (Craft->CraftIndex != 0)
+        if (Craft->CraftIndex == 0)
             break;
     }
+
+    Craft = Craft == MSData->SCraftAiInfo ? Craft : (Craft - 1);
 
     MSData->SelectedCraft.MagicAriaActionIndex  = Craft->MagicAriaActionIndex;
     MSData->SelectedCraft.ActionIndex           = Craft->ActionIndex;
