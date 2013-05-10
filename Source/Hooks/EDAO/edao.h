@@ -207,6 +207,11 @@ public:
         return *(CBattle **)PtrAdd(this, 0x82BA4);
     }
 
+    CActor* GetActorInfo()
+    {
+        return (CActor *)PtrAdd(this, 0x384EC);
+    }
+
     PUSHORT GetSBreakList()
     {
         return (PUSHORT)PtrAdd(this, 0x7EE10);
