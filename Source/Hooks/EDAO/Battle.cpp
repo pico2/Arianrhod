@@ -31,13 +31,13 @@ ULONG FASTCALL CBattle::GetPredefinedMagicNumber(PMONSTER_STATUS MSData)
     return MagicDefined;
 }
 
-NAKED VOID CBattle::OverWriteBattleStatusWithChrStatus()
+NAKED VOID CBattle::OverWriteCraftWithChrCraft()
 {
     INLINE_ASM
     {
         mov     dword ptr [ebp - 20h], 0x0;
         mov     ecx, [ebp - 08h];
-        call    CBattle::GetActorInfo
+        call    CBattle::GetActor
         mov     ecx, eax;
         call    CActor::GetPartyChipMap
         mov     edx, dword ptr [ebp - 14h];
@@ -51,12 +51,80 @@ NAKED VOID CBattle::OverWriteBattleStatusWithChrStatus()
     }
 }
 
+NAKED VOID CBattle::NakedOverWriteBattleStatusWithChrStatus()
+{
+    INLINE_ASM
+    {
+        mov     ecx, [ebp - 08h];
+        mov     edx, edi;
+        push    eax;
+        call    CBattle::OverWriteBattleStatusWithChrStatus
+        ret;
+    }
+}
+
+PMONSTER_STATUS FASTCALL CBattle::OverWriteBattleStatusWithChrStatus(PMONSTER_STATUS MSData, PCHAR_STATUS ChrStatus)
+{
+    MSData = PtrSub(MSData, FIELD_OFFSET(MONSTER_STATUS, ChrStatus[BattleStatusFinal].MaximumHP));
+
+    PCHAR_STATUS Raw = &MSData->ChrStatus[BattleStatusRaw];
+    PCHAR_STATUS Final = &MSData->ChrStatus[BattleStatusFinal];
+
+    *Final = *ChrStatus;
+
+    if (GetActor()->GetPartyChipMap()[MSData->CharID] < MINIMUM_CUSTOM_CHAR_ID)
+        return MSData;
+
+    Final->MaximumHP    += Raw->MaximumHP   / 2;
+    Final->InitialHP    += Raw->InitialHP   / 2;
+    Final->MaximumEP    += Raw->MaximumEP   / 2;
+    Final->InitialEP    += Raw->InitialEP   / 2;
+    Final->STR          += Raw->STR         * 2 / 3;
+    Final->DEF          += Raw->DEF         * 2 / 3;
+    Final->ATS          += Raw->ATS         * 2 / 3;
+    Final->ADF          += Raw->ADF         * 2 / 3;
+    Final->DEX          += Raw->DEX         * 2 / 3;
+    Final->AGL          += Raw->AGL         * 2 / 3;
+    Final->MOV          += Raw->MOV         * 2 / 3;
+    Final->SPD          += Raw->SPD         * 2 / 3;
+
+    return MSData;
+}
+
+NAKED VOID CBattle::NakedIsChrStatusNeedRefresh()
+{
+    INLINE_ASM
+    {
+        mov     ecx, [ebp - 0Ch];
+        mov     edx, dword ptr [ebp - 8Ch];
+        push    dword ptr [ebp - 25E8h];
+        push    eax;
+        call    CBattle::IsChrStatusNeedRefresh
+        neg     eax;
+        ret;
+    }
+}
+
+BOOL FASTCALL CBattle::IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, ULONG_PTR PrevLevel)
+{
+    PMONSTER_STATUS MSData;
+
+    MSData = GetMonsterStatus() + ChrPosition;
+
+    if (GetActor()->GetPartyChipMap()[MSData->CharID] < MINIMUM_CUSTOM_CHAR_ID)
+    {
+        return CurrentStatus->Level != PrevLevel;
+    }
+
+    return TRUE;
+}
+
 NAKED ULONG CBattle::GetChrIdForSCraft()
 {
     INLINE_ASM
     {
         mov     ecx, [ebp - 08h];
-        call    CBattle::GetActorInfo
+        call    CBattle::GetActor
         mov     ecx, eax;
         call    CActor::GetPartyChipMap
         mov     ecx, dword ptr [ebp - 14h];
@@ -85,7 +153,7 @@ ULONG FASTCALL CBattle::GetTurnVoiceChrId(PMONSTER_STATUS MSData)
     ULONG ChrId, PartyId;
 
     ChrId = MSData->CharID;
-    PartyId = GetActorInfo()->GetPartyChipMap()[ChrId];
+    PartyId = GetActor()->GetPartyChipMap()[ChrId];
 
     return PartyId < MINIMUM_CUSTOM_CHAR_ID ? ChrId : PartyId;
 }
@@ -116,7 +184,7 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
     ULONG           ChrId;
     PCRAFT_AI_INFO  Craft;
 
-    ChrId = GetBattle()->GetActorInfo()->GetPartyChipMap()[MSData->CharID];
+    ChrId = GetBattle()->GetActor()->GetPartyChipMap()[MSData->CharID];
     if (ChrId < MINIMUM_CUSTOM_CHAR_ID)
     {
         MSData->CurrentActionIndex = GetSBreakList()[MSData->CharID];

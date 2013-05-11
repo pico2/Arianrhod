@@ -221,6 +221,7 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x01,      1, 0x40991D),    // cpu
         PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
         PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
+        PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
@@ -250,11 +251,13 @@ BOOL Initialize(PVOID BaseAddress)
 
         // hack for boss
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5A36C2, METHOD_PTR(&CBattle::OverWriteBattleStatusWithChrStatus)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A36C2, METHOD_PTR(&CBattle::OverWriteCraftWithChrCraft)),
         INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::GetChrIdForSCraft)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::NakedGetTurnVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedGetPredefinedMagicNumber)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::NakedOverWriteBattleStatusWithChrStatus)),
+        INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::NakedIsChrStatusNeedRefresh)),
 
         INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::NakedGetChrSBreak)),
 

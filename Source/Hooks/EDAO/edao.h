@@ -16,7 +16,7 @@ typedef struct
 {
     ULONG Magic;
     ULONG CompressedSize;
-    
+
 } UCL_COMPRESS_HEADER;
 
 
@@ -75,6 +75,51 @@ enum
     ACTION_ITEM,
 };
 
+enum
+{
+    BattleStatusRaw,
+    BattleStatusFinal,
+};
+
+
+typedef union
+{
+    DUMMY_STRUCT(0x34);
+
+    struct
+    {
+        ULONG                   MaximumHP;                  // 0x234
+        ULONG                   InitialHP;                  // 0x238
+        USHORT                  Level;                      // 0x23C
+        USHORT                  MaximumEP;                  // 0x23E
+        USHORT                  InitialEP;                  // 0x240
+        USHORT                  InitialCP;                  // 0x242
+        USHORT                  EXP;                        // 0x244
+
+        DUMMY_STRUCT(2);
+
+        USHORT                  STR;                        // 0x248
+        USHORT                  DEF;                        // 0x24A
+        USHORT                  ATS;                        // 0x24C
+        USHORT                  ADF;                        // 0x24E
+        USHORT                  DEX;                        // 0x250
+        USHORT                  AGL;                        // 0x252
+        USHORT                  MOV;                        // 0x254
+        USHORT                  SPD;                        // 0x256
+
+        DUMMY_STRUCT(4);
+
+        USHORT                  MaximumCP;                  // 0x25C
+
+        DUMMY_STRUCT(2);                                    // 0x25E
+
+        USHORT                  RNG;                        // 0x260
+
+        DUMMY_STRUCT(2);
+    };
+
+} CHAR_STATUS, *PCHAR_STATUS;
+
 typedef union
 {
     DUMMY_STRUCT(0x2424);
@@ -99,32 +144,9 @@ typedef union
 
         DUMMY_STRUCT(0x234 - 0x184);
 
-        ULONG                   MaximumHP;                  // 0x234
-        ULONG                   InitialHP;                  // 0x238
-        USHORT                  Level;                      // 0x23C
-        USHORT                  MaximumEP;                  // 0x23E
-        USHORT                  InitialEP;                  // 0x240
-        USHORT                  InitialCP;                  // 0x242
-        USHORT                  EXP;                        // 0x244
+        CHAR_STATUS ChrStatus[2];                           // 0x234
 
-        DUMMY_STRUCT(2);
-
-        USHORT                  STR;                        // 0x248
-        USHORT                  DEF;                        // 0x24A
-        USHORT                  ATS;                        // 0x24C
-        USHORT                  ADF;                        // 0x24E
-        USHORT                  DEX;                        // 0x250
-        USHORT                  AGL;                        // 0x252
-        USHORT                  MOV;                        // 0x254
-        USHORT                  SPD;                        // 0x256
-
-        DUMMY_STRUCT(4);
-
-        USHORT                  MaximumCP;                  // 0x25C
-
-        DUMMY_STRUCT(0x3E);
-
-        USHORT                  MoveSPD;                    // 0x29C
+        USHORT MoveSPD;                                     // 0x29C
 
         DUMMY_STRUCT(0x54C - 0x29E);
 
@@ -173,7 +195,7 @@ public:
     VOID USE_CRAFT_FOR_CHECKING();
     VOID USE_SCRAFT_FOR_CHECKING();
 
-    CActor* GetActorInfo()
+    CActor* GetActor()
     {
         return *(CActor **)PtrAdd(this, 0x38D28);
     }
@@ -198,7 +220,13 @@ public:
         return *(PULONG)PtrAdd(this, 0x113080);
     }
 
-    VOID OverWriteBattleStatusWithChrStatus();
+    VOID OverWriteCraftWithChrCraft();
+    PMONSTER_STATUS FASTCALL OverWriteBattleStatusWithChrStatus(PMONSTER_STATUS MSData, PCHAR_STATUS ChrStatus);
+    VOID NakedOverWriteBattleStatusWithChrStatus();
+
+    VOID NakedIsChrStatusNeedRefresh();
+    BOOL FASTCALL IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, ULONG_PTR PrevLevel);
+
     ULONG GetChrIdForSCraft();
 
     VOID  NakedGetTurnVoiceChrId();
@@ -207,7 +235,6 @@ public:
     VOID  NakedGetSBreakVoiceChrId();
 
     VOID NakedGetPredefinedMagicNumber();
-
     ULONG FASTCALL GetPredefinedMagicNumber(PMONSTER_STATUS MSData);
 };
 
@@ -220,6 +247,20 @@ public:
     EDAO* GetEDAO()
     {
         return (EDAO *)PtrSub(this, 0x4D3E8);
+    }
+
+    PCHAR_STATUS GetChrStatus(ULONG_PTR ChrId)
+    {
+        return &((PCHAR_STATUS)PtrAdd(this, 0x2BBBC))[ChrId];
+    }
+
+    VOID CalcChrFinalStatus(ULONG ChrId, PCHAR_STATUS FinalStatus, PCHAR_STATUS RawStatus)
+    {
+        TYPE_OF(&CGlobal::CalcChrFinalStatus) f;
+        
+        *(PVOID *)&f = (PVOID)0x677B36;
+        
+        return (this->*f)(ChrId, FinalStatus, RawStatus);
     }
 
     static TYPE_OF(&CGlobal::GetMagicDescription) StubGetMagicDescription;
@@ -244,7 +285,7 @@ public:
         return *(CBattle **)PtrAdd(this, 0x82BA4);
     }
 
-    CActor* GetActorInfo()
+    CActor* GetActor()
     {
         return (CActor *)PtrAdd(this, 0x384EC);
     }
@@ -254,10 +295,19 @@ public:
         return (PUSHORT)PtrAdd(this, 0x7EE10);
     }
 
+    VOID CalcChrRawStatusFromLevel(ULONG ChrId, ULONG Level, ULONG Unknown = 0)
+    {
+        TYPE_OF(&EDAO::CalcChrRawStatusFromLevel) f;
+        
+        *(PVOID *)&f = (PVOID)0x675FF7;
+
+        return (this->*f)(ChrId, Level, Unknown);
+    }
+
     VOID NakedGetChrSBreak();
     VOID FASTCALL GetChrSBreak(PMONSTER_STATUS MSData);
 
-    // hook 
+    // hook
 public:
     VOID THISCALL Fade(ULONG Param1, ULONG Param2, ULONG Param3, ULONG Param4, ULONG Param5, ULONG Param6);
     BOOL THISCALL CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex);

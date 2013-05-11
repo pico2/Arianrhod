@@ -567,7 +567,13 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    abort();
+    union
+    {
+        DUMMY_STRUCT(40);
+        ULONG l;
+    } xxx [2];
+
+    PrintConsoleA("%d\n", sizeof(xxx));
 
     return;
 
