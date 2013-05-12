@@ -136,26 +136,62 @@ NAKED ULONG CBattle::GetChrIdForSCraft()
     }
 }
 
+ULONG FASTCALL CBattle::GetVoiceChrIdWorker(PMONSTER_STATUS MSData)
+{
+    ULONG ChrId, PartyId;
+    
+    ChrId = MSData->CharID;
+    PartyId = GetActor()->GetPartyChipMap()[ChrId];
+    
+    return PartyId < MINIMUM_CUSTOM_CHAR_ID ? ChrId : PartyId;
+}
+
+/*++
+
+  mov     word ptr [ebp-const], r16
+  mov     r32, const
+  mov     word ptr [ebp-const], r16
+  mov     r32, const
+  mov     word ptr [ebp-const], r16
+  mov     r32, [ebp+8]
+  movzx   r32, [r32+0A]
+
+--*/
+
 NAKED VOID CBattle::NakedGetTurnVoiceChrId()
 {
     INLINE_ASM
     {
         mov     ecx, [ebp - 0Ch];
         mov     edx, [ebp + 08h];
-        call    CBattle::GetTurnVoiceChrId;
+        call    CBattle::GetVoiceChrIdWorker;
         mov     ecx, eax;
         ret;
     }
 }
 
-ULONG FASTCALL CBattle::GetTurnVoiceChrId(PMONSTER_STATUS MSData)
+NAKED VOID CBattle::NakedGetReplySupportVoiceChrId()
 {
-    ULONG ChrId, PartyId;
+    INLINE_ASM
+    {
+        jmp CBattle::NakedGetTurnVoiceChrId;
+    }
+}
 
-    ChrId = MSData->CharID;
-    PartyId = GetActor()->GetPartyChipMap()[ChrId];
+NAKED VOID CBattle::NakedGetRunawayVoiceChrId()
+{
+    INLINE_ASM
+    {
+        jmp CBattle::NakedGetTurnVoiceChrId;
+    }
+}
 
-    return PartyId < MINIMUM_CUSTOM_CHAR_ID ? ChrId : PartyId;
+NAKED VOID CBattle::NakedGetTeamRushVoiceChrId()
+{
+    INLINE_ASM
+    {
+        jmp CBattle::NakedGetTurnVoiceChrId;
+    }
 }
 
 NAKED VOID CBattle::NakedGetSBreakVoiceChrId()

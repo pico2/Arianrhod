@@ -120,6 +120,17 @@ typedef union
 
 } CHAR_STATUS, *PCHAR_STATUS;
 
+typedef struct
+{
+    ULONG               ConditionFlags;
+    PVOID               Effect;
+    BYTE                Unknown2[2];
+    USHORT              ConditionRate;
+    ULONG               ATLeft;
+    ULONG               Unknown4;
+
+} MS_EFFECT_INFO;
+
 typedef union
 {
     DUMMY_STRUCT(0x2424);
@@ -148,7 +159,11 @@ typedef union
 
         USHORT MoveSPD;                                     // 0x29C
 
-        DUMMY_STRUCT(0x54C - 0x29E);
+        DUMMY_STRUCT(2);
+
+        MS_EFFECT_INFO          EffectInfo[0x14];           // 0x2A0
+
+        DUMMY_STRUCT(0x54C - 0x430);
 
         USHORT                  Equipment[5];               // 0x54C
         USHORT                  Orbment[7];                 // 0x556
@@ -229,10 +244,13 @@ public:
 
     ULONG GetChrIdForSCraft();
 
-    VOID  NakedGetTurnVoiceChrId();
-    ULONG FASTCALL GetTurnVoiceChrId(PMONSTER_STATUS MSData);
+    VOID NakedGetTurnVoiceChrId();
+    VOID NakedGetReplySupportVoiceChrId();
+    VOID NakedGetRunawayVoiceChrId();
+    VOID NakedGetTeamRushVoiceChrId();
+    VOID NakedGetSBreakVoiceChrId();
 
-    VOID  NakedGetSBreakVoiceChrId();
+    ULONG FASTCALL GetVoiceChrIdWorker(PMONSTER_STATUS MSData);
 
     VOID NakedGetPredefinedMagicNumber();
     ULONG FASTCALL GetPredefinedMagicNumber(PMONSTER_STATUS MSData);
