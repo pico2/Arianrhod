@@ -139,10 +139,10 @@ NAKED ULONG CBattle::GetChrIdForSCraft()
 ULONG FASTCALL CBattle::GetVoiceChrIdWorker(PMONSTER_STATUS MSData)
 {
     ULONG ChrId, PartyId;
-    
+
     ChrId = MSData->CharID;
     PartyId = GetActor()->GetPartyChipMap()[ChrId];
-    
+
     return PartyId < MINIMUM_CUSTOM_CHAR_ID ? ChrId : PartyId;
 }
 
@@ -245,6 +245,21 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
 /************************************************************************
   CGlobal
 ************************************************************************/
+
+PCREATE_INFO CGlobal::GetMagicData(USHORT MagicId)
+{
+    if (MagicId < MINIMUM_CUSTOM_CRAFT_INDEX)
+        return (this->*StubGetMagicData)(MagicId);
+
+    CBattle*        Battle;
+    PMONSTER_STATUS MSData;
+
+    Battle = GetEDAO()->GetBattle();
+
+    MSData = &Battle->GetMonsterStatus()[Battle->GetCurrentChrIndex()];
+
+    return &MSData->CraftInfo[MagicId - MINIMUM_CUSTOM_CRAFT_INDEX];
+}
 
 PCSTR CGlobal::GetMagicDescription(USHORT MagicId)
 {

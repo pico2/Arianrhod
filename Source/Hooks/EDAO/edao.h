@@ -35,8 +35,7 @@ typedef struct  // 0x18
 
 typedef struct
 {
-    BYTE    Index;
-    BYTE    ActionIndex;
+    USHORT  ActionIndex;
     BYTE    Target;
     BYTE    Unknown_3;
     BYTE    Attribute;
@@ -48,7 +47,7 @@ typedef struct
     BYTE    AriaTime;
     BYTE    SkillTime;
     USHORT  EP_CP;
-    USHORT  Unknown_0E;
+    USHORT  RangeSize2;
     USHORT  State1Parameter;
     USHORT  State1Time;
     USHORT  State2Parameter;
@@ -259,8 +258,9 @@ public:
 class CGlobal
 {
 public:
-    PCSTR GetMagicDescription(USHORT MagicId);
-    PBYTE GetMagicQueryTable(USHORT MagicId);
+    PCREATE_INFO    GetMagicData(USHORT MagicId);
+    PCSTR           GetMagicDescription(USHORT MagicId);
+    PBYTE           GetMagicQueryTable(USHORT MagicId);
 
     EDAO* GetEDAO()
     {
@@ -281,10 +281,12 @@ public:
         return (this->*f)(ChrId, FinalStatus, RawStatus);
     }
 
-    static TYPE_OF(&CGlobal::GetMagicDescription) StubGetMagicDescription;
-    static TYPE_OF(&CGlobal::GetMagicQueryTable) StubGetMagicQueryTable;
+    static TYPE_OF(&CGlobal::GetMagicData)          StubGetMagicData;
+    static TYPE_OF(&CGlobal::GetMagicDescription)   StubGetMagicDescription;
+    static TYPE_OF(&CGlobal::GetMagicQueryTable)    StubGetMagicQueryTable;
 };
 
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = NULL;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = NULL;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = NULL;
 

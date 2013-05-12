@@ -274,6 +274,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::NakedGetChrSBreak)),
 
+        INLINE_HOOK_JUMP_RVA(0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
         INLINE_HOOK_JUMP_RVA(0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
         INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
 
