@@ -106,7 +106,8 @@ GetFileName(
     PWCHAR  pszFileName;
 
     static WCHAR szDataPath[]   = L"data\\";
-    static WCHAR szPatch[]      = L"patch\\";
+    static WCHAR szPatch[]      = L"patch\\\\";
+    static WCHAR szPatch2[]     = L"patch2\\";
 
     if (IsInputUnicode)
     {
@@ -144,6 +145,13 @@ GetFileName(
         pszFileName -= countof(szDataPath) - 2;
         CopyStruct(pszFileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
 
+        if (IsPathExists(pszHooked))
+        {
+            pszFileName = pszHooked;
+            break;
+        }
+
+        CopyStruct(pszFileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
         pszFileName = IsPathExists(pszHooked) ? pszHooked : pszOriginal;
     }
 

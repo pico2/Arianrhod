@@ -4,18 +4,9 @@
 
 #define NRV2E
 
-#include <Windows.h>
-#include "my_headers.h"
-#include "my_commsrc.h"
-#include <ucl/ucl_conf.h>
-#include <ucl/ucl.h>
-#include <ucl/n2_99.c>
-#include <ucl/ucl_init.c>
-#include <ucl/ucl_ptr.c>
-#include <ucl/ucl_util.c>
-#include <ucl/alloc.c>
+#include "MyLibrary.cpp"
 
-OVERLOAD_CPP_NEW_WITH_HEAP(CMem::GetGlobalHeap())
+ML_OVERLOAD_NEW
 
 typedef struct
 {
@@ -159,7 +150,7 @@ ULONG Compress(PVOID pvOutput, ULONG OutBufferSize, PVOID pvInput, ULONG InputSi
         ULONG CompressedSize;
     } *pHeader;
 
-    FillMemory(&UclConfig, sizeof(UclConfig), -1);
+    FillMemory(&UclConfig, sizeof(UclConfig), (BYTE)-1);
     UclConfig.bb_endian  = 0;
     UclConfig.bb_size    = 32;
     UclConfig.max_offset = 0x3FFFFF;
@@ -167,16 +158,13 @@ ULONG Compress(PVOID pvOutput, ULONG OutBufferSize, PVOID pvInput, ULONG InputSi
     *(PULONG_PTR)&pHeader = (ULONG_PTR)pvOutput;
     pHeader->CompressedSize = OutBufferSize - sizeof(*pHeader);
 
-    Result = ucl_nrv2e_99_compress(
-                (PBYTE)pvInput,
-                InputSize,
-                (PBYTE)(pHeader + 1),
-                (PUINT)&pHeader->CompressedSize,
-                NULL,
-                10,
-                &UclConfig,
-                NULL
-             );
+    //PVOID WorkSpace;
+    //ULONG CompressBufferWorkSpaceSize, CompressFragmentWorkSpaceSize;
+    //RtlGetCompressionWorkSpaceSize(3, &CompressBufferWorkSpaceSize, &CompressFragmentWorkSpaceSize);
+    //WorkSpace = AllocateMemoryP(CompressBufferWorkSpaceSize + CompressFragmentWorkSpaceSize);
+    //RtlCompressBuffer(COMPRESSION_FORMAT_DEFAULT, pvInput, InputSize, (PUCHAR)(pHeader + 1), OutBufferSize, 0, &pHeader->CompressedSize, WorkSpace);
+
+    Result = UCL_NRV2E_Compress(pvInput, InputSize, pHeader + 1, &pHeader->CompressedSize);
 
     pHeader->Magic = UCL_COMPRESS_MAGIC;
 
@@ -217,20 +205,20 @@ int CDECL compare(COLOR_REF *p1, COLOR_REF *p2)
     return 1;
 }
 
-HRESULT InitPaletteColors(COLOR_REF *pColor, PULONG pColorCount, IMG_BITMAP_HEADER *pBmp, PVOID pvRaw)
+HRESULT InitPaletteColors(COLOR_REF *pColor, PULONG pColorCount, IMAGE_BITMAP_HEADER *pBmp, PVOID pvRaw)
 {
     LONG Stride, ColorCount;
     PULONG pRaw, pRawBase;
     COLOR_REF *p;
 
     ColorCount = 0;
-    Stride = (pBmp->Info.dwWidth * pBmp->Info.wBit / 8 + 3) & ~3;
+    Stride = (pBmp->Info.Width * pBmp->Info.Bit / 8 + 3) & ~3;
 
     pRawBase = (PULONG)pvRaw;
-    for (ULONG Height = pBmp->Info.dwHeight; Height; --Height)
+    for (ULONG Height = pBmp->Info.Height; Height; --Height)
     {
         pRaw = pRawBase;
-        for (ULONG Width = pBmp->Info.dwWidth; Width; --Width)
+        for (ULONG Width = pBmp->Info.Width; Width; --Width)
         {
             LONG  Index;
             ULONG Color;
@@ -379,21 +367,21 @@ HRESULT ConvertBmp32ToItp(PWCHAR pszFileName)
     ULONG FileSize, ColorCount;
     FILE *fp;
     COLOR_REF *pColors;
-    IMG_BITMAP_HEADER Bmp;
+    IMAGE_BITMAP_HEADER Bmp;
 
     fp = _wfopen(pszFileName, L"rb");
     if (fp == NULL)
         return TYPE_E_IOERROR;
 
     fread(&Bmp, sizeof(Bmp), 1, fp);
-    if (Bmp.wTag != TAG2('BM') || Bmp.Info.wBit != 32)
+    if (Bmp.Tag != TAG2('BM') || Bmp.Info.Bit != 32)
     {
         PrintConsoleW(L"%s: 32-bit bmp only\n", pszFileName);
         fclose(fp);
         return TYPE_E_UNSUPFORMAT;
     }
 
-    FileSize = Bmp.dwFileSize - sizeof(Bmp);
+    FileSize = Bmp.FileSize - sizeof(Bmp);
     pvBitmap = new BYTE[FileSize];
     if (pvBitmap == NULL)
     {
@@ -409,11 +397,11 @@ HRESULT ConvertBmp32ToItp(PWCHAR pszFileName)
     if (Bmp.Info.dwHeight < 0)
         Bmp.Info.dwHeight = -Bmp.Info.dwHeight;
 */
-    pColors = new COLOR_REF[Bmp.Info.dwWidth * Bmp.Info.dwHeight];
+    pColors = new COLOR_REF[Bmp.Info.Width * Bmp.Info.Height];
     InitPaletteColors(pColors, &ColorCount, &Bmp, pvBitmap);
 
     //  Header + PaletteCount + Palette + ColorIndex
-    FileSize = sizeof(ITP_3E9_HEADER) + sizeof(ULONG) + 256 * sizeof(ULONG) + Bmp.Info.dwWidth * Bmp.Info.dwHeight;
+    FileSize = sizeof(ITP_3E9_HEADER) + sizeof(ULONG) + 256 * sizeof(ULONG) + Bmp.Info.Width * Bmp.Info.Height;
     pvItp = new BYTE[FileSize];
 
     GenerateItp3E8(
@@ -422,13 +410,13 @@ HRESULT ConvertBmp32ToItp(PWCHAR pszFileName)
         pColors,
         ColorCount,
         pvBitmap,
-        Bmp.Info.dwWidth,
-        Bmp.Info.dwHeight,
-        (Bmp.Info.dwWidth * Bmp.Info.wBit / 8 + 3) & ~3
+        Bmp.Info.Width,
+        Bmp.Info.Height,
+        (Bmp.Info.Width * Bmp.Info.Bit / 8 + 3) & ~3
     );
 
-    lstrcpyW(szFile, pszFileName);
-    lstrcpyW(findextw(szFile), L".itp");
+    StrCopyW(szFile, pszFileName);
+    StrCopyW(findextw(szFile), L".itp");
     fp = _wfopen(szFile, L"wb");
     if (fp != NULL)
     {
@@ -445,21 +433,21 @@ HRESULT ConvertBmp32ToItp(PWCHAR pszFileName)
 
 VOID MergeAlpha(PVOID pv8Bit, PVOID pv32Bit)
 {
-    IMG_BITMAP_HEADER *p8, *p32;
+    IMAGE_BITMAP_HEADER *p8, *p32;
     PBYTE   pb8, pb32, pb32Base;
     LONG    Stride, Height, Width;
     PULONG  pPalette;
 
-    p8  = (IMG_BITMAP_HEADER *)pv8Bit;
-    p32 = (IMG_BITMAP_HEADER *)pv32Bit;
+    p8  = (IMAGE_BITMAP_HEADER *)pv8Bit;
+    p32 = (IMAGE_BITMAP_HEADER *)pv32Bit;
 
-    pb8     = (PBYTE)p8 + p8->dwRawOffset;
-    pb32    = (PBYTE)p32 + p32->dwRawOffset;
+    pb8     = (PBYTE)p8 + p8->RawOffset;
+    pb32    = (PBYTE)p32 + p32->RawOffset;
     pPalette = (PULONG)(p8 + 1);
 
-    Stride = GetBitmapStride(p32->Info.dwWidth, 32);
-    Height = p8->Info.dwHeight;
-    Width  = p8->Info.dwWidth;
+    Stride = GetBitmapStride(p32->Info.Width, 32);
+    Height = p8->Info.Height;
+    Width  = p8->Info.Width;
 
     pb32Base = pb32 + (Height - 1) * Stride;
 
@@ -505,13 +493,13 @@ HRESULT Bitmap32ToItp3E9(PVOID pv32Bit, PVOID pvItp)
 {
     LONG    Stride, Width, Height;
     PBYTE   pbItp, pb32Bit, pb32BitBase;
-    IMG_BITMAP_HEADER *pHeader;
+    IMAGE_BITMAP_HEADER *pHeader;
 
-    pHeader = (IMG_BITMAP_HEADER *)pv32Bit;
+    pHeader = (IMAGE_BITMAP_HEADER *)pv32Bit;
     pbItp   = (PBYTE)pvItp;
 
-    Width   = pHeader->Info.dwWidth;
-    Height  = pHeader->Info.dwHeight;
+    Width   = pHeader->Info.Width;
+    Height  = pHeader->Info.Height;
 
     *(PULONG)&pbItp[0] = 0x3E9;
     *(PULONG)&pbItp[4] = Width;
@@ -522,7 +510,7 @@ HRESULT Bitmap32ToItp3E9(PVOID pv32Bit, PVOID pvItp)
     LONG w, h;
 
     Stride      = GetBitmapStride(Width, 32);
-    pb32BitBase = (PBYTE)pHeader + pHeader->dwRawOffset + (Height - 1) * Stride;
+    pb32BitBase = (PBYTE)pHeader + pHeader->RawOffset + (Height - 1) * Stride;
 
     h = Height;
     do
@@ -555,18 +543,17 @@ ForceInline Void main2(Int argc, WChar **argv)
     PVOID pvBuffer, pvOutput, pvCompressed;
     ULONG BufferSize, OutBufferSize, CompressedBufferSize, FileSize, OutSize;
     WCHAR file[MAX_PATH];
-    CMem  m;
 
     BufferSize              = 0x100000;
     OutBufferSize           = BufferSize;
     CompressedBufferSize    = BufferSize;
-    pvBuffer                = m.Alloc(BufferSize);
-    pvOutput                = m.Alloc(OutBufferSize);
-    pvCompressed            = m.Alloc(CompressedBufferSize);
+    pvBuffer                = AllocateMemoryP(BufferSize);
+    pvOutput                = AllocateMemoryP(OutBufferSize);
+    pvCompressed            = AllocateMemoryP(CompressedBufferSize);
 
     while (--argc)
     {
-        IMG_BITMAP_HEADER *pHeader;
+        IMAGE_BITMAP_HEADER *pHeader;
 
         fp = _wfopen(*++argv, L"rb");
         if (fp == NULL)
@@ -576,27 +563,27 @@ ForceInline Void main2(Int argc, WChar **argv)
         if (FileSize > BufferSize)
         {
             BufferSize  = FileSize;
-            pvBuffer    = m.ReAlloc(pvBuffer, BufferSize);
+            pvBuffer    = ReAllocateMemoryP(pvBuffer, BufferSize);
         }
 
         fread(pvBuffer, FileSize, 1, fp);
         fclose(fp);
 
-        lstrcpyW(file, *argv);
-        lstrcpyW(findextw(file), L".itp");
+        StrCopyW(file, *argv);
+        StrCopyW(findextw(file), L".itp");
         fp = _wfopen(file, L"wb");
         if (fp == NULL)
             continue;
 
-        pHeader = (IMG_BITMAP_HEADER *)pvBuffer;
+        pHeader = (IMAGE_BITMAP_HEADER *)pvBuffer;
 
-        OutSize  = 4 + sizeof(pHeader->Info.dwWidth) + sizeof(pHeader->Info.dwHeight);
-        OutSize += pHeader->Info.dwWidth * pHeader->Info.dwHeight * 2;
+        OutSize  = 4 + sizeof(pHeader->Info.Width) + sizeof(pHeader->Info.Height);
+        OutSize += pHeader->Info.Width * pHeader->Info.Height * 2;
 
         if (OutSize > OutBufferSize)
         {
             OutBufferSize = OutSize;
-            pvOutput = m.ReAlloc(pvOutput, OutBufferSize);
+            pvOutput = ReAllocateMemoryP(pvOutput, OutBufferSize);
         }
 
         Bitmap32ToItp3E9(pvBuffer, pvOutput);
@@ -604,7 +591,7 @@ ForceInline Void main2(Int argc, WChar **argv)
         if (CompressedBufferSize < OutSize * 4)
         {
             CompressedBufferSize = OutSize * 4;
-            pvCompressed = m.ReAlloc(pvCompressed, CompressedBufferSize);
+            pvCompressed = ReAllocateMemoryP(pvCompressed, CompressedBufferSize);
         }
 
         ITP_3E9_HEADER *pItpHeader = (ITP_3E9_HEADER *)pvOutput;
@@ -621,9 +608,9 @@ ForceInline Void main2(Int argc, WChar **argv)
         fclose(fp);
     }
 
-    m.Free(pvBuffer);
-    m.Free(pvOutput);
-    m.Free(pvCompressed);
+    FreeMemoryP(pvBuffer);
+    FreeMemoryP(pvOutput);
+    FreeMemoryP(pvCompressed);
 }
 
 #else
@@ -682,22 +669,21 @@ ForceInline Void main2(Int argc, WChar **argv)
     PVOID pvBuffer, pvOutput, pvCompressed;
     ULONG BufferSize, OutBufferSize, CompressedBufferSize, FileSize, OutSize;
     WCHAR file[MAX_PATH];
-    CMem  m;
 
     ITC_ENTRY Entry[160], *pEntry;
 
     BufferSize              = 0x100000;
     OutBufferSize           = BufferSize;
     CompressedBufferSize    = BufferSize;
-    pvBuffer                = m.Alloc(BufferSize);
-    pvOutput                = m.Alloc(OutBufferSize);
-    pvCompressed            = m.Alloc(CompressedBufferSize);
+    pvBuffer                = AllocateMemoryP(BufferSize);
+    pvOutput                = AllocateMemoryP(OutBufferSize);
+    pvCompressed            = AllocateMemoryP(CompressedBufferSize);
 
     while (--argc)
     {
         ULONG               Header, Offset, Index;
         PWCHAR              pszUnderLine, pszIndex;
-        IMG_BITMAP_HEADER  *pHeader;
+        IMAGE_BITMAP_HEADER  *pHeader;
 
         ++argv;
         pszUnderLine = wcsrchr(*argv, '_');
@@ -708,7 +694,7 @@ ForceInline Void main2(Int argc, WChar **argv)
 
         pszIndex    = file + (pszUnderLine - *argv);
 
-        lstrcpyW(pszIndex, L".itc");
+        StrCopyW(pszIndex, L".itc");
         fitc = _wfopen(file, L"wb+");
         if (fitc == NULL)
             continue;
@@ -731,13 +717,13 @@ ForceInline Void main2(Int argc, WChar **argv)
             if (FileSize > BufferSize)
             {
                 BufferSize  = FileSize;
-                pvBuffer    = m.ReAlloc(pvBuffer, BufferSize);
+                pvBuffer    = ReAllocateMemoryP(pvBuffer, BufferSize);
             }
 
             fread(pvBuffer, FileSize, 1, fp);
             fclose(fp);
 
-            pHeader = (IMG_BITMAP_HEADER *)pvBuffer;
+            pHeader = (IMAGE_BITMAP_HEADER *)pvBuffer;
 
             OutSize  = 4 + sizeof(pHeader->Info.dwWidth) + sizeof(pHeader->Info.dwHeight);
             OutSize += pHeader->Info.dwWidth * pHeader->Info.dwHeight * 2;
@@ -745,7 +731,7 @@ ForceInline Void main2(Int argc, WChar **argv)
             if (OutSize > OutBufferSize)
             {
                 OutBufferSize = OutSize;
-                pvOutput = m.ReAlloc(pvOutput, OutBufferSize);
+                pvOutput = ReAllocateMemoryP(pvOutput, OutBufferSize);
             }
 
             Bitmap32ToItp3E9(pvBuffer, pvOutput);
@@ -753,7 +739,7 @@ ForceInline Void main2(Int argc, WChar **argv)
             if (CompressedBufferSize < OutSize * 4)
             {
                 CompressedBufferSize = OutSize * 4;
-                pvCompressed = m.ReAlloc(pvCompressed, CompressedBufferSize);
+                pvCompressed = ReAllocateMemoryP(pvCompressed, CompressedBufferSize);
             }
 
             ITP_3E9_HEADER *pItpHeader = (ITP_3E9_HEADER *)pvOutput;
@@ -785,21 +771,19 @@ ForceInline Void main2(Int argc, WChar **argv)
         fclose(fitc);
     }
 
-    m.Free(pvBuffer);
-    m.Free(pvOutput);
-    m.Free(pvCompressed);
+    FreeMemoryP(pvBuffer);
+    FreeMemoryP(pvOutput);
+    FreeMemoryP(pvCompressed);
 }
 
 #endif
 
-void __cdecl main(Int argc, WChar **argv)
+int __cdecl main(Long_Ptr argc, wchar_t **argv)
 {
-    MyLib_Initialize();
-
+    ml::MlInitialize();
     getargsW(&argc, &argv);
     main2(argc, argv);
-
-    MyLib_UnInitialize();
-
-    exit(0);
+    ReleaseArgv(argv);
+    Ps::ExitProcess(0);
 }
+
