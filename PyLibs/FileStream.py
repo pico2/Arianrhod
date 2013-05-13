@@ -150,7 +150,7 @@ class BytesStream:
     def double(self):
         return ReadDouble(self.stream)
 
-    def astr(self):
+    def astr(self, cp = '936'):
         return ReadAString(self.stream)
 
     def wstr(self):

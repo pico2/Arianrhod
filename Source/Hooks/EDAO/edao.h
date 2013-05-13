@@ -4,6 +4,7 @@
 #include "MyLibrary.h"
 
 class EDAO;
+class CGlobal;
 
 #define UCL_COMPRESS_MAGIC TAG4('UCL4')
 
@@ -26,7 +27,7 @@ typedef struct  // 0x18
     BYTE    Probability;
     BYTE    Target;
     BYTE    TargetCondition;
-    BYTE    MagicAriaActionIndex;
+    BYTE    AriaActionIndex;
     BYTE    ActionIndex;
     USHORT  CraftIndex;
     ULONG   Parameter[4];
@@ -175,7 +176,7 @@ typedef union
         struct
         {
             USHORT                  CraftIndex;             // 0xF24
-            BYTE                    MagicAriaActionIndex;   // 0xF26
+            BYTE                    AriaActionIndex;   // 0xF26
             BYTE                    ActionIndex;            // 0xF27
 
         } SelectedCraft;
@@ -199,6 +200,16 @@ public:
     {
         return (PUSHORT)PtrAdd(this, 0x6140);
     }
+
+    BOOL IsCustomChar(ULONG_PTR ChrId)
+    {
+        return GetPartyChipMap()[ChrId] >= MINIMUM_CUSTOM_CHAR_ID;
+    }
+
+    PUSHORT GetChrMagicList()
+    {
+        return (PUSHORT)PtrAdd(this, 0x5D4);
+    }
 };
 
 class CBattle
@@ -212,6 +223,11 @@ public:
     CActor* GetActor()
     {
         return *(CActor **)PtrAdd(this, 0x38D28);
+    }
+
+    BOOL IsCustomChar(ULONG_PTR ChrId)
+    {
+        return GetActor()->IsCustomChar(ChrId);
     }
 
     EDAO* GetEDAO()
@@ -234,7 +250,6 @@ public:
         return *(PULONG)PtrAdd(this, 0x113080);
     }
 
-    VOID OverWriteCraftWithChrCraft();
     PMONSTER_STATUS FASTCALL OverWriteBattleStatusWithChrStatus(PMONSTER_STATUS MSData, PCHAR_STATUS ChrStatus);
     VOID NakedOverWriteBattleStatusWithChrStatus();
 
@@ -251,44 +266,9 @@ public:
 
     ULONG FASTCALL GetVoiceChrIdWorker(PMONSTER_STATUS MSData);
 
-    VOID NakedGetPredefinedMagicNumber();
-    ULONG FASTCALL GetPredefinedMagicNumber(PMONSTER_STATUS MSData);
+    VOID NakedCopyMagicAndCraftData();
+    VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
 };
-
-class CGlobal
-{
-public:
-    PCREATE_INFO    GetMagicData(USHORT MagicId);
-    PCSTR           GetMagicDescription(USHORT MagicId);
-    PBYTE           GetMagicQueryTable(USHORT MagicId);
-
-    EDAO* GetEDAO()
-    {
-        return (EDAO *)PtrSub(this, 0x4D3E8);
-    }
-
-    PCHAR_STATUS GetChrStatus(ULONG_PTR ChrId)
-    {
-        return &((PCHAR_STATUS)PtrAdd(this, 0x2BBBC))[ChrId];
-    }
-
-    VOID CalcChrFinalStatus(ULONG ChrId, PCHAR_STATUS FinalStatus, PCHAR_STATUS RawStatus)
-    {
-        TYPE_OF(&CGlobal::CalcChrFinalStatus) f;
-        
-        *(PVOID *)&f = (PVOID)0x677B36;
-        
-        return (this->*f)(ChrId, FinalStatus, RawStatus);
-    }
-
-    static TYPE_OF(&CGlobal::GetMagicData)          StubGetMagicData;
-    static TYPE_OF(&CGlobal::GetMagicDescription)   StubGetMagicDescription;
-    static TYPE_OF(&CGlobal::GetMagicQueryTable)    StubGetMagicQueryTable;
-};
-
-DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = NULL;
-DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = NULL;
-DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = NULL;
 
 class EDAO
 {
@@ -307,7 +287,12 @@ public:
 
     CActor* GetActor()
     {
-        return (CActor *)PtrAdd(this, 0x384EC);
+        return *(CActor **)PtrAdd(this, 0x384EC);
+    }
+
+    BOOL IsCustomChar(ULONG_PTR ChrId)
+    {
+        return GetActor()->IsCustomChar(ChrId);
     }
 
     PUSHORT GetSBreakList()
@@ -338,6 +323,47 @@ public:
 
 DECL_SELECTANY TYPE_OF(EDAO::StubFade) EDAO::StubFade = NULL;
 DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped = NULL;
+
+
+class CGlobal
+{
+public:
+    PCREATE_INFO    GetMagicData(USHORT MagicId);
+    PCSTR           GetMagicDescription(USHORT MagicId);
+    PBYTE           GetMagicQueryTable(USHORT MagicId);
+
+    EDAO* GetEDAO()
+    {
+        return (EDAO *)PtrSub(this, 0x4D3E8);
+    }
+
+    BOOL IsCustomChar(ULONG_PTR ChrId)
+    {
+        return GetEDAO()->GetActor()->IsCustomChar(ChrId);
+    }
+
+    PCHAR_STATUS GetChrStatus(ULONG_PTR ChrId)
+    {
+        return &((PCHAR_STATUS)PtrAdd(this, 0x2BBBC))[ChrId];
+    }
+
+    VOID CalcChrFinalStatus(ULONG ChrId, PCHAR_STATUS FinalStatus, PCHAR_STATUS RawStatus)
+    {
+        TYPE_OF(&CGlobal::CalcChrFinalStatus) f;
+        
+        *(PVOID *)&f = (PVOID)0x677B36;
+        
+        return (this->*f)(ChrId, FinalStatus, RawStatus);
+    }
+
+    static TYPE_OF(&CGlobal::GetMagicData)          StubGetMagicData;
+    static TYPE_OF(&CGlobal::GetMagicDescription)   StubGetMagicDescription;
+    static TYPE_OF(&CGlobal::GetMagicQueryTable)    StubGetMagicQueryTable;
+};
+
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = NULL;
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = NULL;
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = NULL;
 
 
 

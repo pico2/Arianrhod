@@ -1,54 +1,47 @@
 #include "edao.h"
 
-NAKED VOID CBattle::NakedGetPredefinedMagicNumber()
+NAKED VOID CBattle::NakedCopyMagicAndCraftData()
 {
     INLINE_ASM
     {
         mov     ecx, [ebp - 08h];
         mov     edx, [ebp + 08h];
-        call    CBattle::GetPredefinedMagicNumber
-        mov     [ebp - 20h], eax;
-        ret;
+        and     dword ptr [ebp - 20h], 0;
+        jmp     CBattle::CopyMagicAndCraftData
     }
 }
 
-ULONG FASTCALL CBattle::GetPredefinedMagicNumber(PMONSTER_STATUS MSData)
+VOID FASTCALL CBattle::CopyMagicAndCraftData(PMONSTER_STATUS MSData)
 {
-    ULONG_PTR MagicDefined;
-    PCRAFT_AI_INFO Magic;
+    PUSHORT         MagicList;
+    ULONG_PTR       MaxMagicNumber;
+    PCRAFT_AI_INFO  Magic;
 
-    MagicDefined = 0;
-    Magic = MSData->MagicAiInfo;
+    if (!IsCustomChar(MSData->CharID))
+        return;
 
-    for (ULONG_PTR Count = countof(MSData->MagicAiInfo); Count; ++Magic, --Count)
+    MaxMagicNumber  = countof(MSData->MagicAiInfo);
+    Magic           = MSData->MagicAiInfo;
+    MagicList       = GetActor()->GetChrMagicList() + MSData->CharID * MaxMagicNumber;
+
+    for (ULONG_PTR Count = countof(MSData->MagicAiInfo); Count; --Count)
     {
         if (Magic->CraftIndex == 0)
             break;
 
-        ++MagicDefined;
+        --MaxMagicNumber;
+        ++Magic;
     }
 
-    return MagicDefined;
-}
-
-NAKED VOID CBattle::OverWriteCraftWithChrCraft()
-{
-    INLINE_ASM
+    for (; MaxMagicNumber; ++Magic, ++MagicList, --MaxMagicNumber)
     {
-        mov     dword ptr [ebp - 20h], 0x0;
-        mov     ecx, [ebp - 08h];
-        call    CBattle::GetActor
-        mov     ecx, eax;
-        call    CActor::GetPartyChipMap
-        mov     edx, dword ptr [ebp - 14h];
-        movzx   eax, word ptr [eax + edx * 2];
-        mov     ecx, [esp];
-        cmp     eax, MINIMUM_CUSTOM_CHAR_ID
-        mov     edx, 0x9A37F4;
-        cmovae  ecx, edx;
-        mov     [esp], ecx;
-        ret;
+        Magic->CraftIndex = *MagicList;
+        Magic->AriaActionIndex  = 6;
+        Magic->ActionIndex      = 7;
+        Magic->Condition        = 0;
     }
+
+    *(PVOID *)_AddressOfReturnAddress() = (PVOID)0x9A37F4;
 }
 
 NAKED VOID CBattle::NakedOverWriteBattleStatusWithChrStatus()
@@ -72,7 +65,7 @@ PMONSTER_STATUS FASTCALL CBattle::OverWriteBattleStatusWithChrStatus(PMONSTER_ST
 
     *Final = *ChrStatus;
 
-    if (GetActor()->GetPartyChipMap()[MSData->CharID] < MINIMUM_CUSTOM_CHAR_ID)
+    if (!IsCustomChar(MSData->CharID))
         return MSData;
 
     Final->MaximumHP    += Raw->MaximumHP   / 2;
@@ -111,7 +104,7 @@ BOOL FASTCALL CBattle::IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATU
 
     MSData = GetMonsterStatus() + ChrPosition;
 
-    if (GetActor()->GetPartyChipMap()[MSData->CharID] < MINIMUM_CUSTOM_CHAR_ID)
+    if (!IsCustomChar(MSData->CharID))
     {
         return CurrentStatus->Level != PrevLevel;
     }
@@ -143,7 +136,7 @@ ULONG FASTCALL CBattle::GetVoiceChrIdWorker(PMONSTER_STATUS MSData)
     ChrId = MSData->CharID;
     PartyId = GetActor()->GetPartyChipMap()[ChrId];
 
-    return PartyId < MINIMUM_CUSTOM_CHAR_ID ? ChrId : PartyId;
+    return IsCustomChar(ChrId) ? PartyId : ChrId;
 }
 
 /*++
@@ -217,11 +210,9 @@ NAKED VOID EDAO::NakedGetChrSBreak()
 
 VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
 {
-    ULONG           ChrId;
-    PCRAFT_AI_INFO  Craft;
+    PCRAFT_AI_INFO Craft;
 
-    ChrId = GetBattle()->GetActor()->GetPartyChipMap()[MSData->CharID];
-    if (ChrId < MINIMUM_CUSTOM_CHAR_ID)
+    if (!IsCustomChar(MSData->CharID))
     {
         MSData->CurrentActionIndex = GetSBreakList()[MSData->CharID];
         return;
@@ -237,7 +228,7 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
     //Craft = Craft == MSData->SCraftAiInfo ? Craft : (Craft - 1);
     Craft = PtrSub(Craft, ((Craft == MSData->SCraftAiInfo) - 1) & sizeof(*Craft));
 
-    MSData->SelectedCraft.MagicAriaActionIndex  = Craft->MagicAriaActionIndex;
+    MSData->SelectedCraft.AriaActionIndex  = Craft->AriaActionIndex;
     MSData->SelectedCraft.ActionIndex           = Craft->ActionIndex;
     MSData->CurrentActionIndex                  = Craft->CraftIndex;
 }

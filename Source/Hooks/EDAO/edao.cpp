@@ -1,7 +1,5 @@
-#pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
-#pragma comment(linker, "/EXPORT:Direct3DCreate9=d3d9.Direct3DCreate9")
 
 #include "edao.h"
 #include "MyLibrary.cpp"
@@ -89,8 +87,6 @@ HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lp
 
     return Window;
 }
-
-
 
 PWCHAR
 GetFileName(
@@ -219,6 +215,8 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    ml::MlInitialize();
+
     SetExeDirectoryAsCurrent();
 
     MEMORY_PATCH p[] =
@@ -240,6 +238,8 @@ BOOL Initialize(PVOID BaseAddress)
     {
         // crack
 
+#if !D3D9_VER
+
         INLINE_HOOK_JUMP_RVA_NULL(0x27969D, METHOD_PTR(&CBattle::USE_ATTACK_FOR_CHECKING)),
         INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::USE_MAGIC_FOR_CHECKING)),
         INLINE_HOOK_JUMP_RVA_NULL(0x275DF4, METHOD_PTR(&CBattle::USE_CRAFT_FOR_CHECKING)),
@@ -247,6 +247,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_JUMP_RVA_NULL(0x279986, METHOD_PTR(&CSSaveData::SaveData2SystemData)),
         INLINE_HOOK_JUMP_RVA_NULL(0x279FA8, METHOD_PTR(&CSSaveData::SystemData2SaveData)),
+
+#endif // D3D9_VER
 
         // tweak
 
@@ -259,7 +261,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // hack for boss
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5A36C2, METHOD_PTR(&CBattle::OverWriteCraftWithChrCraft)),
+        //INLINE_HOOK_CALL_RVA_NULL(0x5A36C2, METHOD_PTR(&CBattle::OverWriteCraftWithChrCraft)),
         INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::GetChrIdForSCraft)),
 
         INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::NakedGetTurnVoiceChrId)),
@@ -268,7 +270,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::NakedGetTeamRushVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedGetPredefinedMagicNumber)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedCopyMagicAndCraftData)),
         INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::NakedOverWriteBattleStatusWithChrStatus)),
         INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::NakedIsChrStatusNeedRefresh)),
 
@@ -301,3 +303,49 @@ BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 
     return TRUE;
 }
+
+#if !D3D9_VER
+
+#pragma comment(linker, "/ENTRY:DllMain")
+#pragma comment(linker, "/EXPORT:Direct3DCreate9=d3d9.Direct3DCreate9")
+
+#else // D3D9_VER
+
+#include <d3d9.h>
+#pragma comment(linker, "/EXPORT:Direct3DCreate9=_Arianrhod_Direct3DCreate9@4")
+
+EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
+{
+    static TYPE_OF(Arianrhod_Direct3DCreate9) *Direct3DCreate9;
+
+    if (Direct3DCreate9 == NULL)
+    {
+        ULONG           Length;
+        NTSTATUS        Status;
+        PVOID           d3d9;
+        WCHAR           D3D9Path[MAX_NTPATH];
+
+        Length = Nt_GetSystemDirectory(D3D9Path, countof(D3D9Path));
+        CopyStruct(D3D9Path + Length, L"d3d9.dll", sizeof(L"d3d9.dll"));
+
+        d3d9 = Ldr::LoadDll(D3D9Path);
+        if (d3d9 == NULL)
+            return NULL;
+
+        LdrAddRefDll(GET_MODULE_HANDLE_EX_FLAG_PIN, d3d9);
+
+        *(PVOID *)&Direct3DCreate9 = GetRoutineAddress(d3d9, "Direct3DCreate9");
+        if (Direct3DCreate9 == NULL)
+            return NULL;
+
+    }
+
+    if ((ULONG_PTR)_ReturnAddress() == 0x8055F5)
+    {
+        DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
+    }
+
+    return Direct3DCreate9(SDKVersion);
+}
+
+#endif
