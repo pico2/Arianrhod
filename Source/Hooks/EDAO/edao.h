@@ -445,4 +445,8 @@ public:
 DECL_SELECTANY TYPE_OF(EDAOFileStream::StubUncompress) EDAOFileStream::StubUncompress = NULL;
 
 
+
+LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri);
+
+
 #endif // _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_

@@ -190,28 +190,14 @@ LONG64 InitWarningItpTimeStamp()
     return -1;
 }
 
-BOOL EDAO::CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex)
-{
-    switch (ItemId)
-    {
-        case 0xB7:  // ú—Ä¿
-        case 0xB8:  // ÌìÑÛ
-        case 0xBB:  // Ì½Öª
-            if (EquippedIndex != NULL)
-                *EquippedIndex = 0;
-
-            return TRUE;
-    }
-
-    return (this->*StubCheckItemEquipped)(ItemId, EquippedIndex);
-}
-
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
 }
 
 #define METHOD_PTR(_method) PtrAdd((PVOID)NULL, _method)
+
+#include "xxoo.cpp"
 
 BOOL Initialize(PVOID BaseAddress)
 {
@@ -228,6 +214,13 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
         PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
         PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
+
+        // debug AT
+
+        PATCH_MEMORY(0x49EB,    2, 0x5F668D),    // disable orig at
+        PATCH_MEMORY(0x81,      1, 0x5F66D9),    // disable orig at
+        PATCH_MEMORY(0x80,      1, 0x5F68A4),    // force show debug at
+        PATCH_MEMORY(0x2C,      1, 0x5F693D),    // debug at pos.X advance
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
@@ -254,6 +247,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
         INLINE_HOOK_JUMP_RVA(0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
+        INLINE_HOOK_CALL_RVA_NULL(0x5F690B, FormatBattleChrAT),
 
         // custom format itp / itc
 
@@ -279,6 +273,10 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA(0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
         INLINE_HOOK_JUMP_RVA(0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
         INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
+
+        // xxoo
+
+        INLINE_HOOK_JUMP_RVA_NULL(0x5B1BF4, NakedArianrhodRefreshSy),
 
         //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
         //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),

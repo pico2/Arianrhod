@@ -276,3 +276,13 @@ PBYTE CGlobal::GetMagicQueryTable(USHORT MagicId)
 
     return StaticMagicQueryTable;
 }
+
+
+/************************************************************************
+  misc
+************************************************************************/
+
+LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri)
+{
+    return sprintf(Buffer, "%d", IcoAT);
+}

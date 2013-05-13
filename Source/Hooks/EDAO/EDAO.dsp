@@ -107,5 +107,9 @@ SOURCE=.\edao.h
 
 SOURCE=.\edao_vm.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\Global.cpp
+# End Source File
 # End Target
 # End Project
