@@ -223,12 +223,48 @@ typedef union
     ULONG Flags;
     struct
     {
-        UCHAR   HP      : 1;
-        UCHAR   Level   : 1;
-        UCHAR   EXP     : 1;
+        UCHAR   HP              : 1;        // 0x00000001
+        UCHAR   Level           : 1;        // 0x00000002
+        UCHAR   EXP             : 1;        // 0x00000004
+        UCHAR   Information     : 1;
+        UCHAR   Resist          : 1;        // 0x00000020
+        UCHAR   AttributeRate   : 1;        // 0x00000040
+
+                                            // 0x10000000   orb
     };
 
-} MONSTER_INFO_FLAGS;
+    BOOL AllValid()
+    {
+        ULONG AllFlags = 0x01 | 0x02 | 0x04 | 0x20 | 0x40;
+        return (Flags & AllFlags) == AllFlags;
+    }
+
+    BOOL IsShowByOrbment()
+    {
+        return FLAG_ON(Flags, 0x10000000);
+    }
+
+} MONSTER_INFO_FLAGS, *PMONSTER_INFO_FLAGS;
+
+
+
+enum
+{
+    COLOR_WHITE     = 0,
+    COLOR_ORANGE    = 1,
+    COLOR_RED       = 2,
+    COLOR_BLUE      = 3,
+    COLOR_YELLOW    = 4,
+    COLOR_GREEN     = 5,
+    COLOR_GRAY      = 6,
+    COLOR_PINK      = 7,
+    COLOR_GOLD      = 8,
+    COLOR_BLACK     = 9,
+    COLOR_YELLOWB   = 10,
+
+
+    COLOR_MAXIMUM   = 21,
+};
 
 class CBattleInfoBox
 {
@@ -248,18 +284,23 @@ public:
         return (PCOORD)PtrAdd(*(PULONG_PTR)PtrAdd(this, 0x20), 0xF2);
     }
 
-    ULONG_PTR GetMonsterInfoFlags()
+    ULONG_PTR GetBackgroundColor()
     {
-        return *(PULONG)PtrAdd(this, 0x1028);
+        return *(PULONG)PtrAdd(*(PULONG_PTR)PtrAdd(this, 0x20), 0x100);
     }
 
-    VOID DrawSimpleTitle(LONG Left, LONG Top, PCSTR Text, ULONG ColorIndex, LONG Weight, ULONG ZeroU1 = 0, FLOAT ZeroF1 = 0)
+    MONSTER_INFO_FLAGS GetMonsterInfoFlags()
     {
-        TYPE_OF(&CBattleInfoBox::DrawSimpleTitle) StubDrawSimpleTitle;
+        return *(PMONSTER_INFO_FLAGS)PtrAdd(this, 0x1028);
+    }
 
-        *(PVOID *)&StubDrawSimpleTitle = (PVOID)0x67A101;
+    NoInline VOID DrawSimpleText(LONG X, LONG Y, PCSTR Text, ULONG ColorIndex, LONG Weight = FW_NORMAL, ULONG ZeroU1 = 1, FLOAT ZeroF1 = 1)
+    {
+        TYPE_OF(&CBattleInfoBox::DrawSimpleText) StubDrawSimpleText;
 
-        return (this->*StubDrawSimpleTitle)(Left, Top, Text, ColorIndex, Weight, ZeroU1, ZeroF1);
+        *(PVOID *)&StubDrawSimpleText = (PVOID)0x67A101;
+
+        return (this->*StubDrawSimpleText)(X, Y, Text, ColorIndex, Weight, ZeroU1, ZeroF1);
     }
 
 public:
@@ -374,8 +415,20 @@ public:
         return *(PUSHORT)PtrAdd(this, 0xA6FA8);
     }
 
+    VOID StubDrawNumber(LONG X, LONG Y, PCSTR Text, ULONG OneU1, ULONG Color, ULONG ZeroU1);
+
+    NoInline VOID DrawNumber(LONG X, LONG Y, PCSTR Text, ULONG_PTR Color, ULONG OneU1 = 1, ULONG ZeroU1 = 0)
+    {
+        TYPE_OF(&EDAO::StubDrawNumber) StubDrawNumber;
+
+        *(PVOID *)&StubDrawNumber = (PVOID)0x6778E3;
+
+        return (this->*StubDrawNumber)(X, Y, Text, OneU1, Color, ZeroU1);
+    }
+
     VOID THISCALL StubDrawRectangle(USHORT Layer, LONG Left, LONG Top, LONG Right, LONG Bottom, FLOAT ZeroF1, FLOAT ZeroF2, FLOAT ZeroF3, FLOAT ZeroF4, ULONG UpperLeftColor, ULONG UpperRightColor, ULONG ZeroU1,ULONG ZeroU2,ULONG ZeroU3,ULONG ZeroU4,ULONG ZeroU5,ULONG ZeroU6,FLOAT ZeroF5);
 
+    NoInline
     VOID
     THISCALL
     DrawRectangle(
@@ -580,9 +633,5 @@ DECL_SELECTANY TYPE_OF(EDAOFileStream::StubUncompress) EDAOFileStream::StubUncom
 
 LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri);
 
-
-/************************************************************************
-  implement
-************************************************************************/
 
 #endif // _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_

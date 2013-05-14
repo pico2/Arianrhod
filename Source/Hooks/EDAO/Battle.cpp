@@ -299,9 +299,16 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
     (this->*StubDrawMonsterStatus)();
 
-    PCOORD          UpperLeft;
-    RECT            Rect;
-    PMONSTER_STATUS MSData;
+    BOOL                ShowInfo, ShowByOrbment;
+    ULONG_PTR           BackgroundColor;
+    MONSTER_INFO_FLAGS  Flags;
+    PCOORD              UpperLeft;
+    RECT                Rect;
+    PMONSTER_STATUS     MSData;
+
+    Flags = GetMonsterInfoFlags();
+    ShowByOrbment = Flags.IsShowByOrbment();
+    ShowInfo = ShowByOrbment || Flags.AllValid();
 
     UpperLeft = GetUpperLeftCoord();
 
@@ -312,9 +319,75 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     Rect.right  = Rect.left + debug.right;
     Rect.bottom = Rect.top + debug.bottom;
 
-    GetEDAO()->DrawRectangle(Rect.left, Rect.top, Rect.right, Rect.bottom, 0x80808080, 0x80808080);
+    BackgroundColor = (GetBackgroundColor() & 0xA0000000) | 0x00101020;
+
+    GetEDAO()->DrawRectangle(Rect.left, Rect.top, Rect.right, Rect.bottom, BackgroundColor, BackgroundColor);
 
     MSData = GetBattle()->GetMonsterStatus() + GetBattle()->GetCurrentTargetIndex();
+
+    typedef struct
+    {
+        PCSTR Text;
+        ULONG Value;
+
+        ULONG_PTR (*Format)(PMONSTER_STATUS MSData, PSTR Buffer);
+
+    } STATUS_ENTRY;
+
+    static POINT debug2 = { -11, -14 };
+
+    STATUS_ENTRY *Entry, Status[] =
+    {
+        { "EP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { return sprintf(Buffer, "%d/%d", MSData->ChrStatus[BattleStatusFinal].InitialEP, MSData->ChrStatus[BattleStatusFinal].MaximumEP); }  },
+        { "CP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { return sprintf(Buffer, "%d/%d", MSData->ChrStatus[BattleStatusFinal].InitialCP, MSData->ChrStatus[BattleStatusFinal].MaximumCP); }  },
+
+        { "DEF:", MSData->ChrStatus[BattleStatusFinal].DEF },
+        { "ATS:", MSData->ChrStatus[BattleStatusFinal].ATS },
+        { "ADF:", MSData->ChrStatus[BattleStatusFinal].ADF },
+        { "DEX:", MSData->ChrStatus[BattleStatusFinal].DEX },
+        { "AGL:", MSData->ChrStatus[BattleStatusFinal].AGL },
+        { "MOV:", MSData->ChrStatus[BattleStatusFinal].MOV },
+        { "SPD:", MSData->ChrStatus[BattleStatusFinal].SPD },
+        { "RNG:", MSData->ChrStatus[BattleStatusFinal].RNG },
+    };
+
+    CHAR        Buffer[0x200];
+    LONG_PTR    X, Y, ValueX, ValueY, BoxWidth;
+    ULONG_PTR   ValueColor;
+    EDAO*       edao;
+
+    edao = GetEDAO();
+
+    BoxWidth = Rect.right - Rect.left;
+
+    X = Rect.left - UpperLeft->X + debug2.x;
+    Y = Rect.top - UpperLeft->Y + debug2.y;
+
+    ValueY = Rect.top - UpperLeft->Y + 24;
+    ValueColor = ShowByOrbment ? 0xFFFF8020 : 0xFFFFFFFF;
+
+    Buffer[0] = '?';
+    Buffer[1] = 0;
+
+    FOR_EACH(Entry, Status, countof(Status))
+    {
+        ULONG_PTR Length;
+
+        DrawSimpleText(X, Y, Entry->Text, COLOR_GOLD);
+
+        if (ShowInfo)
+        {
+            Entry->Format == NULL ? sprintf(Buffer, "%d", Entry->Value) : Entry->Format(MSData, Buffer);
+            edao->DrawNumber(X + 69, ValueY, Buffer, ValueColor);
+        }
+        else
+        {
+            DrawSimpleText(X + 26, Y, "?", COLOR_WHITE);
+        }
+
+        Y += 16;
+        ValueY += 16;
+    }
 }
 
 /************************************************************************
