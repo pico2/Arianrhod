@@ -152,12 +152,16 @@ typedef union
         ULONG                   SymbolIndex;                // 0x10
         ULONG                   MSFileIndex;                // 0x14
 
-        DUMMY_STRUCT(0x17C - 0x18);
+        DUMMY_STRUCT(0x172 - 0x18);
+
+        USHORT                  ActionType;                 // 0x172
+
+        DUMMY_STRUCT(0x8);
 
         USHORT                  WhoAttackMe;                // 0x17C
-        USHORT                  CurrentActionIndex;         // 0x17E
+        USHORT                  CurrentCraftIndex;          // 0x17E
         USHORT                  LastActionIndex;            // 0x180
-        USHORT                  CurrentCraftIndex;          // 0x182
+        USHORT                  CurrentAiIndex;             // 0x182
 
         DUMMY_STRUCT(0x234 - 0x184);
 
@@ -182,7 +186,7 @@ typedef union
         struct
         {
             USHORT                  CraftIndex;             // 0xF24
-            BYTE                    AriaActionIndex;   // 0xF26
+            BYTE                    AriaActionIndex;        // 0xF26
             BYTE                    ActionIndex;            // 0xF27
 
         } SelectedCraft;
@@ -289,6 +293,21 @@ public:
         return *(PULONG)PtrAdd(*(PULONG_PTR)PtrAdd(this, 0x20), 0x100);
     }
 
+    VOID SetTargetIsEnemy(BOOL Is)
+    {
+        *(PULONG)PtrAdd(*(PULONG_PTR)PtrAdd(this, 0x20), 0xEC) = Is ? 0 : 1;
+    }
+
+    ULONG_PTR IsTargetEnemy()
+    {
+        return *(PULONG)PtrAdd(*(PULONG_PTR)PtrAdd(this, 0x20), 0xEC) != 1;
+    }
+
+    VOID SetMonsterInfoFlags(ULONG_PTR Flags)
+    {
+        *(PULONG_PTR)PtrAdd(this, 0x1028) = Flags;
+    }
+
     MONSTER_INFO_FLAGS GetMonsterInfoFlags()
     {
         return *(PMONSTER_INFO_FLAGS)PtrAdd(this, 0x1028);
@@ -315,10 +334,10 @@ INIT_STATIC_MEMBER(CBattleInfoBox::StubDrawMonsterStatus);
 class CBattle
 {
 public:
-    VOID USE_ATTACK_FOR_CHECKING();
-    VOID USE_MAGIC_FOR_CHECKING();
-    VOID USE_CRAFT_FOR_CHECKING();
-    VOID USE_SCRAFT_FOR_CHECKING();
+    VOID THISCALL SetSelectedAttack(PMONSTER_STATUS MSData);
+    VOID THISCALL SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT CurrentCraftIndex);
+    VOID THISCALL SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex);
+    VOID THISCALL SetSelectedSCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex);
 
     CActor* GetActor()
     {

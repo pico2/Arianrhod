@@ -35,7 +35,7 @@ VOID FASTCALL CBattle::CopyMagicAndCraftData(PMONSTER_STATUS MSData)
 
     for (; MaxMagicNumber; ++Magic, ++MagicList, --MaxMagicNumber)
     {
-        Magic->CraftIndex = *MagicList;
+        Magic->CraftIndex       = *MagicList;
         Magic->AriaActionIndex  = 6;
         Magic->ActionIndex      = 7;
         Magic->Condition        = 0;
@@ -214,7 +214,7 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
 
     if (!IsCustomChar(MSData->CharID))
     {
-        MSData->CurrentActionIndex = GetSBreakList()[MSData->CharID];
+        MSData->CurrentCraftIndex = GetSBreakList()[MSData->CharID];
         return;
     }
 
@@ -228,9 +228,9 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
     //Craft = Craft == MSData->SCraftAiInfo ? Craft : (Craft - 1);
     Craft = PtrSub(Craft, ((Craft == MSData->SCraftAiInfo) - 1) & sizeof(*Craft));
 
-    MSData->SelectedCraft.AriaActionIndex  = Craft->AriaActionIndex;
-    MSData->SelectedCraft.ActionIndex           = Craft->ActionIndex;
-    MSData->CurrentActionIndex                  = Craft->CraftIndex;
+    MSData->SelectedCraft.AriaActionIndex   = Craft->AriaActionIndex;
+    MSData->SelectedCraft.ActionIndex       = Craft->ActionIndex;
+    MSData->CurrentCraftIndex               = Craft->CraftIndex;
 }
 
 /************************************************************************
@@ -297,8 +297,6 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     if (GetBattle()->GetCurrentTargetIndex() > MAXIMUM_CHR_NUMBER_IN_BATTLE)
         return;
 
-    (this->*StubDrawMonsterStatus)();
-
     BOOL                ShowInfo, ShowByOrbment;
     ULONG_PTR           BackgroundColor;
     MONSTER_INFO_FLAGS  Flags;
@@ -306,13 +304,21 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     RECT                Rect;
     PMONSTER_STATUS     MSData;
 
+    if (!IsTargetEnemy())
+    {
+        SetTargetIsEnemy(TRUE);
+        SetMonsterInfoFlags(~0u);
+    }
+
+    (this->*StubDrawMonsterStatus)();
+
     Flags = GetMonsterInfoFlags();
-    ShowByOrbment = Flags.IsShowByOrbment();
-    ShowInfo = ShowByOrbment || Flags.AllValid();
+    ShowInfo = Flags.AllValid();
+    ShowByOrbment = !ShowInfo && Flags.IsShowByOrbment();
 
     UpperLeft = GetUpperLeftCoord();
 
-    static RECT debug = { 284, 12, 128, 100 };
+    RECT debug = { 284, 12, 128, 100 };
 
     Rect.left   = UpperLeft->X + debug.left;
     Rect.top    = UpperLeft->Y + debug.top;
@@ -334,13 +340,12 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
     } STATUS_ENTRY;
 
-    static POINT debug2 = { -11, -14 };
-
     STATUS_ENTRY *Entry, Status[] =
     {
         { "EP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { return sprintf(Buffer, "%d/%d", MSData->ChrStatus[BattleStatusFinal].InitialEP, MSData->ChrStatus[BattleStatusFinal].MaximumEP); }  },
         { "CP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { return sprintf(Buffer, "%d/%d", MSData->ChrStatus[BattleStatusFinal].InitialCP, MSData->ChrStatus[BattleStatusFinal].MaximumCP); }  },
 
+        { "STR:", MSData->ChrStatus[BattleStatusFinal].STR },
         { "DEF:", MSData->ChrStatus[BattleStatusFinal].DEF },
         { "ATS:", MSData->ChrStatus[BattleStatusFinal].ATS },
         { "ADF:", MSData->ChrStatus[BattleStatusFinal].ADF },
@@ -356,6 +361,8 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     ULONG_PTR   ValueColor;
     EDAO*       edao;
 
+    POINT debug2 = { -11, -14 };
+
     edao = GetEDAO();
 
     BoxWidth = Rect.right - Rect.left;
@@ -364,7 +371,7 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     Y = Rect.top - UpperLeft->Y + debug2.y;
 
     ValueY = Rect.top - UpperLeft->Y + 24;
-    ValueColor = ShowByOrbment ? 0xFFFF8020 : 0xFFFFFFFF;
+    ValueColor = (ShowByOrbment ? 0xFF8020 : 0xFFFFFF) | (GetBackgroundColor() & 0xFF000000);
 
     Buffer[0] = '?';
     Buffer[1] = 0;
@@ -385,8 +392,8 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
             DrawSimpleText(X + 26, Y, "?", COLOR_WHITE);
         }
 
-        Y += 16;
-        ValueY += 16;
+        Y += 14;
+        ValueY += 14;
     }
 }
 

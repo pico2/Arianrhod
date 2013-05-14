@@ -1,193 +1,41 @@
-NAKED VOID CBattle::USE_SCRAFT_FOR_CHECKING()
+VOID THISCALL CBattle::SetSelectedSCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    INLINE_ASM
-    {
-        push    ebp
-        mov     ebp, esp
-        sub     esp, 0xD8
-        push    ebx
-        push    esi
-        push    edi
-        //push    ecx
-        //lea     edi, dword ptr [ebp-0xD8]
-        //mov     ecx, 0x36
-        //mov     eax, 0xCCCCCCCC
-        //rep     stos dword ptr es:[edi]
-        //pop     ecx
-        mov     dword ptr [ebp-0x8], ecx
-        mov     eax, 0x4
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     word ptr [ecx+0x172], ax
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0xC]
-        mov     word ptr [eax+0x17E], cx
-        mov     eax, dword ptr [ebp+0x10]
-        imul    eax, eax, 0x18
-        mov     ecx, dword ptr [ebp+0x8]
-        lea     edx, dword ptr [ecx+eax+0xE64];
-        mov     dword ptr [ebp-0x14], edx
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0x10]
-        mov     word ptr [eax+0x182], cx
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0xC]
-        mov     word ptr [eax+0xF24], cx;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp-0x14]
-        mov     dl, byte ptr [ecx+0x4]
-        mov     byte ptr [eax+0xF26], dl;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp-0x14]
-        mov     dl, byte ptr [ecx+0x5]
-        mov     byte ptr [eax+0xF27], dl;
-        pop     edi
-        pop     esi
-        pop     ebx
-        mov     esp, ebp
-        pop     ebp
-        ret     0xC
-    }
+    MSData->ActionType                      = ACTION_SCRAFT;
+    MSData->CurrentCraftIndex               = CraftIndex;
+    MSData->CurrentAiIndex                  = AiIndex;
+    MSData->SelectedCraft.CraftIndex        = CraftIndex;
+    MSData->SelectedCraft.AriaActionIndex   = MSData->SCraftAiInfo[AiIndex].AriaActionIndex;
+    MSData->SelectedCraft.ActionIndex       = MSData->SCraftAiInfo[AiIndex].ActionIndex;
 }
 
-NAKED VOID CBattle::USE_CRAFT_FOR_CHECKING()
+VOID THISCALL CBattle::SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    INLINE_ASM
-    {
-        push    ebp
-        mov     ebp, esp
-        sub     esp, 0xD8
-        push    ebx
-        push    esi
-        push    edi
-        //push    ecx
-        //lea     edi, dword ptr [ebp-0xD8]
-        //mov     ecx, 0x36
-        //mov     eax, 0xCCCCCCCC
-        //rep     stos dword ptr es:[edi]
-        //pop     ecx
-        mov     dword ptr [ebp-0x8], ecx
-        mov     eax, 0x3
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     word ptr [ecx+0x172], ax
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0xC]
-        mov     word ptr [eax+0x17E], cx
-        mov     eax, dword ptr [ebp+0x10]
-        imul    eax, eax, 0x18
-        mov     ecx, dword ptr [ebp+0x8]
-        lea     edx, dword ptr [ecx+eax+0xCFC];
-        mov     dword ptr [ebp-0x14], edx
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0x10]
-        mov     word ptr [eax+0x182], cx
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0xC]
-        mov     word ptr [eax+0xF24], cx;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp-0x14]
-        mov     dl, byte ptr [ecx+0x4]
-        mov     byte ptr [eax+0xF26], dl;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp-0x14]
-        mov     dl, byte ptr [ecx+0x5]
-        mov     byte ptr [eax+0xF27], dl;
-        pop     edi
-        pop     esi
-        pop     ebx
-        mov     esp, ebp
-        pop     ebp
-        ret     0xC
-    }
+    MSData->ActionType                      = ACTION_CRAFT;
+    MSData->CurrentCraftIndex               = CraftIndex;
+    MSData->CurrentAiIndex                  = AiIndex;
+    MSData->SelectedCraft.CraftIndex        = CraftIndex;
+    MSData->SelectedCraft.AriaActionIndex   = MSData->CraftAiInfo[AiIndex].AriaActionIndex;
+    MSData->SelectedCraft.ActionIndex       = MSData->CraftAiInfo[AiIndex].ActionIndex;
 }
 
-NAKED VOID CBattle::USE_MAGIC_FOR_CHECKING()
+VOID THISCALL CBattle::SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    INLINE_ASM
-    {
-        push    ebp
-        mov     ebp, esp
-        sub     esp, 0xCC
-        push    ebx
-        push    esi
-        push    edi
-        //push    ecx
-        //lea     edi, dword ptr [ebp-0xCC]
-        //mov     ecx, 0x33
-        //mov     eax, 0xCCCCCCCC
-        //rep     stos dword ptr es:[edi]
-        //pop     ecx
-        mov     dword ptr [ebp-0x8], ecx
-        mov     eax, 0x2
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     word ptr [ecx+0x172], ax
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0xC]
-        mov     word ptr [eax+0x17E], cx
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0x10]
-        mov     word ptr [eax+0x182], cx
-        mov     eax, dword ptr [ebp+0x8]
-        mov     cx, word ptr [ebp+0xC]
-        mov     word ptr [eax+0xF24], cx;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     byte ptr [eax+0xF26], 0x6;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     byte ptr [eax+0xF27], 0x7;
-        pop     edi
-        pop     esi
-        pop     ebx
-        mov     esp, ebp
-        pop     ebp
-        ret     0xC
-    }
+    MSData->ActionType                      = ACTION_MAGIC;
+    MSData->CurrentCraftIndex               = CraftIndex;
+    MSData->CurrentAiIndex                  = AiIndex;
+    MSData->SelectedCraft.CraftIndex        = CraftIndex;
+    MSData->SelectedCraft.AriaActionIndex   = 6;
+    MSData->SelectedCraft.ActionIndex       = CraftIndex < MINIMUM_CUSTOM_CRAFT_INDEX ? 7 : MSData->MagicAiInfo[AiIndex].ActionIndex;
 }
 
-NAKED VOID CBattle::USE_ATTACK_FOR_CHECKING()
+VOID THISCALL CBattle::SetSelectedAttack(PMONSTER_STATUS MSData)
 {
-    INLINE_ASM
-    {
-        push    ebp
-        mov     ebp, esp
-        sub     esp, 0xCC
-        push    ebx
-        push    esi
-        push    edi
-        //push    ecx
-        //lea     edi, dword ptr [ebp-0xCC]
-        //mov     ecx, 0x33
-        //mov     eax, 0xCCCCCCCC
-        //rep     stos dword ptr es:[edi]
-        //pop     ecx
-        mov     dword ptr [ebp-0x8], ecx
-        xor     eax, eax
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     word ptr [ecx+0x172], ax
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     dx, word ptr [ecx+0x56A];
-        mov     word ptr [eax+0x17E], dx
-        mov     eax, 0xFFFF
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     word ptr [ecx+0x182], ax
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     dl, byte ptr [ecx+0x569];
-        mov     byte ptr [eax+0xF27], dl;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     dl, byte ptr [ecx+0x568];
-        mov     byte ptr [eax+0xF26], dl;
-        mov     eax, dword ptr [ebp+0x8]
-        mov     ecx, dword ptr [ebp+0x8]
-        mov     dx, word ptr [ecx+0x56A];
-        mov     word ptr [eax+0xF24], dx;
-        pop     edi
-        pop     esi
-        pop     ebx
-        mov     esp, ebp
-        pop     ebp
-        ret     0x4
-    }
+    MSData->ActionType                      = ACTION_ATTACK;
+    MSData->CurrentCraftIndex               = MSData->Attack.CraftIndex;
+    MSData->CurrentAiIndex                  = (USHORT)-1;
+    MSData->SelectedCraft.CraftIndex        = MSData->Attack.CraftIndex;
+    MSData->SelectedCraft.AriaActionIndex   = MSData->Attack.AriaActionIndex;
+    MSData->SelectedCraft.ActionIndex       = MSData->Attack.ActionIndex;
 }
 
 

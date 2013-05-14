@@ -222,6 +222,9 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x80,      1, 0x5F68A4),    // force show debug at
         PATCH_MEMORY(0x2C,      1, 0x5F693D),    // debug at pos.X advance
 
+        // monster info
+        PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
+
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
         PATCH_MEMORY(AoCreateFileA,         4, 0x9D576C),       // CreateFileA
@@ -233,10 +236,10 @@ BOOL Initialize(PVOID BaseAddress)
 
 #if !D3D9_VER
 
-        INLINE_HOOK_JUMP_RVA_NULL(0x27969D, METHOD_PTR(&CBattle::USE_ATTACK_FOR_CHECKING)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::USE_MAGIC_FOR_CHECKING)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x275DF4, METHOD_PTR(&CBattle::USE_CRAFT_FOR_CHECKING)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x272AB9, METHOD_PTR(&CBattle::USE_SCRAFT_FOR_CHECKING)),
+        INLINE_HOOK_JUMP_RVA_NULL(0x27969D, METHOD_PTR(&CBattle::SetSelectedAttack)),
+        INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
+        INLINE_HOOK_JUMP_RVA_NULL(0x275DF4, METHOD_PTR(&CBattle::SetSelectedCraft)),
+        INLINE_HOOK_JUMP_RVA_NULL(0x272AB9, METHOD_PTR(&CBattle::SetSelectedSCraft)),
 
         INLINE_HOOK_JUMP_RVA_NULL(0x279986, METHOD_PTR(&CSSaveData::SaveData2SystemData)),
         INLINE_HOOK_JUMP_RVA_NULL(0x279FA8, METHOD_PTR(&CSSaveData::SystemData2SaveData)),
@@ -293,6 +296,8 @@ BOOL Initialize(PVOID BaseAddress)
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
+    //PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, WhoAttackMe));
+
     switch (Reason)
     {
         case DLL_PROCESS_ATTACH:
