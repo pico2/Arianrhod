@@ -315,6 +315,7 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     Flags = GetMonsterInfoFlags();
     ShowInfo = Flags.AllValid();
     ShowByOrbment = !ShowInfo && Flags.IsShowByOrbment();
+    ShowInfo = ShowInfo || ShowByOrbment;
 
     UpperLeft = GetUpperLeftCoord();
 
