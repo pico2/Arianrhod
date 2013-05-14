@@ -112,7 +112,7 @@ BOOL FASTCALL CBattle::IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATU
     return TRUE;
 }
 
-NAKED ULONG CBattle::GetChrIdForSCraft()
+NAKED ULONG CBattle::NakedGetChrIdForSCraft()
 {
     INLINE_ASM
     {
@@ -278,6 +278,45 @@ PBYTE CGlobal::GetMagicQueryTable(USHORT MagicId)
 }
 
 
+
+/************************************************************************
+  info box
+************************************************************************/
+
+VOID THISCALL CBattleInfoBox::SetMonsterInfoBoxSize(LONG X, LONG Y, LONG Width, LONG Height)
+{
+    TYPE_OF(&CBattleInfoBox::SetMonsterInfoBoxSize) StubSetBoxSize;
+
+    *(PVOID *)&StubSetBoxSize = (PVOID)0x67302C;
+
+    return (this->*StubSetBoxSize)(X, Y, 120, Height);
+}
+
+VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
+{
+    if (GetBattle()->GetCurrentTargetIndex() > MAXIMUM_CHR_NUMBER_IN_BATTLE)
+        return;
+
+    (this->*StubDrawMonsterStatus)();
+
+    PCOORD          UpperLeft;
+    RECT            Rect;
+    PMONSTER_STATUS MSData;
+
+    UpperLeft = GetUpperLeftCoord();
+
+    static RECT debug = { 284, 12, 128, 100 };
+
+    Rect.left   = UpperLeft->X + debug.left;
+    Rect.top    = UpperLeft->Y + debug.top;
+    Rect.right  = Rect.left + debug.right;
+    Rect.bottom = Rect.top + debug.bottom;
+
+    GetEDAO()->DrawRectangle(Rect.left, Rect.top, Rect.right, Rect.bottom, 0x80808080, 0x80808080);
+
+    MSData = GetBattle()->GetMonsterStatus() + GetBattle()->GetCurrentTargetIndex();
+}
+
 /************************************************************************
   misc
 ************************************************************************/
@@ -286,3 +325,4 @@ LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LON
 {
     return sprintf(Buffer, "%d", IcoAT);
 }
+

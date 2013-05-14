@@ -255,9 +255,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // hack for boss
 
-        //INLINE_HOOK_CALL_RVA_NULL(0x5A36C2, METHOD_PTR(&CBattle::OverWriteCraftWithChrCraft)),
-        INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::GetChrIdForSCraft)),
-
+        INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::NakedGetChrIdForSCraft)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::NakedGetTurnVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::NakedGetRunawayVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::NakedGetReplySupportVoiceChrId)),
@@ -273,6 +271,12 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA(0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
         INLINE_HOOK_JUMP_RVA(0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
         INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
+
+
+        // monster info box
+
+        INLINE_HOOK_CALL_RVA_NULL(0x626AEA, METHOD_PTR(&CBattleInfoBox::SetMonsterInfoBoxSize)),
+        INLINE_HOOK_JUMP_RVA(0x27AC8C, METHOD_PTR(&CBattleInfoBox::DrawMonsterStatus), CBattleInfoBox::StubDrawMonsterStatus),
 
         // xxoo
 

@@ -5,11 +5,17 @@
 
 class EDAO;
 class CGlobal;
+class CBattle;
+
+#define INIT_STATIC_MEMBER(x) DECL_SELECTANY TYPE_OF(x) x = NULL
+
+#define DECL_STATIC_METHOD_POINTER(cls, method) static TYPE_OF(&cls::method) Stub##method
 
 #define UCL_COMPRESS_MAGIC TAG4('UCL4')
 
-#define MINIMUM_CUSTOM_CHAR_ID      0xB0
-#define MINIMUM_CUSTOM_CRAFT_INDEX  0x3E8
+#define MINIMUM_CUSTOM_CHAR_ID          0xB0
+#define MINIMUM_CUSTOM_CRAFT_INDEX      0x3E8
+#define MAXIMUM_CHR_NUMBER_IN_BATTLE    0x16
 
 #pragma pack(push, 1)
 
@@ -212,6 +218,59 @@ public:
     }
 };
 
+typedef union
+{
+    ULONG Flags;
+    struct
+    {
+        UCHAR   HP      : 1;
+        UCHAR   Level   : 1;
+        UCHAR   EXP     : 1;
+    };
+
+} MONSTER_INFO_FLAGS;
+
+class CBattleInfoBox
+{
+public:
+    EDAO* GetEDAO()
+    {
+        return *(EDAO **)PtrAdd(this, 0xC);
+    }
+
+    CBattle* GetBattle()
+    {
+        return (CBattle *)PtrSub(this, 0xF0D24);
+    }
+
+    PCOORD GetUpperLeftCoord()
+    {
+        return (PCOORD)PtrAdd(*(PULONG_PTR)PtrAdd(this, 0x20), 0xF2);
+    }
+
+    ULONG_PTR GetMonsterInfoFlags()
+    {
+        return *(PULONG)PtrAdd(this, 0x1028);
+    }
+
+    VOID DrawSimpleTitle(LONG Left, LONG Top, PCSTR Text, ULONG ColorIndex, LONG Weight, ULONG ZeroU1 = 0, FLOAT ZeroF1 = 0)
+    {
+        TYPE_OF(&CBattleInfoBox::DrawSimpleTitle) StubDrawSimpleTitle;
+
+        *(PVOID *)&StubDrawSimpleTitle = (PVOID)0x67A101;
+
+        return (this->*StubDrawSimpleTitle)(Left, Top, Text, ColorIndex, Weight, ZeroU1, ZeroF1);
+    }
+
+public:
+    VOID THISCALL SetMonsterInfoBoxSize(LONG X, LONG Y, LONG Width, LONG Height);
+    VOID THISCALL DrawMonsterStatus();
+
+    DECL_STATIC_METHOD_POINTER(CBattleInfoBox, DrawMonsterStatus);
+};
+
+INIT_STATIC_MEMBER(CBattleInfoBox::StubDrawMonsterStatus);
+
 class CBattle
 {
 public:
@@ -223,6 +282,11 @@ public:
     CActor* GetActor()
     {
         return *(CActor **)PtrAdd(this, 0x38D28);
+    }
+
+    CBattleInfoBox* GetBattleInfoBox()
+    {
+        return (CBattleInfoBox *)PtrAdd(this, 0xF0D24);
     }
 
     BOOL IsCustomChar(ULONG_PTR ChrId)
@@ -245,9 +309,14 @@ public:
         return (PMONSTER_STATUS)PtrAdd(this, 0x4DE4);
     }
 
-    ULONG_PTR GetCurrentChrIndex()
+    LONG_PTR GetCurrentChrIndex()
     {
-        return *(PULONG)PtrAdd(this, 0x113080);
+        return *(PLONG)PtrAdd(this, 0x113080);
+    }
+
+    LONG_PTR GetCurrentTargetIndex()
+    {
+        return *(PLONG)PtrAdd(this, 0x113090);
     }
 
     PMONSTER_STATUS FASTCALL OverWriteBattleStatusWithChrStatus(PMONSTER_STATUS MSData, PCHAR_STATUS ChrStatus);
@@ -256,7 +325,7 @@ public:
     VOID NakedIsChrStatusNeedRefresh();
     BOOL FASTCALL IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, ULONG_PTR PrevLevel);
 
-    ULONG GetChrIdForSCraft();
+    ULONG NakedGetChrIdForSCraft();
 
     VOID NakedGetTurnVoiceChrId();
     VOID NakedGetReplySupportVoiceChrId();
@@ -300,10 +369,73 @@ public:
         return (PUSHORT)PtrAdd(this, 0x7EE10);
     }
 
+    ULONG_PTR GetLayer()
+    {
+        return *(PUSHORT)PtrAdd(this, 0xA6FA8);
+    }
+
+    VOID THISCALL StubDrawRectangle(USHORT Layer, LONG Left, LONG Top, LONG Right, LONG Bottom, FLOAT ZeroF1, FLOAT ZeroF2, FLOAT ZeroF3, FLOAT ZeroF4, ULONG UpperLeftColor, ULONG UpperRightColor, ULONG ZeroU1,ULONG ZeroU2,ULONG ZeroU3,ULONG ZeroU4,ULONG ZeroU5,ULONG ZeroU6,FLOAT ZeroF5);
+
+    VOID
+    THISCALL
+    DrawRectangle(
+        /* USHORT Layer */
+        LONG    Left,
+        LONG    Top,
+        LONG    Right,
+        LONG    Bottom,
+
+        ULONG   UpperLeftColor,
+        ULONG   UpperRightColor,
+
+        FLOAT   ZeroF1 = 0,
+        FLOAT   ZeroF2 = 0,
+        FLOAT   ZeroF3 = 0,
+        FLOAT   ZeroF4 = 0,
+
+        ULONG   ZeroU1 = 0,
+        ULONG   ZeroU2 = 0,
+        ULONG   ZeroU3 = 0,
+        ULONG   ZeroU4 = 0,
+        ULONG   ZeroU5 = 0,
+        ULONG   ZeroU6 = 0,
+
+        FLOAT   ZeroF5 = 0
+    )
+    {
+        TYPE_OF(&EDAO::StubDrawRectangle) StubDrawRectangle;
+        *(PVOID *)&StubDrawRectangle = (PVOID)0x6726EA;
+
+        return (PtrAdd(this, 0x254)->*StubDrawRectangle)(
+                    GetLayer(),
+                    Left,
+                    Top,
+                    Right,
+                    Bottom,
+
+                    ZeroF1,
+                    ZeroF2,
+                    ZeroF3,
+                    ZeroF4,
+
+                    UpperLeftColor,
+                    UpperRightColor,
+
+                    ZeroU1,
+                    ZeroU2,
+                    ZeroU3,
+                    ZeroU4,
+                    ZeroU5,
+                    ZeroU6,
+
+                    ZeroF5
+                );
+    }
+
     VOID CalcChrRawStatusFromLevel(ULONG ChrId, ULONG Level, ULONG Unknown = 0)
     {
         TYPE_OF(&EDAO::CalcChrRawStatusFromLevel) f;
-        
+
         *(PVOID *)&f = (PVOID)0x675FF7;
 
         return (this->*f)(ChrId, Level, Unknown);
@@ -328,9 +460,9 @@ DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped 
 class CGlobal
 {
 public:
-    PCREATE_INFO    GetMagicData(USHORT MagicId);
-    PCSTR           GetMagicDescription(USHORT MagicId);
-    PBYTE           GetMagicQueryTable(USHORT MagicId);
+    PCREATE_INFO    THISCALL GetMagicData(USHORT MagicId);
+    PCSTR           THISCALL GetMagicDescription(USHORT MagicId);
+    PBYTE           THISCALL GetMagicQueryTable(USHORT MagicId);
 
     EDAO* GetEDAO()
     {
@@ -350,9 +482,9 @@ public:
     VOID CalcChrFinalStatus(ULONG ChrId, PCHAR_STATUS FinalStatus, PCHAR_STATUS RawStatus)
     {
         TYPE_OF(&CGlobal::CalcChrFinalStatus) f;
-        
+
         *(PVOID *)&f = (PVOID)0x677B36;
-        
+
         return (this->*f)(ChrId, FinalStatus, RawStatus);
     }
 
@@ -448,5 +580,9 @@ DECL_SELECTANY TYPE_OF(EDAOFileStream::StubUncompress) EDAOFileStream::StubUncom
 
 LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri);
 
+
+/************************************************************************
+  implement
+************************************************************************/
 
 #endif // _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_

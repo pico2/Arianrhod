@@ -565,30 +565,46 @@ BOOL IsRunningInVMWare()
 
 // #include "HookPort.cpp"
 
+#include "FolderDialog.cpp"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PrintConsoleA("%*\b%d\n", 123, 456);
-
-    return;
-
     LOGFONTW lf;
 
-    SetThreadLocale(0x0411);
-    SetThreadUILanguage(0x411);
-    SetThreadPreferredUILanguages(MUI_LANGUAGE_ID, L"411", NULL);
+    HDC dc = CreateCompatibleDC(NULL);
 
     lf.lfCharSet = 0x80;
     lf.lfFaceName[0] = 0;
 
     EnumFontFamiliesExW(GetDC(NULL), &lf, 
-        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM)
+        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM dc)
         {
+            HFONT ft;
+
+            ft = CreateFontW(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, lf->lfFaceName);
+            DeleteObject(SelectObject((HDC)dc, ft));
+
+            LOOP_ONCE
+            {
+                ULONG dw;
+                PVOID buf;
+
+                dw = GetFontData((HDC)dc, 'eman', 0, NULL, 0);
+                if (dw == GDI_ERROR)
+                    break;
+
+                buf = AllocateMemory(dw);
+                GetFontData((HDC)dc, 'eman', 0, buf, dw);
+            }
+
             PrintConsoleW(L"%02X, %s\n", lf->lfCharSet, lf->lfFaceName);
             return TRUE;
         },
-        0,
+        (LPARAM)dc,
         0
     );
+
+    DeleteDC(dc);
 
     PauseConsole();
 
