@@ -173,7 +173,11 @@ typedef union
 
         MS_EFFECT_INFO          EffectInfo[0x14];           // 0x2A0
 
-        DUMMY_STRUCT(0x54C - 0x430);
+        DUMMY_STRUCT(0x538 - 0x430);
+
+        ULONG                   AT;                         // 0x538
+
+        DUMMY_STRUCT(0x54C - 0x53C);
 
         USHORT                  Equipment[5];               // 0x54C
         USHORT                  Orbment[7];                 // 0x556
@@ -331,6 +335,55 @@ public:
 
 INIT_STATIC_MEMBER(CBattleInfoBox::StubDrawMonsterStatus);
 
+typedef union
+{
+    DUMMY_STRUCT(0x78);
+    struct
+    {
+        DUMMY_STRUCT(0x60);
+        PMONSTER_STATUS MSData; // 0x60
+        DUMMY_STRUCT(4);
+        ULONG   IconAT;          // 0x68 不含20 空; 含10 AT条移动; 含04 行动、delay后的([20A]0销毁); 含40 当前行动的(1销毁)
+        USHORT  par;            // 0x6C
+        DUMMY_STRUCT(3);
+        byte    RNo;		    // 0x71
+        DUMMY_STRUCT(1);
+        byte    sequence;	    // 0x73
+        bool    isSBreak;
+        DUMMY_STRUCT(3);
+    };
+
+} AT_BAR_ENTRY, *PAT_BAR_ENTRY;
+
+class CBattleAT
+{
+public:
+    AT_BAR_ENTRY   Entry[0x3C];
+    PAT_BAR_ENTRY  EntryPointer[0x3C];      // 0x0x1C20
+
+    BOOL IsCurrentChrSBreak()
+    {
+        return EntryPointer[0]->isSBreak;
+    }
+
+    // -1 for null
+    BYTE THISCALL GetChrAT0()
+    {
+        TYPE_OF(&CBattleAT::GetChrAT0) f;
+        *(PVOID *)&f = (PVOID)0x00677230;
+		return (this->*f)();
+    }
+
+    VOID AdvanceChrInATBar(PMONSTER_STATUS MSData, BOOL X = TRUE)
+    {
+        TYPE_OF(&CBattleAT::AdvanceChrInATBar) StubForwardATBar;
+
+        *(PVOID *)&StubForwardATBar = (PVOID)0x676D3F;
+
+        return (this->*StubForwardATBar)(MSData, X);
+    }
+};
+
 class CBattle
 {
 public:
@@ -357,6 +410,11 @@ public:
     EDAO* GetEDAO()
     {
         return *(EDAO **)PtrAdd(this, 0x38D24);
+    }
+
+    CBattleAT* GetBattleAT()
+    {
+        return (CBattleAT *)PtrAdd(this, 0x103148);
     }
 
     PVOID GetMSFileBuffer()
@@ -398,7 +456,23 @@ public:
     VOID NakedCopyMagicAndCraftData();
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
 
+    VOID NakedGetBattleState();
+
     BOOL ThinkSBreak(PMONSTER_STATUS MSData);
+};
+
+class CSound
+{
+public:
+
+    VOID THISCALL PlaySound(ULONG SeIndex, ULONG v1 = 1, ULONG v2 = 0, ULONG v3 = 100, ULONG v4 = 0, ULONG v5 = 35, ULONG v6 = 0)
+    {
+        TYPE_OF(&CSound::PlaySound) PlaySound;
+
+        *(PVOID *)&PlaySound = (PVOID)0x677271;
+
+        return (this->*PlaySound)(SeIndex, v1, v2, v3, v4, v5, v6);
+    }
 };
 
 class EDAO
@@ -414,6 +488,11 @@ public:
     CBattle* GetBattle()
     {
         return *(CBattle **)PtrAdd(this, 0x82BA4);
+    }
+
+    CSound* GetSound()
+    {
+        return (CSound *)PtrAdd(this, 0x3A628);
     }
 
     CActor* GetActor()
