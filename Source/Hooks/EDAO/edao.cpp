@@ -90,16 +90,16 @@ HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lp
 
 PWCHAR
 GetFileName(
-    PWCHAR  pszHooked,
-    ULONG   HookedBufferCount,
-    PWCHAR  pszOriginal,
+    PWCHAR  HookedPath,
+    ULONG   HookedPathCount,
+    PWCHAR  OriginalPath,
     ULONG   OriginalCount,
-    LPCSTR  lpFileName,
+    LPCSTR  InputFileName,
     BOOL    IsInputUnicode = FALSE
 )
 {
-    ULONG   Length, AppPathLength;
-    PWCHAR  pszFileName;
+    ULONG_PTR   Length, AppPathLength;
+    PWSTR       FileName;
 
     static WCHAR szDataPath[]   = L"data\\";
     static WCHAR szPatch[]      = L"patch\\\\";
@@ -107,11 +107,11 @@ GetFileName(
 
     if (IsInputUnicode)
     {
-        StrCopyW(pszOriginal, (LPWSTR)lpFileName);
+        StrCopyW(OriginalPath, (LPWSTR)InputFileName);
     }
     else
     {
-        AnsiToUnicode(pszOriginal, OriginalCount, (PCHAR)lpFileName, -1);
+        AnsiToUnicode(OriginalPath, OriginalCount, (PCHAR)InputFileName, -1);
     }
 
     PLDR_MODULE Module;
@@ -119,43 +119,43 @@ GetFileName(
     Module = FindLdrModuleByHandle(NULL);
     AppPathLength = (Module->FullDllName.Length - Module->BaseDllName.Length) / sizeof(WCHAR);
 
-    Length = RtlGetFullPathName_U(pszOriginal, HookedBufferCount * sizeof(WCHAR), pszHooked, NULL);
+    Length = RtlGetFullPathName_U(OriginalPath, HookedPathCount * sizeof(WCHAR), HookedPath, NULL);
     Length = Length / sizeof(WCHAR) + 1;
-    pszFileName = pszHooked + AppPathLength;
+    FileName = HookedPath + AppPathLength;
     LOOP_ONCE
     {
-        if (StrNICompareW(pszFileName, szDataPath, countof(szDataPath) - 1) ||
-            StrNICompareW(Module->FullDllName.Buffer, pszHooked, AppPathLength))
+        if (StrNICompareW(FileName, szDataPath, countof(szDataPath) - 1) ||
+            StrNICompareW(Module->FullDllName.Buffer, HookedPath, AppPathLength))
         {
-            pszFileName = pszOriginal;
+            FileName = OriginalPath;
             break;
         }
 
-        pszFileName += countof(szDataPath) - 2;
+        FileName += countof(szDataPath) - 2;
         RtlMoveMemory(
-            pszFileName + countof(szPatch) - countof(szDataPath),
-            pszFileName,
-            (Length - (pszFileName - pszHooked)) * sizeof(*pszFileName)
+            FileName + countof(szPatch) - countof(szDataPath),
+            FileName,
+            (Length - (FileName - HookedPath)) * sizeof(*FileName)
         );
 
-        pszFileName -= countof(szDataPath) - 2;
-        CopyStruct(pszFileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
+        FileName -= countof(szDataPath) - 2;
+        CopyStruct(FileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
 
-        if (IsPathExists(pszHooked))
+        if (IsPathExists(HookedPath))
         {
-            pszFileName = pszHooked;
+            FileName = HookedPath;
             break;
         }
 
-        CopyStruct(pszFileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
-        pszFileName = IsPathExists(pszHooked) ? pszHooked : pszOriginal;
+        CopyStruct(FileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
+        FileName = IsPathExists(HookedPath) ? HookedPath : OriginalPath;
     }
 
 #if CONSOLE_DEBUG
-    PrintConsoleW(L"%s\n", pszFileName);
+    PrintConsoleW(L"%s\n", FileName);
 #endif
 
-    return pszFileName;
+    return FileName;
 }
 
 HANDLE
@@ -170,10 +170,10 @@ AoCreateFileA(
     HANDLE                  hTemplateFile
 )
 {
-    WCHAR szFile[MAX_NTPATH], szFullPath[MAX_NTPATH];
+    WCHAR OriginalPath[MAX_NTPATH], HookedPath[MAX_NTPATH];
 
     return NtFileDisk::SimulateCreateFile(
-                GetFileName(szFullPath, countof(szFullPath), szFile, countof(szFile), lpFileName),
+                GetFileName(HookedPath, countof(HookedPath), OriginalPath, countof(OriginalPath), lpFileName),
                 dwDesiredAccess,
                 dwShareMode,
                 lpSecurityAttributes,
@@ -181,6 +181,29 @@ AoCreateFileA(
                 dwFlagsAndAttributes,
                 hTemplateFile
            );
+}
+
+HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
+{
+    NTSTATUS        Status;
+    HANDLE          FindHandle;
+    WCHAR           OriginalPath[MAX_NTPATH], HookedPath[MAX_NTPATH];
+    ML_FIND_DATA    FindData;
+
+    Status = QueryFirstFile(
+                    &FindHandle,
+                    GetFileName(HookedPath, countof(HookedPath), OriginalPath, countof(OriginalPath), FileName),
+                    &FindData
+                );
+
+    FindFileData->cFileName[0] = 0;
+
+    if (NT_FAILED(Status))
+        return NULL;
+
+    UnicodeToAnsi(FindFileData->cFileName, countof(FindFileData->cFileName), FindData.FileName);
+
+    return FindHandle;
 }
 
 // [0xC29988]+78f84
@@ -224,6 +247,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         // monster info
         PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
+        
+        // iat hook
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
@@ -252,6 +277,11 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA(0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, FormatBattleChrAT),
 
+        // file redirection
+
+        INLINE_HOOK_CALL_RVA_NULL(0x48C1EA, AoFindFirstFileA),
+        INLINE_HOOK_CALL_RVA_NULL(0x48C206, NtClose),
+
         // custom format itp / itc
 
         INLINE_HOOK_JUMP_RVA(0x273D24, METHOD_PTR(&EDAOFileStream::Uncompress), EDAOFileStream::StubUncompress),
@@ -275,6 +305,10 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA(0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
         INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
 
+
+        // think sbreak
+
+        //INLINE_HOOK_JUMP_RVA_NULL(0x2720F0, METHOD_PTR(&CBattle::ThinkSBreak)),
 
         // monster info box
 

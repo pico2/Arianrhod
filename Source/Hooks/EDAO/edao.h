@@ -397,6 +397,8 @@ public:
 
     VOID NakedCopyMagicAndCraftData();
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
+
+    BOOL ThinkSBreak(PMONSTER_STATUS MSData);
 };
 
 class EDAO

@@ -59,7 +59,7 @@ TGitNtQueryAttributesFile(
 
     if (NT_SUCCESS(Status) && FileInformation != NULL)
     {
-        CLEAR_FLAG(FileInformation->FileAttributes.LowPart, FILE_ATTRIBUTE_REPARSE_POINT);
+        CLEAR_FLAG(FileInformation->FileAttributes, FILE_ATTRIBUTE_REPARSE_POINT);
     }
 
     return Status;
@@ -191,8 +191,6 @@ EXTC LRESULT NTAPI LbSendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPa
     return Result;
 }
 
-#pragma comment(linker, "/EXPORT:__TrackMouseEvent=COMCTL32._TrackMouseEvent")
-
 HFONT NTAPI gCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement, _In_ int cOrientation, _In_ int cWeight, _In_ DWORD bItalic, _In_ DWORD bUnderline, _In_ DWORD bStrikeOut, _In_ DWORD iCharSet, _In_ DWORD iOutPrecision, _In_ DWORD iClipPrecision, _In_ DWORD iQuality, _In_ DWORD iPitchAndFamily, _In_opt_ LPCWSTR pszFaceName)
 {
 /*
@@ -203,15 +201,52 @@ HFONT NTAPI gCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement
     return CreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, L"ºÚÌå");
 }
 
+#pragma comment(linker, "/EXPORT:GetFileVersionInfoSizeW=VERSION.GetFileVersionInfoSizeW")
+#pragma comment(linker, "/EXPORT:VerQueryValueW=VERSION.VerQueryValueW")
+#pragma comment(linker, "/EXPORT:GetFileVersionInfoW=VERSION.GetFileVersionInfoW")
+
+int CDECL CompareActiveCode(PCWSTR s1, PCWSTR s2)
+{
+    if (_ReturnAddress() != (PVOID)0x65FAEA)
+        return wcscmp(s1, s2);
+
+    static BOOL NotFirst = FALSE;
+
+    if (NotFirst)
+        return wcscmp(s1, s2);
+
+    NotFirst = TRUE;
+    return 0;
+}
+
 BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
 
+    LdrDisableThreadCalloutsForDll(BaseAddress);
+
     MEMORY_PATCH p[] =
     {
-        PATCH_MEMORY(gCreateFontW, 4, 0x166044),
-        PATCH_MEMORY(0x75FF0E, 4, 0x78744),
+        PATCH_MEMORY(CompareActiveCode, 4, 0x0DBA2C),
     };
+
+    Reg::SetKeyValue(
+        HKEY_CURRENT_USER,
+        L"Software\\pjjy\\PureEnglish\\Student_Homework",
+        L"cfg.reg.sActiveCode",
+        REG_SZ,
+        L"123456789",
+        sizeof(L"123456789")
+    );
+
+    Reg::SetKeyValue(
+        HKEY_CURRENT_USER,
+        L"Software\\pjjy\\PureEnglish\\Student_Homework",
+        L"cfg.reg.sSerialNumber",
+        REG_SZ,
+        L"1111111111111111",
+        sizeof(L"1111111111111111")
+    );
 
     Nt_PatchMemory(p, countof(p), 0, 0, GetExeModuleHandle());
 

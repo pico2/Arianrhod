@@ -195,6 +195,21 @@ NAKED VOID CBattle::NakedGetSBreakVoiceChrId()
     }
 }
 
+
+BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
+{
+    TYPE_OF(&CBattle::ThinkSBreak) ThinkMagicEveryChrAction;
+    TYPE_OF(&CBattle::ThinkSBreak) ThinkSCraft;
+    
+    *(PVOID *)&ThinkMagicEveryChrAction = (PVOID)0x9926E0;
+    *(PVOID *)&ThinkSCraft              = (PVOID)0x98E730;
+
+    if (FLAG_ON(MSData->State, 0x8000 | 0x4000))
+        return (this->*ThinkMagicEveryChrAction)(MSData);
+
+    return (this->*ThinkSCraft)(MSData) || (this->*ThinkMagicEveryChrAction)(MSData);
+}
+
 /************************************************************************
   EDAO
 ************************************************************************/
@@ -379,8 +394,6 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
     FOR_EACH(Entry, Status, countof(Status))
     {
-        ULONG_PTR Length;
-
         DrawSimpleText(X, Y, Entry->Text, COLOR_GOLD);
 
         if (ShowInfo)
