@@ -196,6 +196,22 @@ typedef union MONSTER_STATUS
         return AiType != 0xFF && !FLAG_ON(State, CHR_FLAG_NPC | CHR_FLAG_PLAYER | CHR_FLAG_EMPTY);
     }
 
+    BOOL IsChrCanThinkSCraft()
+    {
+        if (!IsChrEnemy())
+            return FALSE;
+
+        switch (AiType)
+        {
+            case 0x00:
+            case 0x02:
+            case 0x1F:
+                return TRUE;
+        }
+
+        return FALSE;
+    }
+
     struct
     {
 

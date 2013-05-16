@@ -209,7 +209,7 @@ NAKED VOID CBattle::NakedGetBattleState()
         cmp     PreviousState, -1;
         je      RETURN;
 
-        cmp     PreviousState, 9;
+        cmp     PreviousState, 1Eh;
         je      THINK_FIRST_SBREAK;
 
         mov     PreviousState, ecx;
@@ -267,7 +267,7 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
     if ((this->*StubThinkSBreak)(MSData))
         return TRUE;
 
-    if (!MSData->IsChrEnemy())
+    if (!MSData->IsChrCanThinkSCraft())
         return FALSE;
 
     SelfEntry = GetBattleATBar()->FindATBarEntry(MSData);
