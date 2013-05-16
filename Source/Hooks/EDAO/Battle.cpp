@@ -195,19 +195,66 @@ NAKED VOID CBattle::NakedGetSBreakVoiceChrId()
     }
 }
 
+NAKED VOID CBattle::NakedGetBattleState()
+{
+    static ULONG PreviousState;
+
+    INLINE_ASM
+    {
+        mov     dword ptr [ebp-0x294], ecx;
+        mov     ecx, dword ptr [eax+0x113078];
+        cmp     ecx, 2;
+        je      INIT_STATE;
+
+        cmp     PreviousState, -1;
+        je      RETURN;
+
+        cmp     PreviousState, 9;
+        je      THINK_FIRST_SBREAK;
+
+        mov     PreviousState, ecx;
+
+        jmp     RETURN;
+
+THINK_FIRST_SBREAK:
+
+        mov     dword ptr [eax+0x113078], 03Ch;
+        or      PreviousState, -1;
+        jmp     RETURN;
+
+INIT_STATE:
+
+        and     PreviousState, 0;
+
+RETURN:
+
+        ret;
+    }
+}
 
 BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
 {
     TYPE_OF(&CBattle::ThinkSBreak) ThinkMagicEveryChrAction;
     TYPE_OF(&CBattle::ThinkSBreak) ThinkSCraft;
-    
+
     *(PVOID *)&ThinkMagicEveryChrAction = (PVOID)0x9926E0;
     *(PVOID *)&ThinkSCraft              = (PVOID)0x98E730;
 
     if (FLAG_ON(MSData->State, 0x8000 | 0x4000))
         return (this->*ThinkMagicEveryChrAction)(MSData);
 
-    return (this->*ThinkSCraft)(MSData) || (this->*ThinkMagicEveryChrAction)(MSData);
+    if (MSData->ChrStatus[BattleStatusFinal].InitialCP > 100)
+    {
+        GetEDAO()->GetSound()->PlaySound(506);
+        GetBattleAT()->AdvanceChrInATBar(MSData, TRUE);
+
+        GetBattleAT()->EntryPointer[0]->IconAT = 0;
+        MSData->AT = 0;
+
+        return FALSE;
+    }
+
+    return (this->*ThinkMagicEveryChrAction)(MSData);
 }
 
 /************************************************************************
@@ -287,7 +334,7 @@ PBYTE CGlobal::GetMagicQueryTable(USHORT MagicId)
     if (MagicId < MINIMUM_CUSTOM_CRAFT_INDEX)
         return (this->*StubGetMagicQueryTable)(MagicId);
 
-    static BYTE StaticMagicQueryTable[] = { 233, 233, 233, 233, 233, 233, 233, 233 };
+    static BYTE StaticMagicQueryTable[7] = { /* 233, 233, 233, 233, 233, 233, 233, 233 */ };
 
     return StaticMagicQueryTable;
 }

@@ -245,6 +245,9 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x80,      1, 0x5F68A4),    // force show debug at
         PATCH_MEMORY(0x2C,      1, 0x5F693D),    // debug at pos.X advance
 
+        // enemy sbreak
+        //PATCH_MEMORY(0xEB,      1, 0x623525),    // do sth. when first icon in atbar is empty
+
         // monster info
         PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
         
@@ -308,7 +311,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         // think sbreak
 
-        //INLINE_HOOK_JUMP_RVA_NULL(0x2720F0, METHOD_PTR(&CBattle::ThinkSBreak)),
+        INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
+        INLINE_HOOK_JUMP_RVA_NULL(0x2720F0, METHOD_PTR(&CBattle::ThinkSBreak)),
 
         // monster info box
 
