@@ -246,6 +246,8 @@ BOOL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
         return (this->*StubThinkSCraft)(MSData);
     }
 
+    SetCurrentActionChr(0xA, MSData);
+
     return TRUE;
 }
 
@@ -256,7 +258,8 @@ BOOL CBattle::ThinkRunaway(PMONSTER_STATUS MSData)
 
 BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
 {
-    PAT_BAR_ENTRY SelfEntry, *Entry;
+    BOOL            Success;
+    PAT_BAR_ENTRY   SelfEntry, *Entry;
 
     //TYPE_OF(&CBattle::ThinkSBreak) ThinkMagicEveryChrAction;
     //*(PULONG_PTR)&ThinkMagicEveryChrAction = 0x9926E0;
@@ -271,16 +274,16 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
         return FALSE;
 
     SelfEntry = GetBattleATBar()->FindATBarEntry(MSData);
-
+/*
     FOR_EACH(Entry, GetBattleATBar()->EntryPointer, countof(GetBattleATBar()->EntryPointer))
     {
-        if (Entry[0] == SelfEntry)
+        if (Entry[0] == SelfEntry && Entry != GetBattleATBar()->EntryPointer)
             break;
 
         if (Entry[0]->IsSBreaking)
             return FALSE;
     }
-
+*/
     if (SelfEntry == NULL || SelfEntry->IsSBreaking)
         return FALSE;
 
@@ -298,7 +301,28 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
     if (FindEffectInfoByCondition(MSData, Conditions) != NULL)
         return FALSE;
 
-    if (!(this->*ThinkSCraft)(MSData))
+    struct
+    {
+        PMONSTER_STATUS MSData;
+        ULONG_PTR       Type;
+        ULONG_PTR       Unknown_119AEE;
+        ULONG_PTR       Unknown_11A4D9;
+
+    } SavedData;
+
+    SavedData.MSData            = *(PMONSTER_STATUS *)PtrAdd(this, 0x119AE8);
+    SavedData.Type              = *(PUSHORT)PtrAdd(this, 0x119AEC);
+    SavedData.Unknown_119AEE    = *(PUSHORT)PtrAdd(this, 0x119AEE);
+    SavedData.Unknown_11A4D9    = *(PUSHORT)PtrAdd(this, 0x11A4D9);
+
+    Success = (this->*ThinkSCraft)(MSData);
+
+    *(PMONSTER_STATUS *)PtrAdd(this, 0x119AE8)  = SavedData.MSData;
+    *(PUSHORT)PtrAdd(this, 0x119AEC)            = SavedData.Type;
+    *(PUSHORT)PtrAdd(this, 0x119AEE)            = SavedData.Unknown_119AEE;
+    *(PUSHORT)PtrAdd(this, 0x11A4D9)            = SavedData.Unknown_11A4D9;
+
+    if (!Success)
         return FALSE;
 
     GetEDAO()->GetSound()->PlaySound(506);

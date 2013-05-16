@@ -519,6 +519,11 @@ public:
         return *(PBOOL)PtrAdd(this, 0x3A7B0);
     }
 
+    VOID THISCALL SetCurrentActionChr(USHORT Type, PMONSTER_STATUS MSData)
+    {
+        DETOUR_METHOD(CBattle, SetCurrentActionChr, 0x999100, Type, MSData);
+    }
+
     PVOID GetMSFileBuffer()
     {
         return PtrAdd(this, 0x114ED0);
