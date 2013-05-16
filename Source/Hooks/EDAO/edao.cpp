@@ -312,11 +312,6 @@ BOOL Initialize(PVOID BaseAddress)
 
         // enemy sbreak
 
-        //INLINE_HOOK_CALL_RVA_NULL(0x561BA7, METHOD_PTR(&CBattle::NakedGetBattleState)),
-        //INLINE_HOOK_CALL_RVA_NULL(0x5656D9, METHOD_PTR(&CBattle::NakedGetBattleState)),
-        //INLINE_HOOK_CALL_RVA_NULL(0x574AA9, METHOD_PTR(&CBattle::NakedGetBattleState)),
-        //INLINE_HOOK_JUMP_RVA(0x2720F0, METHOD_PTR(&CBattle::ThinkMagicEveryChrAction), CBattle::StubThinkMagicEveryChrAction),
-
         INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
         INLINE_HOOK_JUMP_RVA(0x599100, METHOD_PTR(&CBattle::SetCurrentActionChrInfo), CBattle::StubSetCurrentActionChrInfo),
         INLINE_HOOK_JUMP_RVA(0x276925, METHOD_PTR(&CBattle::ThinkRunaway), CBattle::StubThinkRunaway),
