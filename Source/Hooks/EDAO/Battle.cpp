@@ -195,44 +195,67 @@ NAKED VOID CBattle::NakedGetSBreakVoiceChrId()
     }
 }
 
+VOID FASTCALL CBattle::HandleBattleState(ULONG_PTR CurrentState)
+{
+    static ULONG_PTR PreviousState;
+
+    //*(PULONG)PtrAdd(this, 0x113078) = 0x12;
+
+    if (PreviousState == CurrentState)
+        return;
+
+    PreviousState = CurrentState;
+    if (CurrentState != 0x12)
+        return;
+
+    PAT_BAR_ENTRY*  Entry;
+    BOOLEAN         Flags[0x20];
+
+    ZeroMemory(Flags, sizeof(Flags));
+
+    FOR_EACH(Entry, GetBattleATBar()->EntryPointer, countof(GetBattleATBar()->EntryPointer))
+    {
+        PMONSTER_STATUS MSData;
+
+        MSData = Entry[0]->MSData;
+        if (MSData == NULL)
+            continue;
+
+        if (Flags[MSData->CharPosition])
+            continue;
+
+        Flags[MSData->CharPosition] = TRUE;
+
+        ThinkSBreak(MSData);
+    }
+}
+
 NAKED VOID CBattle::NakedGetBattleState()
 {
     static ULONG PreviousState;
 
     INLINE_ASM
     {
-        mov     dword ptr [ebp-0x294], ecx;
-        mov     ecx, dword ptr [eax+0x113078];
-        cmp     ecx, 2;
-        je      INIT_STATE;
-
-        cmp     PreviousState, -1;
-        je      RETURN;
-
-        cmp     PreviousState, 1Eh;
-        je      THINK_FIRST_SBREAK;
-
-        mov     PreviousState, ecx;
-
-        jmp     RETURN;
-
-THINK_FIRST_SBREAK:
-
-        mov     dword ptr [eax+0x113078], 03Ch;
-        or      PreviousState, -1;
-        jmp     RETURN;
-
-INIT_STATE:
-
-        and     PreviousState, 0;
-
-RETURN:
-
-        ret;
+        mov     dword ptr [ebp - 294h], ecx;
+        mov     edx, dword ptr [eax + 113078h];
+        mov     ecx, eax;
+        jmp     CBattle::HandleBattleState
     }
 }
 
-BOOL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
+VOID THISCALL CBattle::SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSData)
+{
+    PTEB_ACTIVE_FRAME Frame;
+
+    Frame = FindThreadFrame(THINK_SBREAK_FILTER);
+
+    if (Frame != NULL && Frame->Data == (ULONG_PTR)MSData)
+        return;
+
+    return (this->*StubSetCurrentActionChrInfo)(Type, MSData);
+}
+
+BOOL THISCALL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
 {
     PAT_BAR_ENTRY Entry;
 
@@ -246,12 +269,12 @@ BOOL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
         return (this->*StubThinkSCraft)(MSData);
     }
 
-    SetCurrentActionChr(0xA, MSData);
+    SetCurrentActionChrInfo(0xA, MSData);
 
     return TRUE;
 }
 
-BOOL CBattle::ThinkRunaway(PMONSTER_STATUS MSData)
+BOOL THISCALL CBattle::ThinkRunaway(PMONSTER_STATUS MSData)
 {
     return GetBattleATBar()->FindATBarEntry(MSData)->IsSBreaking ? FALSE : (this->*StubThinkRunaway)(MSData);
 }
@@ -267,23 +290,11 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
     TYPE_OF(&CBattle::ThinkSBreak) ThinkSCraft;
     *(PULONG_PTR)&ThinkSCraft = 0x98E730;
 
-    if ((this->*StubThinkSBreak)(MSData))
-        return TRUE;
-
     if (!MSData->IsChrCanThinkSCraft())
         return FALSE;
 
     SelfEntry = GetBattleATBar()->FindATBarEntry(MSData);
-/*
-    FOR_EACH(Entry, GetBattleATBar()->EntryPointer, countof(GetBattleATBar()->EntryPointer))
-    {
-        if (Entry[0] == SelfEntry && Entry != GetBattleATBar()->EntryPointer)
-            break;
 
-        if (Entry[0]->IsSBreaking)
-            return FALSE;
-    }
-*/
     if (SelfEntry == NULL || SelfEntry->IsSBreaking)
         return FALSE;
 
@@ -303,27 +314,45 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
 
     struct
     {
-        PMONSTER_STATUS MSData;
-        ULONG_PTR       Type;
-        ULONG_PTR       Unknown_119AEE;
-        ULONG_PTR       Unknown_11A4D9;
+        USHORT                          ActionType;
+        USHORT                          CurrentCraftIndex;
+        USHORT                          CurrentAiIndex;
+        TYPE_OF(MSData->SelectedCraft)  SelectedCraft;
 
     } SavedData;
 
-    SavedData.MSData            = *(PMONSTER_STATUS *)PtrAdd(this, 0x119AE8);
-    SavedData.Type              = *(PUSHORT)PtrAdd(this, 0x119AEC);
-    SavedData.Unknown_119AEE    = *(PUSHORT)PtrAdd(this, 0x119AEE);
-    SavedData.Unknown_11A4D9    = *(PUSHORT)PtrAdd(this, 0x11A4D9);
+    SavedData.ActionType        = MSData->SelectedActionType;
+    SavedData.CurrentCraftIndex = MSData->CurrentCraftIndex;
+    SavedData.CurrentAiIndex    = MSData->CurrentAiIndex;
+    SavedData.SelectedCraft     = MSData->SelectedCraft;
 
+    TEB_ACTIVE_FRAME Frame;
+
+    Frame.Context   = THINK_SBREAK_FILTER;
+    Frame.Data      = (ULONG_PTR)MSData;
+    Frame.Push();
+
+    Success = TRUE;
     Success = (this->*ThinkSCraft)(MSData);
 
-    *(PMONSTER_STATUS *)PtrAdd(this, 0x119AE8)  = SavedData.MSData;
-    *(PUSHORT)PtrAdd(this, 0x119AEC)            = SavedData.Type;
-    *(PUSHORT)PtrAdd(this, 0x119AEE)            = SavedData.Unknown_119AEE;
-    *(PUSHORT)PtrAdd(this, 0x11A4D9)            = SavedData.Unknown_11A4D9;
+    Frame.Pop();
 
     if (!Success)
+    {
+        MSData->SelectedActionType  = SavedData.ActionType;
+        MSData->CurrentCraftIndex   = SavedData.CurrentCraftIndex;
+        MSData->CurrentAiIndex      = SavedData.CurrentAiIndex;
+        MSData->SelectedCraft       = SavedData.SelectedCraft;
         return FALSE;
+    }
+
+    if (MSData->CurrentActionType == ACTION_ARIA_MAGIC ||
+        MSData->CurrentActionType == ACTION_ARIA_CRAFT ||
+        MSData->PreviousActionType == ACTION_ARIA_MAGIC ||
+        MSData->PreviousActionType == ACTION_ARIA_CRAFT)
+    {
+        CancelAria(MSData, TRUE);
+    }
 
     GetEDAO()->GetSound()->PlaySound(506);
     GetBattleATBar()->AdvanceChrInATBar(MSData, IsForceInsertToFirst());

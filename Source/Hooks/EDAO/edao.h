@@ -121,6 +121,10 @@ enum
     ACTION_CRAFT,
     ACTION_SCRAFT,
     ACTION_ITEM,
+    ACTION_ARIA_MAGIC,
+    ACTION_CAST_MAGIC,
+    ACTION_ARIA_CRAFT,
+    ACTION_CAST_CRAFT,
 };
 
 enum
@@ -224,12 +228,18 @@ typedef union MONSTER_STATUS
         ULONG                   SymbolIndex;                // 0x10
         ULONG                   MSFileIndex;                // 0x14
 
-        DUMMY_STRUCT(0x172 - 0x18);
+        DUMMY_STRUCT(0x16C - 0x18);
 
-        USHORT                  ActionType;                 // 0x172
+        USHORT                  CurrentActionType;          // 0x16C
 
-        DUMMY_STRUCT(0x8);
+        DUMMY_STRUCT(2);
 
+        USHORT                  PreviousActionType;         // 0x170
+        USHORT                  SelectedActionType;         // 0x172
+        USHORT                  Unknown_174;
+        USHORT                  Unknown_176;
+        USHORT                  Unknown_178;
+        USHORT                  Unknown_17A;
         USHORT                  WhoAttackMe;                // 0x17C
         USHORT                  CurrentCraftIndex;          // 0x17E
         USHORT                  LastActionIndex;            // 0x180
@@ -519,11 +529,6 @@ public:
         return *(PBOOL)PtrAdd(this, 0x3A7B0);
     }
 
-    VOID THISCALL SetCurrentActionChr(USHORT Type, PMONSTER_STATUS MSData)
-    {
-        DETOUR_METHOD(CBattle, SetCurrentActionChr, 0x999100, Type, MSData);
-    }
-
     PVOID GetMSFileBuffer()
     {
         return PtrAdd(this, 0x114ED0);
@@ -556,6 +561,11 @@ public:
     VOID THISCALL ShowSkipAnimeButton()
     {
         DETOUR_METHOD(CBattle, ShowSkipAnimeButton, 0x673513);
+    }
+
+    VOID THISCALL CancelAria(PMONSTER_STATUS MSData, BOOL Reset)
+    {
+        DETOUR_METHOD(CBattle, CancelAria, 0x99DDC0, MSData, Reset);
     }
 
     /************************************************************************
@@ -593,9 +603,14 @@ public:
       enemy sbreak
     ************************************************************************/
 
+#define THINK_SBREAK_FILTER TAG4('THSB')
+
     VOID NakedGetBattleState();
-    BOOL ThinkRunaway(PMONSTER_STATUS MSData);
-    BOOL ThinkSCraft(PMONSTER_STATUS MSData);
+    VOID FASTCALL HandleBattleState(ULONG_PTR CurrentState);
+    VOID THISCALL SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSData);
+    BOOL THISCALL ThinkRunaway(PMONSTER_STATUS MSData);
+    BOOL THISCALL ThinkSCraft(PMONSTER_STATUS MSData);
+
     BOOL ThinkSBreak(PMONSTER_STATUS MSData);
 
 
@@ -628,22 +643,21 @@ public:
     }
 
 
+    DECL_STATIC_METHOD_POINTER(CBattle, LoadMSFile);
+
     /************************************************************************
       acgn end
     ************************************************************************/
 
 
+    DECL_STATIC_METHOD_POINTER(CBattle, SetCurrentActionChrInfo);
     DECL_STATIC_METHOD_POINTER(CBattle, ThinkRunaway);
     DECL_STATIC_METHOD_POINTER(CBattle, ThinkSCraft);
-    DECL_STATIC_METHOD_POINTER(CBattle, ThinkSBreak);
-
-    /////acgn/////////////////////////////////////////////////////////////////////////////////////////////////
-    DECL_STATIC_METHOD_POINTER(CBattle, LoadMSFile);
 };
 
+INIT_STATIC_MEMBER(CBattle::StubSetCurrentActionChrInfo);
 INIT_STATIC_MEMBER(CBattle::StubThinkRunaway);
 INIT_STATIC_MEMBER(CBattle::StubThinkSCraft);
-INIT_STATIC_MEMBER(CBattle::StubThinkSBreak);
 INIT_STATIC_MEMBER(CBattle::StubLoadMSFile);
 
 class CSound

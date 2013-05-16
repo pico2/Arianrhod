@@ -1,6 +1,6 @@
 VOID THISCALL CBattle::SetSelectedSCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    MSData->ActionType                      = ACTION_SCRAFT;
+    MSData->SelectedActionType              = ACTION_SCRAFT;
     MSData->CurrentCraftIndex               = CraftIndex;
     MSData->CurrentAiIndex                  = AiIndex;
     MSData->SelectedCraft.CraftIndex        = CraftIndex;
@@ -10,7 +10,7 @@ VOID THISCALL CBattle::SetSelectedSCraft(PMONSTER_STATUS MSData, USHORT CraftInd
 
 VOID THISCALL CBattle::SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    MSData->ActionType                      = ACTION_CRAFT;
+    MSData->SelectedActionType              = ACTION_CRAFT;
     MSData->CurrentCraftIndex               = CraftIndex;
     MSData->CurrentAiIndex                  = AiIndex;
     MSData->SelectedCraft.CraftIndex        = CraftIndex;
@@ -20,7 +20,7 @@ VOID THISCALL CBattle::SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftInde
 
 VOID THISCALL CBattle::SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    MSData->ActionType                      = ACTION_MAGIC;
+    MSData->SelectedActionType              = ACTION_MAGIC;
     MSData->CurrentCraftIndex               = CraftIndex;
     MSData->CurrentAiIndex                  = AiIndex;
     MSData->SelectedCraft.CraftIndex        = CraftIndex;
@@ -30,7 +30,7 @@ VOID THISCALL CBattle::SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftInde
 
 VOID THISCALL CBattle::SetSelectedAttack(PMONSTER_STATUS MSData)
 {
-    MSData->ActionType                      = ACTION_ATTACK;
+    MSData->SelectedActionType              = ACTION_ATTACK;
     MSData->CurrentCraftIndex               = MSData->Attack.CraftIndex;
     MSData->CurrentAiIndex                  = (USHORT)-1;
     MSData->SelectedCraft.CraftIndex        = MSData->Attack.CraftIndex;
