@@ -250,7 +250,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // monster info
         PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
-        
+
         // iat hook
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
@@ -278,7 +278,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
         INLINE_HOOK_JUMP_RVA(0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
-        INLINE_HOOK_CALL_RVA_NULL(0x5F690B, FormatBattleChrAT),
+        INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
+        INLINE_HOOK_CALL_RVA_NULL(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
 
         // file redirection
 
@@ -309,19 +310,25 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
 
 
-        // think sbreak
+        // enemy sbreak
 
-        INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x2720F0, METHOD_PTR(&CBattle::ThinkSBreak)),
+        //INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
+        INLINE_HOOK_JUMP_RVA(0x2720F0, METHOD_PTR(&CBattle::ThinkSBreak), CBattle::StubThinkSBreak),
+        INLINE_HOOK_JUMP_RVA(0x276925, METHOD_PTR(&CBattle::ThinkRunaway), CBattle::StubThinkRunaway),
+        INLINE_HOOK_JUMP_RVA(0x27643E, METHOD_PTR(&CBattle::ThinkSCraft), CBattle::StubThinkSCraft),
+
 
         // monster info box
 
         INLINE_HOOK_CALL_RVA_NULL(0x626AEA, METHOD_PTR(&CBattleInfoBox::SetMonsterInfoBoxSize)),
         INLINE_HOOK_JUMP_RVA(0x27AC8C, METHOD_PTR(&CBattleInfoBox::DrawMonsterStatus), CBattleInfoBox::StubDrawMonsterStatus),
 
-        // xxoo
 
+        // acgn
         INLINE_HOOK_JUMP_RVA_NULL(0x5B1BF4, NakedArianrhodRefreshSy),
+        INLINE_HOOK_JUMP_RVA(0x275EFD,      METHOD_PTR(&CBattle::LoadMSFile), CBattle::StubLoadMSFile),	//it3
+        INLINE_HOOK_JUMP_RVA_NULL(0x5D3545, METHOD_PTR(&CBattle::NakedAS_8D_5F)), //Ê±¿Õ´ó±À»µ
+
 
         //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
         //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),
@@ -334,7 +341,7 @@ BOOL Initialize(PVOID BaseAddress)
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
-    //PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, WhoAttackMe));
+    //PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, Equipment));
 
     switch (Reason)
     {

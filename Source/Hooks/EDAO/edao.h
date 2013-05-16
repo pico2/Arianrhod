@@ -8,8 +8,9 @@ class CGlobal;
 class CBattle;
 
 #define INIT_STATIC_MEMBER(x) DECL_SELECTANY TYPE_OF(x) x = NULL
-
 #define DECL_STATIC_METHOD_POINTER(cls, method) static TYPE_OF(&cls::method) Stub##method
+#define DETOUR_METHOD(cls, method, addr, ...) TYPE_OF(&cls::method) (method); *(PULONG_PTR)&(method) = addr; return (this->*method)(__VA_ARGS__)
+
 
 #define UCL_COMPRESS_MAGIC TAG4('UCL4')
 
@@ -25,6 +26,47 @@ typedef struct
     ULONG CompressedSize;
 
 } UCL_COMPRESS_HEADER;
+
+
+ML_NAMESPACE_BEGIN(CraftConditions)
+
+    static const ULONG_PTR Poison              = 0x00000001;
+    static const ULONG_PTR Frozen              = 0x00000002;
+    static const ULONG_PTR Landification       = 0x00000004;
+    static const ULONG_PTR Sleeping            = 0x00000008;
+    static const ULONG_PTR BanArts             = 0x00000010;
+    static const ULONG_PTR Darkness            = 0x00000020;
+    static const ULONG_PTR BanCraft            = 0x00000040;
+    static const ULONG_PTR Confusion           = 0x00000080;
+    static const ULONG_PTR Stun                = 0x00000100;
+    static const ULONG_PTR OnehitKill          = 0x00000200;
+    static const ULONG_PTR Burning             = 0x00000400;
+    static const ULONG_PTR Rage                = 0x00000800;
+    static const ULONG_PTR ArtsGuard           = 0x00001000;
+    static const ULONG_PTR CraftGuard          = 0x00002000;
+
+    static const ULONG_PTR MaxGuard            = 0x00004000;
+    static const ULONG_PTR Vanish              = 0x00008000;
+    static const ULONG_PTR StrUp               = 0x00010000;
+    static const ULONG_PTR DefUp               = 0x00020000;
+    static const ULONG_PTR AtsUp               = 0x00040000;
+    static const ULONG_PTR AdfUp               = 0x00080000;
+    static const ULONG_PTR DexUp               = 0x00100000;
+    static const ULONG_PTR AglUp               = 0x00200000;
+    static const ULONG_PTR MovUp               = 0x00400000;
+    static const ULONG_PTR SpdUp               = 0x00800000;
+    static const ULONG_PTR HPRecovery          = 0x01000000;
+    static const ULONG_PTR CPRecovery          = 0x02000000;
+
+    static const ULONG_PTR Stealth             = 0x04000000;
+    static const ULONG_PTR ArtsReflect         = 0x08000000;
+    static const ULONG_PTR Reserve_1           = 0x10000000;
+    static const ULONG_PTR Reserve_2           = 0x20000000;
+    static const ULONG_PTR Reserve_3           = 0x40000000;
+
+    static const ULONG_PTR Dead                = 0x80000000;
+
+ML_NAMESPACE_END
 
 
 typedef struct  // 0x18
@@ -135,14 +177,28 @@ typedef struct
     ULONG               ATLeft;
     ULONG               Unknown4;
 
-} MS_EFFECT_INFO;
+} MS_EFFECT_INFO, *PMS_EFFECT_INFO;
 
-typedef union
+enum
+{
+    CHR_FLAG_ENEMY  = 0x1000,
+    CHR_FLAG_NPC    = 0x2000,
+    CHR_FLAG_PLAYER = 0x4000,
+    CHR_FLAG_EMPTY  = 0x8000,
+};
+
+typedef union MONSTER_STATUS
 {
     DUMMY_STRUCT(0x2424);
 
+    BOOL IsChrEnemy()
+    {
+        return AiType != 0xFF && !FLAG_ON(State, CHR_FLAG_NPC | CHR_FLAG_PLAYER | CHR_FLAG_EMPTY);
+    }
+
     struct
     {
+
         USHORT                  CharPosition;               // 0x00
         USHORT                  State;                      // 0x02
         USHORT                  State2;                     // 0x04
@@ -171,13 +227,18 @@ typedef union
 
         DUMMY_STRUCT(2);
 
-        MS_EFFECT_INFO          EffectInfo[0x14];           // 0x2A0
+        MS_EFFECT_INFO          EffectInfo[32];             // 0x2A0
 
-        DUMMY_STRUCT(0x538 - 0x430);
+        DUMMY_STRUCT(0x538 - (0x2A0 + sizeof(MS_EFFECT_INFO) * 32));
 
         ULONG                   AT;                         // 0x538
+        ULONG                   AT2;                        // 0x53C
+        USHORT                  AiType;                     // 0x540
+        USHORT                  EXPGet;                     // 0x542
+        USHORT                  DropItem[2];                // 0x544
+        BYTE                    DropRate[2];                // 0x548
 
-        DUMMY_STRUCT(0x54C - 0x53C);
+        DUMMY_STRUCT(2);
 
         USHORT                  Equipment[5];               // 0x54C
         USHORT                  Orbment[7];                 // 0x556
@@ -341,21 +402,28 @@ typedef union
     struct
     {
         DUMMY_STRUCT(0x60);
-        PMONSTER_STATUS MSData; // 0x60
+
+        PMONSTER_STATUS MSData;     // 0x60
+
         DUMMY_STRUCT(4);
-        ULONG   IconAT;          // 0x68 不含20 空; 含10 AT条移动; 含04 行动、delay后的([20A]0销毁); 含40 当前行动的(1销毁)
-        USHORT  par;            // 0x6C
+
+        ULONG   IconAT;             // 0x68 不含20 空; 含10 AT条移动; 含04 行动、delay后的([20A]0销毁); 含40 当前行动的(1销毁)
+        USHORT  par;                // 0x6C
+
         DUMMY_STRUCT(3);
-        byte    RNo;		    // 0x71
+        BYTE    RNo;		        // 0x71
+
         DUMMY_STRUCT(1);
-        byte    sequence;	    // 0x73
-        bool    isSBreak;
+
+        BYTE    sequence;	        // 0x73
+        BOOLEAN IsSBreaking;
+
         DUMMY_STRUCT(3);
     };
 
 } AT_BAR_ENTRY, *PAT_BAR_ENTRY;
 
-class CBattleAT
+class CBattleATBar
 {
 public:
     AT_BAR_ENTRY   Entry[0x3C];
@@ -363,24 +431,37 @@ public:
 
     BOOL IsCurrentChrSBreak()
     {
-        return EntryPointer[0]->isSBreak;
+        return EntryPointer[0]->IsSBreaking;
     }
 
     // -1 for null
     BYTE THISCALL GetChrAT0()
     {
-        TYPE_OF(&CBattleAT::GetChrAT0) f;
+        TYPE_OF(&CBattleATBar::GetChrAT0) f;
         *(PVOID *)&f = (PVOID)0x00677230;
 		return (this->*f)();
     }
 
-    VOID AdvanceChrInATBar(PMONSTER_STATUS MSData, BOOL X = TRUE)
+    VOID AdvanceChrInATBar(PMONSTER_STATUS MSData, BOOL InsertToFirstPos)
     {
-        TYPE_OF(&CBattleAT::AdvanceChrInATBar) StubForwardATBar;
+        TYPE_OF(&CBattleATBar::AdvanceChrInATBar) AdvanceChrInATBar;
 
-        *(PVOID *)&StubForwardATBar = (PVOID)0x676D3F;
+        *(PVOID *)&AdvanceChrInATBar = (PVOID)0x676D3F;
 
-        return (this->*StubForwardATBar)(MSData, X);
+        return (this->*AdvanceChrInATBar)(MSData, InsertToFirstPos);
+    }
+
+    NoInline PAT_BAR_ENTRY FindATBarEntry(PMONSTER_STATUS MSData)
+    {
+        PAT_BAR_ENTRY *Entry;
+
+        FOR_EACH(Entry, EntryPointer, countof(EntryPointer))
+        {
+            if (Entry[0]->MSData == MSData)
+                return Entry[0];
+        }
+
+        return NULL;
     }
 };
 
@@ -412,9 +493,14 @@ public:
         return *(EDAO **)PtrAdd(this, 0x38D24);
     }
 
-    CBattleAT* GetBattleAT()
+    CBattleATBar* GetBattleATBar()
     {
-        return (CBattleAT *)PtrAdd(this, 0x103148);
+        return (CBattleATBar *)PtrAdd(this, 0x103148);
+    }
+
+    BOOL IsForceInsertToFirst()
+    {
+        return *(PBOOL)PtrAdd(this, 0x3A7B0);
     }
 
     PVOID GetMSFileBuffer()
@@ -437,6 +523,31 @@ public:
         return *(PLONG)PtrAdd(this, 0x113090);
     }
 
+    PMS_EFFECT_INFO THISCALL FindEffectInfoByCondition(PMONSTER_STATUS MSData, ULONG_PTR Condition, ULONG_PTR TimeLeft = 0)
+    {
+        TYPE_OF(&CBattle::FindEffectInfoByCondition) FindEffectInfoByCondition;
+
+        *(PULONG_PTR)&FindEffectInfoByCondition = 0x9E34A0;
+
+        return (this->*FindEffectInfoByCondition)(MSData, Condition, TimeLeft);
+    }
+
+    VOID THISCALL ShowSkipAnimeButton()
+    {
+        DETOUR_METHOD(CBattle, ShowSkipAnimeButton, 0x673513);
+    }
+
+    /************************************************************************
+      tweak
+    ************************************************************************/
+
+    static LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri);
+    static LONG CDECL ShowSkipCraftAnimeButton(...);
+
+    /************************************************************************
+      hack for use enemy
+    ************************************************************************/
+
     PMONSTER_STATUS FASTCALL OverWriteBattleStatusWithChrStatus(PMONSTER_STATUS MSData, PCHAR_STATUS ChrStatus);
     VOID NakedOverWriteBattleStatusWithChrStatus();
 
@@ -456,10 +567,63 @@ public:
     VOID NakedCopyMagicAndCraftData();
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
 
-    VOID NakedGetBattleState();
 
+    /************************************************************************
+      enemy sbreak
+    ************************************************************************/
+
+    VOID NakedGetBattleState();
+    BOOL ThinkRunaway(PMONSTER_STATUS MSData);
+    BOOL ThinkSCraft(PMONSTER_STATUS MSData);
     BOOL ThinkSBreak(PMONSTER_STATUS MSData);
+
+
+    /************************************************************************
+      acgn beg
+    ************************************************************************/
+
+    VOID THISCALL LoadMSFile(PMONSTER_STATUS MSData, ULONG MSFileIndex);
+    VOID THISCALL LoadMonsterIt3(ULONG CharPosition, ULONG par2, PSTR it3Path);
+    VOID NakedAS_8D_5F();
+	VOID THISCALL AS_8D_5F(PMONSTER_STATUS);
+
+    VOID THISCALL UnsetCondition(PMONSTER_STATUS MSData, ULONG condition)
+    {
+        TYPE_OF(&CBattle::UnsetCondition) f;
+        *(PVOID *)&f = (PVOID)0x672AE1;
+        return (this->*f)(MSData, condition);
+    }
+
+    VOID THISCALL SetCondition(PMONSTER_STATUS MSData, ULONG par2, ULONG condition, ULONG par4, ULONG par5)
+    {
+        TYPE_OF(&CBattle::SetCondition) f;
+        *(PVOID *)&f = (PVOID)0x676EA2;
+        return (this->*f)(MSData, par2, condition, par4, par5);
+	}
+
+    BOOL CheckCondition(PMONSTER_STATUS MSData, ULONG condition, ULONG par3=0)
+    {
+        return FindEffectInfoByCondition(MSData, condition, par3) != NULL;
+    }
+
+
+    /************************************************************************
+      acgn end
+    ************************************************************************/
+
+
+    DECL_STATIC_METHOD_POINTER(CBattle, ThinkRunaway);
+    DECL_STATIC_METHOD_POINTER(CBattle, ThinkSCraft);
+    DECL_STATIC_METHOD_POINTER(CBattle, ThinkSBreak);
+
+    /////acgn/////////////////////////////////////////////////////////////////////////////////////////////////
+    DECL_STATIC_METHOD_POINTER(CBattle, LoadMSFile);
 };
+
+INIT_STATIC_MEMBER(CBattle::StubThinkRunaway);
+INIT_STATIC_MEMBER(CBattle::StubThinkSCraft);
+INIT_STATIC_MEMBER(CBattle::StubThinkSBreak);
+INIT_STATIC_MEMBER(CBattle::StubLoadMSFile);
 
 class CSound
 {
@@ -729,9 +893,6 @@ public:
 
 DECL_SELECTANY TYPE_OF(EDAOFileStream::StubUncompress) EDAOFileStream::StubUncompress = NULL;
 
-
-
-LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri);
 
 
 #endif // _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_

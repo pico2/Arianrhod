@@ -232,29 +232,81 @@ RETURN:
     }
 }
 
-BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
+BOOL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
 {
-    TYPE_OF(&CBattle::ThinkSBreak) ThinkMagicEveryChrAction;
-    TYPE_OF(&CBattle::ThinkSBreak) ThinkSCraft;
+    PAT_BAR_ENTRY Entry;
 
-    *(PVOID *)&ThinkMagicEveryChrAction = (PVOID)0x9926E0;
-    *(PVOID *)&ThinkSCraft              = (PVOID)0x98E730;
+    Entry = GetBattleATBar()->EntryPointer[0];
 
-    if (FLAG_ON(MSData->State, 0x8000 | 0x4000))
-        return (this->*ThinkMagicEveryChrAction)(MSData);
-
-    if (MSData->ChrStatus[BattleStatusFinal].InitialCP > 100)
+    if (!MSData->IsChrEnemy() ||
+        Entry == NULL ||
+        Entry->MSData != MSData ||
+        !Entry->IsSBreaking)
     {
-        GetEDAO()->GetSound()->PlaySound(506);
-        GetBattleAT()->AdvanceChrInATBar(MSData, TRUE);
-
-        GetBattleAT()->EntryPointer[0]->IconAT = 0;
-        MSData->AT = 0;
-
-        return FALSE;
+        return (this->*StubThinkSCraft)(MSData);
     }
 
-    return (this->*ThinkMagicEveryChrAction)(MSData);
+    return TRUE;
+}
+
+BOOL CBattle::ThinkRunaway(PMONSTER_STATUS MSData)
+{
+    return GetBattleATBar()->FindATBarEntry(MSData)->IsSBreaking ? FALSE : (this->*StubThinkRunaway)(MSData);
+}
+
+BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
+{
+    PAT_BAR_ENTRY SelfEntry, *Entry;
+
+    //TYPE_OF(&CBattle::ThinkSBreak) ThinkMagicEveryChrAction;
+    //*(PULONG_PTR)&ThinkMagicEveryChrAction = 0x9926E0;
+
+    TYPE_OF(&CBattle::ThinkSBreak) ThinkSCraft;
+    *(PULONG_PTR)&ThinkSCraft = 0x98E730;
+
+    if ((this->*StubThinkSBreak)(MSData))
+        return TRUE;
+
+    if (!MSData->IsChrEnemy())
+        return FALSE;
+
+    SelfEntry = GetBattleATBar()->FindATBarEntry(MSData);
+
+    FOR_EACH(Entry, GetBattleATBar()->EntryPointer, countof(GetBattleATBar()->EntryPointer))
+    {
+        if (Entry[0] == SelfEntry)
+            break;
+
+        if (Entry[0]->IsSBreaking)
+            return FALSE;
+    }
+
+    if (SelfEntry == NULL || SelfEntry->IsSBreaking)
+        return FALSE;
+
+    ULONG_PTR Conditions =  CraftConditions::Frozen         |
+                            CraftConditions::Landification  |
+                            CraftConditions::Sleeping       |
+                            CraftConditions::Stun           |
+                            CraftConditions::BanCraft       |
+                            CraftConditions::Confusion      |
+                            CraftConditions::OnehitKill     |
+                            CraftConditions::Vanish         |
+                            CraftConditions::Reserve_3      |
+                            CraftConditions::Dead;
+
+    if (FindEffectInfoByCondition(MSData, Conditions) != NULL)
+        return FALSE;
+
+    if (!(this->*ThinkSCraft)(MSData))
+        return FALSE;
+
+    GetEDAO()->GetSound()->PlaySound(506);
+    GetBattleATBar()->AdvanceChrInATBar(MSData, IsForceInsertToFirst());
+
+    MSData->AT = 0;
+
+    return FALSE;
 }
 
 /************************************************************************
@@ -436,9 +488,6 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     ValueY = Rect.top - UpperLeft->Y + 24;
     ValueColor = (ShowByOrbment ? 0xFF8020 : 0xFFFFFF) | (GetBackgroundColor() & 0xFF000000);
 
-    Buffer[0] = '?';
-    Buffer[1] = 0;
-
     FOR_EACH(Entry, Status, countof(Status))
     {
         DrawSimpleText(X, Y, Entry->Text, COLOR_GOLD);
@@ -459,11 +508,22 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 }
 
 /************************************************************************
-  misc
+  battle tweak
 ************************************************************************/
 
-LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri)
+LONG CDECL CBattle::FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri)
 {
     return sprintf(Buffer, "%d", IcoAT);
 }
 
+LONG CDECL CBattle::ShowSkipCraftAnimeButton(...)
+{
+    AllocStack(16);
+
+    CBattle *Battle;
+
+    Battle = *(CBattle **)(*(PULONG_PTR)PtrSub(_AddressOfReturnAddress(), sizeof(PVOID)) - 0xC);
+    Battle->ShowSkipAnimeButton();
+
+    return 0;
+}
