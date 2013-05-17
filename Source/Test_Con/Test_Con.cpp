@@ -565,8 +565,6 @@ BOOL IsRunningInVMWare()
 
 // #include "HookPort.cpp"
 
-#include "FolderDialog.cpp"
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     LOGFONTW lf;
