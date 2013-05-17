@@ -200,10 +200,13 @@ typedef union MONSTER_STATUS
         return AiType != 0xFF && !FLAG_ON(State, CHR_FLAG_NPC | CHR_FLAG_PLAYER | CHR_FLAG_EMPTY);
     }
 
-    BOOL IsChrCanThinkSCraft()
+    BOOL IsChrCanThinkSCraft(BOOL CheckAiType = FALSE)
     {
         if (!IsChrEnemy())
             return FALSE;
+
+        if (!CheckAiType)
+            return TRUE;
 
         switch (AiType)
         {
@@ -608,6 +611,10 @@ public:
     VOID NakedGetBattleState();
     VOID FASTCALL HandleBattleState(ULONG_PTR CurrentState);
     VOID THISCALL SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSData);
+
+    LONG NakedEnemyThinkAction();
+    BOOL FASTCALL EnemyThinkAction(PMONSTER_STATUS MSData);
+
     BOOL THISCALL ThinkRunaway(PMONSTER_STATUS MSData);
     BOOL THISCALL ThinkSCraft(PMONSTER_STATUS MSData);
 

@@ -255,6 +255,42 @@ VOID THISCALL CBattle::SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSDa
     return (this->*StubSetCurrentActionChrInfo)(Type, MSData);
 }
 
+
+NAKED LONG CBattle::NakedEnemyThinkAction()
+{
+    INLINE_ASM
+    {
+        mov     dword ptr [ebp - 114h], eax;
+        mov     edx, [ebp + 08h];
+        mov     ecx, [ebp - 0Ch];
+        call    CBattle::EnemyThinkAction
+        or      eax, eax;
+        mov     eax, 991CBDh;
+        cmove   eax, [esp];
+        mov     [esp], eax;
+        ret;
+    }
+}
+
+BOOL FASTCALL CBattle::EnemyThinkAction(PMONSTER_STATUS MSData)
+{
+    PAT_BAR_ENTRY Entry;
+
+    Entry = GetBattleATBar()->EntryPointer[0];
+
+    if (!MSData->IsChrEnemy() ||
+        Entry == NULL ||
+        Entry->MSData != MSData ||
+        !Entry->IsSBreaking)
+    {
+        return FALSE;
+    }
+
+    SetCurrentActionChrInfo(0xA, MSData);
+
+    return TRUE;
+}
+
 BOOL THISCALL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
 {
     PAT_BAR_ENTRY Entry;
@@ -359,7 +395,7 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
 
     MSData->AT = 0;
 
-    return FALSE;
+    return TRUE;
 }
 
 /************************************************************************

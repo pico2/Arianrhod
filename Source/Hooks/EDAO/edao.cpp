@@ -277,7 +277,7 @@ BOOL Initialize(PVOID BaseAddress)
         // tweak
 
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
-        INLINE_HOOK_JUMP_RVA(0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
+        INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
         INLINE_HOOK_CALL_RVA_NULL(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
 
@@ -313,20 +313,21 @@ BOOL Initialize(PVOID BaseAddress)
         // enemy sbreak
 
         INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
-        INLINE_HOOK_JUMP_RVA(0x599100, METHOD_PTR(&CBattle::SetCurrentActionChrInfo), CBattle::StubSetCurrentActionChrInfo),
-        INLINE_HOOK_JUMP_RVA(0x276925, METHOD_PTR(&CBattle::ThinkRunaway), CBattle::StubThinkRunaway),
-        INLINE_HOOK_JUMP_RVA(0x27643E, METHOD_PTR(&CBattle::ThinkSCraft), CBattle::StubThinkSCraft),
+        INLINE_HOOK_JUMP_RVA     (0x599100, METHOD_PTR(&CBattle::SetCurrentActionChrInfo), CBattle::StubSetCurrentActionChrInfo),
+        INLINE_HOOK_CALL_RVA_NULL(0x591C3A, METHOD_PTR(&CBattle::NakedEnemyThinkAction)),
+        //INLINE_HOOK_JUMP_RVA(0x276925, METHOD_PTR(&CBattle::ThinkRunaway), CBattle::StubThinkRunaway),
+        //INLINE_HOOK_JUMP_RVA(0x27643E, METHOD_PTR(&CBattle::ThinkSCraft), CBattle::StubThinkSCraft),
 
 
         // monster info box
 
         INLINE_HOOK_CALL_RVA_NULL(0x626AEA, METHOD_PTR(&CBattleInfoBox::SetMonsterInfoBoxSize)),
-        INLINE_HOOK_JUMP_RVA(0x27AC8C, METHOD_PTR(&CBattleInfoBox::DrawMonsterStatus), CBattleInfoBox::StubDrawMonsterStatus),
+        INLINE_HOOK_JUMP_RVA     (0x27AC8C, METHOD_PTR(&CBattleInfoBox::DrawMonsterStatus), CBattleInfoBox::StubDrawMonsterStatus),
 
 
         // acgn
         INLINE_HOOK_JUMP_RVA_NULL(0x5B1BF4, NakedArianrhodRefreshSy),
-        INLINE_HOOK_JUMP_RVA(0x275EFD,      METHOD_PTR(&CBattle::LoadMSFile), CBattle::StubLoadMSFile),	//it3
+        INLINE_HOOK_JUMP_RVA     (0x275EFD,      METHOD_PTR(&CBattle::LoadMSFile), CBattle::StubLoadMSFile),	//it3
         INLINE_HOOK_JUMP_RVA_NULL(0x5D3545, METHOD_PTR(&CBattle::NakedAS_8D_5F)), //Ê±¿Õ´ó±À»µ
 
 
