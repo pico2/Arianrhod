@@ -565,8 +565,28 @@ BOOL IsRunningInVMWare()
 
 // #include "HookPort.cpp"
 
+#include <zlib.h>
+#pragma comment(lib, "zlib1.lib")
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    NtFileDisk x;
+
+    x.Open(L"E:\\Desktop\\Luxor 2 HD\\locale\\english.mjz");
+
+    x.Seek(0x35, FILE_BEGIN);
+
+    PVOID buf = AllocateMemory(0x2CD1);
+    x.Read(buf, 0x2CD1);
+
+    PVOID out = AllocateMemory(0xB37A);
+
+    ULONG_PTR outsize = 0xB37A;
+
+    uncompress((PBYTE)out, &outsize, (PBYTE)buf, 0x2CD1);
+
+    return;
+
     LOGFONTW lf;
 
     HDC dc = CreateCompatibleDC(NULL);

@@ -199,8 +199,6 @@ VOID FASTCALL CBattle::HandleBattleState(ULONG_PTR CurrentState)
 {
     static ULONG_PTR PreviousState;
 
-    //*(PULONG)PtrAdd(this, 0x113078) = 0x12;
-
     if (PreviousState == CurrentState)
         return;
 
@@ -210,23 +208,42 @@ VOID FASTCALL CBattle::HandleBattleState(ULONG_PTR CurrentState)
 
     PAT_BAR_ENTRY*  Entry;
     BOOLEAN         Flags[0x20];
+    ULONG_PTR       Count;
+    PMONSTER_STATUS MSData, MSDataList[countof(Flags)];
 
     ZeroMemory(Flags, sizeof(Flags));
 
+    Count = 0;
+
     FOR_EACH(Entry, GetBattleATBar()->EntryPointer, countof(GetBattleATBar()->EntryPointer))
     {
-        PMONSTER_STATUS MSData;
-
         MSData = Entry[0]->MSData;
         if (MSData == NULL)
             continue;
+
+        if (Entry[0]->IsSBreaking && !MSData->IsChrEnemy())
+            return;
 
         if (Flags[MSData->CharPosition])
             continue;
 
         Flags[MSData->CharPosition] = TRUE;
 
-        ThinkSBreak(MSData);
+        if (!ThinkSBreak(MSData, Entry[0]))
+            continue;
+
+        MSDataList[Count++] = MSData;
+    }
+
+    if (Count == 0)
+        return;
+
+    GetEDAO()->GetSound()->PlaySound(506);
+
+    for (PMONSTER_STATUS *MSData = MSDataList; Count; ++MSData, --Count)
+    {
+        (*MSData)->AT = 0;
+        GetBattleATBar()->AdvanceChrInATBar(*MSData, IsForceInsertToFirst());
     }
 }
 
@@ -243,19 +260,6 @@ NAKED VOID CBattle::NakedGetBattleState()
     }
 }
 
-VOID THISCALL CBattle::SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSData)
-{
-    PTEB_ACTIVE_FRAME Frame;
-
-    Frame = FindThreadFrame(THINK_SBREAK_FILTER);
-
-    if (Frame != NULL && Frame->Data == (ULONG_PTR)MSData)
-        return;
-
-    return (this->*StubSetCurrentActionChrInfo)(Type, MSData);
-}
-
-
 NAKED LONG CBattle::NakedEnemyThinkAction()
 {
     INLINE_ASM
@@ -270,6 +274,18 @@ NAKED LONG CBattle::NakedEnemyThinkAction()
         mov     [esp], eax;
         ret;
     }
+}
+
+VOID THISCALL CBattle::SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSData)
+{
+    PTEB_ACTIVE_FRAME Frame;
+
+    Frame = FindThreadFrame(THINK_SBREAK_FILTER);
+
+    if (Frame != NULL && Frame->Data == (ULONG_PTR)MSData)
+        return;
+
+    return (this->*StubSetCurrentActionChrInfo)(Type, MSData);
 }
 
 BOOL FASTCALL CBattle::EnemyThinkAction(PMONSTER_STATUS MSData)
@@ -291,47 +307,20 @@ BOOL FASTCALL CBattle::EnemyThinkAction(PMONSTER_STATUS MSData)
     return TRUE;
 }
 
-BOOL THISCALL CBattle::ThinkSCraft(PMONSTER_STATUS MSData)
+BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData, PAT_BAR_ENTRY Entry)
 {
-    PAT_BAR_ENTRY Entry;
-
-    Entry = GetBattleATBar()->EntryPointer[0];
-
-    if (!MSData->IsChrEnemy() ||
-        Entry == NULL ||
-        Entry->MSData != MSData ||
-        !Entry->IsSBreaking)
-    {
-        return (this->*StubThinkSCraft)(MSData);
-    }
-
-    SetCurrentActionChrInfo(0xA, MSData);
-
-    return TRUE;
-}
-
-BOOL THISCALL CBattle::ThinkRunaway(PMONSTER_STATUS MSData)
-{
-    return GetBattleATBar()->FindATBarEntry(MSData)->IsSBreaking ? FALSE : (this->*StubThinkRunaway)(MSData);
-}
-
-BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
-{
-    BOOL            Success;
-    PAT_BAR_ENTRY   SelfEntry, *Entry;
+    BOOL Success;
 
     //TYPE_OF(&CBattle::ThinkSBreak) ThinkMagicEveryChrAction;
     //*(PULONG_PTR)&ThinkMagicEveryChrAction = 0x9926E0;
 
-    TYPE_OF(&CBattle::ThinkSBreak) ThinkSCraft;
+    TYPE_OF(&CBattle::ThinkSCraft) ThinkSCraft;
     *(PULONG_PTR)&ThinkSCraft = 0x98E730;
 
-    if (!MSData->IsChrCanThinkSCraft())
+    if (Entry->IsSBreaking)
         return FALSE;
 
-    SelfEntry = GetBattleATBar()->FindATBarEntry(MSData);
-
-    if (SelfEntry == NULL || SelfEntry->IsSBreaking)
+    if (!MSData->IsChrCanThinkSCraft())
         return FALSE;
 
     ULONG_PTR Conditions =  CraftConditions::Frozen         |
@@ -389,11 +378,6 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData)
     {
         CancelAria(MSData, TRUE);
     }
-
-    GetEDAO()->GetSound()->PlaySound(506);
-    GetBattleATBar()->AdvanceChrInATBar(MSData, IsForceInsertToFirst());
-
-    MSData->AT = 0;
 
     return TRUE;
 }

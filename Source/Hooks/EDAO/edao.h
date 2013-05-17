@@ -618,7 +618,7 @@ public:
     BOOL THISCALL ThinkRunaway(PMONSTER_STATUS MSData);
     BOOL THISCALL ThinkSCraft(PMONSTER_STATUS MSData);
 
-    BOOL ThinkSBreak(PMONSTER_STATUS MSData);
+    BOOL ThinkSBreak(PMONSTER_STATUS MSData, PAT_BAR_ENTRY Entry);
 
 
     /************************************************************************

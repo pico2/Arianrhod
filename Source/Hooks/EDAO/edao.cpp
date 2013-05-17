@@ -226,6 +226,8 @@ BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
 
+    LdrDisableThreadCalloutsForDll(BaseAddress);
+
     SetExeDirectoryAsCurrent();
 
     MEMORY_PATCH p[] =
