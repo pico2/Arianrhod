@@ -230,6 +230,12 @@ BOOL Initialize(PVOID BaseAddress)
 
     SetExeDirectoryAsCurrent();
 
+    static DOUBLE DefaultDistance = 0.f;
+
+    BYTE PushActorDistance[6] = { 0xDD, 0x05 };
+
+    *(DOUBLE **)&PushActorDistance[2] = &DefaultDistance;
+
     MEMORY_PATCH p[] =
     {
         PATCH_MEMORY(0xEB,      1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking
@@ -247,8 +253,10 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x80,      1, 0x5F68A4),    // force show debug at
         PATCH_MEMORY(0x2C,      1, 0x5F693D),    // debug at pos.X advance
 
-        // enemy sbreak
-        //PATCH_MEMORY(0xEB,      1, 0x623525),    // do sth. when first icon in atbar is empty
+        // tweak
+
+        PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
+        PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
 
         // monster info
         PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy

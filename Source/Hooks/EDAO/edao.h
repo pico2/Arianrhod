@@ -205,6 +205,9 @@ typedef union MONSTER_STATUS
         if (!IsChrEnemy())
             return FALSE;
 
+        if (AiType == 0xFF)
+            return FALSE;
+
         if (!CheckAiType)
             return TRUE;
 
