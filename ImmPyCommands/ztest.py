@@ -166,8 +166,8 @@ def main(args):
 
             funcname = 'AS_%02X' % i
 
-            #imm.setComment(int(func), funcname)
-            #imm.setLabel(int(func), funcname)
+            imm.setComment(int(func), funcname)
+            imm.setLabel(int(func), funcname)
 
             imm.log('AS_%02X: %08X' % (i, func), int(func))
     except:

@@ -219,11 +219,66 @@ int CDECL CompareActiveCode(PCWSTR s1, PCWSTR s2)
     return 0;
 }
 
+#include <zlib.h>
+
 BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
+
+    EnumDirectoryFiles(NULL, L"*.*", 0, L"E:\\Desktop\\Luxor 2 HD\\locale\\data", NULL,
+        [](PVOID, PWIN32_FIND_DATAW fd, ULONG_PTR) -> LONG_PTR
+        {
+            BOOL Success;
+            z_stream stream;
+            NtFileMemory file;
+            PVOID Buffer;
+
+            file.Open(fd->cFileName);
+
+            ZeroMemory(&stream, sizeof(stream));
+
+            stream.next_in = (Bytef*)file.GetBuffer();
+            stream.avail_in = file.GetSize32();
+
+            Buffer = AllocateMemory(stream.avail_in * 4);
+            stream.next_out = (PBYTE)Buffer;
+            stream.avail_out = stream.avail_in * 4;
+
+            INLINE_ASM
+            {
+                mov     eax, 0x55EBD4;
+                lea     ecx, stream;
+                mov     edx, 4CB1A0h;
+                call    edx;
+
+                lea     eax, stream;
+                push    eax;
+                mov     eax, 4CB330h;
+                call    eax;
+                add     esp, 4;
+                mov     Success, eax;
+            }
+/*
+            if (Success != Z_OK)
+                return 0;
+*/
+            NtFileDisk file2;
+
+            file2.Create(fd->cFileName);
+            file2.Write(Buffer, stream.total_out);
+
+            FreeMemory(Buffer);
+
+            return 0;
+        },
+        0,
+        EDF_SUBDIR
+    );
+
+
+    return FALSE;
 
     MEMORY_PATCH p[] =
     {

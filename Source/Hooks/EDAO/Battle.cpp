@@ -600,3 +600,35 @@ LONG CDECL CBattle::ShowSkipCraftAnimeButton(...)
 
     return 0;
 }
+
+
+/************************************************************************
+  at bar
+************************************************************************/
+
+PAT_BAR_ENTRY THISCALL CBattleATBar::LookupReplaceAtBarEntry(PMONSTER_STATUS MSData, BOOL IsFirst)
+{
+    PAT_BAR_ENTRY   FirstEntry, *Entry;
+    PMONSTER_STATUS NewMSData;
+
+    AllocStack(16);
+
+    NewMSData = *(PMONSTER_STATUS *)(*(PULONG_PTR)PtrSub(_AddressOfReturnAddress(), sizeof(PVOID)) - 0x44);
+
+    FirstEntry = NULL;
+    FOR_EACH(Entry, EntryPointer, countof(EntryPointer))
+    {
+        if (!FLAG_ON(Entry[0]->Flags, 0x20))
+            continue;
+
+        if (Entry[0]->MSData != MSData)
+            continue;
+
+        if (FirstEntry == NULL)
+            FirstEntry = *Entry;
+
+        Entry[0]->MSData = NewMSData;
+    }
+
+    return FirstEntry;
+}

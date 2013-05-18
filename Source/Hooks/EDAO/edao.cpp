@@ -267,7 +267,6 @@ BOOL Initialize(PVOID BaseAddress)
 #if !D3D9_VER
 
         INLINE_HOOK_JUMP_RVA_NULL(0x27969D, METHOD_PTR(&CBattle::SetSelectedAttack)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
         INLINE_HOOK_JUMP_RVA_NULL(0x275DF4, METHOD_PTR(&CBattle::SetSelectedCraft)),
         INLINE_HOOK_JUMP_RVA_NULL(0x272AB9, METHOD_PTR(&CBattle::SetSelectedSCraft)),
 
@@ -276,12 +275,18 @@ BOOL Initialize(PVOID BaseAddress)
 
 #endif // D3D9_VER
 
+        INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
+
         // tweak
 
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
         INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
         INLINE_HOOK_CALL_RVA_NULL(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
+
+        // bug fix
+
+        INLINE_HOOK_CALL_RVA_NULL(0x5B1BE6, METHOD_PTR(&CBattleATBar::LookupReplaceAtBarEntry)),
 
         // file redirection
 
@@ -300,16 +305,13 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::NakedGetReplySupportVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::NakedGetTeamRushVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
-
         INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedCopyMagicAndCraftData)),
         INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::NakedOverWriteBattleStatusWithChrStatus)),
         INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::NakedIsChrStatusNeedRefresh)),
-
         INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::NakedGetChrSBreak)),
-
-        INLINE_HOOK_JUMP_RVA(0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
-        INLINE_HOOK_JUMP_RVA(0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
-        INLINE_HOOK_JUMP_RVA(0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
+        INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
+        INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
+        INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
 
 
         // enemy sbreak
@@ -317,8 +319,6 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
         INLINE_HOOK_JUMP_RVA     (0x599100, METHOD_PTR(&CBattle::SetCurrentActionChrInfo), CBattle::StubSetCurrentActionChrInfo),
         INLINE_HOOK_CALL_RVA_NULL(0x591C3A, METHOD_PTR(&CBattle::NakedEnemyThinkAction)),
-        //INLINE_HOOK_JUMP_RVA(0x276925, METHOD_PTR(&CBattle::ThinkRunaway), CBattle::StubThinkRunaway),
-        //INLINE_HOOK_JUMP_RVA(0x27643E, METHOD_PTR(&CBattle::ThinkSCraft), CBattle::StubThinkSCraft),
 
 
         // monster info box
@@ -328,8 +328,8 @@ BOOL Initialize(PVOID BaseAddress)
 
 
         // acgn
-        INLINE_HOOK_JUMP_RVA_NULL(0x5B1BF4, NakedArianrhodRefreshSy),
-        INLINE_HOOK_JUMP_RVA     (0x275EFD,      METHOD_PTR(&CBattle::LoadMSFile), CBattle::StubLoadMSFile),	//it3
+
+        INLINE_HOOK_JUMP_RVA     (0x275EFD, METHOD_PTR(&CBattle::LoadMSFile), CBattle::StubLoadMSFile),	//it3
         INLINE_HOOK_JUMP_RVA_NULL(0x5D3545, METHOD_PTR(&CBattle::NakedAS_8D_5F)), //Ê±¿Õ´ó±À»µ
 
 

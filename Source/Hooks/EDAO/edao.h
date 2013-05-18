@@ -437,7 +437,7 @@ typedef union
         DUMMY_STRUCT(4);
 
         ULONG   IconAT;             // 0x68 不含20 空; 含10 AT条移动; 含04 行动、delay后的([20A]0销毁); 含40 当前行动的(1销毁)
-        USHORT  par;                // 0x6C
+        USHORT  Flags;                // 0x6C
 
         DUMMY_STRUCT(3);
         BYTE    RNo;		        // 0x71
@@ -456,7 +456,7 @@ class CBattleATBar
 {
 public:
     AT_BAR_ENTRY   Entry[0x3C];
-    PAT_BAR_ENTRY  EntryPointer[0x3C];      // 0x0x1C20
+    PAT_BAR_ENTRY  EntryPointer[0x3C];      // 0x1C20
 
     BOOL IsCurrentChrSBreak()
     {
@@ -492,6 +492,8 @@ public:
 
         return NULL;
     }
+
+    PAT_BAR_ENTRY THISCALL LookupReplaceAtBarEntry(PMONSTER_STATUS MSData, BOOL IsFirst);
 };
 
 class CBattle
