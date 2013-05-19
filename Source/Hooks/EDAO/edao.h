@@ -691,6 +691,12 @@ class EDAO
     // battle
 
 public:
+
+    static EDAO* GlobalGetEDAO()
+    {
+        return *(EDAO **)0xC29988;
+    }
+
     CGlobal* GetGlobal()
     {
         return (CGlobal *)PtrAdd(this, 0x4D3E8);
@@ -724,6 +730,22 @@ public:
     ULONG_PTR GetLayer()
     {
         return *(PUSHORT)PtrAdd(this, 0xA6FA8);
+    }
+
+    LONG THISCALL AoMessageBox(PCSTR Text, BOOL CanUseCancelButton = TRUE)
+    {
+        typedef struct
+        {
+            PVOID Callbacks[4];
+
+        } MSGBOX_CALLBACK;
+
+        LONG (FASTCALL *AoMessageBoxWorker)(EDAO*, PVOID, BOOL CanUseCancelButton, PCSTR Text, MSGBOX_CALLBACK, ULONG, ULONG, ULONG);
+
+        MSGBOX_CALLBACK cb = { (PVOID)0x676056, NULL, NULL, NULL };
+
+        *(PULONG_PTR)&AoMessageBoxWorker = 0x67A4D5;
+        return AoMessageBoxWorker(this, 0, CanUseCancelButton, Text, cb, 0, 0, -1);
     }
 
     VOID StubDrawNumber(LONG X, LONG Y, PCSTR Text, ULONG OneU1, ULONG Color, ULONG ZeroU1);

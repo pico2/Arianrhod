@@ -206,6 +206,20 @@ HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
     return FindHandle;
 }
 
+LONG NTAPI ShowExitMessageBox(HWND hWnd, PCSTR Text, PCSTR Caption, UINT Type)
+{
+    ULONG_PTR   Length;
+    PSTR        Buffer;
+
+    Length = StrLengthA(Text) + 1;
+    Buffer = (PSTR)AllocStack(Length + 3);
+
+    *(PULONG)&Buffer[0] = TAG3('#5C');
+    CopyMemory(Buffer + 3, Text, Length);
+
+    return EDAO::GlobalGetEDAO()->AoMessageBox(Buffer) == TRUE ? IDYES : IDNO;
+}
+
 // [0xC29988]+78f84
 
 LONG64 InitWarningItpTimeStamp()
@@ -258,6 +272,8 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
 
+        PATCH_MEMORY(0x00, 1, 0x55F6E1),        // ±¨¡È
+
         // monster info
         PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
 
@@ -287,6 +303,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // tweak
 
+        INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
         INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
