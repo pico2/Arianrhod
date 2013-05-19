@@ -481,8 +481,11 @@ VOID THISCALL CBattleInfoBox::SetMonsterInfoBoxSize(LONG X, LONG Y, LONG Width, 
 
 VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 {
-    if (GetBattle()->GetCurrentTargetIndex() > MAXIMUM_CHR_NUMBER_IN_BATTLE)
+    if (GetBattle()->GetCurrentTargetIndex() > MAXIMUM_CHR_NUMBER_IN_BATTLE ||
+        GetBattle()->GetCurrentTargetIndex() < 0)
+    {
         return;
+    }
 
     BOOL                ShowInfo, ShowByOrbment;
     ULONG_PTR           BackgroundColor;
@@ -530,6 +533,7 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
     STATUS_ENTRY *Entry, Status[] =
     {
+        { "HP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { ULONG Current = MSData->ChrStatus[BattleStatusFinal].InitialHP, Maximum = MSData->ChrStatus[BattleStatusFinal].MaximumHP; return sprintf(Buffer, "%d/%d %d", Current, Maximum, Maximum == 0 ? 0 :(Current * 100 / Maximum)); }  },
         { "EP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { return sprintf(Buffer, "%d/%d", MSData->ChrStatus[BattleStatusFinal].InitialEP, MSData->ChrStatus[BattleStatusFinal].MaximumEP); }  },
         { "CP:", 0, [](PMONSTER_STATUS MSData, PSTR Buffer) -> ULONG_PTR { return sprintf(Buffer, "%d/%d", MSData->ChrStatus[BattleStatusFinal].InitialCP, MSData->ChrStatus[BattleStatusFinal].MaximumCP); }  },
 
@@ -575,8 +579,8 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
             DrawSimpleText(X + 26, Y, "?", COLOR_WHITE);
         }
 
-        Y += 14;
-        ValueY += 14;
+        Y += 13;
+        ValueY += 13;
     }
 }
 

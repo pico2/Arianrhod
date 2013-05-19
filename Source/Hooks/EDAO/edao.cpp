@@ -303,7 +303,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // tweak
 
-        INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
+        //INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
         INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
