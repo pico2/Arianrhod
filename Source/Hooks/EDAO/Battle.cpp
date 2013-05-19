@@ -567,12 +567,33 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
     FOR_EACH(Entry, Status, countof(Status))
     {
+        ULONG_PTR Length;
+
         DrawSimpleText(X, Y, Entry->Text, COLOR_GOLD);
 
         if (ShowInfo)
         {
-            Entry->Format == NULL ? sprintf(Buffer, "%d", Entry->Value) : Entry->Format(MSData, Buffer);
+            Length = Entry->Format == NULL ? sprintf(Buffer, "%d", Entry->Value) : Entry->Format(MSData, Buffer);
             edao->DrawNumber(X + 69, ValueY, Buffer, ValueColor);
+            if (Entry == Status)
+            {
+                ULONG Color = ShowByOrbment ? COLOR_RED : COLOR_WHITE;
+                ULONG PercentLength;
+
+                PercentLength = 1;
+                while (Buffer[Length - 1] != ' ')
+                {
+                    --Length;
+                    ++PercentLength;
+                }
+
+                Length *= 6;
+                PercentLength *= 6;
+
+                DrawSimpleText(X + Length + 19, Y, "(", Color);
+                DrawSimpleText(X + Length + 20 + PercentLength, Y, "%", Color);
+                DrawSimpleText(X + Length + 20 + PercentLength + 6, Y, ")", Color);
+            }
         }
         else
         {
