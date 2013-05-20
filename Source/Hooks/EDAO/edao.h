@@ -158,9 +158,8 @@ typedef union
         USHORT                  AGL;                        // 0x252
         USHORT                  MOV;                        // 0x254
         USHORT                  SPD;                        // 0x256
-
-        DUMMY_STRUCT(4);
-
+        USHORT                  DEXRate;                    // 0x258
+        USHORT                  AGLRate;                    // 0x25A
         USHORT                  MaximumCP;                  // 0x25C
 
         DUMMY_STRUCT(2);                                    // 0x25E

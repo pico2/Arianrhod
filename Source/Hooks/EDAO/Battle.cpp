@@ -580,7 +580,7 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
                 ULONG Color = ShowByOrbment ? COLOR_RED : COLOR_WHITE;
                 ULONG PercentLength;
 
-                PercentLength = 1;
+                PercentLength = 0;
                 while (Buffer[Length - 1] != ' ')
                 {
                     --Length;
@@ -591,8 +591,8 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
                 PercentLength *= 6;
 
                 DrawSimpleText(X + Length + 19, Y, "(", Color);
-                DrawSimpleText(X + Length + 20 + PercentLength, Y, "%", Color);
-                DrawSimpleText(X + Length + 20 + PercentLength + 6, Y, ")", Color);
+                DrawSimpleText(X + Length + 26 + PercentLength, Y, "%", Color);
+                DrawSimpleText(X + Length + 26 + PercentLength + 6, Y, ")", Color);
             }
         }
         else
