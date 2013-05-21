@@ -5,7 +5,7 @@
 
 #include "irotori.h"
 #include "key.h"
-#include "MyLibraryUser.cpp"
+#include "MyLibrary.cpp"
 #include "cxdec.cpp"
 #include "HookPort.cpp"
 
@@ -282,10 +282,9 @@ DecryptAPCTimer(
 }
 
 NTSTATUS
-HOOKPORT_CALLTYPE
+HPCALL
 HookNtDeviceIoControlFile(
-    PSYSCALL_INFO       SysCallInfo,
-    PSYSTEM_CALL_ACTION Action,
+    HPARGS
     HANDLE              FileHandle,
     HANDLE              Event,
     PIO_APC_ROUTINE     ApcRoutine,
@@ -306,7 +305,7 @@ HookNtDeviceIoControlFile(
     PTHREAD_TEXT_BUFFER TextBuffer;
     PIROTORI_INFO       Info;
 
-    Action->Action = BlockSystemCall;
+    HPARG_FLTINFO->Action = BlockSystemCall;
 
     TextBuffer = (PTHREAD_TEXT_BUFFER)Nt_FindThreadFrameByContext2(THREAD_TEXT_BUFFER_MAGIC);
     if (TextBuffer == NULL)
@@ -314,7 +313,7 @@ HookNtDeviceIoControlFile(
 
 #if 1
 
-    Info = (PIROTORI_INFO)Action->FilterContext;
+    Info = (PIROTORI_INFO)HPARG_FLTINFO->FilterContext;
 
     Context.ContextFlags = CONTEXT_DEBUG_REGISTERS;
     Status = Info->NtGetContextThread(NtCurrentThread(), &Context);
@@ -672,10 +671,9 @@ FreeThreadParameter(
 }
 
 NTSTATUS
-HOOKPORT_CALLTYPE
+HPCALL
 HookNtCreateThreadEx(
-    PSYSCALL_INFO       SysCallInfo,
-    PSYSTEM_CALL_ACTION Action,
+    HPARGS
     PHANDLE             ThreadHandle,
     ACCESS_MASK         DesiredAccess,
     POBJECT_ATTRIBUTES  ObjectAttributes,
@@ -693,11 +691,10 @@ HookNtCreateThreadEx(
 
     StartParameter = AllocateThreadParameter(StartAddress, Parameter);
 
-    Action->Action = BlockSystemCall;
+    HPARG_FLTINFO->Action = BlockSystemCall;
 
-    return CallSysCall(
+    return HpCallSysCall(
                 NtCreateThreadEx,
-                SysCallInfo,
                 ThreadHandle,
                 DesiredAccess,
                 ObjectAttributes,
@@ -713,10 +710,9 @@ HookNtCreateThreadEx(
 }
 
 NTSTATUS
-HOOKPORT_CALLTYPE
+HPCALL
 HookNtCreateThread(
-    PSYSCALL_INFO       SysCallInfo,
-    PSYSTEM_CALL_ACTION Action,
+    HPARGS
     PHANDLE             ThreadHandle,
     ACCESS_MASK         DesiredAccess,
     POBJECT_ATTRIBUTES  ObjectAttributes,
@@ -736,11 +732,10 @@ HookNtCreateThread(
     NewContext.Eax = DEFAULT_THREAD_START_ADDRESS;
     NewContext.Ebx = (ULONG_PTR)StartParameter;
 
-    Action->Action = BlockSystemCall;
+    HPARG_FLTINFO->Action = BlockSystemCall;
 
-    return CallSysCall(
+    return HpCallSysCall(
                 NtCreateThread,
-                SysCallInfo,
                 ThreadHandle,
                 DesiredAccess,
                 ObjectAttributes,
@@ -754,7 +749,45 @@ HookNtCreateThread(
 
 THREAD_START_PARAMETER SystemThreadParameter;
 
-VOID NTAPI HookLdrInitializeThunk(PCONTEXT ThreadContext, PVOID NtdllBase)
+VOID NTAPI HookLdrInitializeThunk_Win8(PVOID Unknown, PCONTEXT ThreadContext, PVOID NtdllBase)
+{
+    PIROTORI_INFO           Info;
+    ULONG_PTR               ThreadStartAddress;
+    PLDR_MODULE             NtdllModule;
+    PTHREAD_START_PARAMETER Parameter;
+
+    Info = g_Info;
+
+    NtdllModule = GetNtdllLdrModule();
+
+    ThreadStartAddress = ThreadContext->Eax;
+
+    Info->RtlPushFrame(&SystemThreadParameter);
+
+    if (ThreadStartAddress + 1 == 0)
+    {
+        ThreadContext->Eax = NULL;
+    }
+    else if (
+             ThreadStartAddress >= (ULONG_PTR)NtdllModule->DllBase &&
+             ThreadStartAddress <= PtrAdd(NtdllModule->SizeOfImage, NtdllModule->DllBase) &&
+             ThreadStartAddress != (ULONG_PTR)Info->NtCreateThread &&
+             ThreadStartAddress != (ULONG_PTR)Info->NtCreateThreadEx &&
+             ThreadStartAddress != (ULONG_PTR)Info->RtlCreateUserThread &&
+             ThreadStartAddress != (ULONG_PTR)Info->DbgUiRemoteBreakin
+            )
+    {
+    }
+    else
+    {
+        ThreadContext->Eax = (ULONG_PTR)StubThreadStart;
+    }
+
+    if (NtdllBase != NULL)
+        return ((TYPE_OF(HookLdrInitializeThunk_Win8) *)Info->StubLdrInitializeThunk)(Unknown, ThreadContext, NtdllBase);
+}
+
+VOID NTAPI HookLdrInitializeThunk_Win7(PCONTEXT ThreadContext, PVOID NtdllBase)
 {
     PIROTORI_INFO           Info;
     ULONG_PTR               ThreadStartAddress;
@@ -792,7 +825,7 @@ VOID NTAPI HookLdrInitializeThunk(PCONTEXT ThreadContext, PVOID NtdllBase)
         return Info->StubLdrInitializeThunk(ThreadContext, NtdllBase);
 }
 
-NAKED VOID HookLdrInitializeThunkNT5(PCONTEXT ThreadContext, PVOID NtdllBase, ULONG_PTR, CONTEXT)
+NAKED VOID HookLdrInitializeThunk_XP(PCONTEXT ThreadContext, PVOID NtdllBase, ULONG_PTR, CONTEXT)
 {
     INLINE_ASM
     {
@@ -807,17 +840,16 @@ FIND_CONTEXT_PTR:
 
         push    0;
         push    eax;
-        call    HookLdrInitializeThunk;
+        call    HookLdrInitializeThunk_Win7;
         mov     eax, g_Info;
         jmp     [eax]PIROTORI_INFO.StubLdrInitializeThunk;
     }
 }
 
 NTSTATUS
-HOOKPORT_CALLTYPE
+HPCALL
 HookNtContinue(
-    PSYSCALL_INFO       SysCallInfo,
-    PSYSTEM_CALL_ACTION Action,
+    HPARGS
     PCONTEXT            Context,
     BOOLEAN             TestAlert
 )
@@ -836,7 +868,7 @@ HookNtContinue(
     Probe = (PTHREAD_TEXT_BUFFER)Nt_FindThreadFrameByContext2(THREAD_TEXT_BUFFER_MAGIC);
     if (Probe != NULL)
     {
-        if (Probe != Action->FilterContext)
+        if (Probe != HPARG_FLTINFO->FilterContext)
             return STATUS_SUCCESS;
 
         if (Context->Eax != (ULONG_PTR)Probe->Buffer)
@@ -871,7 +903,7 @@ HookNtContinue(
 
     if (PtrXor(Context->Eax, StubThreadStart) == 0)
     {
-        Action->Action = BlockSystemCall;
+        HPARG_FLTINFO->Action = BlockSystemCall;
         return STATUS_SUCCESS;
     }
 
@@ -982,8 +1014,22 @@ BOOL Initialize(PVOID BaseAddress)
     static CHAR FontFace[] = "SIMHEI";
 
     PVOID HookLdrInitializeThunk;
+    ULONG OSMajorVersion;
 
-    HookLdrInitializeThunk = (Nt_CurrentPeb()->OSMajorVersion > 5) ? ::HookLdrInitializeThunk : (PVOID)HookLdrInitializeThunkNT5;
+    OSMajorVersion = Nt_CurrentPeb()->OSMajorVersion;
+
+    if (OSMajorVersion >= 9000)
+    {
+        HookLdrInitializeThunk = HookLdrInitializeThunk_Win8;
+    }
+    else if (OSMajorVersion >= 7000)
+    {
+        HookLdrInitializeThunk = HookLdrInitializeThunk_Win7;
+    }
+    else
+    {
+        HookLdrInitializeThunk = HookLdrInitializeThunk_XP;
+    }
 
     MEMORY_PATCH p[] =
     {

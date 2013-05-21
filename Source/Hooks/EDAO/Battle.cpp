@@ -494,7 +494,9 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     RECT                Rect;
     PMONSTER_STATUS     MSData;
 
-    if (!IsTargetEnemy())
+    MSData = GetBattle()->GetMonsterStatus() + GetBattle()->GetCurrentTargetIndex();
+
+    if (!IsTargetEnemy() || MSData->MSFileIndex == 0x30090011)
     {
         SetTargetIsEnemy(TRUE);
         SetMonsterInfoFlags(~0u);
@@ -519,8 +521,6 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
     BackgroundColor = (GetBackgroundColor() & 0xA0000000) | 0x00101020;
 
     GetEDAO()->DrawRectangle(Rect.left, Rect.top, Rect.right, Rect.bottom, BackgroundColor, BackgroundColor);
-
-    MSData = GetBattle()->GetMonsterStatus() + GetBattle()->GetCurrentTargetIndex();
 
     typedef struct
     {
