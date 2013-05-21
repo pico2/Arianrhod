@@ -88,11 +88,11 @@ HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lp
     return Window;
 }
 
-PWCHAR
+PWSTR
 GetFileName(
-    PWCHAR  HookedPath,
+    PWSTR   HookedPath,
     ULONG   HookedPathCount,
-    PWCHAR  OriginalPath,
+    PWSTR   OriginalPath,
     ULONG   OriginalCount,
     LPCSTR  InputFileName,
     BOOL    IsInputUnicode = FALSE
@@ -107,11 +107,11 @@ GetFileName(
 
     if (IsInputUnicode)
     {
-        StrCopyW(OriginalPath, (LPWSTR)InputFileName);
+        StrCopyW(OriginalPath, (PWSTR)InputFileName);
     }
     else
     {
-        AnsiToUnicode(OriginalPath, OriginalCount, (PCHAR)InputFileName, -1);
+        AnsiToUnicode(OriginalPath, OriginalCount, (PSTR)InputFileName, -1);
     }
 
     PLDR_MODULE Module;
@@ -206,6 +206,38 @@ HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
     return FindHandle;
 }
 
+BOOL AoIsFileExist(PCSTR FileName)
+{
+    WCHAR OriginalPath[MAX_NTPATH], HookedPath[MAX_NTPATH];
+
+    if (GetFileName(HookedPath, countof(HookedPath), OriginalPath, countof(OriginalPath), FileName) == HookedPath)
+        return TRUE;
+
+    return IsPathExists(OriginalPath);
+}
+
+LONG CDECL GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrIndex)
+{
+    CHAR FullPath[MAX_NTPATH];
+
+    sprintf(FullPath, "data/campimg/chrimg%02d.itp", ChrIndex);
+    if (!AoIsFileExist(FullPath))
+        ChrIndex = 9999;
+
+    return sprintf(Buffer, "chrimg%02d", ChrIndex);
+}
+
+LONG CDECL GetBattleFace(PSTR Buffer, PCSTR Format, PCSTR DataPath, LONG ChrIndex)
+{
+    LONG_PTR Length;
+
+    Length = sprintf(Buffer, "%sbattle/itp/bface%03d.itp", DataPath, ChrIndex);
+    if (!AoIsFileExist(Buffer))
+        Length = sprintf(Buffer, "%sbattle/itp/bface%03d.itp", DataPath, 9999);
+
+    return Length;
+}
+
 LONG NTAPI ShowExitMessageBox(HWND hWnd, PCSTR Text, PCSTR Caption, UINT Type)
 {
     ULONG_PTR   Length;
@@ -259,6 +291,7 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
         PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
         PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
+        PATCH_MEMORY(0x20000,   4, 0x4E71B2),    // chrimg max buffer size
 
         // debug AT
 
@@ -317,6 +350,9 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x48C1EA, AoFindFirstFileA),
         INLINE_HOOK_CALL_RVA_NULL(0x48C206, NtClose),
+        INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, GetCampImage),
+        INLINE_HOOK_CALL_RVA_NULL(0x4E6AE4, GetCampImage),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, GetBattleFace),
 
         // custom format itp / itc
 

@@ -565,12 +565,15 @@ BOOL IsRunningInVMWare()
 
 // #include "HookPort.cpp"
 
+#include "FolderDialog.cpp"
+
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    FLOAT x = 510.f;
+    ml::FolderDialog fd;
 
-    printf("%f\n", x);
+    fd.DoModule();
+
     return;
 
     LOGFONTW lf;
@@ -580,7 +583,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     lf.lfCharSet = 0x80;
     lf.lfFaceName[0] = 0;
 
-    EnumFontFamiliesExW(GetDC(NULL), &lf, 
+    EnumFontFamiliesExW(GetDC(NULL), &lf,
         [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM dc)
         {
             HFONT ft;
