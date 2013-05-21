@@ -1,5 +1,9 @@
 #include "edao.h"
 
+/************************************************************************
+  EDAO
+************************************************************************/
+
 BOOL EDAO::CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex)
 {
     switch (ItemId)
@@ -14,4 +18,35 @@ BOOL EDAO::CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex)
     }
     
     return (this->*StubCheckItemEquipped)(ItemId, EquippedIndex);
+}
+
+
+/************************************************************************
+  CScript
+************************************************************************/
+
+NAKED VOID CScript::NakedInheritSaveData()
+{
+    INLINE_ASM
+    {
+        mov     dword ptr [eax + 82BB4h], 0;
+        lea     edx, dword ptr [ebp - 0x26454 + 0x1B008];
+        mov     ecx, [ebp - 0Ch];
+        jmp     CScript::InheritSaveData
+    }
+}
+
+VOID FASTCALL CScript::InheritSaveData(PBYTE ScenarioFlags)
+{
+    ULONG_PTR CustomOffset[] =
+    {
+        0x210,
+    };
+
+    PULONG_PTR Offset;
+
+    FOR_EACH(Offset, CustomOffset, countof(CustomOffset))
+    {
+        *(PBYTE)PtrAdd(this, 0x9C + *Offset) = ScenarioFlags[*Offset];
+    }
 }

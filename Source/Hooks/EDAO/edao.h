@@ -685,6 +685,18 @@ public:
     }
 };
 
+
+class CScript
+{
+public:
+    VOID FASTCALL InheritSaveData(PBYTE ScenarioFlags);
+    VOID NakedInheritSaveData();
+
+    DECL_STATIC_METHOD_POINTER(CScript, InheritSaveData);
+};
+
+INIT_STATIC_MEMBER(CScript::StubInheritSaveData);
+
 class EDAO
 {
     // battle
