@@ -351,7 +351,6 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x48C1EA, AoFindFirstFileA),
         INLINE_HOOK_CALL_RVA_NULL(0x48C206, NtClose),
         INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, GetCampImage),
-        INLINE_HOOK_CALL_RVA_NULL(0x4E6AE4, GetCampImage),
         INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, GetBattleFace),
 
         // custom format itp / itc
