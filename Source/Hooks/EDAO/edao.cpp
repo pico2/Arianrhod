@@ -345,6 +345,7 @@ BOOL Initialize(PVOID BaseAddress)
         // bug fix
 
         INLINE_HOOK_CALL_RVA_NULL(0x5B1BE6, METHOD_PTR(&CBattleATBar::LookupReplaceAtBarEntry)),
+        INLINE_HOOK_JUMP_RVA     (0x275DAE, METHOD_PTR(&CBattle::ExecuteActionScript), CBattle::StubExecuteActionScript),
 
         // file redirection
 
@@ -401,6 +402,18 @@ BOOL Initialize(PVOID BaseAddress)
         //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
         //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),
     };
+
+#if 0
+    RtlSetUnhandledExceptionFilter(
+        [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG
+    {
+        ExceptionBox(L"crashed");
+        CreateMiniDump(ExceptionPointers);
+        return ExceptionContinueSearch;
+    }
+        );
+
+#endif
 
     Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
 

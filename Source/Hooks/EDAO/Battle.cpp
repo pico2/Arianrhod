@@ -382,6 +382,31 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData, PAT_BAR_ENTRY Entry)
     return TRUE;
 }
 
+VOID
+THISCALL
+CBattle::
+ExecuteActionScript(
+    PMONSTER_STATUS MSData,
+    PBYTE           ActionScript,
+    BYTE            ChrThreadId,
+    USHORT          ScriptOffset,
+    ULONG           Unknown1,
+    ULONG           Unknown2,
+    ULONG           Unknown3
+)
+{
+    if (ScriptOffset == 0xFFFF)
+    {
+        ULONG_PTR Offset = 0;
+        while (ActionScript[Offset] != 0)
+            ++Offset;
+
+        ScriptOffset = Offset;
+    }
+
+    return (this->*StubExecuteActionScript)(MSData, ActionScript, ChrThreadId, ScriptOffset, Unknown1, Unknown2, Unknown3);
+}
+
 /************************************************************************
   EDAO
 ************************************************************************/

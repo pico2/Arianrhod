@@ -575,6 +575,22 @@ public:
         DETOUR_METHOD(CBattle, CancelAria, 0x99DDC0, MSData, Reset);
     }
 
+
+    /************************************************************************
+      bug fix
+    ************************************************************************/
+    VOID
+    THISCALL
+    ExecuteActionScript(
+        PMONSTER_STATUS MSData,
+        PBYTE           ActionScript,
+        BYTE            ChrThreadId,
+        USHORT          ScriptOffset,
+        ULONG           Unknown1,
+        ULONG           Unknown2,
+        ULONG           Unknown3
+    );
+
     /************************************************************************
       tweak
     ************************************************************************/
@@ -664,12 +680,14 @@ public:
     DECL_STATIC_METHOD_POINTER(CBattle, SetCurrentActionChrInfo);
     DECL_STATIC_METHOD_POINTER(CBattle, ThinkRunaway);
     DECL_STATIC_METHOD_POINTER(CBattle, ThinkSCraft);
+    DECL_STATIC_METHOD_POINTER(CBattle, ExecuteActionScript);
 };
 
 INIT_STATIC_MEMBER(CBattle::StubSetCurrentActionChrInfo);
 INIT_STATIC_MEMBER(CBattle::StubThinkRunaway);
 INIT_STATIC_MEMBER(CBattle::StubThinkSCraft);
 INIT_STATIC_MEMBER(CBattle::StubLoadMSFile);
+INIT_STATIC_MEMBER(CBattle::StubExecuteActionScript);
 
 class CSound
 {

@@ -40,7 +40,7 @@ VOID FASTCALL CScript::InheritSaveData(PBYTE ScenarioFlags)
 {
     ULONG_PTR CustomOffset[] =
     {
-        0x210,
+        0x212,
     };
 
     PULONG_PTR Offset;
