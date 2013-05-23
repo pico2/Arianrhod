@@ -5,6 +5,28 @@
 #include "MyLibrary.cpp"
 #include "edao_vm.h"
 
+#define ENABLE_LOG  0
+
+void WriteLog(PCWSTR Format, ...)
+{
+#if ENABLE_LOG
+
+    NtFileDisk log;
+    WCHAR Buffer[0xFF0];
+
+    log.CreateIfNotExist(L"log.txt");
+    log.Seek(0, FILE_END);
+
+    log.Write(Buffer, vswprintf(Buffer, Format, (va_list)(&Format + 1)) * 2);
+    log.Write(L"\r\n", 4);
+
+#endif
+}
+
+#if !ENABLE_LOG
+    #define WriteLog(...)
+#endif
+
 VOID THISCALL EDAO::Fade(ULONG Param1, ULONG Param2, ULONG Param3, ULONG Param4, ULONG Param5, ULONG Param6)
 {
     if (GetAsyncKeyState(VK_LSHIFT) >= 0)
@@ -141,6 +163,8 @@ GetFileName(
         FileName -= countof(szDataPath) - 2;
         CopyStruct(FileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
 
+        WriteLog(L"pass1: %s", HookedPath);
+
         if (IsPathExists(HookedPath))
         {
             FileName = HookedPath;
@@ -149,11 +173,11 @@ GetFileName(
 
         CopyStruct(FileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
         FileName = IsPathExists(HookedPath) ? HookedPath : OriginalPath;
+
+        WriteLog(L"pass2: %s", HookedPath);
     }
 
-#if CONSOLE_DEBUG
-    PrintConsoleW(L"%s\n", FileName);
-#endif
+    WriteLog(L"%d, %s -> %s", FileName == HookedPath, OriginalPath, HookedPath);
 
     return FileName;
 }
@@ -312,9 +336,14 @@ BOOL Initialize(PVOID BaseAddress)
 
         // iat hook
 
+#if !D3D9_VER
+
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
         PATCH_MEMORY(AoCreateFileA,         4, 0x9D576C),       // CreateFileA
+
+#endif
+
     };
 
     MEMORY_FUNCTION_PATCH f[] =
@@ -353,6 +382,12 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x48C206, NtClose),
         INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, GetCampImage),
         INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, GetBattleFace),
+
+#if D3D9_VER
+
+        INLINE_HOOK_JUMP_NULL(EATLookupRoutineByHashPNoFix(GetKernel32Handle(), KERNEL32_CreateFileA), AoCreateFileA),
+
+#endif
 
         // custom format itp / itc
 
@@ -447,6 +482,25 @@ BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 #include <d3d9.h>
 #pragma comment(linker, "/EXPORT:Direct3DCreate9=_Arianrhod_Direct3DCreate9@4")
 
+NoInline BOOL IsCodeDecompressed()
+{
+    SEH_TRY
+    {
+        static ULONG Signature[] =
+        {
+		    0xe9003ffa, 0x0024ca08, 0x0e8a03e9, 0x78cee900,
+            0xf9e90025, 0xe900276e, 0x00225f64, 0x0c354fe9,
+            0x54dae900, 0xb5e90025, 0xe900033e, 0x004ebe90
+        };
+
+        return RtlCompareMemory((PVOID)0x672020, Signature, sizeof(Signature)) == sizeof(Signature);
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
 EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
 {
     static TYPE_OF(Arianrhod_Direct3DCreate9) *Direct3DCreate9;
@@ -470,10 +524,21 @@ EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
         *(PVOID *)&Direct3DCreate9 = GetRoutineAddress(d3d9, "Direct3DCreate9");
         if (Direct3DCreate9 == NULL)
             return NULL;
-
     }
 
-    if ((ULONG_PTR)_ReturnAddress() == 0x8055F5)
+#if ENABLE_LOG
+    {
+        NtFileDisk log;
+        log.Create(L"log.txt");
+        ULONG BOM = BOM_UTF16_LE;
+        log.Write(&BOM, 2);
+    }
+
+#endif
+
+    WriteLog(L"%08X\n", _ReturnAddress());
+
+    if (IsCodeDecompressed())
     {
         DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
     }
