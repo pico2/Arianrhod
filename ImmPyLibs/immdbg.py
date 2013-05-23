@@ -36,16 +36,16 @@ if sys.winver == '2.7':
             return self._reg == y
 
         def __add__(self, y):
-            return Register(self._reg + y)
+            return Register(self._reg + int(y))
 
         def __sub__(self, y):
-            return Register(self._reg - y)
+            return Register(self._reg - int(y))
 
         def __mul__(self, y):
-            return Register(self._reg * y)
+            return Register(self._reg * int(y))
 
         def __truediv__(self, y):
-            return Register(self._reg / y)
+            return Register(self._reg / int(y))
 
         def buf(self, size):
             return imm.readMemory(self._reg, int(size))

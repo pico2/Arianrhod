@@ -614,6 +614,8 @@ public:
     VOID NakedGetReplySupportVoiceChrId();
     VOID NakedGetRunawayVoiceChrId();
     VOID NakedGetTeamRushVoiceChrId();
+    VOID NakedGetUnderAttackVoiceChrId();
+    VOID NakedGetUnderAttackVoiceChrId2();
     VOID NakedGetSBreakVoiceChrId();
 
     ULONG FASTCALL GetVoiceChrIdWorker(PMONSTER_STATUS MSData);

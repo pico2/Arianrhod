@@ -15,6 +15,12 @@ void WriteLog(PCWSTR Format, ...)
     WCHAR Buffer[0xFF0];
 
     log.CreateIfNotExist(L"log.txt");
+    if (log.GetSize32() == 0)
+    {
+        ULONG BOM = BOM_UTF16_LE;
+        log.Write(&BOM, 2);
+    }
+
     log.Seek(0, FILE_END);
 
     log.Write(Buffer, vswprintf(Buffer, Format, (va_list)(&Format + 1)) * 2);
@@ -163,7 +169,7 @@ GetFileName(
         FileName -= countof(szDataPath) - 2;
         CopyStruct(FileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
 
-        WriteLog(L"pass1: %s", HookedPath);
+        //WriteLog(L"pass1: %s", HookedPath);
 
         if (IsPathExists(HookedPath))
         {
@@ -174,10 +180,10 @@ GetFileName(
         CopyStruct(FileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
         FileName = IsPathExists(HookedPath) ? HookedPath : OriginalPath;
 
-        WriteLog(L"pass2: %s", HookedPath);
+        //WriteLog(L"pass2: %s", HookedPath);
     }
 
-    WriteLog(L"%d, %s -> %s", FileName == HookedPath, OriginalPath, HookedPath);
+    //WriteLog(L"%d, %s -> %s", FileName == HookedPath, OriginalPath, HookedPath);
 
     return FileName;
 }
@@ -292,6 +298,32 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 #include "xxoo.cpp"
 
+VOID NTAPI PrintOP(LONG sub, LONG offset, PBYTE base)
+{
+    //if (sub == 0) offset -= 4;
+
+    if (offset == 0x1572)
+        MessageBoxW(0,0,0,0);
+
+    //AllocConsole();PrintConsoleA("%02X, %08X, %02X\n", sub, offset, base[offset]);
+    WriteLog(L"%02X, %08X, %02X", sub, offset, base[offset]);
+}
+
+NAKED VOID xxx()
+{
+    INLINE_ASM
+    {
+        push    eax;
+        push    edx;
+        push    dword ptr [ecx + 2];
+        and     dword ptr [esp], 0xFF;
+        mov     al, byte ptr [eax+edx];
+        mov     byte ptr [ebp-0x29], al;
+        call    PrintOP;
+        ret;
+    }
+}
+
 BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
@@ -334,6 +366,8 @@ BOOL Initialize(PVOID BaseAddress)
         // monster info
         PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
 
+        //PATCH_MEMORY(0x00,      1, 0x5304C9),     // skip op Sleep
+
         // iat hook
 
 #if !D3D9_VER
@@ -362,6 +396,7 @@ BOOL Initialize(PVOID BaseAddress)
 #endif // D3D9_VER
 
         INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
+        //INLINE_HOOK_CALL_RVA_NULL(0x51E1C7, xxx),
 
         // tweak
 
@@ -400,6 +435,8 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::NakedGetRunawayVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::NakedGetReplySupportVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::NakedGetTeamRushVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5DFA21, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E081E, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId2)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedCopyMagicAndCraftData)),
         INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::NakedOverWriteBattleStatusWithChrStatus)),
@@ -526,17 +563,7 @@ EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
             return NULL;
     }
 
-#if ENABLE_LOG
-    {
-        NtFileDisk log;
-        log.Create(L"log.txt");
-        ULONG BOM = BOM_UTF16_LE;
-        log.Write(&BOM, 2);
-    }
-
-#endif
-
-    WriteLog(L"%08X\n", _ReturnAddress());
+    //WriteLog(L"%08X\n", _ReturnAddress());
 
     if (IsCodeDecompressed())
     {

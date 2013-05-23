@@ -567,12 +567,27 @@ BOOL IsRunningInVMWare()
 
 #include "FolderDialog.cpp"
 
+int searchprime(int num)
+{
+    int pn=0;
+    bool *mask=new bool[num+1];
+    for(int i=2;i<=num;i++)
+        if(!mask[i])
+        {
+            if(i<32767)
+                for(int j=i*i;j<=num;j+=i)
+                    mask[j]=true;
+        }
+
+    delete []mask;
+    return pn;
+}
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    ml::FolderDialog fd;
+    int x = GetRandom32Range(100000000, 999999999);
 
-    fd.DoModule();
+    printf("%d", x);
 
     return;
 
