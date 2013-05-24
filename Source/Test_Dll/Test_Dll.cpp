@@ -201,24 +201,6 @@ HFONT NTAPI gCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement
     return CreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, L"ºÚÌå");
 }
 
-#pragma comment(linker, "/EXPORT:GetFileVersionInfoSizeW=VERSION.GetFileVersionInfoSizeW")
-#pragma comment(linker, "/EXPORT:VerQueryValueW=VERSION.VerQueryValueW")
-#pragma comment(linker, "/EXPORT:GetFileVersionInfoW=VERSION.GetFileVersionInfoW")
-
-int CDECL CompareActiveCode(PCWSTR s1, PCWSTR s2)
-{
-    if (_ReturnAddress() != (PVOID)0x65FAEA)
-        return wcscmp(s1, s2);
-
-    static BOOL NotFirst = FALSE;
-
-    if (NotFirst)
-        return wcscmp(s1, s2);
-
-    NotFirst = TRUE;
-    return 0;
-}
-
 #include <zlib.h>
 
 BOOL Initialize(PVOID BaseAddress)
@@ -280,30 +262,6 @@ BOOL Initialize(PVOID BaseAddress)
 
     return FALSE;
 
-    MEMORY_PATCH p[] =
-    {
-        PATCH_MEMORY(CompareActiveCode, 4, 0x0DBA2C),
-    };
-
-    Reg::SetKeyValue(
-        HKEY_CURRENT_USER,
-        L"Software\\pjjy\\PureEnglish\\Student_Homework",
-        L"cfg.reg.sActiveCode",
-        REG_SZ,
-        L"123456789",
-        sizeof(L"123456789")
-    );
-
-    Reg::SetKeyValue(
-        HKEY_CURRENT_USER,
-        L"Software\\pjjy\\PureEnglish\\Student_Homework",
-        L"cfg.reg.sSerialNumber",
-        REG_SZ,
-        L"1111111111111111",
-        sizeof(L"1111111111111111")
-    );
-
-    Nt_PatchMemory(p, countof(p), 0, 0, GetExeModuleHandle());
 
     return TRUE;
 }
