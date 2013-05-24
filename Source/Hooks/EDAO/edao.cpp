@@ -251,26 +251,37 @@ BOOL AoIsFileExist(PCSTR FileName)
     return IsPathExists(OriginalPath);
 }
 
-LONG CDECL GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrIndex)
+LONG CDECL GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrId)
 {
     CHAR FullPath[MAX_NTPATH];
 
-    sprintf(FullPath, "data/campimg/chrimg%02d.itp", ChrIndex);
+    sprintf(FullPath, "data/campimg/chrimg%02d.itp", ChrId);
     if (!AoIsFileExist(FullPath))
-        ChrIndex = 9999;
+        ChrId = 9999;
 
-    return sprintf(Buffer, "chrimg%02d", ChrIndex);
+    return sprintf(Buffer, Format, ChrId);
 }
 
-LONG CDECL GetBattleFace(PSTR Buffer, PCSTR Format, PCSTR DataPath, LONG ChrIndex)
+LONG CDECL GetBattleFace(PSTR Buffer, PCSTR Format, PCSTR DataPath, LONG ChrId)
 {
     LONG_PTR Length;
 
-    Length = sprintf(Buffer, "%sbattle/itp/bface%03d.itp", DataPath, ChrIndex);
+    Length = sprintf(Buffer, Format, DataPath, ChrId);
     if (!AoIsFileExist(Buffer))
-        Length = sprintf(Buffer, "%sbattle/itp/bface%03d.itp", DataPath, 9999);
+        Length = sprintf(Buffer, Format, DataPath, 9999);
 
     return Length;
+}
+
+LONG CDECL GetFieldAttackChr(PSTR Buffer, PCSTR Format, LONG ChrId)
+{
+    CHAR FullPath[MAX_NTPATH];
+
+    sprintf(FullPath, "data/system/fachr%03d._bn", ChrId);
+    if (!AoIsFileExist(FullPath))
+        ChrId = 999;
+
+    return sprintf(Buffer, Format, ChrId);
 }
 
 LONG NTAPI ShowExitMessageBox(HWND hWnd, PCSTR Text, PCSTR Caption, UINT Type)
@@ -422,6 +433,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x48C206, NtClose),
         INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, GetCampImage),
         INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, GetBattleFace),
+        INLINE_HOOK_CALL_RVA_NULL(0x2F9101, GetFieldAttackChr),
 
 #if D3D9_VER
 
