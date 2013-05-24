@@ -7,6 +7,11 @@
 
 #define ENABLE_LOG  0
 
+#if !D3D9_VER
+    #undef ENABLE_LOG
+    #define ENABLE_LOG 0
+#endif
+
 void WriteLog(PCWSTR Format, ...)
 {
 #if ENABLE_LOG
@@ -87,7 +92,7 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
     return WindowProc(Window, Message, wParam, lParam);
 }
 
-HWND WINAPI CreateWindowExCenterA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
+HWND WINAPI CreateWindowExCenterA(ULONG dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, ULONG dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
     HWND    Window;
     RECT    rcWordArea;
@@ -169,7 +174,7 @@ GetFileName(
         FileName -= countof(szDataPath) - 2;
         CopyStruct(FileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
 
-        //WriteLog(L"pass1: %s", HookedPath);
+        WriteLog(L"pass1: %s", HookedPath);
 
         if (IsPathExists(HookedPath))
         {
@@ -180,10 +185,10 @@ GetFileName(
         CopyStruct(FileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
         FileName = IsPathExists(HookedPath) ? HookedPath : OriginalPath;
 
-        //WriteLog(L"pass2: %s", HookedPath);
+        WriteLog(L"pass2: %s", HookedPath);
     }
 
-    //WriteLog(L"%d, %s -> %s", FileName == HookedPath, OriginalPath, HookedPath);
+    WriteLog(L"%d, %s -> %s", FileName == HookedPath, OriginalPath, HookedPath);
 
     return FileName;
 }
@@ -192,11 +197,11 @@ HANDLE
 WINAPI
 AoCreateFileA(
     LPCSTR                  lpFileName,
-    DWORD                   dwDesiredAccess,
-    DWORD                   dwShareMode,
+    ULONG                   dwDesiredAccess,
+    ULONG                   dwShareMode,
     LPSECURITY_ATTRIBUTES   lpSecurityAttributes,
-    DWORD                   dwCreationDisposition,
-    DWORD                   dwFlagsAndAttributes,
+    ULONG                   dwCreationDisposition,
+    ULONG                   dwFlagsAndAttributes,
     HANDLE                  hTemplateFile
 )
 {
@@ -426,7 +431,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // custom format itp / itc
 
-        INLINE_HOOK_JUMP_RVA(0x273D24, METHOD_PTR(&EDAOFileStream::Uncompress), EDAOFileStream::StubUncompress),
+        //INLINE_HOOK_JUMP_RVA(0x273D24, METHOD_PTR(&EDAOFileStream::Uncompress), EDAOFileStream::StubUncompress),
 
         // hack for boss
 
@@ -517,7 +522,9 @@ BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 #else // D3D9_VER
 
 #include <d3d9.h>
+
 #pragma comment(linker, "/EXPORT:Direct3DCreate9=_Arianrhod_Direct3DCreate9@4")
+#pragma comment(linker, "/EXPORT:DirectInput8Create=_Arianrhod_DirectInput8Create@20")
 
 NoInline BOOL IsCodeDecompressed()
 {
@@ -563,7 +570,14 @@ EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
             return NULL;
     }
 
-    //WriteLog(L"%08X\n", _ReturnAddress());
+#if ENABLE_LOG
+    {
+        NtFileDisk f;
+        f.Create(L"log.txt");
+    }
+#endif
+
+    WriteLog(L"%08X\n", _ReturnAddress());
 
     if (IsCodeDecompressed())
     {
@@ -571,6 +585,63 @@ EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
     }
 
     return Direct3DCreate9(SDKVersion);
+}
+
+EXTC
+HRESULT
+STDCALL
+Arianrhod_DirectInput8Create(
+    HINSTANCE   hinst,
+    ULONG       Version,
+    REFIID      riidltf,
+    PVOID*      ppvOut,
+    LPUNKNOWN   punkOuter
+)
+{
+    static TYPE_OF(Arianrhod_DirectInput8Create) *DirectInput8Create;
+
+    if (DirectInput8Create == NULL)
+    {
+        ULONG       Length;
+        NTSTATUS    Status;
+        PVOID       dinput8;
+        WCHAR       DInput8Path[MAX_NTPATH];
+
+        Length = Nt_GetSystemDirectory(DInput8Path, countof(DInput8Path));
+        CopyStruct(DInput8Path + Length, L"dinput8.dll", sizeof(L"dinput8.dll"));
+
+        dinput8 = Ldr::LoadDll(DInput8Path);
+        if (dinput8 == NULL)
+            return NULL;
+
+        LdrAddRefDll(GET_MODULE_HANDLE_EX_FLAG_PIN, dinput8);
+
+        *(PVOID *)&DirectInput8Create = GetRoutineAddress(dinput8, "DirectInput8Create");
+        if (DirectInput8Create == NULL)
+            return NULL;
+    }
+
+#if ENABLE_LOG
+    {
+        NtFileDisk f;
+        f.Create(L"log.txt");
+    }
+#endif
+
+    WriteLog(L"%08X\n", _ReturnAddress());
+
+    if (IsCodeDecompressed())
+    {
+        static BOOL Hooked = FALSE;
+
+        if (!Hooked)
+        {
+            DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
+            Hooked = TRUE;
+        }
+    }
+
+    return DirectInput8Create(hinst, Version, riidltf, ppvOut, punkOuter);
 }
 
 #endif
