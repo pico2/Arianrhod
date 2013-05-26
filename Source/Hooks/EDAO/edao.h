@@ -167,6 +167,8 @@ typedef union
         USHORT                  RNG;                        // 0x260
 
         DUMMY_STRUCT(2);
+
+        ULONG                   ConditionFlags;             // 0x264
     };
 
 } CHAR_STATUS, *PCHAR_STATUS;
@@ -250,7 +252,14 @@ typedef union MONSTER_STATUS
         USHORT                  LastActionIndex;            // 0x180
         USHORT                  CurrentAiIndex;             // 0x182
 
-        DUMMY_STRUCT(0x234 - 0x184);
+        DUMMY_STRUCT(0x1AA - 0x184);
+
+        USHORT                  Target[0x10];               // 0x1AA
+        BYTE                    TargetCount;                // 0x1CA
+        BYTE                    SelectedTargetIndex;        // 0x1CB
+        COORD                   SelectedTargetPos;          // 0x1CC
+
+        DUMMY_STRUCT(0x234 - 0x1CE);
 
         CHAR_STATUS ChrStatus[2];                           // 0x234
 
