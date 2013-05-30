@@ -1,4 +1,4 @@
-import os, sys, struct
+import os, sys, struct, io
 
 if sys.winver == '2.7':
     import pefile
