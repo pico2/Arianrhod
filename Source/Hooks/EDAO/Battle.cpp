@@ -518,7 +518,7 @@ VOID FASTCALL EDAO::GetChrSBreak(PMONSTER_STATUS MSData)
   CGlobal
 ************************************************************************/
 
-PCREATE_INFO CGlobal::GetMagicData(USHORT MagicId)
+PCRAFT_INFO CGlobal::GetMagicData(USHORT MagicId)
 {
     if (MagicId < MINIMUM_CUSTOM_CRAFT_INDEX)
         return (this->*StubGetMagicData)(MagicId);

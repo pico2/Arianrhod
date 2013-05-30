@@ -104,7 +104,7 @@ typedef struct
 
     DUMMY_STRUCT(4);
 
-} CREATE_INFO, *PCREATE_INFO;
+} CRAFT_INFO, *PCRAFT_INFO;
 
 typedef struct
 {
@@ -298,7 +298,7 @@ typedef union MONSTER_STATUS
 
         DUMMY_STRUCT(4);                                    // 0xF28
 
-        CREATE_INFO                 CraftInfo[16];          // 0xF2C
+        CRAFT_INFO                 CraftInfo[16];          // 0xF2C
         CRAFT_DESCRIPTION           CraftDescription[10];   // 0x10EC
 
     };
@@ -893,7 +893,7 @@ DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped 
 class CGlobal
 {
 public:
-    PCREATE_INFO    THISCALL GetMagicData(USHORT MagicId);
+    PCRAFT_INFO    THISCALL GetMagicData(USHORT MagicId);
     PCSTR           THISCALL GetMagicDescription(USHORT MagicId);
     PBYTE           THISCALL GetMagicQueryTable(USHORT MagicId);
 
