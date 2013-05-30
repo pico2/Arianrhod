@@ -259,7 +259,7 @@ typedef union MONSTER_STATUS
         BYTE                    SelectedTargetIndex;        // 0x1CB
         COORD                   SelectedTargetPos;          // 0x1CC
 
-        DUMMY_STRUCT(0x234 - 0x1CE);
+        DUMMY_STRUCT(0x234 - 0x1D0);
 
         CHAR_STATUS ChrStatus[2];                           // 0x234
 
@@ -563,6 +563,13 @@ public:
     LONG_PTR GetCurrentTargetIndex()
     {
         return *(PLONG)PtrAdd(this, 0x113090);
+    }
+
+    VOID ShowConditionText(PMONSTER_STATUS MSData, PCSTR Text, ULONG Color = RGBA(255, 136, 0, 255), ULONG Unknown = 0)
+    {
+        TYPE_OF(&CBattle::ShowConditionText) ShowConditionText;
+        *(PULONG_PTR)&ShowConditionText = 0xA17420;
+        return (this->*ShowConditionText)(MSData, Text, Color, Unknown);
     }
 
     PMS_EFFECT_INFO THISCALL FindEffectInfoByCondition(PMONSTER_STATUS MSData, ULONG_PTR Condition, ULONG_PTR TimeLeft = 0)

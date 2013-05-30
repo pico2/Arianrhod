@@ -511,7 +511,7 @@ BOOL Initialize(PVOID BaseAddress)
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
-    //PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, Equipment));
+    PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, Equipment));
 
     switch (Reason)
     {

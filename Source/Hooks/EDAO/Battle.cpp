@@ -312,7 +312,8 @@ VOID THISCALL CBattle::SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSDa
 
 BOOL FASTCALL CBattle::EnemyThinkAction(PMONSTER_STATUS MSData)
 {
-    PAT_BAR_ENTRY Entry;
+    PUSHORT         Target;
+    PAT_BAR_ENTRY   Entry;
 
     Entry = GetBattleATBar()->EntryPointer[0];
 
@@ -322,6 +323,52 @@ BOOL FASTCALL CBattle::EnemyThinkAction(PMONSTER_STATUS MSData)
         !Entry->IsSBreaking)
     {
         return FALSE;
+    }
+
+    ULONG_PTR Index, AliveCount, AliveTarget[countof(MSData->Target)];
+
+    AliveCount = 0;
+
+    FOR_EACH(Target, MSData->Target, (ULONG_PTR)MSData->TargetCount)
+    {
+        if (*Target == 0xFF)
+            continue;
+
+        if (FLAG_ON(GetMonsterStatus()[*Target].ChrStatus[BattleStatusFinal].ConditionFlags, CraftConditions::Dead))
+            continue;
+
+        AliveTarget[AliveCount++] = *Target;
+    }
+
+    MSData->TargetCount = AliveCount;
+
+    //AliveCount = 0;
+
+    if (AliveCount == 0)
+    {
+        ShowConditionText(MSData, "SBREAK FAILED");
+
+        MSData->SelectedActionType = 8;
+        MSData->CurrentCraftIndex = 9;
+
+        SetCurrentActionChrInfo(0x16, MSData);
+
+        return TRUE;
+    }
+
+    Index = 0;
+
+    FOR_EACH(Target, MSData->Target, countof(AliveTarget))
+    {
+        if (AliveCount == 0)
+        {
+            *Target = 0xFF;
+        }
+        else
+        {
+            --AliveCount;
+            *Target = AliveTarget[Index++];
+        }
     }
 
     SetCurrentActionChrInfo(0xA, MSData);
