@@ -430,7 +430,7 @@ BOOL Initialize(PVOID BaseAddress)
         // file redirection
 
         INLINE_HOOK_CALL_RVA_NULL(0x48C1EA, AoFindFirstFileA),
-        INLINE_HOOK_CALL_RVA_NULL(0x48C206, NtClose),
+        INLINE_HOOK_CALL_RVA_NULL(0x48C206, ZwClose),
         INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, GetCampImage),
         INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, GetBattleFace),
         INLINE_HOOK_CALL_RVA_NULL(0x2F9101, GetFieldAttackChr),
