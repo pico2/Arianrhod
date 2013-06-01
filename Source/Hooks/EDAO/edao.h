@@ -298,8 +298,12 @@ typedef union MONSTER_STATUS
 
         DUMMY_STRUCT(4);                                    // 0xF28
 
-        CRAFT_INFO                 CraftInfo[16];          // 0xF2C
+        CRAFT_INFO                  CraftInfo[16];          // 0xF2C
         CRAFT_DESCRIPTION           CraftDescription[10];   // 0x10EC
+
+        DUMMY_STRUCT(0x2408 - 0x10EC - sizeof(CRAFT_DESCRIPTION) * 10);
+
+        ULONG                       SummonCount;            // 0x2408
 
     };
 
@@ -591,6 +595,12 @@ public:
         DETOUR_METHOD(CBattle, CancelAria, 0x99DDC0, MSData, Reset);
     }
 
+    VOID THISCALL UpdateHP(PMONSTER_STATUS MSData, LONG Delta, LONG Initial, BOOL What = TRUE)
+    {
+        TYPE_OF(&CBattle::UpdateHP) UpdateHP;
+        *(PULONG_PTR)&UpdateHP = 0x9ED1F0;
+        return (this->*UpdateHP)(MSData, Delta, Initial, What);
+    }
 
     /************************************************************************
       bug fix
@@ -638,6 +648,31 @@ public:
 
     VOID NakedCopyMagicAndCraftData();
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
+
+
+
+    typedef struct
+    {
+        BYTE    OpCode;
+        BYTE    Function;
+
+        union
+        {
+            ULONG Param[4];
+
+        };
+
+    } AS_8D_PARAM, *PAS_8D_PARAM;
+
+    enum
+    {
+        AS_8D_FUNCTION_MINIMUM  = 0x63,
+
+        AS_8D_FUNCTION_REI_JI_MAI_GO    =   AS_8D_FUNCTION_MINIMUM,
+    };
+
+    VOID NakedAS8DDispatcher();
+    VOID FASTCALL AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM ASBuffer);
 
 
     /************************************************************************

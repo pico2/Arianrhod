@@ -476,6 +476,56 @@ ExecuteActionScript(
     return (this->*StubExecuteActionScript)(MSData, ActionScript, ChrThreadId, ScriptOffset, Unknown1, Unknown2, Unknown3);
 }
 
+NAKED VOID CBattle::NakedAS8DDispatcher()
+{
+    INLINE_ASM
+    {
+        push    ecx;
+        mov     ecx, [ebp - 0Ch];
+        mov     edx, [ebp + 08h];
+        mov     eax, [ebp + 0Ch];
+        mov     eax, [eax + 20h];
+        lea     eax, [eax - 12h];
+        push    eax;
+        call    CBattle::AS8DDispatcher
+        pop     ecx;
+        cmp     ecx, 0x62;
+        ret;
+    }
+}
+
+VOID FASTCALL CBattle::AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
+{
+    if (Parameter->Function < AS_8D_FUNCTION_MINIMUM)
+        return;
+
+    switch (Parameter->Function)
+    {
+        case AS_8D_FUNCTION_REI_JI_MAI_GO:
+        {
+            LONG Initial, Delta, TargetCount;
+
+            TargetCount = MSData->TargetCount;
+            TargetCount = TargetCount >= 3 ? 4 : TargetCount;
+
+            Initial = MSData->ChrStatus[BattleStatusFinal].InitialHP;
+            Delta = MSData->ChrStatus[BattleStatusFinal].MaximumHP;
+
+            if (TargetCount != 4)
+                Delta = Delta / 4 * TargetCount;
+
+            if (Initial >= Delta)
+                return;
+
+            MSData->ChrStatus[BattleStatusFinal].InitialHP = Delta;
+            Delta -= Initial;
+
+            UpdateHP(MSData, Delta, Initial);
+        }
+        break;
+    }
+}
+
 /************************************************************************
   EDAO
 ************************************************************************/

@@ -377,12 +377,16 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
 
-        PATCH_MEMORY(0x00, 1, 0x55F6E1),        // ±¨¡È
+        PATCH_MEMORY(0xEB,  1,  0x2CAA98),      // enable shimmer when width > 1024
+        PATCH_MEMORY(0xEB,  1,  0x2C33BE),      // enable blur when width > 1024
+        PATCH_MEMORY(0xEB,  1,  0x2EFBB8),      // capture ?
+
+        PATCH_MEMORY(0x00,  1,  0x55F6E1),        // ±¨¡È
 
         // monster info
-        PATCH_MEMORY(0xEB,      1, 0x626AC8),    // bypass check is enemy
+        PATCH_MEMORY(0xEB,  1,  0x626AC8),      // bypass check is enemy
 
-        //PATCH_MEMORY(0x00,      1, 0x5304C9),     // skip op Sleep
+        //PATCH_MEMORY(0x00,  1,  0x5304C9),      // skip op Sleep
 
         // iat hook
 
@@ -391,6 +395,8 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
         PATCH_MEMORY(AoCreateFileA,         4, 0x9D576C),       // CreateFileA
+
+        PATCH_MEMORY(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
 
 #endif
 
@@ -447,6 +453,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // hack for boss
 
+        INLINE_HOOK_CALL_RVA_NULL(0x5D1ED5, METHOD_PTR(&CBattle::NakedAS8DDispatcher)),
         INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::NakedGetChrIdForSCraft)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::NakedGetTurnVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::NakedGetRunawayVoiceChrId)),
@@ -511,7 +518,7 @@ BOOL Initialize(PVOID BaseAddress)
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
-    //PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, Equipment));
+    PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, SummonCount));
 
     switch (Reason)
     {
