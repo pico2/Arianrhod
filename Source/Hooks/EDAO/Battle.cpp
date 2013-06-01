@@ -503,26 +503,62 @@ VOID FASTCALL CBattle::AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM Param
     {
         case AS_8D_FUNCTION_REI_JI_MAI_GO:
         {
-            LONG Initial, Delta, TargetCount;
+            LONG Initial, Increment, TargetCount;
 
             TargetCount = MSData->TargetCount;
             TargetCount = TargetCount >= 3 ? 4 : TargetCount;
 
             Initial = MSData->ChrStatus[BattleStatusFinal].InitialHP;
-            Delta = MSData->ChrStatus[BattleStatusFinal].MaximumHP;
+            Increment = MSData->ChrStatus[BattleStatusFinal].MaximumHP;
 
             if (TargetCount != 4)
-                Delta = Delta / 4 * TargetCount;
+                Increment = Increment / 4 * TargetCount;
 
-            if (Initial >= Delta)
+            if (Initial >= Increment)
                 return;
 
-            MSData->ChrStatus[BattleStatusFinal].InitialHP = Delta;
-            Delta -= Initial;
+            MSData->ChrStatus[BattleStatusFinal].InitialHP = Increment;
+            Increment -= Initial;
 
-            UpdateHP(MSData, Delta, Initial);
+            UpdateHP(MSData, Increment, Initial);
         }
         break;
+    }
+}
+
+NAKED VOID CBattle::NakedNoResistConditionUp()
+{    
+    enum
+    {
+        Conditions =    CraftConditions::StrUp |
+                        CraftConditions::DefUp |
+                        CraftConditions::AtsUp |
+                        CraftConditions::AdfUp |
+                        CraftConditions::DexUp |
+                        CraftConditions::AglUp |
+                        CraftConditions::MovUp |
+                        CraftConditions::SpdUp,
+    };
+
+    INLINE_ASM
+    {
+        mov     edx, [ebp-0x15C];
+        test    edx, Conditions;
+        je      _RET2;
+
+        and     ecx, edx;
+        je      _RET;
+
+        mov     eax, [ebp + 0x18];
+        and     eax, 1 << 31;
+
+_RET:
+        ret;
+
+_RET2:
+        and     ecx, edx;
+        ret;
+
     }
 }
 

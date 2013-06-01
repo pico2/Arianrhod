@@ -320,6 +320,16 @@ public:
         return (PUSHORT)PtrAdd(this, 0x6140);
     }
 
+    PUSHORT GetPartyList()
+    {
+        return (PUSHORT)PtrAdd(this, 0x2CC);
+    }
+
+    PUSHORT GetPartyListSaved()
+    {
+        return (PUSHORT)PtrAdd(this, 0x2DC);
+    }
+
     BOOL IsCustomChar(ULONG_PTR ChrId)
     {
         return GetPartyChipMap()[ChrId] >= MINIMUM_CUSTOM_CHAR_ID;
@@ -595,11 +605,11 @@ public:
         DETOUR_METHOD(CBattle, CancelAria, 0x99DDC0, MSData, Reset);
     }
 
-    VOID THISCALL UpdateHP(PMONSTER_STATUS MSData, LONG Delta, LONG Initial, BOOL What = TRUE)
+    VOID THISCALL UpdateHP(PMONSTER_STATUS MSData, LONG Increment, LONG Initial, BOOL What = TRUE)
     {
         TYPE_OF(&CBattle::UpdateHP) UpdateHP;
         *(PULONG_PTR)&UpdateHP = 0x9ED1F0;
-        return (this->*UpdateHP)(MSData, Delta, Initial, What);
+        return (this->*UpdateHP)(MSData, Increment, Initial, What);
     }
 
     /************************************************************************
@@ -620,6 +630,8 @@ public:
     /************************************************************************
       tweak
     ************************************************************************/
+
+    VOID NakedNoResistConditionUp();
 
     static LONG CDECL FormatBattleChrAT(PSTR Buffer, PCSTR Format, LONG Index, LONG No, LONG IcoAT, LONG ObjAT, LONG Pri);
     static LONG CDECL ShowSkipCraftAnimeButton(...);
@@ -756,17 +768,48 @@ public:
     }
 };
 
+typedef struct
+{
+    USHORT  State;
+    BYTE    ScenaIndex;
+
+    DUMMY_STRUCT(1);
+
+    ULONG   FunctionOffset;
+    ULONG   CurrentOffset;
+
+} *PSCENA_ENV_BLOCK;
 
 class CScript
 {
 public:
+    EDAO* GetEDAO()
+    {
+        return (EDAO *)PtrSub(this, 0x384EC);
+    }
+
+    CActor* GetActor()
+    {
+        return *(CActor **)this;
+    }
+
+    PBYTE* GetScenaTable()
+    {
+        return (PBYTE *)PtrAdd(this, 0x7D4);
+    }
+
+
+    BOOL THISCALL ScpSaveRestoreParty(PSCENA_ENV_BLOCK Block);
+
     VOID FASTCALL InheritSaveData(PBYTE ScenarioFlags);
     VOID NakedInheritSaveData();
 
     DECL_STATIC_METHOD_POINTER(CScript, InheritSaveData);
+    DECL_STATIC_METHOD_POINTER(CScript, ScpSaveRestoreParty);
 };
 
 INIT_STATIC_MEMBER(CScript::StubInheritSaveData);
+INIT_STATIC_MEMBER(CScript::StubScpSaveRestoreParty);
 
 class EDAO
 {
@@ -794,9 +837,14 @@ public:
         return (CSound *)PtrAdd(this, 0x3A628);
     }
 
+    CScript* GetScript()
+    {
+        return (CScript *)PtrAdd(this, 0x384EC);
+    }
+
     CActor* GetActor()
     {
-        return *(CActor **)PtrAdd(this, 0x384EC);
+        return GetScript()->GetActor();
     }
 
     BOOL IsCustomChar(ULONG_PTR ChrId)
@@ -812,6 +860,13 @@ public:
     ULONG_PTR GetLayer()
     {
         return *(PUSHORT)PtrAdd(this, 0xA6FA8);
+    }
+
+    VOID LoadFieldAttackData(ULONG_PTR Dummy = 0)
+    {
+        TYPE_OF(&EDAO::LoadFieldAttackData) LoadFieldAttackData;
+        *(PULONG_PTR)&LoadFieldAttackData = 0x6F8D30;
+        return (this->*LoadFieldAttackData)(Dummy);
     }
 
     LONG THISCALL AoMessageBox(PCSTR Text, BOOL CanUseCancelButton = TRUE)

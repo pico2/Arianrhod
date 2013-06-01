@@ -50,3 +50,21 @@ VOID FASTCALL CScript::InheritSaveData(PBYTE ScenarioFlags)
         *(PBYTE)PtrAdd(this, 0x9C + *Offset) = ScenarioFlags[*Offset];
     }
 }
+
+BOOL THISCALL CScript::ScpSaveRestoreParty(PSCENA_ENV_BLOCK Block)
+{
+    BOOL   Result, NeedRefreshFA;
+    USHORT Chr[8];
+
+    enum { Save = 1, Restore = 2 };
+
+    NeedRefreshFA = GetScenaTable()[Block->ScenaIndex][Block->CurrentOffset + 1] == Restore &&
+                    RtlCompareMemory(GetActor()->GetPartyListSaved(), GetActor()->GetPartyList(), sizeof(Chr)) != sizeof(Chr);
+
+    Result = (this->*StubScpSaveRestoreParty)(Block);
+
+    if (NeedRefreshFA)
+        GetEDAO()->LoadFieldAttackData();
+
+    return Result;
+}

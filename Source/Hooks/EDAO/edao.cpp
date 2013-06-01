@@ -386,6 +386,10 @@ BOOL Initialize(PVOID BaseAddress)
         // monster info
         PATCH_MEMORY(0xEB,  1,  0x626AC8),      // bypass check is enemy
 
+
+        // buf fix
+        PATCH_MEMORY(0xEB,  1,  0x60CC8F),      // burst energy
+
         //PATCH_MEMORY(0x00,  1,  0x5304C9),      // skip op Sleep
 
         // iat hook
@@ -424,7 +428,10 @@ BOOL Initialize(PVOID BaseAddress)
 
         //INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
+
         INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
+        INLINE_HOOK_CALL_RVA_NULL(0x5DE1D9, METHOD_PTR(&CBattle::NakedNoResistConditionUp)),
+
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
         INLINE_HOOK_CALL_RVA_NULL(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
 
@@ -432,6 +439,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x5B1BE6, METHOD_PTR(&CBattleATBar::LookupReplaceAtBarEntry)),
         INLINE_HOOK_JUMP_RVA     (0x275DAE, METHOD_PTR(&CBattle::ExecuteActionScript), CBattle::StubExecuteActionScript),
+
+        INLINE_HOOK_JUMP_RVA     (0x550C90, METHOD_PTR(&CScript::ScpSaveRestoreParty), CScript::StubScpSaveRestoreParty),
 
         // file redirection
 
@@ -518,7 +527,7 @@ BOOL Initialize(PVOID BaseAddress)
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
-    PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, SummonCount));
+    //PrintConsoleW(L"%d", FIELD_OFFSET(MONSTER_STATUS, SummonCount));
 
     switch (Reason)
     {
