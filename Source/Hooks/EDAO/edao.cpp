@@ -37,13 +37,12 @@ void WriteLog(PCWSTR Format, ...)
 #if !ENABLE_LOG
     #define WriteLog(...)
 #endif
-
+/*
 VOID THISCALL EDAO::Fade(ULONG Param1, ULONG Param2, ULONG Param3, ULONG Param4, ULONG Param5, ULONG Param6)
 {
     if (GetAsyncKeyState(VK_LSHIFT) >= 0)
         (this->*StubFade)(Param1, Param2, Param3, Param4, Param5, Param6);
 }
-
 float Rate = 200.f;
 float fuck = 0.17f;
 
@@ -57,8 +56,10 @@ NAKED VOID FadeInRate()
         ret;
     }
 }
+*/
 
 BOOL    Turbo;
+ULONG   TurboCount;
 WNDPROC WindowProc;
 
 SHORT NTAPI AoGetKeyState(int VirtualKey)
@@ -67,10 +68,14 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
     {
         case VK_SHIFT:
         case VK_LSHIFT:
-            if (Turbo)
-                return (SHORT)0xFFFF8001;
+            if (!Turbo)
+                break;
 
-            break;
+            Turbo ^= 1 << 31;
+            if (Turbo < 0)
+                break;
+
+            return (SHORT)0xFFFF8001;
     }
 
     return GetKeyState(VirtualKey);
@@ -78,6 +83,11 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
 
 LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+    FLOAT Delta;
+    ULONG Index;
+
+    enum { X = 0, Y = 1, Z = 2, Z2 = 42 };
+
     switch (Message)
     {
         case WM_KEYUP:
@@ -85,6 +95,37 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
             {
                 case 'T':
                     Turbo ^= TRUE;
+                    break;
+            }
+            break;
+
+        case WM_KEYDOWN:
+            switch (wParam & 0xFFFF)
+            {
+                case VK_NUMPAD4: Index = X; Delta = -1.f; goto CHANGE_CHR_COORD;
+                case VK_NUMPAD6: Index = X; Delta = 1.f;  goto CHANGE_CHR_COORD;
+
+                case VK_NUMPAD2: Index = Y; Delta = -1.f; goto CHANGE_CHR_COORD;
+                case VK_NUMPAD8: Index = Y; Delta = 1.f;  goto CHANGE_CHR_COORD;
+
+                case VK_NUMPAD7: Index = Z; Delta = 1.f;  goto CHANGE_CHR_COORD;
+                case VK_NUMPAD9: Index = Z; Delta = -1.f;  goto CHANGE_CHR_COORD;
+
+CHANGE_CHR_COORD:
+
+                    if (GetKeyState(VK_CONTROL) >= 0)
+                        break;
+
+                    PFLOAT Coord = (PFLOAT)(*(PULONG_PTR)PtrAdd(EDAO::GlobalGetEDAO(), 0x78CB8 + 0x2BC) + 0x80);
+                    Coord[Index] += Delta;
+/*
+                    switch (wParam & 0xFFFF)
+                    {
+                        case VK_NUMPAD7:
+                        case VK_NUMPAD9:
+                            Coord[Z2] += Delta;
+                    }
+*/
                     break;
             }
     }
@@ -377,6 +418,10 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
 
+        PATCH_MEMORY(0x00, 1, 0x653972),   // box height
+        PATCH_MEMORY(0x00, 1, 0x653C31),   // monster height
+        PATCH_MEMORY(0x00, 1, 0x655E64),   // actor height (mini map)
+
         PATCH_MEMORY(0xEB,  1,  0x2CAA98),      // enable shimmer when width > 1024
         PATCH_MEMORY(0xEB,  1,  0x2C33BE),      // enable blur when width > 1024
         PATCH_MEMORY(0xEB,  1,  0x2EFBB8),      // capture ?
@@ -428,6 +473,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         //INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
+        INLINE_HOOK_CALL_RVA_NULL(0x3E2B21, EDAO::NakedLoadSaveDataThumb),
+        INLINE_HOOK_CALL_RVA_NULL(0x465F08, EDAO::NakedSetSaveDataScrollStep),
 
         INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
         INLINE_HOOK_CALL_RVA_NULL(0x5DE1D9, METHOD_PTR(&CBattle::NakedNoResistConditionUp)),

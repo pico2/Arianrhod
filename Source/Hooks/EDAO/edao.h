@@ -967,16 +967,22 @@ public:
     VOID NakedGetChrSBreak();
     VOID FASTCALL GetChrSBreak(PMONSTER_STATUS MSData);
 
+
+    /************************************************************************
+      tweak
+    ************************************************************************/
+
+    static VOID NakedLoadSaveDataThumb();
+    static VOID NakedSetSaveDataScrollStep();
+
     // hook
 public:
     VOID THISCALL Fade(ULONG Param1, ULONG Param2, ULONG Param3, ULONG Param4, ULONG Param5, ULONG Param6);
     BOOL THISCALL CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex);
 
-    static TYPE_OF(&EDAO::Fade)                 StubFade;
-    static TYPE_OF(&EDAO::CheckItemEquipped)    StubCheckItemEquipped;
+    DECL_STATIC_METHOD_POINTER(EDAO, CheckItemEquipped);
 };
 
-DECL_SELECTANY TYPE_OF(EDAO::StubFade) EDAO::StubFade = NULL;
 DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped = NULL;
 
 

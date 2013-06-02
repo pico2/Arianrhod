@@ -550,7 +550,7 @@ NAKED VOID CBattle::NakedNoResistConditionUp()
         je      _RET;
 
         mov     eax, [ebp + 0x18];
-        and     eax, 1 << 31;
+        and     eax, 1 << 15;
 
 _RET:
         ret;
