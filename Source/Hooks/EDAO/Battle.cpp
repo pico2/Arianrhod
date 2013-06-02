@@ -496,6 +496,9 @@ NAKED VOID CBattle::NakedAS8DDispatcher()
 
 VOID FASTCALL CBattle::AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
 {
+    if (MSData == NULL)
+        return;
+
     if (Parameter->Function < AS_8D_FUNCTION_MINIMUM)
         return;
 
@@ -550,7 +553,7 @@ NAKED VOID CBattle::NakedNoResistConditionUp()
         je      _RET;
 
         mov     eax, [ebp + 0x18];
-        and     eax, 1 << 15;
+        and     eax, (1 << 15) | (1 << 31);
 
 _RET:
         ret;

@@ -678,7 +678,7 @@ public:
 
     enum
     {
-        AS_8D_FUNCTION_MINIMUM  = 0x63,
+        AS_8D_FUNCTION_MINIMUM  = 0x70,
 
         AS_8D_FUNCTION_REI_JI_MAI_GO    =   AS_8D_FUNCTION_MINIMUM,
     };
