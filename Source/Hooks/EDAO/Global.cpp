@@ -107,8 +107,13 @@ VOID FASTCALL LoadSaveDataThumbFast(Gdiplus::Bitmap *bitmap, PBYTE RGBBuffer, PB
         {
             Color = *(LPCOLORREF)buf;
 
-            *(LPCOLORREF)rgb    = Color & 0x00FFFFFF;
-            *(LPCOLORREF)alpha  = RGB(Color >> 24, Color >> 24, Color >> 24);
+            rgb[0] = GetRValue(Color);
+            rgb[1] = GetGValue(Color);
+            rgb[2] = GetBValue(Color);
+
+            alpha[0] = Color >> 24;
+            alpha[1] = Color >> 24;
+            alpha[2] = Color >> 24;
 
             buf     += 4;
             rgb     += 3;
@@ -129,7 +134,6 @@ NAKED VOID EDAO::NakedLoadSaveDataThumb()
     {
         mov     dword ptr [ebp-0x6CC], 0x7FFFFFFF;
 
-        lea     ecx, dword ptr [ebp - 0x6B4];
         mov     edx, dword ptr [ebp - 0x350];
         push    dword ptr [ebp - 0x234];
         push    dword ptr [ebp - 0x35C];

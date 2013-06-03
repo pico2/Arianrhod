@@ -113,8 +113,7 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
 
 CHANGE_CHR_COORD:
 
-                    if (GetKeyState(VK_CONTROL) >= 0)
-                        break;
+                    //if (GetKeyState(VK_CONTROL) >= 0) break;
 
                     PFLOAT Coord = (PFLOAT)(*(PULONG_PTR)PtrAdd(EDAO::GlobalGetEDAO(), 0x78CB8 + 0x2BC) + 0x80);
                     Coord[Index] += Delta;
@@ -473,7 +472,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         //INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
         INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
-        INLINE_HOOK_CALL_RVA_NULL(0x3E2B21, EDAO::NakedLoadSaveDataThumb),
+        INLINE_HOOK_CALL_RVA_NULL(0x3E2B42, EDAO::NakedLoadSaveDataThumb),
         INLINE_HOOK_CALL_RVA_NULL(0x465F08, EDAO::NakedSetSaveDataScrollStep),
 
         INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
