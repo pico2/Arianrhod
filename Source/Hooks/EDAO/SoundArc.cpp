@@ -2,6 +2,9 @@
 
 #define HANDLE_CTRL(_ctrl_code, fn)   case (_ctrl_code): return fn(Parameter)
 
+//#undef DebugPrint
+//#define DebugPrint(...) { AllocConsole(); PrintConsoleW(__VA_ARGS__); PrintConsoleW(L"\n"); }
+
 
 CSoundPlayer *g_Player;
 
@@ -182,6 +185,8 @@ LRESULT CSoundPlayer::PlayFade(ULONG_PTR Parameter)
 
 LRESULT CSoundPlayer::FadeOut(ULONG_PTR Parameter)
 {
+    DebugPrint(L"FadeOut: %d", m_UnknownF[0]);
+
     return this->IFadeOut(m_UnknownF[0]);
 }
 
@@ -356,12 +361,14 @@ LRESULT CSoundPlayer::FadeOutEx(ULONG_PTR Parameter)
     Index   = m_UnknownF[0];
     Time    = m_UnknownF[1];
 
+    DebugPrint(L"FadeOutEx: %d, %d", Index, Time);
+
     Result = this->IFadeOutEx(Index, Time);
 
     if (Time != 0)
     {
         m_FadeOutTime[Index] = Time;
-        m_FadeOutTimeStamp[Index] = NtGetTickCount();
+        m_FadeOutTimeStamp[Index] = (ULONG)NtGetTickCount();
     }
 
     return Result;
@@ -407,12 +414,23 @@ LRESULT CSoundPlayer::SetSeVol(ULONG_PTR Parameter)
 
 LRESULT CSoundPlayer::SetBGMVol(ULONG_PTR Parameter)
 {
-    if (m_FadeOutTimeStamp[BGMBuffer] != 0)
-    {
-        if (NtGetTickCount() - m_FadeOutTimeStamp[BGMBuffer] < m_FadeOutTime[BGMBuffer])
-            return TRUE;
+    ULONG_PTR TimeStamp, Elapsed;
 
-        m_FadeOutTimeStamp[BGMBuffer] = 0;
+    TimeStamp = NtGetTickCount();
+
+    for (ULONG_PTR Index = 0; Index != MaxBuffer; ++Index)
+    {
+        if (m_FadeOutTimeStamp[Index] != 0)
+        {
+            Elapsed = TimeStamp - m_FadeOutTimeStamp[Index];
+
+            DebugPrint(L"SetBGMVol(%d): %d, %d", Index, m_FadeOutTime[Index], Elapsed);
+
+            if (Elapsed < m_FadeOutTime[Index])
+                return TRUE;
+
+            m_FadeOutTimeStamp[Index] = 0;
+        }
     }
 
     return this->ISetBGMVol(Parameter);

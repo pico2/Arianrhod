@@ -126,7 +126,7 @@ protected:
 
 protected:
 
-    enum { SEBuffer = 0, BGMBuffer = 1 };
+    enum { BGMBuffer1 = 0, BGMBuffer2 = 1, MaxBuffer };
 
     PVOID   m_Sound3D;
     ULONG   m_UnknownF[0x100];
