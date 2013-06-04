@@ -111,5 +111,13 @@ SOURCE=.\edao_vm.h
 
 SOURCE=.\Global.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\SoundArc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SoundArc.h
+# End Source File
 # End Target
 # End Project

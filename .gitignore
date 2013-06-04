@@ -46,7 +46,7 @@ Source/LocaleEmulator2/LocaleEmulator/Loader.exe
 Source/LocaleEmulator2/LocaleEmulator/LocaleEmulator.dll
 Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /Source/Hooks/yx
-/Source/Hooks/EDAO
+/Source/Hooks/EDAO/Decompiler
 /TempSync/ChromeUpdater/LATEST_CHANGE
 /TempSync/ChromeUpdater/CHECK
 /Source/Hooks/Crack

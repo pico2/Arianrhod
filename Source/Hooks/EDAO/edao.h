@@ -3,6 +3,8 @@
 
 #include "MyLibrary.h"
 
+ML_OVERLOAD_NEW
+
 class EDAO;
 class CGlobal;
 class CBattle;

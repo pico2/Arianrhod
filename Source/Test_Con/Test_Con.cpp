@@ -562,9 +562,28 @@ BOOL IsRunningInVMWare()
 }
 
 #pragma comment(lib, NT6_LIB(kernel32))
+#pragma comment(lib, "wininet.lib")
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    ULONG       read;
+    HINTERNET   internetopen;
+    HINTERNET   file;
+    BYTE        buf[0x1000];
+
+    internetopen=InternetOpenW(NULL, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+
+    file = InternetOpenUrlW(
+                            internetopen,
+                            L"http://119.147.41.144/query_game_downloader?name=longwu",
+                            NULL,
+                            0,
+                            INTERNET_FLAG_RELOAD,
+                            0
+                        );
+
+    InternetReadFile(file, buf, sizeof(buf), &read);
+
 
     return;
 
