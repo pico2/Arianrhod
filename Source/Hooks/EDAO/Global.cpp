@@ -132,13 +132,12 @@ NAKED VOID EDAO::NakedLoadSaveDataThumb()
 {
     INLINE_ASM
     {
-        mov     dword ptr [ebp-0x6CC], 0x7FFFFFFF;
-
         mov     edx, dword ptr [ebp - 0x350];
         push    dword ptr [ebp - 0x234];
         push    dword ptr [ebp - 0x35C];
 
         call    LoadSaveDataThumbFast
+        or      eax, -1;
         ret;
     }
 }
