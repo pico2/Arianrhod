@@ -2,8 +2,10 @@
 
 #define HANDLE_CTRL(_ctrl_code, fn)   case (_ctrl_code): return fn(Parameter)
 
-//#undef DebugPrint
-//#define DebugPrint(...) { AllocConsole(); PrintConsoleW(__VA_ARGS__); PrintConsoleW(L"\n"); }
+#if 0
+    #undef DebugPrint
+    #define DebugPrint(...) { AllocConsole(); PrintConsoleW(__VA_ARGS__); PrintConsoleW(L"\n"); }
+#endif
 
 
 CSoundPlayer *g_Player;
@@ -97,18 +99,20 @@ LRESULT NTAPI CSoundPlayer::StaticDispatchCtrlCode(HWND Window, UINT Message, WP
             StubStaticDispatchCtrlCode(Window, Message, wParam, lParam);
 }
 
-LRESULT CSoundPlayer::DispatchCtrlCode(ULONG_PTR Message, ULONG_PTR MinorCtrlCode, ULONG_PTR Parameter)
+LRESULT CSoundPlayer::DispatchCtrlCode(ULONG_PTR Message, ULONG_PTR CtrlCode, ULONG_PTR Parameter)
 {
     switch (Message)
     {
         case WM_CONTROL_SOUND:
-            if (MinorCtrlCode < CTRL_MINIMUM)
+            if (CtrlCode < CTRL_MINIMUM)
             {
-                m_UnknownF[MinorCtrlCode] = Parameter;
+                m_UnknownF[CtrlCode] = Parameter;
                 break;
             }
 
-            switch (MinorCtrlCode)
+            DebugPrint(L"%X", CtrlCode);
+
+            switch (CtrlCode)
             {
                 HANDLE_CTRL(CTRL_PLAY_FADE,                 PlayFade);
                 HANDLE_CTRL(CTRL_PLAY_FADE_B,               PlayFadeB);
