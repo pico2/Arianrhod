@@ -575,6 +575,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
 
+    //Ldr::LoadDll(L"ed_ao_ex.dll");
+
     return TRUE;
 }
 
