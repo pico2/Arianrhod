@@ -72,9 +72,7 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
             if (!Turbo)
                 break;
 
-            Turbo ^= 1 << 31;
-            if (Turbo < 0)
-                break;
+            ++*EDAO::GlobalGetEDAO()->GetMap()->GetFrameNumber();
 
             return (SHORT)0xFFFF8001;
     }
@@ -97,6 +95,10 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
                 case 'T':
                     Turbo ^= TRUE;
                     break;
+
+                //case 'J':
+                //    EDAO::GlobalGetEDAO()->JumpToMap();
+                //    break;
             }
             break;
 

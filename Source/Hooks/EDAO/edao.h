@@ -813,6 +813,17 @@ public:
 INIT_STATIC_MEMBER(CScript::StubInheritSaveData);
 INIT_STATIC_MEMBER(CScript::StubScpSaveRestoreParty);
 
+
+class CMap
+{
+public:
+
+    PULONG GetFrameNumber()
+    {
+        return (PULONG)PtrAdd(this, 0x1C7C);
+    }
+};
+
 class EDAO
 {
     // battle
@@ -822,6 +833,16 @@ public:
     static EDAO* GlobalGetEDAO()
     {
         return *(EDAO **)0xC29988;
+    }
+
+    static VOID JumpToMap()
+    {
+        return ((TYPE_OF(&EDAO::JumpToMap))0x6A0DF0)();
+    }
+
+    CMap* GetMap()
+    {
+        return (CMap *)PtrAdd(this, 0x141C);
     }
 
     CGlobal* GetGlobal()
