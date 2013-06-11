@@ -90,7 +90,7 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
     switch (Message)
     {
         case WM_KEYUP:
-            switch (wParam & 0xFFFF)
+            switch (LOWORD(wParam))
             {
                 case 'T':
                     Turbo ^= TRUE;
@@ -576,6 +576,8 @@ BOOL Initialize(PVOID BaseAddress)
 #endif
 
     Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
+
+    Turbo = TRUE;
 
     //Ldr::LoadDll(L"ed_ao_ex.dll");
 
