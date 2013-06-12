@@ -422,15 +422,18 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
         PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
 
-        PATCH_MEMORY(0x00, 1, 0x653972),   // box height
-        PATCH_MEMORY(0x00, 1, 0x653C31),   // monster height
-        PATCH_MEMORY(0x00, 1, 0x655E64),   // actor height (mini map)
+        PATCH_MEMORY(0x00,      1, 0x653972),       // box height
+        PATCH_MEMORY(0x00,      1, 0x653C31),       // monster height
+        PATCH_MEMORY(0x00,      1, 0x655E64),       // actor height (mini map)
 
-        PATCH_MEMORY(0xEB,  1,  0x2CAA98),      // enable shimmer when width > 1024
-        PATCH_MEMORY(0xEB,  1,  0x2C33BE),      // enable blur when width > 1024
-        PATCH_MEMORY(0xEB,  1,  0x2EFBB8),      // capture ?
+        PATCH_MEMORY(0xEB,      1,  0x2CAA98),      // enable shimmer when width > 1024
+        PATCH_MEMORY(0xEB,      1,  0x2C33BE),      // enable blur when width > 1024
+        PATCH_MEMORY(0xEB,      1,  0x2EFBB8),      // capture ?
 
-        PATCH_MEMORY(0x00,  1,  0x55F6E1),        // ±¨¡È
+        PATCH_MEMORY(0x00,      1,  0x55F6E1),      // ±¨¡È
+
+        PATCH_MEMORY(0x1CEB,    2,  0x64ACFE),      // remove crappy mouse control @ PositionWindow
+        PATCH_MEMORY(0x32,      1,  0x54FDA4),      // text length of menu item created by MenuCmd(1, x, x)
 
         // monster info
         PATCH_MEMORY(0xEB,  1,  0x626AC8),      // bypass check is enemy
@@ -533,6 +536,11 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
         INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
         INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
+        INLINE_HOOK_CALL_RVA_NULL(0x332B26, METHOD_PTR(&EDAO::GetStatusIcon)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4948B9, METHOD_PTR(&EDAO::GetCFace)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4948DF, METHOD_PTR(&EDAO::GetCFace)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CActor::GetTeamAttackMemberId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CActor::GetTeamAttackMemberId)),
 
 
         // inherit custom flags

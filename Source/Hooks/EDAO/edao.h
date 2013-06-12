@@ -341,6 +341,23 @@ public:
     {
         return (PUSHORT)PtrAdd(this, 0x5D4);
     }
+
+    PBYTE GetScenaFlags()
+    {
+        return (PBYTE)PtrAdd(this, 0x9C);
+    }
+
+    BOOL IsYinRixia()
+    {
+        return FLAG_ON(GetScenaFlags()[0x165], 1 << 5);
+    }
+
+    BOOL IsLazyKnight()
+    {
+        return FLAG_ON(GetScenaFlags()[0x1A0], 1);
+    }
+
+    ULONG FASTCALL GetTeamAttackMemberId(ULONG ChrId);
 };
 
 typedef union
@@ -817,7 +834,7 @@ INIT_STATIC_MEMBER(CScript::StubScpSaveRestoreParty);
 class CMap
 {
 public:
-
+    
     PULONG GetFrameNumber()
     {
         return (PULONG)PtrAdd(this, 0x1C7C);
@@ -987,8 +1004,16 @@ public:
         return (this->*f)(ChrId, Level, Unknown);
     }
 
+
+    /************************************************************************
+      hack for boss
+    ************************************************************************/
+
     VOID NakedGetChrSBreak();
     VOID FASTCALL GetChrSBreak(PMONSTER_STATUS MSData);
+    LONG FASTCALL GetStatusIcon(ULONG ChrId);
+    LONG FASTCALL GetCFace(ULONG ChrId);
+    LONG FASTCALL GetLeaderChangeVoice(ULONG ChrId);
 
 
     /************************************************************************
@@ -1012,9 +1037,9 @@ DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped 
 class CGlobal
 {
 public:
-    PCRAFT_INFO    THISCALL GetMagicData(USHORT MagicId);
-    PCSTR           THISCALL GetMagicDescription(USHORT MagicId);
-    PBYTE           THISCALL GetMagicQueryTable(USHORT MagicId);
+    PCRAFT_INFO THISCALL GetMagicData(USHORT MagicId);
+    PCSTR       THISCALL GetMagicDescription(USHORT MagicId);
+    PBYTE       THISCALL GetMagicQueryTable(USHORT MagicId);
 
     EDAO* GetEDAO()
     {
@@ -1129,5 +1154,6 @@ public:
 DECL_SELECTANY TYPE_OF(EDAOFileStream::StubUncompress) EDAOFileStream::StubUncompress = NULL;
 
 
+BOOL AoIsFileExist(PCSTR FileName);
 
 #endif // _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_
