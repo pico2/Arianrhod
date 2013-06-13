@@ -102,14 +102,13 @@ class Debugger2(Debugger):
         return debugger.get_all_modules()
 
     def QueryModuleByName(self, modname):
-        found = None
         modname = mbcs(modname).lower()
         modulos = self.QueryAllModules()
         for name, mod in modulos.iteritems():
             if modname in os.path.splitext(os.path.basename(name))[0].lower():
                 return Module(name, mod[MODULE_INFO_BASE], mod[MODULE_INFO_SIZE], mod[MODULE_INFO_ENTRY_POINT])
 
-        return found
+        return None
 
     log = asuna_log
     Detach = Detach2
