@@ -566,17 +566,7 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-
-    NtFileDisk f;
-    HANDLE fd;
-
-    f.Open(L"E:\\Desktop\\yx\\th135\\th135cn.pak");
-
-    ZwDuplicateObject(CurrentProcess, f, CurrentProcess, &fd, 0, 0, DUPLICATE_SAME_ACCESS);
-
-    SetFilePointer(fd, 0, 0, FILE_CURRENT);
-    NtFileDisk::Seek(f, 0x100, FILE_BEGIN);
-    SetFilePointer(fd, 0, 0, FILE_CURRENT);
+    LoadLibraryA("ADVAPI32\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
 
     return;
 
