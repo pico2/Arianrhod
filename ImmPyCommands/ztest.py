@@ -152,6 +152,7 @@ def main(args):
     debugger.pyreset()
 
     functbl = Register(0xBE1460)
+    functbl = Register(0xBE0E10)
 
     try:
         for i in range(0x100):
@@ -164,7 +165,7 @@ def main(args):
             offset = int((func + 1).u32())
             func = func + 5 + offset
 
-            funcname = 'AS_%02X' % i
+            funcname = 'SCP_%02X' % i
 
             imm.setComment(int(func), funcname)
             imm.setLabel(int(func), funcname)
