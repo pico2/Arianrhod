@@ -110,7 +110,7 @@ def Arianrhod_LastBattle(caller_locals):
     OP_6C(0x3F15, 0x0)
     OP_6C(0x46E6, 0x1388)
     BeginChrThread(0xD, 1, 0, 11)
-    PlayBgm("ed7584.ogg", 0)
+    PlayBGM("ed7584.ogg", 0)
 
     Jc((scpexpr(EXPR_PUSH_VALUE_INDEX, 0x3), scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_EQU), scpexpr(EXPR_END)), "xxx_first_battle_lose")
 

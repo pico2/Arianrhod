@@ -18,7 +18,7 @@ InstructionNames[0x03]  = 'Jump'
 InstructionNames[0x04]  = 'Switch'
 InstructionNames[0x05]  = 'Call'
 InstructionNames[0x06]  = 'NewScene'
-InstructionNames[0x07]  = 'OP_07'
+InstructionNames[0x07]  = 'IdleLoop'
 InstructionNames[0x08]  = 'Sleep'
 InstructionNames[0x09]  = 'SetXXXFlags'
 InstructionNames[0x0A]  = 'ClearXXXFlags'
@@ -40,17 +40,17 @@ InstructionNames[0x1A]  = 'EventEnd'
 InstructionNames[0x1B]  = 'OP_1B'
 InstructionNames[0x1C]  = 'OP_1C'
 InstructionNames[0x1D]  = 'OP_1D'
-InstructionNames[0x1E]  = 'PlayBgm'
+InstructionNames[0x1E]  = 'PlayBGM'
 InstructionNames[0x1F]  = 'OP_1F'
-InstructionNames[0x20]  = 'VolumeBgm'
+InstructionNames[0x20]  = 'VolumeBGM'
 InstructionNames[0x21]  = 'OP_21'
-InstructionNames[0x22]  = 'OP_22'
+InstructionNames[0x22]  = 'WaitBGM'
 InstructionNames[0x23]  = 'Sound'
 InstructionNames[0x24]  = 'OP_24'
 InstructionNames[0x25]  = 'OP_25'
 InstructionNames[0x26]  = 'SoundDistance'
 InstructionNames[0x27]  = 'SoundLoad'
-InstructionNames[0x28]  = 'OP_28'
+InstructionNames[0x28]  = 'Yield'
 InstructionNames[0x29]  = 'OP_29'
 InstructionNames[0x2A]  = 'OP_2A'
 InstructionNames[0x2B]  = 'OP_2B'
@@ -78,9 +78,9 @@ InstructionNames[0x42]  = 'OP_42'
 InstructionNames[0x43]  = 'GetPartyIndex'
 InstructionNames[0x44]  = 'BeginChrThread'
 InstructionNames[0x45]  = 'EndChrThread'
-InstructionNames[0x46]  = 'BeginInvoke'
-InstructionNames[0x47]  = 'BeginInvoke2'
-InstructionNames[0x48]  = 'OP_48'
+InstructionNames[0x46]  = 'QueueWorkItem'
+InstructionNames[0x47]  = 'QueueWorkItem2'
+InstructionNames[0x48]  = 'WaitChrThread'
 InstructionNames[0x49]  = 'OP_49'
 InstructionNames[0x4A]  = 'Event'
 InstructionNames[0x4B]  = 'OP_4B'
@@ -91,8 +91,8 @@ InstructionNames[0x4F]  = 'OP_4F'
 InstructionNames[0x50]  = 'OP_50'
 InstructionNames[0x51]  = 'OP_51'
 InstructionNames[0x52]  = 'OP_52'
-InstructionNames[0x53]  = 'OP_53'
-InstructionNames[0x54]  = 'OP_54'
+InstructionNames[0x53]  = 'TalkBegin'
+InstructionNames[0x54]  = 'TalkEnd'
 InstructionNames[0x55]  = 'AnonymousTalk'
 InstructionNames[0x56]  = 'OP_56'
 InstructionNames[0x57]  = 'OP_57'
@@ -148,7 +148,7 @@ InstructionNames[0x8D]  = 'SetChrSubChip'
 InstructionNames[0x8E]  = 'OP_8E'
 InstructionNames[0x8F]  = 'SetChrPos'
 InstructionNames[0x90]  = 'OP_90'
-InstructionNames[0x91]  = 'OP_91'
+InstructionNames[0x91]  = 'TurnDirection'
 InstructionNames[0x92]  = 'OP_92'
 InstructionNames[0x93]  = 'OP_93'
 InstructionNames[0x94]  = 'OP_94'
@@ -180,23 +180,23 @@ InstructionNames[0xAD]  = 'OP_AD'
 InstructionNames[0xAE]  = 'OP_AE'
 InstructionNames[0xAF]  = 'OP_AF'
 InstructionNames[0xB2]  = 'OP_B2'
-InstructionNames[0xB3]  = 'OP_B3'
+InstructionNames[0xB3]  = 'OutputDebugInt'
 InstructionNames[0xB4]  = 'OP_B4'
 InstructionNames[0xB5]  = 'OP_B5'
-InstructionNames[0xB6]  = 'OP_B6'
+InstructionNames[0xB6]  = 'LoadOps'
 InstructionNames[0xB7]  = 'OP_B7'
 InstructionNames[0xB8]  = 'PlayMovie'
 InstructionNames[0xB9]  = 'OP_B9'
 InstructionNames[0xBA]  = 'ReplaceBGM'
 InstructionNames[0xBC]  = 'OP_BC'
-InstructionNames[0xBD]  = 'OP_BD'
+InstructionNames[0xBD]  = 'UseItem'
 InstructionNames[0xBE]  = 'OP_BE'
 InstructionNames[0xBF]  = 'OP_BF'
 InstructionNames[0xC0]  = 'SetChrChipPat'
 InstructionNames[0xC2]  = 'LoadChrChipPat'
 InstructionNames[0xC3]  = 'OP_C3'
 InstructionNames[0xC4]  = 'OP_C4'
-InstructionNames[0xC5]  = 'OP_C5'
+InstructionNames[0xC5]  = 'MiniGame'
 InstructionNames[0xC7]  = 'OP_C7'
 InstructionNames[0xC9]  = 'OP_C9'
 InstructionNames[0xCA]  = 'CreatePortrait'
@@ -973,25 +973,6 @@ def scp_1d(data):
 
         data.Instruction.OperandFormat = 'BB' + operand
 
-def scp_28(data):
-
-    if data.Reason == HANDLER_REASON_DISASM:
-
-        fs = data.FileStream
-        ins = data.Instruction
-
-        if fs.byte() != Jump:
-            raise Exception('op_28 not followed by a Jump @ %X' % fs.tell() - 2)
-
-        fs.seek(-1, io.SEEK_CUR)
-
-        data.Instruction.OperandFormat = 'BO'
-        data.Instruction.Flags.StartBlock = True
-
-    elif data.Reason == HANDLER_REASON_ASSEMBLE:
-
-        data.Instruction.OperandFormat = 'BO'
-
 def scp_29(data):
 
     def getopr(opr2):
@@ -1200,10 +1181,10 @@ def scp_lambda_worker(data, extra_length):
 
 
 def scp_46(data):
-    return scp_lambda_worker(data, 1)               # OP_00
+    return scp_lambda_worker(data, 1)               # ExitThread
 
 def scp_47(data):
-    return scp_lambda_worker(data, 1 + 5)       # OP_28, Jump(Offset)
+    return scp_lambda_worker(data, 1 + 5)       # Yield, Jump(Offset)
 
 
 def scp_4e(data):
@@ -1634,9 +1615,9 @@ edao_op_list = \
     inst(Jc,                        NO_OPERAND,             INSTRUCTION_START_BLOCK,    scp_if),
     inst(Jump,                      'O',                    INSTRUCTION_JUMP),
     inst(Switch,                    NO_OPERAND,             INSTRUCTION_END_BLOCK,      scp_switch),
-    inst(Call,                      'CC'),          # main_scp index, func index
+    inst(Call,                      'CC'),          # Call(scp index, func index)
     inst(NewScene,                  NO_OPERAND,             0,                          scp_new_scene),
-    inst(OP_07,                     NO_OPERAND),
+    inst(IdleLoop),
     inst(Sleep,                     'H'),
     inst(SetXXXFlags,               'L'),
     inst(ClearXXXFlags,             'L'),
@@ -1658,18 +1639,17 @@ edao_op_list = \
     inst(OP_1B,                     'BBW'),
     inst(OP_1C,                     'BBBBBBWW'),
     inst(OP_1D,                     NO_OPERAND,             0,                          scp_1d),
-    inst(PlayBgm,                   'MC'),
+    inst(PlayBGM,                   'MC'),
     inst(OP_1F),
-    inst(VolumeBgm,                 'BL'),
+    inst(VolumeBGM,                 'BL'),
     inst(OP_21,                     'L'),
-    inst(OP_22),
+    inst(WaitBGM),
     inst(Sound,                     'HCCC'),
     inst(OP_24,                     'W'),
     inst(OP_25,                     'WB'),
     inst(SoundDistance,             'WLLLLLBL'),
     inst(SoundLoad,                 'H'),
-    inst(OP_28),
-    #inst(OP_28,                     NO_OPERAND,             0,                          scp_28),
+    inst(Yield),
     inst(OP_29,                     NO_OPERAND,             0,                          scp_29),
     inst(OP_2A,                     NO_OPERAND,             0,                          scp_2a),
     inst(OP_2B,                     NO_OPERAND,             0,                          scp_2b),
@@ -1697,11 +1677,9 @@ edao_op_list = \
     inst(GetPartyIndex,             'B'),           # GetPartyIndex(chr_id)     return chr index of team member
     inst(BeginChrThread,            'WCCC'),
     inst(EndChrThread,              'WB'),
-    #inst(BeginInvoke,               'WBB'),
-    #inst(BeginInvoke2,              'WBB'),
-    inst(BeginInvoke,               NO_OPERAND,             0,                          scp_46),
-    inst(BeginInvoke2,              NO_OPERAND,             0,                          scp_47),
-    inst(OP_48,                     'WB'),
+    inst(QueueWorkItem,             NO_OPERAND,             0,                          scp_46),
+    inst(QueueWorkItem2,            NO_OPERAND,             0,                          scp_47),
+    inst(WaitChrThread,             'WC'),
     inst(OP_49),
     inst(Event,                     'CC'),
     inst(OP_4B,                     'WB'),
@@ -1712,8 +1690,8 @@ edao_op_list = \
     inst(OP_50,                     NO_OPERAND,             0,                          scp_50),
     inst(OP_51),
     inst(OP_52,                     NO_OPERAND,             0,                          scp_52),
-    inst(OP_53,                     'W'),
-    inst(OP_54,                     'W'),
+    inst(TalkBegin,                 'W'),
+    inst(TalkEnd,                   'W'),
     inst(AnonymousTalk,             NO_OPERAND,             0,                          scp_anonymous_talk),
     inst(OP_56),
     inst(OP_57,                     'B'),
@@ -1769,7 +1747,7 @@ edao_op_list = \
     inst(OP_8E,                     'WS'),
     inst(SetChrPos,                 'WiiiH'),
     inst(OP_90,                     'WLLLW'),
-    inst(OP_91,                     'WWW'),
+    inst(TurnDirection,             'WWH'),
     inst(OP_92,                     'WLLW'),
     inst(OP_93,                     'WWW'),
     inst(OP_94,                     'WLLLLL'),
@@ -1801,23 +1779,23 @@ edao_op_list = \
     inst(OP_AE,                     'WW'),
     inst(OP_AF,                     'B'),
     inst(OP_B2,                     'W'),
-    inst(OP_B3,                     'B'),
+    inst(OutputDebugInt,            'B'),
     inst(OP_B4,                     'B'),
     inst(OP_B5,                     'BW'),
-    inst(OP_B6),
+    inst(LoadOps),                                                  # obsolete
     inst(OP_B7,                     'BBW'),
     inst(PlayMovie,                 'BSWW'),
     inst(OP_B9,                     'B'),
     inst(ReplaceBGM,                'MM'),
     inst(OP_BC,                     'B'),
-    inst(OP_BD,                     'WW'),
+    inst(UseItem,                   'WW'),
     inst(OP_BE,                     'BW'),
     inst(OP_BF,                     'BB'),
     inst(SetChrChipPat,             'BBL'),                         # SetChrChipPat(chr_id, func_id, param)
     inst(LoadChrChipPat),
     inst(OP_C3,                     'BBWWWBLLLLLL'),
     inst(OP_C4,                     'BBWW'),
-    inst(OP_C5,                     'BLLLLLLLL'),
+    inst(MiniGame,                  'BLLLLLLLL'),
     inst(OP_C7,                     'BB'),
     inst(OP_C9,                     'BL'),
     inst(CreatePortrait,            'CHHHHHHHHHHHHLBS'),

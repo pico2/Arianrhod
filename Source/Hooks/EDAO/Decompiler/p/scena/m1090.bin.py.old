@@ -476,7 +476,7 @@ def main():
     BeginChrThread(0xD, 1, 0, 11)
     OP_22()
     Sleep(10)
-    PlayBgm("ed7584.ogg", 0)
+    PlayBGM("ed7584.ogg", 0)
     OP_C9(0x0, 0x80000000)
     OP_CB(0x0, 0x3, 0xFFFFFFFF, 0x1F4, 0x0, 0x0)
     OP_CB(0x0, 0x0, 0xFFFFD8F0, 0x0, 0x1F4, 0x0)
@@ -651,7 +651,7 @@ def main():
 
     CloseMessageWindow()
     Sleep(300)
-    VolumeBgm(0x46, 0x3E8)
+    VolumeBGM(0x46, 0x3E8)
     OP_25(0x33C, 0xA)
     OP_CB(0x1, 0x1, 0x41A, 0x41A, 0x0, 0x0)
     OP_CB(0x1, 0x1, 0x3E8, 0x3E8, 0x3E8, 0x0)
@@ -707,7 +707,7 @@ def main():
     OP_CC(0x0, 0x1, 0x3)
     FadeToBright(1500, 16777215)
     OP_0D()
-    VolumeBgm(0x64, 0x3E8)
+    VolumeBGM(0x64, 0x3E8)
     OP_25(0x33C, 0x1E)
     Sleep(500)
 
@@ -908,7 +908,7 @@ def main():
     OP_21(0x7D0)
     OP_22()
     Sleep(10)
-    PlayBgm("ed7458.ogg", 0)
+    PlayBGM("ed7458.ogg", 0)
     OP_68(-5900, 2420, 0, 3000)
     OP_6D(0x5A, 0x9, 0x0, 0xBB8)
     OP_6E(0x226, 0xBB8)
@@ -1310,7 +1310,7 @@ def main():
     OP_6C(0x3F15, 0x0)
     OP_6C(0x46E6, 0x1388)
     BeginChrThread(0xD, 1, 0, 11)
-    PlayBgm("ed7584.ogg", 0)
+    PlayBGM("ed7584.ogg", 0)
 
     #Jc((scpexpr(EXPR_PUSH_VALUE_INDEX, 0x3), scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_EQU), scpexpr(EXPR_END)), "first_battle_lose")
 
@@ -1897,7 +1897,7 @@ def main():
 
     OP_22()
     Sleep(10)
-    PlayBgm("ed7573.ogg", 0)
+    PlayBGM("ed7573.ogg", 0)
     OP_6C(0x32C8, 0x7530)
     Sleep(500)
 

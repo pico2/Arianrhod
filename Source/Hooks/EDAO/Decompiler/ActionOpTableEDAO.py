@@ -18,7 +18,7 @@ InstructionNames[0x03] = 'AS_03'
 InstructionNames[0x04] = 'AS_04'
 InstructionNames[0x05] = 'AS_05'
 InstructionNames[0x06] = 'Sleep'
-InstructionNames[0x07] = 'Update'
+InstructionNames[0x07] = 'Yield'
 InstructionNames[0x08] = 'ChrSetPos'
 InstructionNames[0x09] = 'AS_09'
 InstructionNames[0x0A] = 'AS_0A'
@@ -364,7 +364,7 @@ edao_as_op_list = \
     inst(AS_04,                         'BBW'),
     inst(AS_05,                         'BBL'),
     inst(Sleep,                         'H'),
-    inst(Update,                         NO_OPERAND),
+    inst(Yield),
     inst(ChrSetPos,                     'BBiii'),           # ChrSetPos(target, src, x, z, y)
     inst(AS_09,                         'B'),
     inst(AS_0A,                         'BBBL'),
@@ -400,7 +400,7 @@ edao_as_op_list = \
     inst(Say,                           'BSL'),
     inst(AS_29,                         'B'),
     inst(ShowInfoText,                  'SI'),
-    inst(AS_2B,                         NO_OPERAND),
+    inst(AS_2B),
     inst(ShowChrTrails,                 'BHH'),         # ShowChrTrails(target, interval, number)
     inst(HideChrTrails,                 'B'),
     inst(ShakeChr,                      'Biii'),
@@ -408,7 +408,7 @@ edao_as_op_list = \
     inst(AS_31,                         'BW'),
     inst(AS_32,                         'BB'),
     inst(AS_33,                         'BB'),
-    inst(AS_34,                         NO_OPERAND),
+    inst(AS_34),
     inst(LockCamera,                    'BiiiH'),       # LockCamera(target, x, z, y, move_time)
     inst(AS_36,                         'B'),
     inst(SetCameraDegree,               'hhhh'),        # SetCameraDegree(horizon, vertical, height, 0)
@@ -429,16 +429,16 @@ edao_as_op_list = \
     inst(AS_4A,                         'B'),
     inst(Jc,                            'BBLo',                 INSTRUCTION_START_BLOCK),
     inst(ForeachTarget,                 'o',                    INSTRUCTION_START_BLOCK),
-    inst(ResetTarget,                   NO_OPERAND),
-    inst(NextTarget,                    NO_OPERAND),
-    inst(AS_4F,                         NO_OPERAND),
+    inst(ResetTarget),
+    inst(NextTarget),
+    inst(AS_4F),
     inst(Call,                          'o',                    INSTRUCTION_CALL),    # ret stack size == 4
     inst(CallReturn,                    NO_OPERAND,             INSTRUCTION_END_BLOCK),
     inst(AS_52,                         'B'),
     inst(AS_53,                         'B'),
     inst(SendMessage,                   'B'),
     inst(ArtsUsing,                     'W'),
-    inst(ArtsEnd,                        NO_OPERAND),
+    inst(ArtsEnd),
     inst(AS_57,                         'BB'),
     inst(Knockback,                     'B'),
     inst(AS_59,                         'BW'),
@@ -457,14 +457,14 @@ edao_as_op_list = \
     inst(AS_67,                         'WBB'),
     inst(AS_68,                         'BBL'),
     inst(LoadChrChip,                   NO_OPERAND,             0,                          as_load_chr_chip),
-    inst(AS_6B,                         NO_OPERAND),
-    inst(AS_6C,                         NO_OPERAND),
+    inst(AS_6B),
+    inst(AS_6C),
     inst(AS_6D,                         'L'),
     inst(AS_6E,                         'L'),
     inst(AS_6F,                         'BB'),
     inst(AS_70,                         'BBWWWW'),
     inst(AS_71,                         'B'),
-    inst(AS_72,                         NO_OPERAND),
+    inst(AS_72),
     inst(AS_73,                         'B'),
     inst(AS_74,                         'BW'),
     inst(AS_77,                         'B'),
@@ -477,15 +477,15 @@ edao_as_op_list = \
     inst(AS_7E,                         'L'),
     inst(BlurSwitch,                    'WLBBB'),
     inst(CancelBlur,                    'I'),
-    inst(AS_82,                         NO_OPERAND),
+    inst(AS_82),
     inst(AS_83,                         'B'),
     inst(ChrRotate,                     'BHHHIB'),      # ChrRotate(TargetChr, Degree, xx, xxx, xxxx, 4)
     inst(AS_85,                         'BBL'),
     inst(AS_87,                         'WB'),
     inst(AS_89,                         'B'),
     inst(ChrDuplicate,                  'BB'),          # ChrDuplicate(TargetChr, SourceChr)
-    inst(UseItemBegin,                  NO_OPERAND),
-    inst(UseItemEnd,                    NO_OPERAND),
+    inst(UseItemBegin),
+    inst(UseItemEnd),
     inst(AS_8D,                         'BLLLL'),
     inst(AS_8E,                         NO_OPERAND,             0,                          as_op_8e),
     inst(AS_8F,                         'B'),
@@ -493,7 +493,7 @@ edao_as_op_list = \
     inst(ChrSetRelativePos,             'BBiiihi'),
     inst(AS_93,                         'BBS'),
     inst(AS_94,                         'BSL'),
-    inst(ResetLookingTargetData,        NO_OPERAND),
+    inst(ResetLookingTargetData),
     inst(LookingTargetAdd,              'BSB'),
     inst(LookingTarget,                 'HCC'),
     inst(AS_98,                         'B'),
@@ -520,7 +520,7 @@ edao_as_op_list = \
     inst(AS_B4,                         'BB'),
     inst(LoadCclm,                      NO_OPERAND,             0,                          as_load_cclm),
     inst(UnlockCclm,                    NO_OPERAND,             0,                          as_unlock_cclm),
-    inst(AS_B7,                         NO_OPERAND),
+    inst(AS_B7),
     inst(AS_B8,                         'B'),
 ]
 

@@ -49,15 +49,15 @@ def TeamRushAction():
     SetChrChip(0xFF, 0x0)
     SetChrSubChip(0xFF, 0x0)
     Sleep(70)
-    Update()
+    Yield()
     SetChrChip(0xFF, 0x7)
     SetChrSubChip(0xFF, 0x0)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     SoundEx(358, 0x0)
     Sleep(100)
-    Update()
+    Yield()
 
     SendMessage(0x2)
 
@@ -76,28 +76,28 @@ def TeamRushAction():
 
     AS_3D(150, 150, 150, 600)
     Sleep(3000)
-    Update()
+    Yield()
 
     EndChrThread(0xFF, 2)
     BeginChrThread(0xFF, 2, "tr_damage_thread", 0x0)
     Sleep(500)
-    Update()
+    Yield()
 
     CancelEffect(0xFF, 0x2)
     CancelEffect(0xFF, 0x4)
 
     EndChrThread(0xFF, 1)
     EndChrThread(0xFF, 2)
-    Update()
+    Yield()
 
     AS_21(0x1, 0xFF, 300, 20000)
     CancelBlur(0x12C)
     Sleep(100)
-    Update()
+    Yield()
 
     SetChrSubChip(0xFF, 1)
     Sleep(800)
-    Update()
+    Yield()
 
     #ChrJumpBack(1000, 5000)
 
@@ -105,7 +105,7 @@ def TeamRushAction():
     SetChrSubChip(0xFF, 0x0)
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
     Sleep(500)
-    Update()
+    Yield()
 
     EndChrThread(0xFF, 1)
     FreeEffect(0)
@@ -118,13 +118,13 @@ def TeamRushAction():
 
     SetChrSubChip(0xFF, 0x4)
     Sleep(50)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x3)
     Sleep(50)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x2)
     Sleep(50)
-    Update()
+    Yield()
     Jump("tr_attack_anime_thread")
 
 
@@ -140,14 +140,14 @@ def TeamRushAction():
     AS_A7(0xFF, 0x3, 0xFE, 0xFF38, 0x1F4, 0xFF38, 0xC8, 0x3E8, 0xC8, 0x0)
     DamageAnime(0xFE, 0x0, 0x32)
     Sleep(100)
-    Update()
+    Yield()
     NextTarget()
     Jump("tr_da_next_target")
 
     label("tr_da_end_target")
 
     Sleep(100)
-    Update()
+    Yield()
     Jump("tr_damage_anime_thread")
 
 
@@ -163,7 +163,7 @@ def TeamRushAction():
     DamageAnime(0xFE, 0x0, 0x32)
     DamageCue(0xFE)
     Sleep(100)
-    Update()
+    Yield()
     NextTarget()
     Jump("tr_damage_next_target")
 
@@ -208,11 +208,11 @@ def TeamRushAction():
     EndChrThread(0xFF, 1)
     Jc(0x10, 0x1, 0xFFFFFFFF, "loc_300F")
     Sleep(200)
-    Update()
+    Yield()
     PlayEffect(0xFF, 0xF9, 0x2, 0x0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0xFF)
     SoundEx(183, 0x0)
     Sleep(800)
-    Update()
+    Yield()
 
     label("loc_300F")
 
@@ -227,10 +227,10 @@ def Dead():
     SetChrChip(0xFF, 0)
     SetChrSubChip(0xFF, 0)
     Sleep(1000)
-    Update()
+    Yield()
 
     StopSound(3868)
-    Update()
+    Yield()
 
     Return()
 
@@ -263,16 +263,16 @@ def ArtsAria():
 
     SetChrSubChip(0xFF, 0x0)
     Sleep(130)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     Sleep(130)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x2)
     Sleep(130)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     Sleep(130)
-    Update()
+    Yield()
     Jump("arts_chip_loop")
 
 def ArtsCast():
@@ -282,15 +282,15 @@ def ArtsCast():
     SoundEx(510, 0x0)
     TurnDirection(0xFF, 0xFB, 0x0, 0x1F4, 0x0)
     Sleep(200)
-    Update()
+    Yield()
     SetChrChip(0xFF, 0x3)
     SetChrSubChip(0xFF, 0x3)
     Sleep(300)
-    Update()
+    Yield()
     Voice(0x0, 3875, 3876, 0, 0, 0xFE)
     SetChrSubChip(0xFF, 0x4)
     Sleep(0)
-    Update()
+    Yield()
 
     label("arts_cast_skip_voice")
 
@@ -301,7 +301,7 @@ def ArtsCast():
 def EnterBattle():
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
     Voice(0x0, 3881, 3882, 0, 0, 0xFE)
-    Update()
+    Yield()
     EndChrThread(0xFF, 1)
     Return()
 
@@ -322,7 +322,7 @@ def UnderAttack():
     SetChrChip(CraftTarget.Self, 4)
     SetChrSubChip(CraftTarget.Self, 3)
     Sleep(1000)
-    Update()
+    Yield()
 
 def BattleWin():
 
@@ -336,7 +336,7 @@ def BattleWin():
     SetChrChip(CraftTarget.Self, 8)
     SetChrSubChip(CraftTarget.Self, 13)
     Sleep(2000)
-    Update()
+    Yield()
 
     Seq = \
     [
@@ -358,7 +358,7 @@ def BattleWin():
     for x in Seq:
         SetChrSubChip(CraftTarget.Self, x[0])
         Sleep(x[1])
-        Update()
+        Yield()
 
     Return()
 
@@ -366,14 +366,14 @@ def UseItem():
     SetChrChip(0xFF, 0x3)
     SetChrSubChip(0xFF, 0x0)
     Sleep(300)
-    Update()
+    Yield()
     Voice(0x0, 3881, 3906, 0, 0, 0xFE)
     SetChrSubChip(0xFF, 0x4)
     Sleep(300)
-    Update()
+    Yield()
     PlayEffect(0xFF, 0xFF, 0x2A, 0x2, 0, 1000, 500, 0, 0, 0, 65535, 65535, 65535, 0xFF)
     Sleep(500)
-    Update()
+    Yield()
     UseItemBegin()
     UseItemEnd()
     Return()
@@ -405,7 +405,7 @@ def Longinus(enemy_version = False):
         for i in range(17):
             AS_5F(i, 0)
 
-        Update()
+        Yield()
 
     AS_78(0x1)
 
@@ -469,20 +469,20 @@ def Longinus(enemy_version = False):
     LockCamera(TargetPos, 0, 750, 0, 500)
     SetCameraDistance(height + 1000, 0)
     SetCameraDistance(height, 500)
-    Update()
+    Yield()
 
     Voice(0x0, 3864, 0, 0, 0, 0xFE)
     SetChrChip(0xFF, 0x7)
     SetChrSubChip(0xFF, 0x0)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x2)
     SoundEx(358, 0x0)
     Sleep(1000)
-    Update()
+    Yield()
 
     gun_height = 6500
 
@@ -496,7 +496,7 @@ def Longinus(enemy_version = False):
 
     BeginChrThread(0xFF, 1, show_lightning_thread, 0)
     Sleep(1200)
-    Update()
+    Yield()
 
     SoundEx(970, 0)
     SoundEx(920, 0)
@@ -504,7 +504,7 @@ def Longinus(enemy_version = False):
     PlayEffect(chr_gun, chr_gun, eff_gun_appear, 0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, eff_gun_appear)
     ShowChr(chr_gun, 500)
     Sleep(500)
-    Update()
+    Yield()
 
     EndChrThread(0xFF, 1)
     CancelEffect(CraftTarget.Self, eff_lightning)
@@ -514,14 +514,14 @@ def Longinus(enemy_version = False):
     PlayEffect(0xFF, TargetPos, eff_boom, 0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, eff_boom)
     ChrMove(chr_gun, chr_gun, 0, -gun_height - 10000, 0, 70, 0)
     Sleep(70)
-    Update()
+    Yield()
 
     if enemy_version:
         Fade(1, 500, 0)
         LockCamera(TargetPos, 0, 750, 0, 500)
         SetCameraDistance(21000, 0)
         SetCameraDistance(20000, 500)
-        Update()
+        Yield()
 
     BeginChrThread(CraftTarget.Self, 1, damage_thread, 0)
     WaitChrThread(CraftTarget.Self, 1)
@@ -529,11 +529,11 @@ def Longinus(enemy_version = False):
 
     HideChr(chr_gun, 0)
     Sleep(500)
-    Update()
+    Yield()
 
     CancelEffect(-1, eff_boom)
     Sleep(1000)
-    Update()
+    Yield()
 
     ChrSetPos(chr_gun, CraftTarget.InitialPos, 0, 0, 0)
     FreeEffect(eff_cloud)
@@ -552,7 +552,7 @@ def Longinus(enemy_version = False):
     StopEffect(0xFF, eff_lightning)
     PlayEffect(0xFF, TargetPos, eff_lightning, 0, 0, -3200, -500, 0, 0, 0, 1000, 1000, 1000, eff_lightning)
     Sleep(1700)
-    Update()
+    Yield()
 
     Jump(show_lightning_thread)
 
@@ -606,7 +606,7 @@ def Longinus(enemy_version = False):
         label(damage_end)
 
     Sleep(50)
-    Update()
+    Yield()
 
     if not enemy_version:
 
@@ -644,31 +644,31 @@ def EnumaElish():
 
     TurnDirection(CraftTarget.Self, CraftTarget.TargetPos, 0x0, 1500, 0x0)
     Sleep(50)
-    Update()
+    Yield()
 
     Voice(0x0, 3857, 0, 0, 0, 0xFE)
     Sleep(2500)
-    Update()
+    Yield()
 
     SetChrChip(0xFF, chip_raise_gun)
 
     SetChrSubChip(0xFF, 0x0)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x2)
     SoundEx(358, 0x0)
     Sleep(1500)
-    Update()
+    Yield()
 
     SoundEx(207, 0)
 
     for i in range(300, 1100, 100):
         PlayEffect(0xFF, 0xFF, eff_whirl, 0x04, 0, 0, -1800, 90, 0, 0, i, i, i, eff_whirl)
         Sleep(400)
-        Update()
+        Yield()
 
     BeginChrThread(CraftTarget.Self, 1, loop_sound_thread, 0)
 
@@ -679,23 +679,23 @@ def EnumaElish():
     Voice(0, 3872, 0, 0, 0, 0xFE)
     SetChrChip(-1, chip_attack)
     SetChrSubChip(-1, 1)
-    Update()
+    Yield()
 
     Fade(0x1, 1000, 0x0)
-    Update()
+    Yield()
 
 
     for size in range(1100, 3000, 200):
         for i in range(eff_whirl_layers):
             PlayEffect(0xFF, 0xFF, eff_whirl, 0x04, 0, -1300, 0, 180, 0, 0, size, size, size, eff_whirl + i)
             Sleep(200)
-            Update()
+            Yield()
 
     #Sleep(4000)
-    #Update()
+    #Yield()
 
     SetChrSubChip(0xFF, 4)
-    Update()
+    Yield()
     Voice(0, 3873, 0, 0, 0, 0xFE)
 
     Call('ea_1_cancel_all_layers')
@@ -707,18 +707,18 @@ def EnumaElish():
     ea_2.ea_2()
 
     #CancelEffect(CraftTarget.Self, eff_whirl)
-    #Update()
+    #Yield()
 
     #for i in range(2200, 0, -200):
     #    PlayEffect(0xFF, 0xFF, eff_whirl, 0x04, 0, -1300, 0, 180, 0, 0, i, i, i, eff_whirl)
     #    Sleep(50)
-    #    Update()
+    #    Yield()
 
     WaitChrThread(CraftTarget.Self, 1)
 
     #CancelEffect(CraftTarget.Self, eff_whirl)
     Sleep(1300)
-    Update()
+    Yield()
 
     FreeEffect(eff_whirl)
 
@@ -732,7 +732,7 @@ def EnumaElish():
     for i in range(eff_whirl_layers):
         CancelEffect(CraftTarget.Self, eff_whirl + i)
 
-    Update()
+    Yield()
 
     CallReturn()
 
@@ -742,7 +742,7 @@ def EnumaElish():
     label(loop_sound_thread)
     SoundEx(175, 0)
     Sleep(2700)
-    Update()
+    Yield()
 
     Jump(loop_sound_thread)
 
@@ -769,7 +769,7 @@ def unmask(enemy_version = False):
     SetChrChip(CraftTarget.Self, 7)
     SetChrSubChip(CraftTarget.Self, 13)
     Sleep(2000)
-    Update()
+    Yield()
 
     Seq = \
     [
@@ -789,13 +789,13 @@ def unmask(enemy_version = False):
     for x in Seq:
         SetChrSubChip(CraftTarget.Self, x[0])
         Sleep(x[1])
-        Update()
+        Yield()
 
     SoundEx(158, 0x0)
     for i in range(2, 14):
         SetChrSubChip(CraftTarget.Self, i)
         Sleep(100)
-        Update()
+        Yield()
 
     SetBrightness(0x0, 0x2, 0x7D0)
     Voice(0x0, 3869, 0, 0, 0, 0xFE)
@@ -804,7 +804,7 @@ def unmask(enemy_version = False):
     SetChrSubChip(0xFF, 14)
 
     Sleep(100)
-    Update()
+    Yield()
     BeginChrThread(0xFF, 1, "boost_thread", 0x0)
     SoundEx(366, 0x0)
     SetCameraDistance(16000, 2000)
@@ -812,18 +812,18 @@ def unmask(enemy_version = False):
     AS_7F(0x7D0, 0xBBFFFFFF, 0x0, 0x1, 0x1)
     PlayEffect(0xFF, 0xFF, 0x0, 0x1, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0x2)
     Sleep(2000)
-    Update()
+    Yield()
     AS_7F(0x0, 0xBBFFFFFF, 0x0, 0x1, 0x5)
     CancelBlur(0x3E8)
     SetCameraDistance(21000, 100)
     AS_3D(500, 500, 500, 500)
     SoundEx(321, 0x0)
     Sleep(500)
-    Update()
+    Yield()
 
     SoundEx(881, 0x0)
     EndChrThread(0xFF, 1)
-    Update()
+    Yield()
 
     class BuffInfo:
         def __init__(self, rate, time, prob, flag):
@@ -865,7 +865,7 @@ def unmask(enemy_version = False):
         ]
 
     Sleep(2000)
-    Update()
+    Yield()
 
     CancelEffect(0xFF, 0x2)
 
@@ -887,7 +887,7 @@ def unmask(enemy_version = False):
     PlayEffectIfConditionExist(CraftTarget.Self, ConditionFlags, 0x83, '')
 
     Sleep(500)
-    Update()
+    Yield()
 
     FreeEffect(0x0)
     AS_6B()
@@ -897,7 +897,7 @@ def unmask(enemy_version = False):
     ClearChipModeFlags(0x0, 0xFF, 0x2)
     SetChrChip(0xFF, 0)
     SetChrSubChip(0xFF, 5)
-    Update()
+    Yield()
     Return()
 
     if not enemy_version:
@@ -905,13 +905,13 @@ def unmask(enemy_version = False):
 
         SetChrSubChip(0xFF, 0xF)
         Sleep(100)
-        Update()
+        Yield()
         SetChrSubChip(0xFF, 0x11)
         Sleep(100)
-        Update()
+        Yield()
         SetChrSubChip(0xFF, 0x10)
         Sleep(100)
-        Update()
+        Yield()
         Jump("boost_thread")
 
         Return()
@@ -944,16 +944,16 @@ def Craft_暴雨疾风枪():
     TurnDirection(CraftTarget.Self, CraftTarget.TargetPos, 0x0, 1500, 0x0)
     SoundEx(531, 0x0)
     Sleep(50)
-    Update()
+    Yield()
 
     SetChrChip(CraftTarget.Self, attack_chip)
     SetChrSubChip(CraftTarget.Self, 0)
     Sleep(100)
-    Update()
+    Yield()
 
     SetChrSubChip(CraftTarget.Self, 1)
     Sleep(200)
-    Update()
+    Yield()
 
     SoundEx(548, 0x0)
     SoundEx(203, 0x0)
@@ -962,18 +962,18 @@ def Craft_暴雨疾风枪():
     SetCameraDistance(17000, 1000)
 
     Voice(0x0, 3891, 0, 0, 0, 0xFE)
-    Update()
+    Yield()
 
     PlayEffect(CraftTarget.Self, 0xFD, eff_cutin, 0x0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0x2)
     BlurSwitch(0x0, 0xBBFFFFFF, 0x0, 0x1, 0xA)
     WaitEffect(0xFF, 0x2)
     CancelBlur(0)
-    Update()
+    Yield()
 
     SetChrChip(CraftTarget.Self, attack_chip)
     SetChrSubChip(CraftTarget.Self, 1)
     Sleep(1000)
-    Update()
+    Yield()
 
     ResetLookingTargetData()
     LookingTargetAdd(0xFF, "", 0x0)
@@ -986,7 +986,7 @@ def Craft_暴雨疾风枪():
     ShowChrTrails(CraftTarget.Self, 100, 300)
     ChrTurnAndMove(0x0, CraftTarget.Self, CraftTarget.TargetPos, -2000, 50000)
     Sleep(100)
-    Update()
+    Yield()
     HideChrTrails(CraftTarget.Self)
 
 
@@ -1010,11 +1010,11 @@ def Craft_暴雨疾风枪():
     BeginChrThread(CraftTarget.Self, damage_thread_id,      damage_thread, 0x0)
 
     Sleep(2000)
-    Update()
+    Yield()
 
     CancelEffect(CraftTarget.Self, 2)
     #Sleep(50)
-    Update()
+    Yield()
 
 
     EndChrThread(CraftTarget.Self, attack_thread_id)
@@ -1025,7 +1025,7 @@ def Craft_暴雨疾风枪():
 
     SetChrSubChip(CraftTarget.Self, 1)
     Sleep(800)
-    Update()
+    Yield()
 
     EndChrThread(CraftTarget.Self, damage_anime_thread_id)
 
@@ -1038,12 +1038,12 @@ def Craft_暴雨疾风枪():
     ShowChrTrails(CraftTarget.Self, 100, 300)
     ChrJump(CraftTarget.Self, 0xF0, 0, 0, 0, 300, 3000)
     Sleep(100)
-    Update()
+    Yield()
 
     SetChrChip(CraftTarget.Self, 0)
     SetChrSubChip(CraftTarget.Self, 0)
     Sleep(400)
-    Update()
+    Yield()
 
     HideChrTrails(CraftTarget.Self)
     WaitChrThread(CraftTarget.Self, knock_back_eff_thread_id)
@@ -1067,7 +1067,7 @@ def Craft_暴雨疾风枪():
     for i in range(2, 5):
         SetChrSubChip(CraftTarget.Self, i)
         Sleep(50)
-        Update()
+        Yield()
 
     Jump(attack_thread_loop)
 
@@ -1094,14 +1094,14 @@ def Craft_暴雨疾风枪():
     DamageAnime(CraftTarget.TargetChr, 0, 50)
     DamageCue(CraftTarget.TargetChr)
     Sleep(50)
-    Update()
+    Yield()
     NextTarget()
     Jump(next_target)
 
     label(end_of_loop)
 
     Sleep(180)
-    Update()
+    Yield()
     Jump(next_damage)
 
     #########################################################
@@ -1114,12 +1114,12 @@ def Craft_暴雨疾风枪():
     SoundEx(833, 0)
     SoundEx(825, 0)
     Sleep(1000)
-    Update()
+    Yield()
 
     SoundEx(271, 0)
     SoundEx(287, 0)
     Sleep(1000)
-    Update()
+    Yield()
 
     StopSound(225)
     StopSound(825)
@@ -1150,7 +1150,7 @@ def Craft_暴雨疾风枪():
     ForeachTarget(end_of_loop)
     DamageAnime(CraftTarget.TargetChr, 0, 50)
     Sleep(50)
-    Update()
+    Yield()
     NextTarget()
     Jump(next_target)
 
@@ -1192,7 +1192,7 @@ def Craft_暴雨疾风枪():
     label(no_stun)
 
     Sleep(50)
-    Update()
+    Yield()
     NextTarget()
     Jump(next_target)
 
@@ -1219,10 +1219,10 @@ def Craft_大地轰雷锤(enemy_version = False):
     SetChrChip(0xFF, 0x7)
     SetChrSubChip(0xFF, 0x0)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x2)
     SoundEx(358, 0x0)
     AS_95()
@@ -1230,29 +1230,29 @@ def Craft_大地轰雷锤(enemy_version = False):
     LockCamera(0xFF, 0, 3000, 0, 1000)
     AS_3B(20000, 1000)
     Sleep(1000)
-    Update()
+    Yield()
     PlayEffect(0xFF, 0xFD, 0x0, 0x0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0x2)
     SoundEx(167, 0x0)
     Sleep(1500)
-    Update()
+    Yield()
     Voice(0x0, 3865, 0, 0, 0, 0xFE)
     Sleep(750)
-    Update()
+    Yield()
 
     PlayEffect(0xFF, 0xFF, 0x1, 0x3, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0xFF)
     AS_3D(50, 50, 50, 1700)
     Sleep(1700)
-    Update()
+    Yield()
     StopEffect(0xFF, 0x2)
     LockCamera(0xFF, 0, 1500, 0, 100)
     Sleep(80)
-    Update()
+    Yield()
     AS_95()
     AS_96(0xFF, "", 0x0)
     AS_96(0xFC, "", 0x0)
     AS_97(0x32, 0x14, 0x1E)
     Sleep(500)
-    Update()
+    Yield()
 
     BeginChrThread(0xFF, 1, damage_thread, 0x0)
     AS_14(0x1)
@@ -1289,7 +1289,7 @@ def Craft_大地轰雷锤(enemy_version = False):
     DamageAnime(0xFE, 0x1, 0x32)
     DamageCue(0xFE)
     Sleep(50)
-    Update()
+    Yield()
     NextTarget()
     Jump(find_next_target)
 
@@ -1332,20 +1332,20 @@ def 零时迷子():
 
     SetChrSubChip(0xFF, 0x0)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x1)
     Sleep(100)
-    Update()
+    Yield()
     SetChrSubChip(0xFF, 0x2)
     SoundEx(358, 0x0)
     Sleep(1000)
-    Update()
+    Yield()
 
     Call(rei_ji_mai_go)
 
     AS_8D(0x70, 0, 0, 0, 0)
     WaitEffect(0xff, 3)
-    Update()
+    Yield()
 
     FreeEffect(eff_bs890010)
     FreeEffect(eff_com000)
@@ -1363,7 +1363,7 @@ def 零时迷子():
     LockCamera(-1, 0, 750, 0, 500)
     SetCameraDistance(height + 1000, 0)
     SetCameraDistance(height, 500)
-    Update()
+    Yield()
 
     CallReturn()
 
@@ -1375,30 +1375,30 @@ def 零时迷子():
     PlayEffect(0xFF, 0xFF, eff_bs884013, 0x0, 0, height, 0, 0, 0, 0, 3000, 3000, 3000, 0xFF)
     SoundEx(688, 0x0)
     Sleep(200)
-    Update()
+    Yield()
     PlayEffect(0xFF, 0xFF, eff_bs890010, 0x0, 0, height, 0, 0, 0, 0, 400, 400, 400, 0x3)
     SoundEx(687, 0x1)
     Sleep(1000)
-    Update()
+    Yield()
     SoundEx(682, 0x0)
     Sleep(500)
-    Update()
+    Yield()
     Fade(0x1, 500, 0x0)
     SetBattleSpeed(700)
     Sleep(200)
-    Update()
+    Yield()
     Sleep(500)
-    Update()
+    Yield()
     SoundEx(697, 0x1)
     Sleep(1000)
-    Update()
+    Yield()
     AS_A0(0x2, 0x400)
     SoundEx(695, 0x0)
     StopSound(687)
     StopSound(697)
     SetBattleSpeed(80)
     Sleep(180)
-    Update()
+    Yield()
     SetBattleSpeed(800)
     PlayEffect(0xFF, 0xFF, eff_com000, 0x0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0x4)
     AS_A9(0xFF, 0x4, 0xFF6E6E6E)
@@ -1410,21 +1410,21 @@ def 零时迷子():
     SoundEx(698, 0x0)
     SoundEx(687, 0x1)
     Sleep(500)
-    Update()
+    Yield()
     SoundEx(697, 0x1)
     Sleep(1300)
-    Update()
+    Yield()
     SoundEx(680, 0x0)
     Sleep(1200)
-    Update()
+    Yield()
     SoundEx(689, 0x0)
     Sleep(500)
-    Update()
+    Yield()
     AS_43(0x0, 0x320, 0xFFFFFFFF)
     SetBattleSpeed(1000)
     CancelBlur(0x3E8)
     Sleep(2000)
-    Update()
+    Yield()
     StopEffect(0xFF, 4)
     StopEffect(0xFF, 5)
 

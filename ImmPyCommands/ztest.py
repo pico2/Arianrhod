@@ -162,10 +162,13 @@ def main(args):
                 #imm.log('OP_%02X: NULLLLLLLLLLLLLLLLLLLLL' % i)
                 continue
 
+            funcname = 'SCP_%02X' % i
+
+            imm.setComment(int(func), funcname)
+            imm.setLabel(int(func), funcname)
+
             offset = int((func + 1).u32())
             func = func + 5 + offset
-
-            funcname = 'SCP_%02X' % i
 
             imm.setComment(int(func), funcname)
             imm.setLabel(int(func), funcname)

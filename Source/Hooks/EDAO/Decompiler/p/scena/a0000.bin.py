@@ -236,10 +236,10 @@ def main():
         )
     )
 
-    AddCharChip(
+    AddCharChip((
         "chr/ch20000.itc",                   # 00
         "chr/ch00100.itc",                   # 01
-    )
+    ))
 
     DeclNpc(-4000,   2000,    0,       135,  261,  0x0, 0,   0,   0,   0,   14,  0,   18,  255,  0)
     DeclNpc(1830,    0,       3589,    135,  261,  0x0, 0,   0,   0,   0,   14,  0,   17,  255,  0)
@@ -1429,7 +1429,7 @@ def main():
 
     label("loc_1C65")
 
-    PlayBgm("ed7450.ogg", 0)
+    PlayBGM("ed7450.ogg", 0)
     OP_29(0x3C, 0x4, 0x2)
     OP_29(0x3C, 0x4, 0x80)
     OP_29(0x3C, 0x1, 0x0)
@@ -1441,7 +1441,7 @@ def main():
 
     OP_21(0x2710)
     Sleep(3000)
-    PlayBgm("ed7205.ogg", 0)
+    PlayBGM("ed7205.ogg", 0)
     OP_29(0x3C, 0x1, 0x1)
     OP_29(0x3C, 0x4, 0x10)
     Jump("loc_1DB3")
@@ -1460,7 +1460,7 @@ def main():
     OP_22()
     Sleep(10)
     Sound(591, 0, 100, 0)
-    PlayBgm("ed7205.ogg", 0)
+    PlayBGM("ed7205.ogg", 0)
     OP_29(0x2, 0x4, 0x2)
     OP_29(0x2, 0x1, 0x0)
     Jump("loc_1DB3")
@@ -2209,7 +2209,7 @@ def main():
 
     label("loc_27BC")
 
-    PlayBgm("ed7552.ogg", 0)
+    PlayBGM("ed7552.ogg", 0)
 
     label("loc_27C0")
 
@@ -2241,22 +2241,22 @@ def main():
 
     label("loc_2815")
 
-    VolumeBgm(0x64, 0x0)
+    VolumeBGM(0x64, 0x0)
     Jump("loc_284E")
 
     label("loc_2820")
 
-    VolumeBgm(0x32, 0x3E8)
+    VolumeBGM(0x32, 0x3E8)
     Jump("loc_284E")
 
     label("loc_282B")
 
-    VolumeBgm(0x14, 0x3E8)
+    VolumeBGM(0x14, 0x3E8)
     Jump("loc_284E")
 
     label("loc_2836")
 
-    VolumeBgm(0x0, 0x0)
+    VolumeBGM(0x0, 0x0)
     Jump("loc_284E")
 
     label("loc_2841")
@@ -3081,7 +3081,7 @@ def main():
 
     label("Function_11_36DC")
 
-    PlayBgm("ed7552.ogg", 0)
+    PlayBGM("ed7552.ogg", 0)
     RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
 
     label("loc_36EA")
@@ -3678,8 +3678,8 @@ def main():
     label("Function_18_4003")
 
     OP_53(0xFE)
-    PlayBgm("ed7552.ogg", 0)
-    VolumeBgm(0x1E, 0x0)
+    PlayBGM("ed7552.ogg", 0)
+    VolumeBGM(0x1E, 0x0)
     RemoveParty(0x8, 0xFF)
     AddParty(0x37, 0xFF, 0xFF)
     OP_91(0xFE, 0x102, 0x1F4)

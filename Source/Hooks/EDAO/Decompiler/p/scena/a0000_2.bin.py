@@ -1855,7 +1855,7 @@ def main():
 
     label("loc_1CF3")
 
-    VolumeBgm(0x28, 0xC8)
+    VolumeBGM(0x28, 0xC8)
     NewScene("m0101", 133, 0, 0)
     OP_07()
     Jump("loc_1D60")
@@ -3606,7 +3606,7 @@ def main():
     label("loc_3772")
 
     SetScenarioFlags(0x22, 4)
-    VolumeBgm(0x3C, 0x64)
+    VolumeBGM(0x3C, 0x64)
     NewScene("c010B", 0, 0, 0)
     OP_07()
     Jump("loc_37D8")

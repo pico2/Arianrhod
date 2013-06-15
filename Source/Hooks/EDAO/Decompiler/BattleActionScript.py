@@ -22,6 +22,7 @@ class BattleActionScriptInfo:
         self.ChrPosFactorOffset     = 0
         self.Reserve                = 0
         self.PreloadChipList        = []
+        self.ModelXFile             = ''
         self.ActionList             = []
 
         self.ChrPosFactor = []

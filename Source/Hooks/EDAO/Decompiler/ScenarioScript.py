@@ -1099,7 +1099,7 @@ class ScenarioInfo:
         hdr.append('from ScenarioHelper import *')
         hdr.append('')
         hdr.append('CreateScenaFile(')
-        hdr.append('    "%s2",                # FileName'        % filename)
+        hdr.append('    "%s",                # FileName'        % filename)
         hdr.append('    "%s",                    # MapName'     % self.MapName)
         hdr.append('    "%s",                    # Location'    % self.Location)
         hdr.append('    0x%04X,                     # %s'       % (self.MapIndex, mapname))

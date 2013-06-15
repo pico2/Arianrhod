@@ -310,8 +310,7 @@ def ReleaseAllGod():
     label("no_Lazy_Knight")
 
 def ShowMenu():
-    OP_F4(0x3)
-    OP_53(0xFF)
+    #OP_F4(0x3)
 
     RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_END)))
 

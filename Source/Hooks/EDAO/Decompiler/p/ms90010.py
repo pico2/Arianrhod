@@ -76,7 +76,7 @@ def main():
     Unknown_55         = 0xB0
     #Resistance         = 0xF0008FFF
     AttributeRate      = [ 100, 100, 100, 100, 100, 100, 100 ]
-    Sepith             = [ 999, 999, 999, 999, 999, 999, 999 ]
+    Sepith             = [ 255, 255, 255, 255, 255, 255, 255 ]
     DropItem           = [ 0x01FF, 0x0000 ]
     DropRate           = [ 100, 0 ]
     Equipment          = [ 0x0009, 0x0000, 0x0000, 0x0000, 0x0000 ]
