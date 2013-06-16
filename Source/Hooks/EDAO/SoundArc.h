@@ -67,7 +67,7 @@ public:
         this->MixClose();
         this->IRelease();
 
-        Ldr::UnloadDll(m_Sound3D);  // todo: sometimes crash
+        //Ldr::UnloadDll(m_Sound3D);  // todo: sometimes crash
     }
 
     NTSTATUS Initialize(HWND GameWindow);

@@ -539,8 +539,8 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x332B26, METHOD_PTR(&EDAO::GetStatusIcon)),
         INLINE_HOOK_CALL_RVA_NULL(0x4948B9, METHOD_PTR(&EDAO::GetCFace)),
         INLINE_HOOK_CALL_RVA_NULL(0x4948DF, METHOD_PTR(&EDAO::GetCFace)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CActor::GetTeamAttackMemberId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CActor::GetTeamAttackMemberId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
 
 
         // inherit custom flags

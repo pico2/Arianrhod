@@ -36,7 +36,7 @@ LONG FASTCALL EDAO::GetCFace(ULONG ChrId)
 {
     ULONG PartyId;
 
-    PartyId = GetActor()->GetPartyChipMap()[ChrId];
+    PartyId = GetSaveData()->GetPartyChipMap()[ChrId];
     if (PartyId >= MINIMUM_CUSTOM_CHAR_ID)
     {
         CHAR FaceFile[MAX_NTPATH];
@@ -49,10 +49,10 @@ LONG FASTCALL EDAO::GetCFace(ULONG ChrId)
     switch (ChrId)
     {
         case CHR_ID_LAZY:
-            return GetActor()->IsLazyKnight() ? CHR_ID_LAZY_KNIGHT : ChrId;
+            return GetSaveData()->IsLazyKnight() ? CHR_ID_LAZY_KNIGHT : ChrId;
 
         case CHR_ID_YIN:
-            return GetActor()->IsYinRixia() ? CHR_ID_RIXIA : ChrId;
+            return GetSaveData()->IsYinRixia() ? CHR_ID_RIXIA : ChrId;
     }
 
     return ChrId;
@@ -73,14 +73,14 @@ LONG FASTCALL EDAO::GetStatusIcon(ULONG ChrId)
             return ChrId;
     }
 
-    PartyId = GetActor()->GetPartyChipMap()[ChrId];
+    PartyId = GetSaveData()->GetPartyChipMap()[ChrId];
     if (PartyId == CHR_ID_RIXIA)
         return 0xC;
 
     switch (ChrId)
     {
         case CHR_ID_YIN:
-            return GetActor()->IsYinRixia() ? 0xC : ChrId;
+            return GetSaveData()->IsYinRixia() ? 0xC : ChrId;
     }
 
     return ChrId;
@@ -90,7 +90,7 @@ LONG FASTCALL EDAO::GetLeaderChangeVoice(ULONG PartyId)
 {
     ULONG ChrId;
 
-    ChrId = GetActor()->GetPartyList()[1];
+    ChrId = GetSaveData()->GetPartyList()[1];
 
     switch (ChrId)
     {
@@ -107,7 +107,7 @@ LONG FASTCALL EDAO::GetLeaderChangeVoice(ULONG PartyId)
     switch (ChrId)
     {
         case CHR_ID_YIN:
-            return GetActor()->IsYinRixia() ? 0xB : ChrId;
+            return GetSaveData()->IsYinRixia() ? 0xB : ChrId;
     }
 
     return ChrId;
@@ -117,7 +117,7 @@ LONG FASTCALL EDAO::GetLeaderChangeVoice(ULONG PartyId)
   CActor
 ************************************************************************/
 
-ULONG FASTCALL CActor::GetTeamAttackMemberId(ULONG ChrId)
+ULONG FASTCALL CSSaveData::GetTeamAttackMemberId(ULONG ChrId)
 {
     switch (ChrId)
     {
@@ -169,7 +169,7 @@ BOOL THISCALL CScript::ScpSaveRestoreParty(PSCENA_ENV_BLOCK Block)
     enum { Save = 1, Restore = 2 };
 
     NeedRefreshFA = GetScenaTable()[Block->ScenaIndex][Block->CurrentOffset + 1] == Restore &&
-                    RtlCompareMemory(GetActor()->GetPartyListSaved(), GetActor()->GetPartyList(), sizeof(Chr)) != sizeof(Chr);
+                    RtlCompareMemory(GetSaveData()->GetPartyListSaved(), GetSaveData()->GetPartyList(), sizeof(Chr)) != sizeof(Chr);
 
     Result = (this->*StubScpSaveRestoreParty)(Block);
 

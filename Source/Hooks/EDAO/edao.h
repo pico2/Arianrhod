@@ -314,8 +314,12 @@ typedef union MONSTER_STATUS
 #pragma pack(pop)
 
 
-class CActor
+class CSSaveData
 {
+public:
+    VOID SaveData2SystemData();
+    VOID SystemData2SaveData();
+
 public:
     PUSHORT GetPartyChipMap()
     {
@@ -548,9 +552,9 @@ public:
     VOID THISCALL SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex);
     VOID THISCALL SetSelectedSCraft(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex);
 
-    CActor* GetActor()
+    CSSaveData* GetSaveData()
     {
-        return *(CActor **)PtrAdd(this, 0x38D28);
+        return *(CSSaveData **)PtrAdd(this, 0x38D28);
     }
 
     CBattleInfoBox* GetBattleInfoBox()
@@ -560,7 +564,7 @@ public:
 
     BOOL IsCustomChar(ULONG_PTR ChrId)
     {
-        return GetActor()->IsCustomChar(ChrId);
+        return GetSaveData()->IsCustomChar(ChrId);
     }
 
     EDAO* GetEDAO()
@@ -807,9 +811,9 @@ public:
         return (EDAO *)PtrSub(this, 0x384EC);
     }
 
-    CActor* GetActor()
+    CSSaveData* GetSaveData()
     {
-        return *(CActor **)this;
+        return *(CSSaveData **)this;
     }
 
     PBYTE* GetScenaTable()
@@ -882,14 +886,14 @@ public:
         return (CScript *)PtrAdd(this, 0x384EC);
     }
 
-    CActor* GetActor()
+    CSSaveData* GetSaveData()
     {
-        return GetScript()->GetActor();
+        return GetScript()->GetSaveData();
     }
 
     BOOL IsCustomChar(ULONG_PTR ChrId)
     {
-        return GetActor()->IsCustomChar(ChrId);
+        return GetSaveData()->IsCustomChar(ChrId);
     }
 
     PUSHORT GetSBreakList()
@@ -1048,7 +1052,7 @@ public:
 
     BOOL IsCustomChar(ULONG_PTR ChrId)
     {
-        return GetEDAO()->GetActor()->IsCustomChar(ChrId);
+        return GetEDAO()->GetSaveData()->IsCustomChar(ChrId);
     }
 
     PCHAR_STATUS GetChrStatus(ULONG_PTR ChrId)
@@ -1074,14 +1078,6 @@ DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagi
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = NULL;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = NULL;
 
-
-
-class CSSaveData
-{
-public:
-    VOID SaveData2SystemData();
-    VOID SystemData2SaveData();
-};
 
 class EDAOFileStream
 {
