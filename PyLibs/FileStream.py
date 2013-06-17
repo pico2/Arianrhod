@@ -94,6 +94,9 @@ class BytesStream:
             closefd     = True,
             opener      = None
         ):
+        if type(file) == bytes or type(file) == bytearray:
+            return self.openmem(file)
+
         self.stream = open(file, mode, buffering, encoding, errors, newline, closefd, opener)
         return self
 
