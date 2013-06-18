@@ -49,3 +49,8 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /TempSync/ChromeUpdater/LATEST_CHANGE
 /TempSync/ChromeUpdater/CHECK
 /Source/Hooks/Crack
+/PyLibs/eric5
+/PyLibs/eric5plugins
+/PyLibs/PyQt4
+/PyLibs/sip.pyd
+/PyLibs/eric5config.py

@@ -58,10 +58,6 @@ StaticGodList = \
 
     CharInfo(0xD0, '碧之虚神'),
     CharInfo(0xD1, '神机TYPE-α'),
-
-    #CharInfo(0xE0, '预留_EEEEEEEEEEE0'),
-    #CharInfo(0xE1, '预留_EEEEEEEEEEE1'),
-    #CharInfo(0xE2, '预留_EEEEEEEEEEE2'),
 )
 
 StaticCharMap = {}
@@ -153,7 +149,7 @@ def ShowGodListMenuWorker(SourceChrId, GodList, IsSubMenu = False):
     OP_60(1)
 
 
-MAXIMUM_MENU_ITEM = 15
+MAXIMUM_MENU_ITEM = 33 - 1
 
 def ShowGodListMenuWithSubMenu(SourceChrId, GodList):
 

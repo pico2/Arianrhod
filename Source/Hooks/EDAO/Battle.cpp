@@ -192,11 +192,7 @@ NAKED VOID CBattle::NakedGetUnderAttackVoiceChrId()
     INLINE_ASM
     {
         call    CBattle::NakedGetTurnVoiceChrId
-        cmp     ecx, MINIMUM_CUSTOM_CHAR_ID
-        mov     eax, dword ptr [ebp-0xF8];
-        cmovae  eax, ecx;
         mov     dword ptr [ebp-0xF8], eax;
-        test    eax, eax;
         ret;
     }
 }

@@ -526,7 +526,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::NakedGetRunawayVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::NakedGetReplySupportVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::NakedGetTeamRushVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5DFA21, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5DFA1B, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E081E, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId2)),
         INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
         INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedCopyMagicAndCraftData)),
