@@ -3,6 +3,10 @@
 
 #include "MyLibrary.h"
 
+
+#define ARCHEAGE_VER 1
+
+
 #define ROOTDIR_SYSTEM32            L"\\SystemRoot\\system32\\"
 
 #define REGKEY_ROOT                 HKEY_LOCAL_MACHINE
@@ -378,6 +382,14 @@ public:
 
     NTSTATUS HookKernel32Routines(PVOID Kernel32);
     NTSTATUS UnHookKernel32Routines();
+
+
+#if ARCHEAGE_VER
+
+    NTSTATUS HookX2GameRoutines(PVOID X2Game);
+
+#endif // ARCHEAGE_VER
+
 
     NTSTATUS InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid);
 

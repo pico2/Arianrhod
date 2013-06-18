@@ -63,14 +63,11 @@ class UnpackerFileEntryFlags:
         else:
             raise Exception('unknown input type %s' % type(Flags))
 
+        self.Compressed = self.FlagOn(UNPACKER_ENTRY_COMPRESSED)
+        self.Encrypted = self.FlagOn(UNPACKER_ENTRY_ENCRYPTED)
+
     def FlagOn(self, Flags):
         return (self.Flags & Flags) != 0
-
-    def Compressed(self):
-        return self.FlagOn(UNPACKER_ENTRY_COMPRESSED)
-
-    def Encrypted(self):
-        return self.FlagOn(UNPACKER_ENTRY_ENCRYPTED)
 
 
 class UnpackerFileEntryBase:
