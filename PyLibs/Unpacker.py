@@ -120,6 +120,9 @@ class UnpackerBase:
 
     def ExtractFileBase(self, Entry, OutputPath = '', Flags = 0):
         FileInfo = self.GetFileData(Entry, Flags)
+        if FileInfo == None:
+            raise Exception('')
+
         OutputFileName = os.path.join(OutputPath, Entry.GetFileName())
         os.makedirs(os.path.dirname(OutputFileName), exist_ok = True)
 
@@ -178,7 +181,11 @@ class UnpackerBase:
 
         for entry in Entries:
 
-            print('Extracting "%s" ... ' % entry.GetFileName(), end = '')
+            try:
+                print('Extracting "%s" ... ' % entry.GetFileName(), end = '')
+            except:
+                print('Extracting xxx ... ', end = '')
+
             try:
                 size = self.ExtractFile(entry, OutputPath)
             except:
