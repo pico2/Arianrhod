@@ -178,8 +178,12 @@ class UnpackerBase:
         OutputPath = os.path.join(os.path.splitext(Path)[0]) + '\\'
 
         Entries = self.GetFileEntries()
+        Path = os.path.basename(Path)
 
-        for entry in Entries:
+        for i in range(len(Entries)):
+            entry = Entries[i]
+
+            SetConsoleTitle('%d / %d: %s' % (i + 1, len(Entries), Path))
 
             try:
                 print('Extracting "%s" ... ' % entry.GetFileName(), end = '')

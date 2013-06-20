@@ -3,8 +3,27 @@ from misc import *
 from PyImage import *
 from FileIo import *
 
+def XMLCreate(RootTag = 'Arianrhod'):
+    return ['<?xml version="1.0" encoding="utf-8"?>', '<%s>' % RootTag]
+
+def XMLAppendText(xml, text, attrib = ''):
+
+    if attrib != '':
+        attrib = ' ' + attrib
+
+    xml.append('    <Text%s>' % attrib)
+    xml.append('        <jp><![CDATA[%s]]></jp>' % text)
+    xml.append('        <sc><![CDATA[%s]]></sc>' % text)
+    xml.append('    </Text>')
+
+    return xml
+
+def XMLSaveTo(xml, filename, RootTag = 'Arianrhod'):
+    xml.append('</%s>' % RootTag)
+    open(filename, 'wb').write('\r\n'.join(xml).encode('UTF8'))
+
 def ForEachFile(filelist, callback, filter = '*.*'):
-    for f in sys.argv[1:]:
+    for f in filelist:
         if os.path.isdir(f):
             for x in EnumDirectoryFiles(f, filter):
                 callback(x)
