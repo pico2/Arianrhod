@@ -54,3 +54,4 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /PyLibs/PyQt4
 /PyLibs/sip.pyd
 /PyLibs/eric5config.py
+/PyLibs/Crypto
