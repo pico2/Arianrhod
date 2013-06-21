@@ -562,46 +562,24 @@ BOOL IsRunningInVMWare()
 }
 
 #pragma comment(lib, NT6_LIB(kernel32))
-#pragma comment(lib, "wininet.lib")
 
+enum enumx
+{
+	enum1,
+	enum2,
+	enum3,
+};
 
-#define kNumPosBitsMax 4
-#define kNumPosStatesMax (1 << kNumPosBitsMax)
-
-#define kLenNumLowBits 3
-#define kLenNumLowSymbols (1 << kLenNumLowBits)
-#define kLenNumMidBits 3
-#define kLenNumMidSymbols (1 << kLenNumMidBits)
-#define kLenNumHighBits 8
-#define kLenNumHighSymbols (1 << kLenNumHighBits)
-
-#define LenChoice 0
-#define LenChoice2 (LenChoice + 1)
-#define LenLow (LenChoice2 + 1)
-#define LenMid (LenLow + (kNumPosStatesMax << kLenNumLowBits))
-#define LenHigh (LenMid + (kNumPosStatesMax << kLenNumMidBits))
-#define kNumLenProbs (LenHigh + kLenNumHighSymbols)
-
-
-#define kNumStates 12
-#define kNumLitStates 7
-
-#define kStartPosModelIndex 4
-#define kEndPosModelIndex 14
-#define kNumFullDistances (1 << (kEndPosModelIndex >> 1))
-
-#define kNumPosSlotBits 6
-#define kNumLenToPosStates 4
-
-#define kNumAlignBits 4
-#define kAlignTableSize (1 << kNumAlignBits)
-
-#define kMatchMinLen 2
-#define kMatchSpecLenStart (kMatchMinLen + kLenNumLowSymbols + kLenNumMidSymbols + kLenNumHighSymbols)
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PrintConsoleW(L"%X\n", kMatchSpecLenStart);
+    enumx cls;
+
+	switch (cls)
+	{
+	default:
+		break;
+	}
 
     return;
 
