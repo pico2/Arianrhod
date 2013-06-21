@@ -563,23 +563,28 @@ BOOL IsRunningInVMWare()
 
 #pragma comment(lib, NT6_LIB(kernel32))
 
-enum enumx
-{
-	enum1,
-	enum2,
-	enum3,
-};
-
+#include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    enumx cls;
+    SS_PROCESS_OBJECT obj;
+    NtFileDisk SsDevice;
+    PROCESS_INFORMATION pi;
 
-	switch (cls)
-	{
-	default:
-		break;
-	}
+    if (NT_FAILED(Ps::CreateProcess(L"WinHex.exe", NULL, NULL, 0, NULL, &pi)))
+        return;
+
+    SsDevice.OpenDevice(SHADOW_SYSCALL_DEVICE_SYMBOLIC);
+
+    obj.ProcessId = pi.dwProcessId;
+    obj.Flags = 0;
+    obj.ShadowSystemCall = TRUE;
+    obj.DenyAccess = TRUE;
+    obj.AccessAny = TRUE;
+    ControlShadowDevice(SsDevice, IOCTL_SET_PROCESS_INFO, &obj, sizeof(obj));
+
+    NtClose(pi.hProcess);
+    NtClose(pi.hThread);
 
     return;
 
