@@ -567,24 +567,9 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    SS_PROCESS_OBJECT obj;
-    NtFileDisk SsDevice;
-    PROCESS_INFORMATION pi;
+    WCHAR buf[MAX_NTPATH];
 
-    if (NT_FAILED(Ps::CreateProcess(L"WinHex.exe", NULL, NULL, 0, NULL, &pi)))
-        return;
-
-    SsDevice.OpenDevice(SHADOW_SYSCALL_DEVICE_SYMBOLIC);
-
-    obj.ProcessId = pi.dwProcessId;
-    obj.Flags = 0;
-    obj.ShadowSystemCall = TRUE;
-    obj.DenyAccess = TRUE;
-    obj.AccessAny = TRUE;
-    ControlShadowDevice(SsDevice, IOCTL_SET_PROCESS_INFO, &obj, sizeof(obj));
-
-    NtClose(pi.hProcess);
-    NtClose(pi.hThread);
+    RtlDosSearchPath_U(CurrentPeb()->ProcessParameters->DllPath.Buffer, L"USER32.dll", NULL, sizeof(buf), buf, NULL);
 
     return;
 
