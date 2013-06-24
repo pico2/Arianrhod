@@ -38,7 +38,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Gr /MD /W4 /GR- /Z7 /O2 /Ob1 /I "E:\Desktop\client2\trunk\src\XLGA\CommonFile1" /D _AFXDLL=1 /D USE_NT_VER=1 /D "WIN32" /D "UNICODE" /D "_UNICODE" /D _CRT_NON_CONFORMING_SWPRINT=1 /FD /GS- /MP /GL /arch:SSE /c
+# ADD CPP /nologo /Gr /MD /W4 /GR- /Z7 /O2 /Ob1 /I "E:\Desktop\client2\trunk\src\XLGA\CommonFile1" /D "WIN32" /D "UNICODE" /D "_UNICODE" /FD /GS- /MP /GL /arch:SSE /c
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
 # ADD RSC /l 0x804 /d "NDEBUG"
 BSC32=bscmake.exe

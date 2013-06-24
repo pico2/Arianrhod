@@ -565,11 +565,20 @@ BOOL IsRunningInVMWare()
 
 #include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
+#include "SectionProtector.h"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    WCHAR buf[MAX_NTPATH];
+    RTL_RESOURCE resource;
 
-    RtlDosSearchPath_U(CurrentPeb()->ProcessParameters->DllPath.Buffer, L"USER32.dll", NULL, sizeof(buf), buf, NULL);
+    RtlInitializeResource(&resource);
+
+    PROTECT_SECTION(&resource)
+    {
+        PrintConsoleA("5");
+    };
+
+    RtlDeleteResource(&resource);
 
     return;
 
