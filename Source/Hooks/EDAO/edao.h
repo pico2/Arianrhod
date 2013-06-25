@@ -14,8 +14,6 @@ class CBattle;
 #define DETOUR_METHOD(cls, method, addr, ...) TYPE_OF(&cls::method) (method); *(PULONG_PTR)&(method) = addr; return (this->*method)(__VA_ARGS__)
 
 
-#define UCL_COMPRESS_MAGIC TAG4('UCL4')
-
 #define MINIMUM_CUSTOM_CHAR_ID          0xB0
 #define MINIMUM_CUSTOM_CRAFT_INDEX      0x3E8
 #define MAXIMUM_CHR_NUMBER_IN_BATTLE    0x16
@@ -117,16 +115,16 @@ typedef struct
 
 enum
 {
-    ACTION_ATTACK,
-    ACTION_MOVE,
-    ACTION_MAGIC,
-    ACTION_CRAFT,
-    ACTION_SCRAFT,
-    ACTION_ITEM,
-    ACTION_ARIA_MAGIC,
-    ACTION_CAST_MAGIC,
-    ACTION_ARIA_CRAFT,
-    ACTION_CAST_CRAFT,
+    ACTION_ATTACK       = 0,
+    ACTION_MOVE         = 1,
+    ACTION_MAGIC        = 2,
+    ACTION_CRAFT        = 3,
+    ACTION_SCRAFT       = 4,
+    ACTION_ITEM         = 5,
+    ACTION_ARIA_MAGIC   = 6,
+    ACTION_CAST_MAGIC   = 7,
+    ACTION_ARIA_CRAFT   = 8,
+    ACTION_CAST_CRAFT   = 9,
 };
 
 enum
@@ -935,7 +933,7 @@ public:
     {
         TYPE_OF(&EDAO::StubDrawNumber) StubDrawNumber;
 
-        *(PVOID *)&StubDrawNumber = (PVOID)0x6778E3;
+        *(PVOID *)&StubDrawNumber = (PVOID)0x734A00;
 
         return (this->*StubDrawNumber)(X, Y, Text, OneU1, Color, ZeroU1);
     }
@@ -1077,78 +1075,6 @@ public:
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = NULL;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = NULL;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = NULL;
-
-
-class EDAOFileStream
-{
-public:
-    ULONG THISCALL Read(PVOID Buffer, ULONG Size, ULONG Count = 1, ULONG Unknown = 0, ULONG Unknown2 = 0)
-    {
-        TYPE_OF(&EDAOFileStream::Read) StubRead;
-
-        *(PVOID *)&StubRead = (PVOID)0x6725AA;
-
-        return (this->*StubRead)(Buffer, Size, Count, Unknown, Unknown2);
-    }
-
-    BOOL THISCALL Seek(LONG Offset, ULONG SeekMethod)
-    {
-        TYPE_OF(&EDAOFileStream::Seek) StubSeek;
-
-        *(PVOID *)&StubSeek = (PVOID)0x675787;
-        return (this->*StubSeek)(Offset, SeekMethod);
-    }
-
-    ULONG THISCALL Uncompress(PVOID Output, ULONG BlockSize, ULONG BlockCount)
-    {
-        LONG_PTR            BytesRead;
-        PVOID               Buffer;
-        UCL_COMPRESS_HEADER Header;
-
-        static PVOID        StaticBuffer;
-        static ULONG_PTR    StaticBufferSize;
-
-        ULONG pos = m_Position;
-
-        BytesRead = Read(&Header, sizeof(Header));
-        if (BytesRead != sizeof(Header) || Header.Magic != UCL_COMPRESS_MAGIC)
-        {
-            Seek(-BytesRead, SEEK_CUR);
-            m_Position = pos;
-
-            return (this->*StubUncompress)(Output, BlockSize, BlockCount);
-        }
-
-        Buffer = StaticBuffer;
-        if (Header.CompressedSize > StaticBufferSize)
-        {
-            StaticBufferSize = Header.CompressedSize;
-            Buffer = ReAllocateMemoryP(Buffer, StaticBufferSize);
-            StaticBuffer = Buffer;
-        }
-
-        if (Buffer == NULL)
-            return 0;
-
-        Read(Buffer, Header.CompressedSize);
-
-        UCL_NRV2E_Decompress(Buffer, Header.CompressedSize, Output, &BlockSize);
-
-        return BlockSize;
-    }
-
-    static TYPE_OF(&EDAOFileStream::Uncompress) StubUncompress;
-
-    CHAR    m_FileName[0x24];   // 0x00
-    ULONG   m_Position;         // 0x24
-    ULONG   m_Size;             // 0x28
-    DUMMY_STRUCT(0x54);         // 0x2C
-    BYTE    m_BufferIndex;
-    BYTE    m_BufferFlags;
-};
-
-DECL_SELECTANY TYPE_OF(EDAOFileStream::StubUncompress) EDAOFileStream::StubUncompress = NULL;
-
 
 BOOL AoIsFileExist(PCSTR FileName);
 

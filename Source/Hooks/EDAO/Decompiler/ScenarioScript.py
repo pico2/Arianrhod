@@ -579,20 +579,72 @@ class ScenarioMonsterInfo:
 
 class ScenarioEventInfo:
     # 0x60 bytes
+
     def __init__(self, fs = None):
         if fs == None:
             return
 
-        self.Binary = fs.read(0x60)
+        self.X              = fs.float()                # 0x00
+        self.Y              = fs.float()                # 0x04
+        self.Z              = fs.float()                # 0x08
+        self.Range          = fs.float()                # 0x0C
 
-    def __str__(self):
-        return str(self.Binary)
+        self.UnknownFloat_10 = [0] * 0x10
+        for i in range(len(self.UnknownFloat_10)):
+            self.UnknownFloat_10[i] = fs.float()        # 0x10 - 0x4C
+
+        self.Flags          = fs.ushort()       # 0x50
+        self.ScenaIndex     = fs.ushort()       # 0x52
+        self.FunctionIndex  = fs.ushort()       # 0x54
+        self.Reserve        = fs.read(0xA)        # 0x56
+
+        if self.Reserve != b'\x00' * len(self.Reserve): bp()
+
+    #def __str__(self):
+    #    return str(self.Binary)
 
     def param(self):
-        return self.__str__()
+        #x = str(self.X)
+        #z = str(self.Z)
+        #y = str(self.Y)
+        #rng = str(self.Range)
+        #maxlen = max(len(x), len(z))
+        #maxlen = max(maxlen, len(y))
+        #maxlen = max(maxlen, len(rng))
+
+        p = '0x%04X, %d, %d, %s, %s, %s, %s, ' % (
+                    self.Flags,
+                    self.ScenaIndex,
+                    self.FunctionIndex,
+
+                    self.X,
+                    self.Y,
+                    self.Z,
+                    self.Range,
+                )
+
+        floats = ''
+        for v in self.UnknownFloat_10:
+            floats += '%s, ' % v
+
+        floats = '[%s]' % floats[:-2]
+
+        p = p + floats
+
+        space = [8, 3, 5] + [23] * 4 + [23] * len(self.UnknownFloat_10)
+        return AdjustParam(p, space)
 
     def binary(self):
-        return self.Binary
+        p = struct.pack(
+                '<ffff' + 'f' * len(self.UnknownFloat_10),
+                self.X, self.Y, self.Z, self.Range,
+                *self.UnknownFloat_10
+            )
+
+        data = struct.pack('<HHH', self.Flags, self.ScenaIndex, self.FunctionIndex)
+
+        bin = p + data
+        return bin + b'\x00' * (0x60 - len(bin))
 
 class ScenarioActorInfo:
     def __init__(self, fs = None):

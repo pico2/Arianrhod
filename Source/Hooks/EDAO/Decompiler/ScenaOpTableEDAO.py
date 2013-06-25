@@ -184,7 +184,7 @@ InstructionNames[0xB3]  = 'OutputDebugInt'
 InstructionNames[0xB4]  = 'OP_B4'
 InstructionNames[0xB5]  = 'OP_B5'
 InstructionNames[0xB6]  = 'LoadOps'
-InstructionNames[0xB7]  = 'OP_B7'
+InstructionNames[0xB7]  = 'ModifyEventFlags'
 InstructionNames[0xB8]  = 'PlayMovie'
 InstructionNames[0xB9]  = 'OP_B9'
 InstructionNames[0xBA]  = 'ReplaceBGM'
@@ -1783,7 +1783,7 @@ edao_op_list = \
     inst(OP_B4,                     'B'),
     inst(OP_B5,                     'BW'),
     inst(LoadOps),                                                  # obsolete
-    inst(OP_B7,                     'BBW'),
+    inst(ModifyEventFlags,          'CCW'),     # ModifyEventFlags(set_or_clear, event_index, flags)   0: set, 1: clear
     inst(PlayMovie,                 'BSWW'),
     inst(OP_B9,                     'B'),
     inst(ReplaceBGM,                'MM'),

@@ -240,14 +240,28 @@ def DeclMonster(X, Z, Y, Unknown_0C, BattleInfoName, Unknown_12, ChipIndex, Unkn
 
     scena.fs.write(moninfo.binary())
 
-def DeclEvent(buf):
-    
+def DeclEvent(Flags, ScenaIndex, FunctionIndex, X, Y, Z, Range, UnknownFloat_10):
+
+    VerifyTupleOrList(UnknownFloat_10)
+
+    if len(UnknownFloat_10) != 0x10:
+        raise Exception('length not 0x10')
+
     AddScnInfo(SCN_INFO_EVENT)
 
     ev = ScenarioEventInfo()
-    ev.Binary = buf
+
+    ev.X                = float(X)
+    ev.Y                = float(Y)
+    ev.Z                = float(Z)
+    ev.Range            = float(Range)
+    ev.UnknownFloat_10  = UnknownFloat_10
+    ev.Flags            = Flags
+    ev.ScenaIndex       = ScenaIndex
+    ev.FunctionIndex    = FunctionIndex
 
     scena.fs.write(ev.binary())
+
 
 def DeclActor(TriggerX, TriggerZ, TriggerY, TriggerRange, ActorX, ActorZ, ActorY, Flags, TalkScenaIndex, TalkFunctionIndex, Unknown_22):
 

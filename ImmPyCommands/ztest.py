@@ -152,7 +152,7 @@ def main(args):
     debugger.pyreset()
 
     functbl = Register(0xBE1460)
-    functbl = Register(0xBE0E10)
+    #functbl = Register(0xBE0E10)
 
     try:
         for i in range(0x100):
@@ -162,7 +162,7 @@ def main(args):
                 #imm.log('OP_%02X: NULLLLLLLLLLLLLLLLLLLLL' % i)
                 continue
 
-            funcname = 'SCP_%02X' % i
+            funcname = 'AS_%02X' % i
 
             imm.setComment(int(func), funcname)
             imm.setLabel(int(func), funcname)

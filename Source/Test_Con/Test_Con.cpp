@@ -16,6 +16,7 @@
     #define _UNICODE
 #endif
 
+#include <ws2spi.h>
 #include "MyLibrary.cpp"
 
 #if defined(UNICODE)
@@ -562,23 +563,24 @@ BOOL IsRunningInVMWare()
 }
 
 #pragma comment(lib, NT6_LIB(kernel32))
+#pragma comment(lib, NT6_LIB(ws2_32))
 
 #include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
-#include "SectionProtector.h"
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    RTL_RESOURCE resource;
+    PVOID mswsock;
+    LPWSPSTARTUP WSPStartup;
+    WSADATA wsadata;
 
-    RtlInitializeResource(&resource);
+    mswsock = Ldr::LoadDll(L"mswsock.dll");
+    WSPStartup = (LPWSPSTARTUP)GetRoutineAddress(mswsock, "WSPStartup");
 
-    PROTECT_SECTION(&resource)
-    {
-        PrintConsoleA("5");
-    };
+    WSAStartup(0x202, &wsadata);
 
-    RtlDeleteResource(&resource);
+    closesocket(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
+
+    WSACleanup();
 
     return;
 
