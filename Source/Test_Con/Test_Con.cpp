@@ -567,20 +567,21 @@ BOOL IsRunningInVMWare()
 
 #include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
+#include "MlString.h"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PVOID mswsock;
-    LPWSPSTARTUP WSPStartup;
-    WSADATA wsadata;
+    ml::MlInitialize();
 
-    mswsock = Ldr::LoadDll(L"mswsock.dll");
-    WSPStartup = (LPWSPSTARTUP)GetRoutineAddress(mswsock, "WSPStartup");
+    String x = L"fuck";
+    String y;
 
-    WSAStartup(0x202, &wsadata);
+    y = x + L"concat";
+    PrintConsoleW(L"%s\n", y);
 
-    closesocket(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
+    y = x + y;
 
-    WSACleanup();
+    PrintConsoleW(L"%s\n", y);
 
     return;
 
