@@ -580,7 +580,10 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     PrintConsoleW(L"%s\n", y);
 
     y = x + y;
+    PrintConsoleW(L"%s\n", y);
 
+    y = L"short";
+    y += L" long";
     PrintConsoleW(L"%s\n", y);
 
     return;

@@ -3,6 +3,8 @@
 
 #include "MyLibrary.h"
 
+#define STRING_DEBUG 0
+
 class StringImplement
 {
 public:
@@ -51,14 +53,14 @@ public:
     NoInline NTSTATUS CopyFrom(STRING_CONST_POINTER_TYPE Str, LARGE_LENGTH_TYPE Count)
     {
         FAIL_RETURN(VerifyBufferLength(Count));
-        CopyString(Str, Count);
+        CopyString(Str, Count, FALSE);
         return STATUS_SUCCESS;
     }
 
     NoInline NTSTATUS Concat(STRING_CONST_POINTER_TYPE Str, LARGE_LENGTH_TYPE Count)
     {
         FAIL_RETURN(VerifyBufferLength(GetCount() + Count));
-        CopyString(Str, Count);
+        CopyString(Str, Count, TRUE);
         return STATUS_SUCCESS;
     }
 
@@ -93,9 +95,12 @@ protected:
         return STATUS_SUCCESS;
     }
 
-    NoInline VOID CopyString(STRING_CONST_POINTER_TYPE Str, LARGE_LENGTH_TYPE Count)
+    NoInline VOID CopyString(STRING_CONST_POINTER_TYPE Str, LARGE_LENGTH_TYPE Count, BOOL Concat)
     {
         LARGE_LENGTH_TYPE Length;
+
+        if (!Concat)
+            this->String.Length = 0;
 
         if (Count == 0)
             return;
@@ -116,6 +121,8 @@ protected:
         this->String.Buffer         = Buffer;
         this->String.Length         = 0;
         this->String.MaximumLength  = (STRING_LENGTH_TYPE)MaximumLength;
+
+        GetBuffer()[0] = 0;
     }
 
     VOID AddNull()
@@ -125,7 +132,7 @@ protected:
 
     VOID CopyBuffer(StringImplement *Impl)
     {
-        CopyString(Impl->GetBuffer(), Impl->GetCount());
+        CopyString(Impl->GetBuffer(), Impl->GetCount(), FALSE);
     }
 };
 
@@ -169,6 +176,11 @@ public:
     ~String()
     {
         ReleaseBuffer();
+
+#if STRING_DEBUG
+        this->Buffer = (STRING_POINTER_TYPE)0xFFEEDDCC;
+#endif
+
     }
 
     NoInline String& operator=(STRING_CONST_POINTER_TYPE Str)
@@ -254,7 +266,7 @@ protected:
 
     NTSTATUS ReleaseImplement(StringImplement *Impl)
     {
-        return FreeMemoryP(Impl) ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+        return FreeMemory(Impl) ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
     }
 
     NTSTATUS ReleaseBuffer()
@@ -294,7 +306,7 @@ protected:
         }
 
         Length = StringImplement::CountToLengthAddNull(Count);
-        Impl = (StringImplement *)AllocateMemoryP(kStringImplSize + Length);
+        Impl = (StringImplement *)AllocateMemory(kStringImplSize + Length);
         if (Impl == NULL)
             return STATUS_NO_MEMORY;
 
@@ -316,7 +328,7 @@ protected:
         return CopyFrom(Str, StringImplement::GetStringCount(Str));
     }
 
-    NTSTATUS CopyFrom(STRING_CONST_POINTER_TYPE Str, LARGE_LENGTH_TYPE Count)
+    NoInline NTSTATUS CopyFrom(STRING_CONST_POINTER_TYPE Str, LARGE_LENGTH_TYPE Count)
     {
         NTSTATUS Status;
 
@@ -325,6 +337,41 @@ protected:
 
         return GetImplement()->CopyFrom(Str, Count);
     }
+
+
+private:
+    PVOID AllocateMemory(ULONG_PTR Size)
+    {
+
+#if STRING_DEBUG
+        ++DebugAllocCount;
+#endif
+
+        return AllocateMemoryP(Size);
+    }
+
+    BOOL FreeMemory(PVOID Memory)
+    {
+
+#if STRING_DEBUG
+        --DebugAllocCount;
+        if (DebugAllocCount < 0)
+            RtlRaiseException(0);
+#endif
+
+        return FreeMemoryP(Memory);
+    }
+
+
+#if STRING_DEBUG
+    static LONG_PTR DebugAllocCount;
+#endif
 };
+
+#if STRING_DEBUG
+
+DECL_SELECTANY LONG_PTR String::DebugAllocCount = 0;
+
+#endif
 
 #endif // _MLSTRING_H_252d9413_55ca_4d44_976f_c0dcecd5afd4_
