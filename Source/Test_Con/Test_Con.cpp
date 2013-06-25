@@ -567,10 +567,6 @@ BOOL IsRunningInVMWare()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    WCHAR buf[MAX_NTPATH];
-
-    RtlDosSearchPath_U(CurrentPeb()->ProcessParameters->DllPath.Buffer, L"USER32.dll", NULL, sizeof(buf), buf, NULL);
-
     return;
 
     LOGFONTW lf;
