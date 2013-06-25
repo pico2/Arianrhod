@@ -20,8 +20,8 @@ InstructionNames[0x05]  = 'Call'
 InstructionNames[0x06]  = 'NewScene'
 InstructionNames[0x07]  = 'IdleLoop'
 InstructionNames[0x08]  = 'Sleep'
-InstructionNames[0x09]  = 'SetXXXFlags'
-InstructionNames[0x0A]  = 'ClearXXXFlags'
+InstructionNames[0x09]  = 'SetMapFlags'
+InstructionNames[0x0A]  = 'ClearMapFlags'
 InstructionNames[0x0B]  = 'FadeToDark'
 InstructionNames[0x0C]  = 'FadeToBright'
 InstructionNames[0x0D]  = 'OP_0D'
@@ -165,8 +165,8 @@ InstructionNames[0x9E]  = 'OP_9E'
 InstructionNames[0x9F]  = 'OP_9F'
 InstructionNames[0xA0]  = 'OP_A0'
 InstructionNames[0xA1]  = 'OP_A1'
-InstructionNames[0xA2]  = 'OP_A2'
-InstructionNames[0xA3]  = 'OP_A3'
+InstructionNames[0xA2]  = 'SetChrFlags'
+InstructionNames[0xA3]  = 'ClearChrFlags'
 InstructionNames[0xA4]  = 'SetChrBattleFlags'
 InstructionNames[0xA5]  = 'ClearChrBattleFlags'
 InstructionNames[0xA6]  = 'OP_A6'
@@ -942,7 +942,7 @@ def scp_1d(data):
         operand = ''
 
         if opr1 == 0:
-            operand = 'BBLLLLLL'
+            operand = 'BBiiiiii'
         elif opr1 == 2 or opr1 == 3:
             operand = 'B'
 
@@ -1619,8 +1619,8 @@ edao_op_list = \
     inst(NewScene,                  NO_OPERAND,             0,                          scp_new_scene),
     inst(IdleLoop),
     inst(Sleep,                     'H'),
-    inst(SetXXXFlags,               'L'),
-    inst(ClearXXXFlags,             'L'),
+    inst(SetMapFlags,               'L'),
+    inst(ClearMapFlags,             'L'),
     inst(FadeToDark,                'iic'),
     inst(FadeToBright,              'ii'),
     inst(OP_0D),
@@ -1764,8 +1764,8 @@ edao_op_list = \
     inst(OP_9F,                     NO_OPERAND,             0,                          scp_9f),
     inst(OP_A0,                     'WHBB'),
     inst(OP_A1,                     NO_OPERAND,             0,                          scp_a1),
-    inst(OP_A2,                     'WW'),
-    inst(OP_A3,                     'WW'),
+    inst(SetChrFlags,               'WW'),
+    inst(ClearChrFlags,             'WW'),
     inst(SetChrBattleFlags,         'WW'),
     inst(ClearChrBattleFlags,       'WW'),
     inst(OP_A6,                     'WLLLL'),
