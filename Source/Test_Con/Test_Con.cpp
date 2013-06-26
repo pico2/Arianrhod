@@ -573,19 +573,6 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     ml::MlInitialize();
 
-    String x = L"fuck";
-    String y;
-
-    y = x + L"concat";
-    PrintConsoleW(L"%s\n", y);
-
-    y = x + y;
-    PrintConsoleW(L"%s\n", y);
-
-    y = L"short";
-    y += L" long";
-    PrintConsoleW(L"%s\n", y);
-
     return;
 
     LOGFONTW lf;
