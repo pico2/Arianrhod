@@ -1,7 +1,7 @@
 #ifndef _MLSTRING_H_252d9413_55ca_4d44_976f_c0dcecd5afd4_
 #define _MLSTRING_H_252d9413_55ca_4d44_976f_c0dcecd5afd4_
 
-#include "MyLibrary.h"
+#include "Vector.hpp"
 
 #define STRING_DEBUG 0
 #define USE_TEMPLATE 1
@@ -18,7 +18,7 @@ protected:
     typedef PWSTR           STRING_POINTER_TYPE;
     typedef PCWSTR          STRING_CONST_POINTER_TYPE;
 
-#if USE_TEMPLATE
+#if 0 && USE_TEMPLATE
 
 #include "MlPackOn.h"
 
@@ -42,7 +42,8 @@ protected:
 
 #endif
 
-    static const LARGE_LENGTH_TYPE  kInvalidIndex   = ~0u;
+    static const LARGE_LENGTH_TYPE  kMaxNumberValue = ~0u;
+    static const LARGE_LENGTH_TYPE  kInvalidIndex   = kMaxNumberValue;
     static const LARGE_LENGTH_TYPE  kCharSize       = sizeof(STRING_CHAR_TYPE);
     static const LARGE_LENGTH_TYPE  kMaxLength      = ((LARGE_LENGTH_TYPE)1 << bitsof(STRING_LENGTH_TYPE)) - 1 - kCharSize;
 
@@ -203,6 +204,21 @@ protected:
         return Prev == NULL ? kInvalidIndex : Prev - GetBuffer();
     }
 
+    BOOL MatchExpression(PCSTRING_TYPE Expression, BOOL IgnoreCase)
+    {
+        UNICODE_STRING Expr, Name;
+
+        Expr.Length         = Expression->Length;
+        Expr.MaximumLength  = Expr.Length;
+        Expr.Buffer         = Expression->Buffer;
+
+        Name.Length         = GetLength();
+        Name.MaximumLength  = Name.Length;
+        Name.Buffer         = GetBuffer();
+
+        return Rtl::IsNameInExpression(&Expr, &Name, IgnoreCase);
+    }
+
     VOID ToLower()
     {
         StringLowerW(GetBuffer(), GetCount());
@@ -291,6 +307,16 @@ protected:
     {
         return StrLengthW(Str);
     }
+
+    static VOID InitString(PSTRING_TYPE String, STRING_CONST_POINTER_TYPE Buffer, LARGE_LENGTH_TYPE Count = kMaxNumberValue)
+    {
+        if (Count == kMaxNumberValue)
+            Count = GetStringCount(Buffer);
+
+        String->Buffer          = (STRING_POINTER_TYPE)Buffer;
+        String->Length          = CountToLength(Count);
+        String->MaximumLength   = String->Length;
+    }
 };
 
 
@@ -302,6 +328,10 @@ template<typename STRING_LENGTH_TYPE = USHORT, typename LARGE_LENGTH_TYPE = ULON
 
 class StringT
 {
+public:
+
+    typedef ml::GrowableArray<StringT> StringArray;
+
 protected:
 
     typedef StringImplementT<> StringImplement;
@@ -311,9 +341,12 @@ protected:
 
     typedef StringImplement::STRING_CHAR_TYPE               STRING_CHAR_TYPE;
     typedef StringImplement::STRING_TYPE                    STRING_TYPE;
+    typedef StringImplement::PSTRING_TYPE                   PSTRING_TYPE;
+    typedef StringImplement::PCSTRING_TYPE                  PCSTRING_TYPE;
     typedef StringImplement::STRING_POINTER_TYPE            STRING_POINTER_TYPE;
     typedef StringImplement::STRING_CONST_POINTER_TYPE      STRING_CONST_POINTER_TYPE;
 
+    static const LARGE_LENGTH_TYPE  kMaxNumberValue = StringImplement::kMaxNumberValue;
     static const LARGE_LENGTH_TYPE  kInvalidIndex   = StringImplement::kInvalidIndex;
     static const LARGE_LENGTH_TYPE  kMaxLength      = StringImplement::kMaxLength;
     static const LARGE_LENGTH_TYPE  kCharSize       = StringImplement::kCharSize;
@@ -380,6 +413,16 @@ public:
     operator STRING_CONST_POINTER_TYPE() const
     {
         return GetBuffer();
+    }
+
+    operator PSTRING_TYPE()
+    {
+        return GetImplement()->operator PSTRING_TYPE();
+    }
+
+    operator PCSTRING_TYPE() const
+    {
+        return GetImplement()->operator PCSTRING_TYPE();
     }
 
     NoInline StringT& operator=(STRING_CONST_POINTER_TYPE Str)
@@ -538,6 +581,18 @@ public:
         return GetImplement()->LastIndexOf(Str, StartIndex);
     }
 
+    NoInline BOOL MatchExpression(STRING_CONST_POINTER_TYPE Expression, BOOL IgnoreCase = TRUE)
+    {
+        STRING_TYPE Expr;
+        StringImplement::InitString(&Expr, Expression);
+        return GetImplement()->MatchExpression(&Expr, IgnoreCase);
+    }
+
+    NoInline BOOL MatchExpression(StringT Expression, BOOL IgnoreCase = TRUE)
+    {
+        return GetImplement()->MatchExpression(&Expression.GetImplement()->String, IgnoreCase);
+    }
+
     NoInline StringT PadLeft(LARGE_LENGTH_TYPE TotalWidth, STRING_CHAR_TYPE PaddingChar = ' ')
     {
         NTSTATUS            Status;
@@ -565,7 +620,7 @@ public:
     NoInline StringT PadRight(LARGE_LENGTH_TYPE TotalWidth, STRING_CHAR_TYPE PaddingChar = ' ')
     {
         NTSTATUS            Status;
-        StringT              Padded = *this;
+        StringT             Padded = *this;
         LARGE_LENGTH_TYPE   LengthToPad;
 
         if (TotalWidth <= Padded.GetCount())
@@ -582,7 +637,7 @@ public:
         return Padded;
     }
 
-    NoInline StringT Remove(LARGE_LENGTH_TYPE StartIndex, LARGE_LENGTH_TYPE Count = kInvalidIndex)
+    NoInline StringT Remove(LARGE_LENGTH_TYPE StartIndex, LARGE_LENGTH_TYPE Count = kMaxNumberValue)
     {
         NTSTATUS            Status;
         StringT              NewString;
@@ -592,7 +647,7 @@ public:
         if (StartIndex >= GetCount() || StartIndex == 0)
             return NewString;
 
-        if (Count == kInvalidIndex || StartIndex + Count >= GetCount())
+        if (Count == kMaxNumberValue || StartIndex + Count >= GetCount())
             Count = GetCount() - StartIndex;
 
         TailLength = GetCount() - (StartIndex + Count);
@@ -630,14 +685,49 @@ public:
         return ReplaceWorker(Old, 1, New, 1);
     }
 
-    NoInline StringT SubString(LARGE_LENGTH_TYPE StartIndex, LARGE_LENGTH_TYPE Count = kInvalidIndex)
+    StringArray Split(STRING_CHAR_TYPE Separator, LARGE_LENGTH_TYPE MaxSplit = kMaxNumberValue)
+    {
+        STRING_CHAR_TYPE Buffer[2];
+
+        Buffer[0] = Separator;
+        Buffer[1] = 0;
+
+        return SplitWorker(Buffer, 1, MaxSplit);
+    }
+
+    NoInline StringArray Split(STRING_CONST_POINTER_TYPE Separator, LARGE_LENGTH_TYPE MaxSplit = kMaxNumberValue)
+    {
+        return SplitWorker(Separator, StringImplement::GetStringCount(Separator), MaxSplit);
+    }
+
+    NoInline BOOL StartsWith(STRING_CONST_POINTER_TYPE Starts, BOOL CaseInSensitive = FALSE)
+    {
+        return StartsWithWorker(Starts, StringImplement::GetStringCount(Starts), CaseInSensitive);
+    }
+
+    NoInline BOOL StartsWith(const StringT& Starts, BOOL CaseInSensitive = FALSE)
+    {
+        return &Starts == this ? TRUE : StartsWithWorker(Starts, Starts.GetCount(), CaseInSensitive);
+    }
+
+    NoInline BOOL EndsWith(STRING_CONST_POINTER_TYPE Ends, BOOL CaseInSensitive = FALSE)
+    {
+        return EndsWithWorker(Ends, StringImplement::GetStringCount(Ends), CaseInSensitive);
+    }
+
+    NoInline BOOL EndsWith(const StringT& Ends, BOOL CaseInSensitive = FALSE)
+    {
+        return &Ends == this ? TRUE : EndsWithWorker(Ends, Ends.GetCount(), CaseInSensitive);
+    }
+
+    NoInline StringT SubString(LARGE_LENGTH_TYPE StartIndex, LARGE_LENGTH_TYPE Count = kMaxNumberValue)
     {
         StringT NewString;
 
         if (StartIndex >= GetCount())
             return NewString;
 
-        if (Count == kInvalidIndex || StartIndex + Count >= GetCount())
+        if (Count == kMaxNumberValue || StartIndex + Count >= GetCount())
             Count = GetCount() - StartIndex;
 
         NewString.CopyFrom(GetBuffer() + StartIndex, Count);
@@ -838,6 +928,79 @@ protected:
         return NewString;
     }
 
+    StringArray SplitWorker(STRING_CONST_POINTER_TYPE Separator, LARGE_LENGTH_TYPE Length, LARGE_LENGTH_TYPE MaxSplit)
+    {
+        StringArray                 Array;
+        LARGE_LENGTH_TYPE           StartIndex, Sep;
+        STRING_CONST_POINTER_TYPE   Begin, End, Base;
+        StringImplement*            Impl;
+
+        Impl = GetImplement();
+
+        Base        = GetBuffer();
+        Begin       = Base;
+        End         = Begin + GetCount();
+        StartIndex  = 0;
+
+        for (; MaxSplit; --MaxSplit)
+        {
+            Sep = Impl->IndexOf(Separator, StartIndex);
+            if (Sep == kInvalidIndex)
+                break;
+
+            if (Sep != StartIndex)
+            {
+                Array.Add(SubString(StartIndex, Sep - StartIndex));
+            }
+
+            StartIndex = Sep + 1;
+            Begin = Base + StartIndex;
+        }
+
+        if (Begin < End)
+        {
+            Array.Add(SubString(Begin - Base));
+        }
+
+        return Array;
+    }
+
+    BOOL StartsWithWorker(STRING_CONST_POINTER_TYPE Starts, LARGE_LENGTH_TYPE Count, BOOL CaseInSensitive)
+    {
+        StringImplement* Impl;
+
+        Impl = GetImplement();
+
+        if (Count == 0 && Impl->GetCount() == 0)
+            return TRUE;
+
+        if (Count > Impl->GetCount())
+            return FALSE;
+
+        if (Count == Impl->GetCount())
+            return Compare(Starts, Count, CaseInSensitive) == 0;
+
+        return SubString(0, Count).Compare(Starts, Count, CaseInSensitive) == 0;
+    }
+
+    BOOL EndsWithWorker(STRING_CONST_POINTER_TYPE Ends, LARGE_LENGTH_TYPE Count, BOOL CaseInSensitive)
+    {
+        StringImplement* Impl;
+
+        Impl = GetImplement();
+
+        if (Count == 0 && Impl->GetCount() == 0)
+            return TRUE;
+
+        if (Count > Impl->GetCount())
+            return FALSE;
+
+        if (Count == Impl->GetCount())
+            return Compare(Ends, Count, CaseInSensitive) == 0;
+
+        return SubString(Impl->GetCount() - Count).Compare(Ends, Count, CaseInSensitive) == 0;
+    }
+
 private:
     PVOID AllocateMemory(ULONG_PTR Size)
     {
@@ -869,20 +1032,22 @@ private:
 
 #if STRING_DEBUG
 
-DECL_SELECTANY LONG_PTR StringT::DebugAllocCount = 0;
+DECL_SELECTANY LONG_PTR StringT<>::DebugAllocCount = 0;
 
 #endif
 
 #if USE_TEMPLATE
 
     typedef StringT<> String;
-    typedef StringT<ULONG, ULONG64> LargeString;
+    //typedef StringT<ULONG, ULONG64> LargeString;
 
 #else
 
     typedef StringT String;
 
 #endif
+
+typedef String::StringArray StringArray;
 
 
 #endif // _MLSTRING_H_252d9413_55ca_4d44_976f_c0dcecd5afd4_

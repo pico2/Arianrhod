@@ -573,6 +573,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     ml::MlInitialize();
 
+    String(L"fuck").MatchExpression(L"fu*");
+
     return;
 
     LOGFONTW lf;
