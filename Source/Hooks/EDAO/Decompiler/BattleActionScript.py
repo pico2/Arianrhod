@@ -17,6 +17,10 @@ class CharacterPositionFactor:
 
 class BattleActionScriptInfo:
 
+    ActionFileType_Normal   = 0
+    ActionFileType_Arts     = 1
+    ActionFileType_Item     = 2
+
     def __init__(self):
         self.ActionListOffset       = 0
         self.ChrPosFactorOffset     = 0
@@ -33,7 +37,7 @@ class BattleActionScriptInfo:
         self.ChrName = None
         self.ASFileName = ''
 
-        self.IsMagicFile = False
+        self.ActionFileType = self.ActionFileType_Normal
 
     def open(self, asname):
         fs = BytesStream()
@@ -41,15 +45,19 @@ class BattleActionScriptInfo:
 
         self.ASFileName = asname
 
-        asname = os.path.basename(asname)
+        asname = os.path.basename(asname).lower()
 
-        self.IsMagicFile = asname == 'as90000.dat' or asname == 'as90001.dat'
-        if asname == 'as90001.dat':
-            edao.DynamicAddInstruction(0xFF, 'InvalidOpCode')
+        if asname == 'as90000.dat':
+            self.ActionFileType = self.ActionFileType_Arts
+        elif asname == 'as90001.dat':
+            self.ActionFileType = self.ActionFileType_Item
+        else:
+            self.ActionFileType = self.ActionFileType_Normal
+
 
         self.ActionListOffset   = fs.ushort()
 
-        if not self.IsMagicFile:
+        if self.ActionFileType == self.ActionFileType_Normal:
             self.ChrPosFactorOffset = fs.ushort()
             self.Reserve            = fs.ushort()
 
@@ -94,9 +102,10 @@ class BattleActionScriptInfo:
         input()
 
     def GetBuiltinNames(self):
-        if self.IsMagicFile:
 
-            BuiltinMagicNames = []
+        if self.ActionFileType == self.ActionFileType_Arts:
+
+            BuiltinArtsNames = []
 
             try:
                 offsetlist = []
@@ -111,7 +120,7 @@ class BattleActionScriptInfo:
                 magic.open(t_magic)
                 for i in range(len(self.ActionList)):
                     offsetlist.append(magic.ushort())
-                    BuiltinMagicNames.append('')
+                    BuiltinArtsNames.append('')
 
                 NameConflict = {}
 
@@ -141,15 +150,15 @@ class BattleActionScriptInfo:
                         NameConflict[name] += 1
                         name += '_%d' % NameConflict[name]
 
-                    BuiltinMagicNames[i] = name
+                    BuiltinArtsNames[i] = name
             except:
                 bp()
-                BuiltinMagicNames = []
+                BuiltinArtsNames = []
 
 
-            return BuiltinMagicNames
+            return BuiltinArtsNames
 
-        else:
+        elif self.ActionFileType == self.ActionFileType_Normal:
             BuiltinCraftNames = \
             [
                 'SysCraft_Init',                # 00 0
@@ -189,6 +198,8 @@ class BattleActionScriptInfo:
             ]
 
             return BuiltinCraftNames
+
+        return []
 
     def DiasmInstructionCallback(self, data):
         return
@@ -268,6 +279,10 @@ class BattleActionScriptInfo:
             data.Block = block
             data.GlobalLabelTable   = self.GlobalLabelTable
 
+            name = GetValidLabelName(block.Name)
+            if not name.startswith('Craft_'): name = 'Craft_' + name
+
+            blocks.append(['def %s(): pass' % name])
             blocks.append(disasm.FormatCodeBlock2(data))
 
         #for x in disasmtbl: print('%08X' % x)
@@ -285,9 +300,9 @@ class BattleActionScriptInfo:
         name = os.path.splitext(os.path.basename(filename))[0]
         name = os.path.splitext(name)[0]
 
-        if self.IsMagicFile:
+        if self.ActionFileType == self.ActionFileType_Arts:
 
-            lines.append('CreateMagicAction("%s")' % (name + '.dat'))
+            lines.append('CreateArtsAction("%s")' % (name + '.dat'))
 
         else:
 
@@ -393,7 +408,7 @@ def CreateBattleAction(filename, ChrPosFactorList = None):
         actionfile.ChrPosFactor.append(f)
 
 
-def CreateMagicAction(filename):
+def CreateArtsAction(filename):
 
     global actionfile
     actionfile = BattleActionScriptInfoPort()
@@ -401,7 +416,7 @@ def CreateMagicAction(filename):
     actionfile.fs = BytesStream()
     actionfile.fs.open(filename, 'wb+')
 
-    actionfile.IsMagicFile = True
+    actionfile.ActionFileType = BattleActionScriptInfoPort.ActionFileType_Arts
 
     actionfile.ActionListOffset = 2
     actionfile.fs.wushort(actionfile.ActionListOffset)
