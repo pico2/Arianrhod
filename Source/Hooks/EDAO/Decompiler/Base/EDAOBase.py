@@ -1,4 +1,4 @@
-from BaseType import *
+from .BaseType import *
 
 CODE_PAGE = '936'
 

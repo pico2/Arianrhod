@@ -1,5 +1,6 @@
-from InstructionTable import *
-from EDAOBase import *
+from .InstructionTable import *
+from Base.EDAOBase import *
+from GameData.ItemNameMap import *
 
 def GetOpCode(fs):
     return fs.byte()
@@ -388,6 +389,7 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             'E' : wexpr,
             'S' : wstr,
             'M' : lambda value : fs.wshort(BGMFileIndex(value).Index()),
+            'T' : lambda value : fs.wushort(value),
         }
 
         return oprtype[opr](value) if opr in oprtype else super().WriteOperand(data, opr, value)
@@ -414,11 +416,15 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             bgm = BGMFileIndex(bgm)
             return ('"%s"' % bgm.Name()) if not bgm.IsInvalid() else ('0x%08X' % (bgm.Index() & 0xFFFFFFFF))
 
+        def GetItemName(id):
+            return ItemNameMap[id] if id in ItemNameMap else '0x%X' % id
+
         oprtype = \
         {
             'E' : lambda : FormatExpressionList(value),
             'S' : lambda : formatstr(value),
             'M' : lambda : BGMFileIndex(value).param(),
+            'T' : lambda : GetItemName(value),
         }
 
         return oprtype[opr]() if opr in oprtype else super().FormatOperand(param)
@@ -497,7 +503,8 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
         oprtype = \
         {
             'S' : readstr,
-            'M' : lambda : fs.short()
+            'M' : lambda : fs.short(),
+            'T' : lambda : fs.ushort(),
         }
 
         return oprtype[opr]() if opr in oprtype else super().GetOperand(opr, fs)
@@ -608,7 +615,7 @@ class ScpExpression:
             txt += ')'
             return txt
 
-        import Assembler2
+        from Assembler import Assembler2
 
         asm = Assembler2.Disassembler(edao_op_table)
 
@@ -1670,9 +1677,9 @@ edao_op_list = \
     inst(OP_3C,                     'W'),
     inst(OP_3D,                     'W'),
     inst(OP_3E,                     'W'),
-    inst(AddItemNumber,             'Wh'),
-    inst(SubItemNumber,             'Wh'),
-    inst(GetItemNumber,             'WB'),
+    inst(AddItemNumber,             'Th'),
+    inst(SubItemNumber,             'Th'),
+    inst(GetItemNumber,             'TB'),
     inst(OP_42,                     'BWB'),
     inst(GetPartyIndex,             'B'),           # GetPartyIndex(chr_id)     return chr index of team member
     inst(BeginChrThread,            'WCCC'),

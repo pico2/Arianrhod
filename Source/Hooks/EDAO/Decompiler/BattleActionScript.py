@@ -1,6 +1,6 @@
-from Assembler2 import *
-from EDAOBase import *
-import ActionOpTableEDAO as edao
+from Assembler.Assembler2 import *
+from Base.EDAOBase import *
+import Instruction.ActionOpTableEDAO as edao
 import BattleMonsterStatus as MSFile
 
 INVALID_ACTION_OFFSET = 0xFFFF

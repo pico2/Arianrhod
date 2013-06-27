@@ -998,7 +998,7 @@ def main():
     label("loc_126A")
 
     OP_73(0x3, 0x10)
-    SetXXXFlags(0x10000)
+    SetMapFlags(0x10000)
     SetScenarioFlags(0x26, 0)
     SetScenarioFlags(0x26, 4)
     SetScenarioFlags(0x26, 6)
@@ -1119,7 +1119,7 @@ def main():
     StopSound(498, 500, 80)
     Sleep(500)
     SetEventSkip(0x0, "loc_14BB")
-    ClearXXXFlags(0x1)
+    ClearMapFlags(0x1)
     OP_C9(0x0, 0x20)
     OP_78(0x0, 0x1E)
     SetChrPos(0x1E, -1050000, 120000, 920000, 0)
@@ -1160,7 +1160,7 @@ def main():
     Sleep(500)
     SetEventSkip(0x0, "loc_1572")
     FadeToBright(1000, 0)
-    ClearXXXFlags(0x1)
+    ClearMapFlags(0x1)
     OP_C9(0x0, 0x20)
     OP_78(0x0, 0x1E)
     SetChrPos(0x1E, -1000000, 0, 700000, 0)
@@ -1196,7 +1196,7 @@ def main():
 
     label("Function_7_1573")
 
-    ClearXXXFlags(0x10000)
+    ClearMapFlags(0x10000)
     ClearScenarioFlags(0x3C, 0)
     ClearScenarioFlags(0x3C, 1)
     ClearScenarioFlags(0x3C, 2)
@@ -4909,7 +4909,7 @@ def main():
     label("loc_6AAB")
 
     Call(0, 6)
-    ClearXXXFlags(0x10000)
+    ClearMapFlags(0x10000)
     ClearScenarioFlags(0x3C, 0)
     ClearScenarioFlags(0x3C, 1)
     ClearScenarioFlags(0x3C, 2)
@@ -5725,7 +5725,7 @@ def main():
     Sleep(500)
     SetEventSkip(0x0, "loc_7F7F")
     FadeToBright(1000, 0)
-    ClearXXXFlags(0x1)
+    ClearMapFlags(0x1)
     OP_C9(0x0, 0x20)
     OP_78(0x0, 0x1E)
     SetChrPos(0x1E, -1000000, 0, 700000, 0)
@@ -5751,7 +5751,7 @@ def main():
 
     label("loc_7F7F")
 
-    ClearXXXFlags(0x10000)
+    ClearMapFlags(0x10000)
     ClearScenarioFlags(0x3C, 0)
     ClearScenarioFlags(0x3C, 1)
     ClearScenarioFlags(0x3C, 2)
@@ -7844,7 +7844,7 @@ def main():
     StopSound(498, 1000, 100)
     FadeToDark(1000, 0, -1)
     OP_0D()
-    ClearXXXFlags(0x10000)
+    ClearMapFlags(0x10000)
     ClearScenarioFlags(0x3C, 0)
     ClearScenarioFlags(0x3C, 1)
     ClearScenarioFlags(0x3C, 2)

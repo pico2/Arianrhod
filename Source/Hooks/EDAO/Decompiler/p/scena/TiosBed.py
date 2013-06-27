@@ -447,5 +447,5 @@ def ShowMenu():
     OP_60(0x0)
     OP_57(0x0)
     OP_DD()
-    #ClearXXXFlags(0x80)
+    #ClearMapFlags(0x80)
     OP_54(0xFF)

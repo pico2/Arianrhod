@@ -1,5 +1,5 @@
-from InstructionTable import *
-from EDAOBase import *
+from .InstructionTable import *
+from Base.EDAOBase import *
 
 def GetOpCode(fs):
     return fs.byte()

@@ -573,7 +573,9 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     ml::MlInitialize();
 
-    String(L"fuck").MatchExpression(L"fu*");
+    String x = L"fuck";
+
+    PrintConsoleW(L"%c\n", x[1]);
 
     return;
 

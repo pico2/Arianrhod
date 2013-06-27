@@ -1,4 +1,5 @@
-from EDAOBase import *
+from Base.EDAOBase import *
+from GameData.ItemNameMap import *
 
 INVALID_DROP_ITEM_ID        = 0xFFFF
 MAXIMUM_ARTS_NUMBER        = 80
@@ -366,6 +367,8 @@ class BattleMonsterStatus:
         return asfile + base + misc + AttributeRate + Sepith + DropItem + EquipmentAndOrbment + Crafts + Runaway + NameAndDescription
 
     def open(self, msfilename):
+        def GetItemName(id):
+            return '%s' % ItemNameMap[id] if id in ItemNameMap else '0x%04X' % id
 
         fs = BytesStream()
         fs.open(msfilename)
@@ -422,8 +425,12 @@ class BattleMonsterStatus:
         self.Sepith                 = list(fs.read(7))
         self.DropItem               = [ fs.ushort(), fs.ushort() ]
         self.DropRate               = list(fs.read(2))
-        self.Equipment              = struct.unpack('<HHHHH', fs.read(2 * 5))
-        self.Orbment                = struct.unpack('<HHHH', fs.read(2 * 4))
+        self.Equipment              = list(struct.unpack('<HHHHH', fs.read(2 * 5)))
+        self.Orbment                = list(struct.unpack('<HHHH', fs.read(2 * 4)))
+
+        for l in [self.DropItem, self.Equipment, self.Orbment]:
+            for i in range(len(l)):
+                l[i] = GetItemName(l[i])
 
         self.Attack                 = BattleCraftAIInfo(fs)
 
@@ -554,10 +561,10 @@ class BattleMonsterStatus:
         add('Resistance         = 0x%08X' % self.Resistance)
         add('AttributeRate      = [ %s ]' % fmtlist(self.AttributeRate))
         add('Sepith             = [ %s ]' % fmtlist(self.Sepith))
-        add('DropItem           = [ %s ]' % fmtlist(self.DropItem, '0x%04X'))
+        add('DropItem           = [ %s ]' % fmtlist(self.DropItem, '%s'))
         add('DropRate           = [ %s ]' % fmtlist(self.DropRate))
-        add('Equipment          = [ %s ]' % fmtlist(self.Equipment, '0x%04X'))
-        add('Orbment            = [ %s ]' % fmtlist(self.Orbment, '0x%04X'))
+        add('Equipment          = [ %s ]' % fmtlist(self.Equipment, '%s'))
+        add('Orbment            = [ %s ]' % fmtlist(self.Orbment, '%s'))
         add('')
         add('RunawayType        = %d' % self.RunawayType)
         add('RunawayRate        = %d' % self.RunawayRate)

@@ -481,10 +481,14 @@ public:
         return Concat(Str);
     }
 
-    STRING_CHAR_TYPE& operator[](LARGE_LENGTH_TYPE Index)
+    STRING_CHAR_TYPE& operator[](INT Index)
     {
-        //if (Index >= GetCount()) Index = 0;
-        return GetBuffer()[Index];
+        return GetBuffer()[Index < 0 ? GetCount() + Index : Index];
+    }
+
+    NoInline NTSTATUS Assign(LARGE_LENGTH_TYPE Count)
+    {
+        return ResizeBuffer(Count);
     }
 
     LONG Compare(STRING_CONST_POINTER_TYPE Str, BOOL CaseInSensitive = FALSE)

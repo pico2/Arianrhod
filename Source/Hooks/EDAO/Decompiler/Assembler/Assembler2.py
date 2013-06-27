@@ -1,5 +1,5 @@
-from BaseType import *
-from InstructionTable import *
+from Base.BaseType import *
+from Instruction.InstructionTable import *
 
 def plog(*args):
     pass

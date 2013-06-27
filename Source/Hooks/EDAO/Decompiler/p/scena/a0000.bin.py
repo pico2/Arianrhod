@@ -321,7 +321,8 @@ def main():
     PlaceName(10.0, 1.0, 2.0, 0x0000, 0x0000, "地名１")
     PlaceName(-10.0, 1.0, 2.0, 0x0000, 0x0000, "地名３")
 
-    ChipFrameInfo(1000, 0, (0, 1, 2, 3))               # 0
+    ChipFrameInfo(1000, 0, [0, 1, 2, 3])                         # 0
+    ChipFrameInfo(5000, 0, [0, 1, 2, 3])                         # 1
 
 
     label("Function_0_920")
@@ -451,7 +452,7 @@ def main():
 
     label("Function_5_A9D")
 
-    ClearXXXFlags(0x80)
+    ClearMapFlags(0x80)
     ClearParty()
     AddParty(0x0, 0xFF, 0xFF)
     AddParty(0x1, 0xFF, 0xFF)
@@ -942,7 +943,7 @@ def main():
 
     label("Function_9_1247")
 
-    SetXXXFlags(0x80)
+    SetMapFlags(0x80)
 
     AnonymousTalk(
         0x101,
@@ -1243,7 +1244,7 @@ def main():
     RunExpression(0x5, (scpexpr(EXPR_PUSH_VALUE_INDEX, 0x2F), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
     OP_E5(0xC)
     Jc((scpexpr(EXPR_GET_RESULT, 0x5), scpexpr(EXPR_PUSH_VALUE_INDEX, 0x2F), scpexpr(EXPR_NEQ), scpexpr(EXPR_END)), "loc_1A55")
-    SetXXXFlags(0x40000000)
+    SetMapFlags(0x40000000)
     SetChrName("フラン")
 
     AnonymousTalk(
@@ -1275,7 +1276,7 @@ def main():
 
     label("loc_19E7")
 
-    ClearXXXFlags(0x40000000)
+    ClearMapFlags(0x40000000)
 
     AnonymousTalk(
         0xFF,
@@ -2909,7 +2910,7 @@ def main():
     OP_60(0x0)
     OP_57(0x0)
     OP_DD()
-    ClearXXXFlags(0x80)
+    ClearMapFlags(0x80)
     Return()
 
     # Function_9_1247 end
@@ -3574,7 +3575,7 @@ def main():
     OP_60(0xFF)
     FadeToDark(300, 0, -1)
     OP_0D()
-    ClearXXXFlags(0x1)
+    ClearMapFlags(0x1)
     OP_68(3630, 0, 3760, 0)
     OP_6D(0x2D, 0x1E, 0x0, 0x0)
     OP_6C(0x4A38, 0x0)
@@ -3622,7 +3623,7 @@ def main():
 
     FadeToDark(300, 0, -1)
     OP_0D()
-    SetXXXFlags(0x1)
+    SetMapFlags(0x1)
     FadeToBright(300, 0)
     OP_0D()
     Jc((scpexpr(EXPR_PUSH_VALUE_INDEX, 0x45), scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_EQU), scpexpr(EXPR_END)), "loc_3F9D")
@@ -7777,7 +7778,7 @@ def main():
     SetChrPos(0x0, 0, 0, 0, 0)
     EndChrThread(0x0, 0xFF)
     EventEnd(0x5)
-    SetXXXFlags(0x80)
+    SetMapFlags(0x80)
     Return()
 
     # Function_47_816D end
@@ -7807,8 +7808,8 @@ def main():
     ClearParty()
     AddParty(0x1, 0xFF, 0xFF)
     SetChrPos(0x0, 22000, 0, -4000, 0)
-    ClearXXXFlags(0x80)
-    ClearXXXFlags(0x1)
+    ClearMapFlags(0x80)
+    ClearMapFlags(0x1)
     OP_6D(0x0, 0xF, 0x0, 0x0)
     OP_68(22000, 1000, 0, 0)
     OP_6C(0x1B58, 0x0)

@@ -1,5 +1,5 @@
-from Assembler2 import *
-from EDAOBase import *
+from Assembler.Assembler2 import *
+from Base.EDAOBase import *
 
 def GetOpCode(fs):
     return fs.byte()
@@ -122,17 +122,6 @@ class FieldAttackFileInfo:
         fs.write('\r\n'.join(lines).encode('UTF8'))
 
 
-if __name__ == '__main__':
-    def main():
-        for f in sys.argv[1:]:
-            asdat = FieldAttackFileInfo()
-            asdat.open(f)
-            asdat.SaveToFile(f + '.py')
-
-    TryInvoke(main)
-
-
-
 ############################################################################################
 # support functions
 ############################################################################################
@@ -222,3 +211,19 @@ def OpCodeHandler(op, args):
     fs.write(data.FileStream.read())
 
     return inst
+
+
+
+if __name__ == '__main__':
+
+    def procfile(file):
+        print('disasm %s' % file)
+        asdat = FieldAttackFileInfo()
+        asdat.open(file)
+        asdat.SaveToFile(file + '.py')
+
+    def main():
+        ForEachFile(sys.argv[1:], procfile, '*._bn')
+
+    TryInvoke(main)
+

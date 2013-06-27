@@ -1,4 +1,4 @@
-from EDAOBase import *
+from Base.EDAOBase import *
 
 HANDLER_REASON_DISASM         = 0
 HANDLER_REASON_WRITE        = 1

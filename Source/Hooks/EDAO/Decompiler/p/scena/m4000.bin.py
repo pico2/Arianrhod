@@ -130,7 +130,7 @@ def main():
     SetChrPos(0x0, -6660, 0, 27520, 180)
     OP_31(0x1)
     OP_69(0xFF, 0x0)
-    ClearXXXFlags(0x8000000)
+    ClearMapFlags(0x8000000)
 
     label("loc_305")
 
@@ -157,8 +157,8 @@ def main():
 
     label("Function_4_33E")
 
-    SetXXXFlags(0x80)
-    SetXXXFlags(0x8000000)
+    SetMapFlags(0x80)
+    SetMapFlags(0x8000000)
     RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
     ClearScenarioFlags(0x31, 2)
     Jc((scpexpr(EXPR_RAND), scpexpr(EXPR_PUSH_LONG, 0x64), scpexpr(EXPR_IMOD), scpexpr(EXPR_PUSH_LONG, 0x32), scpexpr(EXPR_LSS), scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x182, 1)), scpexpr(EXPR_EQUZ), scpexpr(EXPR_NEQUZ_I64), scpexpr(EXPR_END)), "loc_370")
@@ -367,7 +367,7 @@ def main():
 
     label("loc_65D")
 
-    ClearXXXFlags(0x8000000)
+    ClearMapFlags(0x8000000)
     OP_60(0x0)
     OP_57(0x0)
     TalkEnd(0xFF)
