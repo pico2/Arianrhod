@@ -373,12 +373,6 @@ def ShowMenu():
     Jump('continue_show_menu')
 
 
-    label('change_member')
-
-    ShowChangeMemberMenu()
-    Jump('continue_show_menu')
-
-
     label('restore_all')
     ReleaseAllGod()
     Jump('continue_show_menu')
@@ -430,6 +424,13 @@ def ShowMenu():
     NewScene('a0000', 0, 0, 0)
     OP_07()
     Jump('close_menu')
+
+
+    label('change_member')
+
+    ShowChangeMemberMenu()
+    Jump('continue_show_menu')
+
 
 
     label('close_menu')

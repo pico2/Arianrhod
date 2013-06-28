@@ -1518,7 +1518,7 @@ def scp_menu_cmd(data):
 
         if menutype == 0: pass
         elif menutype == 1: operand = 'S'
-        elif menutype == 2: operand = 'WWB'
+        elif menutype == 2: operand = 'HHC'
         elif menutype == 3: operand = 'B'
         elif menutype == 4: operand = 'B'
         elif menutype == 5: operand = 'B'
@@ -1533,16 +1533,16 @@ def scp_menu_cmd(data):
         ins = Instruction()
         ins = data.Instruction
 
-        menutype, menu_xxx = data.TableEntry.GetAllOperand('BB', fs)
+        menutype, layer = data.TableEntry.GetAllOperand('BC', fs)
 
         ins.Operand.append(menutype)
-        ins.Operand.append(menu_xxx)
+        ins.Operand.append(layer)
 
         operand = getopr(menutype)
 
         ins.Operand += data.TableEntry.GetAllOperand(operand, fs)
 
-        ins.OperandFormat = 'BB' + operand
+        ins.OperandFormat = 'CC' + operand
 
         return ins
 

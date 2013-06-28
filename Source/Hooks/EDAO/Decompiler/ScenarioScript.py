@@ -730,6 +730,104 @@ class ScenarioPlaceNameInfo:
     def binary(self):
         return struct.pack('<fffHHL', self.X, self.Z, self.Y, self.Flags1, self.Flags2, self.NameOffset)
 
+
+class ScenarioInitData:
+
+    # size = 0x40
+
+    def __init__(self, fs = None):
+        self.PackFormat = '<iiiiiiiiHHHHiiiHHHHBBBB'
+
+        if fs == None:
+            return
+
+        if IsTupleOrList(fs):
+            return self.__init__(BytesStream().open(struct.pack(self.PackFormat, *fs)))
+
+        self.Unknown_00             = fs.long()    # 0x00
+        self.Unknown_04             = fs.long()    # 0x04
+        self.Unknown_08             = fs.long()    # 0x08
+        self.Unknown_0C             = fs.long()    # 0x0C
+        self.Unknown_10             = fs.long()    # 0x10
+        self.Unknown_14             = fs.long()    # 0x14
+        self.Unknown_18             = fs.long()    # 0x18
+        self.Unknown_1C             = fs.long()    # 0x1C
+        self.Unknown_20             = fs.ushort()   # 0x20
+        self.Unknown_22             = fs.ushort()   # 0x22
+        self.Unknown_24             = fs.ushort()   # 0x24
+        self.Unknown_26             = fs.ushort()   # 0x26
+        self.Unknown_28             = fs.long()    # 0x28
+        self.Unknown_2C             = fs.long()    # 0x2C
+        self.Unknown_30             = fs.long()    # 0x30
+        self.Unknown_34             = fs.ushort()   # 0x34
+        self.Unknown_36             = fs.ushort()   # 0x36
+        self.Flags                  = fs.ushort()   # 0x38
+        self.Unknown_3A             = fs.ushort()   # 0x3A
+
+        self.InitScenaIndex         = fs.byte()     # 0x3C
+        self.InitFunctionIndex      = fs.byte()     # 0x3D
+        self.EntryScenaIndex        = fs.byte()     # 0x3E
+        self.EntryFunctionIndex     = fs.byte()     # 0x3F
+
+    def param(self):
+        p = ('%d, ' * 23) % (
+                self.Unknown_00,
+                self.Unknown_04,
+                self.Unknown_08,
+                self.Unknown_0C,
+                self.Unknown_10,
+                self.Unknown_14,
+                self.Unknown_18,
+                self.Unknown_1C,
+                self.Unknown_20,
+                self.Unknown_22,
+                self.Unknown_24,
+                self.Unknown_26,
+                self.Unknown_28,
+                self.Unknown_2C,
+                self.Unknown_30,
+                self.Unknown_34,
+                self.Unknown_36,
+                self.Flags,
+                self.Unknown_3A,
+                self.InitScenaIndex,
+                self.InitFunctionIndex,
+                self.EntryScenaIndex,
+                self.EntryFunctionIndex,
+            )
+
+        return p[:-2]
+
+    def binary(self):
+        bin = struct.pack(self.PackFormat,
+                self.Unknown_00,
+                self.Unknown_04,
+                self.Unknown_08,
+                self.Unknown_0C,
+                self.Unknown_10,
+                self.Unknown_14,
+                self.Unknown_18,
+                self.Unknown_1C,
+                self.Unknown_20,
+                self.Unknown_22,
+                self.Unknown_24,
+                self.Unknown_26,
+                self.Unknown_28,
+                self.Unknown_2C,
+                self.Unknown_30,
+                self.Unknown_34,
+                self.Unknown_36,
+                self.Flags,
+                self.Unknown_3A,
+                self.InitScenaIndex,
+                self.InitFunctionIndex,
+                self.EntryScenaIndex,
+                self.EntryFunctionIndex
+            )
+
+        return bin
+
+
 class ScenarioInfo:
     def __init__(self):
         # file header
@@ -749,7 +847,7 @@ class ScenarioInfo:
         self.PreInitFunctionIndex       = 0
         self.ScnInfoNumber              = [0] * SCN_INFO_MAXIMUM
         self.Unknown_51                 = b''
-        self.Information                = b''
+        self.InitData                   = ScenarioInitData()
 
         # file header end
 
@@ -807,7 +905,7 @@ class ScenarioInfo:
         PreInitFunctionIndex = struct.pack('<B', self.PreInitFunctionIndex)
         Unknown_51 = struct.pack('<BBB', self.Unknown_51[0], self.Unknown_51[1], self.Unknown_51[2])
 
-        Information = self.Information
+        Information = self.InitData.binary()
 
         return MapName + \
                 Location + \
@@ -847,7 +945,7 @@ class ScenarioInfo:
         self.PreInitFunctionIndex       = fs.byte()
         self.ScnInfoNumber              = list(struct.unpack('<' + 'B' * SCN_INFO_MAXIMUM, fs.read(SCN_INFO_MAXIMUM * 1)))
         self.Unknown_51                 = fs.read(3)
-        self.Information                = fs.read(0x40)
+        self.InitData                   = ScenarioInitData(fs)
 
         # file header end
 
@@ -994,11 +1092,11 @@ class ScenarioInfo:
     def FormatCodeBlocks(self):
 
         edao.edao_op_table.FunctionLabelList = self.GenerateFunctionLabelList(self.CodeBlocks)
-
         disasm = Disassembler(edao.edao_op_table, self.FormatInstructionCallback)
 
         blocks = []
         blockoffsetmap = {}
+
         for block in self.CodeBlocks:
             if block.Offset in blockoffsetmap:
                 continue
@@ -1167,7 +1265,7 @@ class ScenarioInfo:
         hdr.append('    %s,            # Unknown_51' % self.Unknown_51)
         hdr.append('')
         hdr.append('    # Information')
-        hdr.append('    %s,' % self.Information)
+        hdr.append('    [%s],' % self.InitData.param())
 
         hdr.append(')')
         hdr.append('')
@@ -1312,9 +1410,9 @@ class ScenarioInfo:
         info.append('Unknown_51                 = %s' % self.Unknown_51)
 
         info.append('')
-        info.append('Information:')
-        info.append('%s' % (self.Information))
-        info.append('')
+        #info.append('Information:')
+        #info.append('%s' % (self.InitData))
+        #info.append('')
 
         info.append('ScenaFunctions:')
         for sec in self.ScenaFunctions:

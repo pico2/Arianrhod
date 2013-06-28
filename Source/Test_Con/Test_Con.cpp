@@ -573,9 +573,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     ml::MlInitialize();
 
-    String x = L"fuck";
-
-    PrintConsoleW(L"%c\n", x[1]);
+    ShellExecuteA(0, "open", "C:\\Windows\\notepad.exe", "probe command line", NULL, SW_SHOW);
+    Ps::ExitProcess(0);
 
     return;
 

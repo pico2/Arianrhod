@@ -1,5 +1,4 @@
-from ml import *
-from EDAOBase import *
+from Base.EDAOBase import *
 
 LAST_CHAR_ID            = 0x3E7
 NAME_LIST_ENTRY_SIZE    = 0x14

@@ -1,5 +1,5 @@
 from ScenarioScript import *
-from ScenaOpTableEDAO import *
+from Instruction.ScenaOpTableEDAO import *
 
 def plog(*value, sep = ' ', end = '\n', file = sys.stdout, flush = False):
     pass
@@ -25,7 +25,7 @@ class ScenarioInfoPort(ScenarioInfo):
 
 scena = ScenarioInfoPort()
 
-def CreateScenaFile(FileName, MapName, Location, MapIndex, MapDefaultBGM, Flags, IncludeList, Unknown_4A, PreInitFunctionIndex, Unknown_51, Information):
+def CreateScenaFile(FileName, MapName, Location, MapIndex, MapDefaultBGM, Flags, IncludeList, Unknown_4A, PreInitFunctionIndex, Unknown_51, InitData):
     scena.MapName               = MapName
     scena.Location              = Location
     scena.MapIndex              = MapIndex
@@ -35,7 +35,16 @@ def CreateScenaFile(FileName, MapName, Location, MapIndex, MapDefaultBGM, Flags,
     scena.Unknown_4A            = Unknown_4A
     scena.PreInitFunctionIndex  = PreInitFunctionIndex
     scena.Unknown_51            = Unknown_51
-    scena.Information           = Information
+
+    if type(InitData) == bytes:
+        InitData = ScenarioInitData(BytesStream().open(InitData))
+    elif IsTupleOrList(InitData):
+        InitData = ScenarioInitData(InitData)
+    else:
+        raise Exception('unknown InitData type: %s' % type(InitData))
+
+
+    scena.InitData = InitData
 
     if len(IncludeList) != 6:
         raise Exception('incorrect include list length')
