@@ -18,6 +18,10 @@ class CBattle;
 #define MINIMUM_CUSTOM_CRAFT_INDEX      0x3E8
 #define MAXIMUM_CHR_NUMBER_IN_BATTLE    0x16
 
+
+#define PSP_WIDTH_F                       480.f
+#define PSP_HEIGHT_F                      272.f
+
 #pragma pack(push, 1)
 
 typedef struct
@@ -836,7 +840,6 @@ INIT_STATIC_MEMBER(CScript::StubScpSaveRestoreParty);
 class CMap
 {
 public:
-    
     PULONG GetFrameNumber()
     {
         return (PULONG)PtrAdd(this, 0x1C7C);
@@ -902,6 +905,11 @@ public:
     ULONG_PTR GetLayer()
     {
         return *(PUSHORT)PtrAdd(this, 0xA6FA8);
+    }
+
+    PSIZE GetWindowSize()
+    {
+        return (PSIZE)PtrAdd(this, 0x3084);
     }
 
     VOID LoadFieldAttackData(ULONG_PTR Dummy = 0)
@@ -1035,6 +1043,31 @@ public:
 
 DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped = NULL;
 
+
+
+class CCoordConverter
+{
+public:
+    VOID MapPSPCoordToPC(Gdiplus::PointF Source[2], Gdiplus::PointF Target[2], PFLOAT Transform = NULL)
+    {
+        DETOUR_METHOD(CCoordConverter, MapPSPCoordToPC, 0x6A7030, Source, Target, Transform);
+    }
+};
+
+class CMiniGame
+{
+public:
+
+    static VOID FASTCALL HorrorHouse_GetMonsterPosition(CCoordConverter *Converter, PVOID, Gdiplus::PointF *PSPCoord, Gdiplus::PointF *PCCoord, PFLOAT Transform)
+    {
+        EDAO *edao = EDAO::GlobalGetEDAO();
+
+        Converter->MapPSPCoordToPC(PSPCoord, PCCoord, Transform);
+
+        PCCoord->X *= PSP_WIDTH_F / edao->GetWindowSize()->cx;
+        PCCoord->Y *= PSP_HEIGHT_F / edao->GetWindowSize()->cy;
+    }
+};
 
 class CGlobal
 {

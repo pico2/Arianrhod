@@ -405,6 +405,7 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x06,      1, 0x410731),    // win
         PATCH_MEMORY(0x06,      1, 0x410AD1),    // win
         PATCH_MEMORY(0x01,      1, 0x40991D),    // cpu
+        PATCH_MEMORY(0x00,      4, 0x329851),    // disable foolish get joy stick pos
         PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
         PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
         PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
@@ -497,8 +498,9 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x5B1BE6, METHOD_PTR(&CBattleATBar::LookupReplaceAtBarEntry)),
         INLINE_HOOK_JUMP_RVA     (0x275DAE, METHOD_PTR(&CBattle::ExecuteActionScript), CBattle::StubExecuteActionScript),
-
         INLINE_HOOK_JUMP_RVA     (0x550C90, METHOD_PTR(&CScript::ScpSaveRestoreParty), CScript::StubScpSaveRestoreParty),
+
+        INLINE_HOOK_CALL_RVA_NULL(0x6A58FF, CMiniGame::HorrorHouse_GetMonsterPosition),
 
         // file redirection
 

@@ -3027,6 +3027,7 @@ def main():
 
     NewScene("t1360", 0, 0, 0)
     OP_07()
+
     Jump("loc_36BF")
 
     label("loc_3619")
