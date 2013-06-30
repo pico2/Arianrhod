@@ -947,6 +947,8 @@ class ScenarioInfo:
         self.Unknown_51                 = fs.read(3)
         self.InitData                   = ScenarioInitData(fs)
 
+        self.IncludedScenario.index(0xFFFFFFFF)
+
         # file header end
 
         #if self.PlaceNameOffset != 0: raise Exception('not implemented')

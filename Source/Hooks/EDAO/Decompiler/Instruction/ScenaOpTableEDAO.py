@@ -1,4 +1,4 @@
-from .InstructionTable import *
+from Instruction.InstructionTable import *
 from Base.EDAOBase import *
 from GameData.ItemNameMap import *
 
@@ -40,7 +40,7 @@ InstructionNames[0x19]  = 'EventBegin'
 InstructionNames[0x1A]  = 'EventEnd'
 InstructionNames[0x1B]  = 'OP_1B'
 InstructionNames[0x1C]  = 'OP_1C'
-InstructionNames[0x1D]  = 'OP_1D'
+InstructionNames[0x1D]  = 'SetBarrier'
 InstructionNames[0x1E]  = 'PlayBGM'
 InstructionNames[0x1F]  = 'OP_1F'
 InstructionNames[0x20]  = 'VolumeBGM'
@@ -100,7 +100,7 @@ InstructionNames[0x57]  = 'OP_57'
 InstructionNames[0x58]  = 'MenuTitle'
 InstructionNames[0x59]  = 'CloseMessageWindow'
 InstructionNames[0x5A]  = 'OP_5A'
-InstructionNames[0x5B]  = 'OP_5B'
+InstructionNames[0x5B]  = 'SetMessageWindowPos'
 InstructionNames[0x5C]  = 'ChrTalk'
 InstructionNames[0x5D]  = 'NpcTalk'
 InstructionNames[0x5E]  = 'Menu'
@@ -123,11 +123,11 @@ InstructionNames[0x6E]  = 'OP_6E'
 InstructionNames[0x6F]  = 'OP_6F'
 InstructionNames[0x70]  = 'OP_70'
 InstructionNames[0x71]  = 'OP_71'
-InstructionNames[0x72]  = 'OP_72'
-InstructionNames[0x73]  = 'OP_73'
+InstructionNames[0x72]  = 'SetMapObjFlags'
+InstructionNames[0x73]  = 'ClearMapObjFlags'
 InstructionNames[0x74]  = 'OP_74'
 InstructionNames[0x75]  = 'OP_75'
-InstructionNames[0x76]  = 'OP_76'
+InstructionNames[0x76]  = 'SetMapObjFrame'
 InstructionNames[0x77]  = 'OP_77'
 InstructionNames[0x78]  = 'OP_78'
 InstructionNames[0x79]  = 'OP_79'
@@ -943,6 +943,11 @@ def scp_battle(data):
         BattleInfoOffset = data.Arguments[0]
         ins.OperandFormat = operand_with_battle_info if type(BattleInfoOffset) == str else operand_without_battle_info
 
+
+# SetBarrier(op_0, id, type, 0, x, z, y, cx, cy, degree * 1000)
+# op: 0 = create
+# type: 1 = line, 2 = circle
+
 def scp_1d(data):
 
     def getopr(opr1):
@@ -1645,7 +1650,7 @@ edao_op_list = \
     inst(EventEnd,                  'B'),
     inst(OP_1B,                     'BBW'),
     inst(OP_1C,                     'BBBBBBWW'),
-    inst(OP_1D,                     NO_OPERAND,             0,                          scp_1d),
+    inst(SetBarrier,                NO_OPERAND,             0,                          scp_1d),    # see scp_1d
     inst(PlayBGM,                   'MC'),
     inst(OP_1F),
     inst(VolumeBGM,                 'BL'),
@@ -1705,7 +1710,7 @@ edao_op_list = \
     inst(MenuTitle,                 'hhhS'),
     inst(CloseMessageWindow),
     inst(OP_5A),
-    inst(OP_5B,                     'WWWW'),
+    inst(SetMessageWindowPos,       'hhhh'),        # SetMessageWindowPos(x, y, -1, -1)
     inst(ChrTalk,                   NO_OPERAND,             0,                          scp_create_chr_talk),
     inst(NpcTalk,                   NO_OPERAND,             0,                          scp_create_npc_talk),
     inst(Menu,                      NO_OPERAND,             0,                          scp_create_menu),
@@ -1722,17 +1727,17 @@ edao_op_list = \
     inst(OP_69,                     'BW'),
     inst(OP_6A,                     'WL'),
     inst(OP_6B,                     'W'),
-    inst(OP_6C,                     'LL'),
-    inst(OP_6D,                     'WWWL'),
-    inst(OP_6E,                     'LL'),
+    inst(OP_6C,                     'ii'),
+    inst(OP_6D,                     'Whhi'),
+    inst(OP_6E,                     'ii'),
     inst(OP_6F,                     'B'),
     inst(OP_70,                     'BW'),
     inst(OP_71,                     'BWWWL'),
-    inst(OP_72,                     'BL'),
-    inst(OP_73,                     'BL'),
+    inst(SetMapObjFlags,            'BL'),
+    inst(ClearMapObjFlags,          'BL'),
     inst(OP_74,                     'WB'),
     inst(OP_75,                     'BBL'),
-    inst(OP_76,                     NO_OPERAND,             0,                          scp_76),
+    inst(SetMapObjFrame,            NO_OPERAND,             0,                          scp_76),
     inst(OP_77,                     'BW'),
     inst(OP_78,                     'BW'),
     inst(OP_79,                     'W'),
@@ -1758,7 +1763,7 @@ edao_op_list = \
     inst(OP_92,                     'WLLW'),
     inst(OP_93,                     'WWW'),
     inst(OP_94,                     'WLLLLL'),
-    inst(OP_95,                     'WLLLLB'),
+    inst(OP_95,                     'WiiiiB'),
     inst(OP_96,                     'WLLLLB'),
     inst(OP_97,                     'WLLLLB'),
     inst(OP_98,                     'WLLLLB'),
@@ -1800,7 +1805,7 @@ edao_op_list = \
     inst(OP_BF,                     'BB'),
     inst(SetChrChipPat,             'BBL'),                         # SetChrChipPat(chr_id, func_id, param)
     inst(LoadChrChipPat),
-    inst(OP_C3,                     'BBWWWBLLLLLL'),
+    inst(OP_C3,                     'BBWWWBiiiiii'),
     inst(OP_C4,                     'BBWW'),
     inst(MiniGame,                  'BLLLLLLLL'),
     inst(OP_C7,                     'BB'),
@@ -1808,7 +1813,7 @@ edao_op_list = \
     inst(CreatePortrait,            'CHHHHHHHHHHHHLBS'),
     inst(OP_CB,                     'BBLLLL'),
     inst(OP_CC,                     'BBB'),
-    inst(PlaceName2,                'WWSBW'),
+    inst(PlaceName2,                'hhSBh'),       # PlaceName2(x, y, itp_name, 0, duration)
     inst(SaveRestoreParty,          'B'),           # SaveRestoreParty(save = 1 or restore = 2)
     inst(OP_CF,                     NO_OPERAND,             0,                          scp_cf),
     inst(MenuCmd,                   NO_OPERAND,             0,                          scp_menu_cmd),
@@ -1836,7 +1841,7 @@ edao_op_list = \
     inst(OP_E8),
     inst(ShowSaveClearMenu),
     inst(OP_F0,                     'BW'),
-    inst(OP_F3,                     'L'),
+    inst(OP_F3,                     'i'),
     inst(OP_F4,                     'B'),
     inst(OP_FA,                     'W'),
     inst(OP_FB,                     'WB'),

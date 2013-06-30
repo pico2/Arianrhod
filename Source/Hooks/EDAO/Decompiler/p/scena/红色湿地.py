@@ -14,7 +14,7 @@ def main():
         b'\x00\xff\xff',            # Unknown_51
 
         # Information
-        b'\x00\x00\x00\x00\x00\x00\x00\x00\x18\xfc\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xc0]\x00\x00\xf4\x01\x00\x00\x1e\x00-\x00\x00\x00h\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\xd7\x00\x00\x00\x00\x01',
+        [0, 0, -1000, 0, 0, 0, 24000, 500, 30, 45, 0, 360, 0, 0, 0, 0, 0, 1, 215, 0, 0, 0, 1],
     )
 
     BuildStringList((
@@ -99,17 +99,15 @@ def main():
     label("Function_1_366")
 
     MiniGame(0x2F, 0xFFFFFFFF, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-    #Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x21E, 7)), scpexpr(EXPR_END)), "loc_3A1")
-    #ModifyEventFlags(0, 0, 0x80)
-    #OP_72(0x1, 0x4)
-    #SetChrFlags(0x8, 0x80)
-    #SetChrFlags(0x8, 0x8)
-    #Jump("loc_40A")
+    Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x21E, 7)), scpexpr(EXPR_END)), "loc_3A1")
+    ModifyEventFlags(0, 0, 0x80)
+    SetMapObjFlags(0x1, 0x4)
+    Jump("loc_40A")
 
     label("loc_3A1")
 
     OP_78(0x1, 0x8)
-    OP_73(0x1, 0x4)
+    ClearMapObjFlags(0x1, 0x4)
     ClearChrFlags(0x8, 0x80)
     ClearChrFlags(0x8, 0x8)
     SetChrFlags(0x8, 0x8000)
@@ -118,7 +116,7 @@ def main():
     OP_93(0x8, 0xB4, 0x0)
     OP_52(0x8, 0x7, (scpexpr(EXPR_PUSH_LONG, 0x1F40), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
     OP_52(0x8, 0x28, (scpexpr(EXPR_PUSH_LONG, 0x9), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
-    OP_1D(0x0, 0x0, 0x2, 0x0, 0x4650, 0x0, 0x11170, 0xBB8, 0xBB8, 0x15F90)
+    OP_1D(0x0, 0x0, 0x2, 0x0, 18000, 0, 70000, 3000, 3000, 90000)
 
     label("loc_40A")
 
@@ -162,10 +160,10 @@ def main():
 
     Jc((scpexpr(EXPR_GET_RESULT, 0x0), scpexpr(EXPR_PUSH_LONG, 0xFF), scpexpr(EXPR_NEQ), scpexpr(EXPR_END)), "loc_730")
     Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x20, 5)), scpexpr(EXPR_END)), "loc_4FA")
-    MenuCmd(0x0, 0x0)
-    MenuCmd(0x1, 0x0, "登上梅尔卡瓦")
-    MenuCmd(0x1, 0x0, "放弃")
-    MenuCmd(0x2, 0x0, 0xFFFF, 0xFFFF, 0x1)
+    MenuCmd(0, 0)
+    MenuCmd(1, 0, "登上梅尔卡瓦")
+    MenuCmd(1, 0, "放弃")
+    MenuCmd(2, 0, 65535, 65535, 1)
     MenuEnd(0x0)
     OP_60(0x0)
     Switch(
@@ -192,14 +190,14 @@ def main():
 
     label("loc_4FA")
 
-    MenuCmd(0x0, 0x0)
-    MenuCmd(0x1, 0x0, "驾驶导力车移动")
+    MenuCmd(0, 0)
+    MenuCmd(1, 0, "驾驶导力车移动")
     Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x30, 6)), scpexpr(EXPR_END)), "loc_52A")
-    MenuCmd(0x1, 0x0, "在导力车中休息")
+    MenuCmd(1, 0, "在导力车中休息")
 
     label("loc_52A")
 
-    MenuCmd(0x2, 0x0, 0xFFFF, 0xFFFF, 0x1)
+    MenuCmd(2, 0, 65535, 65535, 1)
     MenuEnd(0x0)
     OP_60(0x0)
     Switch(
@@ -456,7 +454,7 @@ def main():
     OP_E2(0x3)
     Sleep(400)
     Sound(9, 0, 100, 0)
-    OP_5B(0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
+    SetMessageWindowPos(-1, -1, -1, -1)
     OP_E0(0x2B, 0x0)
     SetChrName("")
 
@@ -470,7 +468,7 @@ def main():
 
     CloseMessageWindow()
     OP_57(0x0)
-    OP_5B(0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
+    SetMessageWindowPos(-1, -1, -1, -1)
     SetChrName("")
     Sound(17, 0, 100, 0)
     Jc((scpexpr(EXPR_PUSH_VALUE_INDEX, 0x4A), scpexpr(EXPR_PUSH_LONG, 0x3), scpexpr(EXPR_EQU), scpexpr(EXPR_END)), "loc_97A")
@@ -484,7 +482,7 @@ def main():
         )
     )
 
-    AddItemNumber(0x39, 1)
+    AddItemNumber(盘古之冠, 1)
     Jump("loc_991")
 
     label("loc_97A")
@@ -499,17 +497,17 @@ def main():
         )
     )
 
-    AddItemNumber(0x38, 1)
+    AddItemNumber(光晓之冠, 1)
 
     label("loc_991")
 
     CloseMessageWindow()
     OP_57(0x0)
     OP_5A()
-    OP_5B(0xE, 0x118, 0x3C, 0x3)
+    SetMessageWindowPos(14, 280, 60, 3)
     SetScenarioFlags(0x21E, 7)
     ModifyEventFlags(0, 0, 0x80)
-    OP_72(0x1, 0x4)
+    SetMapObjFlags(0x1, 0x4)
     OP_1D(0x2, 0x0, 0x1)
     SetChrFlags(0x8, 0x80)
     SetChrFlags(0x8, 0x8)

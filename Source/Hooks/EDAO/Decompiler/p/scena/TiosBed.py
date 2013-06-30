@@ -306,7 +306,7 @@ def ReleaseAllGod():
     label("no_Lazy_Knight")
 
 def ShowMenu():
-    #OP_F4(0x3)
+    #SetMessageWindowPos(-1, -1, -1, -1)
 
     RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_END)))
 
@@ -340,7 +340,8 @@ def ShowMenu():
             "全部还原\x01",                  # 2
             "挑战钢之圣女\x01",              # 3
             "进入Debug地图\x01",             # 4
-            "放弃\x01",                      # 5
+            "进入星辰之间\x01",              # 5
+            "放弃\x01",                      # 6
         )
     )
 
@@ -355,6 +356,7 @@ def ShowMenu():
         (2, "restore_all"),
         (3, "challenge_hagane"),
         (4, "enter_debug_map"),
+        (5, "enter_celestial_globe"),
         (-1, "close_menu"),
     )
 
@@ -431,6 +433,9 @@ def ShowMenu():
     ShowChangeMemberMenu()
     Jump('continue_show_menu')
 
+
+    label('enter_celestial_globe')
+    NewScene('e9990', 0, 0, 0)
 
 
     label('close_menu')
