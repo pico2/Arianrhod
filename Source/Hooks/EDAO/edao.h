@@ -3,6 +3,10 @@
 
 #include "MyLibrary.h"
 
+#if D3D9_VER
+    #define NtGetTickCount (ULONG64)GetTickCount
+#endif
+
 ML_OVERLOAD_NEW
 
 class EDAO;

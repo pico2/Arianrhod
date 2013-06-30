@@ -1523,7 +1523,7 @@ def scp_menu_cmd(data):
 
         if menutype == 0: pass
         elif menutype == 1: operand = 'S'
-        elif menutype == 2: operand = 'HHC'
+        elif menutype == 2: operand = 'hhC'
         elif menutype == 3: operand = 'B'
         elif menutype == 4: operand = 'B'
         elif menutype == 5: operand = 'B'

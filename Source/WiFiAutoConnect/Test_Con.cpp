@@ -5,8 +5,6 @@
 #include "MyLibrary.cpp"
 #include <wlanapi.h>
 
-// ²âÊÔÖÐÎÄ
-
 #pragma comment(lib, "Wlanapi.lib")
 
 Void main2(LongPtr argc, TChar **argv)
