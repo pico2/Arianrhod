@@ -10,7 +10,7 @@
 Void main2(LongPtr argc, TChar **argv)
 {
     BOOL                            Connected;
-    ULONG                           NegotiatedVersion;
+    ULONG                           ErrorCode, NegotiatedVersion;
     HANDLE                          Client;
     PWLAN_INTERFACE_INFO_LIST       InterfaceList;
     PWLAN_INTERFACE_INFO            InterfaceInfo;
@@ -22,8 +22,9 @@ Void main2(LongPtr argc, TChar **argv)
     Connected       = FALSE;
 
     WlanOpenHandle(WLAN_UI_API_VERSION, NULL, &NegotiatedVersion, &Client);
-    WlanEnumInterfaces(Client, NULL, &InterfaceList);
+    ErrorCode = WlanEnumInterfaces(Client, NULL, &InterfaceList);
 
+    if (ErrorCode == NO_ERROR)
     FOR_EACH(InterfaceInfo, InterfaceList->InterfaceInfo, InterfaceList->dwNumberOfItems)
     {
 /*
@@ -73,7 +74,9 @@ Void main2(LongPtr argc, TChar **argv)
         if (InterfaceInfo->isState == wlan_interface_state_connected)
             break;
 
-        WlanGetAvailableNetworkList(Client, &InterfaceInfo->InterfaceGuid, 0, NULL, &NetworkList);
+        ErrorCode = WlanGetAvailableNetworkList(Client, &InterfaceInfo->InterfaceGuid, 0, NULL, &NetworkList);
+        if (ErrorCode != NO_ERROR)
+            continue;
 
         FOR_EACH(Network, NetworkList->Network, NetworkList->dwNumberOfItems)
         {

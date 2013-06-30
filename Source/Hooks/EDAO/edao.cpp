@@ -60,7 +60,6 @@ NAKED VOID FadeInRate()
 */
 
 BOOL    Turbo;
-ULONG   TurboCount;
 WNDPROC WindowProc;
 
 SHORT NTAPI AoGetKeyState(int VirtualKey)
@@ -135,6 +134,12 @@ CHANGE_CHR_COORD:
     return WindowProc(Window, Message, wParam, lParam);
 }
 
+VOID ChangeMainWindowProc(HWND GameWindow)
+{
+    if (GameWindow != NULL)
+        WindowProc = (WNDPROC)SetWindowLongPtrA(GameWindow, GWL_WNDPROC, (LONG_PTR)MainWndProc);
+}
+
 HWND WINAPI CreateWindowExCenterA(ULONG dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, ULONG dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
     HWND    Window;
@@ -157,9 +162,7 @@ HWND WINAPI CreateWindowExCenterA(ULONG dwExStyle, LPCSTR lpClassName, LPCSTR lp
     }
 
     Window = CreateWindowExW(dwExStyle, pszClassName, pszWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-
-    if (Window != NULL)
-        WindowProc = (WNDPROC)SetWindowLongPtrA(Window, GWL_WNDPROC, (LONG_PTR)MainWndProc);
+    ChangeMainWindowProc(Window);
 
     return Window;
 }
@@ -447,10 +450,11 @@ BOOL Initialize(PVOID BaseAddress)
 
         // iat hook
 
+        PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
+
 #if !D3D9_VER
 
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
-        PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
         PATCH_MEMORY(AoCreateFileA,         4, 0x9D576C),       // CreateFileA
 
         PATCH_MEMORY(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
@@ -590,7 +594,11 @@ BOOL Initialize(PVOID BaseAddress)
 
     Turbo = TRUE;
 
-    //Ldr::LoadDll(L"ed_ao_ex.dll");
+#if D3D9_VER
+
+    Ldr::LoadDll(L"ed_ao_ex.dll");
+
+#endif
 
     return TRUE;
 }
@@ -680,6 +688,7 @@ EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
     if (IsCodeDecompressed())
     {
         DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
+        ChangeMainWindowProc(*(HWND *)0xDB2E54);
     }
 
     return Direct3DCreate9(SDKVersion);
@@ -727,16 +736,14 @@ Arianrhod_DirectInput8Create(
 #endif
 
     WriteLog(L"%08X\n", _ReturnAddress());
+    
+    static BOOL Hooked = FALSE;
 
-    if (IsCodeDecompressed())
+    if (!Hooked && IsCodeDecompressed())
     {
-        static BOOL Hooked = FALSE;
-
-        if (!Hooked)
-        {
-            DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
-            Hooked = TRUE;
-        }
+        DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
+        ChangeMainWindowProc(*(HWND *)0xDB2E54);
+        Hooked = TRUE;
     }
 
     return DirectInput8Create(hinst, Version, riidltf, ppvOut, punkOuter);

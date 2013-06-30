@@ -2,6 +2,7 @@
 #define _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_
 
 #include "MyLibrary.h"
+#include <GdiPlus.h>
 
 #if D3D9_VER
     #define NtGetTickCount (ULONG64)GetTickCount
