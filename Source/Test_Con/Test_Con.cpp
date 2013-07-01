@@ -16,6 +16,8 @@
     #define _UNICODE
 #endif
 
+#define  _DECL_DLLMAIN
+
 #include <ws2spi.h>
 #include "MyLibrary.cpp"
 
@@ -534,7 +536,7 @@ void listfunc(PWSTR dll)
     UnLoadDll(base);
 }
 
-#include "mlns.h"
+#if ML_X86
 
 BOOL IsRunningInVMWare()
 {
@@ -562,18 +564,254 @@ BOOL IsRunningInVMWare()
     return Result;
 }
 
+#endif
+
 #pragma comment(lib, NT6_LIB(kernel32))
 #pragma comment(lib, NT6_LIB(ws2_32))
 
 #include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
 #include "MlString.h"
-#include <wlanapi.h>
 
-#pragma comment(lib, "Wlanapi.lib")
+TYPE_OF(::CreateProcessW)*  Shell32CreateProcessWPtr;
+TYPE_OF(::CreateProcessW)** Shell32CreateProcessWIAT;
+
+UNICODE_STRING  ProbeApplicationName, ProbeCommandLine;
+PVOID           InvokeReturnAddress;
+
+BOOL TryIsProbeProcess(PCWSTR ApplicationName, PWSTR CommandLine)
+{
+    UNICODE_STRING  AppName, CmdLine;
+
+    RtlInitUnicodeString(&AppName, ApplicationName);
+    RtlInitUnicodeString(&CmdLine, CommandLine);
+
+    SEH_TRY
+    {
+        if (CmdLine.Length < ProbeCommandLine.Length)
+            return FALSE;
+
+        CmdLine.Buffer = PtrAdd(CmdLine.Buffer, CmdLine.Length - ProbeCommandLine.Length);
+        CmdLine.Length = ProbeCommandLine.Length;
+
+        if (!RtlEqualUnicodeString(&CmdLine, &ProbeCommandLine, TRUE))
+            return FALSE;
+
+        if (!RtlEqualUnicodeString(&AppName, &ProbeApplicationName, TRUE))
+            return FALSE;
+
+        return TRUE;
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+BOOL
+NTAPI
+ProbeInvokeCreateProcessW(
+    PCWSTR                  ApplicationName,
+    PWSTR                   CommandLine,
+    PSECURITY_ATTRIBUTES    ProcessAttributes,
+    PSECURITY_ATTRIBUTES    ThreadAttributes,
+    BOOL                    InheritHandles,
+    ULONG                   CreationFlags,
+    PVOID                   Environment,
+    PCWSTR                  CurrentDirectory,
+    LPSTARTUPINFOW          StartupInfo,
+    PPROCESS_INFORMATION    ProcessInformation
+)
+{
+    if (TryIsProbeProcess(ApplicationName, CommandLine))
+    {
+        PVOID BackTrace[3];
+
+        AllocStack(16);
+
+        //PrintConsoleW(L"%d\n", RtlCaptureStackBackTrace(0, countof(BackTrace), BackTrace, NULL));
+
+        RtlCaptureStackBackTrace(0, countof(BackTrace), BackTrace, NULL);
+        InvokeReturnAddress = BackTrace[1];
+        RtlSetLastWin32Error(NO_ERROR);
+
+        return FALSE;
+    }
+
+    return Shell32CreateProcessWPtr(ApplicationName, CommandLine, ProcessAttributes, ThreadAttributes, InheritHandles, CreationFlags, Environment, CurrentDirectory, StartupInfo, ProcessInformation);
+}
+
+BOOL
+NTAPI
+SpeedUpCreateProcessW(
+    PCWSTR                  ApplicationName,
+    PWSTR                   CommandLine,
+    PSECURITY_ATTRIBUTES    ProcessAttributes,
+    PSECURITY_ATTRIBUTES    ThreadAttributes,
+    BOOL                    InheritHandles,
+    ULONG                   CreationFlags,
+    PVOID                   Environment,
+    PCWSTR                  CurrentDirectory,
+    LPSTARTUPINFOW          StartupInfo,
+    PPROCESS_INFORMATION    ProcessInformation
+)
+{
+    LOOP_ONCE
+    {
+        PrintConsoleW(L"%s\n%s\n\n", ApplicationName, CommandLine);
+    }
+
+    return (*Shell32CreateProcessWIAT)(ApplicationName, CommandLine, ProcessAttributes, ThreadAttributes, InheritHandles, CreationFlags, Environment, CurrentDirectory, StartupInfo, ProcessInformation);
+}
+
+PVOID ProbeInvokeCreateProcessAddress()
+{
+    PVOID               Shell32, Shell32CreateProcessW, CreateProcessW;
+    PLDR_MODULE         Shell32Module, MainModule;
+    SHELLEXECUTEINFOW   ExecuteInfo;
+    PIMAGE_NT_HEADERS   NtHeaders;
+
+    Shell32 = Ldr::LoadDll(L"Shell32.dll");
+
+    Shell32CreateProcessW = PtrAdd(Shell32, IATLookupRoutineRVAByHashNoFix(Shell32, KERNEL32_CreateProcessW));
+
+    MainModule = FindLdrModuleByHandle(NULL);
+
+    RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &MainModule->FullDllName, &ProbeApplicationName);
+    RtlInitUnicodeString(&ProbeCommandLine, L"ML_PROBE_APPLICATION_COMMAMD_LINE");
+
+    ZeroMemory(&ExecuteInfo, sizeof(ExecuteInfo));
+
+    ExecuteInfo.cbSize          = sizeof(ExecuteInfo);
+    ExecuteInfo.fMask           = SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
+    ExecuteInfo.lpVerb          = L"open";
+    ExecuteInfo.lpFile          = ProbeApplicationName.Buffer;
+    ExecuteInfo.lpParameters    = ProbeCommandLine.Buffer;
+    ExecuteInfo.nShow           = SW_SHOW;
+
+    *(PVOID *)&Shell32CreateProcessWIAT = Shell32CreateProcessW;
+    *(PVOID *)&Shell32CreateProcessWPtr = *(PVOID *)Shell32CreateProcessWIAT;
+
+    CreateProcessW = ProbeInvokeCreateProcessW;
+    WriteProtectMemory(CurrentProcess, Shell32CreateProcessW, &CreateProcessW, sizeof(CreateProcessW));
+    ShellExecuteExW(&ExecuteInfo);
+    WriteProtectMemory(CurrentProcess, Shell32CreateProcessW, &Shell32CreateProcessWPtr, sizeof(Shell32CreateProcessWPtr));
+
+    RtlFreeUnicodeString(&ProbeApplicationName);
+
+    NtHeaders = RtlImageNtHeader(Shell32);
+
+    if (InvokeReturnAddress < Shell32 || InvokeReturnAddress > PtrAdd(Shell32, NtHeaders->OptionalHeader.SizeOfImage))
+        return NULL;
+
+    return InvokeReturnAddress;
+}
+
+BOOL HookCallCreateProcessFast(PVOID InvokeReturnAddress)
+{
+    PBYTE               InvokeBuffer;
+    PVOID               *JumpAddressBegin, *JumpAddressEnd, HookRoutine;
+    PIMAGE_NT_HEADERS   NtHeaders;
+    PLDR_MODULE         Shell32;
+
+    InvokeBuffer = (PBYTE)InvokeReturnAddress;
+    LOOP_ONCE
+    {
+        PrintConsoleW(L"phase 0\n");
+
+        if (*(PUSHORT)&InvokeBuffer[-6] != 0x15FF)
+            break;
+
+#if ML_X86
+
+        if (*(PULONG)&InvokeBuffer[-4] != (ULONG)Shell32CreateProcessWIAT)
+            break;
+
+#elif ML_AMD64
+
+        if ((PVOID)PtrAdd(InvokeBuffer, *(PULONG)&InvokeBuffer[-4]) != Shell32CreateProcessWIAT)
+            break;
+
+#endif // arch
+
+        PrintConsoleW(L"phase 1\n");
+
+        Shell32 = FindLdrModuleByName(&WCS2US(L"SHELL32.dll"));
+        NtHeaders = RtlImageNtHeader(Shell32->DllBase);
+        if (NtHeaders == NULL)
+            break;
+
+        PrintConsoleW(L"phase 2\n");
+
+        JumpAddressEnd = (PVOID *)PtrAdd(Shell32->DllBase, ROUND_UP(NtHeaders->OptionalHeader.SizeOfHeaders, NtHeaders->OptionalHeader.SectionAlignment));
+        JumpAddressBegin = (PVOID *)(IMAGE_FIRST_SECTION(NtHeaders) + NtHeaders->FileHeader.NumberOfSections);
+
+        while (JumpAddressBegin < JumpAddressEnd)
+        {
+            if (*JumpAddressBegin == NULL)
+                break;
+
+            ++JumpAddressBegin;
+        }
+
+        if (JumpAddressBegin >= JumpAddressEnd)
+            break;
+
+        PrintConsoleW(L"phase 3\n");
+
+        HookRoutine = SpeedUpCreateProcessW;
+        WriteProtectMemory(CurrentProcess, JumpAddressBegin, &HookRoutine, sizeof(HookRoutine));
+
+#if ML_X86
+
+        WriteProtectMemory(CurrentProcess, &InvokeBuffer[-4], &JumpAddressBegin, sizeof(JumpAddressBegin));
+
+#elif ML_AMD64
+
+        ULONG RelateOffset;
+
+        RelateOffset = (ULONG)PtrSub(JumpAddressBegin, InvokeBuffer);
+
+        PrintConsoleW(L"target = %I64X\n", PtrOffset(PtrAdd(InvokeBuffer, RelateOffset), Shell32->DllBase));
+
+        WriteProtectMemory(CurrentProcess, &InvokeBuffer[-4], &RelateOffset, sizeof(RelateOffset));
+
+#endif
+    }
+
+    return FALSE;
+}
+
+BOOL HookCallCreateProcess()
+{
+    PVOID InvokeReturnAddress;
+
+    SEH_TRY
+    {
+        InvokeReturnAddress = ProbeInvokeCreateProcessAddress();
+        if (InvokeReturnAddress == NULL)
+            return FALSE;
+
+        return HookCallCreateProcessFast(InvokeReturnAddress);
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    HookCallCreateProcess();
+
+    //PrintConsoleW(L"%I64X\n%I64X\n", (ULONG64)InvokeReturnAddress, (ULONG64)PtrOffset(InvokeReturnAddress, Shell32));
+    //PauseConsole();
+
+    ShellExecuteA(0, "open", "notepad", "fuck", 0, SW_SHOW);
+    PauseConsole();
+
+    Ps::ExitProcess(0);
+
     return;
 
     LOGFONTW lf;

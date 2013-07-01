@@ -102,6 +102,21 @@ def main():
                     0, 0,
                )
 
+    神速 = CreateCraft(
+                    "神速",
+                    "",
+                    0x05, 0x12, 0x1,
+                    CraftAttribute.NoAttribute,
+                    CraftRange.LineOnLocationIncludeSelf,
+                    CraftState.Physical, CraftState.InterruptAria,
+                    1, 50,
+                    0, 1,
+                    0,
+                    3,
+                    30, 0,
+                    0, 0,
+               )
+
     朗基努斯枪 = CreateCraft(
                     "朗基努斯枪",
                     "据说当年第七柱用这招杀了一个人。",
@@ -264,6 +279,7 @@ def main():
                     摘面具,
                     暴雨疾风枪,
                     零时迷子,
+                    神速,
                     #幻银方舟炮,
                 ])
 
@@ -277,6 +293,7 @@ def main():
     Craft_天地乖离       = CreateAI(0x3,  100,  0x0,  0x1,  0x00, 0x18, 天地乖离,        [30,    1,      0,      0])
     Craft_大地轰雷锤     = CreateAI(0x2,  30,   0x7,  0x1,  0x00, 0x11, 大地轰雷锤,      [0,     0,      1,      0])
     Craft_零时迷子       = CreateAI(0xB,  100,  0x12, 0x1,  0x00, 0x14, 零时迷子,        [0,     0,      0,      0])
+    Craft_神速           = CreateAI(0x2,  30,   0x7,  0x1,  0x00, 0x00, 神速,            [0,     0,      1,      0])
 
     #Craft_幻银方舟炮       = CreateAI(0xB,  100,  0x12, 0x1,  6, 7, 幻银方舟炮,        [0,     0,      0,      0])
 
@@ -284,7 +301,7 @@ def main():
 
 
     ArtsAIList          = []
-    CraftAIList         = [Craft_暴雨疾风枪, Craft_摘面具, Craft_零时迷子, Craft_朗基努斯枪, Craft_疾风轰雷闪, Craft_横扫千军, Craft_天地乖离, Craft_大地轰雷锤]
+    CraftAIList         = [Craft_暴雨疾风枪, Craft_摘面具, Craft_神速, Craft_零时迷子, Craft_朗基努斯枪, Craft_疾风轰雷闪, Craft_横扫千军, Craft_天地乖离, Craft_大地轰雷锤]
     SCraftAIList        = [SCraft_圣技大十字]
     SupportCraftAIList  = []
 
