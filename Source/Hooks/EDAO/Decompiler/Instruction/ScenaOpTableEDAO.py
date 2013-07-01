@@ -118,7 +118,7 @@ InstructionNames[0x69]  = 'OP_69'
 InstructionNames[0x6A]  = 'OP_6A'
 InstructionNames[0x6B]  = 'OP_6B'
 InstructionNames[0x6C]  = 'OP_6C'
-InstructionNames[0x6D]  = 'OP_6D'
+InstructionNames[0x6D]  = 'SetCameraDegree'
 InstructionNames[0x6E]  = 'OP_6E'
 InstructionNames[0x6F]  = 'OP_6F'
 InstructionNames[0x70]  = 'OP_70'
@@ -1728,7 +1728,7 @@ edao_op_list = \
     inst(OP_6A,                     'WL'),
     inst(OP_6B,                     'W'),
     inst(OP_6C,                     'ii'),
-    inst(OP_6D,                     'Whhi'),
+    inst(SetCameraDegree,           'hhhi'),        # SetCameraDegree(horizon, vertical, obliquity, duration)
     inst(OP_6E,                     'ii'),
     inst(OP_6F,                     'B'),
     inst(OP_70,                     'BW'),

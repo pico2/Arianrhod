@@ -800,6 +800,23 @@ public:
 
 typedef struct
 {
+    FLOAT Vertical;
+    FLOAT Obliquity;
+    FLOAT Horizon;
+
+} CAMERA_DEGREE, *PCAMERA_DEGREE;
+
+class CCamera
+{
+public:
+    PCAMERA_DEGREE GetCameraDegree()
+    {
+        return (PCAMERA_DEGREE)PtrAdd(*(PVOID *)PtrAdd(this, 0xB88), 0x30);
+    }
+};
+
+typedef struct
+{
     USHORT  State;
     BYTE    ScenaIndex;
 
@@ -816,6 +833,11 @@ public:
     EDAO* GetEDAO()
     {
         return (EDAO *)PtrSub(this, 0x384EC);
+    }
+
+    CCamera* GetCamera()
+    {
+        return *(CCamera **)PtrAdd(this, 0x524);
     }
 
     CSSaveData* GetSaveData()

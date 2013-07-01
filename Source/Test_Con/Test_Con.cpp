@@ -768,13 +768,13 @@ BOOL HookCallCreateProcessFast(PVOID InvokeReturnAddress)
 
 #elif ML_AMD64
 
-        ULONG RelateOffset;
+        LONG64 RelateOffset;
 
-        RelateOffset = (ULONG)PtrSub(JumpAddressBegin, InvokeBuffer);
+        RelateOffset = (TYPE_OF(RelateOffset))PtrSub(JumpAddressBegin, InvokeBuffer);
 
         PrintConsoleW(L"target = %I64X\n", PtrOffset(PtrAdd(InvokeBuffer, RelateOffset), Shell32->DllBase));
 
-        WriteProtectMemory(CurrentProcess, &InvokeBuffer[-4], &RelateOffset, sizeof(RelateOffset));
+        WriteProtectMemory(CurrentProcess, &InvokeBuffer[-4], &RelateOffset, sizeof(LONG));
 
 #endif
     }
@@ -804,12 +804,12 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     HookCallCreateProcess();
 
-    //PrintConsoleW(L"%I64X\n%I64X\n", (ULONG64)InvokeReturnAddress, (ULONG64)PtrOffset(InvokeReturnAddress, Shell32));
-    //PauseConsole();
+    PrintConsoleW(L"\n");
 
-    ShellExecuteA(0, "open", "notepad", "fuck", 0, SW_SHOW);
+    ShellExecuteA(0, "open", "notepad", "", 0, SW_SHOW);
+    ShellExecuteA(0, "open", "mspaint", "", 0, SW_SHOW);
+
     PauseConsole();
-
     Ps::ExitProcess(0);
 
     return;

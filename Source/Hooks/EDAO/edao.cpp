@@ -85,6 +85,12 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
     ULONG Index;
 
     enum { X = 0, Y = 1, Z = 2, Z2 = 42 };
+    enum
+    {
+        V = FIELD_OFFSET(CAMERA_DEGREE, Vertical) / sizeof(FLOAT),
+        O = FIELD_OFFSET(CAMERA_DEGREE, Obliquity) / sizeof(FLOAT),
+        H = FIELD_OFFSET(CAMERA_DEGREE, Horizon) / sizeof(FLOAT),
+    };
 
     switch (Message)
     {
@@ -105,28 +111,34 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
             switch (wParam & 0xFFFF)
             {
                 case VK_NUMPAD4: Index = X; Delta = -1.f; goto CHANGE_CHR_COORD;
-                case VK_NUMPAD6: Index = X; Delta = 1.f;  goto CHANGE_CHR_COORD;
+                case VK_NUMPAD6: Index = X; Delta = +1.f;  goto CHANGE_CHR_COORD;
 
                 case VK_NUMPAD2: Index = Y; Delta = -1.f; goto CHANGE_CHR_COORD;
-                case VK_NUMPAD8: Index = Y; Delta = 1.f;  goto CHANGE_CHR_COORD;
+                case VK_NUMPAD8: Index = Y; Delta = +1.f;  goto CHANGE_CHR_COORD;
 
-                case VK_NUMPAD7: Index = Z; Delta = 1.f;  goto CHANGE_CHR_COORD;
+                case VK_NUMPAD7: Index = Z; Delta = +1.f;  goto CHANGE_CHR_COORD;
                 case VK_NUMPAD9: Index = Z; Delta = -1.f;  goto CHANGE_CHR_COORD;
 
 CHANGE_CHR_COORD:
-
-                    //if (GetKeyState(VK_CONTROL) >= 0) break;
-
+                {
                     PFLOAT Coord = (PFLOAT)(*(PULONG_PTR)PtrAdd(EDAO::GlobalGetEDAO(), 0x78CB8 + 0x2BC) + 0x80);
                     Coord[Index] += Delta;
-/*
-                    switch (wParam & 0xFFFF)
-                    {
-                        case VK_NUMPAD7:
-                        case VK_NUMPAD9:
-                            Coord[Z2] += Delta;
-                    }
-*/
+                    break;
+                }
+
+                case VK_INSERT: Index = H; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+                case VK_DELETE: Index = H; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+
+                case VK_HOME:   Index = V; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+                case VK_END:    Index = V; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+
+                case VK_PRIOR:  Index = O; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+                case VK_NEXT:   Index = O; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+
+CHANGE_CAMERA_DEGREE:
+
+                    ((PFLOAT)EDAO::GlobalGetEDAO()->GetScript()->GetCamera()->GetCameraDegree())[Index] += Delta;
+
                     break;
             }
     }
