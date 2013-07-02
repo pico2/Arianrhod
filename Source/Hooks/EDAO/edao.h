@@ -1,8 +1,11 @@
 #ifndef _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_
 #define _EDAO_H_5c8a3013_4334_4138_9413_3d0209da878e_
 
+#define DIRECTINPUT_VERSION 0x800
+
 #include "MyLibrary.h"
 #include <GdiPlus.h>
+#include <dinput.h>
 
 #if D3D9_VER
     #define NtGetTickCount (ULONG64)GetTickCount
@@ -879,6 +882,27 @@ public:
     }
 };
 
+class CInput
+{
+public:
+    BOOL UseJoyStick()
+    {
+        return *(PBOOL)this;
+    }
+
+    LPDIRECTINPUTDEVICE8A GetDInputDevice()
+    {
+        return *(LPDIRECTINPUTDEVICE8A *)PtrAdd(this, 0x218);
+    }
+
+    VOID THISCALL HandleMainInterfaceInputState(PVOID Parameter1, CInput *Input, PVOID Parameter3);
+
+    DECL_STATIC_METHOD_POINTER(CInput, HandleMainInterfaceInputState);
+};
+
+INIT_STATIC_MEMBER(CInput::StubHandleMainInterfaceInputState);
+
+
 class EDAO
 {
     // battle
@@ -940,9 +964,9 @@ public:
         return (PFLOAT)(*(PULONG_PTR)PtrAdd(EDAO::GlobalGetEDAO(), 0x78CB8 + 0x2BC));
     }
 
-    VOID UpdateChrCoord(PFLOAT ChrCoord)
+    VOID UpdateChrCoord(PVOID Parameter)
     {
-        DETOUR_METHOD(EDAO, UpdateChrCoord, 0x74F490, ChrCoord);
+        DETOUR_METHOD(EDAO, UpdateChrCoord, 0x74F490, Parameter);
     }
 
     ULONG_PTR GetLayer()

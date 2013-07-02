@@ -364,3 +364,97 @@ NAKED VOID EDAO::NakedSetSaveDataScrollStep()
         jmp     SetSaveDataScrollStep
     }
 }
+
+
+/************************************************************************
+  keyboard input
+************************************************************************/
+
+VOID HandleSingleKey(ULONG_PTR KeyCode, BOOL KeyPress)
+{
+    FLOAT   Delta;
+    ULONG   Index;
+
+    extern BOOL Turbo;
+
+    enum { X = 0, Y = 1, Z = 2, Z2 = 42 };
+    enum
+    {
+        V = FIELD_OFFSET(CAMERA_INFO, Vertical),
+        O = FIELD_OFFSET(CAMERA_INFO, Obliquity),
+        H = FIELD_OFFSET(CAMERA_INFO, Horizon),
+        D = FIELD_OFFSET(CAMERA_INFO, Distance),
+    };
+
+    switch (KeyPress)
+    {
+        case TRUE:
+            switch (KeyCode)
+            {
+                case DIK_NUMPAD4:   Index = X; Delta = -.5f; goto CHANGE_CHR_COORD;
+                case DIK_NUMPAD6:   Index = X; Delta = +.5f;  goto CHANGE_CHR_COORD;
+
+                case DIK_NUMPAD2:   Index = Y; Delta = -.5f; goto CHANGE_CHR_COORD;
+                case DIK_NUMPAD8:   Index = Y; Delta = +.5f;  goto CHANGE_CHR_COORD;
+
+                case DIK_NUMPAD7:   Index = Z; Delta = +1.f;  goto CHANGE_CHR_COORD;
+                case DIK_NUMPAD9:   Index = Z; Delta = -1.f;  goto CHANGE_CHR_COORD;
+
+CHANGE_CHR_COORD:
+                {
+                    EDAO*   edao;
+                    PFLOAT  Coord;
+
+                    edao = EDAO::GlobalGetEDAO();
+                    Coord = edao->GetChrCoord();
+
+                    PtrAdd(Coord, 0x80)[Index] += Delta;
+                    edao->UpdateChrCoord(*(PVOID *)PtrAdd(edao, 0x78F78));
+                    break;
+                }
+
+                case DIK_INSERT:    Index = H; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+                case DIK_DELETE:    Index = H; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+
+                case DIK_HOME:      Index = V; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+                case DIK_END:       Index = V; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+
+                case DIK_PRIOR:     Index = O; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+                case DIK_NEXT:      Index = O; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+
+                case DIK_NUMPAD1:   Index = D; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+                case DIK_NUMPAD3:   Index = D; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+
+CHANGE_CAMERA_DEGREE:
+
+                    *(PFLOAT)PtrAdd(EDAO::GlobalGetEDAO()->GetScript()->GetCamera()->GetCameraInfo(), Index) += Delta;
+                    break;
+            }
+    }
+}
+
+VOID THISCALL CInput::HandleMainInterfaceInputState(PVOID Parameter1, CInput *Input, PVOID Parameter3)
+{
+    CHAR                    *Key, KeyState[0x100];
+    HRESULT                 Result;
+    LPDIRECTINPUTDEVICE8A   InputDevice;
+
+    (this->*StubHandleMainInterfaceInputState)(Parameter1, Input, Parameter3);
+
+    if (*(PCHAR)PtrAdd(EDAO::GlobalGetEDAO(), 0xA7071) != 1)
+        return;
+
+    InputDevice = Input->GetDInputDevice();
+    if (InputDevice == NULL)
+        return;
+
+    Result = InputDevice->GetDeviceState(sizeof(KeyState), KeyState);
+    if (FAILED(Result))
+        return;
+
+    FOR_EACH(Key, KeyState, countof(KeyState))
+    {
+        if (*Key < 0)
+            HandleSingleKey(Key - KeyState, TRUE);
+    }
+}

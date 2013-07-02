@@ -800,8 +800,29 @@ BOOL HookCallCreateProcess()
     }
 }
 
+class A
+{
+public:
+    A create()
+    {
+        return A();
+    }
+};
+
+class B : public A
+{
+public:
+};
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    B b, c;
+    A a;
+
+    a = b.create();
+
+    return;
+
     HookCallCreateProcess();
 
     PrintConsoleW(L"\n");

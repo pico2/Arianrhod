@@ -162,8 +162,8 @@ def main():
 
     import TiosBed
 
-    SaveRestoreParty(0)
-    SaveRestoreParty(2)
+    PartySelect(0)
+    PartySelect(2)
     TiosBed.ShowMenu()
     ClearParty()
     AddParty(0x0, 0xFF, 0xFF)
@@ -1065,7 +1065,7 @@ def main():
     label("loc_1311")
 
     OP_32(0xFF, 0xF9, 0x0)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     ClearParty()
     AddParty(0x0, 0xFF, 0xFF)
     SetEventSkip(0x0, "loc_13C4")
@@ -1261,7 +1261,7 @@ def main():
 
     label("loc_16A3")
 
-    SaveRestoreParty(0x2)
+    PartySelect(0x2)
     Switch(
         (scpexpr(EXPR_PUSH_VALUE_INDEX, 0x1E), scpexpr(EXPR_END)),
         (0, "loc_175C"),
@@ -2487,7 +2487,7 @@ def main():
     OP_A3(0x105, 0x4)
     OP_49()
     OP_32(0xFF, 0xFE, 0x0)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     RemoveParty(0x4, 0xFF)
     RemoveParty(0x6, 0xFF)
     OP_D7(0x1E)
@@ -3019,7 +3019,7 @@ def main():
     StopEffect(0x1, 0x0)
     Sleep(500)
     OP_32(0xFF, 0xFE, 0x0)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     OP_A3(0x103, 0x4)
     OP_A3(0x105, 0x4)
     ClearParty()
@@ -3476,7 +3476,7 @@ def main():
     OP_5A()
     OP_5B(0xE, 0x118, 0x3C, 0x3)
     OP_32(0xFF, 0xFE, 0x0)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     OP_A3(0x103, 0x4)
     OP_A3(0x105, 0x4)
     ClearParty()
@@ -3887,7 +3887,7 @@ def main():
     OP_5A()
     OP_5B(0xE, 0x118, 0x3C, 0x3)
     OP_32(0xFF, 0xFE, 0x0)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     OP_A3(0x103, 0x4)
     OP_A3(0x105, 0x4)
     ClearParty()
@@ -4833,7 +4833,7 @@ def main():
     OP_5B(0xE, 0x118, 0x3C, 0x3)
     OP_32(0xFF, 0xFE, 0x0)
     RemoveParty(0x6, 0xFF)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     OP_A3(0x103, 0x4)
     OP_A3(0x105, 0x4)
     ClearParty()
@@ -4974,7 +4974,7 @@ def main():
 
     label("loc_6BDE")
 
-    SaveRestoreParty(0x2)
+    PartySelect(0x2)
     OP_21(0x7D0)
     WaitBGM()
     SetScenarioFlags(0x22, 1)
@@ -5816,7 +5816,7 @@ def main():
 
     label("loc_80AF")
 
-    SaveRestoreParty(0x2)
+    PartySelect(0x2)
     SetScenarioFlags(0x23, 0)
     NewScene("e4300", 0, 0, 0)
     IdleLoop()
@@ -6753,7 +6753,7 @@ def main():
     OP_57(0x0)
     OP_5A()
     OP_5B(0xE, 0x118, 0x3C, 0x3)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     OP_A3(0x105, 0x4)
     ClearParty()
     AddParty(0x0, 0xFF, 0xFF)
@@ -6780,7 +6780,7 @@ def main():
     EventBegin(0x0)
     FadeToDark(0, 0, -1)
     LoadChrToIndex("apl/ch50203.itc", 0x1E)
-    SaveRestoreParty(0x2)
+    PartySelect(0x2)
     Jc((scpexpr(EXPR_EXEC_OP, "GetPartyIndex(0x4)"), scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_LSS), scpexpr(EXPR_END)), "loc_9AB5")
     AddParty(0x4, 0xFF, 0xFF)
 
@@ -7767,7 +7767,7 @@ def main():
     FadeToDark(1000, 0, -1)
     OP_0D()
     OP_32(0xFF, 0xFE, 0x0)
-    SaveRestoreParty(0x1)
+    PartySelect(0x1)
     OP_A3(0x105, 0x4)
     ClearParty()
     AddParty(0x0, 0xFF, 0xFF)
@@ -7909,7 +7909,7 @@ def main():
 
     label("loc_B520")
 
-    SaveRestoreParty(0x2)
+    PartySelect(0x2)
     OP_21(0x7D0)
     WaitBGM()
     SetScenarioFlags(0x23, 7)

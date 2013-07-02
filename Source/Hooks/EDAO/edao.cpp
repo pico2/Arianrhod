@@ -81,18 +81,6 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
 
 LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lParam)
 {
-    FLOAT   Delta;
-    ULONG   Index;
-
-    enum { X = 0, Y = 1, Z = 2, Z2 = 42 };
-    enum
-    {
-        V = FIELD_OFFSET(CAMERA_INFO, Vertical),
-        O = FIELD_OFFSET(CAMERA_INFO, Obliquity),
-        H = FIELD_OFFSET(CAMERA_INFO, Horizon),
-        D = FIELD_OFFSET(CAMERA_INFO, Distance),
-    };
-
     switch (Message)
     {
         case WM_KEYUP:
@@ -107,49 +95,6 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
                 //    break;
             }
             break;
-
-        case WM_KEYDOWN:
-            switch (wParam & 0xFFFF)
-            {
-                case VK_NUMPAD4: Index = X; Delta = -1.f; goto CHANGE_CHR_COORD;
-                case VK_NUMPAD6: Index = X; Delta = +1.f;  goto CHANGE_CHR_COORD;
-
-                case VK_NUMPAD2: Index = Y; Delta = -1.f; goto CHANGE_CHR_COORD;
-                case VK_NUMPAD8: Index = Y; Delta = +1.f;  goto CHANGE_CHR_COORD;
-
-                case VK_NUMPAD7: Index = Z; Delta = +1.f;  goto CHANGE_CHR_COORD;
-                case VK_NUMPAD9: Index = Z; Delta = -1.f;  goto CHANGE_CHR_COORD;
-
-CHANGE_CHR_COORD:
-                {
-                    EDAO*   edao;
-                    PFLOAT  Coord;
-
-                    edao = EDAO::GlobalGetEDAO();
-                    Coord = edao->GetChrCoord();
-
-                    PtrAdd(Coord, 0x80)[Index] += Delta;
-                    edao->UpdateChrCoord(Coord);
-                    break;
-                }
-
-                case VK_INSERT: Index = H; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
-                case VK_DELETE: Index = H; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
-
-                case VK_HOME:   Index = V; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
-                case VK_END:    Index = V; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
-
-                case VK_PRIOR:  Index = O; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
-                case VK_NEXT:   Index = O; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
-
-                case VK_NUMPAD1:Index = D; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
-                case VK_NUMPAD3:Index = D; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
-
-CHANGE_CAMERA_DEGREE:
-
-                    *(PFLOAT)PtrAdd(EDAO::GlobalGetEDAO()->GetScript()->GetCamera()->GetCameraInfo(), Index) += Delta;
-                    break;
-            }
     }
 
     return WindowProc(Window, Message, wParam, lParam);
@@ -423,24 +368,21 @@ HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
 
 BOOL AoIsFileExist(PCSTR FileName)
 {
-    NTSTATUS                Status;
-    UNICODE_STRING          FileToCheck, RedirectedFile;
-    OBJECT_ATTRIBUTES       ObjectAttributes;
-    FILE_BASIC_INFORMATION  FileBasic;
+    BOOL            Exists;
+    NTSTATUS        Status;
+    UNICODE_STRING  FileToCheck, RedirectedFile;
 
     Status = AnsiToUnicodeString(&FileToCheck, FileName);
     if (NT_FAILED(Status))
         return NULL;
 
     Status = GetRedirectedFileName(&FileToCheck, &RedirectedFile);
-
-    InitializeObjectAttributes(&ObjectAttributes, NT_SUCCESS(Status) ? &RedirectedFile : &FileToCheck, OBJ_CASE_INSENSITIVE, NULL, 0);
-    Status = ZwQueryAttributesFile(&ObjectAttributes, &FileBasic);
+    Exists = IsPathExists(NT_SUCCESS(Status) ? RedirectedFile.Buffer : FileToCheck.Buffer);
 
     RtlFreeUnicodeString(&FileToCheck);
     RtlFreeUnicodeString(&RedirectedFile);
 
-    return NT_SUCCESS(Status) && FileBasic.FileAttributes != INVALID_FILE_ATTRIBUTES;
+    return Exists;
 }
 
 LONG NTAPI ShowExitMessageBox(HWND hWnd, PCSTR Text, PCSTR Caption, UINT Type)
@@ -613,10 +555,10 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
         INLINE_HOOK_CALL_RVA_NULL(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
 
-
         INLINE_HOOK_JUMP_RVA_NULL(0x46B6A0, METHOD_PTR(&CSoundPlayer::GetSoundControlWindow)),
         INLINE_HOOK_JUMP         (EATLookupRoutineByHashPNoFix(FindLdrModuleByName(&WCS2US(L"USER32.dll"))->DllBase, USER32_SendMessageA), CSoundPlayer::StaticDispatchCtrlCode, CSoundPlayer::StubStaticDispatchCtrlCode),
 
+        INLINE_HOOK_CALL_RVA     (0x328C77, METHOD_PTR(&CInput::HandleMainInterfaceInputState), CInput::StubHandleMainInterfaceInputState),
 
         // bug fix
 
