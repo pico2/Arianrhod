@@ -84,7 +84,7 @@ class BGMFileIndex:
                 self.IsIndexInvalid = True
                 return
 
-            self.FileName = 'ed7%04d' % param
+            self.FileName = 'ed7%03d' % param
             self.FileIndex = param
 
         elif type(param) == str:

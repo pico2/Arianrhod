@@ -102,6 +102,8 @@ def main():
     Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x21E, 7)), scpexpr(EXPR_END)), "loc_3A1")
     ModifyEventFlags(0, 0, 0x80)
     SetMapObjFlags(0x1, 0x4)
+    SetChrFlags(0x8, 0x80)
+    SetChrFlags(0x8, 0x8)
     Jump("loc_40A")
 
     label("loc_3A1")
@@ -116,7 +118,7 @@ def main():
     OP_93(0x8, 0xB4, 0x0)
     OP_52(0x8, 0x7, (scpexpr(EXPR_PUSH_LONG, 0x1F40), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
     OP_52(0x8, 0x28, (scpexpr(EXPR_PUSH_LONG, 0x9), scpexpr(EXPR_STUB), scpexpr(EXPR_END)))
-    OP_1D(0x0, 0x0, 0x2, 0x0, 18000, 0, 70000, 3000, 3000, 90000)
+    SetBarrier(0x0, 0x0, 0x2, 0x0, 18000, 0, 70000, 3000, 3000, 90000)
 
     label("loc_40A")
 
@@ -163,7 +165,7 @@ def main():
     MenuCmd(0, 0)
     MenuCmd(1, 0, "登上梅尔卡瓦")
     MenuCmd(1, 0, "放弃")
-    MenuCmd(2, 0, 65535, 65535, 1)
+    MenuCmd(2, 0, -1, -1, 1)
     MenuEnd(0x0)
     OP_60(0x0)
     Switch(
@@ -197,7 +199,7 @@ def main():
 
     label("loc_52A")
 
-    MenuCmd(2, 0, 65535, 65535, 1)
+    MenuCmd(2, 0, -1, -1, 1)
     MenuEnd(0x0)
     OP_60(0x0)
     Switch(
@@ -211,7 +213,7 @@ def main():
 
     label("loc_554")
 
-    OP_76(0x0, "light", 0x0, 0x1)
+    SetMapObjFrame(0x0, "light", 0x0, 0x1)
     OP_74(0x0, 0x1E)
     Jc((scpexpr(EXPR_PUSH_LONG, 0x1), scpexpr(EXPR_END)), "loc_585")
     OP_70(0x0, 0x12C)
@@ -258,7 +260,7 @@ def main():
 
     Sleep(1000)
     OP_0D()
-    OP_76(0x0, "light", 0x1, 0x1)
+    SetMapObjFrame(0x0, "light", 0x1, 0x1)
     OP_70(0x0, 0x0)
     Jump("loc_489")
 
@@ -508,7 +510,7 @@ def main():
     SetScenarioFlags(0x21E, 7)
     ModifyEventFlags(0, 0, 0x80)
     SetMapObjFlags(0x1, 0x4)
-    OP_1D(0x2, 0x0, 0x1)
+    SetBarrier(0x2, 0x0, 0x1)
     SetChrFlags(0x8, 0x80)
     SetChrFlags(0x8, 0x8)
     OP_E2(0x2)

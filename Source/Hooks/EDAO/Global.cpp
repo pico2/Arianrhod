@@ -31,6 +31,39 @@ enum
     CHR_ID_RIXIA        = 0x20,
 };
 
+LONG CDECL EDAO::GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrId)
+{
+    CHAR FullPath[MAX_NTPATH];
+
+    sprintf(FullPath, "data/campimg/chrimg%02d.itp", ChrId);
+    if (!AoIsFileExist(FullPath))
+        ChrId = 9999;
+
+    return sprintf(Buffer, Format, ChrId);
+}
+
+LONG CDECL EDAO::GetBattleFace(PSTR Buffer, PCSTR Format, PCSTR DataPath, LONG ChrId)
+{
+    LONG_PTR Length;
+
+    Length = sprintf(Buffer, Format, DataPath, ChrId);
+    if (!AoIsFileExist(Buffer))
+        Length = sprintf(Buffer, Format, DataPath, 9999);
+
+    return Length;
+}
+
+LONG CDECL EDAO::GetFieldAttackChr(PSTR Buffer, PCSTR Format, LONG ChrId)
+{
+    CHAR FullPath[MAX_NTPATH];
+
+    sprintf(FullPath, "data/system/fachr%03d._bn", ChrId);
+    if (!AoIsFileExist(FullPath))
+        ChrId = 999;
+
+    return sprintf(Buffer, Format, ChrId);
+}
+
 LONG FASTCALL EDAO::GetCFace(ULONG ChrId)
 {
     ULONG PartyId;

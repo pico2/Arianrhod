@@ -1335,7 +1335,7 @@ class ScenarioInfo:
 
         return hdr
 
-    def SaveToFile(self, filename):
+    def SaveToFile(self, filename, append_place_name = True):
         lines = []
 
         lines += self.GenerateHeader(filename)
@@ -1358,6 +1358,21 @@ class ScenarioInfo:
         lines.insert(2, 'def main():')
         lines.append('TryInvoke(main)')
         lines.append('')
+
+        if append_place_name:
+            debugmap = ['a0000', 'map1']
+            if self.MapName.lower() not in debugmap:
+                mapname = self.GetMapNameByIndex(self.MapIndex)
+
+                if mapname != '':
+                    ext = ''
+                    while True:
+                        filename, ext2 = os.path.splitext(filename)
+                        if ext2 == '':
+                            break
+                        ext = ext2 + ext
+
+                    filename = '%s_%s%s' % (filename, mapname, ext)
 
         fs = open(filename, 'wb')
         fs.write(''.encode('utf_8_sig'))

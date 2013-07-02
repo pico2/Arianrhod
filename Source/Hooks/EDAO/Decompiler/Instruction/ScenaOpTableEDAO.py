@@ -117,7 +117,7 @@ InstructionNames[0x68]  = 'OP_68'
 InstructionNames[0x69]  = 'OP_69'
 InstructionNames[0x6A]  = 'OP_6A'
 InstructionNames[0x6B]  = 'OP_6B'
-InstructionNames[0x6C]  = 'OP_6C'
+InstructionNames[0x6C]  = 'SetCameraDistance'
 InstructionNames[0x6D]  = 'MoveCamera'
 InstructionNames[0x6E]  = 'OP_6E'
 InstructionNames[0x6F]  = 'OP_6F'
@@ -204,7 +204,7 @@ InstructionNames[0xCA]  = 'CreatePortrait'
 InstructionNames[0xCB]  = 'OP_CB'
 InstructionNames[0xCC]  = 'OP_CC'
 InstructionNames[0xCD]  = 'PlaceName2'
-InstructionNames[0xCE]  = 'SaveRestoreParty'
+InstructionNames[0xCE]  = 'PartySelect'
 InstructionNames[0xCF]  = 'OP_CF'
 InstructionNames[0xD0]  = 'MenuCmd'
 InstructionNames[0xD1]  = 'OP_D1'
@@ -1727,7 +1727,7 @@ edao_op_list = \
     inst(OP_69,                     'BW'),
     inst(OP_6A,                     'WL'),
     inst(OP_6B,                     'W'),
-    inst(OP_6C,                     'ii'),
+    inst(SetCameraDistance,         'ii'),          # SetCameraDistance(distance, duration)
     inst(MoveCamera,                'hhhi'),        # MoveCamera(horizon, vertical, obliquity, duration)
     inst(OP_6E,                     'ii'),
     inst(OP_6F,                     'B'),
@@ -1814,7 +1814,7 @@ edao_op_list = \
     inst(OP_CB,                     'BBLLLL'),
     inst(OP_CC,                     'BBB'),
     inst(PlaceName2,                'hhSBh'),       # PlaceName2(x, y, itp_name, 0, duration)
-    inst(SaveRestoreParty,          'B'),           # SaveRestoreParty(save = 1 or restore = 2)
+    inst(PartySelect,               'C'),           # PartySelect(0 = select menu, save = 1, restore = 2)
     inst(OP_CF,                     NO_OPERAND,             0,                          scp_cf),
     inst(MenuCmd,                   NO_OPERAND,             0,                          scp_menu_cmd),
     inst(OP_D1,                     'W'),

@@ -162,6 +162,7 @@ def main():
 
     import TiosBed
 
+    SaveRestoreParty(0)
     SaveRestoreParty(2)
     TiosBed.ShowMenu()
     ClearParty()

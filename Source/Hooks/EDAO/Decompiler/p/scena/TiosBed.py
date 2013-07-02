@@ -306,8 +306,6 @@ def ReleaseAllGod():
     label("no_Lazy_Knight")
 
 def ShowMenu():
-    #SetMessageWindowPos(-1, -1, -1, -1)
-
     RunExpression(0x0, (scpexpr(EXPR_PUSH_LONG, 0x0), scpexpr(EXPR_END)))
 
     label('bed_show_cg_menu')

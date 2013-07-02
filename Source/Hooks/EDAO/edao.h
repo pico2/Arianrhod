@@ -800,18 +800,24 @@ public:
 
 typedef struct
 {
-    FLOAT Vertical;
-    FLOAT Obliquity;
-    FLOAT Horizon;
+    DUMMY_STRUCT(0x30);
 
-} CAMERA_DEGREE, *PCAMERA_DEGREE;
+    FLOAT Vertical;         // 0x30
+    FLOAT Obliquity;        // 0x34
+    FLOAT Horizon;          // 0x38
+
+    DUMMY_STRUCT(0x54 - 0x38 - sizeof(FLOAT));
+
+    FLOAT Distance;         // 0x54
+
+} CAMERA_INFO, *PCAMERA_INFO;
 
 class CCamera
 {
 public:
-    PCAMERA_DEGREE GetCameraDegree()
+    PCAMERA_INFO GetCameraInfo()
     {
-        return (PCAMERA_DEGREE)PtrAdd(*(PVOID *)PtrAdd(this, 0xB88), 0x30);
+        return (PCAMERA_INFO)*(PVOID *)PtrAdd(this, 0xB88);
     }
 };
 
@@ -927,6 +933,16 @@ public:
     PUSHORT GetSBreakList()
     {
         return (PUSHORT)PtrAdd(this, 0x7EE10);
+    }
+
+    PFLOAT GetChrCoord()
+    {
+        return (PFLOAT)(*(PULONG_PTR)PtrAdd(EDAO::GlobalGetEDAO(), 0x78CB8 + 0x2BC));
+    }
+
+    VOID UpdateChrCoord(PFLOAT ChrCoord)
+    {
+        DETOUR_METHOD(EDAO, UpdateChrCoord, 0x74F490, ChrCoord);
     }
 
     ULONG_PTR GetLayer()
@@ -1052,6 +1068,9 @@ public:
     LONG FASTCALL GetCFace(ULONG ChrId);
     LONG FASTCALL GetLeaderChangeVoice(ULONG ChrId);
 
+    static LONG CDECL GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrId);
+    static LONG CDECL GetBattleFace(PSTR Buffer, PCSTR Format, PCSTR DataPath, LONG ChrId);
+    static LONG CDECL GetFieldAttackChr(PSTR Buffer, PCSTR Format, LONG ChrId);
 
     /************************************************************************
       tweak

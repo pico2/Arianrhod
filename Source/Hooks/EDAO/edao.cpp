@@ -81,15 +81,16 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
 
 LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lParam)
 {
-    FLOAT Delta;
-    ULONG Index;
+    FLOAT   Delta;
+    ULONG   Index;
 
     enum { X = 0, Y = 1, Z = 2, Z2 = 42 };
     enum
     {
-        V = FIELD_OFFSET(CAMERA_DEGREE, Vertical) / sizeof(FLOAT),
-        O = FIELD_OFFSET(CAMERA_DEGREE, Obliquity) / sizeof(FLOAT),
-        H = FIELD_OFFSET(CAMERA_DEGREE, Horizon) / sizeof(FLOAT),
+        V = FIELD_OFFSET(CAMERA_INFO, Vertical),
+        O = FIELD_OFFSET(CAMERA_INFO, Obliquity),
+        H = FIELD_OFFSET(CAMERA_INFO, Horizon),
+        D = FIELD_OFFSET(CAMERA_INFO, Distance),
     };
 
     switch (Message)
@@ -121,8 +122,14 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
 
 CHANGE_CHR_COORD:
                 {
-                    PFLOAT Coord = (PFLOAT)(*(PULONG_PTR)PtrAdd(EDAO::GlobalGetEDAO(), 0x78CB8 + 0x2BC) + 0x80);
-                    Coord[Index] += Delta;
+                    EDAO*   edao;
+                    PFLOAT  Coord;
+
+                    edao = EDAO::GlobalGetEDAO();
+                    Coord = edao->GetChrCoord();
+
+                    PtrAdd(Coord, 0x80)[Index] += Delta;
+                    edao->UpdateChrCoord(Coord);
                     break;
                 }
 
@@ -135,10 +142,12 @@ CHANGE_CHR_COORD:
                 case VK_PRIOR:  Index = O; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
                 case VK_NEXT:   Index = O; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
 
+                case VK_NUMPAD1:Index = D; Delta = -1.f; goto CHANGE_CAMERA_DEGREE;
+                case VK_NUMPAD3:Index = D; Delta = +1.f; goto CHANGE_CAMERA_DEGREE;
+
 CHANGE_CAMERA_DEGREE:
 
-                    ((PFLOAT)EDAO::GlobalGetEDAO()->GetScript()->GetCamera()->GetCameraDegree())[Index] += Delta;
-
+                    *(PFLOAT)PtrAdd(EDAO::GlobalGetEDAO()->GetScript()->GetCamera()->GetCameraInfo(), Index) += Delta;
                     break;
             }
     }
@@ -179,115 +188,228 @@ HWND WINAPI CreateWindowExCenterA(ULONG dwExStyle, LPCSTR lpClassName, LPCSTR lp
     return Window;
 }
 
-PWSTR
-GetFileName(
-    PWSTR   HookedPath,
-    ULONG   HookedPathCount,
-    PWSTR   OriginalPath,
-    ULONG   OriginalCount,
-    LPCSTR  InputFileName,
-    BOOL    IsInputUnicode = FALSE
-)
+
+typedef struct
 {
-    ULONG_PTR   Length, AppPathLength;
-    PWSTR       FileName;
+    UNICODE_STRING Original;
+    UNICODE_STRING Redirected;
 
-    static WCHAR szDataPath[]   = L"data\\";
-    static WCHAR szPatch[]      = L"patch\\\\";
-    static WCHAR szPatch2[]     = L"patch2\\";
+} FILE_REDIRECT_ENTRY, *PFILE_REDIRECT_ENTRY;
 
-    if (IsInputUnicode)
+PFILE_REDIRECT_ENTRY GlobalRedirectEntry;
+
+#define REDIRECT_PATH(orig, redir) { RTL_CONSTANT_STRING(orig), RTL_CONSTANT_STRING(redir) }
+
+
+NTSTATUS InitializeRedirectEntry()
+{
+    NTSTATUS                Status;
+    UNICODE_STRING          ExePath;
+    PLDR_MODULE             Module;
+    PWSTR                   Buffer;
+    ULONG_PTR               Length;
+    PFILE_REDIRECT_ENTRY    Entry, RedirectEntry;
+
+    static FILE_REDIRECT_ENTRY RedirectSubDirectory[] =
     {
-        StrCopyW(OriginalPath, (PWSTR)InputFileName);
-    }
-    else
-    {
-        AnsiToUnicode(OriginalPath, OriginalCount, (PSTR)InputFileName, -1);
-    }
-
-    PLDR_MODULE Module;
+        REDIRECT_PATH(L"data\\", L"patch\\"),
+        REDIRECT_PATH(L"data\\", L"patch2\\"),
+    };
 
     Module = FindLdrModuleByHandle(NULL);
-    AppPathLength = (Module->FullDllName.Length - Module->BaseDllName.Length) / sizeof(WCHAR);
+    Status = NtFileDisk::QueryFullNtPath(Module->FullDllName.Buffer, &ExePath);
+    FAIL_RETURN(Status);
 
-    Length = RtlGetFullPathName_U(OriginalPath, HookedPathCount * sizeof(WCHAR), HookedPath, NULL);
-    Length = Length / sizeof(WCHAR) + 1;
-    FileName = HookedPath + AppPathLength;
-    LOOP_ONCE
+    RedirectEntry = (PFILE_REDIRECT_ENTRY)AllocateMemoryP((countof(RedirectSubDirectory) + 1) * sizeof(*RedirectEntry), HEAP_ZERO_MEMORY);
+    if (RedirectEntry == NULL)
     {
-        if (StrNICompareW(FileName, szDataPath, countof(szDataPath) - 1) ||
-            StrNICompareW(Module->FullDllName.Buffer, HookedPath, AppPathLength))
-        {
-            FileName = OriginalPath;
-            break;
-        }
-
-        FileName += countof(szDataPath) - 2;
-        RtlMoveMemory(
-            FileName + countof(szPatch) - countof(szDataPath),
-            FileName,
-            (Length - (FileName - HookedPath)) * sizeof(*FileName)
-        );
-
-        FileName -= countof(szDataPath) - 2;
-        CopyStruct(FileName, szPatch, sizeof(szPatch) - sizeof(*szPatch));
-
-        WriteLog(L"pass1: %s", HookedPath);
-
-        if (IsPathExists(HookedPath))
-        {
-            FileName = HookedPath;
-            break;
-        }
-
-        CopyStruct(FileName, szPatch2, sizeof(szPatch2) - sizeof(*szPatch2));
-        FileName = IsPathExists(HookedPath) ? HookedPath : OriginalPath;
-
-        WriteLog(L"pass2: %s", HookedPath);
+        RtlFreeUnicodeString(&ExePath);
+        return STATUS_NO_MEMORY;
     }
 
-    WriteLog(L"%d, %s -> %s", FileName == HookedPath, OriginalPath, HookedPath);
+    GlobalRedirectEntry = RedirectEntry;
 
-    return FileName;
+    ExePath.Length -= Module->BaseDllName.Length;
+    Length = 0;
+    FOR_EACH(Entry, RedirectSubDirectory, countof(RedirectSubDirectory))
+    {
+        Length = ML_MAX(Entry->Original.Length, ML_MAX(Entry->Redirected.Length, Length));
+    }
+
+    Length += ExePath.Length;
+
+    Buffer = (PWSTR)AllocStack(Length + sizeof(WCHAR));
+
+    FOR_EACH(Entry, RedirectSubDirectory, countof(RedirectSubDirectory))
+    {
+        CopyMemory(Buffer, ExePath.Buffer, ExePath.Length);
+        CopyMemory(PtrAdd(Buffer, ExePath.Length), Entry->Original.Buffer, Entry->Original.Length);
+        *PtrAdd(Buffer, ExePath.Length + Entry->Original.Length) = 0;
+        RtlCreateUnicodeString(&RedirectEntry->Original, Buffer);
+
+        CopyMemory(PtrAdd(Buffer, ExePath.Length), Entry->Redirected.Buffer, Entry->Redirected.Length);
+        *PtrAdd(Buffer, ExePath.Length + Entry->Redirected.Length) = 0;
+        RtlCreateUnicodeString(&RedirectEntry->Redirected, Buffer);
+
+        ++RedirectEntry;
+    }
+
+    return STATUS_SUCCESS;
 }
 
-HANDLE
-WINAPI
-AoCreateFileA(
-    LPCSTR                  lpFileName,
-    ULONG                   dwDesiredAccess,
-    ULONG                   dwShareMode,
-    LPSECURITY_ATTRIBUTES   lpSecurityAttributes,
-    ULONG                   dwCreationDisposition,
-    ULONG                   dwFlagsAndAttributes,
-    HANDLE                  hTemplateFile
+NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING RedirectedFile)
+{
+    ULONG_PTR               Length, BufferLength;
+    PWSTR                   Buffer;
+    NTSTATUS                Status;
+    UNICODE_STRING          SubFilePath, Redirected, OriginalPath;
+    OBJECT_ATTRIBUTES       oa;
+    FILE_BASIC_INFORMATION  FileBasic;
+    PFILE_REDIRECT_ENTRY    Entry;
+
+    RtlInitEmptyString(RedirectedFile);
+
+    Entry = GlobalRedirectEntry;
+    if (Entry == NULL)
+        return STATUS_FLT_NOT_INITIALIZED;
+
+    if (OriginalFile == NULL || OriginalFile->Buffer == NULL)
+    {
+        return STATUS_INVALID_PARAMETER;
+    }
+
+    Status = NtFileDisk::QueryFullNtPath(OriginalFile->Buffer, &OriginalPath);
+    FAIL_RETURN(Status);
+
+    BufferLength = MAX_NTPATH * sizeof(WCHAR);
+    Buffer = (PWSTR)AllocStack(BufferLength);
+    SubFilePath = OriginalPath;
+
+    FOR_EACH(Entry, Entry, ~0u)
+    {
+        if (Entry->Original.Buffer == NULL)
+            return STATUS_NO_MATCH;
+
+        if (OriginalPath.Length <= Entry->Original.Length)
+            continue;
+
+        SubFilePath.Length = Entry->Original.Length;
+        if (!RtlEqualUnicodeString(&SubFilePath, &Entry->Original, TRUE))
+            continue;
+
+        Length = Entry->Redirected.Length + OriginalPath.Length - SubFilePath.Length + sizeof(WCHAR);
+        if (Length > BufferLength)
+        {
+            Buffer = (PWSTR)AllocStack(Length - BufferLength);
+            BufferLength = Length;
+        }
+
+        Length = OriginalPath.Length - SubFilePath.Length;
+
+        CopyMemory(Buffer, Entry->Redirected.Buffer, Entry->Redirected.Length);
+        CopyMemory(PtrAdd(Buffer, Entry->Redirected.Length), PtrAdd(OriginalPath.Buffer, SubFilePath.Length), Length);
+        Length += Entry->Redirected.Length;
+        *PtrAdd(Buffer, Length) = 0;
+
+        Redirected.Length           = (USHORT)Length;
+        Redirected.MaximumLength    = Redirected.Length;
+        Redirected.Buffer           = Buffer;
+
+        InitializeObjectAttributes(&oa, &Redirected, OBJ_CASE_INSENSITIVE, NULL, 0);
+        Status = ZwQueryAttributesFile(&oa, &FileBasic);
+        if (
+            NT_SUCCESS(Status) &&
+            FileBasic.FileAttributes != INVALID_FILE_ATTRIBUTES &&
+            FLAG_OFF(FileBasic.FileAttributes, FILE_ATTRIBUTE_DIRECTORY)
+           )
+        {
+            Status = RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &Redirected, RedirectedFile);
+            if (NT_SUCCESS(Status))
+                break;
+        }
+    }
+
+    RtlFreeUnicodeString(&OriginalPath);
+
+    return STATUS_SUCCESS;
+}
+
+TYPE_OF(NtCreateFile)* StubNtCreateFile;
+
+NTSTATUS
+NTAPI
+AoCreateFile(
+    PHANDLE             FileHandle,
+    ACCESS_MASK         DesiredAccess,
+    POBJECT_ATTRIBUTES  ObjectAttributes,
+    PIO_STATUS_BLOCK    IoStatusBlock,
+    PLARGE_INTEGER      AllocationSize,
+    ULONG               FileAttributes,
+    ULONG               ShareAccess,
+    ULONG               CreateDisposition,
+    ULONG               CreateOptions,
+    PVOID               EaBuffer,
+    ULONG               EaLength
 )
 {
-    WCHAR OriginalPath[MAX_NTPATH], HookedPath[MAX_NTPATH];
+    NTSTATUS            Status;
+    UNICODE_STRING      RedirectedFile;
+    OBJECT_ATTRIBUTES   LocalObjectAttributes;
 
-    return NtFileDisk::SimulateCreateFile(
-                GetFileName(HookedPath, countof(HookedPath), OriginalPath, countof(OriginalPath), lpFileName),
-                dwDesiredAccess,
-                dwShareMode,
-                lpSecurityAttributes,
-                dwCreationDisposition,
-                dwFlagsAndAttributes,
-                hTemplateFile
-           );
+    RtlInitEmptyString(&RedirectedFile);
+
+    if (ObjectAttributes != NULL)
+    {
+        LocalObjectAttributes = *ObjectAttributes;
+        if (NT_SUCCESS(GetRedirectedFileName(LocalObjectAttributes.ObjectName, &RedirectedFile)))
+        {
+            LocalObjectAttributes.ObjectName = &RedirectedFile;
+            LocalObjectAttributes.RootDirectory = NULL;
+            CLEAR_FLAG(LocalObjectAttributes.Attributes, OBJ_INHERIT);
+
+            ObjectAttributes = &LocalObjectAttributes;
+        }
+    }
+
+    Status = StubNtCreateFile(
+                FileHandle,
+                DesiredAccess,
+                ObjectAttributes,
+                IoStatusBlock,
+                AllocationSize,
+                FileAttributes,
+                ShareAccess,
+                CreateDisposition,
+                CreateOptions,
+                EaBuffer,
+                EaLength
+            );
+
+    RtlFreeUnicodeString(&RedirectedFile);
+
+    return Status;
 }
 
 HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
 {
     NTSTATUS        Status;
     HANDLE          FindHandle;
-    WCHAR           OriginalPath[MAX_NTPATH], HookedPath[MAX_NTPATH];
     ML_FIND_DATA    FindData;
+    UNICODE_STRING  FileToFind, RedirectedFile;
 
+    Status = AnsiToUnicodeString(&FileToFind, FileName);
+    if (NT_FAILED(Status))
+        return NULL;
+
+    Status = GetRedirectedFileName(&FileToFind, &RedirectedFile);
     Status = QueryFirstFile(
                     &FindHandle,
-                    GetFileName(HookedPath, countof(HookedPath), OriginalPath, countof(OriginalPath), FileName),
+                    NT_SUCCESS(Status) ? RedirectedFile.Buffer : FileToFind.Buffer,
                     &FindData
                 );
+
+    RtlFreeUnicodeString(&FileToFind);
+    RtlFreeUnicodeString(&RedirectedFile);
 
     FindFileData->cFileName[0] = 0;
 
@@ -301,45 +423,24 @@ HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
 
 BOOL AoIsFileExist(PCSTR FileName)
 {
-    WCHAR OriginalPath[MAX_NTPATH], HookedPath[MAX_NTPATH];
+    NTSTATUS                Status;
+    UNICODE_STRING          FileToCheck, RedirectedFile;
+    OBJECT_ATTRIBUTES       ObjectAttributes;
+    FILE_BASIC_INFORMATION  FileBasic;
 
-    if (GetFileName(HookedPath, countof(HookedPath), OriginalPath, countof(OriginalPath), FileName) == HookedPath)
-        return TRUE;
+    Status = AnsiToUnicodeString(&FileToCheck, FileName);
+    if (NT_FAILED(Status))
+        return NULL;
 
-    return IsPathExists(OriginalPath);
-}
+    Status = GetRedirectedFileName(&FileToCheck, &RedirectedFile);
 
-LONG CDECL GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrId)
-{
-    CHAR FullPath[MAX_NTPATH];
+    InitializeObjectAttributes(&ObjectAttributes, NT_SUCCESS(Status) ? &RedirectedFile : &FileToCheck, OBJ_CASE_INSENSITIVE, NULL, 0);
+    Status = ZwQueryAttributesFile(&ObjectAttributes, &FileBasic);
 
-    sprintf(FullPath, "data/campimg/chrimg%02d.itp", ChrId);
-    if (!AoIsFileExist(FullPath))
-        ChrId = 9999;
+    RtlFreeUnicodeString(&FileToCheck);
+    RtlFreeUnicodeString(&RedirectedFile);
 
-    return sprintf(Buffer, Format, ChrId);
-}
-
-LONG CDECL GetBattleFace(PSTR Buffer, PCSTR Format, PCSTR DataPath, LONG ChrId)
-{
-    LONG_PTR Length;
-
-    Length = sprintf(Buffer, Format, DataPath, ChrId);
-    if (!AoIsFileExist(Buffer))
-        Length = sprintf(Buffer, Format, DataPath, 9999);
-
-    return Length;
-}
-
-LONG CDECL GetFieldAttackChr(PSTR Buffer, PCSTR Format, LONG ChrId)
-{
-    CHAR FullPath[MAX_NTPATH];
-
-    sprintf(FullPath, "data/system/fachr%03d._bn", ChrId);
-    if (!AoIsFileExist(FullPath))
-        ChrId = 999;
-
-    return sprintf(Buffer, Format, ChrId);
+    return NT_SUCCESS(Status) && FileBasic.FileAttributes != INVALID_FILE_ATTRIBUTES;
 }
 
 LONG NTAPI ShowExitMessageBox(HWND hWnd, PCSTR Text, PCSTR Caption, UINT Type)
@@ -404,9 +505,13 @@ BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
 
-    LdrDisableThreadCalloutsForDll(BaseAddress);
+    //EnableHeapCorruptionHelper();
 
+    LdrDisableThreadCalloutsForDll(BaseAddress);
     SetExeDirectoryAsCurrent();
+
+    InitializeRedirectEntry();
+
 
     static DOUBLE DefaultDistance = 0.f;
 
@@ -420,7 +525,6 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x06,      1, 0x410731),    // win
         PATCH_MEMORY(0x06,      1, 0x410AD1),    // win
         PATCH_MEMORY(0x01,      1, 0x40991D),    // cpu
-        PATCH_MEMORY(0x00,      4, 0x329851),    // disable foolish get joy stick pos
         PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
         PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
         PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
@@ -466,8 +570,10 @@ BOOL Initialize(PVOID BaseAddress)
 
 #if !D3D9_VER
 
+        PATCH_MEMORY(0x00,      4, 0x329851),    // disable foolish get joy stick pos
+
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
-        PATCH_MEMORY(AoCreateFileA,         4, 0x9D576C),       // CreateFileA
+        //PATCH_MEMORY(AoCreateFile,         4, 0x9D576C),       // CreateFileA
 
         PATCH_MEMORY(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
 
@@ -493,6 +599,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
         //INLINE_HOOK_CALL_RVA_NULL(0x51E1C7, xxx),
 
+
         // tweak
 
         //INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
@@ -510,6 +617,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA_NULL(0x46B6A0, METHOD_PTR(&CSoundPlayer::GetSoundControlWindow)),
         INLINE_HOOK_JUMP         (EATLookupRoutineByHashPNoFix(FindLdrModuleByName(&WCS2US(L"USER32.dll"))->DllBase, USER32_SendMessageA), CSoundPlayer::StaticDispatchCtrlCode, CSoundPlayer::StubStaticDispatchCtrlCode),
 
+
         // bug fix
 
         INLINE_HOOK_CALL_RVA_NULL(0x5B1BE6, METHOD_PTR(&CBattleATBar::LookupReplaceAtBarEntry)),
@@ -518,46 +626,43 @@ BOOL Initialize(PVOID BaseAddress)
 
         INLINE_HOOK_CALL_RVA_NULL(0x6A58FF, CMiniGame::HorrorHouse_GetMonsterPosition),
 
+
         // file redirection
 
+        INLINE_HOOK_JUMP         (ZwCreateFile, AoCreateFile, StubNtCreateFile),
         INLINE_HOOK_CALL_RVA_NULL(0x48C1EA, AoFindFirstFileA),
         INLINE_HOOK_CALL_RVA_NULL(0x48C206, ZwClose),
-        INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, GetCampImage),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, GetBattleFace),
-        INLINE_HOOK_CALL_RVA_NULL(0x2F9101, GetFieldAttackChr),
+        INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, EDAO::GetCampImage),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, EDAO::GetBattleFace),
+        INLINE_HOOK_CALL_RVA_NULL(0x2F9101, EDAO::GetFieldAttackChr),
+        INLINE_HOOK_CALL_RVA_NULL(0x4948B9, METHOD_PTR(&EDAO::GetCFace)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4948DF, METHOD_PTR(&EDAO::GetCFace)),
 
-#if D3D9_VER
-
-        INLINE_HOOK_JUMP_NULL(EATLookupRoutineByHashPNoFix(GetKernel32Handle(), KERNEL32_CreateFileA), AoCreateFileA),
-
-#endif
 
         // custom format itp / itc
-
         //INLINE_HOOK_JUMP_RVA(0x273D24, METHOD_PTR(&EDAOFileStream::Uncompress), EDAOFileStream::StubUncompress),
+
 
         // hack for boss
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5D1ED5, METHOD_PTR(&CBattle::NakedAS8DDispatcher)),
-        INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::NakedGetChrIdForSCraft)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::NakedGetTurnVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::NakedGetRunawayVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::NakedGetReplySupportVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::NakedGetTeamRushVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5DFA1B, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E081E, METHOD_PTR(&CBattle::NakedGetUnderAttackVoiceChrId2)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::NakedGetSBreakVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::NakedCopyMagicAndCraftData)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::NakedOverWriteBattleStatusWithChrStatus)),
-        INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::NakedIsChrStatusNeedRefresh)),
-        INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::NakedGetChrSBreak)),
-        INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::GetMagicData), CGlobal::StubGetMagicData),
-        INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::GetMagicQueryTable), CGlobal::StubGetMagicQueryTable),
-        INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::GetMagicDescription), CGlobal::StubGetMagicDescription),
-        INLINE_HOOK_CALL_RVA_NULL(0x332B26, METHOD_PTR(&EDAO::GetStatusIcon)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4948B9, METHOD_PTR(&EDAO::GetCFace)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4948DF, METHOD_PTR(&EDAO::GetCFace)),
-        INLINE_HOOK_CALL_RVA_NULL(0x2F82B8, METHOD_PTR(&EDAO::GetLeaderChangeVoice)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5D1ED5, METHOD_PTR(&CBattle::   NakedAS8DDispatcher)),
+        INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::   NakedGetChrIdForSCraft)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::   NakedGetTurnVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::   NakedGetRunawayVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::   NakedGetReplySupportVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::   NakedGetTeamRushVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5DFA1B, METHOD_PTR(&CBattle::   NakedGetUnderAttackVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E081E, METHOD_PTR(&CBattle::   NakedGetUnderAttackVoiceChrId2)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::   NakedGetSBreakVoiceChrId)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::   NakedCopyMagicAndCraftData)),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::   NakedOverWriteBattleStatusWithChrStatus)),
+        INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::   NakedIsChrStatusNeedRefresh)),
+        INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::      NakedGetChrSBreak)),
+        INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::   GetMagicData),          CGlobal::StubGetMagicData),
+        INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::   GetMagicQueryTable),    CGlobal::StubGetMagicQueryTable),
+        INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::   GetMagicDescription),   CGlobal::StubGetMagicDescription),
+        INLINE_HOOK_CALL_RVA_NULL(0x332B26, METHOD_PTR(&EDAO::      GetStatusIcon)),
+        INLINE_HOOK_CALL_RVA_NULL(0x2F82B8, METHOD_PTR(&EDAO::      GetLeaderChangeVoice)),
         INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
         INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
 
@@ -748,7 +853,7 @@ Arianrhod_DirectInput8Create(
 #endif
 
     WriteLog(L"%08X\n", _ReturnAddress());
-    
+
     static BOOL Hooked = FALSE;
 
     if (!Hooked && IsCodeDecompressed())

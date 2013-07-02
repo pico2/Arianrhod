@@ -1,7 +1,7 @@
 @echo off
 cd/d "%~dp0"
 
-for %%i in (scena\*.py) do %%i
+for %%i in (scena\*.bin.py) do %%i
 
 fachr176._bn.py
 t_name.py
