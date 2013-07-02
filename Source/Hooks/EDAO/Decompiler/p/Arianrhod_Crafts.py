@@ -306,9 +306,6 @@ def EnterBattle():
     Return()
 
 def UnderAttack():
-    #LoadChrChip(7, "chr/ch03554.itc", 0xFF)
-
-
     AS_78(1)
 
     LoadEffect(1, "eff/trapdmg2.eff")
@@ -323,6 +320,8 @@ def UnderAttack():
     SetChrSubChip(CraftTarget.Self, 3)
     Sleep(1000)
     Yield()
+
+    FreeEffect(1)
 
 def BattleWin():
 
@@ -1443,3 +1442,18 @@ def 零时迷子():
     ResetBrightness(0)
 
     CallReturn()
+
+
+def 神速():
+
+    AS_78(1)
+    #LoadEffect(1, "event/ev202_00.eff")
+    LoadEffect(0x1, "battle/cr036200.eff")
+    AS_78(0)
+
+    PlayEffect(0xFF, 0xFF, 1, 1, 0, 1000, 0, 0, 0, 0, 1000, 1000, 1000, 1)
+    WaitEffect(-1, 1)
+    Yield()
+
+    Sleep(5000)
+    Yield()

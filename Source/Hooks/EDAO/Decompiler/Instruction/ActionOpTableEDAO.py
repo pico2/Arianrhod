@@ -381,8 +381,8 @@ edao_as_op_list = \
     inst(WaitEffect,                    'BB'),
     inst(StopEffect,                    'BB'),
     inst(CancelEffect,                  'BB'),
-    inst(PlayEffect,                    'BBBBiiiHHHHHHB'),      # PlayEffect(eff_owner, chr, eff_index, x, z, y, degree_vert, degree_horz, unknown, size_x, size_z, size_y, eff_handle)
-    inst(Play3DEffect,                  'BBSBBiiiHHHHHHB'),
+    inst(PlayEffect,                    'BBBBiiihhhhhhC'),      # PlayEffect(eff_owner, chr, eff_index, x, z, y, degree_vert, degree_horz, unknown, size_x, size_z, size_y, eff_handle)
+    inst(Play3DEffect,                  'BBSBBiiihhhhhhC'),
     inst(AS_1A,                         'BBW'),
     inst(SetChrChip,                    'BB'),
     inst(DamageCue,                     'B'),

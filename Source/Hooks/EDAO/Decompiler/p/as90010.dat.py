@@ -38,7 +38,7 @@ def main():
         'Craft_麒麟功',                     # 16 22
         'Craft_朗基努斯枪',                 # 17 23
         'Craft_EnumaElish',                 # 18 24
-        'stub_craft',                       # 19 25
+        'Craft_神速',                       # 19 25
         "Craft_圣技大十字",                 # 1A 26
         'Craft_朗基努斯枪_EnemyVersion',    # 1B 27
         'Craft_unmask_EnemyVersion',        # 1C 28
@@ -98,6 +98,10 @@ def main():
 
     label('Craft_EnumaElish')
     Arianrhod.EnumaElish()
+    Return()
+
+    label('Craft_神速')
+    Arianrhod.神速()
     Return()
 
     label('stub_craft')

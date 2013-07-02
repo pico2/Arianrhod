@@ -162,7 +162,6 @@ def main():
 
     import TiosBed
 
-    PartySelect(0)
     PartySelect(2)
     TiosBed.ShowMenu()
     ClearParty()
