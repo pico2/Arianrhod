@@ -503,6 +503,7 @@ BOOL Initialize(PVOID BaseAddress)
         // buf fix
         PATCH_MEMORY(0xEB,      1,  0x60CC8F),      // burst energy
         PATCH_MEMORY(0x32,      1,  0x54FDA4),      // text length of menu item created by MenuCmd(1, x, x)
+        // PATCH_MEMORY(0x37,      1,  0x5006B8),      // dead lock while exiting
 
         //PATCH_MEMORY(0x00,  1,  0x5304C9),      // skip op Sleep
 

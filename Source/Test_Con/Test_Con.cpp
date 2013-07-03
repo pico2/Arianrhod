@@ -800,26 +800,131 @@ BOOL HookCallCreateProcess()
     }
 }
 
-class A
-{
-public:
-    A create()
-    {
-        return A();
-    }
-};
+// {5a936bef-668d-4f6e-b057-7da30869c871}
+SET_GUID(GUID_ShellOverlayHook,
+0x5a936bef, 0x668d, 0x4f6e, 0xb0, 0x57, 0x7d, 0xa3, 0x08, 0x69, 0xc8, 0x71);
 
-class B : public A
+WCHAR IconOverlayKey[] = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers\\" L"\x01" L"Arianrhod";
+
+ULONG_PTR FormatDllClassId(PWSTR Buffer, PCUNICODE_STRING GuidString)
 {
-public:
-};
+    return swprintf(Buffer, L"CLSID\\%wZ\\InprocServer32", GuidString);
+}
+
+#pragma comment(lib, "advapi32.lib")
+
+NTSTATUS UnInstallShellOverlayHook()
+{
+    WCHAR           DllClassIdKey[MAX_NTPATH];
+    ULONG_PTR       Length;
+    NTSTATUS        Status;
+    UNICODE_STRING  GuidString;
+
+    Status = RtlStringFromGUID(GUID_ShellOverlayHook, &GuidString);
+    FAIL_RETURN(Status);
+
+    Length = FormatDllClassId(DllClassIdKey, &GuidString);
+
+    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey);
+
+    DllClassIdKey[Length - countof(L"\\InprocServer32") + 1] = 0;
+
+    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey);
+
+    Reg::DeleteKey(HKEY_LOCAL_MACHINE, IconOverlayKey);
+
+    RtlFreeUnicodeString(&GuidString);
+
+    return 0;
+}
+
+NTSTATUS InstallShellOverlayHook()
+{
+    WCHAR           DllClassIdKey[MAX_NTPATH];
+    PWSTR           DllFullPath;
+    ULONG_PTR       Length;
+    NTSTATUS        Status;
+    UNICODE_STRING  GuidString, DllPath, ThreadingModel;
+    PLDR_MODULE     ExeModule;
+
+    static WCHAR DllFileName[] = L"IconOverlayHandler.dll";
+
+    ExeModule               = FindLdrModuleByHandle(NULL);
+    DllPath                 = ExeModule->FullDllName;
+    DllPath.Length          = (USHORT)PtrOffset(findnamew(DllPath.Buffer), DllPath.Buffer);
+    DllPath.MaximumLength   = DllPath.Length;
+
+    Status = RtlStringFromGUID(GUID_ShellOverlayHook, &GuidString);
+    FAIL_RETURN(Status);
+
+    SCOPE_EXIT
+    {
+        RtlFreeUnicodeString(&GuidString);
+    }
+    SCOPE_EXIT_END;
+
+    FormatDllClassId(DllClassIdKey, &GuidString);
+
+    DllFullPath = (PWSTR)AllocStack(DllPath.Length + sizeof(DllFileName));
+    Length = swprintf(DllFullPath, L"%wZ%s", &DllPath, DllFileName);
+
+    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, NULL, REG_SZ, DllFullPath, Length * sizeof(WCHAR));
+    FAIL_RETURN(Status);
+
+
+    RTL_CONST_STRING(ThreadingModel, L"Apartment");
+
+    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, L"ThreadingModel", REG_SZ, ThreadingModel.Buffer, ThreadingModel.Length);
+    FAIL_RETURN(Status);
+
+    Status = Reg::SetKeyValue(HKEY_LOCAL_MACHINE, IconOverlayKey, NULL, REG_SZ, GuidString.Buffer, GuidString.Length);
+
+    return Status;
+}
+
+#include <ShlObj.h>
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    B b, c;
-    A a;
+    NTSTATUS Status;
 
-    a = b.create();
+    Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);
+    
+    if (Status == STATUS_PRIVILEGE_NOT_HELD)
+    {
+        ShellExecuteW(NULL, L"runas", FindLdrModuleByHandle(NULL)->FullDllName.Buffer, NULL, NULL, SW_SHOW);
+        Ps::ExitProcess(0);
+    }
+
+    if (NT_FAILED(Status))
+    {
+        Ps::ExitProcess(0);
+    }
+
+    if (NT_FAILED(InstallShellOverlayHook()))
+    {
+        UnInstallShellOverlayHook();
+        Ps::ExitProcess(0);
+    }
+
+    ULONG ExplorerPid;
+
+    if (GetWindowThreadProcessId(GetShellWindow(), &ExplorerPid) != 0)
+    {
+        HANDLE Explorer = PidToHandle(ExplorerPid);
+        if (Explorer != NULL)
+        {
+            NtTerminateProcess(Explorer, 1);
+            NtClose(Explorer);
+
+            Ps::CreateProcess(NULL, L"explorer.exe");
+        }
+    }
+
+    PauseConsole(L"Press any key to uninstall ...");
+    UnInstallShellOverlayHook();
+
+    Ps::ExitProcess(0);
 
     return;
 

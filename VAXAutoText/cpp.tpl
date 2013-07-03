@@ -87,18 +87,18 @@ a::nn:
 a::n0:
 != 0
 a:GUID IMPLEMENT_OLECREATE:#guid:
-// {$GUID_STRING$} 
+// {$GUID_STRING$}
 IMPLEMENT_OLECREATE($GUID_Class$, $GUID_ExternalName$, 
 $GUID_DEFINITION$);
 
 a:DEFINE_GUID:#guid:
-// {$GUID_STRING$} 
-DEFINE_GUID($GUID_Name$, 
+// {$GUID_STRING$}
+DEFINE_GUID(GUID_$GUID_Name$, 
 $GUID_DEFINITION$);
 
 a:GUID struct instance:#guid:
-// {$GUID_STRING$} 
-static const GUID $GUID_InstanceName$ = 
+// {$GUID_STRING$}
+static const GUID GUID_$GUID_InstanceName$ = 
 { $GUID_STRUCT$ };
 
 a:GUID string:#guid:
