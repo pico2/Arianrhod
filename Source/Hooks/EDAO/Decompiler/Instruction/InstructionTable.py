@@ -1,6 +1,36 @@
 from Base.EDAOBase import *
 
-HANDLER_REASON_DISASM         = 0
+def DefaultOpCodeHandler(data):
+    entry   = data.TableEntry
+    fs      = data.FileStream
+    inst    = data.Instruction
+    oprs    = inst.OperandFormat
+    values  = data.Arguments
+
+    entry.Container.WriteOpCode(fs, inst.OpCode)
+
+    if len(oprs) != len(values):
+        raise Exception('operand: does not match values')
+
+    for i in range(len(oprs)):
+        entry.WriteOperand(data, oprs[i], values[i])
+
+    return inst
+
+def OpCodeHandlerPrivate(data):
+    op = data.Instruction.OpCode
+    entry = data.TableEntry
+
+    handler = entry.Handler if entry.Handler != None else DefaultOpCodeHandler
+    inst = handler(data)
+
+    if inst == None:
+        inst = DefaultOpCodeHandler(data)
+
+    return inst
+
+
+HANDLER_REASON_DISASM       = 0
 HANDLER_REASON_WRITE        = 1
 HANDLER_REASON_FORMAT       = 2
 HANDLER_REASON_FUNCTION     = 3

@@ -161,35 +161,6 @@ for op, inst in edao_fa_op_table.items():
         exec('\r\n'.join(func))
 
 
-def DefaultOpCodeHandler(data):
-    entry   = data.TableEntry
-    fs      = data.FileStream
-    inst    = data.Instruction
-    oprs    = inst.OperandFormat
-    values  = data.Arguments
-
-    entry.Container.WriteOpCode(fs, inst.OpCode)
-
-    if len(oprs) != len(values):
-        raise Exception('operand: does not match values')
-
-    for i in range(len(oprs)):
-        entry.WriteOperand(data, oprs[i], values[i])
-
-    return inst
-
-def OpCodeHandlerPrivate(data):
-    op = data.Instruction.OpCode
-    entry = data.TableEntry
-
-    handler = entry.Handler if entry.Handler != None else DefaultOpCodeHandler
-    inst = handler(data)
-
-    if inst == None:
-        inst = DefaultOpCodeHandler(data)
-
-    return inst
-
 def OpCodeHandler(op, args):
     entry = edao_fa_op_table[op]
     fs = fafile

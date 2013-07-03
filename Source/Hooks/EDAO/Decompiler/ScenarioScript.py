@@ -1360,7 +1360,7 @@ class ScenarioInfo:
         lines.append('')
 
         if append_place_name:
-            debugmap = ['a0000', 'map1']
+            debugmap = ['a0000', 'map1', 'a0002']
             if self.MapName.lower() not in debugmap:
                 mapname = self.GetMapNameByIndex(self.MapIndex)
 
@@ -1372,7 +1372,7 @@ class ScenarioInfo:
                             break
                         ext = ext2 + ext
 
-                    filename = '%s_%s%s' % (filename, mapname, ext)
+                    filename = '%s.%s%s' % (filename, mapname, ext)
 
         fs = open(filename, 'wb')
         fs.write(''.encode('utf_8_sig'))
