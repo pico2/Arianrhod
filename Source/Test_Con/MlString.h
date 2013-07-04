@@ -171,7 +171,7 @@ protected:
 
         Found = wcsstr(Begin + StartIndex, Str);
 
-        return Found == NULL ? kInvalidIndex : Found - Begin;
+        return Found == nullptr ? kInvalidIndex : Found - Begin;
     }
 
     BOOL IsNullOrEmpty()
@@ -189,19 +189,19 @@ protected:
         Begin = GetBuffer();
         End = PtrAdd(GetBuffer(), GetLength());
 
-        Prev = NULL;
+        Prev = nullptr;
         Begin += StartIndex;
         while (Begin < End)
         {
             Found = wcsstr(Begin, Str);
-            if (Found == NULL)
+            if (Found == nullptr)
                 break;
 
             Prev = Found;
             Begin = Found + 1;
         }
 
-        return Prev == NULL ? kInvalidIndex : Prev - GetBuffer();
+        return Prev == nullptr ? kInvalidIndex : Prev - GetBuffer();
     }
 
     BOOL MatchExpression(PCSTRING_TYPE Expression, BOOL IgnoreCase)
@@ -567,7 +567,7 @@ public:
 
     NoInline BOOL IsNullOrEmpty()
     {
-        return GetImplement() == NULL ? TRUE : GetImplement()->IsNullOrEmpty();
+        return GetImplement() == nullptr ? TRUE : GetImplement()->IsNullOrEmpty();
     }
 
     NoInline LARGE_LENGTH_TYPE LastIndexOf(STRING_CHAR_TYPE Chr, LARGE_LENGTH_TYPE StartIndex = 0)
@@ -803,7 +803,7 @@ public:
 protected:
     StringImplement* GetImplement() const
     {
-        return this->Buffer == NULL ? NULL : FIELD_BASE(this->Buffer, StringImplement, Buffer);
+        return this->Buffer == nullptr ? nullptr : FIELD_BASE(this->Buffer, StringImplement, Buffer);
     }
 
     VOID SetImplement(StringImplement *Impl)
@@ -813,7 +813,7 @@ protected:
 
     VOID Reset()
     {
-        this->Buffer = NULL;
+        this->Buffer = nullptr;
     }
 
     NTSTATUS ReleaseImplement(StringImplement *Impl)
@@ -850,7 +850,7 @@ protected:
 
         LOOP_ONCE
         {
-            if (OldImpl == NULL)
+            if (OldImpl == nullptr)
                 break;
 
             if (OldImpl->GetMaxLength() > Length)
@@ -860,12 +860,12 @@ protected:
         Length = StringImplement::CountToLengthAddNull(Count);
         MaxLength = ROUND_UP(Length * 3 / 2, kCharSize);
         Impl = (StringImplement *)AllocateMemory(kStringImplSize + MaxLength);
-        if (Impl == NULL)
+        if (Impl == nullptr)
             return STATUS_NO_MEMORY;
 
         Impl->SetBuffer(Impl->Buffer, MaxLength);
 
-        if (OldImpl != NULL)
+        if (OldImpl != nullptr)
         {
             Impl->CopyBuffer(OldImpl);
             ReleaseImplement(OldImpl);

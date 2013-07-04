@@ -4,6 +4,8 @@
 
 #include "MyLibrary.cpp"
 
+ML_OVERLOAD_NEW
+
 TYPE_OF(::CreateProcessW)*  Shell32CreateProcessWPtr;
 TYPE_OF(::CreateProcessW)** Shell32CreateProcessWIAT;
 
@@ -104,7 +106,7 @@ PVOID ProbeInvokeCreateProcessAddress()
 
     Shell32CreateProcessW = PtrAdd(Shell32, IATLookupRoutineRVAByHashNoFix(Shell32, KERNEL32_CreateProcessW));
 
-    MainModule = FindLdrModuleByHandle(NULL);
+    MainModule = FindLdrModuleByHandle(nullptr);
 
     RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &MainModule->FullDllName, &ProbeApplicationName);
     RtlInitUnicodeString(&ProbeCommandLine, L"ML_PROBE_APPLICATION_COMMAMD_LINE");
@@ -116,6 +118,7 @@ PVOID ProbeInvokeCreateProcessAddress()
     ExecuteInfo.lpVerb          = L"open";
     ExecuteInfo.lpFile          = ProbeApplicationName.Buffer;
     ExecuteInfo.lpParameters    = ProbeCommandLine.Buffer;
+    ExecuteInfo.lpDirectory     = ProbeApplicationName.Buffer;
     ExecuteInfo.nShow           = SW_SHOW;
 
     *(PVOID *)&Shell32CreateProcessWIAT = Shell32CreateProcessW;
@@ -131,7 +134,7 @@ PVOID ProbeInvokeCreateProcessAddress()
     NtHeaders = RtlImageNtHeader(Shell32);
 
     if (InvokeReturnAddress < Shell32 || InvokeReturnAddress > PtrAdd(Shell32, NtHeaders->OptionalHeader.SizeOfImage))
-        return NULL;
+        return nullptr;
 
     return InvokeReturnAddress;
 }
@@ -165,18 +168,44 @@ BOOL HookCallCreateProcessFast(PVOID InvokeReturnAddress)
 
         Shell32 = FindLdrModuleByName(&WCS2US(L"SHELL32.dll"));
         NtHeaders = RtlImageNtHeader(Shell32->DllBase);
-        if (NtHeaders == NULL)
+        if (NtHeaders == nullptr)
             break;
 
         JumpAddressEnd = (PVOID *)PtrAdd(Shell32->DllBase, ROUND_UP(NtHeaders->OptionalHeader.SizeOfHeaders, NtHeaders->OptionalHeader.SectionAlignment));
         JumpAddressBegin = (PVOID *)(IMAGE_FIRST_SECTION(NtHeaders) + NtHeaders->FileHeader.NumberOfSections);
 
+        JumpAddressBegin = (PVOID *)ROUND_UP((ULONG_PTR)JumpAddressBegin, 16);
+
         while (JumpAddressBegin < JumpAddressEnd)
         {
-            if (*JumpAddressBegin == NULL)
-                break;
 
-            ++JumpAddressBegin;
+#if ML_X86
+
+            if (
+                JumpAddressBegin[0] == nullptr &&
+                JumpAddressBegin[1] == nullptr &&
+                JumpAddressBegin[2] == nullptr &&
+                JumpAddressBegin[3] == nullptr
+               )
+            {
+                break;
+            }
+
+            JumpAddressBegin += 4;
+
+#else
+            if (
+                JumpAddressBegin[0] == nullptr &&
+                JumpAddressBegin[1] == nullptr
+               )
+            {
+                break;
+            }
+
+            JumpAddressBegin += 2;
+
+#endif
+
         }
 
         if (JumpAddressBegin >= JumpAddressEnd)
@@ -212,7 +241,7 @@ BOOL HookCallCreateProcess()
     SEH_TRY
     {
         InvokeReturnAddress = ProbeInvokeCreateProcessAddress();
-        if (InvokeReturnAddress == NULL)
+        if (InvokeReturnAddress == nullptr)
             return FALSE;
 
         return HookCallCreateProcessFast(InvokeReturnAddress);
@@ -237,7 +266,7 @@ NTSTATUS CheckIsExplorer()
 
     static WCHAR ExplorerName[] = L"explorer.exe";
 
-    Status = NtQueryVirtualMemory(CurrentProcess, NtClose, MemoryMappedFilenameInformation, NULL, 0, &Length);
+    Status = NtQueryVirtualMemory(CurrentProcess, NtClose, MemoryMappedFilenameInformation, nullptr, 0, &Length);
     if (Status != STATUS_INFO_LENGTH_MISMATCH)
         return Status;
 
@@ -245,7 +274,7 @@ NTSTATUS CheckIsExplorer()
     Status = NtQueryVirtualMemory(CurrentProcess, NtClose, MemoryMappedFilenameInformation, NtdllFileName, Length, &Length);
     FAIL_RETURN(Status);
 
-    Status = NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, NULL, 0, &ReturnLength);
+    Status = NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, nullptr, 0, &ReturnLength);
     if (Status != STATUS_INFO_LENGTH_MISMATCH)
         return Status;
 
@@ -253,14 +282,14 @@ NTSTATUS CheckIsExplorer()
     Status = NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, ExeFileName, ReturnLength, &ReturnLength);
     FAIL_RETURN(Status);
 
-    BackSlash = NULL;
+    BackSlash = nullptr;
     Length = NtdllFileName->Name.Length / sizeof(WCHAR) - 1;
     for (; Length != 0; --Length)
     {
         if (NtdllFileName->Name.Buffer[Length] != '\\')
             continue;
 
-        if (BackSlash != NULL)
+        if (BackSlash != nullptr)
         {
             BackSlash = &NtdllFileName->Name.Buffer[Length];
             break;
@@ -269,10 +298,13 @@ NTSTATUS CheckIsExplorer()
         BackSlash = &NtdllFileName->Name.Buffer[Length];
     }
 
-    if (BackSlash == NULL)
+    if (BackSlash == nullptr)
         return STATUS_NO_MATCH;
 
     ++BackSlash;
+
+    if (PtrOffset(BackSlash, NtdllFileName->Name.Buffer) + sizeof(ExplorerName) > NtdllFileName->Name.MaximumLength)
+        return STATUS_NO_MATCH;
 
     CopyStruct(BackSlash, ExplorerName, sizeof(ExplorerName));
 
@@ -293,6 +325,13 @@ BOOL Initialize(PVOID BaseAddress)
     if (NT_FAILED(CheckIsExplorer()))
         return FALSE;
 
+    switch (GetCurrentSessionId())
+    {
+        case 0:
+        case INVALID_SESSION_ID:
+            return FALSE;
+    }
+
     {
         NtFileDisk  f;
         WCHAR       buf[0x100];
@@ -303,11 +342,15 @@ BOOL Initialize(PVOID BaseAddress)
         f.Write(buf, swprintf(buf, L"\xFEFF%08X, %02d:%02d:%02d", BaseAddress, st.wHour, st.wMinute, st.wSecond) * sizeof(WCHAR));
     }
 
-    if (!HookCallCreateProcess())
-        return FALSE;
-
     LdrDisableThreadCalloutsForDll(BaseAddress);
     LdrAddRefDll(LDR_ADDREF_DLL_PIN, BaseAddress);
+    Ps::CreateThread(
+        ThreadLambdaType_(PVOID)
+        {
+            return HookCallCreateProcess();
+        },
+        nullptr
+    );
 
     return TRUE;
 }

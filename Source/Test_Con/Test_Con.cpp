@@ -884,12 +884,23 @@ NTSTATUS InstallShellOverlayHook()
 
 #include <ShlObj.h>
 
+int func(ULONG_PTR n, ...)
+{
+    return PrintConsoleW(L"%d\n", n);
+}
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    vacall(func, argc, argv);
+    vacall(func, argc, argv, argc, argv);
+    vacall(func, argc, argv, argc, argv, argc, argv);
+
+    return;
+
     NTSTATUS Status;
 
     Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);
-    
+
     if (Status == STATUS_PRIVILEGE_NOT_HELD)
     {
         ShellExecuteW(NULL, L"runas", FindLdrModuleByHandle(NULL)->FullDllName.Buffer, NULL, NULL, SW_SHOW);
