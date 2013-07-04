@@ -891,12 +891,6 @@ int func(ULONG_PTR n, ...)
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    vacall(func, argc, argv);
-    vacall(func, argc, argv, argc, argv);
-    vacall(func, argc, argv, argc, argv, argc, argv);
-
-    return;
-
     NTSTATUS Status;
 
     Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);
