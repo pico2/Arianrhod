@@ -263,11 +263,12 @@ NTSTATUS CheckIsExplorer()
 
     PPROCESS_IMAGE_FILE_NAME            ExeFileName;
     PMEMORY_MAPPED_FILENAME_INFORMATION NtdllFileName;
+    MEMORY_MAPPED_FILENAME_INFORMATION  LocalMapped;
 
     static WCHAR ExplorerName[] = L"explorer.exe";
 
-    Status = NtQueryVirtualMemory(CurrentProcess, NtClose, MemoryMappedFilenameInformation, nullptr, 0, &Length);
-    if (Status != STATUS_INFO_LENGTH_MISMATCH)
+    Status = NtQueryVirtualMemory(CurrentProcess, NtClose, MemoryMappedFilenameInformation, &LocalMapped, sizeof(LocalMapped), &Length);
+    if (Status != STATUS_INFO_LENGTH_MISMATCH && Status != STATUS_BUFFER_OVERFLOW)
         return Status;
 
     NtdllFileName = (PMEMORY_MAPPED_FILENAME_INFORMATION)AllocStack(Length);
@@ -325,6 +326,7 @@ BOOL Initialize(PVOID BaseAddress)
     if (NT_FAILED(CheckIsExplorer()))
         return FALSE;
 
+    if (CurrentPeb()->OSMajorVersion > 5)
     switch (GetCurrentSessionId())
     {
         case 0:

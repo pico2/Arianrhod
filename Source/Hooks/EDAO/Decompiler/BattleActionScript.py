@@ -152,7 +152,6 @@ class BattleActionScriptInfo:
 
                     BuiltinArtsNames[i] = name
             except:
-                bp()
                 BuiltinArtsNames = []
 
 

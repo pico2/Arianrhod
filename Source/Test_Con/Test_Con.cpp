@@ -571,7 +571,7 @@ BOOL IsRunningInVMWare()
 
 #include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
-#include "MlString.h"
+#include "String.hpp"
 
 TYPE_OF(::CreateProcessW)*  Shell32CreateProcessWPtr;
 TYPE_OF(::CreateProcessW)** Shell32CreateProcessWIAT;
