@@ -122,7 +122,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <OutputFile>IconOverlayHandler.dll</OutputFile>
+      <OutputFile>E:\Desktop\Source\Test_Con\IconOverlayHandler.dll</OutputFile>
       <ImportLibrary>.\Release\IconOverlayHandler.lib</ImportLibrary>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
       <AdditionalDependencies>ntdll.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>

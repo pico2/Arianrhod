@@ -1,11 +1,9 @@
 @echo off
 setlocal
 
-start /MIN D:\TortoiseSVN\bin\TortoiseProc.exe /command:update /path:"E:\SyncPrivate\" /closeonend:2
+rem start "" /MIN "C:\Program Files\TortoiseSVN\bin\TortoiseProc.exe" /command:update /path:"E:\SyncPrivate\" /closeonend:2
 
-rem "D:\TortoiseGit\bin\TortoiseGitProc.exe" /command:pull /path:"E:\Sync\" /closeonend:2
-
-for /F "delims=" %%I in ("D:\PortableGit") do @set git_install_root=%%~fI
+for /F "delims=" %%I in ("F:\PortableGit") do @set git_install_root=%%~fI
 set PATH=%git_install_root%\bin;%git_install_root%\mingw\bin;%git_install_root%\cmd;%PATH%
 
 if not exist "%HOME%" @set HOME=%HOMEDRIVE%%HOMEPATH%
@@ -19,5 +17,12 @@ cd/d "E:\Sync"
 
 git pull
 
-pause
+echo.
+echo private...
+echo.
 
+cd/d "E:\SyncPrivate\"
+
+git pull
+
+pause

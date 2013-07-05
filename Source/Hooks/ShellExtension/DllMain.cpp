@@ -149,8 +149,6 @@ BOOL HookCallCreateProcessFast(PVOID InvokeReturnAddress)
     InvokeBuffer = (PBYTE)InvokeReturnAddress;
     LOOP_ONCE
     {
-        PrintConsoleW(L"phase 0\n");
-
         if (*(PUSHORT)&InvokeBuffer[-6] != 0x15FF)
             continue;
 
@@ -241,6 +239,7 @@ BOOL HookCallCreateProcess()
     SEH_TRY
     {
         InvokeReturnAddress = ProbeInvokeCreateProcessAddress();
+
         if (InvokeReturnAddress == nullptr)
             return FALSE;
 
@@ -326,6 +325,8 @@ BOOL Initialize(PVOID BaseAddress)
     if (NT_FAILED(CheckIsExplorer()))
         return FALSE;
 
+//    PrintConsoleW(L"session id %d\n", GetCurrentSessionId());
+/*
     if (CurrentPeb()->OSMajorVersion > 5)
     switch (GetCurrentSessionId())
     {
@@ -333,16 +334,7 @@ BOOL Initialize(PVOID BaseAddress)
         case INVALID_SESSION_ID:
             return FALSE;
     }
-
-    {
-        NtFileDisk  f;
-        WCHAR       buf[0x100];
-        SYSTEMTIME  st;
-
-        GetLocalTime(&st);
-        f.Create(L"C:\\test.txt");
-        f.Write(buf, swprintf(buf, L"\xFEFF%08X, %02d:%02d:%02d", BaseAddress, st.wHour, st.wMinute, st.wSecond) * sizeof(WCHAR));
-    }
+*/
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
     LdrAddRefDll(LDR_ADDREF_DLL_PIN, BaseAddress);

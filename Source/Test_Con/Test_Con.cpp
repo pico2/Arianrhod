@@ -825,13 +825,13 @@ NTSTATUS UnInstallShellOverlayHook()
 
     Length = FormatDllClassId(DllClassIdKey, &GuidString);
 
-    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey);
+    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey, KEY_WOW64_64KEY);
 
     DllClassIdKey[Length - countof(L"\\InprocServer32") + 1] = 0;
 
-    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey);
+    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey, KEY_WOW64_64KEY);
 
-    Reg::DeleteKey(HKEY_LOCAL_MACHINE, IconOverlayKey);
+    Reg::DeleteKey(HKEY_LOCAL_MACHINE, IconOverlayKey, KEY_WOW64_64KEY);
 
     RtlFreeUnicodeString(&GuidString);
 
@@ -868,35 +868,38 @@ NTSTATUS InstallShellOverlayHook()
     DllFullPath = (PWSTR)AllocStack(DllPath.Length + sizeof(DllFileName));
     Length = swprintf(DllFullPath, L"%wZ%s", &DllPath, DllFileName);
 
-    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, NULL, REG_SZ, DllFullPath, Length * sizeof(WCHAR));
+    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, NULL, REG_SZ, DllFullPath, Length * sizeof(WCHAR), KEY_WOW64_64KEY);
     FAIL_RETURN(Status);
 
 
     RTL_CONST_STRING(ThreadingModel, L"Apartment");
 
-    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, L"ThreadingModel", REG_SZ, ThreadingModel.Buffer, ThreadingModel.Length);
+    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, L"ThreadingModel", REG_SZ, ThreadingModel.Buffer, ThreadingModel.Length, KEY_WOW64_64KEY);
     FAIL_RETURN(Status);
 
-    Status = Reg::SetKeyValue(HKEY_LOCAL_MACHINE, IconOverlayKey, NULL, REG_SZ, GuidString.Buffer, GuidString.Length);
+    Status = Reg::SetKeyValue(HKEY_LOCAL_MACHINE, IconOverlayKey, NULL, REG_SZ, GuidString.Buffer, GuidString.Length, KEY_WOW64_64KEY);
 
     return Status;
 }
 
 #include <ShlObj.h>
 
-int func(ULONG_PTR n, ...)
-{
-    return PrintConsoleW(L"%d\n", n);
-}
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    KERNEL_USER_TIMES Times;
 
-    NtQueryInformationThread(CurrentThread, ThreadTimes, &Times, sizeof(Times), NULL);
-    PrintConsoleW(L"%I64X, %I64X\n", Times.KernelTime, Times.UserTime);
+#if 0
+
+    Ps::CreateThread(
+        ThreadLambdaType_(PVOID)
+        {
+            return PrintConsoleW(L"fuck\n");
+        },
+        nullptr
+    );
 
     return;
+
+#endif
 
     NTSTATUS Status;
 
@@ -929,7 +932,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
             NtTerminateProcess(Explorer, 1);
             NtClose(Explorer);
 
-            Ps::CreateProcess(NULL, L"explorer.exe");
+            //Ps::CreateProcess(NULL, L"explorer.exe");
+            //ShellExecuteW(NULL, L"open", L"explorer.exe", NULL, NULL, SW_SHOW);
         }
     }
 
