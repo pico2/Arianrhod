@@ -891,6 +891,13 @@ int func(ULONG_PTR n, ...)
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    KERNEL_USER_TIMES Times;
+
+    NtQueryInformationThread(CurrentThread, ThreadTimes, &Times, sizeof(Times), NULL);
+    PrintConsoleW(L"%I64X, %I64X\n", Times.KernelTime, Times.UserTime);
+
+    return;
+
     NTSTATUS Status;
 
     Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);

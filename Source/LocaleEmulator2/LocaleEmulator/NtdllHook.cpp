@@ -130,6 +130,47 @@ LeNtQuerySystemInformation(
     return Status;
 }
 
+NTSTATUS
+HPCALL
+LeNtQueryInformationThread(
+    HPARGS
+    HANDLE          ThreadHandle,
+    THREADINFOCLASS ThreadInformationClass,
+    PVOID           ThreadInformation,
+    ULONG           ThreadInformationLength,
+    PULONG          ReturnLength
+)
+{
+    NTSTATUS Status;
+
+    switch (ThreadInformationClass)
+    {
+        case ThreadTimes:
+            break;
+
+        default:
+            return 0;
+    }
+
+    HPARG_FLTINFO->Action = BlockSystemCall;
+
+    Status = HpCallSysCall(NtQueryInformationThread, ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength, ReturnLength);
+    FAIL_RETURN(Status);
+
+    PKERNEL_USER_TIMES Times;
+
+    Times = (PKERNEL_USER_TIMES)ThreadInformation;
+
+    //Times->CreateTime.QuadPart = 0;
+    Times->KernelTime.QuadPart = 0x26161;
+    Times->UserTime.QuadPart = 0x26161;
+
+    AllocConsole();
+    PrintConsoleW(L"%I64X, %I64X\n", Times->KernelTime, Times->UserTime);
+
+    return Status;
+}
+
 NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
 {
     NTSTATUS    Status;
@@ -528,6 +569,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
         ZwClose(RootKey);
 
     ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
+    //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
     ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
 
