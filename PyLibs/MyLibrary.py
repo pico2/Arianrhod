@@ -3,8 +3,10 @@ from misc import *
 from PyImage import *
 from FileIo import *
 
-def XMLCreate(RootTag = 'Arianrhod'):
-    return ['<?xml version="1.0" encoding="utf-8"?>', '<%s>' % RootTag]
+def XMLCreate(RootTag = 'Arianrhod', attrib = ''):
+    if attrib != '':
+        attrib = ' ' + attrib
+    return ['<?xml version="1.0" encoding="utf-8"?>', '<%s%s>' % (RootTag, attrib)]
 
 def XMLAppendText(xml, text, attrib = ''):
 
