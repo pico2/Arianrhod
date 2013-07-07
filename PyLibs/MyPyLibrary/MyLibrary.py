@@ -1,7 +1,7 @@
-from syslib import *
-from misc import *
-from PyImage import *
-from FileIo import *
+from MyPyLibrary.syslib import *
+from MyPyLibrary.misc import *
+from MyPyLibrary.PyImage import *
+from MyPyLibrary.FileIo import *
 
 def XMLCreate(RootTag = 'Arianrhod', attrib = ''):
     if attrib != '':

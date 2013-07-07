@@ -1,1 +1,1 @@
-from MyLibrary import *
+from MyPyLibrary.MyLibrary import *

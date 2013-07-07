@@ -1,4 +1,4 @@
-from syslib import *
+from MyPyLibrary.syslib import *
 import io
 
 def ReadByte(fs):

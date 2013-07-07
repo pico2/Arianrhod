@@ -1,5 +1,5 @@
 import os, glob
-from FileStream import *
+from MyPyLibrary.FileStream import *
 
 def EnumDirectoryFiles(path, filter = '*.*'):
     allfiles = []
