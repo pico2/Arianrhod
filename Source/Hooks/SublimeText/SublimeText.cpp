@@ -8,13 +8,33 @@
 #include "MyLibrary.cpp"
 #include "mlns.h"
 
-#define ST_VERSION 3
+#define ST_VERSION_AUTO 999
+
+#define ST_VERSION ST_VERSION_AUTO
 
 #if ST_VERSION == 2
+
     typedef WCHAR ACP_TEXT;
+    ACP_TEXT Acp[10];
+
 #elif ST_VERSION == 3
+
     typedef CHAR ACP_TEXT;
+    ACP_TEXT Acp[10];
+
 #endif
+
+typedef struct
+{
+    PWSTR Begin;
+    PWSTR End;
+
+    ULONG_PTR Length()
+    {
+        return End - Begin;
+    }
+
+} SUBLIME_TEXT_WSTRING, *PSUBLIME_TEXT_WSTRING;
 
 enum
 {
@@ -29,23 +49,38 @@ enum
     STCP_ACP            = ~0u,
 };
 
-typedef struct
-{
-    PWSTR Begin;
-    PWSTR End;
+ULONG (CDECL *StubUnicodeToACP)(ULONG CpIndex, PSUBLIME_TEXT_WSTRING Unicode, PSTR Ansi, LONG AnsiSize);
 
-    ULONG_PTR Length()
+
+ULONG CDECL UnicodeToACP(ULONG CpIndex, PSUBLIME_TEXT_WSTRING Unicode, PSTR Ansi, LONG AnsiSize)
+{
+    if (CpIndex != STCP_ACP)
+        return StubUnicodeToACP(CpIndex, Unicode, Ansi, AnsiSize);
+
+    PSTR        AnsiBuffer;
+    PWSTR       UnicodeBuffer;
+    ULONG_PTR   Size, UnicodeSize;
+
+    AnsiBuffer      = Ansi;
+    UnicodeBuffer   = Unicode->Begin;
+    UnicodeSize     = Unicode->Length();
+    for (; UnicodeSize != 0 && AnsiSize > 0; AnsiSize -= Size, --UnicodeSize)
     {
-        return End - Begin;
+        UnicodeToAnsi(AnsiBuffer, AnsiSize, UnicodeBuffer, 1, &Size);
+
+        ++UnicodeBuffer;
+        AnsiBuffer += Size;
     }
 
-} SUBLIME_TEXT_WSTRING, *PSUBLIME_TEXT_WSTRING;
+    Unicode->Begin = UnicodeBuffer;
+
+    return AnsiBuffer - Ansi;
+}
+
+#if ST_VERSION != ST_VERSION_AUTO
 
 PSUBLIME_TEXT_WSTRING (CDECL *StubGetEncodingByIndex)(PSUBLIME_TEXT_WSTRING Encoding, ULONG CpIndex);
 ULONG (*StubACPToUnicode)();
-ULONG (CDECL *StubUnicodeToACP)(ULONG CpIndex, PSUBLIME_TEXT_WSTRING Unicode, PSTR Ansi, LONG AnsiSize);
-
-ACP_TEXT Acp[10];
 
 PSUBLIME_TEXT_WSTRING CDECL GetEncodingByIndex(PSUBLIME_TEXT_WSTRING Encoding, ULONG CpIndex)
 {
@@ -113,30 +148,38 @@ NAKED ULONG NakedACPToUnicode_3()
     }
 }
 
-ULONG CDECL UnicodeToACP(ULONG CpIndex, PSUBLIME_TEXT_WSTRING Unicode, PSTR Ansi, LONG AnsiSize)
+#else // auto
+
+ULONG STDCALL ACPToUnicode(PSTR *Ansi, PSTR AnsiEnd, PWSTR *Unicode, PLONG CpIndex)
 {
-    if (CpIndex != STCP_ACP)
-        return StubUnicodeToACP(CpIndex, Unicode, Ansi, AnsiSize);
+    ULONG_PTR Length;
 
-    PSTR        AnsiBuffer;
-    PWSTR       UnicodeBuffer;
-    ULONG_PTR   Size, UnicodeSize;
+    --*Ansi;
 
-    AnsiBuffer      = Ansi;
-    UnicodeBuffer   = Unicode->Begin;
-    UnicodeSize     = Unicode->Length();
-    for (; UnicodeSize != 0 && AnsiSize > 0; AnsiSize -= Size, --UnicodeSize)
-    {
-        UnicodeToAnsi(AnsiBuffer, AnsiSize, UnicodeBuffer, 1, &Size);
+    Length = AnsiEnd - *Ansi;
+    AnsiToUnicode(*Unicode, Length, *Ansi, Length, &Length);
 
-        ++UnicodeBuffer;
-        AnsiBuffer += Size;
-    }
+    *Unicode    = PtrAdd(*Unicode, Length);
+    *Ansi       = AnsiEnd;
+    *CpIndex    = STCP_ACP;
 
-    Unicode->Begin = UnicodeBuffer;
-
-    return AnsiBuffer - Ansi;
+    return 0;
 }
+
+NAKED ULONG NakedACPToUnicode_3()
+{
+    INLINE_ASM
+    {
+        push    edx;            // PULONG   CpIndex
+        push    edi;            // PWSTR*   Unicode
+        push    ebx;            // PCSTR    End
+        push    esi;            // PCSTR*   Buffer
+        call    ACPToUnicode;
+        ret;
+    }
+}
+
+#endif // ST_VERSION_AUTO
 
 BOOL UnInitialize(PVOID BaseAddress)
 {
@@ -164,6 +207,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     swprintf(Acp, L"ACP %d", CurrentPeb()->AnsiCodePageData[1]);
 
+    Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
+
 #elif ST_VERSION == 3
 
     MEMORY_PATCH p[] =
@@ -183,9 +228,101 @@ BOOL Initialize(PVOID BaseAddress)
 
     sprintf(Acp, "ACP %d", CurrentPeb()->AnsiCodePageData[1]);
 
-#endif
-
     Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
+
+#elif ST_VERSION == ST_VERSION_AUTO
+
+    static BYTE DefaultEncodingStub1[] =
+    {
+		0x8b, 0x06, 0x8a, 0x08, 0x40, 0x89, 0x06, 0x8b, 0x02, 0x0f, 0xb6, 0xd1
+    };
+
+    static BYTE DefaultEncodingStub2[] =
+    {
+        0x8b, 0x0f, 0x66, 0x8b, 0x04, 0x50, 0x8b, 0x55, 0x08, 0x66, 0x89, 0x01, 0x83, 0x07, 0x02, 0x39,
+		0x1e, 0x72, 0xda
+    };
+
+    static CHAR WithEncodingString[] = " with encoding ";
+
+    PVOID ACPToUnicodeStub, UnicodeToACPStub, WithEncodingStub;
+    PLDR_MODULE module;
+
+    ACPToUnicodeStub = NULL;
+    UnicodeToACPStub = NULL;
+
+    module = FindLdrModuleByHandle(NULL);
+
+    {
+
+        SEARCH_PATTERN_DATA Pattern[] =
+        {
+            ADD_PATTERN(DefaultEncodingStub1, 0, sizeof(DefaultEncodingStub1) + 7),
+            ADD_PATTERN(DefaultEncodingStub2),
+        };
+
+        ACPToUnicodeStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
+        if (ACPToUnicodeStub == NULL)
+            return FALSE;
+    }
+
+    {
+        SEARCH_PATTERN_DATA Pattern[] =
+        {
+            ADD_PATTERN(WithEncodingString),
+        };
+
+        WithEncodingStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
+        if (WithEncodingStub == NULL)
+            return FALSE;
+    }
+
+    {
+        SEARCH_PATTERN_DATA Pattern[] =
+        {
+            ADD_PATTERN(&WithEncodingStub),
+        };
+
+        WithEncodingStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
+        if (WithEncodingStub == NULL)
+            return FALSE;
+    }
+
+    BOOL MagicFound = FALSE;
+
+    WithEncodingStub = PtrAdd(WithEncodingStub, 4);
+    for (LONG_PTR Size = 0x200; Size > 0; )
+    {
+        ULONG_PTR Len;
+
+        if (*(PULONG)PtrAdd(WithEncodingStub, 2) == 0x40000)
+        {
+            MagicFound = TRUE;
+        }
+        else if (MagicFound) switch (*(PBYTE)WithEncodingStub)
+        {
+            case CALL:
+                Size = 0;
+                UnicodeToACPStub = GetCallDestination(WithEncodingStub);
+                continue;
+        }
+
+        Len = GetOpCodeSize(WithEncodingStub);
+        WithEncodingStub = PtrAdd(WithEncodingStub, Len);
+        Size -= Len;
+        if (Size <= 0)
+            return FALSE;
+    }
+
+    MEMORY_FUNCTION_PATCH f[] =
+    {
+        INLINE_HOOK_CALL_NULL(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
+        INLINE_HOOK_JUMP_RVA(UnicodeToACPStub, UnicodeToACP, StubUnicodeToACP),
+    };
+
+    Nt_PatchMemory(0, 0, f, countof(f));
+
+#endif
 
     return TRUE;
 }
