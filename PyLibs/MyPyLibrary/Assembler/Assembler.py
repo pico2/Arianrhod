@@ -1,4 +1,3 @@
-from Base.BaseType import *
 from Assembler.InstructionTable import *
 
 def plog(*args):

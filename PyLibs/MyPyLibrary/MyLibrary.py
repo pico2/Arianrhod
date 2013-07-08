@@ -1,7 +1,16 @@
-from MyPyLibrary.syslib import *
-from MyPyLibrary.misc import *
-from MyPyLibrary.PyImage import *
-from MyPyLibrary.FileIo import *
+def AddRelativePath(path):
+    import sys, os
+    path = os.path.abspath(os.path.dirname(__file__) + '\\' + path)
+    sys.path.append(path)
+
+AddRelativePath('.')
+
+del AddRelativePath
+
+from syslib import *
+from misc import *
+from PyImage import *
+from FileIo import *
 
 def XMLCreate(RootTag = 'Arianrhod', attrib = ''):
     if attrib != '':

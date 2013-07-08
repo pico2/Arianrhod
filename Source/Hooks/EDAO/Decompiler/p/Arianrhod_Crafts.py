@@ -392,6 +392,7 @@ def Longinus(enemy_version = False):
     eff_boom        = 3
     eff_damage      = 4
     eff_gun_appear  = 5
+    eff_gun_falldown= 6
 
     chr_gun         = 0x12
 
@@ -417,9 +418,8 @@ def Longinus(enemy_version = False):
     LoadEffect(eff_boom,        "event/ev15101.eff")
     LoadEffect(eff_damage,      "battle/cr035202.eff")
     LoadEffect(eff_gun_appear,  "event/ev14015.eff")
-
-    AS_78(0x0)
-
+    LoadEffect(eff_gun_falldown,"battle/sc031004.eff")
+    AS_78(0)
 
     if enemy_version:
 
@@ -511,6 +511,7 @@ def Longinus(enemy_version = False):
     SoundEx(288, 0)
     PlayEffect(0xFF, TargetPos, eff_beam, 0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, eff_beam)
     PlayEffect(0xFF, TargetPos, eff_boom, 0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, eff_boom)
+    PlayEffect(0xFF, TargetPos, eff_gun_falldown, 0, 0, 4000, 0, 90, 0, 0, 800, 800, 800, eff_gun_falldown)
     ChrMove(chr_gun, chr_gun, 0, -gun_height - 10000, 0, 70, 0)
     Sleep(70)
     Yield()
@@ -541,6 +542,7 @@ def Longinus(enemy_version = False):
     FreeEffect(eff_boom)
     FreeEffect(eff_damage)
     FreeEffect(eff_gun_appear)
+    FreeEffect(eff_gun_falldown)
 
     Return()
 
@@ -1448,10 +1450,10 @@ def 神速():
 
     AS_78(1)
     #LoadEffect(1, "event/ev202_00.eff")
-    LoadEffect(0x1, "battle/cr036200.eff")
+    LoadEffect(0x1, "battle/sc031004.eff")
     AS_78(0)
 
-    PlayEffect(0xFF, 0xFF, 1, 1, 0, 1000, 0, 0, 0, 0, 1000, 1000, 1000, 1)
+    PlayEffect(0xFF, 0xFF, 1, 1, 0, 1000, 0, 90, 0, 0, 1000, 1000, 1000, 1)
     WaitEffect(-1, 1)
     Yield()
 

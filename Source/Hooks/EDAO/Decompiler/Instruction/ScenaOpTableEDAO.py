@@ -1,4 +1,4 @@
-from Instruction.InstructionTable import *
+from Assembler.InstructionTable import *
 from Base.EDAOBase import *
 from GameData.ItemNameMap import *
 

@@ -1,4 +1,4 @@
-from .InstructionTable import *
+from Assembler.InstructionTable import *
 from Base.EDAOBase import *
 
 def GetOpCode(fs):
