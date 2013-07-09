@@ -41,6 +41,9 @@ def ForEachFile(filelist, callback, filter = '*.*'):
         else:
             callback(f)
 
+def TryForEachFile(filelist, callback, filter = '*.*'):
+    TryInvoke(ForEachFile, filelist, callback, filter)
+
 def TryInvoke(method, *values):
     try:
         return method(*values) if len(values) != 0 else method()
