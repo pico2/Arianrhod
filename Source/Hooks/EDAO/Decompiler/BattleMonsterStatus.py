@@ -837,15 +837,12 @@ def SaveToMS(filename, local):
 
     open(filename, 'wb').write(ms.binary())
 
+def procfile(file):
+    print('disasm %s' % file)
+    ms = BattleMonsterStatus()
+    ms.open(file)
+    ms.SaveTo(os.path.splitext(file)[0] + '.py')
+
 if __name__ == '__main__':
 
-    def procfile(file):
-        print('disasm %s' % file)
-        ms = BattleMonsterStatus()
-        ms.open(file)
-        ms.SaveTo(os.path.splitext(file)[0] + '.py')
-
-    def main():
-        ForEachFile(sys.argv[1:], procfile, 'ms*.dat')
-
-    TryInvoke(main)
+    TryForEachFileMP(sys.argv[1:], procfile, 'ms*.dat')

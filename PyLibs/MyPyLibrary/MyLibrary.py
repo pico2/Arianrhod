@@ -12,27 +12,6 @@ from misc import *
 from PyImage import *
 from FileIo import *
 
-def XMLCreate(RootTag = 'Arianrhod', attrib = ''):
-    if attrib != '':
-        attrib = ' ' + attrib
-    return ['<?xml version="1.0" encoding="utf-8"?>', '<%s%s>' % (RootTag, attrib)]
-
-def XMLAppendText(xml, text, attrib = ''):
-
-    if attrib != '':
-        attrib = ' ' + attrib
-
-    xml.append('    <Text%s>' % attrib)
-    xml.append('        <jp><![CDATA[%s]]></jp>' % text)
-    xml.append('        <sc><![CDATA[%s]]></sc>' % text)
-    xml.append('    </Text>')
-
-    return xml
-
-def XMLSaveTo(xml, filename, RootTag = 'Arianrhod'):
-    xml.append('</%s>' % RootTag)
-    open(filename, 'wb').write('\r\n'.join(xml).encode('UTF8'))
-
 def ForEachFile(filelist, callback, filter = '*.*'):
     for f in filelist:
         if os.path.isdir(f):
@@ -43,6 +22,46 @@ def ForEachFile(filelist, callback, filter = '*.*'):
 
 def TryForEachFile(filelist, callback, filter = '*.*'):
     TryInvoke(ForEachFile, filelist, callback, filter)
+
+def TryForEachFileMP(filelist, callback, filter = '*.*'):
+    TryInvoke(ForEachFileMP, filelist, callback, filter)
+
+
+def ForEachFileMPInvoker(cb, flist):
+    for f in flist:
+        cb(f)
+
+def ForEachFileMP(filelist, callback, filter = '*.*'):
+    allfile = []
+    for f in filelist:
+        if os.path.isdir(f):
+            allfile += EnumDirectoryFiles(f, filter)
+        else:
+            allfile.append(f)
+
+    if len(allfile) == 0:
+        return
+
+    import multiprocessing
+
+    core = multiprocessing.cpu_count()
+
+    files = []
+    step = int(len(allfile) / core + 1)
+    n = 0
+    for i in range(core):
+        files.append(allfile[n:n + step])
+        n += step
+
+    process = []
+    for f in files:
+        t = multiprocessing.Process(target = ForEachFileMPInvoker, args = [callback, f])
+        t.start()
+        process.append(t)
+
+    for t in process:
+        t.join()
+
 
 def TryInvoke(method, *values):
     try:
@@ -63,3 +82,26 @@ def ReadTextToList(filename, cp = '936'):
         stm = stm.decode(cp)
 
     return stm.replace('\r\n','\n').replace('\r','\n').split('\n')
+
+
+
+def XMLCreate(RootTag = 'Arianrhod', attrib = ''):
+    if attrib != '':
+        attrib = ' ' + attrib
+    return ['<?xml version="1.0" encoding="utf-8"?>', '<%s%s>' % (RootTag, attrib)]
+
+def XMLAppendText(xml, text, attrib = ''):
+
+    if attrib != '':
+        attrib = ' ' + attrib
+
+    xml.append('    <Text%s>' % attrib)
+    xml.append('        <jp><![CDATA[%s]]></jp>' % text)
+    xml.append('        <sc><![CDATA[%s]]></sc>' % text)
+    xml.append('    </Text>')
+
+    return xml
+
+def XMLSaveTo(xml, filename, RootTag = 'Arianrhod'):
+    xml.append('</%s>' % RootTag)
+    open(filename, 'wb').write('\r\n'.join(xml).encode('UTF8'))

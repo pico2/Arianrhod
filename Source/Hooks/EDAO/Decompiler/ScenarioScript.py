@@ -1443,15 +1443,13 @@ class ScenarioInfo:
 
         return '\r\n'.join(info)
 
+
+def procfile(file):
+    print('disasm %s' % file)
+    scena = ScenarioInfo()
+    scena.open(file)
+    scena.SaveToFile(file + '.py')
+
 if __name__ == '__main__':
 
-    def procfile(file):
-        print('disasm %s' % file)
-        scena = ScenarioInfo()
-        scena.open(file)
-        scena.SaveToFile(file + '.py')
-
-    def main():
-        ForEachFile(sys.argv[1:], procfile, '*.bin')
-
-    TryInvoke(main)
+    TryForEachFileMP(sys.argv[1:], procfile, '*.bin')

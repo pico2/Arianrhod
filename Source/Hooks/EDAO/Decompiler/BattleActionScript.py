@@ -528,16 +528,12 @@ Jc(0x16, 0x1, 0x0, "loc_A4A")
 
 '''
 
+def procfile(file):
+    print('disasm %s' % file)
+    asdat = BattleActionScriptInfo()
+    asdat.open(file)
+    asdat.SaveToFile(file + '.py')
 
 if __name__ == '__main__':
 
-    def procfile(file):
-        print('disasm %s' % file)
-        asdat = BattleActionScriptInfo()
-        asdat.open(file)
-        asdat.SaveToFile(file + '.py')
-
-    def main():
-        ForEachFile(sys.argv[1:], procfile, 'as*.dat')
-
-    TryInvoke(main)
+    TryForEachFileMP(sys.argv[1:], procfile, 'as*.dat')
