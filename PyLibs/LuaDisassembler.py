@@ -4,11 +4,22 @@ class LuaString:
     def __init__(self, fs = None):
         if fs is None: return
 
-        self.Length = fs.ulong()
-        self.String = '' if self.Length == 0 else fs.read(self.Length)[:-1].decode('UTF8')
+        if type(fs) == str:
+            self.String = fs
+            return
+
+        length = fs.ulong()
+        self.String = '' if length == 0 else fs.read(length)[:-1].decode('UTF8')
 
     def __str__(self):
         return self.String
+
+    def Binary(self, ContainNull = False):
+        if self.String == '' and not ContainNull:
+            return struct.pack('<I', 0)
+
+        bin = self.String.encode('UTF8') + b'\x00'
+        return struct.pack('<I', len(bin)) + bin
 
 class LuaHeader:
     def __init__(self, fs = None):
@@ -23,6 +34,9 @@ class LuaHeader:
         self.SizeOfInstruction      = fs.byte()
         self.SizeOfDouble           = fs.byte()
         self.IsDoubleIntegral       = fs.byte()
+
+    def Binary(self):
+        return self.Signature + struct.pack('<' + 'B' * 8, self.Version, self.Official, self.Endianness, self.SizeOfInt, self.SizeOfPtr, self.SizeOfInstruction, self.SizeOfDouble, self.IsDoubleIntegral)
 
     def ToStrings(self):
         lines = []
@@ -60,28 +74,59 @@ class LuaCode:
         for i in range(number):
             self.Instruction.append(LuaInstruction(fs))
 
+    def Binary(self):
+        bin = struct.pack('<I', len(self.Instruction))
+        for inst in self.Instruction:
+            bin += struct.pack('<I', inst.Value)
+
+        return bin
+
 LUA_TNIL        = 0
 LUA_TBOOLEAN    = 1
 LUA_TNUMBER     = 3
 LUA_TSTRING     = 4
 
-def LuaReadNil(fs):
-    return None
+def ReadLuaNil(fs):
+    return b''
 
-def LuaReadBoolean(fs):
+def ReadLuaBoolean(fs):
     return bool(fs.byte())
 
-def LuaReadNumber(fs):
+def ReadLuaNumber(fs):
     return fs.double()
 
-def LuaReadString(fs):
+def ReadLuaString(fs):
     return LuaString(fs).String
 
-luatype = {}
-luatype[LUA_TNIL]       = LuaReadNil
-luatype[LUA_TBOOLEAN]   = LuaReadBoolean
-luatype[LUA_TNUMBER]    = LuaReadNumber
-luatype[LUA_TSTRING]    = LuaReadString
+def PackLuaNil(value):
+    return b''
+
+def PackLuaBoolean(value):
+    return struct.pack('<B', value)
+
+def PackLuaNumber(value):
+    return struct.pack('<d', value)
+
+def PackLuaString(value):
+    return LuaString(value).Binary(True)
+
+
+ReadLuaType = \
+{
+    LUA_TNIL        : ReadLuaNil,
+    LUA_TBOOLEAN    : ReadLuaBoolean,
+    LUA_TNUMBER     : ReadLuaNumber,
+    LUA_TSTRING     : ReadLuaString,
+}
+
+PackLuaType = \
+{
+    LUA_TNIL        : PackLuaNil,
+    LUA_TBOOLEAN    : PackLuaBoolean,
+    LUA_TNUMBER     : PackLuaNumber,
+    LUA_TSTRING     : PackLuaString,
+}
+
 
 PyTypeToLuaType = {}
 PyTypeToLuaType[None]   = LUA_TNIL
@@ -99,21 +144,32 @@ class LuaConstants:
         number = fs.ulong()
         for i in range(number):
             type = fs.byte()
-            self.Value.append(luatype[type](fs))
+            self.Value.append(ReadLuaType[type](fs))
+
+    def Binary(self):
+        bin = struct.pack('<I', len(self.Value))
+        for v in self.Value:
+            luatype = PyTypeToLuaType[type(v)]
+            bin += struct.pack('<B', luatype) + PackLuaType[luatype](v)
+
+        return bin
 
 
 class LuaLocalVariable:
     def __init__(self, fs = None, StartPC = None, EndPC = None):
         if fs is None: return
 
+        self.VarName = LuaString(fs)
+
         if type(fs) == str:
-            self.VarName = fs
             self.StartPC = StartPC
             self.EndPC = EndPC
         else:
-            self.VarName    = LuaString(fs)
             self.StartPC    = fs.ulong()
             self.EndPC      = fs.ulong()
+
+    def Binary(self):
+        return self.VarName.Binary() + struct.pack('<II', self.StartPC, self.EndPC)
 
     def __str__(self):
         return 'LuaLocalVariable("%s", %d, %d)' % (self.VarName, self.StartPC, self.EndPC)
@@ -139,6 +195,21 @@ class LuaDebug:
         for i in range(n):
             self.UpValues.append(LuaString(fs))
 
+    def Binary(self):
+        bin = struct.pack('<I', len(self.LineInfo))
+        for line in self.LineInfo:
+            bin += struct.pack('<I', line)
+
+        bin += struct.pack('<I', len(self.LocalVariable))
+        for var in self.LocalVariable:
+            bin += var.Binary()
+
+        bin += struct.pack('<I', len(self.UpValues))
+        for val in self.UpValues:
+            bin += val.Binary()
+
+        return bin
+
 
 class LuaFunction_51:
     def __init__(self, fs = None):
@@ -162,13 +233,30 @@ class LuaFunction_51:
         self.Code               = LuaCode(fs)
         self.Constants          = LuaConstants(fs)
 
-        self.NumberOfFunction   = fs.ulong()
+        NumberOfFunction = fs.ulong()
 
-        for i in range(self.NumberOfFunction):
+        for i in range(NumberOfFunction):
             self.Functions.append(LuaFunction_51(fs))
             self.Functions[-1].Parent = self.Name
 
         self.Debug = LuaDebug(fs)
+
+    def Binary(self):
+        if type(self.Source) == str:
+            self.Source = LuaString(self.Source)
+
+        bin = self.Source.Binary()
+
+        bin += struct.pack('<IIBBBB', self.LineDefined, self.LastLineDefined, self.NumberOfUpvalues, self.NumberOfParam, self.IsVararg, self.MaxStackSize)
+        bin += self.Code.Binary()
+        bin += self.Constants.Binary()
+        bin += struct.pack('<I', len(self.Functions))
+        for f in self.Functions:
+            bin += f.Binary()
+
+        bin += self.Debug.Binary()
+
+        return bin
 
     def ToStrings(self):
         lines = []
@@ -256,7 +344,10 @@ class LuaDisassembler:
         return self
 
     def CompileTo(self, file):
-        pass
+        fs = BytesStream().open(file, 'wb')
+
+        fs.write(self.Header.Binary())
+        fs.write(self.Function.Binary())
 
     def ToStrings(self):
         lines = []
@@ -267,9 +358,8 @@ class LuaDisassembler:
         lines.append('luac = LuaDisassembler()')
         lines.append('luac.Header = Header')
         lines.append('luac.Function = %s' % self.Function.Name)
-        lines.append('luac.Function = %s' % self.Function.Name)
         lines.append('')
-        lines.append('luac.CompileTo("%s")' % self.FileName)
+        lines.append('luac.CompileTo("%s.luac")' % self.FileName)
         lines.append('')
 
         return lines

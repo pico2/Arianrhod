@@ -886,6 +886,8 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    Ps::CreateProcess(L"QQ.exe");
+    return;
 
 #if 0
 
@@ -932,7 +934,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
             NtTerminateProcess(Explorer, 1);
             NtClose(Explorer);
 
-            Ps::CreateProcess(NULL, L"explorer.exe");
+            //Ps::CreateProcess(NULL, L"explorer.exe");
             //ShellExecuteW(NULL, L"open", L"explorer.exe", NULL, NULL, SW_SHOW);
         }
     }

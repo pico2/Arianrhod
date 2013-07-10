@@ -162,10 +162,10 @@ def main():
 
     import TiosBed
 
-    #PartySelect(2)
+    PartySelect(2)
     TiosBed.ShowMenu()
-    #ClearParty()
-    #AddParty(0x0, 0xFF, 0xFF)
+    ClearParty()
+    AddParty(0x0, 0xFF, 0xFF)
 
     Return()
 
