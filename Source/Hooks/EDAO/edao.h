@@ -129,12 +129,12 @@ enum
 {
     ACTION_ATTACK       = 0,
     ACTION_MOVE         = 1,
-    ACTION_MAGIC        = 2,
+    ACTION_ARTS         = 2,
     ACTION_CRAFT        = 3,
     ACTION_SCRAFT       = 4,
     ACTION_ITEM         = 5,
-    ACTION_ARIA_MAGIC   = 6,
-    ACTION_CAST_MAGIC   = 7,
+    ACTION_ARIA_ARTS    = 6,
+    ACTION_CAST_ARTS    = 7,
     ACTION_ARIA_CRAFT   = 8,
     ACTION_CAST_CRAFT   = 9,
 };

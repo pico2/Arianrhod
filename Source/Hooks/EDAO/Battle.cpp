@@ -436,9 +436,9 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData, PAT_BAR_ENTRY Entry)
         return FALSE;
     }
 
-    if (MSData->CurrentActionType == ACTION_ARIA_MAGIC ||
+    if (MSData->CurrentActionType == ACTION_ARIA_ARTS ||
         MSData->CurrentActionType == ACTION_ARIA_CRAFT ||
-        MSData->PreviousActionType == ACTION_ARIA_MAGIC ||
+        MSData->PreviousActionType == ACTION_ARIA_ARTS ||
         MSData->PreviousActionType == ACTION_ARIA_CRAFT)
     {
         CancelAria(MSData, TRUE);

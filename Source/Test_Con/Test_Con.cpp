@@ -882,11 +882,23 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
+#define _AFXDLL 1
+
 #include <ShlObj.h>
+#include <afxwin.h>
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    Ps::CreateProcess(L"QQ.exe");
+    CString a = L"fuck";
+
+    _asm
+    {
+        lea ecx, a;
+        call CString::AllocBuffer;
+    }
+
+    PrintConsoleW(L"%d\n", a.GetAllocLength());
+
     return;
 
 #if 0

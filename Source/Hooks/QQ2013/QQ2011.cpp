@@ -3,6 +3,7 @@
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 #pragma comment(linker, "/EXPORT:InitCommonControlsEx=COMCTL32.InitCommonControlsEx")
 
+#include "QQ2011.h"
 #include "MyLibrary.cpp"
 #include <Psapi.h>
 
@@ -77,6 +78,11 @@ QqNtQueryInformationProcess(
     return Status;
 }
 
+BOOL CDECL IsTencentTrusted(PCWSTR FileName)
+{
+    return TRUE;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -85,7 +91,7 @@ BOOL UnInitialize(PVOID BaseAddress)
 BOOL Initialize(PVOID BaseAddress)
 {
     NTSTATUS    Status;
-    PVOID       psapi, module;
+    PVOID       module;
     PROCESS_BASIC_INFORMATION BasicInfo;
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
@@ -94,42 +100,56 @@ BOOL Initialize(PVOID BaseAddress)
     if (NT_SUCCESS(Status))
         ParentPid = BasicInfo.InheritedFromUniqueProcessId;
 
-    psapi = Ldr::LoadDll(L"psapi.dll");
-    if (psapi == NULL)
-        return FALSE;
 
-    MEMORY_FUNCTION_PATCH f[] =
+    /************************************************************************
+      psapi
+    ************************************************************************/
+
+    module = Ldr::LoadDll(L"psapi.dll");
+
+    MEMORY_FUNCTION_PATCH Function_psapi[] =
     {
         INLINE_HOOK_JUMP(ZwQueryInformationProcess, QqNtQueryInformationProcess, StubNtQueryInformationProcess),
-        EAT_HOOK_JUMP_HASH(psapi, PSAPI_GetModuleFileNameExW, QqGetModuleFileNameExW, StubGetModuleFileNameExW),
+        EAT_HOOK_JUMP_HASH(module, PSAPI_GetModuleFileNameExW, QqGetModuleFileNameExW, StubGetModuleFileNameExW),
     };
+
+
+    /************************************************************************
+      Common
+    ************************************************************************/
+
+    module = Ldr::LoadDll(L"Common.dll");
+
+    MEMORY_FUNCTION_PATCH Function_Common[] =
+    {
+        EAT_HOOK_JUMP_NULL(module, "?IsTencentTrusted@Misc@Util@@YAHPB_W@Z", IsTencentTrusted),
+    };
+
+
+    /************************************************************************
+      HummerEngine
+    ************************************************************************/
 
     MEMORY_PATCH Patch_HummerEngine[] =
     {
         PATCH_MEMORY(0xD74C033, 4, 0x4D29),
     };
 
-    typedef struct
-    {
-        PCWSTR                  DllName;
-        PMEMORY_PATCH           Patch;
-        ULONG_PTR               PatchCount;
-        PMEMORY_FUNCTION_PATCH  FunctionPatch;
-        ULONG_PTR               FunctionCount;
-
-    } PATCH_ARRAY, *PPATCH_ARRAY;
-
     PATCH_ARRAY *Entry, Array[] = 
     {
-        { L"HummerEngine.dll", Patch_HummerEngine, countof(Patch_HummerEngine) },
+        { L"HummerEngine.dll",  Patch_HummerEngine, countof(Patch_HummerEngine) },
+        { NULL,                 NULL,               0,                          Function_Common,    countof(Function_Common) },
+        { NULL,                 NULL,               0,                          Function_psapi,     countof(Function_psapi) },
     };
 
     FOR_EACH(Entry, Array, countof(Array))
     {
-        Nt_PatchMemory(Entry->Patch, Entry->PatchCount, Entry->FunctionPatch, Entry->FunctionCount, Ldr::LoadDll(Entry->DllName));
-    }
+        PVOID Base;
 
-    Nt_PatchMemory(NULL, 0, f, countof(f), psapi);
+        Base = Entry->DllName == NULL ? NULL : Ldr::LoadDll(Entry->DllName);
+
+        Nt_PatchMemory(Entry->Patch, Entry->PatchCount, Entry->FunctionPatch, Entry->FunctionCount, Base);
+    }
 
     return TRUE;
 }

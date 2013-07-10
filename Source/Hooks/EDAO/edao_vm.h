@@ -20,7 +20,7 @@ VOID THISCALL CBattle::SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftInde
 
 VOID THISCALL CBattle::SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
-    MSData->SelectedActionType              = ACTION_MAGIC;
+    MSData->SelectedActionType              = ACTION_ARTS;
     MSData->CurrentCraftIndex               = CraftIndex;
     MSData->CurrentAiIndex                  = AiIndex;
     MSData->SelectedCraft.CraftIndex        = CraftIndex;
