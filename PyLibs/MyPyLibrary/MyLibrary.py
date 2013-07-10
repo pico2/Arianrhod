@@ -45,6 +45,8 @@ def ForEachFileMP(filelist, callback, filter = '*.*'):
     import multiprocessing
 
     core = multiprocessing.cpu_count()
+    if core == 1:
+        return ForEachFileMPInvoker(callback, allfile)
 
     files = []
     step = int(len(allfile) / core + 1)
@@ -54,10 +56,13 @@ def ForEachFileMP(filelist, callback, filter = '*.*'):
         n += step
 
     process = []
-    for f in files:
+    for f in range(len(files) - 1):
+        f = files[f]
         t = multiprocessing.Process(target = ForEachFileMPInvoker, args = [callback, f])
         t.start()
         process.append(t)
+
+    ForEachFileMPInvoker(callback, files[-1])
 
     for t in process:
         t.join()
