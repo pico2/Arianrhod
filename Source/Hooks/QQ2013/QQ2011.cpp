@@ -7,8 +7,6 @@
 #include "MyLibrary.cpp"
 #include <Psapi.h>
 
-ULONG_PTR ParentPid;
-
 TYPE_OF(GetModuleFileNameExW)*      StubGetModuleFileNameExW;
 TYPE_OF(NtQueryInformationProcess)* StubNtQueryInformationProcess;
 
@@ -78,6 +76,51 @@ QqNtQueryInformationProcess(
     return Status;
 }
 
+TYPE_OF(&::CreateThread)  HummerCreateThread;
+
+HANDLE
+NTAPI
+QqCreateWaitQQProtectThread(
+    PSECURITY_ATTRIBUTES    ThreadAttributes,
+    ULONG_PTR               StackSize,
+    PTHREAD_START_ROUTINE   StartAddress,
+    PVOID                   Parameter,
+    ULONG                   CreationFlags,
+    PULONG                  ThreadId
+)
+{
+    NTSTATUS    Status;
+    PVOID       Ebp, CallCreateQQProtectExchangeWindow;
+    PROCESS_BASIC_INFORMATION BasicInfo;
+
+    LOOP_ONCE
+    {
+        if (PtrAnd(Parameter, 0xFFF00000) != 0)
+            continue;
+
+        Status = ZwQueryInformationProcess((HANDLE)Parameter, ProcessBasicInformation, &BasicInfo, sizeof(BasicInfo), NULL);
+        FAIL_BREAK(Status);
+
+        if (BasicInfo.UniqueProcessId != CurrentPid())
+            break;
+
+        ZwClose((HANDLE)Parameter);
+
+        AllocStack(16);
+        Ebp = *((PVOID *)_AddressOfReturnAddress() - 1);
+
+        CallCreateQQProtectExchangeWindow = *((PVOID *)Ebp + 1);
+        if (*(PBYTE)CallCreateQQProtectExchangeWindow != CALL)
+            break;
+
+        *(PULONG_PTR)((PVOID *)Ebp + 1) += GetOpCodeSize(CallCreateQQProtectExchangeWindow);
+
+        return NULL;
+    }
+
+    return HummerCreateThread(ThreadAttributes, StackSize, StartAddress, Parameter, CreationFlags, ThreadId);
+}
+
 BOOL CDECL IsTencentTrusted(PCWSTR FileName)
 {
     return TRUE;
@@ -92,13 +135,10 @@ BOOL Initialize(PVOID BaseAddress)
 {
     NTSTATUS    Status;
     PVOID       module;
+    ULONG_PTR   CreateThreadIAT;
     PROCESS_BASIC_INFORMATION BasicInfo;
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
-
-    Status = ZwQueryInformationProcess(CurrentProcess, ProcessBasicInformation, &BasicInfo, sizeof(BasicInfo), NULL);
-    if (NT_SUCCESS(Status))
-        ParentPid = BasicInfo.InheritedFromUniqueProcessId;
 
 
     /************************************************************************
@@ -130,9 +170,17 @@ BOOL Initialize(PVOID BaseAddress)
       HummerEngine
     ************************************************************************/
 
+#define IAT_HOOK_HASH(_dllhandle, _hash, _hook)
+
+    module = Ldr::LoadDll(L"HummerEngine.dll");
+
+    CreateThreadIAT = IATLookupRoutineRVAByHashNoFix(module, KERNEL32_CreateThread);
+    *(PVOID *)&HummerCreateThread = *(PVOID *)PtrAdd(module, CreateThreadIAT);
+
     MEMORY_PATCH Patch_HummerEngine[] =
     {
-        PATCH_MEMORY(0xD74C033, 4, 0x4D29),
+        //PATCH_MEMORY(0xD74C033, 4, 0x4D29),
+        PATCH_MEMORY(QqCreateWaitQQProtectThread, sizeof(PVOID), CreateThreadIAT),
     };
 
     PATCH_ARRAY *Entry, Array[] = 
