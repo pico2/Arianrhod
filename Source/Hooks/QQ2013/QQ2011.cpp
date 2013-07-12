@@ -8,8 +8,7 @@
 #include <Psapi.h>
 
 WCHAR GlobalRegistryDb[0x20];
-WCHAR GlobalHistoryDb[0x20];
-WCHAR GlobalPerfreDb[0x20];
+WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
 
 
 TYPE_OF(&SetWindowPos)              StubSetWindowPos;
@@ -41,8 +40,6 @@ NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
     {
         { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\History.db"),  CONST_STRLEN(L"History.db") * sizeof(WCHAR), GlobalHistoryDb },
         { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\Registry.db"), CONST_STRLEN(L"Registry.db") * sizeof(WCHAR), GlobalRegistryDb },
-        //{ RTL_CONSTANT_STRING(L"\\All Users\\QQ\\Perfre.db"),   CONST_STRLEN(L"Perfre.db") * sizeof(WCHAR), GlobalPerfreDb },
-        //{ RTL_CONSTANT_STRING(L"\\All Users\\Registry.db"),     CONST_STRLEN(L"Registry.db") * sizeof(WCHAR), GlobalRegistryDb },
     };
 
     RtlInitEmptyString(Redirected);
@@ -440,7 +437,6 @@ BOOL IsQQUINSpecified()
 
     swprintf(GlobalRegistryDb, L"Registry_%.*s.db", Length, QQUIN);
     swprintf(GlobalHistoryDb, L"History_%.*s.db", Length, QQUIN);
-    swprintf(GlobalPerfreDb, L"Perfre_%.*s.db", Length, QQUIN);
 
     return TRUE;
 }
