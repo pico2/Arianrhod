@@ -14,7 +14,7 @@ class LuaString:
     def __str__(self):
         return self.String
 
-    def Binary(self, ContainNull = False):
+    def ToBinary(self, ContainNull = False):
         if self.String == '' and not ContainNull:
             return struct.pack('<I', 0)
 
@@ -35,7 +35,7 @@ class LuaHeader:
         self.SizeOfDouble           = fs.byte()
         self.IsDoubleIntegral       = fs.byte()
 
-    def Binary(self):
+    def ToBinary(self):
         return self.Signature + struct.pack('<' + 'B' * 8, self.Version, self.Official, self.Endianness, self.SizeOfInt, self.SizeOfPtr, self.SizeOfInstruction, self.SizeOfDouble, self.IsDoubleIntegral)
 
     def ToStrings(self):
@@ -65,6 +65,9 @@ class LuaInstruction:
         else:
             self.Value = fs.ulong()
 
+    def __str__(self):
+        return 'LuaInstruction(0x%08X)' % self.Value
+
 class LuaCode:
     def __init__(self, fs = None):
         if fs is None: return
@@ -74,7 +77,7 @@ class LuaCode:
         for i in range(number):
             self.Instruction.append(LuaInstruction(fs))
 
-    def Binary(self):
+    def ToBinary(self):
         bin = struct.pack('<I', len(self.Instruction))
         for inst in self.Instruction:
             bin += struct.pack('<I', inst.Value)
@@ -108,7 +111,7 @@ def PackLuaNumber(value):
     return struct.pack('<d', value)
 
 def PackLuaString(value):
-    return LuaString(value).Binary(True)
+    return LuaString(value).ToBinary(True)
 
 
 ReadLuaType = \
@@ -146,7 +149,7 @@ class LuaConstants:
             type = fs.byte()
             self.Value.append(ReadLuaType[type](fs))
 
-    def Binary(self):
+    def ToBinary(self):
         bin = struct.pack('<I', len(self.Value))
         for v in self.Value:
             luatype = PyTypeToLuaType[type(v)]
@@ -168,8 +171,8 @@ class LuaLocalVariable:
             self.StartPC    = fs.ulong()
             self.EndPC      = fs.ulong()
 
-    def Binary(self):
-        return self.VarName.Binary() + struct.pack('<II', self.StartPC, self.EndPC)
+    def ToBinary(self):
+        return self.VarName.ToBinary() + struct.pack('<II', self.StartPC, self.EndPC)
 
     def __str__(self):
         return 'LuaLocalVariable("%s", %d, %d)' % (self.VarName, self.StartPC, self.EndPC)
@@ -195,18 +198,18 @@ class LuaDebug:
         for i in range(n):
             self.UpValues.append(LuaString(fs))
 
-    def Binary(self):
+    def ToBinary(self):
         bin = struct.pack('<I', len(self.LineInfo))
         for line in self.LineInfo:
             bin += struct.pack('<I', line)
 
         bin += struct.pack('<I', len(self.LocalVariable))
         for var in self.LocalVariable:
-            bin += var.Binary()
+            bin += var.ToBinary()
 
         bin += struct.pack('<I', len(self.UpValues))
         for val in self.UpValues:
-            bin += val.Binary()
+            bin += val.ToBinary()
 
         return bin
 
@@ -241,20 +244,20 @@ class LuaFunction_51:
 
         self.Debug = LuaDebug(fs)
 
-    def Binary(self):
+    def ToBinary(self):
         if type(self.Source) == str:
             self.Source = LuaString(self.Source)
 
-        bin = self.Source.Binary()
+        bin = self.Source.ToBinary()
 
         bin += struct.pack('<IIBBBB', self.LineDefined, self.LastLineDefined, self.NumberOfUpvalues, self.NumberOfParam, self.IsVararg, self.MaxStackSize)
-        bin += self.Code.Binary()
-        bin += self.Constants.Binary()
+        bin += self.Code.ToBinary()
+        bin += self.Constants.ToBinary()
         bin += struct.pack('<I', len(self.Functions))
         for f in self.Functions:
-            bin += f.Binary()
+            bin += f.ToBinary()
 
-        bin += self.Debug.Binary()
+        bin += self.Debug.ToBinary()
 
         return bin
 
@@ -280,7 +283,7 @@ class LuaFunction_51:
         if len(self.Code.Instruction) != 0:
             lines.append('%s.Code.Instruction = list((' % self.Name)
             for inst in self.Code.Instruction:
-                lines.append('    LuaInstruction(0x%08X),' % inst.Value)
+                lines.append('    %s,' % inst)
             lines.append('))')
             lines.append('')
 
@@ -346,8 +349,8 @@ class LuaDisassembler:
     def CompileTo(self, file):
         fs = BytesStream().open(file, 'wb')
 
-        fs.write(self.Header.Binary())
-        fs.write(self.Function.Binary())
+        fs.write(self.Header.ToBinary())
+        fs.write(self.Function.ToBinary())
 
     def ToStrings(self):
         lines = []
