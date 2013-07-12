@@ -19,6 +19,8 @@ TYPE_OF(&NtOpenFile)                StubNtOpenFile;
 TYPE_OF(&NtCreateFile)              StubNtCreateFile;
 TYPE_OF(&NtQueryAttributesFile)     StubNtQueryAttributesFile;
 
+BOOL (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
+
 
 NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
 {
@@ -411,6 +413,34 @@ BOOL CDECL IsTencentTrusted(PCWSTR FileName)
     return TRUE;
 }
 
+BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
+{
+    PWSTR       Buffer, Name;
+    ULONG_PTR   BufferSize, Length;
+    PLDR_MODULE Module;
+
+    static WCHAR PluginPath[] = L"..\\Plugin\\";
+
+    Module = FindLdrModuleByHandle(&__ImageBase);
+
+    Length = (StrLengthW(PluginName) + 1) * sizeof(WCHAR);
+
+    BufferSize = Module->FullDllName.Length + Length + sizeof(PluginPath);
+    Buffer = (PWSTR)AllocStack(BufferSize);
+
+    CopyMemory(Buffer, Module->FullDllName.Buffer, Module->FullDllName.Length);
+
+    Name = findnamew(Buffer);
+    CopyMemory(Name, PluginPath, sizeof(PluginPath));
+
+    CopyMemory(Name + CONST_STRLEN(PluginPath), PluginName, Length);
+
+    if (!Io::IsPathExists(Buffer))
+        return FALSE;
+
+    return StubInitPluginFileSystem(PluginName);
+}
+
 BOOL IsQQUINSpecified()
 {
     ULONG_PTR Length;
@@ -439,6 +469,197 @@ BOOL IsQQUINSpecified()
     swprintf(GlobalHistoryDb, L"History_%.*s.db", Length, QQUIN);
 
     return TRUE;
+}
+
+PVOID SearchStringReference(PLDR_MODULE Module, PWSTR String, ULONG_PTR SizeInBytes)
+{
+    PVOID StringValue, StringReference;
+
+    SEARCH_PATTERN_DATA Str[] =
+    {
+        ADD_PATTERN_(String, SizeInBytes),
+    };
+
+    StringValue = SearchPattern(Str, countof(Str), Module->DllBase, Module->SizeOfImage);
+    if (StringValue == NULL)
+        return NULL;
+
+    SEARCH_PATTERN_DATA Stub[] =
+    {
+        ADD_PATTERN(&StringValue),
+    };
+
+    StringReference = SearchPattern(Stub, countof(Stub), Module->DllBase, Module->SizeOfImage);
+    if (StringReference == NULL)
+        return NULL;
+
+    return StringReference;
+}
+
+ULONG_PTR SearchAppMisc_PluginListCheck(PVOID AppMisc)
+{
+    PVOID       StringReference;
+    PLDR_MODULE Module;
+
+    static WCHAR String[] = L"PluginListCheck" L"\x3000" L"Begin";
+
+    Module = FindLdrModuleByHandle(AppMisc);
+
+    StringReference = SearchStringReference(Module, String, sizeof(String));
+    if (StringReference == NULL)
+        return IMAGE_INVALID_RVA;
+
+    BYTE StubHeader[] =
+    {
+        0x55,               // push ebp
+        0x8B, 0xEC,         // mov ebp, esp
+    };
+
+    SEARCH_PATTERN_DATA Header[] =
+    {
+        ADD_PATTERN(StubHeader),
+    };
+
+    StringReference = SearchPattern(Header, countof(Header), PtrSub(PtrAdd(StringReference, 4), 0x60), 0x60);
+
+    return StringReference == NULL ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppMisc);
+}
+
+ULONG_PTR SearchAppMisc_ShowPicInMultiPic(PVOID AppMisc)
+{
+    PVOID       StringReference;
+    PLDR_MODULE Module;
+
+    static WCHAR String[] = L"ShowPicInMultiPic begin";
+
+    Module = FindLdrModuleByHandle(AppMisc);
+
+    StringReference = SearchStringReference(Module, String, sizeof(String) - sizeof(WCHAR));
+    if (StringReference == NULL)
+        return IMAGE_INVALID_RVA;
+
+    StringReference = PtrSub(StringReference, 1);
+
+    for (LONG_PTR Length = 0x20; Length > 0; --Length)
+    {
+        if (*(PBYTE)StringReference != CALL)
+        {
+            StringReference = PtrSub(StringReference, 1);
+            continue;
+        }
+
+        if (((PBYTE)StringReference)[-5] != 0xB8)
+        {
+            StringReference = PtrSub(StringReference, 1);
+            continue;
+        }
+
+        if (((PBYTE)StringReference)[-10] == 0x68)
+        {
+            StringReference = PtrSub(StringReference, 10);
+        }
+        else if (((PBYTE)StringReference)[-7] == 0x6A)
+        {
+            StringReference = PtrSub(StringReference, 7);
+        }
+        else
+        {
+            StringReference = PtrSub(StringReference, 1);
+            continue;
+        }
+
+        return PtrOffset(StringReference, AppMisc);
+    }
+
+    return IMAGE_INVALID_RVA;
+}
+
+ULONG_PTR SearchChatFrame_CheckModule(PVOID ChatFrame)
+{
+    PBYTE       Buffer;
+    PVOID       StringReference, LastCall[3];
+    PLDR_MODULE Module;
+
+    static WCHAR String[] = L"exit for invalid version";
+
+    Module = FindLdrModuleByHandle(ChatFrame);
+
+    StringReference = SearchStringReference(Module, String, sizeof(String) - sizeof(WCHAR));
+    if (StringReference == NULL)
+        return IMAGE_INVALID_RVA;
+
+    Buffer = (PBYTE)StringReference + 4;
+
+    ZeroMemory(LastCall, sizeof(LastCall));
+
+    LOOP_FOREVER
+    {
+        ULONG_PTR Length;
+
+        if (Buffer[0] == 0xC3 || Buffer[0] == 0xC2)
+            break;
+
+        if (Buffer[0] == CALL)
+        {
+            LastCall[0] = LastCall[1];
+            LastCall[1] = LastCall[2];
+            LastCall[2] = Buffer;
+        }
+
+        Length = GetOpCodeSize(Buffer);
+        Buffer += Length;
+    }
+
+    return LastCall[0] == NULL ? IMAGE_INVALID_RVA : PtrOffset(GetCallDestination(LastCall[0]), ChatFrame);
+}
+
+ULONG_PTR SearchAppUtil_CheckModule(PVOID AppUtil)
+{
+    PVOID       StringReference;
+    PLDR_MODULE Module;
+
+    static WCHAR String[] = L"PerfStand.CheckImportantModule.Begin";
+
+    Module = FindLdrModuleByHandle(AppUtil);
+
+    StringReference = SearchStringReference(Module, String, sizeof(String));
+    if (StringReference == NULL)
+        return IMAGE_INVALID_RVA;
+
+    StringReference = PtrSub(StringReference, 1);
+
+    for (LONG_PTR Length = 0x20; Length > 0; --Length)
+    {
+        if (*(PBYTE)StringReference != CALL)
+        {
+            StringReference = PtrSub(StringReference, 1);
+            continue;
+        }
+
+        if (((PBYTE)StringReference)[-5] != 0xB8)
+        {
+            StringReference = PtrSub(StringReference, 1);
+            continue;
+        }
+
+        if (((PBYTE)StringReference)[-10] == 0x68)
+        {
+            StringReference = PtrSub(StringReference, 10);
+        }
+        else if (((PBYTE)StringReference)[-7] == 0x6A)
+        {
+            StringReference = PtrSub(StringReference, 7);
+        }
+        else
+        {
+            StringReference = PtrSub(StringReference, 1);
+            continue;
+        }
+
+        return PtrOffset(StringReference, AppUtil);
+    }
+
+    return IMAGE_INVALID_RVA;
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -477,10 +698,10 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_ntdll[] =
     {
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtOpenFile            : (PVOID)IMAGE_INVALID_RVA, QqNtOpenFile,               StubNtOpenFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtCreateFile          : (PVOID)IMAGE_INVALID_RVA, QqNtCreateFile,             StubNtCreateFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtQueryAttributesFile : (PVOID)IMAGE_INVALID_RVA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
-        INLINE_HOOK_JUMP(ZwQueryInformationProcess,                                         QqNtQueryInformationProcess,StubNtQueryInformationProcess),
+        INLINE_HOOK_JUMP(QQUINSpecified ? NtOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               StubNtOpenFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
+        INLINE_HOOK_JUMP(ZwQueryInformationProcess,                                 QqNtQueryInformationProcess,StubNtQueryInformationProcess),
     };
 
 
@@ -504,7 +725,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_Common[] =
     {
-        EAT_HOOK_JUMP_NULL(module, "?IsTencentTrusted@Misc@Util@@YAHPB_W@Z", IsTencentTrusted),
+        EAT_HOOK_JUMP_NULL(module, "?IsTencentTrusted@Misc@Util@@YAHPB_W@Z",        IsTencentTrusted),
+        EAT_HOOK_JUMP     (module, "?InitPluginFileSystem@Boot@Util@@YAHPA_W@Z",    InitPluginFileSystem, StubInitPluginFileSystem),
     };
 
 
@@ -526,16 +748,20 @@ BOOL Initialize(PVOID BaseAddress)
     /************************************************************************
       AppMisc
 
-        L"PluginListCheck
+        L"PluginListCheck"
         mov     eax, 0x80004005
 
         ShowPicInMultiPic begin
     ************************************************************************/
 
+    module = Ldr::LoadDll(L"AppMisc.dll");
+
     MEMORY_FUNCTION_PATCH Function_AppMisc[] =
     {
-        INLINE_HOOK_JUMP_RVA_NULL(0x122CCA, CheckPluginList),
-        INLINE_HOOK_JUMP_RVA_NULL(0x1BC97B, ShowDBClickPicture),
+        //INLINE_HOOK_JUMP_RVA_NULL(0x122CCA, CheckPluginList),
+        //INLINE_HOOK_JUMP_RVA_NULL(0x1BC97B, ShowDBClickPicture),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture),
     };
 
 
@@ -545,14 +771,17 @@ BOOL Initialize(PVOID BaseAddress)
         L"exit for invalid version.17
     ************************************************************************/
 
+    module = Ldr::LoadDll(L"ChatFrameApp.dll");
+
     MEMORY_FUNCTION_PATCH Function_ChatFrame[] =
     {
-        INLINE_HOOK_JUMP_RVA_NULL(0x93C3, IsTencentTrusted),
+        //INLINE_HOOK_JUMP_RVA_NULL(0x93C3, IsTencentTrusted),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchChatFrame_CheckModule(module), IsTencentTrusted),
     };
 
 
     /************************************************************************
-      AppUitl
+      AppUtil
 
         L"PerfStand.CheckImportantModule.Begin"
         L"DllCheck"
@@ -564,9 +793,12 @@ BOOL Initialize(PVOID BaseAddress)
             ...
     ************************************************************************/
 
+    module = Ldr::LoadDll(L"AppUtil.dll");
+
     MEMORY_FUNCTION_PATCH Function_AppUtil[] =
     {
-        INLINE_HOOK_JUMP_RVA_NULL(0xB884, CheckPluginList),
+        //INLINE_HOOK_JUMP_RVA_NULL(0xB884, CheckPluginList),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchAppUtil_CheckModule(module), CheckPluginList),
     };
 
 
