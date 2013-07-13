@@ -886,10 +886,6 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    WCHAR buf[0x100];
-
-    swprintf(buf, L"%.*s\n", 3, L"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    PrintConsoleW(buf);
     return;
 
 #if 0

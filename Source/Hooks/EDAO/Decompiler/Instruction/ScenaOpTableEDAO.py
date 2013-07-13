@@ -1758,7 +1758,7 @@ edao_op_list = \
     inst(SetChrSubChip,             'WB'),
     inst(OP_8E,                     'WS'),
     inst(SetChrPos,                 'WiiiH'),
-    inst(OP_90,                     'WLLLW'),
+    inst(OP_90,                     'Wiiih'),
     inst(TurnDirection,             'WWH'),
     inst(OP_92,                     'WLLW'),
     inst(OP_93,                     'WWW'),
