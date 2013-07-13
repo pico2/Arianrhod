@@ -344,13 +344,16 @@ QqSetWindowPos(
     UINT    Flags
 )
 {
-    BOOL Success;
-    //LONG BuddyWidth     = 697;
-    //LONG BuddyHeight    = 520;
+    BOOL Success, MessageBox;
+
+    LONG BuddyWidth     = 553;
+    LONG BuddyHeight    = 526;
     LONG GroupWidth     = 603;
     LONG GroupHeight    = 527;
     LONG DiscussWidth   = 556;
     LONG DiscussHeight  = 526;
+
+    WCHAR Title[0x200];
 
 #define GROUP_WIDTH     722
 #define GROUP_HEIGHT    671
@@ -372,8 +375,16 @@ QqSetWindowPos(
 
 #endif
 
+    MessageBox = FALSE;
+    GetWindowTextW(hWnd, Title, countof(Title));
+    if (wcsstr(Title, L"ЯћЯЂКазг") != NULL)
+    {
+        MessageBox = TRUE;
+    }
+
     if (
-        //(cx == BuddyWidth && cy == BuddyHeight) ||
+        MessageBox                              ||
+        (cx == BuddyWidth && cy == BuddyHeight) ||
         (cx == GroupWidth && cy == GroupHeight) ||
         (cx == DiscussWidth && cy == DiscussHeight)
        )
@@ -381,14 +392,18 @@ QqSetWindowPos(
         RECT WorkArea;
 
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &WorkArea, 0);
-/*
-        if (cx == BuddyWidth)
+
+        if (MessageBox)
         {
-            cx = BUDDY_WIDTH;
-            cy = BUDDY_HEIGHT;
+            cx = (WorkArea.right - WorkArea.left) * 80 / 100;
+            cy = (WorkArea.bottom - WorkArea.top) * 90 / 100;
+        }
+        else if (cx == BuddyWidth)
+        {
+            //cx = BUDDY_WIDTH;
+            //cy = BUDDY_HEIGHT;
         }
         else
-*/
         {
             cx = GROUP_WIDTH;
             cy = GROUP_HEIGHT;
