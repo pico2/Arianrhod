@@ -560,6 +560,58 @@ PVOID SearchStringReference(PLDR_MODULE Module, PWSTR String, ULONG_PTR SizeInBy
     return StringReference;
 }
 
+PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
+{
+    PBYTE Buffer;
+
+    Buffer = (PBYTE)Start;
+
+    for (; Length != 0; --Buffer, --Length)
+    {
+        switch (Buffer[0])
+        {
+            case CALL:
+                // push    local_var_size
+                // mov     eax, exception_handler
+                // call    _SEH_prolog
+
+                if (Buffer[-5] != 0xB8)
+                    continue;
+
+                if (Buffer[-10] == 0x68)
+                {
+                    Buffer -= 10;
+                }
+                else if (Buffer[-7] == 0x6A)
+                {
+                    Buffer -= 7;
+                }
+                else
+                {
+                    continue;
+                }
+
+                break;
+
+            case 0x55:
+                if (Buffer[1] != 0x8B || Buffer[2] != 0xEC)
+                    continue;
+
+                // push ebp
+                // mov ebp, esp
+
+                break;
+
+            default:
+                continue;
+        }
+
+        return Buffer;
+    }
+
+    return nullptr;
+}
+
 ULONG_PTR SearchAppMisc_PluginListCheck(PVOID AppMisc)
 {
     PVOID       StringReference;
@@ -573,18 +625,7 @@ ULONG_PTR SearchAppMisc_PluginListCheck(PVOID AppMisc)
     if (StringReference == nullptr)
         return IMAGE_INVALID_RVA;
 
-    BYTE StubHeader[] =
-    {
-        0x55,               // push ebp
-        0x8B, 0xEC,         // mov ebp, esp
-    };
-
-    SEARCH_PATTERN_DATA Header[] =
-    {
-        ADD_PATTERN(StubHeader),
-    };
-
-    StringReference = SearchPattern(Header, countof(Header), PtrSub(PtrAdd(StringReference, 4), 0x60), 0x60);
+    StringReference = ReverseSearchFunctionHeader(PtrAdd(StringReference, 4), 0x60);
 
     return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppMisc);
 }
@@ -602,40 +643,9 @@ ULONG_PTR SearchAppMisc_ShowPicInMultiPic(PVOID AppMisc)
     if (StringReference == nullptr)
         return IMAGE_INVALID_RVA;
 
-    StringReference = PtrSub(StringReference, 1);
+    StringReference = ReverseSearchFunctionHeader(PtrAdd(StringReference, 4), 0x20);
 
-    for (LONG_PTR Length = 0x20; Length > 0; --Length)
-    {
-        if (*(PBYTE)StringReference != CALL)
-        {
-            StringReference = PtrSub(StringReference, 1);
-            continue;
-        }
-
-        if (((PBYTE)StringReference)[-5] != 0xB8)
-        {
-            StringReference = PtrSub(StringReference, 1);
-            continue;
-        }
-
-        if (((PBYTE)StringReference)[-10] == 0x68)
-        {
-            StringReference = PtrSub(StringReference, 10);
-        }
-        else if (((PBYTE)StringReference)[-7] == 0x6A)
-        {
-            StringReference = PtrSub(StringReference, 7);
-        }
-        else
-        {
-            StringReference = PtrSub(StringReference, 1);
-            continue;
-        }
-
-        return PtrOffset(StringReference, AppMisc);
-    }
-
-    return IMAGE_INVALID_RVA;
+    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppMisc);
 }
 
 ULONG_PTR SearchChatFrame_CheckModule(PVOID ChatFrame)
@@ -692,38 +702,9 @@ ULONG_PTR SearchAppUtil_CheckImportantModule(PVOID AppUtil)
 
     StringReference = PtrSub(StringReference, 1);
 
-    for (LONG_PTR Length = 0x20; Length > 0; --Length)
-    {
-        if (*(PBYTE)StringReference != CALL)
-        {
-            StringReference = PtrSub(StringReference, 1);
-            continue;
-        }
+    StringReference = ReverseSearchFunctionHeader(StringReference, 0x20);
 
-        if (((PBYTE)StringReference)[-5] != 0xB8)
-        {
-            StringReference = PtrSub(StringReference, 1);
-            continue;
-        }
-
-        if (((PBYTE)StringReference)[-10] == 0x68)
-        {
-            StringReference = PtrSub(StringReference, 10);
-        }
-        else if (((PBYTE)StringReference)[-7] == 0x6A)
-        {
-            StringReference = PtrSub(StringReference, 7);
-        }
-        else
-        {
-            StringReference = PtrSub(StringReference, 1);
-            continue;
-        }
-
-        return PtrOffset(StringReference, AppUtil);
-    }
-
-    return IMAGE_INVALID_RVA;
+    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppUtil);
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -825,7 +806,7 @@ BOOL Initialize(PVOID BaseAddress)
     {
         //INLINE_HOOK_JUMP_RVA_NULL(0x122CCA, CheckPluginList),
         //INLINE_HOOK_JUMP_RVA_NULL(0x1BC97B, ShowDBClickPicture),
-        INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList), // addition SetTimeOut
         INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture),
     };
 
@@ -843,8 +824,8 @@ BOOL Initialize(PVOID BaseAddress)
         //INLINE_HOOK_JUMP_RVA_NULL(0x93C3, IsTencentTrusted),
         INLINE_HOOK_JUMP_RVA_NULL(SearchChatFrame_CheckModule(module), IsTencentTrusted),
     };
-*/
 
+*/
     /************************************************************************
       AppUtil
 

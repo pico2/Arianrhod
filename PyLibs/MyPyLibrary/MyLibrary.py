@@ -13,6 +13,9 @@ from PyImage import *
 from FileIo import *
 
 def ForEachFile(filelist, callback, filter = '*.*'):
+    if type(filelist) == str:
+        filelist = [filelist]
+
     for f in filelist:
         if os.path.isdir(f):
             for x in EnumDirectoryFiles(f, filter):
@@ -32,6 +35,9 @@ def ForEachFileMPInvoker(cb, flist):
         cb(f)
 
 def ForEachFileMP(filelist, callback, filter = '*.*'):
+    if type(filelist) == str:
+        filelist = [filelist]
+
     allfile = []
     for f in filelist:
         if os.path.isdir(f):

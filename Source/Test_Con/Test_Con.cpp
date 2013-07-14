@@ -886,6 +886,10 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    OBJECT_BASIC_INFORMATION obi;
+
+    NtQueryObject((HANDLE)0xC, ObjectBasicInformation, &obi, sizeof(obi), NULL);
+
     return;
 
 #if 0
