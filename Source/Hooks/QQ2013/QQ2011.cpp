@@ -743,9 +743,9 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_ntdll[] =
     {
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               StubNtOpenFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? ZwOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               StubNtOpenFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? ZwCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? ZwQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
         INLINE_HOOK_JUMP(ZwQueryInformationProcess,                                 QqNtQueryInformationProcess,StubNtQueryInformationProcess),
     };
 
