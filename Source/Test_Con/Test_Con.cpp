@@ -886,10 +886,6 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    _asm int 3;
-
-    PrintConsoleW(L"fuck\n");
-
     return;
 
 #if 0
@@ -926,7 +922,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         UnInstallShellOverlayHook();
         Ps::ExitProcess(0);
     }
-
+/*
     ULONG ExplorerPid;
 
     if (GetWindowThreadProcessId(GetShellWindow(), &ExplorerPid) != 0)
@@ -941,6 +937,9 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
             //ShellExecuteW(NULL, L"open", L"explorer.exe", NULL, NULL, SW_SHOW);
         }
     }
+*/
+
+    SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_FLUSH, nullptr, nullptr);
 
     PauseConsole(L"Press any key to uninstall ...");
     UnInstallShellOverlayHook();
