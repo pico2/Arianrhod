@@ -381,7 +381,7 @@ QqSetWindowPos(
 
     MessageBox = FALSE;
     GetWindowTextW(hWnd, Title, countof(Title));
-    if (wcsstr(Title, L"消息盒子") != nullptr)
+    if (wcsstr(Title, L" - 消息盒子") != nullptr)
     {
         MessageBox = TRUE;
     }
@@ -416,7 +416,7 @@ QqSetWindowPos(
         X = ((WorkArea.right - WorkArea.left) - cx) / 2;
         Y = ((WorkArea.bottom - WorkArea.top) - cy) / 2;
 
-        CLEAR_FLAG(Flags, SWP_NOSIZE);
+        CLEAR_FLAG(Flags, SWP_NOSIZE | SWP_NOMOVE);
     }
 
     return StubSetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, Flags);
