@@ -696,12 +696,12 @@ a:Console MainW:#conmw:
 
 #include "MyLibrary.cpp"
 
-ForceInline Void main2(Long_Ptr argc, WChar **argv)
+ForceInline Void main2(LONG_PTR argc, PWSTR *argv)
 {
     $selected$
 }
 
-int __cdecl main(Long_Ptr argc, wchar_t **argv)
+int __cdecl main(LONG_PTR argc, PWSTR *argv)
 {
     getargsW(&argc, &argv);
     main2(argc, argv);

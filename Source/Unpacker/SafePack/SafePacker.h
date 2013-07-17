@@ -1,12 +1,13 @@
 #ifndef _SAFEPACKER_H_5447b095_7f6d_4794_a657_bd31b4450648
 #define _SAFEPACKER_H_5447b095_7f6d_4794_a657_bd31b4450648
 
-#include "MyLibraryUser.h"
 #include "UnpackerBase.h"
 #include "aes.h"
 
-#define SAFE_PACK_MAGIC         TAG4('FUCK')
-#define NRV2E_MAGIC             TAG4('NRV2')
+#define SAFE_PACK_MAGIC         TAG4('ARIA')
+//#define NRV2E_MAGIC             TAG4('NRV2')
+#define LZNT1_MAGIC             TAG4('LZNT')
+#define LZMA_MAGIC              TAG4('LZMA')
 #define DATA_SHIFT_BITS         13
 
 #define GET_ENTRY_OFFSET_LOW(_Entry, _Hash) ((_Entry)->Offset.LowPart ^ _rotl((_Hash)[0], DATA_SHIFT_BITS))
@@ -22,6 +23,7 @@ typedef struct
     ULONG           Flags;
     LARGE_INTEGER   Size;
     LARGE_INTEGER   Offset;
+
 } SAFE_PACK_BUFFER;
 
 typedef struct
@@ -29,10 +31,11 @@ typedef struct
     ULONG           Magic;
     ULONG           HeaderSize;
     ULONG           Flags;
-    ULONG           Reserve;
+    ULONG           NumberOfFiles;
     LARGE_INTEGER   EntryOffset;
     LARGE_INTEGER   EntrySize;
-} SAFE_PACK_HEADER;
+
+} SAFE_PACK_HEADER, *PSAFE_PACK_HEADER;
 
 typedef struct
 {
@@ -47,14 +50,18 @@ typedef struct
     ULONG           FileNameHash[4];
     UNICODE_STRING  FileName;
     WCHAR           Buffer[1];
-} SAFE_PACK_ENTRY;
+
+} SAFE_PACK_ENTRY, *PSAFE_PACK_ENTRY;
 
 typedef enum
 {
     NoCompress,
-    CompressMethodNRV2E,
 
-    CompressMethodUser = 0x80000000,
+    CompressLZNT1           = 1,
+    CompressLZMA            = 2,
+    CompressMethodNRV2E     = 3,
+
+    CompressMethodUser      = 0x80000000,
 
 } SafePackCompressMethodClass;
 
@@ -65,7 +72,8 @@ typedef struct
     ULONG           CompressMethod;
     LARGE_INTEGER   CompressedSize;
     LARGE_INTEGER   OriginalSize;
-} SAFE_PACK_COMPRESSED_HEADER;
+
+} SAFE_PACK_COMPRESSED_HEADER, *PSAFE_PACK_COMPRESSED_HEADER;
 
 struct SAFE_PACK_ENTRY2 : public UNPACKER_FILE_ENTRY_BASE
 {
@@ -75,6 +83,8 @@ struct SAFE_PACK_ENTRY2 : public UNPACKER_FILE_ENTRY_BASE
     LARGE_INTEGER   LastAccessTime;
     LARGE_INTEGER   LastWriteTime;
 };
+
+typedef SAFE_PACK_ENTRY2 *PSAFE_PACK_ENTRY2;
 
 #pragma pack()
 
@@ -202,11 +212,23 @@ public:
         SAFE_PACK_BUFFER *DestinationBuffer
     )
     {
-        BOOL Success;
-        SAFE_PACK_COMPRESSED_HEADER *Header;
 
+#if 0
         UNREFERENCED_PARAMETER(FileInfo);
         return STATUS_COMPRESSION_DISABLED;
+
+#else
+
+        NTSTATUS                        Status;
+        ULONG                           SizeOfImage;
+        ULONG                           CompressionFormatAndEngine;
+        ULONG                           CompressBufferWorkSpaceSize;
+        ULONG                           CompressFragmentWorkSpaceSize;
+        PVOID                           WorkSpace;
+        PSAFE_PACK_COMPRESSED_HEADER    Header;
+
+        if (SourceBuffer->Size.HighPart != 0)
+            return STATUS_COMPRESSION_DISABLED;
 
         if (DestinationBuffer->Size.QuadPart < SourceBuffer->Size.QuadPart * 2)
         {
@@ -214,17 +236,39 @@ public:
             return STATUS_BUFFER_TOO_SMALL;
         }
 
-        Header = (SAFE_PACK_COMPRESSED_HEADER *)DestinationBuffer->Buffer;
 
-        Success = UCL_NRV2E_Compress(
+        CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_MAXIMUM;
+
+        Status = RtlGetCompressionWorkSpaceSize(
+                    CompressionFormatAndEngine,
+                    &CompressBufferWorkSpaceSize,
+                    &CompressFragmentWorkSpaceSize
+                );
+
+        if (NT_FAILED(Status))
+        {
+            return STATUS_COMPRESSION_DISABLED;
+        }
+
+        WorkSpace = AllocStack(CompressBufferWorkSpaceSize + CompressFragmentWorkSpaceSize);
+
+        Header = (PSAFE_PACK_COMPRESSED_HEADER)DestinationBuffer->Buffer;
+
+        Status = RtlCompressBuffer(
+                    CompressionFormatAndEngine,
                     SourceBuffer->Buffer,
                     SourceBuffer->Size.LowPart,
                     Header + 1,
-                    &DestinationBuffer->Size.LowPart
-                  );
+                    DestinationBuffer->Size.LowPart,
+                    CompressFragmentWorkSpaceSize,
+                    &DestinationBuffer->Size.LowPart,
+                    WorkSpace
+                );
 
-        if (!Success)
-            return STATUS_UNSUCCESSFUL;
+        if (NT_FAILED(Status))
+        {
+            return STATUS_COMPRESSION_DISABLED;
+        }
 
         DestinationBuffer->Size.HighPart = 0;
 
@@ -233,15 +277,18 @@ public:
             return STATUS_COMPRESSION_DISABLED;
         }
 
-        Header->Magic                     = NRV2E_MAGIC;
+        Header->Magic                     = LZNT1_MAGIC;
         Header->Flags                     = 0;
-        Header->CompressMethod            = CompressMethodNRV2E;
+        Header->CompressMethod            = CompressLZNT1;
         Header->OriginalSize.QuadPart     = SourceBuffer->Size.QuadPart;
         Header->CompressedSize.QuadPart   = DestinationBuffer->Size.QuadPart;
 
         DestinationBuffer->Size.QuadPart += sizeof(*Header);
 
         return STATUS_SUCCESS;
+
+#endif
+
     }
 
     UPK_STATUS
@@ -253,11 +300,12 @@ public:
         aes_encrypt_ctx AesContext;
 
         return STATUS_NOT_IMPLEMENTED;
-
+/*
         aes_encrypt_key128(&FileInfo->UnicodeHash[4], &AesContext);
         Encrypt(&AesContext, Buffer->Buffer, Buffer->Size.LowPart, FileInfo->UnicodeHash);
 
         return STATUS_SUCCESS;
+*/
     }
 
     UPK_STATUS
@@ -280,7 +328,7 @@ public:
     )
     {
         UNREFERENCED_PARAMETER(Header);
-        return SafePackerBase::CompressData(NULL, SourceBuffer, DestinationBuffer);
+        return CompressData(NULL, SourceBuffer, DestinationBuffer);
     }
 
     UPK_STATUS
@@ -291,8 +339,9 @@ public:
     {
         UNREFERENCED_PARAMETER(Header);
         return STATUS_NOT_IMPLEMENTED;
-        EncryptHeader(SourceBuffer->Buffer, SourceBuffer->Size.LowPart);
-        return STATUS_SUCCESS;
+
+        //EncryptHeader(SourceBuffer->Buffer, SourceBuffer->Size.LowPart);
+        //return STATUS_SUCCESS;
     }
 
     UPK_STATUS
@@ -301,11 +350,12 @@ public:
     )
     {
         return STATUS_NOT_IMPLEMENTED;
-
+/*
         SET_FLAG(Header->Flags, UNPACKER_ENTRY_ENCRYPTED);
         EncryptHeader(Header, Header->HeaderSize);
 
         return STATUS_SUCCESS;
+*/
     }
 
 protected:
@@ -341,15 +391,17 @@ protected:
         Entry->Size.HighPart    = FindData->nFileSizeHigh;
         Entry->Flags            = 0;
 
-        Nt_UnicodeToAnsi(FileName, countof(FileName), FindData->cFileName + Context, Length, &Length);
+        UnicodeToAnsi(FileName, countof(FileName), FindData->cFileName + Context, Length, &Length);
         StringUpperA(FileName, Length);
         sha256(FileName, Length, Entry->AnsiHash);
 
-        CopyMemory(Entry->FileName, FindData->cFileName + Context, (Length + 1) * sizeof(WCHAR));
-        StringUpperW(Entry->FileName, Length);
-        sha256(Entry->FileName, Length * sizeof(WCHAR), Entry->UnicodeHash);
+        Entry->SetFileName(FindData->cFileName + Context);
 
-        CopyMemory(Entry->FileName, FindData->cFileName + Context, (Length + 1) * sizeof(WCHAR));
+        StringUpperW(Entry->GetFileName(), Length);
+
+        sha256(Entry->GetFileName(), Length * sizeof(WCHAR), Entry->UnicodeHash);
+
+        Entry->SetFileName(FindData->cFileName + Context);
 
         return 1;
     }
@@ -410,8 +462,8 @@ Pack(
     PVOID               FileBuffer, Buffer, Compressed, WriteBuffer;
     SAFE_PACK_BUFFER    SourceBuffer, DestinationBuffer;
     SAFE_PACK_HEADER    Header;
-    SAFE_PACK_ENTRY    *EntryBase, *Entry;
-    SAFE_PACK_ENTRY2   *FileList, *FileListBase;
+    PSAFE_PACK_ENTRY    EntryBase, Entry;
+    PSAFE_PACK_ENTRY2   FileList, FileListBase;
     LARGE_INTEGER       FileNumber, DataOffset;
     BaseType           *This;
 
@@ -499,7 +551,21 @@ Pack(
 
     for (LARGE_INTEGER Count = FileNumber; Count.QuadPart; ++FileList, --Count.QuadPart)
     {
-        Length = StrLengthW(FileList->FileName) * sizeof(WCHAR);
+        if (PtrOffset(Entry, EntryBase) > EntrySize)
+        {
+            ULONG_PTR Offset = PtrOffset(Entry, EntryBase);
+            EntrySize = Offset * 3 / 2;
+            EntryBase = (PSAFE_PACK_ENTRY)ReAllocateMemory(EntryBase, EntrySize);
+            if (EntryBase == NULL)
+            {
+                Status = STATUS_NO_MEMORY;
+                goto CLEAN_UP;
+            }
+
+            Entry = PtrAdd(EntryBase, Offset);
+        }
+
+        Length = FileList->GetFileNameLength() * sizeof(WCHAR);
 
         Entry->Flags            = Flags;
         Entry->CreationTime     = FileList->CreationTime;
@@ -512,9 +578,10 @@ Pack(
         Entry->Attributes       = FileList->Attributes;
 
         if (FLAG_ON(Entry->Attributes, FILE_ATTRIBUTE_DIRECTORY))
-            goto PACK_NEXT_FILE;
+            //goto PACK_NEXT_FILE;
+            continue;
 
-        CopyMemory(FileName, FileList->FileName, Length + sizeof(WCHAR));
+        CopyMemory(FileName, FileList->GetFileName(), Length + sizeof(WCHAR));
 
         Status = file.Open(PackPath);
         if (!NT_SUCCESS(Status))
@@ -633,21 +700,23 @@ Pack(
 
         DataOffset.QuadPart += WriteSize;
 
-PACK_NEXT_FILE:
+//PACK_NEXT_FILE:
 
-        CopyMemory(Entry->Buffer, FileList->FileName, Length);
+        CopyMemory(Entry->Buffer, FileList->GetFileName(), Length);
 
         Entry->FileName.Buffer          = PtrSub(Entry->Buffer, EntryBase);
         Entry->FileName.Length          = (USHORT)Length;
-        Entry->FileName.MaximumLength   = (USHORT)Length;
+        Entry->FileName.MaximumLength   = (USHORT)Length + sizeof(WCHAR);
         Entry->EntrySize                = sizeof(*Entry) - sizeof(Entry->Buffer) + Entry->FileName.MaximumLength;
         Entry->EntrySize                = ROUND_UP(Entry->EntrySize, 16);
         Entry                           = PtrAdd(Entry, Entry->EntrySize);
+
         ++PackedFileNumber;
     }
 
     Header.EntrySize.QuadPart   = PtrOffset(Entry, EntryBase);
     Header.EntryOffset.QuadPart = pack.GetCurrentPos64();
+    Header.NumberOfFiles        = (ULONG)PackedFileNumber;
 
 //    qsort(EntryBase, PackedFileNumber, sizeof(*EntryBase), (int (__cdecl *)(const void *,const void *))SortEntry);
 

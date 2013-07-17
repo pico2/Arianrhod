@@ -38,7 +38,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Gr /MD /W4 /GR- /Z7 /O2 /Ob1 /D USE_NT_VER=1 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /GL /GS- /MP /GL /c
+# ADD CPP /nologo /Gr /MD /W4 /GR- /Z7 /O2 /Ob1 /D "WIN32" /D "NDEBUG" /FD /GL /GS- /MP /GL /arch:SSE /c
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
 # ADD RSC /l 0x804 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -53,26 +53,13 @@ LINK32=link.exe
 # Name "SafePack - Win32 Release"
 # Begin Source File
 
-SOURCE=..\..\..\..\MyLib\cls\aes_x86_v2.asm
+SOURCE=..\..\..\..\MyLib\MyLibrary\Class\aes_x86_v2.asm
+# PROP Exclude_From_Build 1
 # PROP Ignore_Default_Tool 1
-# Begin Custom Build
-InputDir=\MyLib\cls
-IntDir=.\Release
-InputPath=..\..\..\..\MyLib\cls\aes_x86_v2.asm
-InputName=aes_x86_v2
-
-"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	yasm -I$(InputDir) -f win32 -O2 -DPREFIX -DNON_MOD16_STACK -DBIT_DEPTH=8 -o "$(IntDir)\$(InputName)".obj "$(InputPath)"
-
-# End Custom Build
 # End Source File
 # Begin Source File
 
 SOURCE=.\main.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\SafePacker.cpp
 # End Source File
 # Begin Source File
 
