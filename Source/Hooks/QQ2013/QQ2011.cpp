@@ -422,6 +422,12 @@ QqSetWindowPos(
     return StubSetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, Flags);
 }
 
+BOOL CDECL ReportScanResult()
+{
+    INLINE_ASM __emit 0xCC;
+    return TRUE;
+}
+
 NTSTATUS CDECL CheckPluginList()
 {
     return STATUS_SUCCESS;
@@ -846,6 +852,7 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_FUNCTION_PATCH Function_AppUtil[] =
     {
         //INLINE_HOOK_JUMP_RVA_NULL(0xB884, CheckPluginList),
+        EAT_HOOK_JUMP_NULL(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z", ReportScanResult),
         INLINE_HOOK_JUMP_RVA_NULL(SearchAppUtil_CheckImportantModule(module), CheckPluginList),
     };
 
