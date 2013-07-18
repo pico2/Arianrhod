@@ -884,19 +884,70 @@ NTSTATUS InstallShellOverlayHook()
 
 #include <ShlObj.h>
 
+NTSTATUS
+QueryDosPathFromNtDeviceName2(
+    PWSTR*  DosPath,
+    PCWSTR  NtDeviceName
+)
+{
+    NTSTATUS        Status;
+    ULONG_PTR       Length;
+    WCHAR           DosLetter[4], TargetPath[MAX_NTPATH];
+    PWSTR           DosPathBuffer;
+    UNICODE_STRING  NtDevice;
+
+    *DosPath = NULL;
+
+    *(PULONG)&DosLetter[0] = TAG2W('A:');
+    *(PULONG)&DosLetter[2] = 0;
+
+    RtlInitUnicodeString(&NtDevice, NtDeviceName);
+
+    for (ULONG_PTR Count = 'Z' - 'A' + 1; Count; ++DosLetter[0], --Count)
+    {
+        Length = QueryDosDeviceW(DosLetter, TargetPath, countof(TargetPath));
+        if (Length == 0)
+            continue;
+
+        Length = lstrlenW(TargetPath);
+
+        if (TargetPath[Length - 1] != '\\')
+            TargetPath[Length++] = '\\';
+
+        Length *= sizeof(WCHAR);
+
+        if (Length >= NtDevice.Length)
+            continue;
+
+        if (RtlCompareMemory(NtDeviceName, TargetPath, Length) !=  Length)
+            continue;
+
+        DosPathBuffer = (PWSTR)malloc(Length + NtDevice.MaximumLength);
+        if (DosPathBuffer == NULL)
+            return STATUS_NO_MEMORY;
+
+        *(PULONG)DosPathBuffer = *(PULONG)DosLetter;
+        DosPathBuffer[2] = '\\';
+
+        CopyMemory(DosPathBuffer + 3, PtrAdd(NtDevice.Buffer, Length), NtDevice.Length - Length);
+        *PtrAdd(DosPathBuffer, NtDevice.Length - Length + 6) = 0;
+
+        *DosPath = DosPathBuffer;
+
+        return STATUS_SUCCESS;
+    }
+
+    return STATUS_OBJECT_PATH_NOT_FOUND;
+}
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    HANDLE cf;
-    PROCESS_IMAGE_FILE_NAME2 ifn;
+    PWSTR DosPath;
+    PROCESS_IMAGE_FILE_NAME2 fn;
 
-    RtlInitEmptyString(&ifn.ImageFileName);
-
-    cf = PidToHandle(CurrentPid(), PROCESS_QUERY_INFORMATION);
-
-    NtQueryInformationProcess(cf, ProcessImageFileNameWin32, &ifn, sizeof(ifn), NULL);
-
-    PrintConsoleW(L"%wZ\n", &ifn.ImageFileName);
-    PauseConsole();
+    NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &fn, sizeof(fn), NULL);
+    QueryDosPathFromNtDeviceName2(&DosPath, fn.ImageFileName.Buffer);
+    free(DosPath);
 
     return;
 
