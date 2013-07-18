@@ -886,6 +886,18 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    HANDLE cf;
+    PROCESS_IMAGE_FILE_NAME2 ifn;
+
+    RtlInitEmptyString(&ifn.ImageFileName);
+
+    cf = PidToHandle(CurrentPid(), PROCESS_QUERY_INFORMATION);
+
+    NtQueryInformationProcess(cf, ProcessImageFileNameWin32, &ifn, sizeof(ifn), NULL);
+
+    PrintConsoleW(L"%wZ\n", &ifn.ImageFileName);
+    PauseConsole();
+
     return;
 
 #if 0
