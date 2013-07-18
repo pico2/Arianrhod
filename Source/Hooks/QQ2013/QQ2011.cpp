@@ -428,6 +428,11 @@ BOOL CDECL ReportScanResult()
     return TRUE;
 }
 
+BOOL CDECL PluginSecurityCheck()
+{
+    return TRUE;
+}
+
 NTSTATUS CDECL CheckPluginList()
 {
     return STATUS_SUCCESS;
@@ -853,7 +858,8 @@ BOOL Initialize(PVOID BaseAddress)
     {
         //INLINE_HOOK_JUMP_RVA_NULL(0xB884, CheckPluginList),
         EAT_HOOK_JUMP_NULL(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z", ReportScanResult),
-        INLINE_HOOK_JUMP_RVA_NULL(SearchAppUtil_CheckImportantModule(module), CheckPluginList),
+        EAT_HOOK_JUMP_NULL(module, "?PluginSecurityCheck@Misc@Util@@YAHXZ",             PluginSecurityCheck),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchAppUtil_CheckImportantModule(module),           CheckPluginList),
     };
 
 

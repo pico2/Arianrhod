@@ -1,45 +1,42 @@
-#pragma comment(linker,"/ENTRY:DllMain")
-#pragma comment(linker,"/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
-#pragma comment(linker,"/SECTION:.Amano,ERW /MERGE:.text=.Amano")
+#pragma comment(linker, "/ENTRY:DllMain")
+#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
+#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include <Windows.h>
-#include "my_headers.h"
-#include "my_api.cpp"
-#include "my_crtadd.cpp"
-#include "Mem.cpp"
+#include "MyLibrary.cpp"
 
-VOID FASTCALL WriteLinkerTempFile(PVOID pThis, PVOID, PCHAR pszText)
+
+VOID FASTCALL WriteLinkerTempFile(PVOID This, PVOID, PSTR Text)
 {
-    PWCHAR pszUnicode;
+    PWSTR Unicode;
     ULONG  Length;
     FILE  *fp;
 
-    Length = StrLengthA(pszText);
-    if (*(PULONG)pszText == TAG4('@ech'))
+    Length = StrLengthA(Text);
+    if (*(PULONG)Text == TAG4('@ech'))
     {
-        pszUnicode = (PWCHAR)pszText;
+        Unicode = (PWSTR)Text;
     }
     else
     {
-        pszUnicode = (PWCHAR)AllocStack(Length * 2 + 2);
-        *(PUSHORT)pszUnicode = BOM_UTF16_LE;
-        Length = MultiByteToWideChar(CP_GB2312, 0, pszText, Length, pszUnicode + 1, Length);
+        Unicode = (PWSTR)AllocStack(Length * 2 + 2);
+        *(PUSHORT)Unicode = BOM_UTF16_LE;
+        Length = MultiByteToWideChar(CP_GB2312, 0, Text, Length, Unicode + 1, Length);
         Length = Length * 2 + 2;
     }
 
-    fp = *(FILE **)((ULONG_PTR)pThis + 0x10);
+    fp = *(PTR_OF(fp))PtrAdd(This, 0x10);
     _setmode(_fileno(fp), _O_BINARY);
-    fwrite(pszUnicode, Length, 1, fp);
+    fwrite(Unicode, Length, 1, fp);
 }
 
-VOID FASTCALL Init2(HMODULE hModule)
+VOID FASTCALL DelayInitialize(PVOID devshl)
 {
     MEMORY_FUNCTION_PATCH f[] =
     {
-        { CALL, 0xE160, WriteLinkerTempFile },
+        INLINE_HOOK_CALL_RVA_NULL(0xE160, WriteLinkerTempFile),
     };
 
-    PatchMemory(NULL, 0, f, countof(f), hModule);
+    Nt_PatchMemory(NULL, 0, f, countof(f), devshl);
 }
 
 ASM VOID LoadDevBldFinished()
@@ -48,38 +45,45 @@ ASM VOID LoadDevBldFinished()
     {
         mov  ecx, [esp + 4];
         push eax;
-        call Init2;
+        call DelayInitialize
         pop  eax;
         test eax, eax;
         ret  0x10;
     }
 }
 
-VOID Init()
+BOOL UnInitialize(PVOID BaseAddress)
+{
+    return FALSE;
+}
+
+BOOL Initialize(PVOID BaseAddress)
 {
     setlocale(LC_ALL, ".936");
 
-    HMODULE hModule = GetModuleHandleW(L"devshl.dll");
+    PLDR_MODULE devshl;
+
     MEMORY_FUNCTION_PATCH f[] =
     {
-        { CALL, 0x380DB, LoadDevBldFinished },
+        INLINE_HOOK_CALL_RVA_NULL(0x380DB, LoadDevBldFinished),
     };
 
-    PatchMemory(NULL, 0, f, countof(f), hModule);
+    devshl = FindLdrModuleByHandle(L"devshl.dll");
+
+    Nt_PatchMemory(NULL, 0, f, countof(f), devshl->DllBase);
+
+    return TRUE;
 }
 
-BOOL WINAPI DllMain(HINSTANCE hInstance, ULONG Reason, LPVOID lpReserved)
+BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
-    UNREFERENCED_PARAMETER(lpReserved);
-
     switch (Reason)
     {
         case DLL_PROCESS_ATTACH:
-            DisableThreadLibraryCalls(hInstance);
-            Init();
-            break;
+            return Initialize(BaseAddress) || UnInitialize(BaseAddress);
 
         case DLL_PROCESS_DETACH:
+            UnInitialize(BaseAddress);
             break;
     }
 
