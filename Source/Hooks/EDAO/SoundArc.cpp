@@ -2,28 +2,23 @@
 
 #define HANDLE_CTRL(_ctrl_code, fn)   case (_ctrl_code): return fn(Parameter)
 
-#if 0
-    #undef DebugPrint
-    #define DebugPrint(...) { AllocConsole(); PrintConsoleW(__VA_ARGS__); PrintConsoleW(L"\n"); }
-#endif
-
 
 CSoundPlayer *g_Player;
 
 HWND THISCALL CSoundPlayer::GetSoundControlWindow()
 {
-    if (g_Player == NULL)
+    if (g_Player == nullptr)
     {
         CSoundPlayer *Player;
 
         Player = new CSoundPlayer;
-        if (Player == NULL)
-            return NULL;
+        if (Player == nullptr)
+            return nullptr;
 
         if (NT_FAILED(Player->Initialize(*(HWND *)PtrAdd(this, 0xB0))))
         {
             delete Player;
-            return NULL;
+            return nullptr;
         }
 
         g_Player = Player;
@@ -76,12 +71,12 @@ NTSTATUS CSoundPlayer::Initialize(HWND GameWindow)
     PVOID*  Function;
 
     m_Sound3D = Ldr::LoadDll(L".\\dll\\sound3d.dll");
-    if (m_Sound3D == NULL)
+    if (m_Sound3D == nullptr)
         return STATUS_NOT_FOUND;
 
     Function = &this->FunctionTable;
 
-    FOR_EACH(Name, FunctionNames, countof(FunctionNames))
+    FOR_EACH_ARRAY(Name, FunctionNames)
     {
         *Function++ = GetRoutineAddress(m_Sound3D, *Name);
     }
@@ -110,7 +105,7 @@ LRESULT CSoundPlayer::DispatchCtrlCode(ULONG_PTR Message, ULONG_PTR CtrlCode, UL
                 break;
             }
 
-            DebugPrint(L"%X", CtrlCode);
+            //DebugPrint(L"%X", CtrlCode);
 
             switch (CtrlCode)
             {
@@ -153,8 +148,9 @@ LRESULT CSoundPlayer::DispatchCtrlCode(ULONG_PTR Message, ULONG_PTR CtrlCode, UL
             PCOPYDATASTRUCT CopyDataStruct;
 
             CopyDataStruct = (PCOPYDATASTRUCT)Parameter;
-
             StrCopyA(m_SeName, (PCSTR)CopyDataStruct->lpData);
+
+            DebugPrint(L"set se: %S\n", m_SeName);
 
             break;
         }

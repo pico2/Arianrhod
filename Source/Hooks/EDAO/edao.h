@@ -11,6 +11,11 @@
     #define NtGetTickCount (ULONG64)GetTickCount
 #endif
 
+#if 0
+    #undef DebugPrint
+    #define DebugPrint(...) { AllocConsole(); PrintConsoleW(__VA_ARGS__); PrintConsoleW(L"\n"); }
+#endif
+
 ML_OVERLOAD_NEW
 
 class EDAO;
@@ -548,7 +553,7 @@ public:
                 return Entry[0];
         }
 
-        return NULL;
+        return nullptr;
     }
 
     PAT_BAR_ENTRY THISCALL LookupReplaceAtBarEntry(PMONSTER_STATUS MSData, BOOL IsFirst);
@@ -764,7 +769,7 @@ public:
 
     BOOL CheckCondition(PMONSTER_STATUS MSData, ULONG condition, ULONG par3=0)
     {
-        return FindEffectInfoByCondition(MSData, condition, par3) != NULL;
+        return FindEffectInfoByCondition(MSData, condition, par3) != nullptr;
     }
 
 
@@ -996,7 +1001,7 @@ public:
 
         LONG (FASTCALL *AoMessageBoxWorker)(EDAO*, PVOID, BOOL CanUseCancelButton, PCSTR Text, MSGBOX_CALLBACK, ULONG, ULONG, ULONG);
 
-        MSGBOX_CALLBACK cb = { (PVOID)0x676056, NULL, NULL, NULL };
+        MSGBOX_CALLBACK cb = { (PVOID)0x676056, nullptr, nullptr, nullptr };
 
         *(PULONG_PTR)&AoMessageBoxWorker = 0x67A4D5;
         return AoMessageBoxWorker(this, 0, CanUseCancelButton, Text, cb, 0, 0, -1);
@@ -1111,14 +1116,14 @@ public:
     DECL_STATIC_METHOD_POINTER(EDAO, CheckItemEquipped);
 };
 
-DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped = NULL;
+DECL_SELECTANY TYPE_OF(EDAO::StubCheckItemEquipped) EDAO::StubCheckItemEquipped = nullptr;
 
 
 
 class CCoordConverter
 {
 public:
-    VOID MapPSPCoordToPC(Gdiplus::PointF Source[2], Gdiplus::PointF Target[2], PFLOAT Transform = NULL)
+    VOID MapPSPCoordToPC(Gdiplus::PointF Source[2], Gdiplus::PointF Target[2], PFLOAT Transform = nullptr)
     {
         DETOUR_METHOD(CCoordConverter, MapPSPCoordToPC, 0x6A7030, Source, Target, Transform);
     }
@@ -1175,9 +1180,9 @@ public:
     static TYPE_OF(&CGlobal::GetMagicQueryTable)    StubGetMagicQueryTable;
 };
 
-DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = NULL;
-DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = NULL;
-DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = NULL;
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = nullptr;
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = nullptr;
+DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = nullptr;
 
 BOOL AoIsFileExist(PCSTR FileName);
 

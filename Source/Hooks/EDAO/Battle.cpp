@@ -236,7 +236,7 @@ VOID FASTCALL CBattle::HandleBattleState(ULONG_PTR CurrentState)
     FOR_EACH(Entry, GetBattleATBar()->EntryPointer, countof(GetBattleATBar()->EntryPointer))
     {
         MSData = Entry[0]->MSData;
-        if (MSData == NULL)
+        if (MSData == nullptr)
             continue;
 
         if (Entry[0]->IsSBreaking && !MSData->IsChrEnemy())
@@ -300,7 +300,7 @@ VOID THISCALL CBattle::SetCurrentActionChrInfo(USHORT Type, PMONSTER_STATUS MSDa
 
     Frame = FindThreadFrame(THINK_SBREAK_FILTER);
 
-    if (Frame != NULL && Frame->Data == (ULONG_PTR)MSData)
+    if (Frame != nullptr && Frame->Data == (ULONG_PTR)MSData)
         return;
 
     return (this->*StubSetCurrentActionChrInfo)(Type, MSData);
@@ -314,7 +314,7 @@ BOOL FASTCALL CBattle::EnemyThinkAction(PMONSTER_STATUS MSData)
     Entry = GetBattleATBar()->EntryPointer[0];
 
     if (!MSData->IsChrEnemy() ||
-        Entry == NULL ||
+        Entry == nullptr ||
         Entry->MSData != MSData ||
         !Entry->IsSBreaking)
     {
@@ -399,7 +399,7 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData, PAT_BAR_ENTRY Entry)
                             CraftConditions::Reserve_3      |
                             CraftConditions::Dead;
 
-    if (FindEffectInfoByCondition(MSData, Conditions) != NULL)
+    if (FindEffectInfoByCondition(MSData, Conditions) != nullptr)
         return FALSE;
 
     struct
@@ -492,7 +492,7 @@ NAKED VOID CBattle::NakedAS8DDispatcher()
 
 VOID FASTCALL CBattle::AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
 {
-    if (MSData == NULL)
+    if (MSData == nullptr)
         return;
 
     if (Parameter->Function < AS_8D_FUNCTION_MINIMUM)
@@ -752,7 +752,7 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
         if (ShowInfo)
         {
-            Length = Entry->Format == NULL ? sprintf(Buffer, "%d", Entry->Value) : Entry->Format(MSData, Buffer);
+            Length = Entry->Format == nullptr ? sprintf(Buffer, "%d", Entry->Value) : Entry->Format(MSData, Buffer);
             edao->DrawNumber(X + 69, ValueY, Buffer, ValueColor);
             if (Entry == Status)
             {
@@ -819,7 +819,7 @@ PAT_BAR_ENTRY THISCALL CBattleATBar::LookupReplaceAtBarEntry(PMONSTER_STATUS MSD
 
     NewMSData = *(PMONSTER_STATUS *)(*(PULONG_PTR)PtrSub(_AddressOfReturnAddress(), sizeof(PVOID)) - 0x44);
 
-    FirstEntry = NULL;
+    FirstEntry = nullptr;
     FOR_EACH(Entry, EntryPointer, countof(EntryPointer))
     {
         if (!FLAG_ON(Entry[0]->Flags, 0x20))
@@ -828,7 +828,7 @@ PAT_BAR_ENTRY THISCALL CBattleATBar::LookupReplaceAtBarEntry(PMONSTER_STATUS MSD
         if (Entry[0]->MSData != MSData)
             continue;
 
-        if (FirstEntry == NULL)
+        if (FirstEntry == nullptr)
             FirstEntry = *Entry;
 
         Entry[0]->MSData = NewMSData;

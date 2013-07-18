@@ -886,10 +886,6 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    WCHAR buf[0x800];
-
-    GetSystemDirectoryW(buf, 0x800);
-
     return;
 
 #if 0

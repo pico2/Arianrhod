@@ -13,7 +13,7 @@ BOOL EDAO::CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex)
         case 0xB7:  // ú—Ä¿
         case 0xB8:  // ÌìÑÛ
         case 0xBB:  // Ì½Öª
-            if (EquippedIndex != NULL)
+            if (EquippedIndex != nullptr)
                 *EquippedIndex = 0;
 
             return TRUE;
@@ -445,14 +445,39 @@ VOID THISCALL CInput::HandleMainInterfaceInputState(PVOID Parameter1, CInput *In
         return;
 
     InputDevice = Input->GetDInputDevice();
-    if (InputDevice == NULL)
+    if (InputDevice == nullptr)
         return;
 
     Result = InputDevice->GetDeviceState(sizeof(KeyState), KeyState);
     if (FAILED(Result))
         return;
 
-    FOR_EACH(Key, KeyState, countof(KeyState))
+#if D3D9_VER
+
+    BYTE ShiftKeys[] =
+    {
+        DIK_LCONTROL,
+        DIK_RCONTROL,
+        DIK_LSHIFT,
+        DIK_RSHIFT,
+        DIK_LMENU,
+        DIK_RMENU,
+    };
+
+    PBYTE ShiftKey;
+
+    FOR_EACH_ARRAY(ShiftKey, ShiftKeys)
+    {
+        if (KeyState[*ShiftKey] < 0)
+            break;
+    }
+
+    if (ShiftKey == &ShiftKeys[countof(ShiftKeys)])
+        return;
+
+#endif // d3d9v
+
+    FOR_EACH_ARRAY(Key, KeyState)
     {
         if (*Key < 0)
             HandleSingleKey(Key - KeyState, TRUE);

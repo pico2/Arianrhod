@@ -7,11 +7,15 @@
 #include "edao_vm.h"
 
 #define ENABLE_LOG  0
+#define DEBUG_DISABLE_PATCH 0
 
 #if !D3D9_VER
     #undef ENABLE_LOG
     #define ENABLE_LOG 0
 #endif
+
+BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved);
+
 
 void WriteLog(PCWSTR Format, ...)
 {
@@ -66,8 +70,11 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
 {
     switch (VirtualKey)
     {
-        case VK_SHIFT:
         case VK_LSHIFT:
+            VirtualKey = VK_SHIFT;
+
+        case VK_SHIFT:
+
             if (!Turbo)
                 break;
 
@@ -102,7 +109,7 @@ LRESULT NTAPI MainWndProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lPara
 
 VOID ChangeMainWindowProc(HWND GameWindow)
 {
-    if (GameWindow != NULL)
+    if (GameWindow != nullptr)
         WindowProc = (WNDPROC)SetWindowLongPtrA(GameWindow, GWL_WNDPROC, (LONG_PTR)MainWndProc);
 }
 
@@ -161,12 +168,12 @@ NTSTATUS InitializeRedirectEntry()
         REDIRECT_PATH(L"data\\", L"patch2\\"),
     };
 
-    Module = FindLdrModuleByHandle(NULL);
+    Module = FindLdrModuleByHandle(nullptr);
     Status = NtFileDisk::QueryFullNtPath(Module->FullDllName.Buffer, &ExePath);
     FAIL_RETURN(Status);
 
     RedirectEntry = (PFILE_REDIRECT_ENTRY)AllocateMemoryP((countof(RedirectSubDirectory) + 1) * sizeof(*RedirectEntry), HEAP_ZERO_MEMORY);
-    if (RedirectEntry == NULL)
+    if (RedirectEntry == nullptr)
     {
         RtlFreeUnicodeString(&ExePath);
         return STATUS_NO_MEMORY;
@@ -215,10 +222,10 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
     RtlInitEmptyString(RedirectedFile);
 
     Entry = GlobalRedirectEntry;
-    if (Entry == NULL)
+    if (Entry == nullptr)
         return STATUS_FLT_NOT_INITIALIZED;
 
-    if (OriginalFile == NULL || OriginalFile->Buffer == NULL)
+    if (OriginalFile == nullptr || OriginalFile->Buffer == nullptr)
     {
         return STATUS_INVALID_PARAMETER;
     }
@@ -232,7 +239,7 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
 
     FOR_EACH(Entry, Entry, ~0u)
     {
-        if (Entry->Original.Buffer == NULL)
+        if (Entry->Original.Buffer == nullptr)
             return STATUS_NO_MATCH;
 
         if (OriginalPath.Length <= Entry->Original.Length)
@@ -260,7 +267,7 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
         Redirected.MaximumLength    = Redirected.Length;
         Redirected.Buffer           = Buffer;
 
-        InitializeObjectAttributes(&oa, &Redirected, OBJ_CASE_INSENSITIVE, NULL, 0);
+        InitializeObjectAttributes(&oa, &Redirected, OBJ_CASE_INSENSITIVE, nullptr, 0);
         Status = ZwQueryAttributesFile(&oa, &FileBasic);
         if (
             NT_SUCCESS(Status) &&
@@ -279,7 +286,50 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
     return STATUS_SUCCESS;
 }
 
-TYPE_OF(NtCreateFile)* StubNtCreateFile;
+TYPE_OF(&NtOpenFile)            StubNtOpenFile;
+TYPE_OF(&NtCreateFile)          StubNtCreateFile;
+TYPE_OF(&NtQueryAttributesFile) StubNtQueryAttributesFile;
+
+NTSTATUS
+NTAPI
+AoOpenFile(
+    PHANDLE             FileHandle,
+    ACCESS_MASK         DesiredAccess,
+    POBJECT_ATTRIBUTES  ObjectAttributes,
+    PIO_STATUS_BLOCK    IoStatusBlock,
+    ULONG               ShareAccess,
+    ULONG               OpenOptions
+)
+{
+    NTSTATUS            Status;
+    OBJECT_ATTRIBUTES   LocalObjectAttributes;
+    UNICODE_STRING      Redirected;
+
+    RtlInitEmptyString(&Redirected);
+
+    LOOP_ONCE
+    {
+        if (ObjectAttributes == nullptr)
+            break;
+
+        Status = GetRedirectedFileName(ObjectAttributes->ObjectName, &Redirected);
+        FAIL_BREAK(Status);
+
+        LocalObjectAttributes               = *ObjectAttributes;
+        LocalObjectAttributes.ObjectName    = &Redirected;
+        LocalObjectAttributes.RootDirectory = nullptr;
+
+        CLEAR_FLAG(LocalObjectAttributes.Attributes, OBJ_INHERIT);
+
+        ObjectAttributes = &LocalObjectAttributes;
+    }
+
+    Status = StubNtOpenFile(FileHandle, DesiredAccess, ObjectAttributes, IoStatusBlock, ShareAccess, OpenOptions);
+
+    RtlFreeUnicodeString(&Redirected);
+
+    return Status;
+}
 
 NTSTATUS
 NTAPI
@@ -303,13 +353,14 @@ AoCreateFile(
 
     RtlInitEmptyString(&RedirectedFile);
 
-    if (ObjectAttributes != NULL)
+    if (ObjectAttributes != nullptr)
     {
-        LocalObjectAttributes = *ObjectAttributes;
-        if (NT_SUCCESS(GetRedirectedFileName(LocalObjectAttributes.ObjectName, &RedirectedFile)))
+        if (NT_SUCCESS(GetRedirectedFileName(ObjectAttributes->ObjectName, &RedirectedFile)))
         {
-            LocalObjectAttributes.ObjectName = &RedirectedFile;
-            LocalObjectAttributes.RootDirectory = NULL;
+            LocalObjectAttributes               = *ObjectAttributes;
+            LocalObjectAttributes.ObjectName    = &RedirectedFile;
+            LocalObjectAttributes.RootDirectory = nullptr;
+
             CLEAR_FLAG(LocalObjectAttributes.Attributes, OBJ_INHERIT);
 
             ObjectAttributes = &LocalObjectAttributes;
@@ -335,6 +386,43 @@ AoCreateFile(
     return Status;
 }
 
+NTSTATUS
+NTAPI
+AoQueryAttributesFile(
+    POBJECT_ATTRIBUTES      ObjectAttributes,
+    PFILE_BASIC_INFORMATION FileInformation
+)
+{
+    NTSTATUS            Status;
+    OBJECT_ATTRIBUTES   LocalObjectAttributes;
+    UNICODE_STRING      Redirected;
+
+    RtlInitEmptyString(&Redirected);
+
+    LOOP_ONCE
+    {
+        if (ObjectAttributes == nullptr)
+            break;
+
+        Status = GetRedirectedFileName(ObjectAttributes->ObjectName, &Redirected);
+        FAIL_BREAK(Status);
+
+        LocalObjectAttributes               = *ObjectAttributes;
+        LocalObjectAttributes.ObjectName    = &Redirected;
+        LocalObjectAttributes.RootDirectory = nullptr;
+
+        CLEAR_FLAG(LocalObjectAttributes.Attributes, OBJ_INHERIT);
+
+        ObjectAttributes = &LocalObjectAttributes;
+    }
+
+    Status = StubNtQueryAttributesFile(ObjectAttributes, FileInformation);
+
+    RtlFreeUnicodeString(&Redirected);
+
+    return Status;
+}
+
 HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
 {
     NTSTATUS        Status;
@@ -344,7 +432,7 @@ HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
 
     Status = AnsiToUnicodeString(&FileToFind, FileName);
     if (NT_FAILED(Status))
-        return NULL;
+        return nullptr;
 
     Status = GetRedirectedFileName(&FileToFind, &RedirectedFile);
     Status = QueryFirstFile(
@@ -359,7 +447,7 @@ HANDLE NTAPI AoFindFirstFileA(PCSTR FileName, PWIN32_FIND_DATAA FindFileData)
     FindFileData->cFileName[0] = 0;
 
     if (NT_FAILED(Status))
-        return NULL;
+        return nullptr;
 
     UnicodeToAnsi(FindFileData->cFileName, countof(FindFileData->cFileName), FindData.FileName);
 
@@ -374,7 +462,7 @@ BOOL AoIsFileExist(PCSTR FileName)
 
     Status = AnsiToUnicodeString(&FileToCheck, FileName);
     if (NT_FAILED(Status))
-        return NULL;
+        return FALSE;
 
     Status = GetRedirectedFileName(&FileToCheck, &RedirectedFile);
     Exists = IsPathExists(NT_SUCCESS(Status) ? RedirectedFile.Buffer : FileToCheck.Buffer);
@@ -447,8 +535,6 @@ BOOL Initialize(PVOID BaseAddress)
 {
     ml::MlInitialize();
 
-    //EnableHeapCorruptionHelper();
-
     LdrDisableThreadCalloutsForDll(BaseAddress);
     SetExeDirectoryAsCurrent();
 
@@ -464,11 +550,13 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_PATCH p[] =
     {
         PATCH_MEMORY(0xEB,      1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking
+
+#if !DEBUG_DISABLE_PATCH
+
         PATCH_MEMORY(0x06,      1, 0x410731),    // win
         PATCH_MEMORY(0x06,      1, 0x410AD1),    // win
         PATCH_MEMORY(0x01,      1, 0x40991D),    // cpu
         PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
-        PATCH_MEMORY(VK_SHIFT,  4, 0x4098BA),    // GetKeyState(VK_SHIFT)
         PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
         PATCH_MEMORY(0x20000,   4, 0x4E71B2),    // chrimg max buffer size
 
@@ -513,14 +601,13 @@ BOOL Initialize(PVOID BaseAddress)
 
 #if !D3D9_VER
 
-        PATCH_MEMORY(0x00,      4, 0x329851),    // disable foolish get joy stick pos
-
+        PATCH_MEMORY(0x00,                  4, 0x329851),       // disable foolish get joy stick pos
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
-        //PATCH_MEMORY(AoCreateFile,         4, 0x9D576C),       // CreateFileA
-
         PATCH_MEMORY(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
 
 #endif
+
+#endif // DEBUG_DISABLE_PATCH
 
     };
 
@@ -542,6 +629,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
         //INLINE_HOOK_CALL_RVA_NULL(0x51E1C7, xxx),
 
+#if !DEBUG_DISABLE_PATCH
 
         // tweak
 
@@ -572,14 +660,16 @@ BOOL Initialize(PVOID BaseAddress)
 
         // file redirection
 
-        INLINE_HOOK_JUMP         (ZwCreateFile, AoCreateFile, StubNtCreateFile),
-        INLINE_HOOK_CALL_RVA_NULL(0x48C1EA, AoFindFirstFileA),
-        INLINE_HOOK_CALL_RVA_NULL(0x48C206, ZwClose),
-        INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B, EDAO::GetCampImage),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A05B4, EDAO::GetBattleFace),
-        INLINE_HOOK_CALL_RVA_NULL(0x2F9101, EDAO::GetFieldAttackChr),
-        INLINE_HOOK_CALL_RVA_NULL(0x4948B9, METHOD_PTR(&EDAO::GetCFace)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4948DF, METHOD_PTR(&EDAO::GetCFace)),
+        INLINE_HOOK_JUMP         (ZwOpenFile,               AoOpenFile,             StubNtOpenFile),
+        INLINE_HOOK_JUMP         (ZwCreateFile,             AoCreateFile,           StubNtCreateFile),
+        INLINE_HOOK_JUMP         (ZwQueryAttributesFile,    AoQueryAttributesFile,  StubNtQueryAttributesFile),
+        INLINE_HOOK_CALL_RVA_NULL(0x48C1EA,                 AoFindFirstFileA),
+        INLINE_HOOK_CALL_RVA_NULL(0x48C206,                 ZwClose),
+        INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B,                 EDAO::GetCampImage),
+        INLINE_HOOK_CALL_RVA_NULL(0x5A05B4,                 EDAO::GetBattleFace),
+        INLINE_HOOK_CALL_RVA_NULL(0x2F9101,                 EDAO::GetFieldAttackChr),
+        INLINE_HOOK_CALL_RVA_NULL(0x4948B9,                 METHOD_PTR(&EDAO::GetCFace)),
+        INLINE_HOOK_CALL_RVA_NULL(0x4948DF,                 METHOD_PTR(&EDAO::GetCFace)),
 
 
         // custom format itp / itc
@@ -636,19 +726,10 @@ BOOL Initialize(PVOID BaseAddress)
 
         //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
         //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),
+
+#endif // DEBUG_DISABLE_PATCH
+
     };
-
-#if 0
-    RtlSetUnhandledExceptionFilter(
-        [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG
-    {
-        ExceptionBox(L"crashed");
-        CreateMiniDump(ExceptionPointers);
-        return ExceptionContinueSearch;
-    }
-        );
-
-#endif
 
     Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
 
@@ -679,134 +760,3 @@ BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 
     return TRUE;
 }
-
-#if !D3D9_VER
-
-#pragma comment(linker, "/ENTRY:DllMain")
-#pragma comment(linker, "/EXPORT:Direct3DCreate9=d3d9.Direct3DCreate9")
-
-#else // D3D9_VER
-
-#include <d3d9.h>
-
-#pragma comment(linker, "/EXPORT:Direct3DCreate9=_Arianrhod_Direct3DCreate9@4")
-#pragma comment(linker, "/EXPORT:DirectInput8Create=_Arianrhod_DirectInput8Create@20")
-
-NoInline BOOL IsCodeDecompressed()
-{
-    SEH_TRY
-    {
-        static ULONG Signature[] =
-        {
-		    0xe9003ffa, 0x0024ca08, 0x0e8a03e9, 0x78cee900,
-            0xf9e90025, 0xe900276e, 0x00225f64, 0x0c354fe9,
-            0x54dae900, 0xb5e90025, 0xe900033e, 0x004ebe90
-        };
-
-        return RtlCompareMemory((PVOID)0x672020, Signature, sizeof(Signature)) == sizeof(Signature);
-    }
-    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
-    {
-        return FALSE;
-    }
-}
-
-EXTC IDirect3D9* STDCALL Arianrhod_Direct3DCreate9(UINT SDKVersion)
-{
-    static TYPE_OF(Arianrhod_Direct3DCreate9) *Direct3DCreate9;
-
-    if (Direct3DCreate9 == NULL)
-    {
-        ULONG           Length;
-        NTSTATUS        Status;
-        PVOID           d3d9;
-        WCHAR           D3D9Path[MAX_NTPATH];
-
-        Length = Nt_GetSystemDirectory(D3D9Path, countof(D3D9Path));
-        CopyStruct(D3D9Path + Length, L"d3d9.dll", sizeof(L"d3d9.dll"));
-
-        d3d9 = Ldr::LoadDll(D3D9Path);
-        if (d3d9 == NULL)
-            return NULL;
-
-        LdrAddRefDll(GET_MODULE_HANDLE_EX_FLAG_PIN, d3d9);
-
-        *(PVOID *)&Direct3DCreate9 = GetRoutineAddress(d3d9, "Direct3DCreate9");
-        if (Direct3DCreate9 == NULL)
-            return NULL;
-    }
-
-#if ENABLE_LOG
-    {
-        NtFileDisk f;
-        f.Create(L"log.txt");
-    }
-#endif
-
-    WriteLog(L"%08X\n", _ReturnAddress());
-
-    if (IsCodeDecompressed())
-    {
-        DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
-        ChangeMainWindowProc(*(HWND *)0xDB2E54);
-    }
-
-    return Direct3DCreate9(SDKVersion);
-}
-
-EXTC
-HRESULT
-STDCALL
-Arianrhod_DirectInput8Create(
-    HINSTANCE   hinst,
-    ULONG       Version,
-    REFIID      riidltf,
-    PVOID*      ppvOut,
-    LPUNKNOWN   punkOuter
-)
-{
-    static TYPE_OF(Arianrhod_DirectInput8Create) *DirectInput8Create;
-
-    if (DirectInput8Create == NULL)
-    {
-        ULONG       Length;
-        NTSTATUS    Status;
-        PVOID       dinput8;
-        WCHAR       DInput8Path[MAX_NTPATH];
-
-        Length = Nt_GetSystemDirectory(DInput8Path, countof(DInput8Path));
-        CopyStruct(DInput8Path + Length, L"dinput8.dll", sizeof(L"dinput8.dll"));
-
-        dinput8 = Ldr::LoadDll(DInput8Path);
-        if (dinput8 == NULL)
-            return NULL;
-
-        LdrAddRefDll(GET_MODULE_HANDLE_EX_FLAG_PIN, dinput8);
-
-        *(PVOID *)&DirectInput8Create = GetRoutineAddress(dinput8, "DirectInput8Create");
-        if (DirectInput8Create == NULL)
-            return NULL;
-    }
-
-#if ENABLE_LOG
-    {
-        NtFileDisk f;
-        f.Create(L"log.txt");
-    }
-#endif
-
-    WriteLog(L"%08X\n", _ReturnAddress());
-
-    static BOOL Hooked = FALSE;
-
-    if (!Hooked && IsCodeDecompressed())
-    {
-        DllMain(&__ImageBase, DLL_PROCESS_ATTACH, 0);
-        ChangeMainWindowProc(*(HWND *)0xDB2E54);
-        Hooked = TRUE;
-    }
-
-    return DirectInput8Create(hinst, Version, riidltf, ppvOut, punkOuter);
-}
-
-#endif

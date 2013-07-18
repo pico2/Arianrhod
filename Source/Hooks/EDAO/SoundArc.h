@@ -61,7 +61,7 @@ public:
 
     ~CSoundPlayer()
     {
-        if (m_Sound3D == NULL)
+        if (m_Sound3D == nullptr)
             return;
 
         this->MixClose();

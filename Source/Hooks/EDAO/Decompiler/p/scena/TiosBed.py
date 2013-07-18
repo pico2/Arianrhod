@@ -338,7 +338,7 @@ def ShowMenu():
             "全部还原\x01",                  # 2
             "挑战钢之圣女\x01",              # 3
             "进入Debug地图\x01",             # 4
-            "进入星辰之间\x01",              # 5
+            #"进入星辰之间\x01",              # 5
             "放弃\x01",                      # 6
         )
     )
@@ -354,7 +354,7 @@ def ShowMenu():
         (2, "restore_all"),
         (3, "challenge_hagane"),
         (4, "enter_debug_map"),
-        (5, "enter_celestial_globe"),
+        #(5, "enter_celestial_globe"),
         (-1, "close_menu"),
     )
 
