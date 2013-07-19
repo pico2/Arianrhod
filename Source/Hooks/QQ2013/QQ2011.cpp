@@ -737,7 +737,7 @@ ULONG_PTR SearchMainFrame_SecurityFrame(PVOID MainFrame)
         return IMAGE_INVALID_RVA;
 
     StringReference = PtrAdd(StringReference, 4);
-    StringReference = ReverseSearchFunctionHeader(StringReference, 0x100);
+    StringReference = ReverseSearchFunctionHeader(StringReference, 0xB0);
 
     return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, MainFrame);
 }
