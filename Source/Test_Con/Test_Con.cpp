@@ -884,70 +884,53 @@ NTSTATUS InstallShellOverlayHook()
 
 #include <ShlObj.h>
 
-NTSTATUS
-QueryDosPathFromNtDeviceName2(
-    PWSTR*  DosPath,
-    PCWSTR  NtDeviceName
-)
+#include "status2str.h"
+
+HANDLE PidToHandle2(ULONG_PTR ProcessId, ULONG_PTR Access /* = PROCESS_ALL_ACCESS */)
 {
-    NTSTATUS        Status;
-    ULONG_PTR       Length;
-    WCHAR           DosLetter[4], TargetPath[MAX_NTPATH];
-    PWSTR           DosPathBuffer;
-    UNICODE_STRING  NtDevice;
+    HANDLE              ProcessHandle;
+    NTSTATUS            Status;
+    OBJECT_ATTRIBUTES   ObjectAttributes;
+    CLIENT_ID           CliendID;
 
-    *DosPath = NULL;
+    CliendID.UniqueThread   = NULL;
+    CliendID.UniqueProcess  = (HANDLE)ProcessId;
+    InitializeObjectAttributes(&ObjectAttributes, NULL, NULL, NULL, NULL);
 
-    *(PULONG)&DosLetter[0] = TAG2W('A:');
-    *(PULONG)&DosLetter[2] = 0;
+    Status = ZwOpenProcess(&ProcessHandle, Access, &ObjectAttributes, &CliendID);
 
-    RtlInitUnicodeString(&NtDevice, NtDeviceName);
+    PrintConsoleW(L"open st: %s\n", NtStatusToString(Status));
 
-    for (ULONG_PTR Count = 'Z' - 'A' + 1; Count; ++DosLetter[0], --Count)
-    {
-        Length = QueryDosDeviceW(DosLetter, TargetPath, countof(TargetPath));
-        if (Length == 0)
-            continue;
+    if (!NT_SUCCESS(Status))
+        return NULL;
 
-        Length = lstrlenW(TargetPath);
-
-        if (TargetPath[Length - 1] != '\\')
-            TargetPath[Length++] = '\\';
-
-        Length *= sizeof(WCHAR);
-
-        if (Length >= NtDevice.Length)
-            continue;
-
-        if (RtlCompareMemory(NtDeviceName, TargetPath, Length) !=  Length)
-            continue;
-
-        DosPathBuffer = (PWSTR)malloc(Length + NtDevice.MaximumLength);
-        if (DosPathBuffer == NULL)
-            return STATUS_NO_MEMORY;
-
-        *(PULONG)DosPathBuffer = *(PULONG)DosLetter;
-        DosPathBuffer[2] = '\\';
-
-        CopyMemory(DosPathBuffer + 3, PtrAdd(NtDevice.Buffer, Length), NtDevice.Length - Length);
-        *PtrAdd(DosPathBuffer, NtDevice.Length - Length + 6) = 0;
-
-        *DosPath = DosPathBuffer;
-
-        return STATUS_SUCCESS;
-    }
-
-    return STATUS_OBJECT_PATH_NOT_FOUND;
+    return ProcessHandle;
 }
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PWSTR DosPath;
+    SCOPE_EXIT
+    {
+        PauseConsole();
+    }
+    SCOPE_EXIT_END;
+
+    NTSTATUS st;
+    HANDLE cf = PidToHandle2(4844, PROCESS_QUERY_LIMITED_INFORMATION);
+    if (cf == NULL)
+    {
+        PrintConsoleW(L"access deny\n");
+        return;
+    }
+
     PROCESS_IMAGE_FILE_NAME2 fn;
 
-    NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &fn, sizeof(fn), NULL);
-    QueryDosPathFromNtDeviceName2(&DosPath, fn.ImageFileName.Buffer);
-    free(DosPath);
+    st = NtQueryInformationProcess(cf, ProcessImageFileName, &cf, sizeof(fn), NULL);
+    PrintConsoleW(L"query st: %s\n", NtStatusToString(st));
+    if (NT_FAILED(st))
+        return;
+
+    PrintConsoleW(L"%wZ\n", &fn.ImageFileName);
 
     return;
 
