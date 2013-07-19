@@ -882,56 +882,8 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
-#include <ShlObj.h>
-
-#include "status2str.h"
-
-HANDLE PidToHandle2(ULONG_PTR ProcessId, ULONG_PTR Access /* = PROCESS_ALL_ACCESS */)
-{
-    HANDLE              ProcessHandle;
-    NTSTATUS            Status;
-    OBJECT_ATTRIBUTES   ObjectAttributes;
-    CLIENT_ID           CliendID;
-
-    CliendID.UniqueThread   = NULL;
-    CliendID.UniqueProcess  = (HANDLE)ProcessId;
-    InitializeObjectAttributes(&ObjectAttributes, NULL, NULL, NULL, NULL);
-
-    Status = ZwOpenProcess(&ProcessHandle, Access, &ObjectAttributes, &CliendID);
-
-    PrintConsoleW(L"open st: %s\n", NtStatusToString(Status));
-
-    if (!NT_SUCCESS(Status))
-        return NULL;
-
-    return ProcessHandle;
-}
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    SCOPE_EXIT
-    {
-        PauseConsole();
-    }
-    SCOPE_EXIT_END;
-
-    NTSTATUS st;
-    HANDLE cf = PidToHandle2(4844, PROCESS_QUERY_LIMITED_INFORMATION);
-    if (cf == NULL)
-    {
-        PrintConsoleW(L"access deny\n");
-        return;
-    }
-
-    PROCESS_IMAGE_FILE_NAME2 fn;
-
-    st = NtQueryInformationProcess(cf, ProcessImageFileName, &cf, sizeof(fn), NULL);
-    PrintConsoleW(L"query st: %s\n", NtStatusToString(st));
-    if (NT_FAILED(st))
-        return;
-
-    PrintConsoleW(L"%wZ\n", &fn.ImageFileName);
-
     return;
 
 #if 0
@@ -985,7 +937,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     }
 */
 
-    SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_FLUSH, nullptr, nullptr);
+    //SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_FLUSH, nullptr, nullptr);
 
     PauseConsole(L"Press any key to uninstall ...");
     UnInstallShellOverlayHook();

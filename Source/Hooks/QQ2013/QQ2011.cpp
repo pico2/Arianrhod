@@ -422,6 +422,11 @@ QqSetWindowPos(
     return StubSetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, Flags);
 }
 
+BOOL NTAPI PopupSecurityFrame(PVOID, PVOID)
+{
+    return TRUE;
+}
+
 BOOL CDECL ReportScanResult()
 {
     INLINE_ASM __emit 0xCC;
@@ -718,6 +723,25 @@ ULONG_PTR SearchAppUtil_CheckImportantModule(PVOID AppUtil)
     return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppUtil);
 }
 
+ULONG_PTR SearchMainFrame_SecurityFrame(PVOID MainFrame)
+{
+    PVOID       StringReference;
+    PLDR_MODULE Module;
+
+    static WCHAR String[] = L"Misc\\SecurityFrame.xml|SecurityWnd";
+
+    Module = FindLdrModuleByHandle(MainFrame);
+
+    StringReference = SearchStringReference(Module, String, sizeof(String));
+    if (StringReference == nullptr)
+        return IMAGE_INVALID_RVA;
+
+    StringReference = PtrAdd(StringReference, 4);
+    StringReference = ReverseSearchFunctionHeader(StringReference, 0x100);
+
+    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, MainFrame);
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -823,6 +847,21 @@ BOOL Initialize(PVOID BaseAddress)
 
 
     /************************************************************************
+      MainFrame
+    ************************************************************************/
+
+    module = Ldr::LoadDll(L"MainFrame.dll");
+
+    MEMORY_FUNCTION_PATCH Function_MainFrame[] =
+    {
+        //INLINE_HOOK_JUMP_RVA_NULL(0x122CCA, CheckPluginList),
+        //INLINE_HOOK_JUMP_RVA_NULL(0x1BC97B, ShowDBClickPicture),
+        INLINE_HOOK_JUMP_RVA_NULL(SearchMainFrame_SecurityFrame(module),    PopupSecurityFrame),
+    };
+
+
+
+    /************************************************************************
       ChatFrameApp
 
         L"exit for invalid version.17
@@ -873,6 +912,7 @@ BOOL Initialize(PVOID BaseAddress)
         { L"AppUtil.dll",       nullptr,               0,                          Function_AppUtil,    countof(Function_AppUtil) },
         //{ L"ChatFrameApp.dll",  nullptr,               0,                          Function_ChatFrame,  countof(Function_ChatFrame) },
         { L"AppMisc.dll",       nullptr,               0,                          Function_AppMisc,    countof(Function_AppMisc) },
+        { L"MainFrame.dll",     nullptr,               0,                          Function_MainFrame,  countof(Function_MainFrame) },
         { nullptr,              nullptr,               0,                          Function_Common,     countof(Function_Common) },
 
         { nullptr,              nullptr,               0,                          Function_ntdll,      countof(Function_ntdll) },
