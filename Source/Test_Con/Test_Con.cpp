@@ -882,8 +882,30 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
+#include "E:\Desktop\src\QuickStart\src\ATipsShellExt\StaticGameList.h"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    PSTATIC_GAME_INFO *List, Game;
+    PUNICODE_STRING SubFile;
+
+    FOR_EACH_ARRAY(List, GameList)
+    {
+        Game = *List;
+        PrintConsoleW(L"Game: %wZ\n", &Game->GameName);
+        PrintConsoleW(L"exe : %wZ\n", &Game->GameProcessName);
+        PrintConsoleW(L"sub file list:\n");
+
+        FOR_EACH(SubFile, Game->SubFileList, Game->NumberOfSubFile)
+        {
+            PrintConsoleW(L"    %wZ\n", SubFile);
+        }
+
+        PrintConsoleW(L"\n");
+    }
+
+    PauseConsole();
+
     return;
 
 #if 0
@@ -920,7 +942,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         UnInstallShellOverlayHook();
         Ps::ExitProcess(0);
     }
-/*
+
     ULONG ExplorerPid;
 
     if (GetWindowThreadProcessId(GetShellWindow(), &ExplorerPid) != 0)
@@ -928,14 +950,14 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         HANDLE Explorer = PidToHandle(ExplorerPid);
         if (Explorer != NULL)
         {
-            NtTerminateProcess(Explorer, 1);
+            NtTerminateProcess(Explorer, 0);
             NtClose(Explorer);
 
-            Ps::CreateProcess(NULL, L"explorer.exe");
+            //Ps::CreateProcess(NULL, L"explorer.exe");
             //ShellExecuteW(NULL, L"open", L"explorer.exe", NULL, NULL, SW_SHOW);
         }
     }
-*/
+
 
     //SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_FLUSH, nullptr, nullptr);
 

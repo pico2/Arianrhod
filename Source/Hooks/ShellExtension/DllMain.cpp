@@ -67,6 +67,88 @@ ProbeInvokeCreateProcessW(
     return Shell32CreateProcessWPtr(ApplicationName, CommandLine, ProcessAttributes, ThreadAttributes, InheritHandles, CreationFlags, Environment, CurrentDirectory, StartupInfo, ProcessInformation);
 }
 
+
+
+PWSTR LookupGameInfo(PCWSTR GameFullPath)
+{
+    ULONG_PTR               Length;
+    PWSTR                   Buffer, Name;
+    ULONG64                 Hash;
+
+    if (GameFullPath == NULL)
+        return NULL;
+
+    if (wcsstr(GameFullPath, L"World of Warcraft Launcher.exe") == NULL)
+        return NULL;
+
+    return L"Ä§ÊÞÊÀ½ç";
+}
+
+NTSTATUS GenerateXlAccCommandLine(PWSTR* XlAccCmdLine, PWSTR Entry, PCWSTR ApplicationName, PCWSTR CommandLine)
+{
+    PWSTR           Buffer;
+    ULONG_PTR       Length;
+    PLDR_MODULE     Module;
+    UNICODE_STRING  AccPath;
+
+    ApplicationName = ApplicationName == NULL ? L"" : ApplicationName;
+    CommandLine = CommandLine == NULL ? L"" : CommandLine;
+
+    Module = FindLdrModuleByHandle(&__ImageBase);
+    Length = (lstrlenW(ApplicationName) + lstrlenW(CommandLine) + MAX_NTPATH) * sizeof(WCHAR) + Module->FullDllName.Length;
+    Buffer = (PWSTR)malloc(Length);
+    if (Buffer == NULL)
+        return STATUS_NO_MEMORY;
+
+    *XlAccCmdLine = Buffer;
+
+    AccPath = Module->FullDllName;
+    AccPath.Length = (USHORT)PtrOffset(PathFindFileNameW(Module->FullDllName.Buffer), Module->FullDllName.Buffer);
+
+    swprintf(
+        Buffer,
+        L"\"%wZXLacc.exe\" -hookstart game:\"%s\" path:\"%s\" param:%s",
+        &AccPath,
+        Entry, ApplicationName, CommandLine
+    );
+
+    return STATUS_SUCCESS;
+}
+
+VOID ReleaseXlAccCommandLine(PWSTR CmdLine)
+{
+    free(CmdLine);
+}
+
+BOOL IsHookStartEnabled()
+{
+    BOOL        Enabled;
+    ULONG_PTR   Length;
+    PWSTR       Buffer;
+    PLDR_MODULE Module;
+
+    static WCHAR Config[] = L"config.ini";
+
+    Module = FindLdrModuleByHandle(&__ImageBase);
+    if (Module == NULL)
+        return FALSE;
+
+    Length = Module->FullDllName.Length + sizeof(Config);
+    Buffer = (PWSTR)malloc(Length);
+    if (Buffer == NULL)
+        return FALSE;
+
+    CopyMemory(Buffer, Module->FullDllName.Buffer, Module->FullDllName.Length);
+    Buffer[Module->FullDllName.Length / sizeof(WCHAR)] = 0;
+    CopyMemory(PathFindFileNameW(Buffer), Config, sizeof(Config));
+
+    Enabled = GetPrivateProfileIntW(L"HOOKSTART", L"BOpen", FALSE, Buffer);
+
+    free(Buffer);
+
+    return Enabled;
+}
+
 BOOL
 NTAPI
 SpeedUpCreateProcessW(
@@ -82,14 +164,42 @@ SpeedUpCreateProcessW(
     PPROCESS_INFORMATION    ProcessInformation
 )
 {
+    BOOL                Success;
+    PWSTR               CmdLine;
+    NTSTATUS            Status;
+    PWSTR               Entry;
+
     LOOP_ONCE
     {
-        AllocConsole();
         PrintConsoleW(
             L"Application: %s\n"
             L"Commandline: %s\n\n",
             ApplicationName, CommandLine
         );
+
+        if (!IsHookStartEnabled())
+            continue;
+
+        Entry = LookupGameInfo(ApplicationName);
+        if (Entry == NULL)
+            break;
+
+        PrintConsoleW(L"game name: %s\n", Entry);
+
+        Status = GenerateXlAccCommandLine(&CmdLine, Entry, ApplicationName, CommandLine);
+        if (NT_FAILED(Status))
+            break;
+
+        PrintConsoleW(L"cmdline: %s\n", CmdLine);
+
+        Success = (*Shell32CreateProcessWIAT)(NULL, CmdLine, ProcessAttributes, ThreadAttributes, InheritHandles, CreationFlags, Environment, CurrentDirectory, StartupInfo, ProcessInformation);
+
+        ReleaseXlAccCommandLine(CmdLine);
+
+        if (!Success)
+            break;
+
+        return Success;
     }
 
     return (*Shell32CreateProcessWIAT)(ApplicationName, CommandLine, ProcessAttributes, ThreadAttributes, InheritHandles, CreationFlags, Environment, CurrentDirectory, StartupInfo, ProcessInformation);
@@ -324,6 +434,8 @@ BOOL Initialize(PVOID BaseAddress)
 {
     if (NT_FAILED(CheckIsExplorer()))
         return FALSE;
+
+    AllocConsole();
 
 //    PrintConsoleW(L"session id %d\n", GetCurrentSessionId());
 /*
