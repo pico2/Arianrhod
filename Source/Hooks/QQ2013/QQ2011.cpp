@@ -12,8 +12,11 @@ WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
 
 PVOID AppUtilBase;
 
+TYPE_OF(&free)                      msvcrX0_free;
 
 TYPE_OF(&SetWindowPos)              StubSetWindowPos;
+TYPE_OF(&ShowWindow)                StubShowWindow;
+TYPE_OF(&PostMessageW)              StubPostMessageW;
 TYPE_OF(&GetModuleFileNameExW)      StubGetModuleFileNameExW;
 TYPE_OF(&NtQueryInformationProcess) StubNtQueryInformationProcess;
 TYPE_OF(&::CreateThread)            HummerCreateThread;
@@ -30,7 +33,7 @@ NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
 {
     ULONG_PTR       Length;
     PWSTR           Buffer;
-    UNICODE_STRING  Registry;
+    UNICODE_STRING  FileName;
 
     typedef struct
     {
@@ -38,14 +41,15 @@ NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
         ULONG_PTR       SuffixLength;
         PCWSTR          NewSubPath;
 
-    } DB_REDIRECT, *PDB_REDIRECT;
+    } REDIRECT_ENTRY, *PDB_REDIRECT;
 
-    PDB_REDIRECT RegistryDb;
+    PDB_REDIRECT Entry;
 
-    static DB_REDIRECT RegistryDbPath[] =
+    static REDIRECT_ENTRY RedirectEntries[] =
     {
         { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\History.db"),  CONST_STRLEN(L"History.db") * sizeof(WCHAR), GlobalHistoryDb },
         { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\Registry.db"), CONST_STRLEN(L"Registry.db") * sizeof(WCHAR), GlobalRegistryDb },
+        //{ RTL_CONSTANT_STRING(L"QQProtect.exe"),                CONST_STRLEN(L"QQProtect.exe") * sizeof(WCHAR), NULL },
     };
 
     RtlInitEmptyString(Redirected);
@@ -55,37 +59,43 @@ NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
         if (Original == nullptr)
             continue;
 
-        FOR_EACH(RegistryDb, RegistryDbPath, countof(RegistryDbPath))
+        FOR_EACH_ARRAY(Entry, RedirectEntries)
         {
-            if (Original->Length <= RegistryDb->SubPath.Length)
+            if (Original->Length <= Entry->SubPath.Length)
                 continue;
 
-            Registry = *Original;
-            Registry.Buffer = PtrSub(PtrAdd(Registry.Buffer, Registry.Length), RegistryDb->SubPath.Length);
-            Registry.Length = RegistryDb->SubPath.Length;
+            FileName = *Original;
+            FileName.Buffer = PtrSub(PtrAdd(FileName.Buffer, FileName.Length), Entry->SubPath.Length);
+            FileName.Length = Entry->SubPath.Length;
 
-            if (!RtlEqualUnicodeString(&Registry, &RegistryDb->SubPath, TRUE))
+            if (!RtlEqualUnicodeString(&FileName, &Entry->SubPath, TRUE))
                 continue;
-
+/*
+            if (Entry->NewSubPath == NULL)
+            {
+                ExceptionBox(L"qqprotect");
+                ++Entry;
+            }
+*/
             break;
         }
 
-        if (RegistryDb == RegistryDbPath + countof(RegistryDbPath))
+        if (Entry == &RedirectEntries[countof(RedirectEntries)])
             break;
 
-        Length = Original->Length + RegistryDb->SubPath.Length + RegistryDb->SuffixLength + sizeof(RegistryDb->NewSubPath);
+        Length = Original->Length + Entry->SubPath.Length + Entry->SuffixLength + sizeof(Entry->NewSubPath);
         Buffer = (PWSTR)AllocStack(Length);
 
-        Registry.MaximumLength = Length;
-        Registry.Buffer = Buffer;
+        FileName.MaximumLength = Length;
+        FileName.Buffer = Buffer;
 
-        Length = StrLengthW(RegistryDb->NewSubPath) * sizeof(WCHAR);
+        Length = StrLengthW(Entry->NewSubPath) * sizeof(WCHAR);
 
-        RtlCopyUnicodeString(&Registry, Original);
-        CopyMemory(PtrSub(PtrAdd(Registry.Buffer, Registry.Length), RegistryDb->SuffixLength), RegistryDb->NewSubPath, Length + sizeof(WCHAR));
-        Registry.Length = Registry.Length - RegistryDb->SuffixLength + Length;
+        RtlCopyUnicodeString(&FileName, Original);
+        CopyMemory(PtrSub(PtrAdd(FileName.Buffer, FileName.Length), Entry->SuffixLength), Entry->NewSubPath, Length + sizeof(WCHAR));
+        FileName.Length = FileName.Length - Entry->SuffixLength + Length;
 
-        RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &Registry, Redirected);
+        RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &FileName, Redirected);
 
         return STATUS_SUCCESS;
     }
@@ -336,6 +346,15 @@ ShowDBClickPicture(
     return S_OK;
 }
 
+BOOL IsWindowMessageBox(HWND hWnd)
+{
+    WCHAR Title[0x200];
+
+    GetWindowTextW(hWnd, Title, countof(Title));
+
+    return wcsstr(Title, L" - 消息盒子") != nullptr;
+}
+
 BOOL
 NTAPI
 QqSetWindowPos(
@@ -348,7 +367,7 @@ QqSetWindowPos(
     UINT    Flags
 )
 {
-    BOOL Success, MessageBox;
+    BOOL IsMessageBox;
 
     LONG BuddyWidth     = 553;
     LONG BuddyHeight    = 526;
@@ -356,8 +375,6 @@ QqSetWindowPos(
     LONG GroupHeight    = 527;
     LONG DiscussWidth   = 556;
     LONG DiscussHeight  = 526;
-
-    WCHAR Title[0x200];
 
 #define GROUP_WIDTH     722
 #define GROUP_HEIGHT    671
@@ -379,15 +396,10 @@ QqSetWindowPos(
 
 #endif
 
-    MessageBox = FALSE;
-    GetWindowTextW(hWnd, Title, countof(Title));
-    if (wcsstr(Title, L" - 消息盒子") != nullptr)
-    {
-        MessageBox = TRUE;
-    }
+    IsMessageBox = IsWindowMessageBox(hWnd);
 
     if (
-        MessageBox                              ||
+        IsMessageBox                            ||
         (cx == BuddyWidth && cy == BuddyHeight) ||
         (cx == GroupWidth && cy == GroupHeight) ||
         (cx == DiscussWidth && cy == DiscussHeight)
@@ -397,7 +409,7 @@ QqSetWindowPos(
 
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &WorkArea, 0);
 
-        if (MessageBox)
+        if (IsMessageBox)
         {
             cx = (WorkArea.right - WorkArea.left) * 80 / 100;
             cy = (WorkArea.bottom - WorkArea.top) * 90 / 100;
@@ -420,6 +432,31 @@ QqSetWindowPos(
     }
 
     return StubSetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, Flags);
+}
+
+BOOL NTAPI QqShowWindow(HWND hWnd, int CmdShow)
+{
+    if (IsWindowMessageBox(hWnd))
+        QqSetWindowPos(hWnd, NULL, 0, 0, 0, 0, 0);
+
+    return StubShowWindow(hWnd, CmdShow);
+}
+
+BOOL NTAPI QqPostMessageW(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+    switch (Message)
+    {
+        case 0x7E9:
+        case 0x7EA:
+        case 0x7EB:
+        case 0x7EC:
+            if (wParam > 0x10000 && msvcrX0_free != NULL)
+                msvcrX0_free((PVOID)wParam);
+
+            return TRUE;
+    }
+
+    return StubPostMessageW(hWnd, Message, wParam, lParam);
 }
 
 BOOL NTAPI PopupSecurityFrame(PVOID, PVOID)
@@ -450,21 +487,37 @@ BOOL CDECL IsTencentTrusted(PCWSTR FileName)
 
 HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
 {
-    static GUID GUID_PluginList = { 0x41D26ED5, 0x7680, 0x4631, 0xBC, 0xC1, 0x5E, 0x52, 0x30, 0x37, 0xF7, 0x0A };
+    static GUID GUID_BlackList[] =
+    {
+        { 0x41D26ED5, 0x7680, 0x4631, 0xBC, 0xC1, 0x5E, 0x52, 0x30, 0x37, 0xF7, 0x0A },     // GUID_PluginList
+        //{ 0x0212e1b9, 0x1375, 0x43cf, 0xb0, 0x9f, 0x1b, 0xe1, 0x04, 0xf0, 0x5b, 0xe3 },     // GUID_QQReplyQDoctor
+    };
+
+    GUID *BlackList;
 
     LOOP_ONCE
     {
         PLDR_MODULE AppUtil;
 
-        if (Guid != GUID_PluginList)
-            continue;
-
-        AppUtil = FindLdrModuleByHandle(_ReturnAddress());
-        if (AppUtil != NULL && AppUtil->DllBase == AppUtilBase)
-            break;
-
         if (Output != nullptr)
             *Output = nullptr;
+
+        FOR_EACH_ARRAY(BlackList, GUID_BlackList)
+        {
+            if (Guid == *BlackList)
+                break;
+        }
+
+        switch (BlackList - GUID_BlackList)
+        {
+            case countof(GUID_BlackList):
+                continue;
+
+            case 0:
+                AppUtil = FindLdrModuleByHandle(_ReturnAddress());
+                if (AppUtil != NULL && AppUtil->DllBase == AppUtilBase)
+                    continue;
+        }
 
         return E_NOINTERFACE;
     }
@@ -759,6 +812,34 @@ BOOL Initialize(PVOID BaseAddress)
 
 
     /************************************************************************
+      msvcrxx
+    ************************************************************************/
+
+    {
+        PLDR_MODULE crt;
+        PUNICODE_STRING crtname;
+
+        static UNICODE_STRING msvcrt[] =
+        {
+            RTL_CONSTANT_STRING(L"msvcr80.dll"),
+            RTL_CONSTANT_STRING(L"msvcr90.dll"),
+            RTL_CONSTANT_STRING(L"msvcr100.dll"),
+            RTL_CONSTANT_STRING(L"msvcr110.dll"),
+        };
+
+        FOR_EACH_ARRAY(crtname, msvcrt)
+        {
+            crt = FindLdrModuleByName(crtname);
+            if (crt == nullptr)
+                continue;
+
+            *(PVOID *)&msvcrX0_free = GetRoutineAddress(crt->DllBase, "free");
+            break;
+        }
+    }
+
+
+    /************************************************************************
       user32
     ************************************************************************/
 
@@ -767,6 +848,8 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_FUNCTION_PATCH Function_user32[] =
     {
         EAT_HOOK_JUMP_HASH(module, USER32_SetWindowPos, QqSetWindowPos, StubSetWindowPos),
+        //EAT_HOOK_JUMP_HASH(module, USER32_ShowWindow,   QqShowWindow,   StubShowWindow),
+        EAT_HOOK_JUMP_HASH(module, USER32_PostMessageW, QqPostMessageW, StubPostMessageW)
     };
 
 
@@ -823,6 +906,7 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_PATCH Patch_HummerEngine[] =
     {
         PATCH_MEMORY(QqCreateWaitQQProtectThread, sizeof(PVOID), CreateThreadIAT),
+        PATCH_MEMORY(0xCC, 1, 0x6300),
     };
 
 
@@ -921,7 +1005,7 @@ BOOL Initialize(PVOID BaseAddress)
     };
 
 
-    FOR_EACH(Entry, Array, countof(Array))
+    FOR_EACH_ARRAY(Entry, Array)
     {
         PVOID Base;
 

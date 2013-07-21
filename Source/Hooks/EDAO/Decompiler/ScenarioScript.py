@@ -441,7 +441,7 @@ class ScenarioBattleInfo:
         pos = fs.tell()
 
         fs.seek(self.BattleMapOffset)
-        self.BattleMap = fs.astr()
+        self.BattleMap = fs.astr(CODE_PAGE)
 
         self.Sepith = None
         if self.SepithOffset != 0:
@@ -720,7 +720,7 @@ class ScenarioPlaceNameInfo:
         pos = fs.tell()
         fs.seek(self.NameOffset)
 
-        self.Name = fs.astr()
+        self.Name = fs.astr(CODE_PAGE)
 
         fs.seek(pos)
 
@@ -976,7 +976,7 @@ class ScenarioInfo:
 
             for offset in offsetlist:
                 town.seek(offset)
-                self.MapNameList.append(town.astr())
+                self.MapNameList.append(town.astr(CODE_PAGE))
 
         except:
             self.MapNameList = []

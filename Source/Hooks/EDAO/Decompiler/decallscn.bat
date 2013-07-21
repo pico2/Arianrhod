@@ -2,8 +2,11 @@
 
 cd/d "%~dp0"
 
-del /q J:\Falcom\ED_AO\data\scena\*.py
+set input=J:\Falcom\ED_AO\data\scena
+set input=J:\PSP\Eiyuu_Densetsu_Ao_no_Kiseki\USRDIR\data\scena
 
-ScenarioScript.py J:\Falcom\ED_AO\data\scena\
+del /q %input%\*.py
+
+ScenarioScript.py %input%\
 
 call cleanup.bat
