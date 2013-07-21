@@ -27,7 +27,38 @@ TYPE_OF(&NtQueryAttributesFile)     StubNtQueryAttributesFile;
 BOOL (CDECL *StubGetPlatformCore)(PVOID *Core);
 BOOL (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
 HRESULT (NTAPI *StubPlatformCore_QueryInterface)(PVOID Object, REFGUID Guid, PVOID Output);
+VOID (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
 
+
+BOOL IsQQUINSpecified()
+{
+    ULONG_PTR Length;
+    WCHAR ch;
+    PWSTR CommandLine, QQUIN;
+
+    CommandLine = CurrentPeb()->ProcessParameters->CommandLine.Buffer;
+
+    QQUIN = wcsstr(CommandLine, L"QQUIN:");
+    if (QQUIN == nullptr)
+        return FALSE;
+
+    QQUIN += CONST_STRLEN(L"QQUIN:");
+
+    CommandLine = QQUIN;
+    while (*CommandLine != ' ' && *CommandLine != '\t' && *CommandLine != 0)
+        ++CommandLine;
+
+    Length = PtrOffset(CommandLine, QQUIN);
+    if (Length >= sizeof(GlobalRegistryDb) - sizeof(L".db"))
+        return FALSE;
+
+    Length /= sizeof(WCHAR);
+
+    swprintf(GlobalRegistryDb, L"Registry_%.*s.db", Length, QQUIN);
+    swprintf(GlobalHistoryDb, L"History_%.*s.db", Length, QQUIN);
+
+    return TRUE;
+}
 
 NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
 {
@@ -574,37 +605,15 @@ BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
     return StubInitPluginFileSystem(PluginName);
 }
 
-BOOL IsQQUINSpecified()
+VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type)
 {
-    ULONG_PTR Length;
-    WCHAR ch;
-    PWSTR CommandLine, QQUIN;
+    if (Type == 0xB)
+        return;
 
-    CommandLine = CurrentPeb()->ProcessParameters->CommandLine.Buffer;
-
-    QQUIN = wcsstr(CommandLine, L"QQUIN:");
-    if (QQUIN == nullptr)
-        return FALSE;
-
-    QQUIN += CONST_STRLEN(L"QQUIN:");
-
-    CommandLine = QQUIN;
-    while (*CommandLine != ' ' && *CommandLine != '\t' && *CommandLine != 0)
-        ++CommandLine;
-
-    Length = PtrOffset(CommandLine, QQUIN);
-    if (Length >= sizeof(GlobalRegistryDb) - sizeof(L".db"))
-        return FALSE;
-
-    Length /= sizeof(WCHAR);
-
-    swprintf(GlobalRegistryDb, L"Registry_%.*s.db", Length, QQUIN);
-    swprintf(GlobalHistoryDb, L"History_%.*s.db", Length, QQUIN);
-
-    return TRUE;
+    StubOnConnectionBroken(This, Dummy, Param1, Param2, Param3, MessageString, Type);
 }
 
-PVOID SearchStringReference(PLDR_MODULE Module, PWSTR String, ULONG_PTR SizeInBytes)
+PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes)
 {
     PVOID StringValue, StringReference;
 
@@ -681,43 +690,43 @@ PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
     return nullptr;
 }
 
-ULONG_PTR SearchAppMisc_PluginListCheck(PVOID AppMisc)
+PVOID
+SearchStringAndReverseSearchHeader(
+    PVOID       ImageBase,
+    PVOID       BytesSequence,
+    ULONG_PTR   SizeInBytes,
+    ULONG_PTR   SearchRange
+)
 {
     PVOID       StringReference;
     PLDR_MODULE Module;
 
-    static WCHAR String[] = L"PluginListCheck" L"\x3000" L"Begin";
+    Module = FindLdrModuleByHandle(ImageBase);
 
-    Module = FindLdrModuleByHandle(AppMisc);
-
-    StringReference = SearchStringReference(Module, String, sizeof(String));
+    StringReference = SearchStringReference(Module, BytesSequence, SizeInBytes);
     if (StringReference == nullptr)
-        return IMAGE_INVALID_RVA;
+        return IMAGE_INVALID_VA;
 
-    StringReference = ReverseSearchFunctionHeader(PtrAdd(StringReference, 4), 0x60);
+    StringReference = ReverseSearchFunctionHeader(PtrAdd(StringReference, 4), SearchRange);
 
-    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppMisc);
+    return StringReference == nullptr ? IMAGE_INVALID_VA : StringReference;
 }
 
-ULONG_PTR SearchAppMisc_ShowPicInMultiPic(PVOID AppMisc)
+PVOID SearchAppMisc_PluginListCheck(PVOID ImageBase)
 {
-    PVOID       StringReference;
-    PLDR_MODULE Module;
+    static WCHAR String[] = L"PluginListCheck¡¡Begin";
 
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String), 0x60);
+}
+
+PVOID SearchAppMisc_ShowPicInMultiPic(PVOID ImageBase)
+{
     static WCHAR String[] = L"ShowPicInMultiPic begin";
 
-    Module = FindLdrModuleByHandle(AppMisc);
-
-    StringReference = SearchStringReference(Module, String, sizeof(String) - sizeof(WCHAR));
-    if (StringReference == nullptr)
-        return IMAGE_INVALID_RVA;
-
-    StringReference = ReverseSearchFunctionHeader(PtrAdd(StringReference, 4), 0x20);
-
-    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppMisc);
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String) - sizeof(WCHAR), 0x20);
 }
 
-ULONG_PTR SearchChatFrame_CheckModule(PVOID ChatFrame)
+PVOID SearchChatFrame_CheckModule(PVOID ChatFrame)
 {
     PBYTE       Buffer;
     PVOID       StringReference, LastCall[3];
@@ -729,7 +738,7 @@ ULONG_PTR SearchChatFrame_CheckModule(PVOID ChatFrame)
 
     StringReference = SearchStringReference(Module, String, sizeof(String) - sizeof(WCHAR));
     if (StringReference == nullptr)
-        return IMAGE_INVALID_RVA;
+        return IMAGE_INVALID_VA;
 
     Buffer = (PBYTE)StringReference + 4;
 
@@ -753,46 +762,28 @@ ULONG_PTR SearchChatFrame_CheckModule(PVOID ChatFrame)
         Buffer += Length;
     }
 
-    return LastCall[0] == nullptr ? IMAGE_INVALID_RVA : PtrOffset(GetCallDestination(LastCall[0]), ChatFrame);
+    return LastCall[0] == nullptr ? IMAGE_INVALID_VA : GetCallDestination(LastCall[0]);
 }
 
-ULONG_PTR SearchAppUtil_CheckImportantModule(PVOID AppUtil)
+PVOID SearchAppUtil_CheckImportantModule(PVOID ImageBase)
 {
-    PVOID       StringReference;
-    PLDR_MODULE Module;
-
     static WCHAR String[] = L"PerfStand.CheckImportantModule.Begin";
 
-    Module = FindLdrModuleByHandle(AppUtil);
-
-    StringReference = SearchStringReference(Module, String, sizeof(String));
-    if (StringReference == nullptr)
-        return IMAGE_INVALID_RVA;
-
-    StringReference = PtrSub(StringReference, 1);
-
-    StringReference = ReverseSearchFunctionHeader(StringReference, 0x20);
-
-    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, AppUtil);
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String), 0x20);
 }
 
-ULONG_PTR SearchMainFrame_SecurityFrame(PVOID MainFrame)
+PVOID SearchMainFrame_SecurityFrame(PVOID ImageBase)
 {
-    PVOID       StringReference;
-    PLDR_MODULE Module;
-
     static WCHAR String[] = L"Misc\\SecurityFrame.xml|SecurityWnd";
 
-    Module = FindLdrModuleByHandle(MainFrame);
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String), 0xB0);
+}
 
-    StringReference = SearchStringReference(Module, String, sizeof(String));
-    if (StringReference == nullptr)
-        return IMAGE_INVALID_RVA;
+PVOID SearchPreLogin_OnConnectionBroken(PVOID ImageBase)
+{
+    static WCHAR String[] = L"CTXServerConnectionDectecter::OnConnectionBroken Stop CSProcessor";
 
-    StringReference = PtrAdd(StringReference, 4);
-    StringReference = ReverseSearchFunctionHeader(StringReference, 0xB0);
-
-    return StringReference == nullptr ? IMAGE_INVALID_RVA : PtrOffset(StringReference, MainFrame);
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String), 0xB0);
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -901,12 +892,14 @@ BOOL Initialize(PVOID BaseAddress)
     module = Ldr::LoadDll(L"HummerEngine.dll");
 
     CreateThreadIAT = IATLookupRoutineRVAByHashNoFix(module, KERNEL32_CreateThread);
-    *(PVOID *)&HummerCreateThread = *(PVOID *)PtrAdd(module, CreateThreadIAT);
+    if (CreateThreadIAT != IMAGE_INVALID_RVA)
+        CreateThreadIAT = PtrAdd(CreateThreadIAT, module);
+
+    *(PVOID *)&HummerCreateThread = *(PVOID *)CreateThreadIAT;
 
     MEMORY_PATCH Patch_HummerEngine[] =
     {
         PATCH_MEMORY(QqCreateWaitQQProtectThread, sizeof(PVOID), CreateThreadIAT),
-        PATCH_MEMORY(0xCC, 1, 0x6300),
     };
 
 
@@ -923,10 +916,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_AppMisc[] =
     {
-        //INLINE_HOOK_JUMP_RVA_NULL(0x122CCA, CheckPluginList),
-        //INLINE_HOOK_JUMP_RVA_NULL(0x1BC97B, ShowDBClickPicture),
-        INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList), // addition SetTimeOut
-        INLINE_HOOK_JUMP_RVA_NULL(SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture),
+        INLINE_HOOK_JUMP_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList), // addition SetTimeOut
+        INLINE_HOOK_JUMP_NULL(SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture),
     };
 
 
@@ -938,9 +929,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_MainFrame[] =
     {
-        //INLINE_HOOK_JUMP_RVA_NULL(0x122CCA, CheckPluginList),
-        //INLINE_HOOK_JUMP_RVA_NULL(0x1BC97B, ShowDBClickPicture),
-        INLINE_HOOK_JUMP_RVA_NULL(SearchMainFrame_SecurityFrame(module),    PopupSecurityFrame),
+        INLINE_HOOK_JUMP_NULL(SearchMainFrame_SecurityFrame(module),    PopupSecurityFrame),
     };
 
 
@@ -979,10 +968,21 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_AppUtil[] =
     {
-        //INLINE_HOOK_JUMP_RVA_NULL(0xB884, CheckPluginList),
         EAT_HOOK_JUMP_NULL(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z", ReportScanResult),
         EAT_HOOK_JUMP_NULL(module, "?PluginSecurityCheck@Misc@Util@@YAHXZ",             PluginSecurityCheck),
-        INLINE_HOOK_JUMP_RVA_NULL(SearchAppUtil_CheckImportantModule(module),           CheckPluginList),
+        INLINE_HOOK_JUMP_NULL(SearchAppUtil_CheckImportantModule(module),               CheckPluginList),
+    };
+
+
+    /************************************************************************
+      PreLogin
+    ************************************************************************/
+
+    module = Ldr::LoadDll(L"PreloginLogic.dll");
+
+    MEMORY_FUNCTION_PATCH Function_PreLogin[] =
+    {
+        INLINE_HOOK_JUMP(SearchPreLogin_OnConnectionBroken(module), OnConnectionBroken, StubOnConnectionBroken),
     };
 
 
@@ -992,16 +992,16 @@ BOOL Initialize(PVOID BaseAddress)
 
     PATCH_ARRAY *Entry, Array[] =
     {
-        { L"HummerEngine.dll",  Patch_HummerEngine, countof(Patch_HummerEngine) },
-        { L"AppUtil.dll",       nullptr,               0,                          Function_AppUtil,    countof(Function_AppUtil) },
-        //{ L"ChatFrameApp.dll",  nullptr,               0,                          Function_ChatFrame,  countof(Function_ChatFrame) },
-        { L"AppMisc.dll",       nullptr,               0,                          Function_AppMisc,    countof(Function_AppMisc) },
-        { L"MainFrame.dll",     nullptr,               0,                          Function_MainFrame,  countof(Function_MainFrame) },
-        { nullptr,              nullptr,               0,                          Function_Common,     countof(Function_Common) },
+        { nullptr,              Patch_HummerEngine,     countof(Patch_HummerEngine) },
+        { nullptr,              nullptr,                0,                          Function_AppUtil,    countof(Function_AppUtil)   },
+        { nullptr,              nullptr,                0,                          Function_AppMisc,    countof(Function_AppMisc)   },
+        { nullptr,              nullptr,                0,                          Function_MainFrame,  countof(Function_MainFrame) },
+        { nullptr,              nullptr,                0,                          Function_PreLogin,   countof(Function_PreLogin)  },
+        { nullptr,              nullptr,                0,                          Function_Common,     countof(Function_Common)    },
 
-        { nullptr,              nullptr,               0,                          Function_ntdll,      countof(Function_ntdll) },
-        { nullptr,              nullptr,               0,                          Function_psapi,      countof(Function_psapi) },
-        { nullptr,              nullptr,               0,                          Function_user32,     countof(Function_user32) },
+        { nullptr,              nullptr,                0,                          Function_ntdll,      countof(Function_ntdll)     },
+        { nullptr,              nullptr,                0,                          Function_psapi,      countof(Function_psapi)     },
+        { nullptr,              nullptr,                0,                          Function_user32,     countof(Function_user32)    },
     };
 
 
