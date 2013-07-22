@@ -62,5 +62,9 @@ SOURCE=.\QQ2011.cpp
 
 SOURCE=.\QQ2011.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\QQMethod.h
+# End Source File
 # End Target
 # End Project

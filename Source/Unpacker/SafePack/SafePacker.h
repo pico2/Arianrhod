@@ -5,17 +5,15 @@
 #include "aes.h"
 
 #define SAFE_PACK_MAGIC         TAG4('ARIA')
-//#define NRV2E_MAGIC             TAG4('NRV2')
+#define NRV2E_MAGIC             TAG4('NRV2')
 #define LZNT1_MAGIC             TAG4('LZNT')
 #define LZMA_MAGIC              TAG4('LZMA')
-#define DATA_SHIFT_BITS         13
 
-#define GET_ENTRY_OFFSET_LOW(_Entry, _Hash) ((_Entry)->Offset.LowPart ^ _rotl((_Hash)[0], DATA_SHIFT_BITS))
-#define GET_ENTRY_OFFSET_HIGH(_Entry, _Hash) ((_Entry)->Offset.HighPart ^ _rotl((_Hash)[1], DATA_SHIFT_BITS))
-#define GET_ENTRY_SIZE(_Entry, _Hash) ((_Entry)->Size ^ _rotl((_Hash)[2], DATA_SHIFT_BITS))
-#define GET_ENTRY_FLAG(_Entry, _Hash) ((_Entry)->Flags ^ _rotl((_Hash)[3], DATA_SHIFT_BITS))
 
-#pragma pack(1)
+#define DEFAULT_COMPRESS_DATA   1
+
+
+#pragma pack(push, 1)
 
 typedef struct
 {
@@ -24,7 +22,15 @@ typedef struct
     LARGE_INTEGER   Size;
     LARGE_INTEGER   Offset;
 
-} SAFE_PACK_BUFFER;
+    VOID Initialize(PVOID Buffer = nullptr, ULONG Flags = 0, LONG64 Size = 0, LONG64 Offset = 0)
+    {
+        this->Buffer            = Buffer;
+        this->Flags             = Flags;
+        this->Size.QuadPart     = Size;
+        this->Offset.QuadPart   = Offset;
+    }
+
+} SAFE_PACK_BUFFER, *PSAFE_PACK_BUFFER;
 
 typedef struct
 {
@@ -57,8 +63,8 @@ typedef enum
 {
     NoCompress,
 
-    CompressLZNT1           = 1,
-    CompressLZMA            = 2,
+    CompressMethodLZNT1     = 1,
+    CompressMethodLZMA      = 2,
     CompressMethodNRV2E     = 3,
 
     CompressMethodUser      = 0x80000000,
@@ -86,7 +92,7 @@ struct SAFE_PACK_ENTRY2 : public UNPACKER_FILE_ENTRY_BASE
 
 typedef SAFE_PACK_ENTRY2 *PSAFE_PACK_ENTRY2;
 
-#pragma pack()
+#pragma pack(pop)
 
 class SafePackerBase
 {
@@ -196,8 +202,8 @@ public:
 
     UPK_STATUS
     PreCompressData(
-        SAFE_PACK_ENTRY2 *FileInfo,
-        SAFE_PACK_BUFFER *Buffer
+        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_BUFFER Buffer
     )
     {
         UNREFERENCED_PARAMETER(FileInfo);
@@ -207,20 +213,20 @@ public:
 
     UPK_STATUS
     CompressData(
-        SAFE_PACK_ENTRY2 *FileInfo,
-        SAFE_PACK_BUFFER *SourceBuffer,
-        SAFE_PACK_BUFFER *DestinationBuffer
+        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_BUFFER SourceBuffer,
+        PSAFE_PACK_BUFFER DestinationBuffer
     )
     {
 
-#if 0
+#if !DEFAULT_COMPRESS_DATA
+
         UNREFERENCED_PARAMETER(FileInfo);
         return STATUS_COMPRESSION_DISABLED;
 
 #else
 
         NTSTATUS                        Status;
-        ULONG                           SizeOfImage;
         ULONG                           CompressionFormatAndEngine;
         ULONG                           CompressBufferWorkSpaceSize;
         ULONG                           CompressFragmentWorkSpaceSize;
@@ -279,7 +285,7 @@ public:
 
         Header->Magic                     = LZNT1_MAGIC;
         Header->Flags                     = 0;
-        Header->CompressMethod            = CompressLZNT1;
+        Header->CompressMethod            = CompressMethodLZNT1;
         Header->OriginalSize.QuadPart     = SourceBuffer->Size.QuadPart;
         Header->CompressedSize.QuadPart   = DestinationBuffer->Size.QuadPart;
 
@@ -293,14 +299,15 @@ public:
 
     UPK_STATUS
     PostCompressData(
-        SAFE_PACK_ENTRY2 *FileInfo,
-        SAFE_PACK_BUFFER *Buffer
+        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_BUFFER Buffer
     )
     {
-        aes_encrypt_ctx AesContext;
 
         return STATUS_NOT_IMPLEMENTED;
 /*
+        aes_encrypt_ctx AesContext;
+
         aes_encrypt_key128(&FileInfo->UnicodeHash[4], &AesContext);
         Encrypt(&AesContext, Buffer->Buffer, Buffer->Size.LowPart, FileInfo->UnicodeHash);
 
@@ -310,8 +317,8 @@ public:
 
     UPK_STATUS
     PreCompressEntry(
-        SAFE_PACK_HEADER *Header,
-        SAFE_PACK_BUFFER *SourceBuffer
+        PSAFE_PACK_HEADER Header,
+        PSAFE_PACK_BUFFER SourceBuffer
     )
     {
         UNREFERENCED_PARAMETER(Header);
@@ -322,19 +329,19 @@ public:
 
     UPK_STATUS
     CompressEntry(
-        SAFE_PACK_HEADER *Header,
-        SAFE_PACK_BUFFER *SourceBuffer,
-        SAFE_PACK_BUFFER *DestinationBuffer
+        PSAFE_PACK_HEADER Header,
+        PSAFE_PACK_BUFFER SourceBuffer,
+        PSAFE_PACK_BUFFER DestinationBuffer
     )
     {
         UNREFERENCED_PARAMETER(Header);
-        return CompressData(NULL, SourceBuffer, DestinationBuffer);
+        return CompressData(nullptr, SourceBuffer, DestinationBuffer);
     }
 
     UPK_STATUS
     PostCompressEntry(
-        SAFE_PACK_HEADER *Header,
-        SAFE_PACK_BUFFER *SourceBuffer
+        PSAFE_PACK_HEADER Header,
+        PSAFE_PACK_BUFFER SourceBuffer
     )
     {
         UNREFERENCED_PARAMETER(Header);
@@ -346,7 +353,7 @@ public:
 
     UPK_STATUS
     EncryptPackHeader(
-        SAFE_PACK_HEADER *Header
+        PSAFE_PACK_HEADER Header
     )
     {
         return STATUS_NOT_IMPLEMENTED;
@@ -373,7 +380,7 @@ protected:
     LONG
     STDCALL
     EnumDirCallback(
-        SAFE_PACK_ENTRY2   *Entry,
+        PSAFE_PACK_ENTRY2   Entry,
         PWIN32_FIND_DATAW   FindData,
         ULONG_PTR           Context
     )
@@ -406,7 +413,7 @@ protected:
         return 1;
     }
 
-    static INT CDECL SortEntry(SAFE_PACK_ENTRY *Entry1, SAFE_PACK_ENTRY *Entry2)
+    static INT CDECL SortEntry(PSAFE_PACK_ENTRY Entry1, PSAFE_PACK_ENTRY Entry2)
     {
         ULONG  Count;
         PULONG Hash1, Hash2;
@@ -438,8 +445,8 @@ public:
     UPK_STATUS
     Pack(
         PCWSTR          InputPath,
-        PCWSTR          OutputFile   = NULL,
-        PLARGE_INTEGER  PackedFiles  = NULL,
+        PCWSTR          OutputFile   = nullptr,
+        PLARGE_INTEGER  PackedFiles  = nullptr,
         ULONG           Flags        = 0
     );
 };
@@ -471,11 +478,11 @@ Pack(
         return STATUS_INVALID_PARAMETER;
 
     This                = GetTopClass();
-    Buffer              = NULL;
-    Compressed          = NULL;
+    Buffer              = nullptr;
+    Compressed          = nullptr;
     PackedFileNumber    = 0;
 
-    if (PackedFiles != NULL)
+    if (PackedFiles != nullptr)
         PackedFiles->QuadPart = 0;
 
     Length = StrLengthW(InputPath);
@@ -500,14 +507,14 @@ Pack(
 
     EntrySize = (ULONG_PTR)FileNumber.QuadPart;
     EntrySize = EntrySize * (sizeof(*Entry) - sizeof(Entry->Buffer) + MAX_NTPATH * sizeof(WCHAR));
-    EntryBase = (SAFE_PACK_ENTRY *)AllocateMemory(EntrySize);
-    if (EntryBase == NULL)
+    EntryBase = (PSAFE_PACK_ENTRY)AllocateMemory(EntrySize);
+    if (EntryBase == nullptr)
     {
         Status = STATUS_INSUFFICIENT_RESOURCES;
         goto CLEAN_UP;
     }
 
-    if (OutputFile == NULL)
+    if (OutputFile == nullptr)
     {
         CopyMemory(PackPath, InputPath, Length * sizeof(WCHAR));
         Length -= PackPath[Length - 1] == '\\';
@@ -556,7 +563,7 @@ Pack(
             ULONG_PTR Offset = PtrOffset(Entry, EntryBase);
             EntrySize = Offset * 3 / 2;
             EntryBase = (PSAFE_PACK_ENTRY)ReAllocateMemory(EntryBase, EntrySize);
-            if (EntryBase == NULL)
+            if (EntryBase == nullptr)
             {
                 Status = STATUS_NO_MEMORY;
                 goto CLEAN_UP;
@@ -592,7 +599,7 @@ Pack(
         {
             BufferSize = FileSize;
             Buffer = ReAllocateMemory(Buffer, BufferSize);
-            if (Buffer == NULL)
+            if (Buffer == nullptr)
             {
                 Status = STATUS_INSUFFICIENT_RESOURCES;
                 goto CLEAN_UP;
@@ -629,7 +636,7 @@ Pack(
         {
             CompressedBufferSize = FileSize * 2;
             Compressed = ReAllocateMemory(Compressed, CompressedBufferSize);
-            if (Compressed == NULL)
+            if (Compressed == nullptr)
             {
                 Status = STATUS_INSUFFICIENT_RESOURCES;
                 goto CLEAN_UP;
@@ -656,7 +663,7 @@ Pack(
 
             CompressedBufferSize = (ULONG_PTR)DestinationBuffer.Size.QuadPart;
             Compressed = ReAllocateMemory(Compressed, CompressedBufferSize);
-            if (Compressed == NULL)
+            if (Compressed == nullptr)
             {
                 Status = STATUS_INSUFFICIENT_RESOURCES;
                 goto CLEAN_UP;
@@ -746,7 +753,7 @@ Pack(
 
         CompressedBufferSize = (ULONG_PTR)DestinationBuffer.Size.QuadPart;
         Compressed = ReAllocateMemory(Compressed, CompressedBufferSize);
-        if (Compressed == NULL)
+        if (Compressed == nullptr)
         {
             Status = STATUS_INSUFFICIENT_RESOURCES;
             goto CLEAN_UP;
@@ -795,7 +802,7 @@ CLEAN_UP:
     FreeMemory(Buffer);
     FreeMemory(Compressed);
 
-    if (UPK_SUCCESS(Status) && PackedFiles != NULL)
+    if (UPK_SUCCESS(Status) && PackedFiles != nullptr)
         PackedFiles->QuadPart = PackedFileNumber;
 
     return Status;

@@ -1,34 +1,32 @@
 #pragma comment(linker, "/ENTRY:main")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
-#pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
+#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include <Windows.h>
-#include "my_headers.h"
+#include "MyLibrary.cpp"
 #include "SafePackReader.h"
-#include "my_commsrc.h"
 
-ForceInline Void main2(Int argc, WChar **argv)
+class SafePackReader : public SafePackReaderImpl<SafePackReader>
 {
-    PVOID buf;
-    NTSTATUS Status;
-    CSafePackReader spr;
-    SAFE_PACK_FILE_INFO FileInfo;
+    ;
+};
 
-    Status = spr.Open(L"..\\Release.pack");
-    if (!NT_SUCCESS(Status))
+ForceInline Void main2(LONG_PTR argc, PWSTR *argv)
+{
+    if (--argc ==0)
         return;
+    
+    SafePackReader spr;
 
-    Status = spr.GetFileInfo("aes_x86_v2.obj", &FileInfo);
-    if (!NT_SUCCESS(Status))
-        return;
-
-    buf = AllocateMemory(FileInfo.Size);
-    spr.Read(&FileInfo, buf, FileInfo.Size);
+    FOR_EACH(argv, argv, argc)
+    {
+        spr.Auto(*argv);
+    }
 }
 
-int __cdecl main(Int argc, WChar **argv)
+int __cdecl main(LONG_PTR argc, PWSTR *argv)
 {
     getargsW(&argc, &argv);
     main2(argc, argv);
-    return Nt_ExitProcess(0);
+    ReleaseArgv(argv);
+    Ps::ExitProcess(0);
 }

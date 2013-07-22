@@ -6,6 +6,7 @@
 #include "QQ2011.h"
 #include "MyLibrary.cpp"
 #include <Psapi.h>
+#include "QQMethod.h"
 
 WCHAR GlobalRegistryDb[0x20];
 WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
@@ -605,12 +606,12 @@ BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
     return StubInitPluginFileSystem(PluginName);
 }
 
-VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type)
+VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG RetryTimeOut)
 {
-    if (Type == 0xB)
+    if (RetryTimeOut == 0xB)
         return;
 
-    StubOnConnectionBroken(This, Dummy, Param1, Param2, Param3, MessageString, Type);
+    StubOnConnectionBroken(This, Dummy, Param1, Param2, Param3, MessageString, RetryTimeOut);
 }
 
 PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes)
