@@ -14,6 +14,8 @@ ForceInline Void main2(LONG_PTR argc, PWSTR *argv)
 {
     if (--argc ==0)
         return;
+
+    ++argv;
     
     SafePackReader spr;
 

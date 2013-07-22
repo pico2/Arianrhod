@@ -365,6 +365,11 @@ public:
 */
     }
 
+    ULONG_PTR GetHeaderMagic()
+    {
+        return SAFE_PACK_MAGIC;
+    }
+
 protected:
     static LARGE_INTEGER FileTimeToLargeInteger(FILETIME FileTime)
     {
@@ -536,7 +541,7 @@ Pack(
     if (!NT_SUCCESS(Status))
         goto CLEAN_UP;
 
-    Header.Magic                = SAFE_PACK_MAGIC;
+    Header.Magic                = This->GetHeaderMagic();
     Header.HeaderSize           = sizeof(Header);
     Header.Flags                = 0;
     Header.EntryOffset.QuadPart = 0;

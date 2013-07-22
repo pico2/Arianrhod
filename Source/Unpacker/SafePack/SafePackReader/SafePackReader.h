@@ -92,8 +92,8 @@ protected:
                     CompressionFormatAndEngine,
                     DestinationBuffer->Buffer,
                     DestinationBuffer->Size.LowPart,
-                    SourceBuffer->Buffer,
-                    SourceBuffer->Size.LowPart,
+                    Header + 1,
+                    Header->CompressedSize.LowPart,
                     &DestinationBuffer->Size.LowPart
                 );
 
@@ -114,6 +114,11 @@ protected:
     )
     {
         return STATUS_NOT_IMPLEMENTED;
+    }
+
+    ULONG_PTR GetHeaderMagic()
+    {
+        return SAFE_PACK_MAGIC;
     }
 };
 
@@ -142,6 +147,12 @@ public:
 
         This->DecryptPackHeader(&HeaderBuffer);
         FAIL_RETURN(Status);
+
+        if (HeaderBuffer.Magic != This->GetHeaderMagic())
+            return STATUS_INVALID_IMAGE_FORMAT;
+
+        if (HeaderBuffer.HeaderSize < sizeof(HeaderBuffer))
+            return STATUS_INFO_LENGTH_MISMATCH;
 
         if (HeaderBuffer.HeaderSize != sizeof(HeaderBuffer))
         {
