@@ -21,7 +21,11 @@ ForceInline Void main2(LONG_PTR argc, PWSTR *argv)
 
     FOR_EACH(argv, argv, argc)
     {
-        spr.Auto(*argv);
+        PSAFE_PACK_READER_ENTRY ent;
+
+        spr.Open(*argv);
+        ent = spr.Lookup(L"Vanguard Princess/Vanguard Princess.1.bmp");
+        PrintConsoleW(L"%s\n", ent->FileName);
     }
 }
 

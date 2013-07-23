@@ -84,7 +84,6 @@ typedef struct
 struct SAFE_PACK_ENTRY2 : public UNPACKER_FILE_ENTRY_BASE
 {
     ULONG           UnicodeHash[8];
-    ULONG           AnsiHash[8];
     LARGE_INTEGER   CreationTime;
     LARGE_INTEGER   LastAccessTime;
     LARGE_INTEGER   LastWriteTime;
@@ -390,7 +389,6 @@ protected:
         ULONG_PTR           Context
     )
     {
-        CHAR    FileName[MAX_NTPATH];
         ULONG   Length;
 
         Length = StrLengthW(FindData->cFileName + Context);
@@ -403,15 +401,7 @@ protected:
         Entry->Size.HighPart    = FindData->nFileSizeHigh;
         Entry->Flags            = 0;
 
-        UnicodeToAnsi(FileName, countof(FileName), FindData->cFileName + Context, Length, &Length);
-        StringUpperA(FileName, Length);
-        sha256(FileName, Length, Entry->AnsiHash);
-
-        Entry->SetFileName(FindData->cFileName + Context);
-
-        StringUpperW(Entry->GetFileName(), Length);
-
-        sha256(Entry->GetFileName(), Length * sizeof(WCHAR), Entry->UnicodeHash);
+        HashFileName(Entry->UnicodeHash, FindData->cFileName + Context, Length);
 
         Entry->SetFileName(FindData->cFileName + Context);
 
@@ -440,6 +430,47 @@ protected:
         } while (--Count);
 
         return 0;
+    }
+
+public:
+
+    static VOID HashFileNameShort(PULONG Hash, PCWSTR FileName, ULONG_PTR Length)
+    {
+        ULONG LongHash[8];
+
+        HashFileName(LongHash, FileName, Length);
+
+        Hash[0]  = LongHash[0] ^ LongHash[4];
+        Hash[1]  = LongHash[1] ^ LongHash[5];
+        Hash[2]  = LongHash[2] ^ LongHash[6];
+        Hash[3]  = LongHash[3] ^ LongHash[7];
+    }
+
+    static VOID HashFileName(PULONG Hash, PCWSTR FileName, ULONG_PTR Length)
+    {
+        PWSTR Buffer, Text;
+
+        ++Length;
+        Length *= sizeof(WCHAR);
+
+        Buffer = (PWSTR)AllocStack(Length);
+        CopyMemory(Buffer, FileName, Length);
+
+        FOR_EACH(Text, Buffer, Length / sizeof(WCHAR) - 1)
+        {
+            switch (*Text)
+            {
+                case '/':
+                    *Text = '\\';
+                    break;
+
+                default:
+                    *Text = CHAR_UPPER(*Text);
+                    break;
+            }
+        }
+
+        sha256(Buffer, Length - sizeof(WCHAR), Hash);
     }
 };
 
@@ -789,7 +820,7 @@ Pack(
 
     Status = This->PostCompressEntry(&Header, &SourceBuffer);
 
-    pack.Seek(0, FILE_END);
+    pack.Seek(0ll, FILE_END);
     Status = pack.Write(WriteBuffer, WriteSize);
     if (!NT_SUCCESS(Status))
         goto CLEAN_UP;
@@ -797,7 +828,7 @@ Pack(
     Header.EntrySize.QuadPart = WriteSize;
 
     EncryptPackHeader(&Header);
-    pack.Seek(0, FILE_BEGIN);
+    pack.Seek(0ll, FILE_BEGIN);
     Status = pack.Write(&Header, sizeof(Header));
 
 CLEAN_UP:

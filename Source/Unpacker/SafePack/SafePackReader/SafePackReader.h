@@ -3,6 +3,86 @@
 
 #include "UnpackerBase.h"
 #include "../SafePacker.h"
+#include "Vector.hpp"
+
+typedef struct SAFE_PACK_READER_ENTRY : public UNPACKER_FILE_ENTRY_BASE
+{
+    ULONG FileNameHash[4];
+
+} SAFE_PACK_READER_ENTRY, *PSAFE_PACK_READER_ENTRY;
+
+interface ISafePackReader
+{
+    virtual UPK_STATUS STDCALL Read(PVOID Buffer, ULONG_PTR Size, PLARGE_INTEGER BytesRead = nullptr) = 0;
+    virtual UPK_STATUS STDCALL GetSize(PLARGE_INTEGER FileSize) = 0;
+    virtual UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position) = 0;
+    virtual UPK_STATUS STDCALL Seek(LONG64 Offset, ULONG_PTR MoveMethod = FILE_BEGIN, PLARGE_INTEGER NewPosition = nullptr) = 0;
+};
+
+class SafePackReaderStreamDisk : public ISafePackReader
+{
+protected:
+    LARGE_INTEGER   Size;
+    LARGE_INTEGER   BeginOffset;
+    NtFileDisk      File;
+
+public:
+    UPK_STATUS STDCALL Read(PVOID Buffer, ULONG_PTR Size, PLARGE_INTEGER BytesRead = nullptr)
+    {
+        return this->File.Read(Buffer, Size, BytesRead);
+    }
+
+    UPK_STATUS STDCALL GetSize(PLARGE_INTEGER Size)
+    {
+        Size->QuadPart = this->Size.QuadPart;
+        return STATUS_SUCCESS;
+    }
+
+    UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position)
+    {
+        NTSTATUS Status;
+
+        Status = File.GetPosition(Position);
+        if (NT_SUCCESS(Status))
+            Position->QuadPart -= BeginOffset.QuadPart;
+
+        return Status;
+    }
+
+    UPK_STATUS STDCALL Seek(LONG64 Offset, ULONG_PTR MoveMethod = FILE_BEGIN, PLARGE_INTEGER NewPosition = nullptr)
+    {
+        LARGE_INTEGER NewOffset;
+
+        switch(MoveMethod)
+        {
+            case FILE_CURRENT:
+                File.GetPosition(&NewOffset);
+                NewOffset.QuadPart += Offset;
+                break;
+
+            case FILE_END:
+                NewOffset.QuadPart = BeginOffset.QuadPart + Size.QuadPart + Offset;
+                break;
+
+            case FILE_BEGIN:
+                NewOffset.QuadPart = BeginOffset.QuadPart + Offset;
+                break;
+
+            default:
+                return STATUS_INVALID_PARAMETER_2;
+        }
+
+        if (NewOffset.QuadPart < BeginOffset.QuadPart ||
+            NewOffset.QuadPart >= BeginOffset.QuadPart +  Size.QuadPart)
+        {
+            return STATUS_INVALID_PARAMETER_1;
+        }
+
+        File.Seek(NewOffset, FILE_BEGIN, NewPosition);
+
+        return STATUS_SUCCESS;
+    }
+};
 
 class SafePackReaderBase
 {
@@ -46,7 +126,7 @@ protected:
 
     UPK_STATUS
     PreDecompressData(
-        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_READER_ENTRY FileInfo,
         PSAFE_PACK_BUFFER Buffer
     )
     {
@@ -55,7 +135,7 @@ protected:
 
     UPK_STATUS
     DecompressData(
-        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_READER_ENTRY FileInfo,
         PSAFE_PACK_BUFFER SourceBuffer,
         PSAFE_PACK_BUFFER DestinationBuffer
     )
@@ -109,7 +189,7 @@ protected:
 
     UPK_STATUS
     PostDecompressData(
-        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_READER_ENTRY FileInfo,
         PSAFE_PACK_BUFFER Buffer
     )
     {
@@ -127,6 +207,7 @@ class SafePackReaderImpl : public UnpackerImpl<BaseType>, public SafePackReaderB
 {
 protected:
     NtFileDisk File;
+    ml::GrowableArray<PSAFE_PACK_READER_ENTRY> LookupTable;
 
 public:
 
@@ -180,7 +261,8 @@ public:
         UPK_STATUS                      Status;
         PVOID                           EntryBuffer;
         ULONG_PTR                       EntrySize;
-        PSAFE_PACK_ENTRY2               Entry;
+        PSAFE_PACK_ENTRY                PackEntry, PackEntryEnd;
+        PSAFE_PACK_READER_ENTRY         Entry;
         SAFE_PACK_BUFFER                SourceBuffer, DestinationBuffer;
         PSAFE_PACK_COMPRESSED_HEADER    CompressHeader;
         BaseType*                       This;
@@ -189,7 +271,7 @@ public:
 
         m_Index.EntrySize = sizeof(*Entry);
 
-        Entry = (PSAFE_PACK_ENTRY2)AllocateEntry(Header->NumberOfFiles);
+        Entry = (PSAFE_PACK_READER_ENTRY)AllocateEntry(Header->NumberOfFiles);
         if (Entry == nullptr)
             return STATUS_NO_MEMORY;
 
@@ -238,15 +320,102 @@ public:
             EntrySize = Header->EntrySize.QuadPart;
         }
 
+        PackEntry = (PSAFE_PACK_ENTRY)EntryBuffer;
+        PackEntryEnd = PtrAdd(PackEntry, EntrySize);
+
+        --Entry;
+
+        for (; PackEntry < PackEntryEnd; PackEntry = PtrAdd(PackEntry, PackEntry->EntrySize))
+        {
+            ++Entry;
+
+            PackEntry->FileName.Buffer = PtrAdd(PackEntry->FileName.Buffer, EntryBuffer);
+
+            Entry->Size.QuadPart    = PackEntry->FileSize.QuadPart;
+            Entry->Offset.QuadPart  = PackEntry->Offset.QuadPart;
+            Entry->Attributes       = PackEntry->Attributes;
+            Entry->Flags            = PackEntry->Flags;
+
+            CopyStruct(Entry->FileNameHash, PackEntry->FileNameHash, sizeof(PackEntry->FileNameHash));
+            Entry->SetFileName(&PackEntry->FileName);
+
+            this->LookupTable.Add(Entry);
+        }
+
+        qsort(this->LookupTable.GetData(), this->LookupTable.GetSize(), sizeof(*this->LookupTable.GetData()),
+            QSortCallbackM(PSAFE_PACK_READER_ENTRY &e1, PSAFE_PACK_READER_ENTRY &e2)
+            {
+                PULONG Hash1, Hash2;
+
+                Hash1 = e1->FileNameHash;
+                Hash2 = e2->FileNameHash;
+                for (ULONG_PTR Count = countof(e1->FileNameHash); Count; ++Hash1, ++Hash2, --Count)
+                {
+                    if (*Hash1 == *Hash2)
+                        continue;
+
+                    return *Hash1 > *Hash2 ? 1 : -1;
+                }
+
+                return 0;
+            }
+        );
+
         return Status;
     }
 
+    PSAFE_PACK_READER_ENTRY Lookup(PULONG Hash)
+    {
+        PSAFE_PACK_READER_ENTRY *Entry;
+
+        Entry = BinarySearch(
+                    this->LookupTable.GetData(),
+                    this->LookupTable.GetData() + this->LookupTable.GetSize(),
+                    Hash,
+                    [](PSAFE_PACK_READER_ENTRY *Entry, PULONG Hash2, ULONG)
+                    {
+                        PULONG Hash1;
+
+                        Hash1 = (*Entry)->FileNameHash;
+                        for (ULONG_PTR Count = countof((*Entry)->FileNameHash); Count; ++Hash1, ++Hash2, --Count)
+                        {
+                            if (*Hash1 == *Hash2)
+                                continue;
+
+                            return *Hash1 > *Hash2 ? 1 : -1;
+                        }
+
+                        return 0;
+                    },
+                    0
+                );
+
+        return Entry == nullptr ? nullptr : *Entry;
+    }
+
+    PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName)
+    {
+        ULONG Hash[4];
+
+        SafePackerBase::HashFileNameShort(Hash, FileName, StrLengthW(FileName));
+
+        return Lookup(Hash);
+    }
+
+    PSAFE_PACK_READER_ENTRY Lookup(PCUNICODE_STRING FileName)
+    {
+        ULONG Hash[4];
+
+        SafePackerBase::HashFileNameShort(Hash, FileName->Buffer, FileName->Length / sizeof(WCHAR));
+
+        return Lookup(Hash);
+    }
 
 protected:
 
     UPK_STATUS
     DecompressBlock(
-        PSAFE_PACK_ENTRY2 FileInfo,
+        PSAFE_PACK_READER_ENTRY FileInfo,
         PSAFE_PACK_BUFFER SourceBuffer,
         PSAFE_PACK_BUFFER DestinationBuffer
     )
