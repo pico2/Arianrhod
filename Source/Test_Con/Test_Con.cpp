@@ -882,8 +882,252 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
+typedef struct TRIE_NODE
+{
+    typedef TRIE_NODE *PTRIE_NODE;
+
+    static const ULONG_PTR kInvalidIndex = ~0u;
+
+    union
+    {
+        struct
+        {
+            ULONG Failure;
+            ULONG Next[0x100];
+        } Index;
+
+        struct
+        {
+            PTRIE_NODE Failure;
+            PTRIE_NODE Next[0x100];
+        };
+    };
+
+    union
+    {
+        PVOID Pointer;
+        ULONG Value;
+
+    } Context;
+
+    TRIE_NODE()
+    {
+        ZeroMemory(this, sizeof(*this));
+    }
+
+} TRIE_NODE, *PTRIE_NODE;
+
+typedef struct
+{
+    PVOID       Data;
+    ULONG_PTR   SizeInBytes;
+    PVOID       Context;
+
+} TRIE_BYTES_ENTRY, *PTRIE_BYTES_ENTRY;
+
+#define ADD_TRIE_STRING(_str, ...) { _str, CONST_STRLEN(_str) * sizeof(_str[0]), __VA_ARGS__ }
+
+class Trie
+{
+protected:
+    PTRIE_NODE Root;
+
+private:
+    Trie()
+    {
+        this->Root = nullptr;
+    }
+
+    ~Trie()
+    {
+        DestroyNode(this->Root);
+    }
+
+public:
+    NTSTATUS BuildNodeArray(PTRIE_NODE *NodeArray, PULONG_PTR NumberOfNodes)
+    {
+    }
+
+    NTSTATUS InsertBytesEntry(PTRIE_BYTES_ENTRY Bytes)
+    {
+        PBYTE       Buffer;
+        ULONG_PTR   Index;
+        PTRIE_NODE  Node, *Next;
+
+        Node = this->Root;
+
+        FOR_EACH(Buffer, (PBYTE)Bytes->Data, Bytes->SizeInBytes)
+        {
+            Index = Buffer[0];
+            Next = &Node->Next[Index];
+            if (*Next == nullptr)
+            {
+                *Next = CreateNode();
+                if (*Next == nullptr)
+                    return STATUS_NO_MEMORY;
+            }
+
+            Node = *Next;
+        }
+
+        return STATUS_SUCCESS;
+    }
+
+    /*++
+    
+    NTSTATUS CallBack(PTRIE_NODE Parent, PTRIE_NODE Node, ULONG_PTR IndexOfNext);
+    
+    --*/
+
+    template<typename CALL_BACK> NTSTATUS EnumNodes(CALL_BACK CallBack)
+    {
+        NTSTATUS    Status;
+        ULONG_PTR   QueueIndex;
+        PTRIE_NODE  Root, Node, Next;
+
+        ml::GrowableArray<PTRIE_NODE> Queue;
+
+        static const ULONG_PTR NumberOfNext = countof(Root->Next);
+
+        Root        = this->Root;
+        Node        = Root;
+        QueueIndex  = 1;
+
+        Status = Queue.Add(Root);
+        FAIL_RETURN(Status);
+
+        do
+        {
+            for (ULONG_PTR Index = 0; Index != NumberOfNext; ++Index)
+            {
+                Next = Node->Next[Index];
+                if (Next == nullptr)
+                    continue;
+
+                Status = CallBack(Node, Next, Index);
+                FAIL_RETURN(Status);
+
+                Status = Queue.Add(Next);
+                FAIL_RETURN(Status);
+            }
+
+            Node = Queue[QueueIndex++];
+
+        } while (QueueIndex != Queue.GetSize());
+
+        return STATUS_SUCCESS;
+    }
+
+    NTSTATUS UpdateFailurePointers()
+    {
+        return EnumNodes(
+                    [=](PTRIE_NODE Parent, PTRIE_NODE Node, ULONG_PTR IndexOfNext) -> NTSTATUS
+                    {
+                        PTRIE_NODE Failure;
+
+                        if (Parent == this->Root)
+                        {
+                            Node->Failure = nullptr;
+                        }
+                        else
+                        {
+                            Failure = Parent->Failure;
+                            while (Failure != nullptr)
+                            {
+                                if (Failure->Next[IndexOfNext] != nullptr)
+                                {
+                                    Failure = Failure->Next[IndexOfNext];
+                                    break;
+                                }
+
+                                Failure = Failure->Failure;
+                            }
+
+                            Node->Failure = Failure;
+                        }
+
+                        return STATUS_SUCCESS;
+                    }
+                );
+    }
+
+    static NTSTATUS BuildTrieFromBytesList(Trie **Tree, PTRIE_BYTES_ENTRY BytesList, ULONG_PTR NumberOfBytes)
+    {
+        Trie*       root;
+        NTSTATUS    Status;
+
+        root = new Trie;
+        if (root == nullptr)
+            return STATUS_NO_MEMORY;
+
+        root->Root = root->CreateNode();
+        if (root->Root == nullptr)
+        {
+            delete root;
+            return STATUS_NO_MEMORY;
+        }
+
+        Status = root->BuildFromBytesList(BytesList, NumberOfBytes);
+        if (NT_FAILED(Status))
+        {
+            ReleaseTrie(root);
+            return Status;
+        }
+
+        *Tree = root;
+        return Status;
+    }
+
+    static NTSTATUS ReleaseTrie(Trie *Tree)
+    {
+        if (Tree == nullptr)
+            return STATUS_SUCCESS;
+
+        Tree->EnumNodes(
+            [=](PTRIE_NODE Parent, PTRIE_NODE Node, ULONG_PTR IndexOfNext) -> NTSTATUS
+            {
+                Tree->DestroyNode(Node);
+                return STATUS_SUCCESS;
+            }
+        );
+
+        delete Tree;
+
+        return STATUS_SUCCESS;
+    }
+
+protected:
+    PTRIE_NODE CreateNode()
+    {
+        return new TRIE_NODE();
+    }
+
+    VOID DestroyNode(PTRIE_NODE Node)
+    {
+        delete Node;
+    }
+
+    NTSTATUS BuildFromBytesList(PTRIE_BYTES_ENTRY BytesList, ULONG_PTR NumberOfBytes)
+    {
+        NTSTATUS Status = STATUS_NO_MORE_ENTRIES;
+
+        FOR_EACH(BytesList, BytesList, NumberOfBytes)
+        {
+            Status = InsertBytesEntry(BytesList);
+            FAIL_BREAK(Status);
+        }
+
+        if (NT_SUCCESS(Status))
+            Status = UpdateFailurePointers();
+
+        return Status;
+    }
+};
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    Trie *tree;
+
     return;
 
 #if 0
