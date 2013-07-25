@@ -21,6 +21,8 @@
 #include <ws2spi.h>
 #include "MyLibrary.cpp"
 
+ML_OVERLOAD_NEW
+
 #if defined(UNICODE)
     #define __WSTRING(str) L##str
     #define WSTRING(str) __WSTRING(str)
@@ -901,12 +903,19 @@ typedef struct TRIE_NODE
             PTRIE_NODE Failure;
             PTRIE_NODE Next[0x100];
         };
+
+        struct
+        {
+            PVOID64 Failure;
+            PVOID64 Next[0x100];
+        } Pad;
     };
 
     union
     {
-        PVOID Pointer;
-        ULONG Value;
+        PVOID   Pointer;
+        ULONG   Value;
+        PVOID64 Pad;
 
     } Context;
 
@@ -927,32 +936,244 @@ typedef struct
 
 #define ADD_TRIE_STRING(_str, ...) { _str, CONST_STRLEN(_str) * sizeof(_str[0]), __VA_ARGS__ }
 
-class Trie
+template<typename NodeType = TRIE_NODE>
+class StaticTrieT
 {
-protected:
-    PTRIE_NODE Root;
+public:
+    typedef NodeType *PNodeType;
+    typedef ml::GrowableArray<NodeType> NodeArray;
+    typedef ml::GrowableArray<PNodeType> NodePArray;
 
-private:
-    Trie()
+protected:
+
+    PNodeType Root;
+
+public:
+    StaticTrieT()
     {
         this->Root = nullptr;
     }
 
-    ~Trie()
+    NTSTATUS BuildNodeArray(NodeArray &Nodes)
+    {
+        NTSTATUS    Status;
+        NodePArray  NodesPointers;
+
+        Status = EnumNodes(
+                    [&](PNodeType Parent, PNodeType Node, ULONG_PTR IndexOfNext)
+                    {
+                        return NodesPointers.Add(Node);
+                    }
+                );
+
+        FAIL_RETURN(Status);
+
+        Status = EnumNodes(
+                    [&](PNodeType Parent, PNodeType Node, ULONG_PTR IndexOfNext)
+                    {
+                        PULONG      IndexNext;
+                        PNodeType*  Next;
+
+                        FAIL_RETURN(Nodes.Add(*Node));
+
+                        Node = &Nodes[Nodes.GetSize() - 1];
+                        Node->Index.Failure = NodesPointers.IndexOf(Node->Failure);
+
+                        IndexNext = Node->Index.Next;
+                        FOR_EACH(Next, Node->Next, countof(Node->Next))
+                        {
+                            *IndexNext++ = NodesPointers.IndexOf(*Next);
+                        }
+
+                        return STATUS_SUCCESS;
+                    }
+                );
+
+        return Status;
+    }
+
+    NTSTATUS InitializeFromNodeArray(PNodeType Nodes, ULONG_PTR NumberOfNodes)
+    {
+        ULONG_PTR   Offset;
+        PULONG      IndexNext;
+        PNodeType   Node, NodeBuffer, Buffer;
+        PNodeType   *Next;
+
+        Buffer = (PNodeType)AllocateMemoryP(NumberOfNodes * sizeof(*Nodes));
+        if (Buffer == nullptr)
+            return STATUS_NO_MEMORY;
+
+        CopyMemory(Buffer, Nodes, NumberOfNodes * sizeof(*Nodes));
+
+        Offset = PtrOffset(Nodes, Buffer);
+
+        FOR_EACH(NodeBuffer, Buffer, NumberOfNodes)
+        {
+            Node = PtrAdd(NodeBuffer, Offset);
+
+            if (NodeBuffer->Index.Failure == NodeArray::kInvalidIndex)
+            {
+                Node->Failure = nullptr;
+            }
+            else
+            {
+                Node->Failure = Nodes + NodeBuffer->Index.Failure;
+            }
+
+            Next = Node->Next;
+            FOR_EACH(IndexNext, NodeBuffer->Index.Next, countof(NodeBuffer->Index.Next))
+            {
+                if (*IndexNext == NodeArray::kInvalidIndex)
+                {
+                    *Next = nullptr;
+                }
+                else
+                {
+                    *Next = Nodes + *IndexNext;
+                }
+
+                ++Next;
+            }
+        }
+
+        this->Root = Nodes;
+
+        FreeMemoryP(Buffer);
+
+        return STATUS_SUCCESS;
+    }
+
+    /*++
+    
+    NTSTATUS CallBack(PNodeType Parent, PNodeType Node, ULONG_PTR IndexOfNext);
+    
+    --*/
+
+    template<typename CALL_BACK> NTSTATUS EnumNodes(CALL_BACK CallBack)
+    {
+        NTSTATUS    Status;
+        ULONG_PTR   QueueIndex;
+        PNodeType   Root, Node, Next;
+
+        NodePArray Queue;
+
+        static const ULONG_PTR NumberOfNext = countof(Root->Next);
+
+        Root        = this->Root;
+        QueueIndex  = 0;
+
+        Status = Queue.Add(Root);
+        FAIL_RETURN(Status);
+
+        Status = CallBack(nullptr, Root, -1);
+        FAIL_RETURN(Status);
+
+        do
+        {
+            Node = Queue[QueueIndex++];
+
+            for (ULONG_PTR Index = 0; Index != NumberOfNext; ++Index)
+            {
+                Next = Node->Next[Index];
+                if (Next == nullptr)
+                    continue;
+
+                Status = CallBack(Node, Next, Index);
+                FAIL_RETURN(Status);
+
+                Status = Queue.Add(Next);
+                FAIL_RETURN(Status);
+            }
+
+        } while (QueueIndex != Queue.GetSize());
+
+        return STATUS_SUCCESS;
+    }
+
+    NTSTATUS LookupWithoutFailure(PVOID *Context, PTRIE_BYTES_ENTRY DataToLookup)
+    {
+        PBYTE       Buffer;
+        ULONG_PTR   Index;
+        PNodeType   Node;
+
+        Node = this->Root;
+
+        FOR_EACH(Buffer, (PBYTE)DataToLookup->Data, DataToLookup->SizeInBytes)
+        {
+            Index = Buffer[0];
+            if (Node->Next[Index] == nullptr)
+                return STATUS_NOT_FOUND;
+
+            Node = Node->Next[Index];
+        }
+
+        *Context = Node->Context.Pointer;
+
+        return STATUS_SUCCESS;
+    }
+
+    NTSTATUS Lookup(PVOID *Context, PTRIE_BYTES_ENTRY DataToLookup)
+    {
+        PBYTE       Buffer;
+        ULONG_PTR   Index;
+        PNodeType   Node;
+
+        Node = this->Root;
+
+        FOR_EACH(Buffer, (PBYTE)DataToLookup->Data, DataToLookup->SizeInBytes)
+        {
+            Index = Buffer[0];
+            while (Node->Next[Index] == nullptr)
+            {
+                Node = Node->Failure;
+                if (Node == nullptr)
+                    return STATUS_NOT_FOUND;
+            }
+
+            Node = Node->Next[Index];
+        }
+
+        *Context = Node->Context.Pointer;
+
+        return STATUS_SUCCESS;
+    }
+};
+
+#define TRIE_DEBUG 1
+
+template<typename NodeType = TRIE_NODE>
+class TrieT : public StaticTrieT<NodeType>
+{
+private:
+
+#if TRIE_DEBUG
+
+    ULONG NodeCount;
+
+#endif
+
+    TrieT()
+    {
+#if TRIE_DEBUG
+        NodeCount = 0;
+#endif
+    }
+
+    ~TrieT()
     {
         DestroyNode(this->Root);
     }
 
 public:
-    NTSTATUS BuildNodeArray(PTRIE_NODE *NodeArray, PULONG_PTR NumberOfNodes)
-    {
-    }
 
     NTSTATUS InsertBytesEntry(PTRIE_BYTES_ENTRY Bytes)
     {
         PBYTE       Buffer;
         ULONG_PTR   Index;
-        PTRIE_NODE  Node, *Next;
+        PNodeType   Node, *Next;
+
+        if (Bytes->SizeInBytes == 0)
+            return STATUS_BUFFER_TOO_SMALL;
 
         Node = this->Root;
 
@@ -970,50 +1191,7 @@ public:
             Node = *Next;
         }
 
-        return STATUS_SUCCESS;
-    }
-
-    /*++
-    
-    NTSTATUS CallBack(PTRIE_NODE Parent, PTRIE_NODE Node, ULONG_PTR IndexOfNext);
-    
-    --*/
-
-    template<typename CALL_BACK> NTSTATUS EnumNodes(CALL_BACK CallBack)
-    {
-        NTSTATUS    Status;
-        ULONG_PTR   QueueIndex;
-        PTRIE_NODE  Root, Node, Next;
-
-        ml::GrowableArray<PTRIE_NODE> Queue;
-
-        static const ULONG_PTR NumberOfNext = countof(Root->Next);
-
-        Root        = this->Root;
-        Node        = Root;
-        QueueIndex  = 1;
-
-        Status = Queue.Add(Root);
-        FAIL_RETURN(Status);
-
-        do
-        {
-            for (ULONG_PTR Index = 0; Index != NumberOfNext; ++Index)
-            {
-                Next = Node->Next[Index];
-                if (Next == nullptr)
-                    continue;
-
-                Status = CallBack(Node, Next, Index);
-                FAIL_RETURN(Status);
-
-                Status = Queue.Add(Next);
-                FAIL_RETURN(Status);
-            }
-
-            Node = Queue[QueueIndex++];
-
-        } while (QueueIndex != Queue.GetSize());
+        Node->Context.Pointer = Bytes->Context;
 
         return STATUS_SUCCESS;
     }
@@ -1021,9 +1199,12 @@ public:
     NTSTATUS UpdateFailurePointers()
     {
         return EnumNodes(
-                    [=](PTRIE_NODE Parent, PTRIE_NODE Node, ULONG_PTR IndexOfNext) -> NTSTATUS
+                    [=](PNodeType Parent, PNodeType Node, ULONG_PTR IndexOfNext) -> NTSTATUS
                     {
-                        PTRIE_NODE Failure;
+                        PNodeType Failure;
+
+                        if (Parent == nullptr)
+                            return STATUS_SUCCESS;
 
                         if (Parent == this->Root)
                         {
@@ -1051,12 +1232,12 @@ public:
                 );
     }
 
-    static NTSTATUS BuildTrieFromBytesList(Trie **Tree, PTRIE_BYTES_ENTRY BytesList, ULONG_PTR NumberOfBytes)
+    static NTSTATUS BuildTrieFromBytesList(TrieT **Tree, PTRIE_BYTES_ENTRY BytesList, ULONG_PTR NumberOfBytes)
     {
-        Trie*       root;
+        TrieT*      root;
         NTSTATUS    Status;
 
-        root = new Trie;
+        root = new TrieT();
         if (root == nullptr)
             return STATUS_NO_MEMORY;
 
@@ -1070,7 +1251,7 @@ public:
         Status = root->BuildFromBytesList(BytesList, NumberOfBytes);
         if (NT_FAILED(Status))
         {
-            ReleaseTrie(root);
+            root->Release();
             return Status;
         }
 
@@ -1078,32 +1259,52 @@ public:
         return Status;
     }
 
-    static NTSTATUS ReleaseTrie(Trie *Tree)
+    NTSTATUS Release()
     {
-        if (Tree == nullptr)
+        if (this == nullptr)
             return STATUS_SUCCESS;
 
-        Tree->EnumNodes(
-            [=](PTRIE_NODE Parent, PTRIE_NODE Node, ULONG_PTR IndexOfNext) -> NTSTATUS
+        PNodeType *Node;
+        NodePArray FreeList;
+
+        this->EnumNodes(
+            [&](PNodeType Parent, PNodeType Node, ULONG_PTR IndexOfNext) -> NTSTATUS
             {
-                Tree->DestroyNode(Node);
+                if (Parent != nullptr)
+                    FreeList.Add(Node);
+
                 return STATUS_SUCCESS;
             }
         );
 
-        delete Tree;
+        FOR_EACH_VEC(Node, FreeList)
+        {
+            DestroyNode(*Node);
+        }
+
+        delete this;
 
         return STATUS_SUCCESS;
     }
 
 protected:
-    PTRIE_NODE CreateNode()
+
+    PNodeType CreateNode()
     {
-        return new TRIE_NODE();
+
+#if TRIE_DEBUG
+        ++NodeCount;
+#endif
+
+        return new NodeType();
     }
 
-    VOID DestroyNode(PTRIE_NODE Node)
+    VOID DestroyNode(PNodeType Node)
     {
+
+#if TRIE_DEBUG
+        --NodeCount;
+#endif
         delete Node;
     }
 
@@ -1124,9 +1325,38 @@ protected:
     }
 };
 
+typedef TrieT<> Trie;
+
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     Trie *tree;
+    StaticTrieT<> statictree;
+    PVOID Context;
+
+    Trie::NodeArray array;
+
+    static TRIE_BYTES_ENTRY ent[] =
+    {
+        ADD_TRIE_STRING(L"fuck1", L"ooxx"),
+        ADD_TRIE_STRING(L"fuck2", L"xxoo"),
+    };
+
+    ml::MlInitialize();
+
+    Trie::BuildTrieFromBytesList(&tree, ent, countof(ent));
+
+    tree->BuildNodeArray(array);
+
+    statictree.InitializeFromNodeArray(array.GetData(), array.GetSize());
+
+    statictree.LookupWithoutFailure(&Context, ent);
+    PrintConsoleW(L"%s\n", Context);
+
+    statictree.LookupWithoutFailure(&Context, ent + 1);
+    PrintConsoleW(L"%s\n", Context);
+
+    tree->Release();
 
     return;
 
