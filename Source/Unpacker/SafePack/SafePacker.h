@@ -9,6 +9,7 @@
 #define LZNT1_MAGIC             TAG4('LZNT')
 #define LZMA_MAGIC              TAG4('LZMA')
 
+#define DebugInfo(...) PrintConsoleW(__VA_ARGS__), PrintConsoleW(L"\n")
 
 #define DEFAULT_COMPRESS_DATA   1
 
@@ -37,9 +38,11 @@ typedef struct
     ULONG           Magic;
     ULONG           HeaderSize;
     ULONG           Flags;
-    ULONG           NumberOfFiles;
+    ULONG           Reserve;
     LARGE_INTEGER   EntryOffset;
     LARGE_INTEGER   EntrySize;
+    LARGE_INTEGER   LookupTableSize;
+    LARGE_INTEGER   NumberOfFiles;
 
 } SAFE_PACK_HEADER, *PSAFE_PACK_HEADER;
 
@@ -539,7 +542,9 @@ Pack(
         return Status;
     }
 
-    NtFileDisk pack, file;
+    NtFileDisk          pack, file;
+    Trie                EntryLookupTable;
+    TRIE_BYTES_ENTRY    BytesEntry;
 
     EntrySize = (ULONG_PTR)FileNumber.QuadPart;
     EntrySize = EntrySize * (sizeof(*Entry) - sizeof(Entry->Buffer) + MAX_NTPATH * sizeof(WCHAR));
@@ -549,6 +554,10 @@ Pack(
         Status = STATUS_INSUFFICIENT_RESOURCES;
         goto CLEAN_UP;
     }
+
+    Status = EntryLookupTable.InitializeRootNode();
+    if (NT_FAILED(Status))
+        goto CLEAN_UP;
 
     if (OutputFile == nullptr)
     {
@@ -594,6 +603,8 @@ Pack(
 
     for (LARGE_INTEGER Count = FileNumber; Count.QuadPart; ++FileList, --Count.QuadPart)
     {
+        DebugInfo(FileList->FileName);
+
         if (PtrOffset(Entry, EntryBase) > EntrySize)
         {
             ULONG_PTR Offset = PtrOffset(Entry, EntryBase);
@@ -754,14 +765,53 @@ Pack(
         Entry->EntrySize                = ROUND_UP(Entry->EntrySize, 16);
         Entry                           = PtrAdd(Entry, Entry->EntrySize);
 
+        BytesEntry.Data         = FileList->GetFileName();
+        BytesEntry.SizeInBytes  = FileList->GetFileNameLength() * sizeof(WCHAR);
+        BytesEntry.Context      = (PVOID)PackedFileNumber;
+
+        Status = EntryLookupTable.InsertBytesEntry(&BytesEntry);
+        if (NT_FAILED(Status))
+            goto CLEAN_UP;
+
         ++PackedFileNumber;
     }
 
-    Header.EntrySize.QuadPart   = PtrOffset(Entry, EntryBase);
-    Header.EntryOffset.QuadPart = pack.GetCurrentPos64();
-    Header.NumberOfFiles        = (ULONG)PackedFileNumber;
+    DebugInfo(L"compress entry");
 
-//    qsort(EntryBase, PackedFileNumber, sizeof(*EntryBase), (int (__cdecl *)(const void *,const void *))SortEntry);
+    Header.EntrySize.QuadPart       = PtrOffset(Entry, EntryBase);
+    Header.EntryOffset.QuadPart     = pack.GetCurrentPos64();
+    Header.NumberOfFiles.QuadPart   = PackedFileNumber;
+
+    {
+        ULONG_PTR Offset, NodeArraySize;
+        Trie::NodeArray Nodes;
+
+        Status = EntryLookupTable.BuildNodeArray(Nodes);
+        if (NT_FAILED(Status))
+            goto CLEAN_UP;
+
+        Offset = ROUND_UP((ULONG_PTR)Header.EntrySize.QuadPart, 16);
+
+        NodeArraySize = Nodes.GetSize() * sizeof(Nodes.GetData()[0]);
+        Header.LookupTableSize.QuadPart = NodeArraySize;
+
+        if (Header.LookupTableSize.QuadPart + Offset > EntrySize)
+        {
+            EntrySize = Header.LookupTableSize.QuadPart + Offset;
+            EntryBase = (PSAFE_PACK_ENTRY)ReAllocateMemory(EntryBase, EntrySize);
+            if (EntryBase == nullptr)
+            {
+                Status = STATUS_NO_MEMORY;
+                goto CLEAN_UP;
+            }
+
+            Entry = PtrAdd(EntryBase, Offset);
+        }
+
+        CopyMemory(Entry, Nodes.GetData(), NodeArraySize);
+
+        Header.EntrySize.QuadPart += NodeArraySize;
+    }
 
     SourceBuffer.Buffer             = EntryBase;
     SourceBuffer.Flags              = Flags;
