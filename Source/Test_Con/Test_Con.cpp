@@ -656,34 +656,33 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
+#include "E:\Desktop\lst.h"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     Trie tree;
     StaticTrieT<> statictree;
-    PVOID Context;
+    PVOID Context, compact;
+    ULONG_PTR size;
 
     Trie::NodeArray array;
-
-    static TRIE_BYTES_ENTRY ent[] =
-    {
-        ADD_TRIE_STRING(L"fuck1", L"ooxx"),
-        ADD_TRIE_STRING(L"fuck2", L"xxoo"),
-    };
+    PTRIE_BYTES_ENTRY ent;
 
     ml::MlInitialize();
 
     tree.InitializeRootNode();
-    tree.BuildFromBytesList(ent, countof(ent));
+    tree.BuildFromBytesList(ents, countof(ents));
 
-    tree.BuildNodeArray(array);
+    tree.BuildCompactTree(&compact, &size);
 
-    statictree.InitializeFromNodeArray(array.GetData(), array.GetSize());
+    NtFileDisk f;
+    f.Create(L"compact.bin");
+    f.Write(compact, size);
 
-    statictree.LookupWithoutFailure(&Context, ent);
-    PrintConsoleW(L"%s\n", Context);
+    FreeMemoryP(compact);
 
-    statictree.LookupWithoutFailure(&Context, ent + 1);
-    PrintConsoleW(L"%s\n", Context);
+    PrintConsoleW(L"%d\n", tree.NodeCount);
+    Ps::Sleep(1000);
 
     return;
 
