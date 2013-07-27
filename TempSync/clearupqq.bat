@@ -39,8 +39,7 @@ for %%p in (^
     Com.Tencent.VAS ^
     Com.Tencent.WBlog ^
     Com.Tencent.WenWen ^
-    Com.Tencent.Winks ^
-    Com.Tencent.Wireless
+    Com.Tencent.Winks
 ) do (
 
     %DEBUG% rd/s/q %%p
