@@ -5,6 +5,8 @@
 #include "SafePacker.h"
 #include "MyLibrary.cpp"
 
+ML_OVERLOAD_NEW
+
 class SafePacker : public SafePackerImpl<SafePacker>
 {
     ;

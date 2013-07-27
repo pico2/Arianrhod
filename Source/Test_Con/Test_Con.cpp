@@ -664,8 +664,6 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     StaticTrieT<> statictree;
     PVOID Context, compact;
     ULONG_PTR size;
-
-    Trie::NodeArray array;
     PTRIE_BYTES_ENTRY ent;
 
     ml::MlInitialize();
@@ -675,9 +673,48 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     tree.BuildCompactTree(&compact, &size);
 
-    NtFileDisk f;
-    f.Create(L"compact.bin");
-    f.Write(compact, size);
+    {
+        NtFileDisk f;
+        f.Create(L"compact.bin");
+        f.Write(compact, size);
+    }
+
+    PrintConsoleW(L"beg test\n");
+
+    {
+        LARGE_INTEGER beg, end, freq;
+        CompactTrie ct;
+
+        NtFileMemory mem;
+
+        mem.Open(L"compact.bin");
+
+        ct.Initialize(mem.GetBuffer(), mem.GetSize32());
+
+        QueryPerformanceFrequency(&freq);
+        QueryPerformanceCounter(&beg);
+
+        FOR_EACH_ARRAY(ent, ents)
+        {
+#if 1
+            Context = nullptr;
+            ct.Lookup(ent, &Context);
+            if (Context != ent->Context)
+                PrintConsoleW(L"%S\n", ent->Data);
+#else   // 0.014621
+            Context = nullptr;
+            tree.LookupWithoutFailure(ent, &Context);
+            if (Context != ent->Context)
+                PrintConsoleW(L"%S\n", ent->Data);
+#endif // 0.05 ~ 0.06
+        }
+
+        QueryPerformanceCounter(&end);
+
+        printf("%f\n", (end.QuadPart - beg.QuadPart) / (DOUBLE)freq.QuadPart);
+        PrintConsoleW(L"test end\n");
+        PauseConsole();
+    }
 
     FreeMemoryP(compact);
 

@@ -53,10 +53,10 @@ typedef struct
     LARGE_INTEGER   Offset;
     LARGE_INTEGER   FileSize;
     ULONG           Attributes;
-    LARGE_INTEGER   CreationTime;
-    LARGE_INTEGER   LastAccessTime;
-    LARGE_INTEGER   LastWriteTime;
-    ULONG           FileNameHash[4];
+    //LARGE_INTEGER   CreationTime;
+    //LARGE_INTEGER   LastAccessTime;
+    //LARGE_INTEGER   LastWriteTime;
+    //ULONG           FileNameHash[4];
     UNICODE_STRING  FileName;
     WCHAR           Buffer[1];
 
@@ -245,7 +245,7 @@ public:
         }
 
 
-        CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_MAXIMUM;
+        CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_STANDARD;
 
         Status = RtlGetCompressionWorkSpaceSize(
                     CompressionFormatAndEngine,
@@ -410,7 +410,7 @@ protected:
 
         return 1;
     }
-
+/*
     static INT CDECL SortEntry(PSAFE_PACK_ENTRY Entry1, PSAFE_PACK_ENTRY Entry2)
     {
         ULONG  Count;
@@ -434,7 +434,7 @@ protected:
 
         return 0;
     }
-
+*/
 public:
 
     static VOID HashFileNameShort(PULONG Hash, PCWSTR FileName, ULONG_PTR Length)
@@ -622,13 +622,13 @@ Pack(
         Length = FileList->GetFileNameLength() * sizeof(WCHAR);
 
         Entry->Flags            = Flags;
-        Entry->CreationTime     = FileList->CreationTime;
-        Entry->LastAccessTime   = FileList->LastAccessTime;
-        Entry->LastWriteTime    = FileList->LastWriteTime;
-        Entry->FileNameHash[0]  = FileList->UnicodeHash[0] ^ FileList->UnicodeHash[4];
-        Entry->FileNameHash[1]  = FileList->UnicodeHash[1] ^ FileList->UnicodeHash[5];
-        Entry->FileNameHash[2]  = FileList->UnicodeHash[2] ^ FileList->UnicodeHash[6];
-        Entry->FileNameHash[3]  = FileList->UnicodeHash[3] ^ FileList->UnicodeHash[7];
+        //Entry->CreationTime     = FileList->CreationTime;
+        //Entry->LastAccessTime   = FileList->LastAccessTime;
+        //Entry->LastWriteTime    = FileList->LastWriteTime;
+        //Entry->FileNameHash[0]  = FileList->UnicodeHash[0] ^ FileList->UnicodeHash[4];
+        //Entry->FileNameHash[1]  = FileList->UnicodeHash[1] ^ FileList->UnicodeHash[5];
+        //Entry->FileNameHash[2]  = FileList->UnicodeHash[2] ^ FileList->UnicodeHash[6];
+        //Entry->FileNameHash[3]  = FileList->UnicodeHash[3] ^ FileList->UnicodeHash[7];
         Entry->Attributes       = FileList->Attributes;
 
         if (FLAG_ON(Entry->Attributes, FILE_ATTRIBUTE_DIRECTORY))
@@ -783,17 +783,16 @@ Pack(
     Header.NumberOfFiles.QuadPart   = PackedFileNumber;
 
     {
-        ULONG_PTR Offset, NodeArraySize;
-        Trie::NodeArray Nodes;
+        ULONG_PTR   Offset, CompactSize;
+        PVOID       Compact;
 
-        Status = EntryLookupTable.BuildNodeArray(Nodes);
+        Status = EntryLookupTable.BuildCompactTree(&Compact, &CompactSize);
         if (NT_FAILED(Status))
             goto CLEAN_UP;
 
         Offset = ROUND_UP((ULONG_PTR)Header.EntrySize.QuadPart, 16);
 
-        NodeArraySize = Nodes.GetSize() * sizeof(Nodes.GetData()[0]);
-        Header.LookupTableSize.QuadPart = NodeArraySize;
+        Header.LookupTableSize.QuadPart = CompactSize;
 
         if (Header.LookupTableSize.QuadPart + Offset > EntrySize)
         {
@@ -801,6 +800,7 @@ Pack(
             EntryBase = (PSAFE_PACK_ENTRY)ReAllocateMemory(EntryBase, EntrySize);
             if (EntryBase == nullptr)
             {
+                FreeMemoryP(Compact);
                 Status = STATUS_NO_MEMORY;
                 goto CLEAN_UP;
             }
@@ -808,9 +808,11 @@ Pack(
             Entry = PtrAdd(EntryBase, Offset);
         }
 
-        CopyMemory(Entry, Nodes.GetData(), NodeArraySize);
+        CopyMemory(Entry, Compact, CompactSize);
 
-        Header.EntrySize.QuadPart += NodeArraySize;
+        Header.EntrySize.QuadPart += CompactSize;
+
+        FreeMemoryP(Compact);
     }
 
     SourceBuffer.Buffer             = EntryBase;

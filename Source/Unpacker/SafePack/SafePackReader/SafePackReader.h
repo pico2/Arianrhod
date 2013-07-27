@@ -3,11 +3,10 @@
 
 #include "UnpackerBase.h"
 #include "../SafePacker.h"
-#include "Vector.hpp"
 
 typedef struct SAFE_PACK_READER_ENTRY : public UNPACKER_FILE_ENTRY_BASE
 {
-    ULONG FileNameHash[4];
+    //ULONG FileNameHash[4];
 
 } SAFE_PACK_READER_ENTRY, *PSAFE_PACK_READER_ENTRY;
 
@@ -207,7 +206,8 @@ class SafePackReaderImpl : public UnpackerImpl<BaseType>, public SafePackReaderB
 {
 protected:
     NtFileDisk File;
-    ml::GrowableArray<PSAFE_PACK_READER_ENTRY> LookupTable;
+    //ml::GrowableArray<PSAFE_PACK_READER_ENTRY> LookupTable;
+    CompactTrie LookupTable;
 
 public:
 
@@ -271,7 +271,7 @@ public:
 
         m_Index.EntrySize = sizeof(*Entry);
 
-        Entry = (PSAFE_PACK_READER_ENTRY)AllocateEntry(Header->NumberOfFiles);
+        Entry = (PSAFE_PACK_READER_ENTRY)AllocateEntry(Header->NumberOfFiles.QuadPart);
         if (Entry == nullptr)
             return STATUS_NO_MEMORY;
 
@@ -325,7 +325,9 @@ public:
 
         --Entry;
 
-        for (; PackEntry < PackEntryEnd; PackEntry = PtrAdd(PackEntry, PackEntry->EntrySize))
+        for (ULONG_PTR NumberOfFiles = Header->NumberOfFiles.QuadPart; 
+             NumberOfFiles != 0 && PackEntry < PackEntryEnd;
+             PackEntry = PtrAdd(PackEntry, PackEntry->EntrySize), --NumberOfFiles)
         {
             ++Entry;
 
@@ -336,79 +338,40 @@ public:
             Entry->Attributes       = PackEntry->Attributes;
             Entry->Flags            = PackEntry->Flags;
 
-            CopyStruct(Entry->FileNameHash, PackEntry->FileNameHash, sizeof(PackEntry->FileNameHash));
             Entry->SetFileName(&PackEntry->FileName);
 
-            this->LookupTable.Add(Entry);
+            ++m_Index.FileCount.QuadPart;
         }
 
-        qsort(this->LookupTable.GetData(), this->LookupTable.GetSize(), sizeof(*this->LookupTable.GetData()),
-            QSortCallbackM(PSAFE_PACK_READER_ENTRY &e1, PSAFE_PACK_READER_ENTRY &e2)
-            {
-                PULONG Hash1, Hash2;
+        if (PackEntry >= PackEntryEnd)
+            return STATUS_INFO_LENGTH_MISMATCH;
 
-                Hash1 = e1->FileNameHash;
-                Hash2 = e2->FileNameHash;
-                for (ULONG_PTR Count = countof(e1->FileNameHash); Count; ++Hash1, ++Hash2, --Count)
-                {
-                    if (*Hash1 == *Hash2)
-                        continue;
-
-                    return *Hash1 > *Hash2 ? 1 : -1;
-                }
-
-                return 0;
-            }
-        );
+        Status = LookupTable.Initialize(PackEntry, Header->LookupTableSize.QuadPart);
 
         return Status;
     }
 
-    PSAFE_PACK_READER_ENTRY Lookup(PULONG Hash)
+    PSAFE_PACK_READER_ENTRY Lookup(PVOID Data, ULONG_PTR SizeInBytes)
     {
-        PSAFE_PACK_READER_ENTRY *Entry;
+        NODE_CONTEXT        Index;
+        NTSTATUS            Status;
+        TRIE_BYTES_ENTRY    Bytes = { Data, SizeInBytes };
 
-        Entry = BinarySearch(
-                    this->LookupTable.GetData(),
-                    this->LookupTable.GetData() + this->LookupTable.GetSize(),
-                    Hash,
-                    [](PSAFE_PACK_READER_ENTRY *Entry, PULONG Hash2, ULONG)
-                    {
-                        PULONG Hash1;
+        Status = this->LookupTable.Lookup(&Bytes, &Index);
+        if (NT_FAILED(Status))
+            return nullptr;
 
-                        Hash1 = (*Entry)->FileNameHash;
-                        for (ULONG_PTR Count = countof((*Entry)->FileNameHash); Count; ++Hash1, ++Hash2, --Count)
-                        {
-                            if (*Hash1 == *Hash2)
-                                continue;
-
-                            return *Hash1 > *Hash2 ? 1 : -1;
-                        }
-
-                        return 0;
-                    },
-                    0
-                );
-
-        return Entry == nullptr ? nullptr : *Entry;
+        return (PSAFE_PACK_READER_ENTRY)PtrAdd(m_Index.Entry, Index * m_Index.EntrySize);
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName)
     {
-        ULONG Hash[4];
-
-        SafePackerBase::HashFileNameShort(Hash, FileName, StrLengthW(FileName));
-
-        return Lookup(Hash);
+        return Lookup((PVOID)FileName, StrLengthW(FileName) * sizeof(FileName[0]));
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCUNICODE_STRING FileName)
     {
-        ULONG Hash[4];
-
-        SafePackerBase::HashFileNameShort(Hash, FileName->Buffer, FileName->Length / sizeof(WCHAR));
-
-        return Lookup(Hash);
+        return Lookup(FileName->Buffer, FileName->Length);
     }
 
 protected:
