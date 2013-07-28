@@ -25,10 +25,21 @@ TYPE_OF(&NtOpenFile)                StubNtOpenFile;
 TYPE_OF(&NtCreateFile)              StubNtCreateFile;
 TYPE_OF(&NtQueryAttributesFile)     StubNtQueryAttributesFile;
 
+HRESULT
+(NTAPI
+*StubShowDBClickPicture)(
+    PVOID   This,
+    PWSTR   PicturePath,
+    PRECT   ClickPosition,
+    BOOL    FromHistoryIfFalse,
+    PVOID   Unknown
+);
+
 BOOL (CDECL *StubGetPlatformCore)(PVOID *Core);
 BOOL (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
 HRESULT (NTAPI *StubPlatformCore_QueryInterface)(PVOID Object, REFGUID Guid, PVOID Output);
 VOID (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
+HRESULT (FASTCALL *StubOnSysDataCome)(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2);
 
 
 BOOL IsQQUINSpecified()
@@ -363,10 +374,13 @@ ShowDBClickPicture(
     PWSTR   PicturePath,
     PRECT   ClickPosition,
     BOOL    FromHistoryIfFalse,
-    PVOID
+    PVOID   Unknown
 )
 {
     SHELLEXECUTEINFOW ShellExecueInfo;
+
+    if (GetKeyState(VK_CONTROL) < 0)
+        return StubShowDBClickPicture(This, PicturePath, ClickPosition, FromHistoryIfFalse, Unknown);
 
     ZeroMemory(&ShellExecueInfo, sizeof(ShellExecueInfo));
     ShellExecueInfo.cbSize  = sizeof(ShellExecueInfo);
@@ -614,6 +628,22 @@ VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Pa
     StubOnConnectionBroken(This, Dummy, Param1, Param2, Param3, MessageString, RetryTimeOut);
 }
 
+HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2)
+{
+    //WCHAR buf[0x100];
+
+    //swprintf(buf, L"%p", Type);
+    //MessageBoxW(0, buf, 0, 64);
+
+    if (Type == 0x30)
+    {
+        //MessageBoxW(0, L"kick off", 0, 64);
+        return S_OK;
+    }
+
+    return StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
+}
+
 PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes)
 {
     PVOID StringValue, StringReference;
@@ -787,6 +817,13 @@ PVOID SearchPreLogin_OnConnectionBroken(PVOID ImageBase)
     return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String), 0xB0);
 }
 
+PVOID SearchPreLogin_OnSysDataCome(PVOID ImageBase)
+{
+    static WCHAR String[] = L"CTXServerConnectionDectecter::OnSysDataCome";
+
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String) - sizeof(String[0]), 0x20);
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -918,7 +955,7 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_FUNCTION_PATCH Function_AppMisc[] =
     {
         INLINE_HOOK_JUMP_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList), // addition SetTimeOut
-        INLINE_HOOK_JUMP_NULL(SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture),
+        INLINE_HOOK_JUMP     (SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture, StubShowDBClickPicture),
     };
 
 
@@ -983,7 +1020,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_PreLogin[] =
     {
-        INLINE_HOOK_JUMP(SearchPreLogin_OnConnectionBroken(module), OnConnectionBroken, StubOnConnectionBroken),
+        //INLINE_HOOK_JUMP(SearchPreLogin_OnConnectionBroken(module), OnConnectionBroken, StubOnConnectionBroken),
+        INLINE_HOOK_JUMP(SearchPreLogin_OnSysDataCome(module), OnSysDataCome, StubOnSysDataCome),
     };
 
 

@@ -662,7 +662,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     Trie tree;
     StaticTrieT<> statictree;
-    PVOID Context, compact;
+    PVOID compact;
+    NODE_CONTEXT Context;
     ULONG_PTR size;
     PTRIE_BYTES_ENTRY ent;
 
@@ -681,6 +682,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     PrintConsoleW(L"beg test\n");
 
+    if (1)
     {
         LARGE_INTEGER beg, end, freq;
         CompactTrie ct;
@@ -697,15 +699,17 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         FOR_EACH_ARRAY(ent, ents)
         {
 #if 1
-            Context = nullptr;
+
             ct.Lookup(ent, &Context);
             if (Context != ent->Context)
                 PrintConsoleW(L"%S\n", ent->Data);
+
 #else   // 0.014621
-            Context = nullptr;
+
             tree.LookupWithoutFailure(ent, &Context);
             if (Context != ent->Context)
                 PrintConsoleW(L"%S\n", ent->Data);
+
 #endif // 0.05 ~ 0.06
         }
 
