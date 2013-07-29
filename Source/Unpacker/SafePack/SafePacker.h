@@ -767,7 +767,7 @@ Pack(
 
         BytesEntry.Data         = FileList->GetFileName();
         BytesEntry.SizeInBytes  = FileList->GetFileNameLength() * sizeof(WCHAR);
-        BytesEntry.Context      = (PVOID)PackedFileNumber;
+        BytesEntry.Context      = (NODE_CONTEXT)PackedFileNumber;
 
         Status = EntryLookupTable.InsertBytesEntry(&BytesEntry);
         if (NT_FAILED(Status))

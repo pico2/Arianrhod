@@ -351,11 +351,11 @@ public:
         return Status;
     }
 
-    PSAFE_PACK_READER_ENTRY Lookup(PVOID Data, ULONG_PTR SizeInBytes)
+    PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName, ULONG_PTR SizeInBytes)
     {
         NODE_CONTEXT        Index;
         NTSTATUS            Status;
-        TRIE_BYTES_ENTRY    Bytes = { Data, SizeInBytes };
+        TRIE_BYTES_ENTRY    Bytes = { (PVOID)FileName, SizeInBytes };
 
         Status = this->LookupTable.Lookup(&Bytes, &Index);
         if (NT_FAILED(Status))
@@ -366,7 +366,7 @@ public:
 
     PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName)
     {
-        return Lookup((PVOID)FileName, StrLengthW(FileName) * sizeof(FileName[0]));
+        return Lookup(FileName, StrLengthW(FileName) * sizeof(FileName[0]));
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCUNICODE_STRING FileName)

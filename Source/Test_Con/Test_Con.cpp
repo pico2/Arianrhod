@@ -672,8 +672,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     tree.InitializeRootNode();
     tree.BuildFromBytesList(ents, countof(ents));
 
-    tree.BuildCompactTree(&compact, &size);
-
+    if (NT_SUCCESS(tree.BuildCompactTree(&compact, &size)))
     {
         NtFileDisk f;
         f.Create(L"compact.bin");
@@ -702,13 +701,19 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
             ct.Lookup(ent, &Context);
             if (Context != ent->Context)
+            {
                 PrintConsoleW(L"%S\n", ent->Data);
+                PauseConsole();
+            }
 
 #else   // 0.014621
 
             tree.LookupWithoutFailure(ent, &Context);
             if (Context != ent->Context)
+            {
                 PrintConsoleW(L"%S\n", ent->Data);
+                PauseConsole();
+            }
 
 #endif // 0.05 ~ 0.06
         }
