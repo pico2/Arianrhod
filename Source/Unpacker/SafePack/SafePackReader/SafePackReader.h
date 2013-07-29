@@ -371,7 +371,7 @@ public:
 
     PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName)
     {
-        return Lookup(FileName, StrLengthW(FileName) * sizeof(FileName[0]));
+        return Lookup(FileName, StrLengthW(FileName));
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCUNICODE_STRING FileName)
