@@ -81,6 +81,11 @@ public:
 
         return STATUS_SUCCESS;
     }
+
+    static UPK_STATUS CreateStream(ISafePackReader *Reader, PSAFE_PACK_READER_ENTRY Entry)
+    {
+        return 0;
+    }
 };
 
 class SafePackReaderBase
@@ -351,11 +356,11 @@ public:
         return Status;
     }
 
-    PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName, ULONG_PTR SizeInBytes)
+    NoInline PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName, ULONG_PTR Length)
     {
         NODE_CONTEXT        Index;
         NTSTATUS            Status;
-        TRIE_BYTES_ENTRY    Bytes = { (PVOID)FileName, SizeInBytes };
+        TRIE_BYTES_ENTRY    Bytes = { (PVOID)FileName, Length * sizeof(FileName[0]) };
 
         Status = this->LookupTable.Lookup(&Bytes, &Index);
         if (NT_FAILED(Status))
