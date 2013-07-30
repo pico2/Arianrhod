@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Data;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Itenso.Windows.Controls.ListViewLayout;
+using System.ComponentModel;
 using System.Windows.Markup;
 using Newtonsoft.Json;
 
@@ -18,8 +20,12 @@ namespace RecordViewer
     /// </summary>
     public partial class TreasureBoxHunter : PanelContext
     {
-        private Dictionary<String, ItemInformation> ItemIdMap;
-        private int NumberOfItems;
+        Dictionary<String, ItemInformation> ItemIdMap;
+        Dictionary<String, String> HeaderPropertyMap;
+        RecordViewerData viewerData = null;
+
+        GridViewColumnHeader    lastHeaderClicked = null;
+        ListSortDirection       lastDirection = ListSortDirection.Ascending;
 
         class ListViewColumnItem
         {
@@ -57,7 +63,15 @@ namespace RecordViewer
             public int      TalkFunctionIndex     { get; set; }
             public String   Description           { get; set; }
             public String   Screenshot            { get; set; }
-            public String   Opend                 { get; set; }
+            public Boolean  Opened               { get; set; }
+
+            public String   Status
+            {
+                get
+                {
+                    return Opened ? "已开启" : "未开启";
+                }
+            }
 
             public
             ItemInformation(
@@ -79,7 +93,7 @@ namespace RecordViewer
                 int      TalkFunctionIndex  = 0,
                 String   Description        = "",
                 String   Screenshot         = "",
-                String   Opend              = ""
+                Boolean  Opened             = false
             )
             {
                 this.ID                 = ID;
@@ -100,7 +114,7 @@ namespace RecordViewer
                 this.TalkFunctionIndex  = TalkFunctionIndex;
                 this.Description        = Description;
                 this.Screenshot         = Screenshot;
-                this.Opend              = Opend;
+                this.Opened             = Opened;
             }
         }
 
@@ -123,18 +137,21 @@ namespace RecordViewer
             return XamlReader.Parse(xaml, context) as DataTemplate;
         }
 
-        public TreasureBoxHunter()
+        public TreasureBoxHunter(RecordViewerData viewerData)
         {
             InitializeComponent();
 
+            this.viewerData = viewerData;
+
             ItemIdMap = new Dictionary<String, ItemInformation>();
+            HeaderPropertyMap = new Dictionary<String, String>();
 
             ListViewColumnItem[] Columns = new ListViewColumnItem[]
             {
                 new ListViewColumnItem("ID",    "ID",              1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("地图",   "Map",             20,     HorizontalAlignment.Center),
+                new ListViewColumnItem("地图",   "Map",             20,    HorizontalAlignment.Center),
                 new ListViewColumnItem("物品",   "Item",            20,    HorizontalAlignment.Left),
-                new ListViewColumnItem("打开",   "Opend",           1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("状态",   "Status",          1,     HorizontalAlignment.Center),
                 new ListViewColumnItem("X",     "ActorX",          1,     HorizontalAlignment.Center),
                 new ListViewColumnItem("Y",     "ActorY",          1,     HorizontalAlignment.Center),
                 new ListViewColumnItem("Z",     "ActorZ",          1,     HorizontalAlignment.Center),
@@ -159,6 +176,8 @@ namespace RecordViewer
 
             foreach (var col in Columns)
             {
+                HeaderPropertyMap[col.Header] = col.Binding;
+
                 GridViewColumn column = new GridViewColumn();
 
                 column.Header = col.Header;
@@ -166,22 +185,57 @@ namespace RecordViewer
                 column.SetValue(GridViewColumn.HeaderContainerStyleProperty, headerStyle);
 
                 treasureBoxGridView.Columns.Add(ProportionalColumn.ApplyWidth(column, GetWidth(col.WidthPercent)));
+
+                //ItemDataTable.Columns.Add(col.Binding, GetPropValue(new ItemInformation(), col.Binding).GetType());
             }
 
-            InitializeTreasureBoxInfo();
 
-            foreach (var pair in ItemIdMap)
+            String boxinfo = @"E:\Desktop\Source\Hooks\EDAO\Decompiler\GameData\box.json";
+
+            try
             {
-                InsertItemInfo(pair.Value);
+                InitializeTreasureBoxInfo(boxinfo);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
+                return;
             }
         }
 
-        public void InitializeTreasureBoxInfo()
+        override public void Refresh()
         {
-            String boxinfo = @"E:\Desktop\Source\Hooks\EDAO\Decompiler\GameData\box.json";
+            EDAOSaveData saveData = viewerData.GetSaveData();
 
-            System.IO.StreamReader reader = new System.IO.StreamReader(boxinfo);
-            String json = reader.ReadToEnd();
+            treasureBoxList.Items.Clear();
+
+            foreach (var pair in ItemIdMap)
+            {
+                if (saveData == null)
+                {
+                    pair.Value.Opened = false;
+                }
+                else
+                {
+                    pair.Value.Opened = saveData.TestScenaFlag(pair.Value.Offset, pair.Value.Bit);
+                }
+
+                InsertItemInfo(pair.Value);
+            }
+
+            if (lastHeaderClicked != null)
+            {
+                Sort(lastHeaderClicked, lastDirection);
+            }
+        }
+
+        public void InitializeTreasureBoxInfo(String boxinfo)
+        {
+            String json;
+            using (System.IO.StreamReader reader = new System.IO.StreamReader(boxinfo))
+            {
+                json = reader.ReadToEnd();
+            }
 
             dynamic items = JsonConvert.DeserializeObject(json);
 
@@ -214,17 +268,60 @@ namespace RecordViewer
 
         public void InsertItemInfo(ItemInformation item)
         {
-            ListViewItem lvi = new ListViewItem();
-
-            lvi.Content = item;
-
-            lvi.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-            treasureBoxList.Items.Add(lvi);
+            treasureBoxList.Items.Add(item);
         }
 
         void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
         {
+            GridViewColumnHeader headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
 
+            if (headerClicked == null)
+                return;
+
+            if (headerClicked != lastHeaderClicked)
+            {
+                direction = ListSortDirection.Ascending;
+            }
+            else
+            {
+                direction = lastDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+            }
+
+            try
+            {
+                Sort(headerClicked, direction);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            if (direction == ListSortDirection.Ascending)
+            {
+                headerClicked.Column.HeaderTemplate = Resources["HeaderTemplateArrowUp"] as DataTemplate;
+            }
+            else
+            {
+                headerClicked.Column.HeaderTemplate = Resources["HeaderTemplateArrowDown"] as DataTemplate;
+            }
+
+            if (lastHeaderClicked != null && lastHeaderClicked != headerClicked)
+            {
+                lastHeaderClicked.Column.HeaderTemplate = null;
+            }
+
+            lastHeaderClicked = headerClicked;
+            lastDirection = direction;
+        }
+
+        private void Sort(GridViewColumnHeader headerClicked, ListSortDirection direction)
+        {
+            var lv = treasureBoxList;
+            lv.Items.SortDescriptions.Clear();
+            SortDescription sd = new SortDescription(HeaderPropertyMap[headerClicked.Column.Header as String], direction);
+            lv.Items.SortDescriptions.Add(sd);
+            lv.Items.Refresh();
         }
     }
 }

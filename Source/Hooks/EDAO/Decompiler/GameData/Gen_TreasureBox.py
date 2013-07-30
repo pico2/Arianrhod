@@ -128,7 +128,7 @@ def main():
 
                 item = ItemInfo()
                 item.Offset = int(scenaflags[0], 16)
-                item.Bit    = int(scenaflags[1], 16)
+                item.Bit    = int(scenaflags[1], 10)
                 item.Item   = current_item
                 item.Line   = i + 1
                 item.File   = file
@@ -171,26 +171,28 @@ def main():
         #lines.append('    "item_%X_%d" : {' % (item.Offset, item.Bit))
         lines.append('    {')
 
-        lines.append('        "ID"                  : "item_%X_%d",'    % (item.Offset, item.Bit))
-        lines.append('        "Map"                 : "%s",'            % info.MapName)
-        lines.append('        "Offset"              : "0x%X",'          % item.Offset)
-        lines.append('        "Bit"                 : %s,'              % item.Bit)
-        lines.append('        "Item"                : "%s",'            % item.Item)
-        lines.append('        "Line"                : %s,'              % item.Line)
-        lines.append('        "File"                : "%s",'            % item.File)
+        itemid = 'item_%X_%d' % (item.Offset, item.Bit)
 
-        lines.append('        "TriggerX"            : %s,'              % item.TriggerX)
-        lines.append('        "TriggerZ"            : %s,'              % item.TriggerZ)
-        lines.append('        "TriggerY"            : %s,'              % item.TriggerY)
-        lines.append('        "TriggerRange"        : %s,'              % item.TriggerRange)
-        lines.append('        "ActorX"              : %s,'              % item.ActorX)
-        lines.append('        "ActorZ"              : %s,'              % item.ActorZ)
-        lines.append('        "ActorY"              : %s,'              % item.ActorY)
-        lines.append('        "TalkScenaIndex"      : %s,'              % item.TalkScenaIndex)
-        lines.append('        "TalkFunctionIndex"   : %s,'              % item.TalkFunctionIndex)
+        lines.append('        "ID"                  : "%s",'                    % itemid)
+        lines.append('        "Map"                 : "%s",'                    % info.MapName)
+        lines.append('        "Offset"              : "0x%X",'                  % item.Offset)
+        lines.append('        "Bit"                 : %s,'                      % item.Bit)
+        lines.append('        "Item"                : "%s",'                    % item.Item)
+        lines.append('        "Line"                : %s,'                      % item.Line)
+        lines.append('        "File"                : "%s",'                    % item.File)
 
-        lines.append('        "Description"         : "%s",'            % '')
-        lines.append('        "Screenshot"          : "%s",'            % '')
+        lines.append('        "TriggerX"            : %s,'                      % item.TriggerX)
+        lines.append('        "TriggerZ"            : %s,'                      % item.TriggerZ)
+        lines.append('        "TriggerY"            : %s,'                      % item.TriggerY)
+        lines.append('        "TriggerRange"        : %s,'                      % item.TriggerRange)
+        lines.append('        "ActorX"              : %s,'                      % item.ActorX)
+        lines.append('        "ActorZ"              : %s,'                      % item.ActorZ)
+        lines.append('        "ActorY"              : %s,'                      % item.ActorY)
+        lines.append('        "TalkScenaIndex"      : %s,'                      % item.TalkScenaIndex)
+        lines.append('        "TalkFunctionIndex"   : %s,'                      % item.TalkFunctionIndex)
+
+        lines.append('        "Description"         : "%s",'                    % '')
+        lines.append('        "Screenshot"          : "Screenshot\\\\%s.png",'  % itemid)
 
 
         lines[-1] = lines[-1][:-1]

@@ -21,7 +21,9 @@ namespace RecordViewer
     /// </summary>
     public partial class RecordViewerMainWindow : Fluent.MetroWindow
     {
-        private Dictionary<RVTabItem, PanelContext> TabPanelMap;
+        Dictionary<RVTabItem, PanelContext> TabPanelMap;
+        RecordViewerData viewerData = new RecordViewerData();
+        String OriginalTitle;
 
         public RecordViewerMainWindow()
         {
@@ -29,12 +31,48 @@ namespace RecordViewer
 
             TabPanelMap = new Dictionary<RVTabItem, PanelContext>();
 
-            TabPanelMap[tabTreasureBox] = new TreasureBoxHunter();
+            TabPanelMap[tabTreasureBox] = new TreasureBoxHunter(viewerData);
 
             this.MinWidth = 500;
             this.MinHeight = 400;
 
             ribbon.SelectedTabChanged += Ribbon_SelectedTabChanged;
+            this.Drop += OnDrop;
+            this.AllowDrop = true;
+
+            OriginalTitle = this.Title;
+        }
+
+        void OnDrop(object sender, DragEventArgs e)
+        {
+            System.IO.FileAttributes Attributes;
+            String FileName = ((String[])e.Data.GetData(DataFormats.FileDrop))[0];
+
+            try
+            {
+                Attributes = System.IO.File.GetAttributes(FileName);
+            }
+            catch
+            {
+                return;
+            }
+
+            if ((Attributes & System.IO.FileAttributes.Directory) != 0)
+                FileName = FileName + "\\savedata.dat";
+
+            try
+            {
+                viewerData.OpenSaveData(FileName);
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                return;
+            }
+
+            this.Title = OriginalTitle + ": " + FileName;
+
+            Ribbon_SelectedTabChanged(this.ribbon, null);
         }
 
         void Ribbon_SelectedTabChanged(object sender, SelectionChangedEventArgs e)
@@ -52,12 +90,12 @@ namespace RecordViewer
             lowerPanel.SwapPanelContext(context);
         }
 
-        private void OnBtnOpenSaveData(object sender, RoutedEventArgs e)
+        void OnBtnOpenSaveData(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("fuck", null, MessageBoxButton.OKCancel, MessageBoxImage.Asterisk);
         }
 
-        private void OnBtnExit(object sender, RoutedEventArgs e)
+        void OnBtnExit(object sender, RoutedEventArgs e)
         {
             Close();
         }

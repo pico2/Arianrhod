@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RecordViewer</RootNamespace>
     <AssemblyName>RecordViewer</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -64,6 +65,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BaseControl.cs" />
+    <Compile Include="EDAOSaveData.cs" />
     <Compile Include="ListViewLayout\ConverterGridViewColumn.cs" />
     <Compile Include="ListViewLayout\FixedColumn.cs" />
     <Compile Include="ListViewLayout\ImageGridViewColumn.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="ListViewLayout\ListViewLayoutManager.cs" />
     <Compile Include="ListViewLayout\ProportionalColumn.cs" />
     <Compile Include="ListViewLayout\RangeColumn.cs" />
+    <Compile Include="RecordViewerData.cs" />
     <Compile Include="TreasureBoxHunter.xaml.cs">
       <DependentUpon>TreasureBoxHunter.xaml</DependentUpon>
     </Compile>

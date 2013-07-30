@@ -14,7 +14,7 @@ namespace RecordViewer
     {
         Boolean ContextInitialized = false;
 
-        public void Refresh()
+        virtual public void Refresh()
         {
             ShowContext();
         }

@@ -7,6 +7,29 @@
     x:Class="RecordViewer.TreasureBoxHunter"
     d:DesignWidth="634.141" d:DesignHeight="373.535"
 >
+
+
+    <RecordViewer:PanelContext.Resources>
+    <DataTemplate x:Key="HeaderTemplateArrowUp">
+      <DockPanel>
+        <TextBlock HorizontalAlignment="Center" Text="{Binding}"/>
+        <Path x:Name="arrow"
+           StrokeThickness = "1"					  
+           Fill            = "gray"
+           Data            = "M 5,10 L 15,10 L 10,5 L 5,10"/>
+     </DockPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="HeaderTemplateArrowDown">
+      <DockPanel>
+        <TextBlock HorizontalAlignment="Center" Text="{Binding }"/>
+        <Path x:Name="arrow"
+              StrokeThickness = "1"					  
+              Fill            = "gray"
+              Data            = "M 5,5 L 10,10 L 15,5 L 5,5"/>
+      </DockPanel>
+    </DataTemplate>
+    </RecordViewer:PanelContext.Resources>
+  
     <Grid/>
         <ListView
             x:Name="treasureBoxList"
@@ -14,6 +37,11 @@
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler"
         >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView x:Name="treasureBoxGridView">
                 </GridView>
