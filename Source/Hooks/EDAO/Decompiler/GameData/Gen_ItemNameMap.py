@@ -1,5 +1,5 @@
 from ml import *
-from BaseType import *
+from Base.BaseType import *
 
 def getname(name):
     filter = \
@@ -53,6 +53,7 @@ def peek(file):
 
     offsetmap = {}
     itemidmap = {}
+    itemtruename = {}
 
     fs.seek(offsetlist[0])
     id = fs.ulong() - 1
@@ -72,12 +73,14 @@ def peek(file):
 
         nameoffset = fs.ushort()
         fs.seek(nameoffset)
-        name = getname(fs.astr())
+        truename = fs.astr()
+        name = getname(truename)
 
         if name == '':
             continue
 
         itemidmap[id] = name
+        itemtruename[id] = truename
 
     items = []
     for id in sorted(itemidmap):
@@ -91,7 +94,11 @@ def peek(file):
         if name == '':
             name = 'Item_%X' % id
 
-        items.append([id, name])
+        truename = itemtruename[id]
+        if truename == '':
+            truename = name
+
+        items.append([id, name, truename])
 
     return items
 
@@ -100,7 +107,7 @@ def main():
     items = peek('J:\\Falcom\\ED_AO\\data\\text\\t_ittxt._dt')
     items += peek('J:\\Falcom\\ED_AO\\data\\text\\t_ittxt2._dt')
 
-    items += [[0xCD, '物理反射'], [0xCE, '魔法反射']]
+    items += [[0xCD, '物理反射', '物理反射'], [0xCE, '魔法反射', '魔法反射']]
 
     items = sorted(items)
 
@@ -111,16 +118,17 @@ def main():
     lines.append('')
 
     lines.append('ItemNameMap = {}')
+    lines.append('ItemTrueNameMap = {}')
     lines.append('')
 
     ItemNameMap = {}
-    for id, name in items:
+    for id, name, truename in items:
         if name not in ItemNameMap:
             ItemNameMap[name] = 0
 
         ItemNameMap[name] += 1
 
-    for id, name in items:
+    for id, name, truename in items:
         namecount = ItemNameMap[name]
         if namecount != 1:
             if name == '':
@@ -128,6 +136,11 @@ def main():
             name = name + '_%X' % id
 
         lines.append('ItemNameMap[0x%04X] = "%s"' % (id, name))
+
+    lines.append('')
+
+    for id, name, truename in items:
+        lines.append('ItemTrueNameMap[0x%04X] = "%s"' % (id, truename))
 
     lines.append('')
     lines.append('for id, name in ItemNameMap.items():')
