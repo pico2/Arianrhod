@@ -63,7 +63,7 @@ namespace RecordViewer
             public int      TalkFunctionIndex     { get; set; }
             public String   Description           { get; set; }
             public String   Screenshot            { get; set; }
-            public Boolean  Opened               { get; set; }
+            public Boolean  Opened                { get; set; }
 
             public String   Status
             {
@@ -148,14 +148,14 @@ namespace RecordViewer
 
             ListViewColumnItem[] Columns = new ListViewColumnItem[]
             {
-                new ListViewColumnItem("ID",    "ID",              1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("地图",   "Map",             20,    HorizontalAlignment.Center),
-                new ListViewColumnItem("物品",   "Item",            20,    HorizontalAlignment.Left),
-                new ListViewColumnItem("状态",   "Status",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("X",     "ActorX",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("Y",     "ActorY",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("Z",     "ActorZ",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("描述",   "Description",     55,    HorizontalAlignment.Center),
+                new ListViewColumnItem("ID",      "ID",              1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("地图",    "Map",             20,    HorizontalAlignment.Center),
+                new ListViewColumnItem("物品",    "Item",            20,    HorizontalAlignment.Left),
+                new ListViewColumnItem("状态",    "Status",          1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("X",       "ActorX",          1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("Y",       "ActorY",          1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("Z",       "ActorZ",          1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("描述",    "Description",     55,    HorizontalAlignment.Center),
             };
 
             Func<Double, long> GetWidth = (Double percent) =>
@@ -185,10 +185,7 @@ namespace RecordViewer
                 column.SetValue(GridViewColumn.HeaderContainerStyleProperty, headerStyle);
 
                 treasureBoxGridView.Columns.Add(ProportionalColumn.ApplyWidth(column, GetWidth(col.WidthPercent)));
-
-                //ItemDataTable.Columns.Add(col.Binding, GetPropValue(new ItemInformation(), col.Binding).GetType());
             }
-
 
             String boxinfo = @"E:\Desktop\Source\Hooks\EDAO\Decompiler\GameData\box.json";
 

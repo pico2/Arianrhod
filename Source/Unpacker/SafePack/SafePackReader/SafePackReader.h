@@ -39,10 +39,10 @@ public:
 
     UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position)
     {
-        NTSTATUS Status;
+        UPK_STATUS Status;
 
         Status = File.GetPosition(Position);
-        if (NT_SUCCESS(Status))
+        if (UPK_SUCCESS(Status))
             Position->QuadPart -= BeginOffset.QuadPart;
 
         return Status;
@@ -147,11 +147,11 @@ protected:
 
 #if !DEFAULT_COMPRESS_DATA
 
-        return STATUS_COMPRESSION_DISABLED;
+        return STATUS_NOT_IMPLEMENTED;
 
 #else
 
-        NTSTATUS                        Status;
+        UPK_STATUS                        Status;
         ULONG                           CompressionFormatAndEngine;
         PSAFE_PACK_COMPRESSED_HEADER    Header;
 
@@ -330,7 +330,7 @@ public:
 
         --Entry;
 
-        for (ULONG_PTR NumberOfFiles = Header->NumberOfFiles.QuadPart; 
+        for (ULONG_PTR NumberOfFiles = Header->NumberOfFiles.QuadPart;
              NumberOfFiles != 0 && PackEntry < PackEntryEnd;
              PackEntry = PtrAdd(PackEntry, PackEntry->EntrySize), --NumberOfFiles)
         {
@@ -359,11 +359,11 @@ public:
     NoInline PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName, ULONG_PTR Length)
     {
         NODE_CONTEXT        Index;
-        NTSTATUS            Status;
+        UPK_STATUS            Status;
         TRIE_BYTES_ENTRY    Bytes = { (PVOID)FileName, Length * sizeof(FileName[0]) };
 
         Status = this->LookupTable.Lookup(&Bytes, &Index);
-        if (NT_FAILED(Status))
+        if (UPK_FAILED(Status))
             return nullptr;
 
         return (PSAFE_PACK_READER_ENTRY)PtrAdd(m_Index.Entry, Index * m_Index.EntrySize);
@@ -379,15 +379,76 @@ public:
         return Lookup(FileName->Buffer, FileName->Length);
     }
 
+    UPK_STATUS
+    GetFileData(
+        PUNPACKER_FILE_INFO         FileInfo,
+        PUNPACKER_FILE_ENTRY_BASE   BaseEntry,
+        ULONG                       Flags = 0
+    )
+    {
+        PVOID                   Buffer;
+        UPK_STATUS              Status;
+        PSAFE_PACK_READER_ENTRY Entry;
+        SAFE_PACK_BUFFER        SourceBuffer, DestinationBuffer;
+
+        Entry = (PSAFE_PACK_READER_ENTRY)BaseEntry;
+
+        Status = File.Seek(Entry->Offset.QuadPart);
+        FAIL_RETURN(Status);
+
+        if (FLAG_ON(Entry->Flags, UNPACKER_ENTRY_COMPRESSED))
+        {
+            Buffer = AllocateMemory(Entry->Size.QuadPart);
+            if (Buffer == nullptr)
+                return STATUS_NO_MEMORY;
+
+            Status = File.Read(Buffer, Entry->Size.QuadPart);
+            if (UPK_FAILED(Status))
+            {
+                FreeMemory(Buffer);
+                return Status;
+            }
+
+            SourceBuffer.Initialize(Buffer, 0, Entry->Size.QuadPart);
+
+            Status = DecompressBlock(Entry, &SourceBuffer, &DestinationBuffer);
+
+            FreeMemory(Buffer);
+            FAIL_RETURN(Status);
+
+            Status = AllocateFileData(FileInfo, DestinationBuffer.Size.QuadPart, UnpackerFileBinary);
+            if (UPK_SUCCESS(Status))
+                CopyMemory(FileInfo->BinaryData.Buffer, DestinationBuffer.Buffer, DestinationBuffer.Size.QuadPart);
+
+            FreeMemory(DestinationBuffer.Buffer);
+        }
+        else
+        {
+            Status = AllocateFileData(FileInfo, Entry->Size.QuadPart, UnpackerFileBinary);
+            FAIL_RETURN(Status);
+
+            Status = File.Read(FileInfo->BinaryData.Buffer, Entry->Size.QuadPart);
+            if (UPK_FAILED(Status))
+            {
+                FreeFileData(FileInfo);
+                return Status;
+            }
+        }
+
+        return Status;
+    }
+
 protected:
 
+    NoInline    
     UPK_STATUS
     DecompressBlock(
         PSAFE_PACK_READER_ENTRY FileInfo,
-        PSAFE_PACK_BUFFER SourceBuffer,
-        PSAFE_PACK_BUFFER DestinationBuffer
+        PSAFE_PACK_BUFFER       SourceBuffer,
+        PSAFE_PACK_BUFFER       DestinationBuffer
     )
     {
+        PVOID       Buffer;
         UPK_STATUS  Status;
         BaseType*   This;
 
@@ -395,21 +456,42 @@ protected:
 
         DestinationBuffer->Initialize();
 
+        Status = This->PreDecompressData(FileInfo, SourceBuffer);
+        if (Status != STATUS_NOT_IMPLEMENTED && UPK_FAILED(Status))
+            return Status;
+
+        Buffer = nullptr;
+
         LOOP_FOREVER
         {
-            DestinationBuffer.Buffer = Compressed;
-            Status = This->DecompressData(FileInfo, &SourceBuffer, &DestinationBuffer);
+            DestinationBuffer->Buffer = Buffer;
+            Status = This->DecompressData(FileInfo, SourceBuffer, DestinationBuffer);
             if (Status != STATUS_BUFFER_TOO_SMALL)
                 break;
 
-            CompressedBufferSize = (ULONG_PTR)DestinationBuffer.Size.QuadPart;
-            Compressed = ReAllocateMemory(Compressed, CompressedBufferSize);
-            if (Compressed == nullptr)
+            Buffer = ReAllocateMemory(Buffer, DestinationBuffer->Size.QuadPart);
+            if (Buffer == nullptr)
             {
                 Status = STATUS_INSUFFICIENT_RESOURCES;
-                goto CLEAN_UP;
+                return Status;
             }
         }
+
+        if (Status != STATUS_NOT_IMPLEMENTED && UPK_FAILED(Status))
+        {
+            FreeMemory(DestinationBuffer->Buffer);
+            return Status;
+        }
+
+        Status = This->PostDecompressData(FileInfo, DestinationBuffer);
+
+        if (Status == STATUS_NOT_IMPLEMENTED)
+            Status = STATUS_SUCCESS;
+
+        if (UPK_FAILED(Status))
+            FreeMemory(DestinationBuffer->Buffer);
+
+        return Status;
     }
 };
 

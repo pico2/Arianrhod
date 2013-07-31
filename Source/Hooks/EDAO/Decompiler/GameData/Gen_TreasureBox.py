@@ -1,5 +1,5 @@
 from ml import *
-import ItemNameMap
+from ItemNameMap import *
 
 scena_path = 'J:\\Falcom\\ED_AO\\data\\scena\\'
 
@@ -113,7 +113,10 @@ def main():
                 item = l[idx + len(prefix):]
                 item = item[:item.find(', ')]
 
-                current_item = item
+                if not eval('%s in ItemTrueNameMap' % item):
+                    continue
+
+                current_item = eval('ItemTrueNameMap[%s]' % item)
 
             elif l.startswith('SetScenarioFlags'):
 

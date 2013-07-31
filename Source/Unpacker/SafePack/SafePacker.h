@@ -730,6 +730,8 @@ Pack(
         {
             SET_FLAG(Entry->Flags, UNPACKER_ENTRY_COMPRESSED);
 
+            Entry->FileSize.QuadPart = DestinationBuffer.Size.QuadPart;
+
             WriteBuffer = DestinationBuffer.Buffer;
             WriteSize   = (ULONG_PTR)DestinationBuffer.Size.QuadPart;
         }

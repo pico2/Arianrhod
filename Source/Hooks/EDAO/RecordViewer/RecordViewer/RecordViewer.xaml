@@ -13,6 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Fluent;Component/Themes/Metro/White.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <FontFamily x:Key="DefaultFontFamily">SIMHEI</FontFamily>
         </ResourceDictionary>
 
     </Fluent:MetroWindow.Resources>
