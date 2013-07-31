@@ -29,6 +29,8 @@ namespace RecordViewer
         {
             InitializeComponent();
 
+            Ribbon.Localization.Culture = new System.Globalization.CultureInfo("zh-CN");
+
             TabPanelMap = new Dictionary<RVTabItem, PanelContext>();
 
             TabPanelMap[tabTreasureBox] = new TreasureBoxHunter(viewerData);
@@ -41,6 +43,7 @@ namespace RecordViewer
             this.AllowDrop = true;
 
             OriginalTitle = this.Title;
+
         }
 
         void OnDrop(object sender, DragEventArgs e)
@@ -92,7 +95,6 @@ namespace RecordViewer
 
         void OnBtnOpenSaveData(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("fuck", null, MessageBoxButton.OKCancel, MessageBoxImage.Asterisk);
         }
 
         void OnBtnExit(object sender, RoutedEventArgs e)

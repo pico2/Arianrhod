@@ -2,38 +2,59 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
-        xmlns:RecordViewer="clr-namespace:RecordViewer"
+        xmlns:RV="clr-namespace:RecordViewer"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         x:Class="RecordViewer.RecordViewerMainWindow"
         Title="星辰の間"
         WindowStartupLocation="CenterScreen"
-        RibbonThemeColor="#FF217346">
+        RibbonThemeColor="#FF217346"
+>
     <Fluent:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Fluent;Component/Themes/Metro/White.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <FontFamily x:Key="DefaultFontFamily">SIMHEI</FontFamily>
         </ResourceDictionary>
 
     </Fluent:MetroWindow.Resources>
 
-    <Grid>
+    <Grid TextElement.FontFamily="Microsoft YaHei" TextElement.FontSize="13">
         <Fluent:Ribbon x:Name="ribbon" Height="135">
             <Fluent:Ribbon.Menu>
                 <Fluent:Backstage>
                     <Fluent:BackstageTabControl>
 
-                        <Fluent:Button
-                            Header="Open SaveData"
-                            Fluent:KeyTip.Keys="O"
-                            Click="OnBtnOpenSaveData"
-                        />
+                        <RV:RVBackstageTabItem
+                            Header="存档列表"
+                            Fluent:KeyTip.Keys="S"
+                        >
+
+                            <Grid
+                                Margin="50"
+                                MinWidth="0"
+                                Width="Auto"
+                                HorizontalAlignment="Stretch"
+                            >
+
+                                <TextBlock
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    MinWidth="0"
+                                    TextWrapping="Wrap"
+                                    Foreground="Black"
+                                >
+                                    游戏路径
+
+                                </TextBlock>
+
+                            </Grid>
+
+                        </RV:RVBackstageTabItem>
 
                         <Fluent:SeparatorTabItem />
 
-                        <Fluent:Button
-                            Header="Exit"
+                        <RV:RVButton
+                            Header="退出"
                             Fluent:KeyTip.Keys="X"
                             Click="OnBtnExit"
                         />
@@ -42,25 +63,25 @@
                 </Fluent:Backstage>
             </Fluent:Ribbon.Menu>
 
-            <RecordViewer:RVTabItem
+            <RV:RVTabItem
                 x:Name="tabTreasureBox"
                 Header="宝箱猎人"
                 Fluent:KeyTip.Keys="G"
             >
 
-            </RecordViewer:RVTabItem>
+            </RV:RVTabItem>
 
         </Fluent:Ribbon>
 
-        <RecordViewer:LowerPanel x:Name="lowerPanel" Margin="0,105,0,0">
+        <RV:LowerPanel x:Name="lowerPanel" Margin="0,105,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <RecordViewer:PanelContext x:Name="Context" />
-        </RecordViewer:LowerPanel>
+            <RV:PanelContext x:Name="Context" />
+        </RV:LowerPanel>
         
     </Grid>
 

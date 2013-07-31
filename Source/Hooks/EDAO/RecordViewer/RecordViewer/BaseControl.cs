@@ -6,8 +6,40 @@ using System.Threading.Tasks;
 
 namespace RecordViewer
 {
+    class DefaultValues
+    {
+        public static String DefaultFontFamily = "Microsoft YaHei";
+        public static Double DefaultFontSize = 14;
+
+        static public void SetDefaultValues(System.Windows.Controls.Control ctrl)
+        {
+            ctrl.FontFamily = new System.Windows.Media.FontFamily(DefaultValues.DefaultFontFamily);
+            ctrl.FontSize = DefaultValues.DefaultFontSize;
+        }
+    }
+
+    public class RVButton : Fluent.Button
+    {
+        public RVButton()
+        {
+            DefaultValues.SetDefaultValues(this);
+        }
+    }
+
     public class RVTabItem : Fluent.RibbonTabItem
     {
+        public RVTabItem()
+        {
+            DefaultValues.SetDefaultValues(this);
+        }
+    }
+
+    public class RVBackstageTabItem : Fluent.BackstageTabItem
+    {
+        public RVBackstageTabItem()
+        {
+            DefaultValues.SetDefaultValues(this);
+        }
     }
 
     public class PanelContext : System.Windows.Controls.Grid
