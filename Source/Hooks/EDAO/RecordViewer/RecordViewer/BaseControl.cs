@@ -6,6 +6,25 @@ using System.Threading.Tasks;
 
 namespace RecordViewer
 {
+    public class Tasks : System.Collections.ObjectModel.ObservableCollection<String>
+    {
+        public Tasks() : base()
+        {
+            Add("Groceries");
+            Add("Laundry");
+            Add("Email");
+            Add("Clean");
+            Add("Dinner");
+            Add("Proposals");
+            Add("Groceries");
+            Add("Laundry");
+            Add("Email");
+            Add("Clean");
+            Add("Dinner");
+            Add("Proposals");
+        }
+    }
+
     class DefaultValues
     {
         public static String DefaultFontFamily = "Microsoft YaHei";

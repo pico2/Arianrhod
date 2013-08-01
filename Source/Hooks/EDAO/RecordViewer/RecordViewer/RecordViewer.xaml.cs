@@ -44,6 +44,7 @@ namespace RecordViewer
 
             OriginalTitle = this.Title;
 
+            saveDataList.ItemsSource = new Tasks();
         }
 
         void OnDrop(object sender, DragEventArgs e)

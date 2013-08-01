@@ -656,10 +656,42 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
-#include "E:\Desktop\lst.h"
+#define PROPERTY(t,n)  __declspec( property ( put = property__set_##n, get = property__get_##n ) ) t n;\
+	typedef t property__tmp_type_##n
+#define READONLY_PROPERTY(t,n) __declspec( property (get = property__get_##n) ) t n;\
+	typedef t property__tmp_type_##n
+#define WRITEONLY_PROPERTY(t,n) __declspec( property (put = property__set_##n) ) t n;\
+	typedef t property__tmp_type_##n
+
+#define GET(n) property__tmp_type_##n property__get_##n()
+#define SET(n) void property__set_##n(const property__tmp_type_##n& value)
+
+class Vector2
+{
+public:
+    float x;
+    float y;
+
+    READONLY_PROPERTY(float, Length);
+    GET(Length)
+    {
+        return sqrt((x*x + y*y));
+    }
+};
+
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    Vector2 vec;
+    vec.x = 1;
+	vec.y = 1;
+
+    PrintConsoleW(L"%d\n", vec.Length);
+
+    return;
+
+#include "E:\Desktop\lst.h"
+
     Trie tree;
     StaticTrieT<> statictree;
     PVOID compact;

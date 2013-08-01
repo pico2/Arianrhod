@@ -10,7 +10,38 @@
         RibbonThemeColor="#FF217346"
 >
     <Fluent:MetroWindow.Resources>
+
         <ResourceDictionary>
+            <DataTemplate x:Key="myTaskTemplate">
+                <Border Name="border" BorderBrush="Black" BorderThickness="1" Padding="5" Margin="5">
+                    <Grid ScrollViewer.CanContentScroll="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Image Stretch="Fill" Width="288" Height="160" Source="D:/galgame/Falcom/ED_AO/savedata/SAV0007/icon0.png" />
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="2013/06/15 00:17"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="终章　～即使如此，我们也……～" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="梅尔卡瓦　　Nightmare"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="PlayTime 79:17:54"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="　阿瑞安赫德  Lv150   　莉夏        Lv150"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="　艾莉        Lv150   　缇欧        Lv150"/>
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="　兰迪        Lv150   　罗伊德      Lv150"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Fluent;Component/Themes/Metro/White.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -29,25 +60,12 @@
                             Fluent:KeyTip.Keys="S"
                         >
 
-                            <Grid
-                                Margin="50"
-                                MinWidth="0"
+                            <ListBox x:Name="saveDataList"
                                 Width="Auto"
-                                HorizontalAlignment="Stretch"
-                            >
-
-                                <TextBlock
-                                    Margin="0,0,0,0"
-                                    HorizontalAlignment="Left"
-                                    MinWidth="0"
-                                    TextWrapping="Wrap"
-                                    Foreground="Black"
-                                >
-                                    游戏路径
-
-                                </TextBlock>
-
-                            </Grid>
+                                Margin="20,100,20,50"
+                                 ItemTemplate="{StaticResource myTaskTemplate}"
+                                 HorizontalContentAlignment="Stretch"
+                            />
 
                         </RV:RVBackstageTabItem>
 
