@@ -9,9 +9,22 @@
 >
 
     <Grid>
-        <TextBlock Foreground="Red" Margin="10" ><Run Text="存档路径"/></TextBlock>
-        <TextBox Foreground="Red"  Height="23" TextWrapping="Wrap" Width="120">fuck</TextBox>
-        <!--ListBox Margin="0,50,0,0"  Background="Black" x:Name="saveDataList" ScrollViewer.CanContentScroll="False" /-->
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="10" >
+                <TextBlock DockPanel.Dock="Left" Foreground="Black" ><Run Text="存档路径"/></TextBlock>
+                <TextBox
+                    MinWidth="500"
+                    x:Name="saveDataPathTextBox"
+                    Margin="10,0"
+                    Foreground="Black"
+                    MouseDoubleClick="saveDataPath_MouseDoubleClick"
+                />
+
+                <Button x:Name="refreshSaveList" Click="refreshSaveList_Click" >重新加载存档</Button>
+
+            </DockPanel>
+            <ListBox Margin="0,50,0,0"  Background="Black" x:Name="saveDataList" ScrollViewer.CanContentScroll="False" />
+        </DockPanel>
     </Grid>
 
 </RV:PanelContext>

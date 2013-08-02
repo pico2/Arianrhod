@@ -682,11 +682,7 @@ public:
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    Vector2 vec;
-    vec.x = 1;
-	vec.y = 1;
-
-    PrintConsoleW(L"%d\n", vec.Length);
+    PrintConsoleW(L"%d\n", argc % 4);
 
     return;
 

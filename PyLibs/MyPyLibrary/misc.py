@@ -18,7 +18,11 @@ ForceInline ULONG HashAPI(PCChar pszName)
 
 def rol32(val, shift):
     val &= 0xFFFFFFFF
-    return (val << shift) | (val >> (32 - shift))
+    return ((val << shift) | (val >> (32 - shift))) & 0xFFFFFFFF
+
+def ror32(val, shift):
+    val &= 0xFFFFFFFF
+    return ((val >> shift) | (val << (32 - shift))) & 0xFFFFFFFF
 
 def HashAPI(str):
     hash = 0
