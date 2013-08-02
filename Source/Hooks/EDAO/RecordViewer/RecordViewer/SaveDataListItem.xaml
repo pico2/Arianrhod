@@ -20,25 +20,25 @@
 
                 <Grid Width="329">
 
-                    <TextBlock x:Name="CharacterName1" Margin="-24,5,252,0" ><Run Text="阿瑞安赫德"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel1" Margin="82,5,143,0" ><Run Text="Lv150"/></TextBlock>
-                    <TextBlock x:Name="CharacterName2" Margin="186,5,9,0" ><Run Text="莉夏"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel2" Margin="260,5,0,0" ><Run Text="Lv150"/></TextBlock>
+                    <TextBlock x:Name="CharacterName1" Margin="-24,5,252,0" />
+                    <TextBlock x:Name="CharacterLevel1" Margin="82,5,143,0" />
+                    <TextBlock x:Name="CharacterName2" Margin="186,5,9,0" />
+                    <TextBlock x:Name="CharacterLevel2" Margin="260,5,0,0" />
 
-                    <TextBlock x:Name="CharacterName3" Margin="-24,26,252,-21" ><Run Text="艾莉"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel3" Margin="82,26,143,-21" ><Run Text="Lv150"/></TextBlock>
-                    <TextBlock x:Name="CharacterName4" Margin="186,26,9,-21" ><Run Text="缇欧"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel4" Margin="260,26,0,-21" ><Run Text="Lv150"/></TextBlock>
+                    <TextBlock x:Name="CharacterName3" Margin="-24,26,252,-21" />
+                    <TextBlock x:Name="CharacterLevel3" Margin="82,26,143,-21" />
+                    <TextBlock x:Name="CharacterName4" Margin="186,26,9,-21" />
+                    <TextBlock x:Name="CharacterLevel4" Margin="260,26,0,-21" />
 
-                    <TextBlock x:Name="CharacterName5" Margin="-24,47,252,-42" ><Run Text="兰迪"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel5" Margin="82,47,143,-42" ><Run Text="Lv150"/></TextBlock>
-                    <TextBlock x:Name="CharacterName6" Margin="186,47,9,-42" ><Run Text="罗伊德"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel6" Margin="260,47,0,-42" ><Run Text="Lv150"/></TextBlock>
+                    <TextBlock x:Name="CharacterName5" Margin="-24,47,252,-42" />
+                    <TextBlock x:Name="CharacterLevel5" Margin="82,47,143,-42" />
+                    <TextBlock x:Name="CharacterName6" Margin="186,47,9,-42" />
+                    <TextBlock x:Name="CharacterLevel6" Margin="260,47,0,-42" />
 
-                    <!--TextBlock x:Name="CharacterName7" Margin="-24,68,252,-63" ><Run Text="阿瑞安赫德"/></TextBlock>
+                    <TextBlock x:Name="CharacterName7" Margin="-24,68,252,-63" ><Run Text="阿瑞安赫德"/></TextBlock>
                     <TextBlock x:Name="CharacterLevel7" Margin="82,68,143,-63" ><Run Text="Lv150"/></TextBlock>
                     <TextBlock x:Name="CharacterName8" Margin="186,68,9,-63" ><Run Text="莉夏"/></TextBlock>
-                    <TextBlock x:Name="CharacterLevel8" Margin="260,68,0,-63" ><Run Text="Lv150"/></TextBlock-->
+                    <TextBlock x:Name="CharacterLevel8" Margin="260,68,0,-63" ><Run Text="Lv150"/></TextBlock>
 
                 </Grid>
 

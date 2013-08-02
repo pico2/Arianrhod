@@ -22,7 +22,7 @@
     <Grid TextElement.FontFamily="Microsoft YaHei" TextElement.FontSize="13">
         <Fluent:Ribbon x:Name="ribbon" Height="135">
             <Fluent:Ribbon.Menu>
-                <Fluent:Backstage>
+                <Fluent:Backstage x:Name="backstage">
                     <Fluent:BackstageTabControl>
 
                         <RV:RVBackstageTabItem

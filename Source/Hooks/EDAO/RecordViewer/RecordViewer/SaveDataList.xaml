@@ -23,7 +23,7 @@
                 <Button x:Name="refreshSaveList" Click="refreshSaveList_Click" >重新加载存档</Button>
 
             </DockPanel>
-            <ListBox Margin="0,50,0,0"  Background="Black" x:Name="saveDataList" ScrollViewer.CanContentScroll="False" />
+            <ListBox Margin="0,50,0,0"  Background="Black" x:Name="saveDataList" ScrollViewer.CanContentScroll="False" SelectionChanged="saveDataList_SelectionChanged" />
         </DockPanel>
     </Grid>
 

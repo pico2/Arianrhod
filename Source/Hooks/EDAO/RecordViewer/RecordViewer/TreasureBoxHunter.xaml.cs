@@ -22,7 +22,6 @@ namespace RecordViewer
     {
         Dictionary<String, ItemInformation> ItemIdMap;
         Dictionary<String, String> HeaderPropertyMap;
-        RecordViewerData viewerData = null;
 
         GridViewColumnHeader    lastHeaderClicked = null;
         ListSortDirection       lastDirection = ListSortDirection.Ascending;
@@ -137,11 +136,9 @@ namespace RecordViewer
             return XamlReader.Parse(xaml, context) as DataTemplate;
         }
 
-        public TreasureBoxHunter(RecordViewerData viewerData)
+        public TreasureBoxHunter()
         {
             InitializeComponent();
-
-            this.viewerData = viewerData;
 
             ItemIdMap = new Dictionary<String, ItemInformation>();
             HeaderPropertyMap = new Dictionary<String, String>();
@@ -202,7 +199,7 @@ namespace RecordViewer
 
         override public void Refresh()
         {
-            EDAOSaveData saveData = viewerData.GetSaveData();
+            EDAOSaveData saveData = GlobalData.CurrentSaveData;
 
             treasureBoxList.Items.Clear();
 

@@ -13,5 +13,14 @@ namespace RecordViewer
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            System.Windows.MessageBox.Show(e.ExceptionObject.ToString());
+        }
     }
 }

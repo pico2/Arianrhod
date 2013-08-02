@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace RecordViewer
 {
@@ -26,39 +27,91 @@ namespace RecordViewer
 
             saveDataPathTextBox.Text = savePath;
 
-            for (int i = 0; i != 10; ++i)
+            RefreshSaveData();
+        }
+
+        List<String> QuerySaveDatas(String SaveDataPath)
+        {
+            return new List<String>(Directory.EnumerateDirectories(SaveDataPath));
+        }
+
+        void RefreshSaveData()
+        {
+            List<String> list;
+
+            saveDataList.Items.Clear();
+
+            try
             {
-                var btn = new SaveDataListItem();
+                list = QuerySaveDatas(savePath);
+            }
+            catch
+            {
+                return;
+            }
 
-                btn.thumb.Source = new BitmapImage(new Uri(String.Format(@"J:\Falcom\ED_AO\savedata\SAV{0:D4}\icon0.png", i + 1)));
+            foreach (var save in list)
+            {
+                try
+                {
+                    EDAOSaveData savedata = new EDAOSaveData(save + "\\savedata.dat");
 
-                saveDataList.Items.Add(btn);
+                    var item = new SaveDataListItem(savedata);
+                    this.saveDataList.Items.Add(item);
+                }
+                catch
+                {
+                }
             }
         }
 
         private void saveDataPath_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            // Windows API code pack
-            // http://www.cnblogs.com/wdhust/archive/2010/06/07/1753200.html
+            try
+            {
+                var dialog = new Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog();
 
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            System.Windows.Forms.DialogResult result;
+                dialog.IsFolderPicker = true;
+                dialog.InitialDirectory = savePath;
+                dialog.DefaultFileName = savePath;
 
-            dialog.SelectedPath = savePath;
-            
-            result = dialog.ShowDialog();
+                var result = dialog.ShowDialog();
 
-            if (result != System.Windows.Forms.DialogResult.OK)
-                return;
+                if (result != Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
+                    return;
 
-            savePath = dialog.SelectedPath;
+                savePath = dialog.FileName;
+            }
+            catch (System.PlatformNotSupportedException)
+            {
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+
+                dialog.SelectedPath = savePath;
+
+                var result = dialog.ShowDialog();
+
+                if (result != System.Windows.Forms.DialogResult.OK)
+                    return;
+
+                savePath = dialog.SelectedPath;
+            }
+
             saveDataPathTextBox.Text = savePath;
         }
 
         private void refreshSaveList_Click(object sender, RoutedEventArgs e)
         {
             savePath = saveDataPathTextBox.Text;
-            System.Windows.MessageBox.Show(savePath);
+
+            RefreshSaveData();
+        }
+
+        private void saveDataList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+                return;
+
+            GlobalData.NotifySaveDataChange((e.AddedItems[0] as SaveDataListItem).saveData);
         }
     }
 }

@@ -22,7 +22,6 @@ namespace RecordViewer
     public partial class RecordViewerMainWindow : Fluent.MetroWindow
     {
         Dictionary<RVTabItem, PanelContext> TabPanelMap;
-        RecordViewerData viewerData = new RecordViewerData();
         String OriginalTitle;
 
         public RecordViewerMainWindow()
@@ -33,7 +32,7 @@ namespace RecordViewer
 
             TabPanelMap = new Dictionary<RVTabItem, PanelContext>();
 
-            TabPanelMap[tabTreasureBox] = new TreasureBoxHunter(viewerData);
+            TabPanelMap[tabTreasureBox] = new TreasureBoxHunter();
 
             this.MinWidth = 500;
             this.MinHeight = 400;
@@ -43,6 +42,22 @@ namespace RecordViewer
             this.AllowDrop = true;
 
             OriginalTitle = this.Title;
+
+            GlobalData.SaveDataChangeHandler = SaveDataChangeDelegate;
+        }
+
+        void SaveDataChangeDelegate(EDAOSaveData NewSaveData)
+        {
+            GlobalData.CurrentSaveData = NewSaveData;
+
+            if (NewSaveData != null)
+            {
+                this.Title = this.OriginalTitle + ": " + NewSaveData.FileName;
+            }
+
+            backstage.IsOpen = false;
+
+            Ribbon_SelectedTabChanged(this.ribbon, null);
         }
 
         void OnDrop(object sender, DragEventArgs e)
@@ -62,19 +77,7 @@ namespace RecordViewer
             if ((Attributes & System.IO.FileAttributes.Directory) != 0)
                 FileName = FileName + "\\savedata.dat";
 
-            try
-            {
-                viewerData.OpenSaveData(FileName);
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-                return;
-            }
-
-            this.Title = OriginalTitle + ": " + FileName;
-
-            Ribbon_SelectedTabChanged(this.ribbon, null);
+            GlobalData.NotifySaveDataChange(new EDAOSaveData(FileName));
         }
 
         void Ribbon_SelectedTabChanged(object sender, SelectionChangedEventArgs e)
