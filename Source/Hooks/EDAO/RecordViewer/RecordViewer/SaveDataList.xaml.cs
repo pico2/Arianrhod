@@ -105,13 +105,5 @@ namespace RecordViewer
 
             RefreshSaveData();
         }
-
-        private void saveDataList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count == 0)
-                return;
-
-            GlobalData.NotifySaveDataChange((e.AddedItems[0] as SaveDataListItem).saveData);
-        }
     }
 }

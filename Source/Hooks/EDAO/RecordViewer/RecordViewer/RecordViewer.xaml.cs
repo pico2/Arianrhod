@@ -34,9 +34,6 @@ namespace RecordViewer
 
             TabPanelMap[tabTreasureBox] = new TreasureBoxHunter();
 
-            this.MinWidth = 500;
-            this.MinHeight = 400;
-
             ribbon.SelectedTabChanged += Ribbon_SelectedTabChanged;
             this.Drop += OnDrop;
             this.AllowDrop = true;
@@ -46,7 +43,7 @@ namespace RecordViewer
             GlobalData.SaveDataChangeHandler = SaveDataChangeDelegate;
         }
 
-        void SaveDataChangeDelegate(EDAOSaveData NewSaveData)
+        void SaveDataChangeDelegate(EDAOSaveData NewSaveData, bool SwitchToMainWindow = false)
         {
             GlobalData.CurrentSaveData = NewSaveData;
 
@@ -55,7 +52,8 @@ namespace RecordViewer
                 this.Title = this.OriginalTitle + ": " + NewSaveData.FileName;
             }
 
-            backstage.IsOpen = false;
+            if (SwitchToMainWindow)
+                this.backstage.IsOpen = false;
 
             Ribbon_SelectedTabChanged(this.ribbon, null);
         }
@@ -95,13 +93,17 @@ namespace RecordViewer
             lowerPanel.SwapPanelContext(context);
         }
 
-        void OnBtnOpenSaveData(object sender, RoutedEventArgs e)
-        {
-        }
-
         void OnBtnExit(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void RecordViewerMainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.MinWidth = this.Width;
+            this.MinHeight = this.Height;
+
+            this.Loaded -= RecordViewerMainWindow_Loaded;
         }
     }
 }

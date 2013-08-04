@@ -62,5 +62,10 @@ namespace RecordViewer
             this.CharacterName8.Text = saveData.characters[7];
             this.CharacterLevel8.Text = saveData.levels[7];
         }
+
+        private void SaveDataListItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            GlobalData.NotifySaveDataChange(this.saveData, true);
+        }
     }
 }

@@ -1,13 +1,14 @@
 ﻿<Fluent:MetroWindow
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
-        xmlns:RV="clr-namespace:RecordViewer"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"
-        x:Class="RecordViewer.RecordViewerMainWindow"
-        Title="星辰の間"
-        WindowStartupLocation="CenterScreen"
-        RibbonThemeColor="#FF217346"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
+    xmlns:RV="clr-namespace:RecordViewer"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
+    x:Class="RecordViewer.RecordViewerMainWindow"
+    Title="星辰の間"
+    WindowStartupLocation="CenterScreen"
+    RibbonThemeColor="#FF217346"
+    Loaded="RecordViewerMainWindow_Loaded"
 >
     <Fluent:MetroWindow.Resources>
 
