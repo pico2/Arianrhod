@@ -1,5 +1,5 @@
 @echo off
-cd/d "%~dp0\QQ2009\Bin"
+cd/d "%~dp0\Files\Bin"
 
 set DEBUG=
 
@@ -8,6 +8,8 @@ for %%f in (auclt.exe QQApp.exe QQExternal.exe QQPI.exe QQSafeUD.exe StorageTool
 )
 
 cd..
+
+rd/s/q QQProtect
 
 del QQUninst.exe txupd.exe
 
