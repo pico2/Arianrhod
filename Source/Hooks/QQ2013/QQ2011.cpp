@@ -40,6 +40,7 @@ BOOL (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
 HRESULT (NTAPI *StubPlatformCore_QueryInterface)(PVOID Object, REFGUID Guid, PVOID Output);
 VOID (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
 HRESULT (FASTCALL *StubOnSysDataCome)(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2);
+TYPE_OF(Util::Group::CheckMsgImage) StubCheckMsgImage;
 
 
 BOOL IsQQUINSpecified()
@@ -350,14 +351,14 @@ QqCreateWaitQQProtectThread(
         if (BasicInfo.UniqueProcessId != CurrentPid())
             break;
 
-        ZwClose((HANDLE)Parameter);
-
         AllocStack(16);
         Ebp = *((PVOID *)_AddressOfReturnAddress() - 1);
 
         CallCreateQQProtectExchangeWindow = *((PVOID *)Ebp + 1);
         if (*(PBYTE)CallCreateQQProtectExchangeWindow != CALL)
             break;
+
+        ZwClose((HANDLE)Parameter);
 
         *(PULONG_PTR)((PVOID *)Ebp + 1) += GetOpCodeSize(CallCreateQQProtectExchangeWindow);
 
@@ -644,6 +645,24 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
     return StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
 }
 
+BOOL CDECL CheckMsgImage(PVOID GroupObject, CTXStringW &Message)
+{
+    BOOL Success;
+
+    Success = StubCheckMsgImage(GroupObject, Message);
+
+    if (!Success && !Message.IsEmpty())
+    {
+        if (wcsstr(Message.Buffer, L"·¢ËÍ") != nullptr)
+        {
+            Success = TRUE;
+            Message.Empty();
+        }
+    }
+
+    return Success;
+}
+
 PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes)
 {
     PVOID StringValue, StringReference;
@@ -839,6 +858,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
 
+    InitializeQqFunctionTable();
+
 
     /************************************************************************
       msvcrxx
@@ -942,6 +963,18 @@ BOOL Initialize(PVOID BaseAddress)
 
 
     /************************************************************************
+      KernelUtil
+
+        CF_Group_Image_TooManyImage
+    ************************************************************************/
+
+    MEMORY_FUNCTION_PATCH Function_KernelUtil[] =
+    {
+        INLINE_HOOK_JUMP(Util::Group::CheckMsgImage, CheckMsgImage, StubCheckMsgImage),
+    };
+
+
+    /************************************************************************
       AppMisc
 
         L"PluginListCheck"
@@ -1032,6 +1065,7 @@ BOOL Initialize(PVOID BaseAddress)
     PATCH_ARRAY *Entry, Array[] =
     {
         { nullptr,              Patch_HummerEngine,     countof(Patch_HummerEngine) },
+        { nullptr,              nullptr,                0,                          Function_KernelUtil, countof(Function_KernelUtil)},
         { nullptr,              nullptr,                0,                          Function_AppUtil,    countof(Function_AppUtil)   },
         { nullptr,              nullptr,                0,                          Function_AppMisc,    countof(Function_AppMisc)   },
         { nullptr,              nullptr,                0,                          Function_MainFrame,  countof(Function_MainFrame) },
@@ -1042,7 +1076,6 @@ BOOL Initialize(PVOID BaseAddress)
         { nullptr,              nullptr,                0,                          Function_psapi,      countof(Function_psapi)     },
         { nullptr,              nullptr,                0,                          Function_user32,     countof(Function_user32)    },
     };
-
 
     FOR_EACH_ARRAY(Entry, Array)
     {

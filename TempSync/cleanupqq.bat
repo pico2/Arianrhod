@@ -1,6 +1,8 @@
 @echo off
 cd/d "%~dp0\Files\Bin"
 
+copy ..\..\QQ2013\Bin\Amano.dll .
+
 set DEBUG=
 
 for %%f in (auclt.exe QQApp.exe QQExternal.exe QQPI.exe QQSafeUD.exe StorageTool.exe Tencentdl.exe Timwp.exe TXPlatform.exe QScanEngine.dll) do (
@@ -10,6 +12,8 @@ for %%f in (auclt.exe QQApp.exe QQExternal.exe QQPI.exe QQSafeUD.exe StorageTool
 cd..
 
 rd/s/q QQProtect
+
+echo D|xcopy /y /e ..\QQ2013\Misc\Sound .\Misc\Sound
 
 del QQUninst.exe txupd.exe
 

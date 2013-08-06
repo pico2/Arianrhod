@@ -682,7 +682,7 @@ public:
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    PrintConsoleW(L"%d\n", argc % 4);
+    DbgBreakPoint();
 
     return;
 

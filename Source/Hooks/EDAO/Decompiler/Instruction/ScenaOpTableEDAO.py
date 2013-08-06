@@ -244,14 +244,28 @@ for op, name in InstructionNames.items():
     expr = '%s = 0x%08X' % (name, op)
     exec(expr)
 
-SCPSTR_CODE_STRING      = -1
-SCPSTR_CODE_ITEM        = 0x1F
-SCPSTR_CODE_LINE_FEED   = 0x01
-SCPSTR_CODE_ENTER       = 0x02
-SCPSTR_CODE_CLEAR       = 0x03
-SCPSTR_CODE_05          = 0x05
-SCPSTR_CODE_COLOR       = 0x07
-SCPSTR_CODE_09          = 0x09
+
+def GetItemName(id):
+    return ItemNameMap[id] if id in ItemNameMap else '0x%X' % id
+
+
+ScpStrCodeMap = {}
+
+ScpStrCodeMap[-1]       = 'SCPSTR_CODE_STRING'
+ScpStrCodeMap[0x1F]     = 'SCPSTR_CODE_ITEM'
+ScpStrCodeMap[0x01]     = 'SCPSTR_CODE_LINE_FEED'
+ScpStrCodeMap[0x02]     = 'SCPSTR_CODE_ENTER'
+ScpStrCodeMap[0x03]     = 'SCPSTR_CODE_CLEAR'
+ScpStrCodeMap[0x05]     = 'SCPSTR_CODE_05'
+ScpStrCodeMap[0x07]     = 'SCPSTR_CODE_COLOR'
+ScpStrCodeMap[0x09]     = 'SCPSTR_CODE_09'
+
+for code, name in ScpStrCodeMap.items():
+    expr = '%s = %d' % (name, code)
+    exec(expr)
+
+def GetStrCode(code):
+    return ScpStrCodeMap[code] if code in ScpStrCodeMap else '0x%X' % code
 
 class ScpString:
     def __init__(self, CtrlCode, Value = None):
@@ -265,10 +279,15 @@ class ScpString:
         if self.CtrlCode == SCPSTR_CODE_STRING:
             return '"%s"' % self.Value
 
-        if self.Value == None:
-            return 'scpstr(0x%X)' % (self.CtrlCode)
+        value = self.Value
+        code = GetStrCode(self.CtrlCode)
 
-        return 'scpstr(0x%X, 0x%X)' % (self.CtrlCode, self.Value)
+        if value == None:
+            return 'scpstr(%s)' % code
+
+        value = GetItemName(value) if self.CtrlCode == SCPSTR_CODE_ITEM else '0x%X' % value
+
+        return 'scpstr(%s, %s)' % (code, value)
 
 def BuildStringListFromObjectList(strlist):
     s = []
@@ -415,9 +434,6 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
         def formatbgm(bgm):
             bgm = BGMFileIndex(bgm)
             return ('"%s"' % bgm.Name()) if not bgm.IsInvalid() else ('0x%08X' % (bgm.Index() & 0xFFFFFFFF))
-
-        def GetItemName(id):
-            return ItemNameMap[id] if id in ItemNameMap else '0x%X' % id
 
         oprtype = \
         {
