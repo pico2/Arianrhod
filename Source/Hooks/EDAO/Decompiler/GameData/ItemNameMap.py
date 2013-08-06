@@ -1427,8 +1427,6 @@ ItemTrueNameMap[0x0658] = "金耀翔天鞋"
 ItemTrueNameMap[0x0659] = "银耀星影鞋"
 ItemTrueNameMap[0x065A] = "斯托雷加Ω"
 
-for id, name in ItemNameMap.items():
-    exec("%s = 0x%04X" % (name, id))
+for id, name in ItemNameMap.items(): exec("%s = 0x%04X" % (name, id))
 
-for id, name in list(ItemTrueNameMap.items()):
-    exec('ItemTrueNameMap["%s"] = %d' % (name, id))
+for id, name in list(ItemTrueNameMap.items()): exec('ItemTrueNameMap["%s"] = %d' % (name, id))

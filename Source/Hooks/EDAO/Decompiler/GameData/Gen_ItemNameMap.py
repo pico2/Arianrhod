@@ -143,12 +143,10 @@ def main():
         lines.append('ItemTrueNameMap[0x%04X] = "%s"' % (id, truename))
 
     lines.append('')
-    lines.append('for id, name in ItemNameMap.items():')
-    lines.append('    exec("%s = 0x%04X" % (name, id))')
+    lines.append('for id, name in ItemNameMap.items(): exec("%s = 0x%04X" % (name, id))')
     lines.append('')
-
-    lines.append('for id, name in list(ItemTrueNameMap.items()):')
-    lines.append('''    exec('ItemTrueNameMap["%s"] = %d' % (name, id))''')
+    lines.append('''for id, name in list(ItemTrueNameMap.items()): exec('ItemTrueNameMap["%s"] = %d' % (name, id))''')
+    lines.append('')
 
     open('ItemNameMap.py', 'wb').write('\r\n'.join(lines).encode('UTF8'))
 
