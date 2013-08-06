@@ -1,5 +1,6 @@
 from ScenarioScript import *
 from Instruction.ScenaOpTableEDAO import *
+from GameData.ItemNameMap import *
 
 def plog(*value, sep = ' ', end = '\n', file = sys.stdout, flush = False):
     pass
@@ -408,6 +409,9 @@ def scpexpr(operation, *args):
 def scpstr(ctrlcode, value = None):
     if type(ctrlcode) == str:
         return ctrlcode
+
+    if ctrlcode == SCPSTR_CODE_ITEM and type(value) == str:
+        value = ItemTrueNameMap[value]
 
     ScpStrCtrlCode = \
     {

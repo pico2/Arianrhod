@@ -147,6 +147,9 @@ def main():
     lines.append('    exec("%s = 0x%04X" % (name, id))')
     lines.append('')
 
+    lines.append('for id, name in list(ItemTrueNameMap.items()):')
+    lines.append('''    exec('ItemTrueNameMap["%s"] = %d' % (name, id))''')
+
     open('ItemNameMap.py', 'wb').write('\r\n'.join(lines).encode('UTF8'))
 
 TryInvoke(main)

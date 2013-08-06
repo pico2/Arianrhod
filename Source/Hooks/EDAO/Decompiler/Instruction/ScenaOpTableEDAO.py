@@ -68,8 +68,8 @@ InstructionNames[0x37]  = 'OP_37'
 InstructionNames[0x38]  = 'OP_38'
 InstructionNames[0x39]  = 'AddSepith'
 InstructionNames[0x3A]  = 'SubSepith'
-InstructionNames[0x3B]  = 'OP_3B'
-InstructionNames[0x3C]  = 'OP_3C'
+InstructionNames[0x3B]  = 'AddMira'
+InstructionNames[0x3C]  = 'SubMira'
 InstructionNames[0x3D]  = 'OP_3D'
 InstructionNames[0x3E]  = 'OP_3E'
 InstructionNames[0x3F]  = 'AddItemNumber'
@@ -248,6 +248,9 @@ for op, name in InstructionNames.items():
 def GetItemName(id):
     return ItemNameMap[id] if id in ItemNameMap else '0x%X' % id
 
+def GetItemTrueName(id):
+    return '\'%s\'' % ItemTrueNameMap[id] if id in ItemTrueNameMap else '0x%X' % id
+
 
 ScpStrCodeMap = {}
 
@@ -285,7 +288,7 @@ class ScpString:
         if value == None:
             return 'scpstr(%s)' % code
 
-        value = GetItemName(value) if self.CtrlCode == SCPSTR_CODE_ITEM else '0x%X' % value
+        value = GetItemTrueName(value) if self.CtrlCode == SCPSTR_CODE_ITEM else '0x%X' % value
 
         return 'scpstr(%s, %s)' % (code, value)
 
@@ -408,7 +411,7 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             'E' : wexpr,
             'S' : wstr,
             'M' : lambda value : fs.wshort(BGMFileIndex(value).Index()),
-            'T' : lambda value : fs.wushort(value),
+            'T' : lambda value : fs.wushort(ItemTrueNameMap[value] if type(value) == str else value),
         }
 
         return oprtype[opr](value) if opr in oprtype else super().WriteOperand(data, opr, value)
@@ -440,7 +443,7 @@ class EDAOScenaInstructionTableEntry(InstructionTableEntry):
             'E' : lambda : FormatExpressionList(value),
             'S' : lambda : formatstr(value),
             'M' : lambda : BGMFileIndex(value).param(),
-            'T' : lambda : GetItemName(value),
+            'T' : lambda : GetItemTrueName(value),
         }
 
         return oprtype[opr]() if opr in oprtype else super().FormatOperand(param)
@@ -1692,10 +1695,10 @@ edao_op_list = \
     inst(AddCraft,                  'BW'),
     inst(OP_37),
     inst(OP_38,                     NO_OPERAND,             0,                          scp_38),
-    inst(AddSepith,                 'BW'),          # AddSepith(0~6, 0xFF, number)
-    inst(SubSepith,                 'BW'),
-    inst(OP_3B,                     'W'),
-    inst(OP_3C,                     'W'),
+    inst(AddSepith,                 'BH'),          # AddSepith(0~6 or 0xFF, number)
+    inst(SubSepith,                 'BH'),
+    inst(AddMira,                   'H'),
+    inst(SubMira,                   'H'),
     inst(OP_3D,                     'W'),
     inst(OP_3E,                     'W'),
     inst(AddItemNumber,             'Th'),
