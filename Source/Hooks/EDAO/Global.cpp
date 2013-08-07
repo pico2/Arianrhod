@@ -375,8 +375,6 @@ VOID HandleSingleKey(ULONG_PTR KeyCode, BOOL KeyPress)
     FLOAT   Delta;
     ULONG   Index;
 
-    extern BOOL Turbo;
-
     enum { X = 0, Y = 1, Z = 2, Z2 = 42 };
     enum
     {

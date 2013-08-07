@@ -16,6 +16,10 @@
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved);
 
+TYPE_OF(&NtOpenFile)            StubNtOpenFile;
+TYPE_OF(&NtCreateFile)          StubNtCreateFile;
+TYPE_OF(&NtQueryAttributesFile) StubNtQueryAttributesFile;
+
 
 void WriteLog(PCWSTR Format, ...)
 {
@@ -268,7 +272,7 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
         Redirected.Buffer           = Buffer;
 
         InitializeObjectAttributes(&oa, &Redirected, OBJ_CASE_INSENSITIVE, nullptr, 0);
-        Status = ZwQueryAttributesFile(&oa, &FileBasic);
+        Status = StubNtQueryAttributesFile(&oa, &FileBasic);
         if (
             NT_SUCCESS(Status) &&
             FileBasic.FileAttributes != INVALID_FILE_ATTRIBUTES &&
@@ -285,10 +289,6 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
 
     return STATUS_SUCCESS;
 }
-
-TYPE_OF(&NtOpenFile)            StubNtOpenFile;
-TYPE_OF(&NtCreateFile)          StubNtCreateFile;
-TYPE_OF(&NtQueryAttributesFile) StubNtQueryAttributesFile;
 
 NTSTATUS
 NTAPI
@@ -465,7 +465,7 @@ BOOL AoIsFileExist(PCSTR FileName)
         return FALSE;
 
     Status = GetRedirectedFileName(&FileToCheck, &RedirectedFile);
-    Exists = IsPathExists(NT_SUCCESS(Status) ? RedirectedFile.Buffer : FileToCheck.Buffer);
+    Exists = NT_SUCCESS(Status) || IsPathExists(FileToCheck.Buffer);
 
     RtlFreeUnicodeString(&FileToCheck);
     RtlFreeUnicodeString(&RedirectedFile);

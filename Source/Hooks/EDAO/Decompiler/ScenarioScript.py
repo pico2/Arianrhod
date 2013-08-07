@@ -1445,6 +1445,7 @@ class ScenarioInfo:
 
 
 def procfile(file):
+    SetConsoleTitle(os.path.basename(file))
     print('disasm %s' % file)
     scena = ScenarioInfo()
     scena.open(file)
