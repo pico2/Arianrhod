@@ -691,15 +691,30 @@ public:
     }
 };
 
+#include "E:\Desktop\lst.h"
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     Trie tree;
 
+    ml::MlInitialize();
 
+    tree.InitializeRootNode();
+    tree.BuildFromBytesList(ents, countof(ents));
+
+    PTRIE_BYTES_ENTRY ent;
+
+    FOR_EACH_ARRAY(ent, ents)
+    {
+        NODE_CONTEXT ctx = 0;
+
+        tree.LookupWithoutFailure(ent, &ctx);
+        if (ctx != ent->Context)
+            DbgBreakPoint();
+    }
 
     return;
-
+    
     NTSTATUS Status;
 
     Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);
