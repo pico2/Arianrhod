@@ -458,17 +458,15 @@ BOOL AoIsFileExist(PCSTR FileName)
 {
     BOOL            Exists;
     NTSTATUS        Status;
-    UNICODE_STRING  FileToCheck, RedirectedFile;
+    UNICODE_STRING  FileToCheck;
 
     Status = AnsiToUnicodeString(&FileToCheck, FileName);
     if (NT_FAILED(Status))
         return FALSE;
 
-    Status = GetRedirectedFileName(&FileToCheck, &RedirectedFile);
-    Exists = NT_SUCCESS(Status) || IsPathExists(FileToCheck.Buffer);
+    Exists = IsPathExists(FileToCheck.Buffer);
 
     RtlFreeUnicodeString(&FileToCheck);
-    RtlFreeUnicodeString(&RedirectedFile);
 
     return Exists;
 }
