@@ -582,8 +582,6 @@ BOOL Initialize(PVOID BaseAddress)
 
         PATCH_MEMORY(0x00,      1,  0x55F6E1),      // ±¨¡È
 
-        PATCH_MEMORY(0x1CEB,    2,  0x64ACFE),      // remove crappy mouse control @ PositionWindow
-
         // monster info
         PATCH_MEMORY(0xEB,      1,  0x626AC8),      // bypass check is enemy
 
@@ -601,6 +599,7 @@ BOOL Initialize(PVOID BaseAddress)
 
 #if !D3D9_VER
 
+        PATCH_MEMORY(0x1CEB,                2, 0x64ACFE),       // remove crappy mouse control @ PositionWindow
         PATCH_MEMORY(0x00,                  4, 0x329851),       // disable foolish get joy stick pos
         PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
         PATCH_MEMORY(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
