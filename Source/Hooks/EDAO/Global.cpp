@@ -427,6 +427,37 @@ CHANGE_CAMERA_DEGREE:
 
                     *(PFLOAT)PtrAdd(EDAO::GlobalGetEDAO()->GetScript()->GetCamera()->GetCameraInfo(), Index) += Delta;
                     break;
+
+                case DIK_LCONTROL:
+                case DIK_RCONTROL:
+                {
+                    CHAR            Buffer[0x200];
+                    PFLOAT          Coord;
+                    LONG            IntPart, FloatPart;
+                    EDAO           *edao;
+
+                    edao = EDAO::GlobalGetEDAO();
+                    Coord = PtrAdd(edao->GetChrCoord(), 0x80);
+                    if (Coord == (PFLOAT)0x80)
+                        break;
+
+                    IntPart = (LONG)Coord[X];
+                    FloatPart = (fabs(Coord[X]) - abs(IntPart)) * 1000;
+                    sprintf(Buffer, "X: %d.%d", IntPart, FloatPart);
+                    edao->DrawText(Buffer, 0, 0, 8, -1, -1, -1);
+
+                    IntPart = (LONG)Coord[Y];
+                    FloatPart = (fabs(Coord[Y]) - abs(IntPart)) * 1000;
+                    sprintf(Buffer, "Y: %d.%d", IntPart, FloatPart);
+                    edao->DrawText(Buffer, 0, 15, 8, -1, -1, -1);
+
+                    IntPart = (LONG)Coord[Z];
+                    FloatPart = (fabs(Coord[Z]) - abs(IntPart)) * 1000;
+                    sprintf(Buffer, "Z: %d.%d", IntPart, FloatPart);
+                    edao->DrawText(Buffer, 0, 30, 8, -1, -1, -1);
+
+                    break;
+                }
             }
     }
 }

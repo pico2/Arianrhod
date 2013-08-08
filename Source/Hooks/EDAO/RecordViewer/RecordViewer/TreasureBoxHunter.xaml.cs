@@ -51,13 +51,13 @@ namespace RecordViewer
             public String   Item                  { get; set; }
             public int      Line                  { get; set; }
             public String   File                  { get; set; }
-            public int      TriggerX              { get; set; }
-            public int      TriggerZ              { get; set; }
-            public int      TriggerY              { get; set; }
-            public int      TriggerRange          { get; set; }
-            public int      ActorX                { get; set; }
-            public int      ActorZ                { get; set; }
-            public int      ActorY                { get; set; }
+            public Double   TriggerX              { get; set; }
+            public Double   TriggerZ              { get; set; }
+            public Double   TriggerY              { get; set; }
+            public Double   TriggerRange          { get; set; }
+            public Double   ActorX                { get; set; }
+            public Double   ActorZ                { get; set; }
+            public Double   ActorY                { get; set; }
             public int      TalkScenaIndex        { get; set; }
             public int      TalkFunctionIndex     { get; set; }
             public String   Description           { get; set; }
@@ -102,13 +102,13 @@ namespace RecordViewer
                 this.Item               = Item;
                 this.Line               = Line;
                 this.File               = File;
-                this.TriggerX           = TriggerX;
-                this.TriggerZ           = TriggerZ;
-                this.TriggerY           = TriggerY;
-                this.TriggerRange       = TriggerRange;
-                this.ActorX             = ActorX;
-                this.ActorZ             = ActorZ;
-                this.ActorY             = ActorY;
+                this.TriggerX           = (Double)TriggerX / 1000;
+                this.TriggerZ           = (Double)TriggerZ / 1000;
+                this.TriggerY           = (Double)TriggerY / 1000;
+                this.TriggerRange       = (Double)TriggerRange / 1000;
+                this.ActorX             = (Double)ActorX / 1000;
+                this.ActorZ             = (Double)ActorZ / 1000;
+                this.ActorY             = (Double)ActorY / 1000;
                 this.TalkScenaIndex     = TalkScenaIndex;
                 this.TalkFunctionIndex  = TalkFunctionIndex;
                 this.Description        = Description;
@@ -149,9 +149,9 @@ namespace RecordViewer
                 new ListViewColumnItem("地图",    "Map",             20,    HorizontalAlignment.Center),
                 new ListViewColumnItem("物品",    "Item",            20,    HorizontalAlignment.Left),
                 new ListViewColumnItem("状态",    "Status",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("X",       "ActorX",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("Y",       "ActorY",          1,     HorizontalAlignment.Center),
-                new ListViewColumnItem("Z",       "ActorZ",          1,     HorizontalAlignment.Center),
+                new ListViewColumnItem("X",       "ActorX",          1,     HorizontalAlignment.Left),
+                new ListViewColumnItem("Y",       "ActorY",          1,     HorizontalAlignment.Left),
+                new ListViewColumnItem("Z",       "ActorZ",          1,     HorizontalAlignment.Left),
                 new ListViewColumnItem("描述",    "Description",     50,    HorizontalAlignment.Center),
             };
 
@@ -244,13 +244,13 @@ namespace RecordViewer
                 item.Item                   = y.Item;
                 item.Line                   = y.Line;
                 item.File                   = y.File;
-                item.TriggerX               = y.TriggerX;
-                item.TriggerZ               = y.TriggerZ;
-                item.TriggerY               = y.TriggerY;
-                item.TriggerRange           = y.TriggerRange;
-                item.ActorX                 = y.ActorX;
-                item.ActorZ                 = y.ActorZ;
-                item.ActorY                 = y.ActorY;
+                item.TriggerX               = (Double)y.TriggerX / 1000;
+                item.TriggerZ               = (Double)y.TriggerZ / 1000;
+                item.TriggerY               = (Double)y.TriggerY / 1000;
+                item.TriggerRange           = (Double)y.TriggerRange / 1000;
+                item.ActorX                 = (Double)y.ActorX / 1000;
+                item.ActorZ                 = (Double)y.ActorZ / 1000;
+                item.ActorY                 = (Double)y.ActorY / 1000;
                 item.TalkScenaIndex         = y.TalkScenaIndex;
                 item.TalkFunctionIndex      = y.TalkFunctionIndex;
                 item.Description            = y.Description;

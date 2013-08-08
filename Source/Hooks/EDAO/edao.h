@@ -1018,6 +1018,11 @@ public:
         return (this->*StubDrawNumber)(X, Y, Text, OneU1, Color, ZeroU1);
     }
 
+    VOID DrawText(PCSTR Text, LONG X, LONG Y, LONG FontSize, BYTE Red, BYTE Green, BYTE Blue)
+    {
+        DETOUR_METHOD(EDAO, DrawText, 0x87D710, Text, X, Y, FontSize, Red, Green, Blue);
+    }
+
     VOID THISCALL StubDrawRectangle(USHORT Layer, LONG Left, LONG Top, LONG Right, LONG Bottom, FLOAT ZeroF1, FLOAT ZeroF2, FLOAT ZeroF3, FLOAT ZeroF4, ULONG UpperLeftColor, ULONG UpperRightColor, ULONG ZeroU1,ULONG ZeroU2,ULONG ZeroU3,ULONG ZeroU4,ULONG ZeroU5,ULONG ZeroU6,FLOAT ZeroF5);
 
     NoInline

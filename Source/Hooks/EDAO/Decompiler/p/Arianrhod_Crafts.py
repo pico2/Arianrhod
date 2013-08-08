@@ -815,7 +815,7 @@ def unmask(enemy_version = False):
     SetCameraDistance(16000, 2000)
     AS_3D(100, 100, 100, 2000)
     AS_7F(0x7D0, 0xBBFFFFFF, 0x0, 0x1, 0x1)
-    PlayEffect(0xFF, 0xFF, 0x0, 0x1, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0x2)
+    PlayEffect(0xFF, 0xFF, 0x0, 0x1, 0, 0, 0, 0, 0, 0, 2000, 2000, 2000, 0x2)
     Sleep(2000)
     Yield()
     AS_7F(0x0, 0xBBFFFFFF, 0x0, 0x1, 0x5)
@@ -1452,14 +1452,48 @@ def 零时迷子():
 
 def 神速():
 
+    fade_time = 600
+
     AS_78(1)
-    #LoadEffect(1, "event/ev202_00.eff")
-    LoadEffect(0x1, "battle/sc031004.eff")
+    LoadEffect(1, "event/ev202_00.eff")
     AS_78(0)
 
-    PlayEffect(0xFF, 0xFF, 1, 1, 0, 1000, 0, 90, 0, 0, 1000, 1000, 1000, 1)
-    WaitEffect(-1, 1)
+    ChrSetPos(0x11, 0xFF, 0, 0, 0)
+
+    BeginChrThread(0xFF, 2, "SysCraft_Stand", 0x0)
+
+    ResetLookingTargetData()
+    LookingTargetAdd(0xFF, "", 0x0)
+    LookingTarget(0x64, 0x14, 0x1E)
+
+    Voice(0x0, 3858, 3862, 0, 0, 0xFE)
+
+    HideChr(-1, fade_time)
+    PlayEffect(0xFF, 0xFF, 1, 0, 0, 650, 0, 0, 0, 0, 1000, 1000, 1000, 1)
+
+    Sleep(fade_time)
     Yield()
 
-    Sleep(5000)
+    ChrSetPos(-1, CraftTarget.TargetPos, 0, 0, 0)
+    TurnDirection(-1, 0x11, 0, 0, 0x0)
+
+    ShowChr(-1, fade_time)
+    PlayEffect(0xFF, 0xFF, 1, 0, 0, 650, 0, 0, 0, 0, 1000, 1000, 1000, 2)
+
+    BeginChrThread(0xFF, 1, "loc_17C", 0x0)
+
+    Sleep(fade_time)
     Yield()
+
+    CancelEffect(-1, 1)
+    CancelEffect(-1, 2)
+    WaitChrThread(-1, 1)
+
+    ChrSetPos(0x11, CraftTarget.InitialPos, 0, 0, 0)
+
+    Sleep(fade_time)
+    Yield()
+
+    EndChrThread(-1, 2)
+    Yield()
+
