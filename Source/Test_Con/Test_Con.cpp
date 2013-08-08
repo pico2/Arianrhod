@@ -696,25 +696,48 @@ public:
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     Trie tree;
+    PVOID compact;
+    CompactTrie comp;
 
     ml::MlInitialize();
 
     tree.InitializeRootNode();
-    tree.BuildFromBytesList(ents, countof(ents));
+
+    PrintConsoleW(L"%p\n", tree.BuildFromBytesList(ents, countof(ents)));
+    PrintConsoleW(L"%d\n", tree.NodeCount);
+
+    PauseConsole(L"compact\n");
+
+    tree.BuildCompactTree(&compact, (PULONG_PTR)&argc);
+
+    {
+        NtFileDisk f;
+        f.Create(L"compact.bin");
+        f.Write(compact, argc);
+    }
+
+    comp.Initialize(compact, argc);
+
+    PrintConsoleW(L"lookup test\n");
 
     PTRIE_BYTES_ENTRY ent;
 
     FOR_EACH_ARRAY(ent, ents)
     {
-        NODE_CONTEXT ctx = 0;
+        NODE_CONTEXT context;
 
-        tree.LookupWithoutFailure(ent, &ctx);
-        if (ctx != ent->Context)
-            DbgBreakPoint();
+        context = -1;
+        comp.Lookup(ent, &context);
+        if (context != ent->Context)
+        {
+            PauseConsole((PWSTR)ent->Data);
+        }
     }
 
+    PauseConsole(L"done");
+
     return;
-    
+
     NTSTATUS Status;
 
     Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);

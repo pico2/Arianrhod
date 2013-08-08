@@ -151,13 +151,13 @@ protected:
 
 #else
 
-        UPK_STATUS                        Status;
+        UPK_STATUS                      Status;
         ULONG                           CompressionFormatAndEngine;
         PSAFE_PACK_COMPRESSED_HEADER    Header;
 
         Header = (PSAFE_PACK_COMPRESSED_HEADER)SourceBuffer->Buffer;
 
-        if (Header->CompressMethod != CompressMethodLZNT1)
+        if (Header->Magic != LZNT1_MAGIC || Header->CompressMethod != CompressMethodLZNT1)
             return STATUS_UNSUPPORTED_COMPRESSION;
 
         if (Header->OriginalSize.HighPart != 0)
@@ -358,9 +358,29 @@ public:
 
     NoInline PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName, ULONG_PTR Length)
     {
+        PWSTR               Buffer;
         NODE_CONTEXT        Index;
-        UPK_STATUS            Status;
-        TRIE_BYTES_ENTRY    Bytes = { (PVOID)FileName, Length * sizeof(FileName[0]) };
+        UPK_STATUS          Status;
+        TRIE_BYTES_ENTRY    Bytes;
+
+        Buffer = (PWSTR)AllocStack(Length * sizeof(FileName[0]));
+
+        Bytes.Data = Buffer;
+        Bytes.SizeInBytes = Length * sizeof(FileName[0]);
+
+        for (ULONG_PTR Count = Length; Count != 0; --Count)
+        {
+            WCHAR ch = *FileName++;
+
+            switch (ch)
+            {
+                case '/':
+                    ch = '\\';
+                    break;
+            }
+
+            *Buffer++ = ch;
+        }
 
         Status = this->LookupTable.Lookup(&Bytes, &Index);
         if (UPK_FAILED(Status))
