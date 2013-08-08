@@ -433,7 +433,7 @@ CHANGE_CAMERA_DEGREE:
                 {
                     CHAR            Buffer[0x200];
                     PFLOAT          Coord;
-                    LONG            IntPart, FloatPart;
+                    LONG            Integer, Decimal;
                     EDAO           *edao;
 
                     edao = EDAO::GlobalGetEDAO();
@@ -441,19 +441,19 @@ CHANGE_CAMERA_DEGREE:
                     if (Coord == (PFLOAT)0x80)
                         break;
 
-                    IntPart = (LONG)Coord[X];
-                    FloatPart = (fabs(Coord[X]) - abs(IntPart)) * 1000;
-                    sprintf(Buffer, "X: %d.%d", IntPart, FloatPart);
+                    Integer = Coord[X];
+                    Decimal = (fabs(Coord[X]) - abs(Integer)) * 1000;
+                    sprintf(Buffer, "X: %d.%d", Integer, Decimal);
                     edao->DrawText(Buffer, 0, 0, 8, -1, -1, -1);
 
-                    IntPart = (LONG)Coord[Y];
-                    FloatPart = (fabs(Coord[Y]) - abs(IntPart)) * 1000;
-                    sprintf(Buffer, "Y: %d.%d", IntPart, FloatPart);
+                    Integer = Coord[Y];
+                    Decimal = (fabs(Coord[Y]) - abs(Integer)) * 1000;
+                    sprintf(Buffer, "Y: %d.%d", Integer, Decimal);
                     edao->DrawText(Buffer, 0, 15, 8, -1, -1, -1);
 
-                    IntPart = (LONG)Coord[Z];
-                    FloatPart = (fabs(Coord[Z]) - abs(IntPart)) * 1000;
-                    sprintf(Buffer, "Z: %d.%d", IntPart, FloatPart);
+                    Integer = Coord[Z];
+                    Decimal = (fabs(Coord[Z]) - abs(Integer)) * 1000;
+                    sprintf(Buffer, "Z: %d.%d", Integer, Decimal);
                     edao->DrawText(Buffer, 0, 30, 8, -1, -1, -1);
 
                     break;
