@@ -278,7 +278,7 @@ def ArtsAria():
 def ArtsCast():
 
     Jc(0x2D, 0x3, 0x2, "arts_cast_skip_voice")
-    PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, 50, 0, 0, 0, 0, 65535, 65535, 65535, 0xFF)
+    PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, 50, 0, 0, 0, 0, 65535, 65535, 65535, 0)
     SoundEx(510, 0x0)
     TurnDirection(0xFF, 0xFB, 0x0, 0x1F4, 0x0)
     Sleep(200)
@@ -290,6 +290,7 @@ def ArtsCast():
     Voice(0x0, 3875, 3876, 0, 0, 0xFE)
     SetChrSubChip(0xFF, 0x4)
     Sleep(0)
+    CancelEffect(0xFF, 0)
     Yield()
 
     label("arts_cast_skip_voice")
@@ -704,6 +705,8 @@ def EnumaElish():
     Voice(0, 3873, 0, 0, 0, 0xFE)
 
     Call('ea_1_cancel_all_layers')
+
+    SoundEx(358, 0x0)
 
     PlayEffect(0xFF, 0xFF, eff_whirl, 0x04, 0, -1300, 0, 180, 0, 0, 5000, 5000, 5000, eff_whirl)
     EndChrThread(CraftTarget.Self, 1)
@@ -1466,7 +1469,7 @@ def 神速():
     LookingTargetAdd(0xFF, "", 0x0)
     LookingTarget(0x64, 0x14, 0x1E)
 
-    Voice(0x0, 3858, 3862, 0, 0, 0xFE)
+    Voice(0x0, 3858, 0, 0, 0, 0xFE)
 
     HideChr(-1, fade_time)
     PlayEffect(0xFF, 0xFF, 1, 0, 0, 650, 0, 0, 0, 0, 1000, 1000, 1000, 1)

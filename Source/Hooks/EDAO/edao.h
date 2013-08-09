@@ -279,6 +279,7 @@ typedef union MONSTER_STATUS
         DUMMY_STRUCT(0x234 - 0x1D0);
 
         CHAR_STATUS ChrStatus[2];                           // 0x234
+                                                            // 0x268
 
         USHORT MoveSPD;                                     // 0x29C
 
@@ -353,7 +354,7 @@ public:
 
     BOOL IsCustomChar(ULONG_PTR ChrId)
     {
-        return GetPartyChipMap()[ChrId] >= MINIMUM_CUSTOM_CHAR_ID;
+        return ChrId >= 0xC ? FALSE : GetPartyChipMap()[ChrId] >= MINIMUM_CUSTOM_CHAR_ID;
     }
 
     PUSHORT GetChrMagicList()
@@ -698,7 +699,6 @@ public:
 
     VOID NakedCopyMagicAndCraftData();
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
-
 
 
     typedef struct
@@ -1180,6 +1180,10 @@ public:
         return (this->*f)(ChrId, FinalStatus, RawStatus);
     }
 
+    PBYTE THISCALL FixWeaponShapeAndRange(USHORT ItemId);
+
+    DECL_STATIC_METHOD_POINTER(CGlobal, FixWeaponShapeAndRange);
+
     static TYPE_OF(&CGlobal::GetMagicData)          StubGetMagicData;
     static TYPE_OF(&CGlobal::GetMagicDescription)   StubGetMagicDescription;
     static TYPE_OF(&CGlobal::GetMagicQueryTable)    StubGetMagicQueryTable;
@@ -1188,6 +1192,8 @@ public:
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicData)           CGlobal::StubGetMagicData = nullptr;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicDescription)    CGlobal::StubGetMagicDescription = nullptr;
 DECL_SELECTANY TYPE_OF(CGlobal::StubGetMagicQueryTable)     CGlobal::StubGetMagicQueryTable = nullptr;
+
+INIT_STATIC_MEMBER(CGlobal::StubFixWeaponShapeAndRange);
 
 BOOL AoIsFileExist(PCSTR FileName);
 

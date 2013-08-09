@@ -24,11 +24,14 @@ BOOL EDAO::CheckItemEquipped(ULONG ItemId, PULONG EquippedIndex)
 
 enum
 {
-    CHR_ID_LAZY         = 4,
-    CHR_ID_YIN          = 5,
+    CHR_ID_LAZY             = 4,
+    CHR_ID_YIN              = 5,
 
-    CHR_ID_LAZY_KNIGHT  = 0x1F,
-    CHR_ID_RIXIA        = 0x20,
+    CHR_ID_LAZY_KNIGHT      = 0x1F,
+    CHR_ID_RIXIA            = 0x20,
+
+    CHR_ID_LAZY_KNIGHT_NULL = 0x35B,
+    CHR_ID_RIXIA_NULL       = 0x35C,
 };
 
 LONG CDECL EDAO::GetCampImage(PSTR Buffer, PCSTR Format, LONG ChrId)
@@ -81,9 +84,11 @@ LONG FASTCALL EDAO::GetCFace(ULONG ChrId)
     switch (ChrId)
     {
         case CHR_ID_LAZY:
+        case CHR_ID_LAZY_KNIGHT_NULL:
             return GetSaveData()->IsLazyKnight() ? CHR_ID_LAZY_KNIGHT : ChrId;
 
         case CHR_ID_YIN:
+        case CHR_ID_RIXIA_NULL:
             return GetSaveData()->IsYinRixia() ? CHR_ID_RIXIA : ChrId;
     }
 
@@ -154,9 +159,11 @@ ULONG FASTCALL CSSaveData::GetTeamAttackMemberId(ULONG ChrId)
     switch (ChrId)
     {
         case CHR_ID_LAZY:
+        case CHR_ID_LAZY_KNIGHT_NULL:
             return IsLazyKnight() ? CHR_ID_LAZY_KNIGHT : ChrId;
 
         case CHR_ID_YIN:
+        case CHR_ID_RIXIA_NULL:
             return IsYinRixia() ? CHR_ID_RIXIA : ChrId;
     }
 

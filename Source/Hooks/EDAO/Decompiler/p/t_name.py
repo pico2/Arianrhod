@@ -38,6 +38,23 @@ AddChar(0x00A1, "秦", "chr/ch45000.itc", "chr/ch45000.itc", 0, 0x00000000)
 AddChar(0x00A2, "谢莉", "chr/ch03400.itc", "chr/ch03400.itc", 0, 0x00000000)
 AddChar(0x00A4, "琪雅", "apl/ch51100.itc", "apl/ch51100.itc", 0, 0x00000000)
 
+
+AddChar(0x0350, "罗伊德", "chr/ch00000.itc", "chr/ch00001.itc", 0, 0x00000000)
+AddChar(0x0351, "艾莉", "chr/ch00100.itc", "chr/ch00101.itc", 0, 0x00000000)
+AddChar(0x0352, "缇欧", "chr/ch00200.itc", "chr/ch00201.itc", 0, 0x00000000)
+AddChar(0x0353, "兰迪", "chr/ch00300.itc", "chr/ch00301.itc", 0, 0x00000000)
+AddChar(0x0354, "瓦吉", "chr/ch03000.itc", "chr/ch03001.itc", 0, 0x00000000)
+AddChar(0x0355, "银", "chr/ch00500.itc", "chr/ch00501.itc", 0, 0x00000000)
+AddChar(0x0356, "神狼蔡特", "chr/ch02710.itc", "chr/ch02751.itc", 0, 0x00000000)
+AddChar(0x0357, "亚里欧斯", "chr/ch02400.itc", "chr/ch02401.itc", 0, 0x00000000)
+AddChar(0x0358, "诺艾尔上士", "chr/ch02900.itc", "chr/ch02901.itc", 0, 0x00000000)
+AddChar(0x0359, "达德利搜查官", "chr/ch00900.itc", "chr/ch00901.itc", 0, 0x00000000)
+AddChar(0x035A, "加尔西亚", "chr/ch04100.itc", "chr/ch04101.itc", 0, 0x00000000)
+
+AddChar(0x035B, "瓦吉", "chr/ch03100.itc", "chr/ch03101.itc", 0, 0x00000000)
+AddChar(0x035C, "莉夏", "chr/ch03200.itc", "chr/ch03201.itc", 0, 0x00000000)
+
+
 AddChar(0x00B0, "阿瑞安赫德", "chr/ch04200.itc", "chr/ch04200.itc", "ms90010.dat", 0x00000000)
 AddChar(0x00B1, "小丑肯帕雷拉", "chr/ch03600.itc", "chr/ch03600.itc", "ms03600.dat", 0x00000000)
 
@@ -56,9 +73,5 @@ AddChar(0x00D0, "碧之虚神", "chr/ch11600.itc", "chr/ch11600.itc", "ms89100.d
 AddChar(0x00D1, "神机TYPE-α", "chr/ch05620.itc", "chr/ch05620.itc", "ms88500.dat", 0x00000000)
 
 AddChar(0x00EF, "阿瑞安赫德", "chr/ch04200.itc", "chr/ch04200.itc", "ms04200.dat", 0x00000000)
-
-#AddChar(0x00E0, "预留_E0", "chr/ch03600.itc", "chr/ch03600.itc", 0, 0x00000000)
-#AddChar(0x00E1, "预留_E1", "chr/ch03600.itc", "chr/ch03600.itc", 0, 0x00000000)
-#AddChar(0x00E2, "预留_E2", "chr/ch03600.itc", "chr/ch03600.itc", 0, 0x00000000)
 
 SaveTo("t_name._dt")

@@ -33,16 +33,16 @@ class BattleCraftInfo:
         self.SkillTime              = fs.byte()     # 0x0B
         self.EP_CP                  = fs.ushort()   # 0x0C
         self.RangeSize2             = fs.ushort()   # 0x0E
-        self.State1Parameter        = fs.ushort()   # 0x10      e.g. damage factor
-        self.State1Time             = fs.ushort()   # 0x12      e.g. frozen AT
-        self.State2Parameter        = fs.ushort()   # 0x14
-        self.State2Time             = fs.ushort()   # 0x16
+        self.State1Parameter        = fs.short()   # 0x10      e.g. damage factor
+        self.State1Time             = fs.short()   # 0x12      e.g. frozen AT
+        self.State2Parameter        = fs.short()   # 0x14
+        self.State2Time             = fs.short()   # 0x16
 
         self.Name = fs.astr()
         self.Description = fs.astr()
 
     def binary(self):
-        return struct.pack('<HBBBBBBBBBBHHHHHH',
+        return struct.pack('<HBBBBBBBBBBHHhhhh',
                     self.ActionIndex,
                     self.Target,
                     self.Unknown_3,

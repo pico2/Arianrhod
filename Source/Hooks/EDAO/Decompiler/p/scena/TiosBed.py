@@ -58,6 +58,8 @@ StaticGodList = \
 
     CharInfo(0xD0, '碧之虚神'),
     CharInfo(0xD1, '神机TYPE-α'),
+
+    CharInfo(None, '无'),
 )
 
 StaticCharMap = {}
@@ -133,7 +135,41 @@ def ShowGodListMenuWorker(SourceChrId, GodList, IsSubMenu = False):
             continue
 
         if GodList[i].SetChipHandler == None:
-            SetChrChipPat(SourceChrId, 1, GodList[i].Id)
+            if GodList[i].Id is None:
+                if StaticCharMap[SourceChrId] == '银':
+
+                    yin_not_change_to_rixia = GenerateUniqueLable()
+                    yin_or_rixia_end        = GenerateUniqueLable()
+
+                    Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x165, 5)), scpexpr(EXPR_END)), yin_not_change_to_rixia)
+                    SetChrChipPat(SourceChrId, 1, 0x35C)
+
+                    Jump(yin_or_rixia_end)
+
+                    label(yin_not_change_to_rixia)
+                    SetChrChipPat(SourceChrId, 1, SourceChrId + 0x350)
+
+                    label(yin_or_rixia_end)
+
+                elif StaticCharMap[SourceChrId] == '瓦吉':
+
+                    lazy_not_change_to_knight = GenerateUniqueLable()
+                    lazy_or_knight_end        = GenerateUniqueLable()
+
+                    Jc((scpexpr(EXPR_TEST_SCENA_FLAGS, MakeScenarioFlags(0x1A0, 0)), scpexpr(EXPR_END)), lazy_not_change_to_knight)
+                    SetChrChipPat(SourceChrId, 1, 0x35B)
+
+                    Jump(lazy_or_knight_end)
+
+                    label(lazy_not_change_to_knight)
+                    SetChrChipPat(SourceChrId, 1, SourceChrId + 0x350)
+
+                    label(lazy_or_knight_end)
+
+                else:
+                    SetChrChipPat(SourceChrId, 1, SourceChrId + 0x350)
+            else:
+                SetChrChipPat(SourceChrId, 1, GodList[i].Id)
         else:
             GodList[i].SetChipHandler(SourceChrId, GodList[i])
 

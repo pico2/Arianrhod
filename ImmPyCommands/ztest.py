@@ -147,11 +147,8 @@ class ExportHooks(LogBpHook):
 
         imm.log('p = %08X, len = %08X' % (addr, size))
 
-def main(args):
-
-    debugger.pyreset()
-
-    functbl = Register(0xBE1460)
+def comfunc(base, prefix):
+    functbl = Register(base)
     #functbl = Register(0xBE0E10)
 
     try:
@@ -162,7 +159,7 @@ def main(args):
                 #imm.log('OP_%02X: NULLLLLLLLLLLLLLLLLLLLL' % i)
                 continue
 
-            funcname = 'AS_%02X' % i
+            funcname = '%s_%02X' % (prefix, i)
 
             imm.setComment(int(func), funcname)
             imm.setLabel(int(func), funcname)
@@ -173,9 +170,16 @@ def main(args):
             imm.setComment(int(func), funcname)
             imm.setLabel(int(func), funcname)
 
-            imm.log('AS_%02X: %08X' % (i, func), int(func))
+            imm.log('%s_%02X: %08X' % (prefix, i, func), int(func))
     except:
         pass
+
+def main(args):
+
+    debugger.pyreset()
+
+    comfunc(0xBE1460, 'AS')
+    comfunc(0xBE0E10, 'SCP')
 
     return ''
 

@@ -695,6 +695,8 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x2F82B8, METHOD_PTR(&EDAO::      GetLeaderChangeVoice)),
         INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
         INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
+        INLINE_HOOK_CALL_RVA     (0x5EB9E7, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange), CGlobal::StubFixWeaponShapeAndRange),  // weapon shape
+        INLINE_HOOK_CALL_RVA_NULL(0x5EC037, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange)),                               // weapon RNG
 
 
         // inherit custom flags

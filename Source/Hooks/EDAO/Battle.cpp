@@ -80,6 +80,7 @@ PMONSTER_STATUS FASTCALL CBattle::OverWriteBattleStatusWithChrStatus(PMONSTER_ST
     Final->AGL          += Raw->AGL         * 2 / 3;
     Final->MOV          += Raw->MOV         * 2 / 3;
     Final->SPD          += Raw->SPD         * 2 / 3;
+    Final->RNG           = Raw->RNG == 0 ? 1 : Raw->RNG;
 
     return MSData;
 }
@@ -526,7 +527,7 @@ VOID FASTCALL CBattle::AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM Param
 }
 
 NAKED VOID CBattle::NakedNoResistConditionUp()
-{    
+{
     enum
     {
         Conditions =    CraftConditions::StrUp |
@@ -643,7 +644,22 @@ PBYTE CGlobal::GetMagicQueryTable(USHORT MagicId)
     return StaticMagicQueryTable;
 }
 
+PBYTE THISCALL CGlobal::FixWeaponShapeAndRange(USHORT ItemId)
+{
+    PMONSTER_STATUS MSData;
 
+    AllocStack(16);
+
+    MSData = *(PMONSTER_STATUS *)PtrAdd(*(PVOID *)PtrSub(_AddressOfReturnAddress(), sizeof(PVOID)), 8);
+
+    if (IsCustomChar(MSData->CharID))
+    {
+        ItemId = 0;
+        MSData->ChrStatus[BattleStatusRaw].RNG = MSData->ChrStatus[BattleStatusFinal].RNG;
+    }
+
+    return (this->*StubFixWeaponShapeAndRange)(ItemId);
+}
 
 /************************************************************************
   info box
