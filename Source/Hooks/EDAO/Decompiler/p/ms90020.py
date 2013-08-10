@@ -40,7 +40,7 @@ def main():
     MaximumCP          = 200
     InitialCP          = 180
 
-    SPD                = 120
+    SPD                = 120*1
     MoveSPD            = 7
     MOV                = 6
     STR                = 1805
@@ -74,7 +74,7 @@ def main():
     Unknown_53         = 0x50
     Unknown_54         = 0xA0
     Unknown_55         = 0xB0
-    AttributeRate      = [ 100, 100, 100, 100, 100, 100, 100 ]
+    AttributeRate      = [ 100, 100, 0, 100, 100, 100, 100 ]
     Sepith             = [ 50, 50, 50, 50, 50, 50, 50 ]
     DropItem           = [ 0x0000, 0x0000 ]
     DropRate           = [ 0, 0 ]
@@ -178,19 +178,34 @@ def main():
                     0, 0,
                )
 
-    炎蝶之舞 = CreateCraft(
-                    "炎蝶之舞",
-                    "攻击：大圆·20％炎伤\\n无数炎之蝶在空中飞舞，20％几率造成「炎伤」状态。",
-                    0x21, 0x12, 0x21,
+    龙皇炼狱火 = CreateCraft(
+                    "伪·龙皇炼狱火",
+                    "用幻术伪装的魔法",
+                    0x23, 0x12, 0x21,
                     CraftAttribute.Hono,
-                    CraftRange.CircleOnTargetNoMove,
+                    CraftRange.FullMap,
                     CraftState.Arts, CraftState.Burning,
-                    1, 100,
-                    25, 20,
+                    135, 100,
+                    0, 20,
                     0,
-                    5,
-                    260, 0,
-                    20, 3,
+                    100,
+                    410, 0,
+                    15, 3,
+               )
+
+    闪电之力 = CreateCraft(
+                    "伪·闪电之力",
+                    "用幻术伪装的魔法",
+                    0x05, 0x12, 0x21,
+                    CraftAttribute.Kaze,
+                    CraftRange.FullMap,
+                    CraftState.Arts, CraftState.BanCraft,
+                    135, 100,
+                    0, 15,
+                    0,
+                    100,
+                    270, 0,
+                    30, 3,
                )
 
     死亡之指 = CreateCraft(
@@ -208,8 +223,23 @@ def main():
                     0, 0,
                )
 
-    混乱之雨 = CreateCraft(
-                    "混乱之雨",
+    时空追放 = CreateCraft(
+                    "时空追放",
+                    "",
+                    0x05, 0x12, 0x1,
+                    CraftAttribute.NoAttribute,
+                    CraftRange.FullMap,
+                    CraftState.NoneState, CraftState.NoneState,
+                    1, 100,
+                    0, 40,
+                    0,
+                    100,
+                    0, 0,
+                    0, 0,
+               )
+
+    玻璃渣 = CreateCraft(
+                    "玻璃渣",
                     "",
                     0x05, 0x12, 0x1,
                     CraftAttribute.NoAttribute,
@@ -229,26 +259,30 @@ def main():
                     置换,
                     空间转移,
                     伪盐之桩,
-                    炎蝶之舞,
+                    龙皇炼狱火,
+                    闪电之力,
                     死亡之指,
-                    混乱之雨,
+                    玻璃渣,
+                    时空追放,
                 ])
 
     Attack = CreateAI(0x1,  100,  0x8,  0x1,  0x00, 0x05, Craft_03E8,      [0,     0,      0,      0])
 
-    Arts_炎蝶之舞        = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x07, 炎蝶之舞,        [0,     0,      1,      0])
+    Arts_龙皇炼狱火      = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x07, 龙皇炼狱火,        [0,     0,      1,      0])
+    Arts_闪电之力        = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x18, 闪电之力,        [0,     0,      1,      0])
 
     Craft_置换           = CreateAI(0x8,  100,  0x0,  0x1,  0x00, 0x12, 置换,            [100,   1,      0,      0])
     #Craft_真实之镜       = CreateAI(0x2,  40,   0x18, 0x1,  0x00, 0x10, 真实之镜,        [0,     0,      0x40000000, 0])
     Craft_相位重置       = CreateAI(0x2,  25,   0x0,  0x1,  0x00, 0x11, 相位重置,        [0,     0,      0,      0])
     Craft_空间转移       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x14, 空间转移,        [3500,  2,      0,      2])
     Craft_死亡之指       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x05, 死亡之指,        [3500,  2,      0,      2])
-    Craft_混乱之雨       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x17, 混乱之雨,        [3500,  2,      0,      2])
+    Craft_玻璃渣         = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x17, 玻璃渣,        [3500,  2,      0,      2])
+    Craft_时空追放       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x19, 时空追放,      [3500,  2,      0,      2])
 
     SCraft_伪盐之桩      = CreateAI(0xA,  100,  0x0,  0x1,  0x00, 0x1A, 伪盐之桩,        [200,   0,      0,      0])
 
-    ArtsAIList         = [Arts_炎蝶之舞]
-    CraftAIList        = [Craft_混乱之雨, Craft_死亡之指, Craft_置换, Craft_相位重置, Craft_空间转移]
+    ArtsAIList         = [Arts_龙皇炼狱火, Arts_闪电之力]
+    CraftAIList        = [Craft_时空追放, Craft_玻璃渣, Craft_死亡之指, Craft_置换, Craft_相位重置, Craft_空间转移]
     SCraftAIList       = [SCraft_伪盐之桩]
     SupportCraftAIList = []
 

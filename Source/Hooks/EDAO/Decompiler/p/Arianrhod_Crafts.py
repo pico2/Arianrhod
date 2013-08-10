@@ -1,5 +1,8 @@
 from ActionHelper import *
 
+
+arts_aria_eff_id = 0
+
 def TeamRushInit():
     LoadChrChip(7, "chr/ch04252.itc", 0xFF)
     Return()
@@ -239,13 +242,13 @@ def ArtsAria():
     TurnDirection(0xFF, 0xFB, 0x0, 500, 0x0)
     Jc(0x8, 0x1, 0x0, "arts_effect_end")
     Jc(0x2D, 0x1, 0x1, "other_voice")
-    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, 65535, 65535, 65535, 0x0)
+    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
     AS_A9(0xFF, 0x0, 0xFFFF0000)
     Jump("arts_effect_end")
 
     label("other_voice")
 
-    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, 65535, 65535, 65535, 0x0)
+    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
     Voice(0x0, 3864, 3883, 3884, 0, 0xFE)
     SoundEx(509, 0x0)
 
@@ -278,9 +281,10 @@ def ArtsAria():
 def ArtsCast():
 
     Jc(0x2D, 0x3, 0x2, "arts_cast_skip_voice")
-    PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, 50, 0, 0, 0, 0, 65535, 65535, 65535, 0)
+    #PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, 50, 0, 0, 0, 0, -1, -1, -1, 0)
+    CancelEffect(0xFF, arts_aria_eff_id)
     SoundEx(510, 0x0)
-    TurnDirection(0xFF, 0xFB, 0x0, 0x1F4, 0x0)
+    TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     Sleep(200)
     Yield()
     SetChrChip(0xFF, 0x3)
@@ -290,7 +294,6 @@ def ArtsCast():
     Voice(0x0, 3875, 3876, 0, 0, 0xFE)
     SetChrSubChip(0xFF, 0x4)
     Sleep(0)
-    CancelEffect(0xFF, 0)
     Yield()
 
     label("arts_cast_skip_voice")

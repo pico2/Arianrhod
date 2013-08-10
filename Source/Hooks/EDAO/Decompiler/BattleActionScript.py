@@ -382,6 +382,9 @@ actionfile = None
 
 def label(labelname):
     pos = actionfile.fs.tell()
+    if actionfile.PrevousHandlerData is not None:
+        pos += actionfile.PrevousHandlerData.FileStream.tell()
+
     plog('%08X: %s' % (pos, labelname))
     if labelname in actionfile.Labels and actionfile.Labels[labelname] != pos:
         raise Exception('label name conflict')
@@ -503,6 +506,7 @@ def OpCodeHandler(op, args):
 
     if UsePrevous:
         data.FileStream = actionfile.PrevousHandlerData.FileStream
+        data.Instruction.Labels = actionfile.PrevousHandlerData.Instruction.Labels
     else:
         data.FileStream = BytesStream().openmem()
         actionfile.PrevousHandlerData = data

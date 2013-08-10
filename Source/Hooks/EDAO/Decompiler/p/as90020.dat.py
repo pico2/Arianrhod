@@ -21,9 +21,9 @@ def main():
         "SysCraft_NormalAttack",            # 05 5
         "SysCraft_ArtsAria",                # 06 6
         "SysCraft_ArtsCast",                # 07 7
-        EMPTY_ACTION,                       # 08 8
+        "SysCraft_Win",                     # 08 8
         "SysCraft_EnterBattle",             # 09 9
-        EMPTY_ACTION,                       # 0A 10
+        "SysCraft_UseItem",                 # 0A 10
         "SysCraft_Stun",                    # 0B 11
         "SysCraft_Unknown2",                # 0C 12
         EMPTY_ACTION,                       # 0D 13
@@ -37,8 +37,8 @@ def main():
         "Craft_15_21_DB0_魔反取消",         # 15 21
         "Craft_16_22_1360_废话2",           # 16 22
         "Craft_混乱之雨",                   # 17 23
-        EMPTY_ACTION,                       # 18 24
-        EMPTY_ACTION,                       # 19 25
+        "闪电之力",                         # 18 24
+        "Craft_时空追放",                   # 19 25
         "Craft_1A_26_DFB_伪盐之桩",         # 1A 26
         EMPTY_ACTION,                       # 1B 27
         EMPTY_ACTION,                       # 1C 28
@@ -47,6 +47,8 @@ def main():
         'SysCraft_TeamRushInit',            # 1E 30
         'SysCraft_TeamRushAction',          # 1F 31
     ))
+
+    arts_aria_eff_id = 0
 
     label('SysCraft_TeamRushInit')
     label('SysCraft_TeamRushAction')
@@ -57,8 +59,8 @@ def main():
 
     label("SysCraft_Init")
 
-    LoadEffect(0x80, "battle/mgaria0.eff")
-    LoadEffect(0x81, "battle/mgaria1.eff")
+    LoadEffect(0x80, "event/ev10006.eff")
+    LoadEffect(0x81, "event/ev10007.eff")
     LoadEffect(0x82, "battle/cr036302.eff")
     LoadEffect(0x83, "battle/cr036010.eff")
     Call("loc_50A")
@@ -274,7 +276,7 @@ def main():
     LookingTargetAdd(0xFF, "", 0x0)
     LookingTarget(100, 16, 16)
     SetBrightness(0x0, 0x2, 2000)
-    TurnDirection(0xFF, 0xFE, 0, 500, 0x0)
+    TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     SetChrChip(0xFF, 0x7)
     SetChrSubChip(0xFF, 0x0)
     Sleep(100)
@@ -386,13 +388,13 @@ def main():
     TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     Jc(0x8, 0x1, 0x0, "loc_743")
     Jc(0x2D, 0x1, 0x1, "loc_716")
-    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, 0)
+    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
     SetEffectColor(0xFF, 0x0, 0xFFFF0000)
     Jump("loc_743")
 
     label("loc_716")
 
-    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, 0)
+    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
     Voice(0x0, 3689, 3690, 0, 0, 0xFE)
     SoundEx(509, 0x0)
 
@@ -430,7 +432,8 @@ def main():
 
     ResetTarget()
     Jc(0x2D, 0x3, 0x2, "loc_79D")
-    PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, 50, 0, 0, 0, 0, -1, -1, -1, 255)
+    #PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, -1000, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
+    CancelEffect(0xFF, arts_aria_eff_id)
     SoundEx(510, 0x0)
     TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     Sleep(200)
@@ -452,6 +455,41 @@ def main():
 
     # SysCraft_ArtsCast end
 
+    def SysCraft_Win(): pass
+
+    label('SysCraft_Win')
+
+    LoadChrChip(7, "apl/ch51117.itc", 0xFF)
+
+    SetChipModeFlags(0x0, CraftTarget.Self, 0x2)
+    SetChrChip(CraftTarget.Self, 7)
+    ChrSetPos(0xFF, 0xFF, 0, 200, 0)
+    Yield()
+
+    SetChrSubChip(0xFF, 0x2)
+    Sleep(500)
+    Yield()
+
+    SoundEx(898, 0)
+    SetChrSubChip(0xFF, 0x1)
+    Sleep(150)
+    Yield()
+
+    SetChrSubChip(0xFF, 0x0)
+    Sleep(300)
+    Yield()
+
+    SoundEx(3717, 0)
+    Sleep(6000)
+    Yield()
+
+    SoundEx(3718, 0)
+    Sleep(3000)
+    Yield()
+
+    Return()
+
+
     def Craft_SysCraft_EnterBattle(): pass
 
     label("SysCraft_EnterBattle")
@@ -464,6 +502,26 @@ def main():
     Return()
 
     # SysCraft_EnterBattle end
+
+    def SysCraft_UseItem(): pass
+
+    label('SysCraft_UseItem')
+
+    SetChrChip(0xFF, 0x3)
+    SetChrSubChip(0xFF, 0x0)
+    Sleep(300)
+    Yield()
+    Voice(0x0, 3674, 3675, 3683, 0, 0xFE)
+    SetChrSubChip(0xFF, 0x4)
+    Sleep(300)
+    Yield()
+    PlayEffect(0xFF, 0xFF, 0x2A, 0x2, 0, 1000, 500, 0, 0, 0, -1, -1, -1, 0xFF)
+    Sleep(500)
+    Yield()
+    UseItemBegin()
+    UseItemEnd()
+    Return()
+
 
     def Craft_SysCraft_Stun(): pass
 
@@ -1252,9 +1310,58 @@ def main():
     interval = 80
     eff_size = 300
 
+    def lambda_Damage_Anime_Thread():
+
+        JumpToLabelIfHasTarget('混乱之雨_Damage_Anime_Thread_Entry')
+        Return()
+
+        label("混乱之雨_Damage_Anime_Thread_Entry")
+
+        Sleep(800)
+        Yield()
+
+        label("混乱之雨_Damage_Anime_Thread_Start")
+
+        ResetTarget()
+
+        label("混乱之雨_Damage_Anime_Anime_Next")
+
+        ForeachTarget("混乱之雨_Damage_Anime_Anime_End")
+
+        AS_67(0x121, 0xFF, 0xFE)
+
+        DamageAnime(0xFE, 0x1, 0x32)
+        DamageCue(0xFE)
+        Yield()
+
+        NextTarget()
+        Jump("混乱之雨_Damage_Anime_Anime_Next")
+
+        label("混乱之雨_Damage_Anime_Anime_End")
+
+        Sleep(200)
+        Yield()
+        Jump('混乱之雨_Damage_Anime_Thread_Start')
+
+        Return()
+
+
+    def lambda_play_sound():
+        Sleep(700)
+        Yield()
+
+        for i in range(loop_count):
+            SoundEx(193, 0x0)
+            Sleep(int(interval * 1.2))
+            Yield()
+
+        Return()
+
     Knockback(0)
-    BeginChrThread(0xFF, 1, "混乱之雨_Damage_Anime_Thread", 0)
-    BeginChrThread(0xFF, 2, '混乱之雨_Play_Sound_Thread', 0)
+
+    QueueWorkItem(0xFF, 1, lambda_Damage_Anime_Thread)
+    QueueWorkItem(0xFF, 2, lambda_play_sound)
+
     Yield()
 
     for i in range(loop_count):
@@ -1281,9 +1388,6 @@ def main():
 
     Call('set_spirit_eff')
 
-    #BeginChrThread(0xFF, 1, "混乱之雨_Damage_Thread", 0)
-    #Yield()
-    #WaitChrThread(0xFF, 1)
     Sleep(500)
     Yield()
 
@@ -1294,82 +1398,248 @@ def main():
     Return()
 
 
-    label("混乱之雨_Play_Sound_Thread")
+    # Craft_混乱之雨 end
 
-    Sleep(700)
-    Yield()
+    def Craft_闪电之力(): pass
 
-    for i in range(loop_count):
-        SoundEx(193, 0x0)
-        Sleep(int(interval * 1.2))
-        Yield()
-
-    Return()
-
-
-
-    label("混乱之雨_Damage_Anime_Thread")
-
-    JumpToLabelIfHasTarget('混乱之雨_Damage_Anime_Thread_Entry')
-    Return()
-
-    label("混乱之雨_Damage_Anime_Thread_Entry")
-
-    Sleep(800)
-    Yield()
-
-    label("混乱之雨_Damage_Anime_Thread_Start")
+    label("闪电之力")
 
     ResetTarget()
+    AS_78(1)
+    LoadEffect(0x0, "battle\\mg043_00.eff")
+    LoadEffect(0x1, "battle\\mg043_01.eff")
+    AS_78(0)
 
-    label("混乱之雨_Damage_Anime_Anime_Next")
-
-    ForeachTarget("混乱之雨_Damage_Anime_Anime_End")
-
-    AS_67(0x121, 0xFF, 0xFE)
-
-    DamageAnime(0xFE, 0x1, 0x32)
-    DamageCue(0xFE)
-    Yield()
-
-    NextTarget()
-    Jump("混乱之雨_Damage_Anime_Anime_Next")
-
-    label("混乱之雨_Damage_Anime_Anime_End")
-
+    #PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, -1000 + 250, 0, 0, 0, 0, -1, -1, -1, 0)
+    CancelEffect(0xFF, arts_aria_eff_id)
+    SoundEx(510, 0x0)
+    TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     Sleep(200)
     Yield()
-    Jump('混乱之雨_Damage_Anime_Thread_Start')
+    SetChrChip(0xFF, 0x3)
+    SetChrSubChip(0xFF, 0x3)
+    Sleep(300)
+    Yield()
+    Voice(0x0, 3691, 3692, 0, 0, 0xFE)
+    SetChrSubChip(0xFF, 0x4)
+    Sleep(0)
+    Yield()
 
+    LockCamera(0xF4, 0, 0, 0, 600)
+    Sleep(600)
+    Yield()
+    PlayEffect(0xFF, 0xFB, 0x0, 0x0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 4)
+    #Sleep(1700)
+    #Yield()
+    ResetTarget()
 
+    label("loc_xxxxxx_23F7")
 
+    ForeachTarget("loc_xxxxxx_2426")
+    PlayEffect(0xFF, 0xFE, 0x0, 0x0, 0, 50, 0, 0, 0, 0, 800, 800, 800, -1)
+    DamageAnime(0xFE, 0x0, 0x32)
+    Sleep(50)
+    Yield()
+    NextTarget()
+    Jump("loc_xxxxxx_23F7")
 
-    label("混乱之雨_Damage_Thread")
+    label("loc_xxxxxx_2426")
 
-    JumpToLabelIfHasTarget('混乱之雨_Damage_Thread_Entry')
-    Return()
-
-    label("混乱之雨_Damage_Thread_Entry")
+    Sleep(1700)
+    Yield()
 
     ResetTarget()
 
-    label("混乱之雨_Damage_Anime_Next")
+    label("loc_yyyyyyyy_23F7")
 
-    ForeachTarget("混乱之雨_Damage_Anime_End")
-
-    DamageAnime(0xFE, 0x1, 0x32)
+    ForeachTarget("loc_yyyyyyyy_2426")
+    PlayEffect(0xFF, 0xFE, 0x1, 0x0, 0, 0, 0, 0, 0, 0, 500, 500, 500, -1)
+    DamageAnime(0xFE, 0x0, 0x32)
     DamageCue(0xFE)
     Sleep(50)
     Yield()
-
     NextTarget()
-    Jump("混乱之雨_Damage_Anime_Next")
+    Jump("loc_yyyyyyyy_23F7")
 
-    label("混乱之雨_Damage_Anime_End")
+    label("loc_yyyyyyyy_2426")
+
+    WaitEffect(0xFF, 0x4)
+    AS_14(0x1)
+
+    FreeEffect(0x0)
+    FreeEffect(0x1)
 
     Return()
 
-    # Craft_混乱之雨 end
+    # 闪电之力 end
+
+
+
+    def Craft_时空追放(): pass
+
+    label("Craft_时空追放")
+
+    AS_78(0x1)
+
+    LoadChrChip(0x7, "chr/ch03652.itc", 0xFF)
+    LoadEffect(0x0, "battle/cr036003.eff")
+    LoadEffect(0x1, "battle/cr036001.eff")
+    LoadEffect(0x2, "event/ev10002.eff")
+
+    AS_78(0x0)
+
+    ResetTarget()
+    ResetLookingTargetData()
+    LookingTargetAdd(0xFF, "", 0x0)
+    LookingTarget(100, 16, 16)
+    SetBrightness(0x0, 0x2, 2000)
+    TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
+    SetChrChip(0xFF, 0x7)
+    SetChrSubChip(0xFF, 0x0)
+    Sleep(100)
+    Yield()
+
+    chr_shadow = 0x12
+
+    ChrDuplicate(chr_shadow, 0xFF)
+    HideChr(chr_shadow, 0)
+    ChrSetPos(chr_shadow, 0xFB, 0, 0, 0)
+
+    Random_Execute(50, '时空追放_Voice_2')
+
+    Voice(0x0, 3703, 3726, 3683, 0, 0xFE)
+    Jump('时空追放_Voice_End')
+
+    label('时空追放_Voice_2')
+    Voice(0x0, 3688, 3732, 3735, 0, 0xFE)
+
+
+    label('时空追放_Voice_End')
+
+    SetChrSubChip(0xFF, 0x1)
+    Sleep(500)
+    Yield()
+    ResetLookingTargetData()
+    Sleep(100)
+    Yield()
+    LookingTargetAdd(0xFF, "", 0x0)
+    LookingTarget(30, 20, 30)
+    AS_3D(100, 100, 100, 300)
+    PlayEffect(0xFF, 0xFF, 0x1, 0x4, -100, 1100, 600, 0, 0, 0, 1000, 1000, 1000, 255)
+    SoundEx(325, 0x0)
+    SetChrSubChip(0xFF, 0x2)
+    BlurSwitch(0x0, 0xBBFFFFFF, 0x0, 0x1, 0x1)
+    Sleep(100)
+    Yield()
+    CancelBlur(0)
+    Sleep(200)
+    Yield()
+    ResetLookingTargetData()
+    LookingTargetAdd(chr_shadow, "", 0x0)
+    LookingTarget(50, 25, 35)
+    Sleep(300)
+    Yield()
+
+    AS_3D(100, 100, 100, 300)
+
+    BeginChrThread(0xFF, 1, '时空追放_Damage_Thread', 0)
+    Yield()
+
+    WaitChrThread(0xFF, 1)
+    Yield()
+
+    Sleep(2500)
+    Yield()
+
+    CancelEffect(0xFF, 0x2)
+    SetChrSubChip(0xFF, 0x3)
+    Sleep(100)
+    Yield()
+    BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
+    AS_8F(0x0)
+    EndChrThread(0xFF, 1)
+    ResetBrightness(1000)
+    ChrSetPos(chr_shadow, CraftTarget.InitialPos, 0, 0, 0)
+    FreeEffect(0x0)
+    FreeEffect(0x1)
+    FreeEffect(0x2)
+    AS_6B()
+    Return()
+
+    ############################################################################
+
+    label("时空追放_Damage_Thread")
+
+    ResetTarget()
+
+    label("时空追放_Damage_Anime_Next")
+
+    ForeachTarget("时空追放_Damage_Anime_End")
+
+    Random_Execute(50, '时空追放_Vanish_Fail')
+    BeginChrThread(0xFE, 3, '时空追放_Target_Vanish_Thread', 0)
+    Jump('时空追放_Damage_Anime_Continue')
+
+    label('时空追放_Vanish_Fail')
+    BeginChrThread(0xFE, 3, '时空追放_Target_Vanish_Fail_Thread', 0)
+
+    label("时空追放_Damage_Anime_Continue")
+
+    Yield()
+
+    NextTarget()
+    Jump("时空追放_Damage_Anime_Next")
+
+    label("时空追放_Damage_Anime_End")
+
+
+    SoundEx(4135, 0)
+
+    Yield()
+    Return()
+
+    ############################################################################
+
+    label('时空追放_Target_Vanish_Thread')
+
+    PlayEffect(0xFF, 0xFF, 2, 0x1, 0, 0, 0, 0, 0, 0, 1500, 1500, 1500, 5)
+    HideChr(0xFF, 1000)
+    Sleep(500)
+    Yield()
+
+    CancelEffect(0xFF, 5)
+    Sleep(250)
+    Yield()
+
+    AS_8D(0x15, 0xFF, CraftConditionFlags.Vanish, 0, 9999)
+    DamageCue(0xFF)
+    Sleep(250)
+    Yield()
+
+    Return()
+
+    ############################################################################
+
+    label('时空追放_Target_Vanish_Fail_Thread')
+
+    PlayEffect(0xFF, 0xFF, 2, 0x1, 0, 0, 0, 0, 0, 0, 1500, 1500, 1500, 5)
+    HideChr(0xFF, 700)
+    Sleep(1500)
+    Yield()
+
+    ShowChr(0xFF, 500)
+    Sleep(500)
+    Yield()
+
+    CancelEffect(0xFF, 5)
+    Sleep(700)
+    Yield()
+
+    Return()
+
+
+    # 时空追放 end
+
 
 
     SaveToFile()

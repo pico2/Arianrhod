@@ -15,8 +15,6 @@ move /y *._dt J:\Falcom\ED_AO\patch\text
 move /y *.bin J:\Falcom\ED_AO\patch\scena
 move /y *.dat J:\Falcom\ED_AO\patch\battle\dat
 
-rd/s/q __pycache__
-rd/s/q scena\__pycache__
-rd/s/q ..\__pycache__
+call ..\cleanup.bat
 
 rem start J:\Falcom\ED_AO\ED_AO_CRACK.exe

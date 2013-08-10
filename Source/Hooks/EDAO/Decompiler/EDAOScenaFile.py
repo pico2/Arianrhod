@@ -83,6 +83,9 @@ def AddScnInfo(index):
 
 def label(labelname):
     pos = scena.fs.tell()
+    if scena.PrevousHandlerData is not None:
+        pos += scena.PrevousHandlerData.FileStream.tell()
+
     plog('%08X: %s' % (pos, labelname))
     if labelname in scena.Labels and scena.Labels[labelname] != pos:
         raise Exception('label name conflict')
@@ -382,6 +385,7 @@ def OpCodeHandler(op, args):
 
     if UsePrevous:
         data.FileStream = scena.PrevousHandlerData.FileStream
+        data.Instruction.Labels = scena.PrevousHandlerData.Instruction.Labels
     else:
         data.FileStream = BytesStream().openmem()
         scena.PrevousHandlerData = data

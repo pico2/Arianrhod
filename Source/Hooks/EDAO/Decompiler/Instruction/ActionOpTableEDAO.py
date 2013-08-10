@@ -383,6 +383,9 @@ def as_lambda_worker(data, extra_length):
 
         pos2 = fs.tell()
 
+        if pos2 - pos > 0xFF:
+            raise Exception('lambda must be smaller than 0x100 bytes: current = %X' % (pos2 - pos))
+
         fs.seek(pos - 1)
         entry.WriteOperand(data, 'B', pos2 - pos - extra_length)
 

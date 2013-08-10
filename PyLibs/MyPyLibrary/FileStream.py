@@ -119,6 +119,9 @@ class BytesStream:
     def tell(self):
         return self.stream.tell()
 
+    def flush(self):
+        return self.stream.flush()
+
     def size(self):
         pos = self.tell()
         self.seek(0, io.SEEK_END)

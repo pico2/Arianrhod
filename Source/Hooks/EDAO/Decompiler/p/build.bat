@@ -15,4 +15,4 @@ move /y *.dat J:\Falcom\ED_AO\patch\battle\dat
 
 start J:\Falcom\ED_AO\ED_AO_CRACK.exe
 
-rd/s/q __pycache__
+call ..\cleanup.bat
