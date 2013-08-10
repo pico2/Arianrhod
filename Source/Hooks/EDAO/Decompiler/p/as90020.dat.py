@@ -36,7 +36,7 @@ def main():
         "Craft_14_20_CF8_空间转移",         # 14 20
         "Craft_15_21_DB0_魔反取消",         # 15 21
         "Craft_16_22_1360_废话2",           # 16 22
-        "Craft_混乱之雨",                   # 17 23
+        "Craft_玻璃渣",                   # 17 23
         "闪电之力",                         # 18 24
         "Craft_时空追放",                   # 19 25
         "Craft_1A_26_DFB_伪盐之桩",         # 1A 26
@@ -63,7 +63,7 @@ def main():
     LoadEffect(0x81, "event/ev10007.eff")
     LoadEffect(0x82, "battle/cr036302.eff")
     LoadEffect(0x83, "battle/cr036010.eff")
-    Call("loc_50A")
+    #Call("loc_50A")
     AS_8D(0x15, 0xFF, 0x8000000, 0x0, 0x270F)
     Call('set_spirit_eff')
     Return()
@@ -76,7 +76,21 @@ def main():
 
     label("loc_50A")
 
+    Random_Execute(50, 'start_voice_2')
     Voice(0x3, 3697, 0, 0, 0, 0xFE)
+    CallReturn()
+
+    label('start_voice_2')
+
+    def labmda_start_voice_2():
+        SoundEx(3724, 0)
+        Sleep(4000)
+        Yield()
+
+        SoundEx(3725, 0)
+        Return()
+
+    QueueWorkItem(0xFF, 3, labmda_start_voice_2)
     CallReturn()
 
     # SysCraft_Init end
@@ -147,14 +161,16 @@ def main():
 
     BeginChrThread(0xFF, 1, 'SysCraft_Stand', 0)
 
-    PlayEffect(0xFF, 0xFF, 1, 0x4, 0, 2000, 0, 0, 0, 0, 500, 500, 500, 1)
+    PlayEffect(0xFF, 0xFF, 1, 0x4, 0, 2000, 0, 0, 0, 0, 500, 500, 500, 4)
 
     Sleep(500)
     Yield()
 
     #Voice(0x0, 3683, 3674, 0, 0, 0xFE)
-    WaitEffect(0xFF, 1)
+    WaitEffect(0xFF, 4)
     Yield()
+    #Sleep(1000)
+    #Yield()
 
     EndChrThread(0xFF, 1)
     Return()
@@ -460,6 +476,8 @@ def main():
     label('SysCraft_Win')
 
     LoadChrChip(7, "apl/ch51117.itc", 0xFF)
+
+    SetMSDataState(2, 0xFF, 0x4000)
 
     SetChipModeFlags(0x0, CraftTarget.Self, 0x2)
     SetChrChip(CraftTarget.Self, 7)
@@ -797,7 +815,7 @@ def main():
     SoundEx(229, 0x0)
     Sleep(800)
     Yield()
-    AS_26(0x2, 0xFF, 0x4000)
+    SetMSDataState(0x2, 0xFF, 0x4000)
     Sleep(1500)
     Yield()
     ResetBrightness(1000)
@@ -1233,9 +1251,9 @@ def main():
     # Craft_1A_26_DFB_伪盐之桩 end
 
 
-    def Craft_混乱之雨(): pass
+    def Craft_玻璃渣(): pass
 
-    label('Craft_混乱之雨')
+    label('Craft_玻璃渣')
 
     桩出现 = 2
     桩移动慢 = 3
@@ -1312,21 +1330,21 @@ def main():
 
     def lambda_Damage_Anime_Thread():
 
-        JumpToLabelIfHasTarget('混乱之雨_Damage_Anime_Thread_Entry')
+        JumpToLabelIfHasTarget('玻璃渣_Damage_Anime_Thread_Entry')
         Return()
 
-        label("混乱之雨_Damage_Anime_Thread_Entry")
+        label("玻璃渣_Damage_Anime_Thread_Entry")
 
         Sleep(800)
         Yield()
 
-        label("混乱之雨_Damage_Anime_Thread_Start")
+        label("玻璃渣_Damage_Anime_Thread_Start")
 
         ResetTarget()
 
-        label("混乱之雨_Damage_Anime_Anime_Next")
+        label("玻璃渣_Damage_Anime_Anime_Next")
 
-        ForeachTarget("混乱之雨_Damage_Anime_Anime_End")
+        ForeachTarget("玻璃渣_Damage_Anime_Anime_End")
 
         AS_67(0x121, 0xFF, 0xFE)
 
@@ -1335,13 +1353,13 @@ def main():
         Yield()
 
         NextTarget()
-        Jump("混乱之雨_Damage_Anime_Anime_Next")
+        Jump("玻璃渣_Damage_Anime_Anime_Next")
 
-        label("混乱之雨_Damage_Anime_Anime_End")
+        label("玻璃渣_Damage_Anime_Anime_End")
 
         Sleep(200)
         Yield()
-        Jump('混乱之雨_Damage_Anime_Thread_Start')
+        Jump('玻璃渣_Damage_Anime_Thread_Start')
 
         Return()
 
@@ -1387,8 +1405,11 @@ def main():
         CancelEffect(0xFF, i)
 
     Call('set_spirit_eff')
+    Sleep(400)
+    Yield()
 
-    Sleep(500)
+    SetChrSubChip(0xFF, 0x3)
+    Sleep(100)
     Yield()
 
     ChrSetPos(chr_shadow, CraftTarget.InitialPos, 0, 0, 0)
@@ -1398,7 +1419,7 @@ def main():
     Return()
 
 
-    # Craft_混乱之雨 end
+    # Craft_玻璃渣 end
 
     def Craft_闪电之力(): pass
 
@@ -1603,7 +1624,7 @@ def main():
     label('时空追放_Target_Vanish_Thread')
 
     PlayEffect(0xFF, 0xFF, 2, 0x1, 0, 0, 0, 0, 0, 0, 1500, 1500, 1500, 5)
-    HideChr(0xFF, 1000)
+    HideChr(0xFF, 700)
     Sleep(500)
     Yield()
 
@@ -1612,9 +1633,10 @@ def main():
     Yield()
 
     AS_8D(0x15, 0xFF, CraftConditionFlags.Vanish, 0, 9999)
-    DamageCue(0xFF)
     Sleep(250)
     Yield()
+
+    DamageCue(0xFF)
 
     Return()
 

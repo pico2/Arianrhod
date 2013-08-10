@@ -213,9 +213,12 @@ typedef union MONSTER_STATUS
 {
     DUMMY_STRUCT(0x2424);
 
-    BOOL IsChrEnemy()
+    BOOL IsChrEnemy(BOOL CheckAIType = TRUE)
     {
-        return AiType != 0xFF && !FLAG_ON(State, CHR_FLAG_NPC | CHR_FLAG_PLAYER | CHR_FLAG_EMPTY);
+        if (CheckAIType && AiType == 0xFF)
+            return FALSE;
+
+        return FLAG_OFF(State, CHR_FLAG_NPC | CHR_FLAG_PLAYER | CHR_FLAG_EMPTY);
     }
 
     BOOL IsChrCanThinkSCraft(BOOL CheckAiType = FALSE)
@@ -699,6 +702,8 @@ public:
 
     VOID NakedCopyMagicAndCraftData();
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
+
+    VOID NakedFindReplaceChr();
 
 
     typedef struct

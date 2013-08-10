@@ -562,6 +562,29 @@ _RET2:
     }
 }
 
+VOID FASTCALL FindReplaceChr(PMONSTER_STATUS MSData, PULONG RandomChrIndex)
+{
+    if (!MSData->IsChrEnemy(FALSE))
+        return;
+
+    FOR_EACH(RandomChrIndex, RandomChrIndex, 8)
+    {
+        *RandomChrIndex += 8;
+    }
+}
+
+NAKED VOID CBattle::NakedFindReplaceChr()
+{
+    INLINE_ASM
+    {
+        mov     dword ptr [ebp - 24h], 0;
+        mov     ecx, [ebp + 8h];
+        lea     edx, [ebp - 70h];
+        call    FindReplaceChr
+        ret;
+    }
+}
+
 /************************************************************************
   EDAO
 ************************************************************************/

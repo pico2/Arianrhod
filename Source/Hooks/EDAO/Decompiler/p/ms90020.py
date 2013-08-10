@@ -35,8 +35,8 @@ def main():
     Level              = 90
     MaximumHP          = 37170
     InitialHP          = 37170
-    MaximumEP          = 0
-    InitialEP          = 0
+    MaximumEP          = 9999*2
+    InitialEP          = 9999*2
     MaximumCP          = 200
     InitialCP          = 180
 
@@ -172,7 +172,7 @@ def main():
                     CraftState.Physical, CraftState.NoneState,
                     1, 50,
                     0, 30,
-                    200,
+                    100,
                     100,
                     175, 0,
                     0, 0,

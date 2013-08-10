@@ -49,8 +49,8 @@ InstructionNames[0x22] = 'BeginChrThread'
 InstructionNames[0x23] = 'WaitChrThread'
 InstructionNames[0x24] = 'SetChipModeFlags'
 InstructionNames[0x25] = 'ClearChipModeFlags'
-InstructionNames[0x26] = 'AS_26'
-InstructionNames[0x27] = 'AS_27'
+InstructionNames[0x26] = 'SetMSDataState'
+InstructionNames[0x27] = 'ClearMSDataState'
 InstructionNames[0x28] = 'Say'
 InstructionNames[0x29] = 'AS_29'
 InstructionNames[0x2A] = 'ShowInfoText'
@@ -460,8 +460,8 @@ edao_as_op_list = \
     inst(WaitChrThread,                 'BC'),
     inst(SetChipModeFlags,              'BBW'),
     inst(ClearChipModeFlags,            'BBW'),
-    inst(AS_26,                         'BBW'),
-    inst(AS_27,                         'BBW'),
+    inst(SetMSDataState,                'CBW'),         # SetMSDataState(state 1 or 2, chr, flags)
+    inst(ClearMSDataState,              'CBW'),
     inst(Say,                           'BSL'),
     inst(AS_29,                         'B'),
     inst(ShowInfoText,                  'SI'),
