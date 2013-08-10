@@ -397,7 +397,7 @@ def ShowMenu():
     label("rest_here")
     OP_32(0xFF, 0xFF, 0)
 
-    if True:
+    if False:
         SetScenarioFlags(SCENA_FLAGS_OFFSET_1, SCENA_FLAGS_BIT_ARIANRHOD)
         SetScenarioFlags(0x20, 2)
         CloseMessageWindow()

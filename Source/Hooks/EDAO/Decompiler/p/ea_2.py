@@ -66,13 +66,18 @@ def ea_2():
     PlayEffect(0xFF, 0xF3, eff_mg064_01, 0x0, 0, 4000, 10000, 0, 0, 0, 400, 400, 400, 0xFF)
     Sleep(200)
     Yield()
-    AS_7F(0x0, 0xBBFFFFFF, 0x0, 0x1, 0x1)
+    BlurSwitch(0x0, 0xBBFFFFFF, 0x0, 0x1, 0x1)
     ResetTarget()
 
     label("loc_xxxxxxxxxxxx_37D8")
 
     ForeachTarget("loc_xxxxxxxxxxxx_3802")
-    AS_AE(0xFE, 0x1, 0x14, b"\x11\xff\xf3\x00\x00\x00\x00\xac\r\x00\x00\x10'\x00\x00\xb8\x0b\x00\x00\x00\x00")
+
+    def lambda_37DF():
+        ChrMove(0xFF, 0xF3, 0, 3500, 10000, 3000, 0x0)
+        Return()
+
+    QueueWorkItem(0xFE, 1, lambda_37DF)
     BeginChrThread(0xFE, 3, "loc_xxxxxxxxxxxx_393C", 0x0)
     Sleep(30)
     Yield()
@@ -105,7 +110,7 @@ def ea_2():
     Sleep(100)
     Yield()
     PlayEffect(0xFF, 0xF3, eff_mg064_02, 0x0, 0, 3500, 9500, 65516, 0, 0, 750, 750, 750, 0x3)
-    AS_7F(0x190, 0xBBFFFFFF, 0x0, 0x1, 0x1)
+    BlurSwitch(0x190, 0xBBFFFFFF, 0x0, 0x1, 0x1)
     SetCameraDistance(4000, 2000)
     AS_3E(0x3E8, 0x7D0)
     SetBattleSpeed(0x320)

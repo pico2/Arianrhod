@@ -4,9 +4,9 @@ cd/d "%~dp0"
 rem c0130.bin.py
 rem fachr176._bn.py
 rem t_name.py
-as90010.dat.py
-ms90010.py
-ms90011.py
+
+for %%i in (as*.py) do %%i
+for %%i in (ms*.py) do %%i
 
 move /y *._bn J:\Falcom\ED_AO\patch\system
 move /y *._dt J:\Falcom\ED_AO\patch\text

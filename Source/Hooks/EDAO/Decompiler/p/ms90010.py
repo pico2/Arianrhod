@@ -137,7 +137,7 @@ def main():
                     "用超高速旋转的枪头形成的空间断层将所有敌人送入异次元空间。",
                     0x05, 0x12, 0x1,
                     CraftAttribute.NoAttribute,
-                    CraftRange.LineOnLocationIncludeSelf,
+                    CraftRange.LineOnLocation,
                     CraftState.Physical, CraftState.NoneState,
                     54, 100,
                     0, 70,

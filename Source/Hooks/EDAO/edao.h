@@ -159,29 +159,29 @@ typedef union
     {
         ULONG                   MaximumHP;                  // 0x234
         ULONG                   InitialHP;                  // 0x238
-        USHORT                  Level;                      // 0x23C
-        USHORT                  MaximumEP;                  // 0x23E
-        USHORT                  InitialEP;                  // 0x240
-        USHORT                  InitialCP;                  // 0x242
-        USHORT                  EXP;                        // 0x244
+        SHORT                   Level;                      // 0x23C
+        SHORT                   MaximumEP;                  // 0x23E
+        SHORT                   InitialEP;                  // 0x240
+        SHORT                   InitialCP;                  // 0x242
+        SHORT                   EXP;                        // 0x244
 
         DUMMY_STRUCT(2);
 
-        USHORT                  STR;                        // 0x248
-        USHORT                  DEF;                        // 0x24A
-        USHORT                  ATS;                        // 0x24C
-        USHORT                  ADF;                        // 0x24E
-        USHORT                  DEX;                        // 0x250
-        USHORT                  AGL;                        // 0x252
-        USHORT                  MOV;                        // 0x254
-        USHORT                  SPD;                        // 0x256
-        USHORT                  DEXRate;                    // 0x258
-        USHORT                  AGLRate;                    // 0x25A
-        USHORT                  MaximumCP;                  // 0x25C
+        SHORT                   STR;                        // 0x248
+        SHORT                   DEF;                        // 0x24A
+        SHORT                   ATS;                        // 0x24C
+        SHORT                   ADF;                        // 0x24E
+        SHORT                   DEX;                        // 0x250
+        SHORT                   AGL;                        // 0x252
+        SHORT                   MOV;                        // 0x254
+        SHORT                   SPD;                        // 0x256
+        SHORT                   DEXRate;                    // 0x258
+        SHORT                   AGLRate;                    // 0x25A
+        SHORT                   MaximumCP;                  // 0x25C
 
         DUMMY_STRUCT(2);                                    // 0x25E
 
-        USHORT                  RNG;                        // 0x260
+        SHORT                   RNG;                        // 0x260
 
         DUMMY_STRUCT(2);
 
@@ -683,7 +683,7 @@ public:
     VOID NakedOverWriteBattleStatusWithChrStatus();
 
     VOID NakedIsChrStatusNeedRefresh();
-    BOOL FASTCALL IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, ULONG_PTR PrevLevel);
+    BOOL FASTCALL IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, LONG_PTR PrevLevel);
 
     ULONG NakedGetChrIdForSCraft();
 

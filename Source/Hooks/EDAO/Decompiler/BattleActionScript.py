@@ -369,11 +369,14 @@ class BattleActionScriptInfo:
 ############################################################################################
 
 class BattleActionScriptInfoPort(BattleActionScriptInfo):
-    FileName = ''
-    Labels             = {}    # map<name, offset>
-    DelayFixLabels     = []    # list of LabelEntry
+    def __init__(self):
+        super().__init__()
 
-    fs = None
+        self.FileName = ''
+        self.Labels             = {}    # map<name, offset>
+        self.DelayFixLabels     = []    # list of LabelEntry
+        self.PrevousHandlerData = None
+        self.fs                 = None
 
 actionfile = None
 
@@ -482,29 +485,42 @@ for op, inst in edao.edao_as_op_table.items():
         func[0] = 'def %s(*args):' % opx
         exec('\r\n'.join(func))
 
+def AssembleForExec(expr):
+    return eval(expr)
+
 def OpCodeHandler(op, args):
     entry = edao.edao_as_op_table[op]
-    fs = actionfile.fs
 
     data = HandlerData(HANDLER_REASON_ASSEMBLE)
     data.Instruction    = Instruction(op)
     data.Arguments      = list(args)
-    data.FileStream     = fs
     data.TableEntry     = entry
+    data.Assemble       = AssembleForExec
 
     data.Instruction.OperandFormat = entry.Operand
 
-    data.FileStream = BytesStream().openmem()
+    UsePrevous = bool(actionfile.PrevousHandlerData != None)
+
+    if UsePrevous:
+        data.FileStream = actionfile.PrevousHandlerData.FileStream
+    else:
+        data.FileStream = BytesStream().openmem()
+        actionfile.PrevousHandlerData = data
 
     #print(entry.OpName)
     inst = OpCodeHandlerPrivate(data)
+
+    if UsePrevous:
+        return inst
+
+    actionfile.PrevousHandlerData = None
 
     offset = actionfile.fs.tell()
     for lb in inst.Labels:
         actionfile.DelayFixLabels.append(LabelEntry(lb.Label, lb.Offset + offset))
 
     data.FileStream.seek(0)
-    fs.write(data.FileStream.read())
+    actionfile.fs.write(data.FileStream.read())
 
     return inst
 
@@ -529,6 +545,7 @@ Jc(0x16, 0x1, 0x0, "loc_A4A")
 '''
 
 def procfile(file):
+    SetConsoleTitle(os.path.basename(file))
     print('disasm %s' % file)
     asdat = BattleActionScriptInfo()
     asdat.open(file)

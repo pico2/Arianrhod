@@ -162,10 +162,10 @@ InstructionNames[0xA1] = 'PlayEffectIfConditionExist'
 InstructionNames[0xA6] = 'AS_A6'
 InstructionNames[0xA7] = 'AS_A7'
 InstructionNames[0xA8] = 'AS_A8'
-InstructionNames[0xA9] = 'AS_A9'
+InstructionNames[0xA9] = 'SetEffectColor'
 InstructionNames[0xAC] = 'AS_AC'
 InstructionNames[0xAD] = 'AS_AD'
-InstructionNames[0xAE] = 'AS_AE'
+InstructionNames[0xAE] = 'QueueWorkItem'
 InstructionNames[0xAF] = 'AS_AF'
 InstructionNames[0xB0] = 'AS_B0'
 InstructionNames[0xB1] = 'AS_B1'
@@ -305,32 +305,94 @@ def as_op_91(data):
 
         return inst
 
-def as_op_ae(data):
-    
+
+def as_lambda_worker(data, extra_length):
+
     if data.Reason == HANDLER_REASON_DISASM:
 
         fs = data.FileStream
-        inst = data.Instruction
-        entry = data.TableEntry
+        ins = data.Instruction
 
-        inst.Operand = entry.GetAllOperand('BBB', fs)
-        inst.Operand.append(fs.read(inst.Operand[-1] + 1))
+        target, tid, length = data.TableEntry.GetAllOperand('BBB', fs)
 
-        inst.OperandFormat = 'BBBs'
+        length += extra_length
 
-        return inst
+        pos = fs.tell()
+        block = data.DisasmBlock(pos, length)
+        fs.seek(pos + length)
+
+        ins.Operand = [target, tid, block]
+
+        return ins
 
     elif data.Reason == HANDLER_REASON_FORMAT:
 
-        inst = data.Instruction
-        entry = data.TableEntry
+        '''
 
-        #return '%s(0x%X, 0x%X, 0x%X, %s)' % (entry.OpName, inst.Operand[0], inst.Operand[1], inst.Operand[3], inst.Operand[4])
+        def lambda_xxx():
+            OP_97(0xFE, 0x7D0, 0x0, 0x0, 0x7D0, 0x0)
+            OP_00()
+
+        X(ChrId, ChrThreadId, lambda_xxx)
+
+        '''
+
+        ins = data.Instruction
+        entry = data.TableEntry
+        target, tid, lambdablock = ins.Operand
+
+        lambda_name = 'lambda_%X' % lambdablock.Offset
+
+        txt = ['', 'def %s():' % lambda_name]
+
+        for inst in lambdablock.Instructions:
+            lambdadata = data.CreateBranch()
+            lambdadata.Instruction = inst
+            lambdabody = lambdadata.Format(lambdadata)
+            for i in range(len(lambdabody)):
+                if lambdabody[i] == '':
+                    continue
+                lambdabody[i] = '    ' + lambdabody[i]
+
+            txt += lambdabody
+
+        txt.append('')
+
+        txt.append('%s(0x%X, %d, %s)' % (data.TableEntry.OpName, target, tid, lambda_name))
+
+        return txt
+
 
     elif data.Reason == HANDLER_REASON_ASSEMBLE:
 
-        data.Arguments[-2] = len(data.Arguments[-1]) - 1
-        data.Instruction.OperandFormat = 'BBBs'
+        fs      = data.FileStream
+        entry   = data.TableEntry
+        inst    = data.Instruction
+
+        target, tid, lambdafunc = data.Arguments
+
+        entry.Container.WriteOpCode(fs, inst.OpCode)
+
+        entry.WriteOperand(data, 'B', target)
+        entry.WriteOperand(data, 'B', tid)
+
+        fs.seek(1, io.SEEK_CUR)
+        pos = fs.tell()
+
+        lambdafunc()
+
+        pos2 = fs.tell()
+
+        fs.seek(pos - 1)
+        entry.WriteOperand(data, 'B', pos2 - pos - extra_length)
+
+        fs.seek(pos2)
+
+        return inst
+
+def as_op_ae(data):
+
+    return as_lambda_worker(data, 1)        # Return
 
 def as_load_cclm(data):
 
@@ -381,8 +443,8 @@ edao_as_op_list = \
     inst(WaitEffect,                    'BB'),
     inst(StopEffect,                    'BB'),
     inst(CancelEffect,                  'BB'),
-    inst(PlayEffect,                    'BBBBiiihhhhhhC'),      # PlayEffect(eff_owner, chr, eff_index, x, z, y, degree_vert, degree_horz, unknown, size_x, size_z, size_y, eff_handle)
-    inst(Play3DEffect,                  'BBSBBiiihhhhhhC'),
+    inst(PlayEffect,                    'BBBBiiihhhhhhc'),      # PlayEffect(eff_owner, pos, eff_index, flag, x, z, y, degree_vert, degree_horz, unknown, size_x, size_z, size_y, eff_handle)
+    inst(Play3DEffect,                  'BBSBBiiihhhhhhc'),
     inst(AS_1A,                         'BBW'),
     inst(SetChrChip,                    'BB'),
     inst(DamageCue,                     'B'),
@@ -468,7 +530,7 @@ edao_as_op_list = \
     inst(AS_73,                         'B'),
     inst(AS_74,                         'BW'),
     inst(AS_77,                         'B'),
-    inst(AS_78,                         'B'),
+    inst(AS_78,                         'C'),
     inst(AS_79,                         'B'),
     inst(AS_7A,                         'B'),
     inst(AS_7B,                         'W'),
@@ -508,10 +570,10 @@ edao_as_op_list = \
     inst(AS_A6,                         'BBLLB'),
     inst(AS_A7,                         'BBBhhhhhhh'),
     inst(AS_A8,                         'BB'),
-    inst(AS_A9,                         'BBL'),
+    inst(SetEffectColor,                'BCL'),             # SetEffectColor(owner, eff_handle, rgba)
     inst(AS_AC,                         'LL'),
     inst(AS_AD,                         'B'),
-    inst(AS_AE,                         NO_OPERAND,             0,                          as_op_ae),
+    inst(QueueWorkItem,                 NO_OPERAND,             0,                          as_op_ae),
     inst(AS_AF,                         'W'),
     inst(AS_B0,                         'WW'),
     inst(AS_B1,                         'BSBL'),

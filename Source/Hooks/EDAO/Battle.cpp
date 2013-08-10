@@ -80,7 +80,7 @@ PMONSTER_STATUS FASTCALL CBattle::OverWriteBattleStatusWithChrStatus(PMONSTER_ST
     Final->AGL          += Raw->AGL         * 2 / 3;
     Final->MOV          += Raw->MOV         * 2 / 3;
     Final->SPD          += Raw->SPD         * 2 / 3;
-    Final->RNG           = Raw->RNG == 0 ? 1 : Raw->RNG;
+    Final->RNG           = Raw->RNG + 1;
 
     return MSData;
 }
@@ -99,7 +99,7 @@ NAKED VOID CBattle::NakedIsChrStatusNeedRefresh()
     }
 }
 
-BOOL FASTCALL CBattle::IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, ULONG_PTR PrevLevel)
+BOOL FASTCALL CBattle::IsChrStatusNeedRefresh(ULONG_PTR ChrPosition, PCHAR_STATUS CurrentStatus, LONG_PTR PrevLevel)
 {
     PMONSTER_STATUS MSData;
 
@@ -719,8 +719,8 @@ VOID THISCALL CBattleInfoBox::DrawMonsterStatus()
 
     typedef struct
     {
-        PCSTR Text;
-        ULONG Value;
+        PCSTR   Text;
+        LONG    Value;
 
         ULONG_PTR (*Format)(PMONSTER_STATUS MSData, PSTR Buffer);
 

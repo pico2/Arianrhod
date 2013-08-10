@@ -1272,7 +1272,12 @@ def main():
     DamageAnime(0xFE, 0x0, 0x32)
     Sleep(100)
     Yield()
-    AS_AE(0xFE, 0x1, 0x14, b'\x11\xff\xff\x00\x00\x00\x00x\x00\x00\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00')
+
+    def lambda_14C6():
+        ChrMove(0xFF, 0xFF, 0, 120, 0, 100, 0x0)
+        Return()
+
+    QueueWorkItem(0xFE, 1, lambda_14C6)
     NextTarget()
     Jump("loc_14B7")
 
@@ -1288,7 +1293,12 @@ def main():
     DamageAnime(0xFE, 0x0, 0x32)
     Sleep(50)
     Yield()
-    AS_AE(0xFE, 0x1, 0x14, b'\x11\xff\xff\x00\x00\x00\x00x\x00\x00\x00\x00\x00\x00\x002\x00\x00\x00\x00\x00')
+
+    def lambda_1514():
+        ChrMove(0xFF, 0xFF, 0, 120, 0, 50, 0x0)
+        Return()
+
+    QueueWorkItem(0xFE, 1, lambda_1514)
     NextTarget()
     Jump("loc_14E0")
 
