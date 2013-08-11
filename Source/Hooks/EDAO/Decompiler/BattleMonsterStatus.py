@@ -19,6 +19,16 @@ class BattleCraftInfo:
         if fs == None:
             return
 
+        '''
+
+            Target  :   MSData.State
+            0x10    :   0x1000 if party else 0x4000 (other side)
+            0x20    :   ebp-39
+            0x40    :   ebp-45
+            0x80    :   0x1000 if enemy (self side)
+
+        '''
+
         self.Index                  = CUSTOM_CRAFT_INDEX_BASE + index
         self.ActionIndex            = fs.ushort()   # 0x00
         self.Target                 = fs.byte()     # 0x02       # in fact, this is an ushort

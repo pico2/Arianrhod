@@ -20,12 +20,45 @@ VOID THISCALL CBattle::SetSelectedCraft(PMONSTER_STATUS MSData, USHORT CraftInde
 
 VOID THISCALL CBattle::SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftIndex, USHORT AiIndex)
 {
+    LONG_PTR                Index;
+    ArtsPage::ArtsPageType  ArtsType;
+    PCRAFT_AI_INFO          ArtsAI;
+    PCRAFT_INFO             CraftInfo;
+    EDAO*                   edao;
+    CArtsNameWindow*        ArtsWindow;
+
     MSData->SelectedActionType              = ACTION_ARTS;
     MSData->CurrentCraftIndex               = CraftIndex;
     MSData->CurrentAiIndex                  = AiIndex;
     MSData->SelectedCraft.CraftIndex        = CraftIndex;
     MSData->SelectedCraft.AriaActionIndex   = 6;
-    MSData->SelectedCraft.ActionIndex       = CraftIndex < MINIMUM_CUSTOM_CRAFT_INDEX ? 7 : MSData->MagicAiInfo[AiIndex].ActionIndex;
+
+    if (CraftIndex < MINIMUM_CUSTOM_CRAFT_INDEX)
+    {
+        MSData->SelectedCraft.ActionIndex = 7;
+        return;
+    }
+
+    edao        = GetEDAO();
+    ArtsWindow  = this->ArtsNameWindow;
+    ArtsType    = ArtsWindow->ArtsType;
+
+    Index = AiIndex;
+
+    FOR_EACH_ARRAY(ArtsAI, MSData->ArtsAiInfo)
+    {
+        if (ArtsAI->CraftIndex < MINIMUM_CUSTOM_CRAFT_INDEX)
+            continue;
+
+        Index -= edao->GetCraftType(&MSData->CraftInfo[ArtsAI->CraftIndex - MINIMUM_CUSTOM_CRAFT_INDEX]) == ArtsType;
+        if (Index < 0)
+        {
+            MSData->SelectedCraft.ActionIndex = ArtsAI->ActionIndex;
+            return;
+        }
+    }
+
+    MSData->SelectedCraft.ActionIndex = 7;
 }
 
 VOID THISCALL CBattle::SetSelectedAttack(PMONSTER_STATUS MSData)

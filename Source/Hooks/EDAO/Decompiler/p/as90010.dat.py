@@ -172,6 +172,7 @@ def main():
         CraftConditionFlags.MaxGuard,
         CraftConditionFlags.HPRecovery,
         CraftConditionFlags.CPRecovery,
+        CraftConditionFlags.Stealth,
         CraftConditionFlags.Dead,
         CraftConditionFlags.Vanish,
     ]

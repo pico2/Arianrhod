@@ -698,6 +698,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA     (0x5EB9E7, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange), CGlobal::StubFixWeaponShapeAndRange),  // weapon shape
         INLINE_HOOK_CALL_RVA_NULL(0x5EC037, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange)),                                       // weapon RNG
         INLINE_HOOK_CALL_RVA_NULL(0x5AF055, METHOD_PTR(&CBattle::   NakedFindReplaceChr)),
+        INLINE_HOOK_CALL_RVA_NULL(0x58B258, METHOD_PTR(&CBattle::   NakedCheckCraftTargetBits)),
 
 
         // inherit custom flags

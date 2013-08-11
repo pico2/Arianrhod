@@ -59,12 +59,12 @@ def main():
 
     label("SysCraft_Init")
 
-    LoadEffect(0x80, "event/ev10006.eff")
-    LoadEffect(0x81, "event/ev10007.eff")
+    LoadEffect(0x80, "event/ev17050.eff")
+    LoadEffect(0x81, "event/ev17051.eff")
     LoadEffect(0x82, "battle/cr036302.eff")
     LoadEffect(0x83, "battle/cr036010.eff")
     #Call("loc_50A")
-    AS_8D(0x15, 0xFF, 0x8000000, 0x0, 0x270F)
+    AS_8D(0x15, 0xFF, 0x8000000, 0x0, 9999)
     Call('set_spirit_eff')
     Return()
 
@@ -166,68 +166,12 @@ def main():
     Sleep(500)
     Yield()
 
-    #Voice(0x0, 3683, 3674, 0, 0, 0xFE)
     WaitEffect(0xFF, 4)
     Yield()
-    #Sleep(1000)
-    #Yield()
 
     EndChrThread(0xFF, 1)
     Return()
 
-
-    '''
-    SetChrChip(0xFF, 0x2)
-    SetChrSubChip(0xFF, 0x0)
-    Sleep(40)
-    Yield()
-    Call("loc_211")
-    Return()
-
-    label("loc_211")
-
-    ShakeChr(0xFF, -200, 0, -200)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 200, 0, 200)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, -200, 0, -200)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 200, 0, 200)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, -150, 0, -150)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 150, 0, 150)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, -100, 0, -100)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 100, 0, 100)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, -50, 0, -50)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 50, 0, 50)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, -50, 0, -50)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 50, 0, 50)
-    Sleep(50)
-    Yield()
-    ShakeChr(0xFF, 0, 0, 0)
-    Sleep(50)
-    Yield()
-    CallReturn()
-
-    '''
 
     # SysCraft_UnderAttack end
 
@@ -277,6 +221,17 @@ def main():
 
     # SysCraft_Dead end
 
+    label('shadow_chr_init')
+
+    chr_shadow = 0x12
+
+    ChrDuplicate(chr_shadow, 0xFF)
+    HideChr(chr_shadow, 0)
+    ChrSetPos(chr_shadow, 0xFB, 0, 0, 0)
+
+    CallReturn()
+
+
     def Craft_SysCraft_NormalAttack(): pass
 
     label("SysCraft_NormalAttack")
@@ -298,11 +253,7 @@ def main():
     Sleep(100)
     Yield()
 
-    chr_shadow = 0x12
-
-    ChrDuplicate(chr_shadow, 0xFF)
-    HideChr(chr_shadow, 0)
-    ChrSetPos(chr_shadow, 0xFB, 0, 0, 0)
+    Call('shadow_chr_init')
 
     Voice(0x0, 3676, 3677, 0, 0, 0xFE)
 
@@ -404,13 +355,13 @@ def main():
     TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     Jc(0x8, 0x1, 0x0, "loc_743")
     Jc(0x2D, 0x1, 0x1, "loc_716")
-    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
+    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, 500, 500, 500, arts_aria_eff_id)
     SetEffectColor(0xFF, 0x0, 0xFFFF0000)
     Jump("loc_743")
 
     label("loc_716")
 
-    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
+    PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, 500, 500, 500, arts_aria_eff_id)
     Voice(0x0, 3689, 3690, 0, 0, 0xFE)
     SoundEx(509, 0x0)
 
@@ -448,6 +399,16 @@ def main():
 
     ResetTarget()
     Jc(0x2D, 0x3, 0x2, "loc_79D")
+    Call('arts_cast_prepare')
+
+    label("loc_79D")
+
+    ArtsUsing(0xFFFF)
+    ArtsEnd()
+    Return()
+
+
+    label('arts_cast_prepare')
     #PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, -1000, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
     CancelEffect(0xFF, arts_aria_eff_id)
     SoundEx(510, 0x0)
@@ -463,11 +424,7 @@ def main():
     Sleep(0)
     Yield()
 
-    label("loc_79D")
-
-    ArtsUsing(0xFFFF)
-    ArtsEnd()
-    Return()
+    CallReturn()
 
     # SysCraft_ArtsCast end
 
@@ -479,6 +436,7 @@ def main():
 
     SetMSDataState(2, 0xFF, 0x4000)
 
+    SetChrSubChip(0xFF, 0)
     SetChipModeFlags(0x0, CraftTarget.Self, 0x2)
     SetChrChip(CraftTarget.Self, 7)
     ChrSetPos(0xFF, 0xFF, 0, 200, 0)
@@ -641,6 +599,8 @@ def main():
 
     label("Craft_10_16_8F0_真实之镜")
 
+    ShowInfoText('　绝对暗示　', 1000)
+
     AS_6D(0x80000000)
     AS_78(0x1)
     LoadEffect(0x0, "battle/cr036100.eff")
@@ -648,36 +608,80 @@ def main():
     AS_78(0x0)
     SetBrightness(0x0, 0x2, 2000)
     AS_6D(0x40000)
+
+    Call('shadow_chr_init')
+
     ResetTarget()
     ResetLookingTargetData()
-    LookingTargetAdd(0xFF, "", 0x0)
-    LookingTargetAdd(0xFE, "", 0x0)
-    LookingTarget(100, 20, 30)
-    TurnDirection(0xFF, 0xFE, 0, 500, 0x0)
+    LookingTargetAdd(chr_shadow, "", 0x0)
+    LookingTarget(50, 50, 50)
+
+    #TurnDirection(0xFF, chr_shadow, 0, 500, 0x0)
+
     Voice(0x0, 3678, 0, 0, 0, 0xFE)
-    PlayEffect(0xFF, 0xFF, 0x1, 0x5, 0, 0, 0, 0, 0, 0, 900, 900, 900, 2)
-    PlayEffect(0xFF, 0xFE, 0x0, 0x5, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 255)
+
+    def lambda_set_mirror_thread():
+        PlayEffect(0xFF, 0xFF, 0x1, 0x5, 0, 0, 0, 0, 0, 0, 900, 900, 900, 9)
+        PlayEffect(0xFF, 0xFF, 0x0, 0x5, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, -1)
+        #AS_67(0xD0, 0xFF, 0xFE)
+
+        Sleep(1700)
+        Yield()
+
+
+        Random_Execute(50, 'change_from_party_to_enemy')
+
+        ClearMSDataState(1, 0xFF, 0x1000)
+        SetMSDataState(1, 0xFF, 0x4000)
+        Jump('party_enemy_change_end')
+
+        label('change_from_party_to_enemy')
+
+        ClearMSDataState(1, 0xFF, 0x4000)
+        SetMSDataState(1, 0xFF, 0x1000)
+
+
+        label('party_enemy_change_end')
+
+        Sleep(1000)
+        Yield()
+
+        StopSound(3679)
+        SoundEx(3679, 0)
+
+        Return()
+
+
+    def lambda_照妖镜_select_target():
+
+        Random_Execute(50, 'lambda_照妖镜_select_target_end')
+
+        QueueWorkItem(0xFE, 3, lambda_set_mirror_thread)
+        DamageCue(0xFE)
+
+        label('lambda_照妖镜_select_target_end')
+
+        Yield()
+
+
     SoundEx(335, 0x0)
-    AS_67(0xD0, 0xFF, 0xFE)
+    ForeachTargetEx(lambda_照妖镜_select_target)
+
     BeginChrThread(0xFF, 1, "loc_135", 0x0)
     Sleep(1700)
     Yield()
+
     EndChrThread(0xFF, 1)
+
     SetChrSubChip(0xFF, 0x3)
     Sleep(300)
     Yield()
     SetChrSubChip(0xFF, 0x4)
     SoundEx(325, 0x0)
-    ResetLookingTargetData()
-    LookingTargetAdd(0xFE, "", 0x0)
-    LookingTarget(100, 20, 30)
-    Sleep(500)
-    Yield()
-    DamageAnime(0xFE, 0x0, 0x32)
-    DamageCue(0xFE)
-    AS_67(0x14C, 0xFF, 0xFE)
+
     Sleep(1000)
     Yield()
+
     AS_6E(0x80000000)
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
     AS_8F(0x0)
@@ -687,8 +691,7 @@ def main():
     Sleep(30)
     Yield()
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
-    Voice(0x0, 3679, 0, 0, 0, 0xFE)
-    Sleep(3000)
+    Sleep(300)
     Yield()
     FreeEffect(0x0)
     FreeEffect(0x1)
@@ -818,6 +821,7 @@ def main():
     SetMSDataState(0x2, 0xFF, 0x4000)
     Sleep(1500)
     Yield()
+    AS_8D(0x15, 0xFF, 0x8000000, 0x0, 9999)
     ResetBrightness(1000)
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
     AS_14(0x0)
@@ -1308,12 +1312,8 @@ def main():
     Sleep(200)
     Yield()
 
+    Call('shadow_chr_init')
 
-    chr_shadow = 0x12
-
-    ChrDuplicate(chr_shadow, 0xFF)
-    HideChr(chr_shadow, 0)
-    ChrSetPos(chr_shadow, 0xFB, 0, 0, 0)
 
     LookingTargetAdd(chr_shadow, "", 0x0)
     LookingTarget(30, 40, 40)
@@ -1431,58 +1431,33 @@ def main():
     LoadEffect(0x1, "battle\\mg043_01.eff")
     AS_78(0)
 
-    #PlayEffect(0xFF, 0xF9, 0x81, 0x0, 0, -1000 + 250, 0, 0, 0, 0, -1, -1, -1, 0)
-    CancelEffect(0xFF, arts_aria_eff_id)
-    SoundEx(510, 0x0)
-    TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
-    Sleep(200)
-    Yield()
-    SetChrChip(0xFF, 0x3)
-    SetChrSubChip(0xFF, 0x3)
-    Sleep(300)
-    Yield()
-    Voice(0x0, 3691, 3692, 0, 0, 0xFE)
-    SetChrSubChip(0xFF, 0x4)
-    Sleep(0)
-    Yield()
+    Call('arts_cast_prepare')
 
     LockCamera(0xF4, 0, 0, 0, 600)
     Sleep(600)
     Yield()
     PlayEffect(0xFF, 0xFB, 0x0, 0x0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 4)
-    #Sleep(1700)
-    #Yield()
-    ResetTarget()
 
-    label("loc_xxxxxx_23F7")
+    def attack_anime():
+        PlayEffect(0xFF, 0xFE, 0x0, 0x0, 0, 50, 0, 0, 0, 0, 800, 800, 800, -1)
+        DamageAnime(0xFE, 0x0, 0x32)
+        Sleep(50)
+        Yield()
 
-    ForeachTarget("loc_xxxxxx_2426")
-    PlayEffect(0xFF, 0xFE, 0x0, 0x0, 0, 50, 0, 0, 0, 0, 800, 800, 800, -1)
-    DamageAnime(0xFE, 0x0, 0x32)
-    Sleep(50)
-    Yield()
-    NextTarget()
-    Jump("loc_xxxxxx_23F7")
-
-    label("loc_xxxxxx_2426")
+    ForeachTargetEx(attack_anime)
 
     Sleep(1700)
     Yield()
 
-    ResetTarget()
 
-    label("loc_yyyyyyyy_23F7")
+    def attack_action():
+        PlayEffect(0xFF, 0xFE, 0x1, 0x0, 0, 0, 0, 0, 0, 0, 500, 500, 500, -1)
+        DamageAnime(0xFE, 0x0, 0x32)
+        DamageCue(0xFE)
+        Sleep(50)
+        Yield()
 
-    ForeachTarget("loc_yyyyyyyy_2426")
-    PlayEffect(0xFF, 0xFE, 0x1, 0x0, 0, 0, 0, 0, 0, 0, 500, 500, 500, -1)
-    DamageAnime(0xFE, 0x0, 0x32)
-    DamageCue(0xFE)
-    Sleep(50)
-    Yield()
-    NextTarget()
-    Jump("loc_yyyyyyyy_23F7")
-
-    label("loc_yyyyyyyy_2426")
+    ForeachTargetEx(attack_action)
 
     WaitEffect(0xFF, 0x4)
     AS_14(0x1)
@@ -1520,11 +1495,7 @@ def main():
     Sleep(100)
     Yield()
 
-    chr_shadow = 0x12
-
-    ChrDuplicate(chr_shadow, 0xFF)
-    HideChr(chr_shadow, 0)
-    ChrSetPos(chr_shadow, 0xFB, 0, 0, 0)
+    Call('shadow_chr_init')
 
     Random_Execute(50, '时空追放_Voice_2')
 
@@ -1569,7 +1540,7 @@ def main():
     WaitChrThread(0xFF, 1)
     Yield()
 
-    Sleep(2500)
+    Sleep(1000)
     Yield()
 
     CancelEffect(0xFF, 0x2)
@@ -1599,10 +1570,11 @@ def main():
 
     Random_Execute(50, '时空追放_Vanish_Fail')
     BeginChrThread(0xFE, 3, '时空追放_Target_Vanish_Thread', 0)
+    DamageCue(0xFE)
     Jump('时空追放_Damage_Anime_Continue')
 
     label('时空追放_Vanish_Fail')
-    BeginChrThread(0xFE, 3, '时空追放_Target_Vanish_Fail_Thread', 0)
+    #BeginChrThread(0xFE, 3, '时空追放_Target_Vanish_Fail_Thread', 0)
 
     label("时空追放_Damage_Anime_Continue")
 
@@ -1614,8 +1586,6 @@ def main():
     label("时空追放_Damage_Anime_End")
 
 
-    SoundEx(4135, 0)
-
     Yield()
     Return()
 
@@ -1623,6 +1593,12 @@ def main():
 
     label('时空追放_Target_Vanish_Thread')
 
+    #ClearMSDataState(1, 0xFF, 0x1000)
+    #SetMSDataState(1, 0xFF, 0x4000)
+    #Return()
+
+    StopSound(4135)
+    SoundEx(4135, 0)
     PlayEffect(0xFF, 0xFF, 2, 0x1, 0, 0, 0, 0, 0, 0, 1500, 1500, 1500, 5)
     HideChr(0xFF, 700)
     Sleep(500)
@@ -1635,8 +1611,6 @@ def main():
     AS_8D(0x15, 0xFF, CraftConditionFlags.Vanish, 0, 9999)
     Sleep(250)
     Yield()
-
-    DamageCue(0xFF)
 
     Return()
 

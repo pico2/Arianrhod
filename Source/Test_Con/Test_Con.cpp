@@ -656,21 +656,6 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
-#define PROPERTY(type, name) \
-    __declspec(property(put = __property_set_##name, get = __property_get_##name ) ) type name; \
-    typedef type __property_type_##name
-
-#define READONLY_PROPERTY(type, name) \
-    __declspec(property(get = __property_get_##name) ) type name; \
-    typedef type __property_type_##name
-
-#define WRITEONLY_PROPERTY(type, name) \
-    __declspec(property(put = __property_set_##name) ) type name; \
-    typedef type property__tmp_type_##name
-
-#define GET(name) __property_type_##name __property_get_##name()
-#define SET(name) void __property_set_##name(const __property_type_##name & value)
-
 class Vector2
 {
 public:

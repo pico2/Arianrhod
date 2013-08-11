@@ -12,3 +12,21 @@ def Random_Execute(Probability, LabelName):
 
 def ChrSetSize(chr, x, z, y):
     AS_8D(0x7, chr, x, z, y)
+
+def ForeachTargetEx(func, reset = True):
+    if reset:
+        ResetTarget()
+
+    foreach_begin   = GenerateUniqueLable()
+    foreach_end     = GenerateUniqueLable()
+
+    label(foreach_begin)
+
+    ForeachTarget(foreach_end)
+    
+    func()
+
+    NextTarget()
+    Jump(foreach_begin)
+
+    label(foreach_end)

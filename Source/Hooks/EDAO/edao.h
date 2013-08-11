@@ -99,6 +99,16 @@ typedef struct  // 0x18
 
 } CRAFT_AI_INFO, *PCRAFT_AI_INFO;
 
+ML_NAMESPACE_BEGIN(CraftInfoTargets)
+
+enum
+{
+    OtherSide   = 0x10,
+    SelfSide    = 0x80,
+};
+
+ML_NAMESPACE_END
+
 typedef struct
 {
     USHORT  ActionIndex;
@@ -159,11 +169,11 @@ typedef union
     {
         ULONG                   MaximumHP;                  // 0x234
         ULONG                   InitialHP;                  // 0x238
-        SHORT                   Level;                      // 0x23C
-        SHORT                   MaximumEP;                  // 0x23E
-        SHORT                   InitialEP;                  // 0x240
-        SHORT                   InitialCP;                  // 0x242
-        SHORT                   EXP;                        // 0x244
+        USHORT                  Level;                      // 0x23C
+        USHORT                  MaximumEP;                  // 0x23E
+        USHORT                  InitialEP;                  // 0x240
+        USHORT                  InitialCP;                  // 0x242
+        USHORT                  EXP;                        // 0x244
 
         DUMMY_STRUCT(2);
 
@@ -177,7 +187,7 @@ typedef union
         SHORT                   SPD;                        // 0x256
         SHORT                   DEXRate;                    // 0x258
         SHORT                   AGLRate;                    // 0x25A
-        SHORT                   MaximumCP;                  // 0x25C
+        USHORT                  MaximumCP;                  // 0x25C
 
         DUMMY_STRUCT(2);                                    // 0x25E
 
@@ -304,7 +314,7 @@ typedef union MONSTER_STATUS
         USHORT                  Equipment[5];               // 0x54C
         USHORT                  Orbment[7];                 // 0x556
         CRAFT_AI_INFO           Attack;                     // 0x564
-        CRAFT_AI_INFO           MagicAiInfo[80];            // 0x57C
+        CRAFT_AI_INFO           ArtsAiInfo[80];             // 0x57C
         CRAFT_AI_INFO           CraftAiInfo[15];            // 0xCFC
         CRAFT_AI_INFO           SCraftAiInfo[5];            // 0xE64
         CRAFT_AI_INFO           SupportAiInfo[3];           // 0xEDC
@@ -563,6 +573,34 @@ public:
     PAT_BAR_ENTRY THISCALL LookupReplaceAtBarEntry(PMONSTER_STATUS MSData, BOOL IsFirst);
 };
 
+ML_NAMESPACE_BEGIN(ArtsPage)
+
+enum ArtsPageType
+{
+    Attack      = 0,
+    Recovery    = 1,
+    Debuff      = 2,
+    Auxiliary   = 3,
+    Master      = 4,
+};
+
+ML_NAMESPACE_END
+
+class CArtsNameWindow
+{
+public:
+
+    READONLY_PROPERTY(ULONG_PTR, SelectedArtsIndex)
+    {
+        return *(PULONG)PtrAdd(this, 0xBC);
+    }
+
+    READONLY_PROPERTY(ArtsPage::ArtsPageType, ArtsType)
+    {
+        return (ArtsPage::ArtsPageType)*(PULONG)PtrAdd(this, 0xDC);
+    }
+};
+
 class CBattle
 {
 public:
@@ -576,14 +614,14 @@ public:
         return *(CSSaveData **)PtrAdd(this, 0x38D28);
     }
 
+    READONLY_PROPERTY(CArtsNameWindow*, ArtsNameWindow)
+    {
+        return *(CArtsNameWindow **)PtrAdd(this, 0xFF59C);
+    }
+
     CBattleInfoBox* GetBattleInfoBox()
     {
         return (CBattleInfoBox *)PtrAdd(this, 0xF0D24);
-    }
-
-    BOOL IsCustomChar(ULONG_PTR ChrId)
-    {
-        return GetSaveData()->IsCustomChar(ChrId);
     }
 
     EDAO* GetEDAO()
@@ -594,6 +632,11 @@ public:
     CBattleATBar* GetBattleATBar()
     {
         return (CBattleATBar *)PtrAdd(this, 0x103148);
+    }
+
+    BOOL IsCustomChar(ULONG_PTR ChrId)
+    {
+        return GetSaveData()->IsCustomChar(ChrId);
     }
 
     BOOL IsForceInsertToFirst()
@@ -704,6 +747,7 @@ public:
     VOID FASTCALL CopyMagicAndCraftData(PMONSTER_STATUS MSData);
 
     VOID NakedFindReplaceChr();
+    VOID NakedCheckCraftTargetBits();
 
 
     typedef struct
@@ -1094,6 +1138,11 @@ public:
         *(PVOID *)&f = (PVOID)0x675FF7;
 
         return (this->*f)(ChrId, Level, Unknown);
+    }
+
+    ArtsPage::ArtsPageType THISCALL GetCraftType(PCRAFT_INFO StateCraftInfo, PCRAFT_INFO EPCPCraftInfo = nullptr)
+    {
+        DETOUR_METHOD(EDAO, GetCraftType, 0x97F100, StateCraftInfo, EPCPCraftInfo);
     }
 
 

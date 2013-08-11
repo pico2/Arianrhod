@@ -35,8 +35,8 @@ def main():
     Level              = 90
     MaximumHP          = 37170
     InitialHP          = 37170
-    MaximumEP          = 9999*2
-    InitialEP          = 9999*2
+    MaximumEP          = 60000
+    InitialEP          = 60000
     MaximumCP          = 200
     InitialCP          = 180
 
@@ -178,36 +178,6 @@ def main():
                     0, 0,
                )
 
-    龙皇炼狱火 = CreateCraft(
-                    "伪·龙皇炼狱火",
-                    "用幻术伪装的魔法",
-                    0x23, 0x12, 0x21,
-                    CraftAttribute.Hono,
-                    CraftRange.FullMap,
-                    CraftState.Arts, CraftState.Burning,
-                    135, 100,
-                    0, 20,
-                    0,
-                    100,
-                    410, 0,
-                    15, 3,
-               )
-
-    闪电之力 = CreateCraft(
-                    "伪·闪电之力",
-                    "用幻术伪装的魔法",
-                    0x05, 0x12, 0x21,
-                    CraftAttribute.Kaze,
-                    CraftRange.FullMap,
-                    CraftState.Arts, CraftState.BanCraft,
-                    135, 100,
-                    0, 15,
-                    0,
-                    100,
-                    270, 0,
-                    30, 3,
-               )
-
     死亡之指 = CreateCraft(
                     "死亡之指",
                     "",
@@ -231,7 +201,22 @@ def main():
                     CraftRange.FullMap,
                     CraftState.NoneState, CraftState.NoneState,
                     1, 100,
-                    0, 40,
+                    0, 50,
+                    0,
+                    100,
+                    0, 0,
+                    0, 0,
+               )
+
+    真实之镜 = CreateCraft(
+                    "照妖镜",
+                    "",
+                    0x05, 0x92, 0x1,
+                    CraftAttribute.NoAttribute,
+                    CraftRange.FullMap,
+                    CraftState.NoneState, CraftState.NoneState,
+                    1, 100,
+                    0, 50,
                     0,
                     100,
                     0, 0,
@@ -253,23 +238,82 @@ def main():
                     0, 0,
                )
 
+
+    #################################################################################
+    # arts                                                                          #
+    #################################################################################
+
+    龙皇炼狱火 = CreateCraft(
+                    "伪·龙皇炼狱火",
+                    "",
+                    0x23, 0x12, 0x21,
+                    CraftAttribute.Hono,
+                    CraftRange.FullMap,
+                    CraftState.Arts, CraftState.Burning,
+                    135, 100,
+                    0, 20,
+                    0,
+                    100,
+                    410, 0,
+                    15, 3,
+               )
+
+    闪电之力 = CreateCraft(
+                    "伪·闪电之力",
+                    "",
+                    0x05, 0x12, 0x21,
+                    CraftAttribute.Kaze,
+                    CraftRange.FullMap,
+                    CraftState.Arts, CraftState.BanCraft,
+                    135, 100,
+                    0, 15,
+                    0,
+                    100,
+                    270, 0,
+                    30, 3,
+               )
+
+    虚空幻域 = CreateCraft(
+                    "伪·虚空幻域",
+                    "",
+                    0x79, 0xC2, 0x21,
+                    CraftAttribute.Gen,
+                    CraftRange.FullMap,
+                    CraftState.Stealth, CraftState.NoneState,
+                    135, 100,
+                    0, 25,
+                    0,
+                    100,
+                    1, 9999,
+                    0, 0,
+               )
+
+    #################################################################################
+    # arts end                                                                      #
+    #################################################################################
+
     CraftList = CreateCraftList([
                     Craft_03E8,
                     相位重置,
                     置换,
                     空间转移,
+
                     伪盐之桩,
-                    龙皇炼狱火,
-                    闪电之力,
                     死亡之指,
                     玻璃渣,
                     时空追放,
+                    真实之镜,
+
+                    龙皇炼狱火,
+                    闪电之力,
+                    虚空幻域,
                 ])
 
     Attack = CreateAI(0x1,  100,  0x8,  0x1,  0x00, 0x05, Craft_03E8,      [0,     0,      0,      0])
 
     Arts_龙皇炼狱火      = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x07, 龙皇炼狱火,        [0,     0,      1,      0])
     Arts_闪电之力        = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x18, 闪电之力,        [0,     0,      1,      0])
+    Arts_虚空幻域        = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x07, 虚空幻域,        [0,     0,      1,      0])
 
     Craft_置换           = CreateAI(0x8,  100,  0x0,  0x1,  0x00, 0x12, 置换,            [100,   1,      0,      0])
     #Craft_真实之镜       = CreateAI(0x2,  40,   0x18, 0x1,  0x00, 0x10, 真实之镜,        [0,     0,      0x40000000, 0])
@@ -278,11 +322,12 @@ def main():
     Craft_死亡之指       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x05, 死亡之指,        [3500,  2,      0,      2])
     Craft_玻璃渣         = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x17, 玻璃渣,        [3500,  2,      0,      2])
     Craft_时空追放       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x19, 时空追放,      [3500,  2,      0,      2])
+    Craft_真实之镜       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x10, 真实之镜,      [3500,  2,      0,      2])
 
     SCraft_伪盐之桩      = CreateAI(0xA,  100,  0x0,  0x1,  0x00, 0x1A, 伪盐之桩,        [200,   0,      0,      0])
 
-    ArtsAIList         = [Arts_龙皇炼狱火, Arts_闪电之力]
-    CraftAIList        = [Craft_时空追放, Craft_玻璃渣, Craft_死亡之指, Craft_置换, Craft_相位重置, Craft_空间转移]
+    ArtsAIList         = [Arts_虚空幻域, Arts_龙皇炼狱火, Arts_闪电之力]
+    CraftAIList        = [Craft_死亡之指, Craft_真实之镜, Craft_时空追放, Craft_玻璃渣, Craft_置换, Craft_相位重置, Craft_空间转移]
     SCraftAIList       = [SCraft_伪盐之桩]
     SupportCraftAIList = []
 

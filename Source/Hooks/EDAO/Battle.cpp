@@ -20,11 +20,11 @@ VOID FASTCALL CBattle::CopyMagicAndCraftData(PMONSTER_STATUS MSData)
     if (!IsCustomChar(MSData->CharID))
         return;
 
-    MaxMagicNumber  = countof(MSData->MagicAiInfo);
-    Magic           = MSData->MagicAiInfo;
+    MaxMagicNumber  = countof(MSData->ArtsAiInfo);
+    Magic           = MSData->ArtsAiInfo;
     MagicList       = GetSaveData()->GetChrMagicList() + MSData->CharID * MaxMagicNumber;
 
-    for (ULONG_PTR Count = countof(MSData->MagicAiInfo); Count; --Count)
+    for (ULONG_PTR Count = countof(MSData->ArtsAiInfo); Count; --Count)
     {
         if (Magic->CraftIndex == 0)
             break;
@@ -581,6 +581,23 @@ NAKED VOID CBattle::NakedFindReplaceChr()
         mov     ecx, [ebp + 8h];
         lea     edx, [ebp - 70h];
         call    FindReplaceChr
+        ret;
+    }
+}
+
+ULONG_PTR FASTCALL CheckPartyCraftTargetBits(PMONSTER_STATUS MSData, PCRAFT_INFO CraftInfo)
+{
+    return (-FLAG_ON(CraftInfo->Target, CraftInfoTargets::OtherSide) & 0x1000) | (-FLAG_ON(CraftInfo->Target, CraftInfoTargets::SelfSide) & 0x4000);
+}
+
+NAKED VOID CBattle::NakedCheckCraftTargetBits()
+{
+    INLINE_ASM
+    {
+        mov     ecx, [ebp - 044h];
+        mov     edx, [ebp - 12Ch];
+        call    CheckPartyCraftTargetBits
+        mov     [ebp - 0CCh], eax;
         ret;
     }
 }
