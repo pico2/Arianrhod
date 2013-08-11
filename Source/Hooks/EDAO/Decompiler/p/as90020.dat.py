@@ -179,6 +179,11 @@ def main():
 
     label("SysCraft_Dead")
 
+    for i in range(4):
+        ClearMSDataState(1, i, 0x1000)
+        SetMSDataState(1, i, 0x4000)
+
+
     AS_6C()
     Jc(0x2, 0x2, 0x10, "loc_523")
     Jump("loc_12A")
