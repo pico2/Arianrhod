@@ -77,9 +77,16 @@ ML_NAMESPACE_BEGIN(CraftConditions)
 
     static const ULONG_PTR Stealth             = 0x04000000;
     static const ULONG_PTR ArtsReflect         = 0x08000000;
+
     static const ULONG_PTR Reserve_1           = 0x10000000;
+    static const ULONG_PTR Boost               = 0x10000000;
+
+    static const ULONG_PTR CraftReflect     = 0x20000000;
+
     static const ULONG_PTR Reserve_2           = 0x20000000;
+
     static const ULONG_PTR Reserve_3           = 0x40000000;
+    static const ULONG_PTR GreenPepper         = 0x40000000;
 
     static const ULONG_PTR Dead                = 0x80000000;
 
@@ -204,10 +211,19 @@ typedef struct
 {
     ULONG               ConditionFlags;
     PVOID               Effect;
-    BYTE                Unknown2[2];
-    USHORT              ConditionRate;
-    ULONG               ATLeft;
-    ULONG               Unknown4;
+    BYTE                CounterType;
+    BYTE                Flags;
+    SHORT               ConditionRate;
+    LONG                ATLeft;
+    LONG                Unknown4;
+
+    enum CounterTypes
+    {
+        ByRounds    = 1,
+        ByTimes     = 2,
+        ByActions   = 3,
+        Infinite    = 4,
+    };
 
 } MS_EFFECT_INFO, *PMS_EFFECT_INFO;
 
@@ -215,7 +231,7 @@ enum
 {
     CHR_FLAG_ENEMY  = 0x1000,
     CHR_FLAG_NPC    = 0x2000,
-    CHR_FLAG_PLAYER = 0x4000,
+    CHR_FLAG_PARTY = 0x4000,
     CHR_FLAG_EMPTY  = 0x8000,
 };
 
@@ -228,7 +244,7 @@ typedef union MONSTER_STATUS
         if (CheckAIType && AiType == 0xFF)
             return FALSE;
 
-        return FLAG_OFF(State, CHR_FLAG_NPC | CHR_FLAG_PLAYER | CHR_FLAG_EMPTY);
+        return FLAG_OFF(State, CHR_FLAG_NPC | CHR_FLAG_PARTY | CHR_FLAG_EMPTY);
     }
 
     BOOL IsChrCanThinkSCraft(BOOL CheckAiType = FALSE)
@@ -517,11 +533,11 @@ typedef union
         USHORT  Flags;                // 0x6C
 
         DUMMY_STRUCT(3);
-        BYTE    RNo;		        // 0x71
+        BYTE    RNo;                // 0x71
 
         DUMMY_STRUCT(1);
 
-        BYTE    sequence;	        // 0x73
+        BYTE    sequence;           // 0x73
         BOOLEAN IsSBreaking;
 
         DUMMY_STRUCT(3);
@@ -545,7 +561,7 @@ public:
     {
         TYPE_OF(&CBattleATBar::GetChrAT0) f;
         *(PVOID *)&f = (PVOID)0x00677230;
-		return (this->*f)();
+        return (this->*f)();
     }
 
     VOID AdvanceChrInATBar(PMONSTER_STATUS MSData, BOOL InsertToFirstPos)
@@ -697,6 +713,11 @@ public:
         return (this->*UpdateHP)(MSData, Increment, Initial, What);
     }
 
+    VOID THISCALL UpdateEffectLeftTime(PMONSTER_STATUS MSData, LONG LeftTime, BYTE CounterType, ULONG ConditionFlag)
+    {
+        DETOUR_METHOD(CBattle, UpdateEffectLeftTime, 0x9E3570, MSData, LeftTime, CounterType, ConditionFlag);
+    }
+
     /************************************************************************
       bug fix
     ************************************************************************/
@@ -749,6 +770,13 @@ public:
     VOID NakedFindReplaceChr();
     VOID NakedCheckCraftTargetBits();
 
+    VOID THISCALL GetConditionIconPosByIndex(Gdiplus::PointF *Position, PMS_EFFECT_INFO EffectInfo, ULONG_PTR ConditionIndex);
+    BOOL THISCALL IsTargetCraftReflect(PMONSTER_STATUS Self, PMONSTER_STATUS Target, ULONG_PTR ActionType = 0xFFFF);
+    VOID THISCALL OnSetChrConditionFlag(PMONSTER_STATUS MSData, ULONG Param2, ULONG ConditionFlag, USHORT Param4, USHORT Param5);
+
+    BOOL FASTCALL UpdateCraftReflectLeftTime(BOOL CanNotReflect, PMONSTER_STATUS MSData);
+    VOID NakedUpdateCraftReflectLeftTime();
+
 
     typedef struct
     {
@@ -800,7 +828,7 @@ public:
     VOID THISCALL LoadMSFile(PMONSTER_STATUS MSData, ULONG MSFileIndex);
     VOID THISCALL LoadMonsterIt3(ULONG CharPosition, ULONG par2, PSTR it3Path);
     VOID NakedAS_8D_5F();
-	VOID THISCALL AS_8D_5F(PMONSTER_STATUS);
+    VOID THISCALL AS_8D_5F(PMONSTER_STATUS);
 
     VOID THISCALL UnsetCondition(PMONSTER_STATUS MSData, ULONG condition)
     {
@@ -814,7 +842,7 @@ public:
         TYPE_OF(&CBattle::SetCondition) f;
         *(PVOID *)&f = (PVOID)0x676EA2;
         return (this->*f)(MSData, par2, condition, par4, par5);
-	}
+    }
 
     BOOL CheckCondition(PMONSTER_STATUS MSData, ULONG condition, ULONG par3=0)
     {
@@ -833,6 +861,8 @@ public:
     DECL_STATIC_METHOD_POINTER(CBattle, ThinkRunaway);
     DECL_STATIC_METHOD_POINTER(CBattle, ThinkSCraft);
     DECL_STATIC_METHOD_POINTER(CBattle, ExecuteActionScript);
+    DECL_STATIC_METHOD_POINTER(CBattle, IsTargetCraftReflect);
+    DECL_STATIC_METHOD_POINTER(CBattle, OnSetChrConditionFlag);
 };
 
 INIT_STATIC_MEMBER(CBattle::StubSetCurrentActionChrInfo);
@@ -840,6 +870,8 @@ INIT_STATIC_MEMBER(CBattle::StubThinkRunaway);
 INIT_STATIC_MEMBER(CBattle::StubThinkSCraft);
 INIT_STATIC_MEMBER(CBattle::StubLoadMSFile);
 INIT_STATIC_MEMBER(CBattle::StubExecuteActionScript);
+INIT_STATIC_MEMBER(CBattle::StubIsTargetCraftReflect);
+INIT_STATIC_MEMBER(CBattle::StubOnSetChrConditionFlag);
 
 class CSound
 {

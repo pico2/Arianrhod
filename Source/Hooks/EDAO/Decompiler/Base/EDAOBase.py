@@ -361,9 +361,15 @@ class CraftConditionFlags:
 
     Stealth             = 0x04000000
     ArtsReflect         = 0x08000000
+
     Reserve_1           = 0x10000000
+    Boost               = 0x10000000
+
+    CraftReflect        = 0x20000000
     Reserve_2           = 0x20000000
+
     Reserve_3           = 0x40000000
+    GreenPepper         = 0x40000000
 
     Dead                = 0x80000000
 
@@ -440,6 +446,7 @@ class CraftState:
     ATDelay                 = 0x11
     InterruptAria           = 0x12
     Fat                     = 0x13
+    GreenPepper             = 0x13
 
     LeechHP                 = 0x16
     LeechEP                 = 0x17

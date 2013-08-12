@@ -64,7 +64,7 @@ def main():
     LoadEffect(0x82, "battle/cr036302.eff")
     LoadEffect(0x83, "battle/cr036010.eff")
     #Call("loc_50A")
-    AS_8D(0x15, 0xFF, 0x8000000, 0x0, 9999)
+    AS_8D(0x15, 0xFF, CraftConditionFlags.ArtsReflect, 0x0, 9999)
     Call('set_spirit_eff')
     Return()
 
@@ -633,6 +633,11 @@ def main():
         Sleep(1700)
         Yield()
 
+        Sleep(1000)
+        Yield()
+
+        StopSound(3679)
+        SoundEx(3679, 0)
 
         Random_Execute(50, 'change_from_party_to_enemy')
 
@@ -645,14 +650,7 @@ def main():
         ClearMSDataState(1, 0xFF, 0x4000)
         SetMSDataState(1, 0xFF, 0x1000)
 
-
         label('party_enemy_change_end')
-
-        Sleep(1000)
-        Yield()
-
-        StopSound(3679)
-        SoundEx(3679, 0)
 
         Return()
 
@@ -826,7 +824,13 @@ def main():
     SetMSDataState(0x2, 0xFF, 0x4000)
     Sleep(1500)
     Yield()
-    AS_8D(0x15, 0xFF, 0x8000000, 0x0, 9999)
+
+    AS_8D(0x16, 0xFF, CraftConditionFlags.ArtsReflect, 0x0, 9999)
+    AS_8D(0x16, 0xFF, CraftConditionFlags.CraftReflect, 0x0, 9999)
+
+    AS_8D(0x15, 0xFF, CraftConditionFlags.ArtsReflect, 0x0, 9999)
+    AS_8D(0x15, 0xFF, CraftConditionFlags.CraftReflect, 0x0, 1)
+
     ResetBrightness(1000)
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
     AS_14(0x0)

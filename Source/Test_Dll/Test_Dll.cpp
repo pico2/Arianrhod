@@ -201,7 +201,22 @@ HFONT NTAPI gCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement
     return CreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, L"ºÚÌå");
 }
 
-#include <zlib.h>
+void* __cdecl m_memcpy(void * _Dst, const void * _Src, rsize_t _MaxCount)
+{
+    CHAR buf[0x100];
+
+    if (_MaxCount < sizeof(buf) && _Dst != nullptr && _Src != nullptr)
+    {
+        CopyMemory(buf, _Src, _MaxCount);
+        buf[_MaxCount] = 0;
+        if (strstr(buf, "1/2013-08-13"))
+        {
+            _asm int 4;
+        }
+    }
+
+    return CopyMemory(_Dst, _Src, _MaxCount);
+}
 
 BOOL Initialize(PVOID BaseAddress)
 {
@@ -209,59 +224,14 @@ BOOL Initialize(PVOID BaseAddress)
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
 
-    EnumDirectoryFiles(NULL, L"*.*", 0, L"E:\\Desktop\\Luxor 2 HD\\locale\\data", NULL,
-        [](PVOID, PWIN32_FIND_DATAW fd, ULONG_PTR) -> LONG_PTR
-        {
-            BOOL Success;
-            z_stream stream;
-            NtFileMemory file;
-            PVOID Buffer;
+    SetExeDirectoryAsCurrent();
 
-            file.Open(fd->cFileName);
+    MEMORY_FUNCTION_PATCH f[] = 
+    {
+        INLINE_HOOK_JUMP_RVA_NULL(0x1366F0, m_memcpy),
+    };
 
-            ZeroMemory(&stream, sizeof(stream));
-
-            stream.next_in = (Bytef*)file.GetBuffer();
-            stream.avail_in = file.GetSize32();
-
-            Buffer = AllocateMemory(stream.avail_in * 4);
-            stream.next_out = (PBYTE)Buffer;
-            stream.avail_out = stream.avail_in * 4;
-
-            INLINE_ASM
-            {
-                mov     eax, 0x55EBD4;
-                lea     ecx, stream;
-                mov     edx, 4CB1A0h;
-                call    edx;
-
-                lea     eax, stream;
-                push    eax;
-                mov     eax, 4CB330h;
-                call    eax;
-                add     esp, 4;
-                mov     Success, eax;
-            }
-/*
-            if (Success != Z_OK)
-                return 0;
-*/
-            NtFileDisk file2;
-
-            file2.Create(fd->cFileName);
-            file2.Write(Buffer, stream.total_out);
-
-            FreeMemory(Buffer);
-
-            return 0;
-        },
-        0,
-        EDF_SUBDIR
-    );
-
-
-    return FALSE;
-
+    Nt_PatchMemory(0, 0, f, countof(f), Ldr::LoadDll(L"js.dll"));
 
     return TRUE;
 }

@@ -538,6 +538,36 @@ BOOL Initialize(PVOID BaseAddress)
 
     InitializeRedirectEntry();
 
+    static const ULONG BuffVerifyFlags =    CraftConditions::Poison         |
+                                            CraftConditions::Frozen         |
+                                            CraftConditions::Landification  |
+                                            CraftConditions::Sleeping       |
+                                            CraftConditions::BanArts        |
+                                            CraftConditions::Darkness       |
+                                            CraftConditions::BanCraft       |
+                                            CraftConditions::Confusion      |
+                                            CraftConditions::Stun           |
+                                            CraftConditions::OnehitKill     |
+                                            CraftConditions::Burning        |
+                                            CraftConditions::Rage           |
+                                            CraftConditions::ArtsGuard      |
+                                            CraftConditions::CraftGuard     |
+                                            CraftConditions::MaxGuard       |
+                                            CraftConditions::StrUp          |
+                                            CraftConditions::DefUp          |
+                                            CraftConditions::AtsUp          |
+                                            CraftConditions::AdfUp          |
+                                            CraftConditions::DexUp          |
+                                            CraftConditions::AglUp          |
+                                            CraftConditions::MovUp          |
+                                            CraftConditions::SpdUp          |
+                                            CraftConditions::HPRecovery     |
+                                            CraftConditions::CPRecovery     |
+                                            CraftConditions::Stealth        |
+                                            CraftConditions::ArtsReflect    |
+                                            CraftConditions::Reserve_1      |
+                                            CraftConditions::Reserve_2      |
+                                            CraftConditions::GreenPepper;
 
     static DOUBLE DefaultDistance = 0.f;
 
@@ -551,12 +581,17 @@ BOOL Initialize(PVOID BaseAddress)
 
 #if !DEBUG_DISABLE_PATCH
 
-        PATCH_MEMORY(0x06,      1, 0x410731),    // win
-        PATCH_MEMORY(0x06,      1, 0x410AD1),    // win
-        PATCH_MEMORY(0x01,      1, 0x40991D),    // cpu
-        PATCH_MEMORY(0x91,      1, 0x2F9EE3),    // one hit
-        PATCH_MEMORY(0x3FEB,    2, 0x452FD1),    // bypass savedata checksum
-        PATCH_MEMORY(0x20000,   4, 0x4E71B2),    // chrimg max buffer size
+        PATCH_MEMORY(0x06,              1, 0x410731),   // win
+        PATCH_MEMORY(0x06,              1, 0x410AD1),   // win
+        PATCH_MEMORY(0x01,              1, 0x40991D),   // cpu
+        PATCH_MEMORY(0x91,              1, 0x2F9EE3),   // one hit
+        PATCH_MEMORY(0x3FEB,            2, 0x452FD1),   // bypass savedata checksum
+        PATCH_MEMORY(0x20000,           4, 0x4E71B2),   // chrimg max buffer size
+        PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4A44),   // buff verify flags
+        PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E48FA),   // buff verify flags
+        PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4972),   // buff verify flags
+
+        PATCH_MEMORY(CraftConditions::CraftReflect, 4, 0x7E1858),    // predefined flag
 
         // debug AT
 
@@ -688,17 +723,21 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::   NakedOverWriteBattleStatusWithChrStatus)),
         INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::   NakedIsChrStatusNeedRefresh)),
         INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::      NakedGetChrSBreak)),
-        INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::   GetMagicData),          CGlobal::StubGetMagicData),
-        INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::   GetMagicQueryTable),    CGlobal::StubGetMagicQueryTable),
-        INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::   GetMagicDescription),   CGlobal::StubGetMagicDescription),
+        INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::   GetMagicData),                  CGlobal::StubGetMagicData),
+        INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::   GetMagicQueryTable),            CGlobal::StubGetMagicQueryTable),
+        INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::   GetMagicDescription),           CGlobal::StubGetMagicDescription),
         INLINE_HOOK_CALL_RVA_NULL(0x332B26, METHOD_PTR(&EDAO::      GetStatusIcon)),
         INLINE_HOOK_CALL_RVA_NULL(0x2F82B8, METHOD_PTR(&EDAO::      GetLeaderChangeVoice)),
         INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
         INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
-        INLINE_HOOK_CALL_RVA     (0x5EB9E7, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange), CGlobal::StubFixWeaponShapeAndRange),  // weapon shape
+        INLINE_HOOK_CALL_RVA     (0x5EB9E7, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange),        CGlobal::StubFixWeaponShapeAndRange),  // weapon shape
         INLINE_HOOK_CALL_RVA_NULL(0x5EC037, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange)),                                       // weapon RNG
         INLINE_HOOK_CALL_RVA_NULL(0x5AF055, METHOD_PTR(&CBattle::   NakedFindReplaceChr)),
         INLINE_HOOK_CALL_RVA_NULL(0x58B258, METHOD_PTR(&CBattle::   NakedCheckCraftTargetBits)),
+        INLINE_HOOK_JUMP_RVA_NULL(0x27A2A0, METHOD_PTR(&CBattle::   GetConditionIconPosByIndex)),
+        INLINE_HOOK_JUMP_RVA     (0x27AF52, METHOD_PTR(&CBattle::   IsTargetCraftReflect),       CBattle::StubIsTargetCraftReflect),
+        INLINE_HOOK_JUMP_RVA     (0x276EA2, METHOD_PTR(&CBattle::   OnSetChrConditionFlag),         CBattle::StubOnSetChrConditionFlag),
+        INLINE_HOOK_CALL_RVA_NULL(0x5AA2FF, METHOD_PTR(&CBattle::   NakedUpdateCraftReflectLeftTime)),
 
 
         // inherit custom flags
