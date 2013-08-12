@@ -44,16 +44,11 @@ def main():
         EMPTY_ACTION,                       # 1C 28
         EMPTY_ACTION,                       # 1D 29
 
-        'SysCraft_TeamRushInit',            # 1E 30
-        'SysCraft_TeamRushAction',          # 1F 31
+        EMPTY_ACTION,                       # 1E 30
+        EMPTY_ACTION,                       # 1F 31
     ))
 
     arts_aria_eff_id = 0
-
-    label('SysCraft_TeamRushInit')
-    label('SysCraft_TeamRushAction')
-
-    Return()
 
     def Craft_SysCraft_Init(): pass
 
@@ -84,7 +79,7 @@ def main():
 
     def labmda_start_voice_2():
         SoundEx(3724, 0)
-        Sleep(4000)
+        Sleep(4800)
         Yield()
 
         SoundEx(3725, 0)
@@ -282,7 +277,8 @@ def main():
     Yield()
     ResetLookingTargetData()
     LookingTargetAdd(chr_shadow, "", 0x0)
-    LookingTarget(50, 25, 35)
+    #LookingTarget(50, 25, 35)
+    LookingTarget(50, 40, 40)
     Sleep(300)
     Yield()
 
@@ -322,6 +318,7 @@ def main():
     AS_67(0x121, 0xFF, 0xFE)
 
     DamageAnime(0xFE, 0x1, 0x32)
+    Sleep(50)
     Yield()
 
     NextTarget()
@@ -341,6 +338,7 @@ def main():
     ForeachTarget("NormalAttack_Damage_End")
 
     DamageCue(0xFE)
+    Sleep(50)
     Yield()
 
     NextTarget()
@@ -348,7 +346,6 @@ def main():
 
     label("NormalAttack_Damage_End")
 
-    Yield()
     Return()
 
     # SysCraft_NormalAttack end
@@ -619,7 +616,7 @@ def main():
     ResetTarget()
     ResetLookingTargetData()
     LookingTargetAdd(chr_shadow, "", 0x0)
-    LookingTarget(50, 50, 50)
+    LookingTarget(50, 40, 40)
 
     #TurnDirection(0xFF, chr_shadow, 0, 500, 0x0)
 
@@ -1325,7 +1322,7 @@ def main():
 
 
     LookingTargetAdd(chr_shadow, "", 0x0)
-    LookingTarget(30, 40, 40)
+    LookingTarget(50, 40, 40)
     Sleep(300)
     Yield()
 
@@ -1537,7 +1534,7 @@ def main():
     Yield()
     ResetLookingTargetData()
     LookingTargetAdd(chr_shadow, "", 0x0)
-    LookingTarget(50, 25, 35)
+    LookingTarget(50, 40, 40)
     Sleep(300)
     Yield()
 
