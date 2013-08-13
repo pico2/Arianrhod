@@ -154,7 +154,9 @@ def main():
 
     Knockback(0)
 
-    BeginChrThread(0xFF, 1, 'SysCraft_Stand', 0)
+    #Jc(0x8, 0x1, 0x0, "under_attack_no_action")
+    #BeginChrThread(0xFF, 1, 'SysCraft_Stand', 0)
+    #label("under_attack_no_action")
 
     PlayEffect(0xFF, 0xFF, 1, 0x4, 0, 2000, 0, 0, 0, 0, 500, 500, 500, 4)
 
@@ -358,7 +360,7 @@ def main():
     Jc(0x8, 0x1, 0x0, "loc_743")
     Jc(0x2D, 0x1, 0x1, "loc_716")
     PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, 500, 500, 500, arts_aria_eff_id)
-    SetEffectColor(0xFF, 0x0, 0xFFFF0000)
+    SetEffectColor(0xFF, 0, 0xFFFF0000)
     Jump("loc_743")
 
     label("loc_716")
@@ -741,7 +743,7 @@ def main():
     ForeachTarget("loc_AF6")
     PlayEffect(0xFF, 0xF8, 0x1, 0x1, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 255)
     SoundEx(190, 0x0)
-    BeginChrThread(0xFE, 1, "loc_B7B", 0x0)
+    BeginChrThread(0xFE, 3, "loc_B7B", 0x0)
     Sleep(100)
     Yield()
     SoundEx(253, 0x0)
@@ -822,11 +824,11 @@ def main():
     Sleep(1500)
     Yield()
 
-    AS_8D(0x16, 0xFF, CraftConditionFlags.ArtsReflect, 0x0, 9999)
-    AS_8D(0x16, 0xFF, CraftConditionFlags.CraftReflect, 0x0, 9999)
+    AS_8D(0x16, 0xFF, CraftConditionFlags.ArtsReflect, 0, 0)
+    AS_8D(0x16, 0xFF, CraftConditionFlags.CraftReflect, 0, 0)
 
-    AS_8D(0x15, 0xFF, CraftConditionFlags.ArtsReflect, 0x0, 9999)
-    AS_8D(0x15, 0xFF, CraftConditionFlags.CraftReflect, 0x0, 1)
+    AS_8D(0x15, 0xFF, CraftConditionFlags.ArtsReflect, 0, 9999)
+    AS_8D(0x15, 0xFF, CraftConditionFlags.CraftReflect, 0, 1)
 
     ResetBrightness(1000)
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)

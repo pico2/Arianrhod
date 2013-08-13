@@ -101,23 +101,6 @@ def main():
                     0, 0,
                )
 
-    '''
-    真实之镜 = CreateCraft(
-                    "真实之镜",
-                    "",
-                    0x05, 0x12, 0x1,
-                    CraftAttribute.NoAttribute,
-                    CraftRange.TargetWithoutMove,
-                    CraftState.Fat, CraftState.NoneState,
-                    1, 50,
-                    0, 15,
-                    0,
-                    1,
-                    100, 3,
-                    0, 0,
-               )
-    '''
-
     相位重置 = CreateCraft(
                     "相位重置",
                     "",

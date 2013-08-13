@@ -7,11 +7,11 @@
 #include "edao_vm.h"
 
 #define ENABLE_LOG  0
-#define DEBUG_DISABLE_PATCH 0
 
 #if !D3D9_VER
     #undef ENABLE_LOG
     #define ENABLE_LOG 0
+    #define DEBUG_DISABLE_PATCH 0
 #endif
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved);
@@ -499,7 +499,7 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 #define METHOD_PTR(_method) PtrAdd((PVOID)NULL, _method)
 
-#include "xxoo.cpp"
+#include "xxoo.hpp"
 
 VOID NTAPI PrintOP(LONG sub, LONG offset, PBYTE base)
 {

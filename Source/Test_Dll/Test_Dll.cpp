@@ -1,7 +1,10 @@
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
-//#pragma comment(linker, "/EXPORT:__strdup=msvcrt._strdup")
+
+#pragma comment(linker, "/EXPORT:MyMessageBoxEx=XunYouCommonDLL2.MyMessageBoxEx")
+#pragma comment(linker, "/EXPORT:isGameInclude=XunYouCommonDLL2.isGameInclude")
+#pragma comment(linker, "/EXPORT:xunyou_login=XunYouCommonDLL2.xunyou_login")
 
 #include "MyLibrary.cpp"
 #include <Windns.h>
@@ -201,37 +204,86 @@ HFONT NTAPI gCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement
     return CreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, L"ºÚÌå");
 }
 
-void* __cdecl m_memcpy(void * _Dst, const void * _Src, rsize_t _MaxCount)
-{
-    CHAR buf[0x100];
+TYPE_OF(&NtDeviceIoControlFile) StubNtDeviceIoControlFile;
 
-    if (_MaxCount < sizeof(buf) && _Dst != nullptr && _Src != nullptr)
+NTSTATUS
+NTAPI
+XyDeviceIoControlFile(
+    HANDLE              FileHandle,
+    HANDLE              Event,
+    PIO_APC_ROUTINE     ApcRoutine,
+    PVOID               ApcContext,
+    PIO_STATUS_BLOCK    IoStatusBlock,
+    ULONG               IoControlCode,
+    PVOID               InputBuffer,
+    ULONG               InputBufferLength,
+    PVOID               OutputBuffer,
+    ULONG               OutputBufferLength
+)
+{
+    PSTR                        SerialNumber;
+    NTSTATUS                    Status, Status2;
+    IO_STATUS_BLOCK             IoStatus;
+    FILE_FS_DEVICE_INFORMATION  FsDevice;
+    PSENDCMDINPARAMS            SendCmdInParams;
+    PSENDCMDOUTPARAMS           SendCmdOutParams;
+
+    Status = StubNtDeviceIoControlFile(FileHandle, Event, ApcRoutine, ApcContext, IoStatusBlock, IoControlCode, InputBuffer, InputBufferLength, OutputBuffer, OutputBufferLength);
+    FAIL_RETURN(Status);
+
+    if (IoControlCode != SMART_RCV_DRIVE_DATA)
+        return Status;
+
+    SendCmdInParams = (PSENDCMDINPARAMS)InputBuffer;
+    SendCmdOutParams = (PSENDCMDOUTPARAMS)OutputBuffer;
+
+    if (SendCmdInParams == nullptr ||
+        InputBufferLength < sizeof(*SendCmdInParams) - sizeof(SendCmdInParams->bBuffer)
+       )
     {
-        CopyMemory(buf, _Src, _MaxCount);
-        buf[_MaxCount] = 0;
-        if (strstr(buf, "1/2013-08-13"))
-        {
-            _asm int 4;
-        }
+        return Status;
     }
 
-    return CopyMemory(_Dst, _Src, _MaxCount);
+    if (SendCmdOutParams == nullptr ||
+        OutputBufferLength < IDENTIFY_BUFFER_SIZE)
+    {
+        return Status;
+    }
+
+    if (SendCmdInParams->irDriveRegs.bFeaturesReg != 0)
+        return Status;
+
+    Status2 = ZwQueryVolumeInformationFile(FileHandle, &IoStatus, &FsDevice, sizeof(FsDevice), FileFsDeviceInformation);
+    if (NT_FAILED(Status2))
+        return Status;
+
+    if (FsDevice.DeviceType != FILE_DEVICE_DISK)
+        return Status;
+
+    // typedef struct _IDSECTOR
+
+    SerialNumber = (PSTR)PtrAdd(SendCmdOutParams->bBuffer, 0x14);
+
+    for (ULONG_PTR Count = 20; Count != 0; --Count)
+    {
+    	*SerialNumber++ = GetRandom32Range('A', 'Z');
+        YieldProcessor();
+    }
+
+    return Status;
 }
 
 BOOL Initialize(PVOID BaseAddress)
 {
-    ml::MlInitialize();
-
+    LdrAddRefDll(LDR_ADDREF_DLL_PIN, BaseAddress);
     LdrDisableThreadCalloutsForDll(BaseAddress);
-
-    SetExeDirectoryAsCurrent();
 
     MEMORY_FUNCTION_PATCH f[] = 
     {
-        INLINE_HOOK_JUMP_RVA_NULL(0x1366F0, m_memcpy),
+        INLINE_HOOK_JUMP(ZwDeviceIoControlFile, XyDeviceIoControlFile, StubNtDeviceIoControlFile),
     };
 
-    Nt_PatchMemory(0, 0, f, countof(f), Ldr::LoadDll(L"js.dll"));
+    Nt_PatchMemory(0, 0, f, countof(f));
 
     return TRUE;
 }

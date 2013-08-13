@@ -47,9 +47,6 @@ VOID THISCALL CBattle::SetSelectedMagic(PMONSTER_STATUS MSData, USHORT CraftInde
 
     FOR_EACH_ARRAY(ArtsAI, MSData->ArtsAiInfo)
     {
-        if (ArtsAI->CraftIndex < MINIMUM_CUSTOM_CRAFT_INDEX)
-            continue;
-
         Index -= edao->GetCraftType(&MSData->CraftInfo[ArtsAI->CraftIndex - MINIMUM_CUSTOM_CRAFT_INDEX]) == ArtsType;
         if (Index < 0)
         {

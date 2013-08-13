@@ -119,5 +119,9 @@ SOURCE=.\SoundArc.cpp
 
 SOURCE=.\SoundArc.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\xxoo.hpp
+# End Source File
 # End Target
 # End Project
