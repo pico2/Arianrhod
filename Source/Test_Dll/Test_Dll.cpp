@@ -266,7 +266,7 @@ XyDeviceIoControlFile(
 
     for (ULONG_PTR Count = 20; Count != 0; --Count)
     {
-    	*SerialNumber++ = GetRandom32Range('A', 'Z');
+        *SerialNumber++ = GetRandom32Range('A', 'Z');
         YieldProcessor();
     }
 

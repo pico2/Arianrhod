@@ -656,74 +656,11 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
-class Vector2
-{
-public:
-    float x;
-    float y;
-
-    PROPERTY(float, Length);
-
-    GET(Length)
-    {
-        return sqrt((x * x + y * y));
-    }
-
-    SET(Length)
-    {
-        x = value;
-        y = value / 2;
-    }
-};
-
-#include "E:\Desktop\lst.h"
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    Trie tree;
-    PVOID compact;
-    CompactTrie comp;
-
-    ml::MlInitialize();
-
-    tree.InitializeRootNode();
-
-    PrintConsoleW(L"%p\n", tree.BuildFromBytesList(ents, countof(ents)));
-    PrintConsoleW(L"%d\n", tree.NodeCount);
-
-    PauseConsole(L"compact\n");
-
-    tree.BuildCompactTree(&compact, (PULONG_PTR)&argc);
-
-    {
-        NtFileDisk f;
-        f.Create(L"compact.bin");
-        f.Write(compact, argc);
-    }
-
-    comp.Initialize(compact, argc);
-
-    PrintConsoleW(L"lookup test\n");
-
-    PTRIE_BYTES_ENTRY ent;
-
-    FOR_EACH_ARRAY(ent, ents)
-    {
-        NODE_CONTEXT context;
-
-        context = -1;
-        comp.Lookup(ent, &context);
-        if (context != ent->Context)
-        {
-            PauseConsole((PWSTR)ent->Data);
-        }
-    }
-
-    PauseConsole(L"done");
+    DbgBreakPoint();
 
     return;
-
-    NTSTATUS Status;
 
     Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);
 
