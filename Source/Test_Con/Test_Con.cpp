@@ -658,6 +658,8 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
+    NTSTATUS Status;
+
     DbgBreakPoint();
 
     return;
