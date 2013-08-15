@@ -659,6 +659,13 @@ NTSTATUS InstallShellOverlayHook()
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    HANDLE evt;
+
+    Status = NtCreateEvent(&evt, EVENT_ALL_ACCESS, nullptr, SynchronizationEvent, TRUE);
+    NtWaitForSingleObject(evt, FALSE, nullptr);
+    NtSetEvent(evt, nullptr);
+    NtWaitForSingleObject(evt, FALSE, nullptr);
+    NtWaitForSingleObject(evt, FALSE, nullptr);
 
     DbgBreakPoint();
 
