@@ -511,7 +511,7 @@ void listfunc(PWSTR dll)
 
     funclist = (PCSTR *)AllocateMemory(0x10000 * sizeof(*funclist), HEAP_ZERO_MEMORY);
 
-    ReLoadDll(dll, &base, NULL, RELOAD_DLL_IGNORE_IAT);
+    LoadPeImage(dll, &base, NULL, RELOAD_DLL_IGNORE_IAT);
 
     n = 0;
     WalkExportTableT(base,
@@ -535,7 +535,7 @@ void listfunc(PWSTR dll)
         PrintConsoleA("    '%s',\n", *funclist++);
     }
 
-    UnLoadDll(base);
+    UnloadPeImage(base);
 }
 
 #if ML_X86
@@ -659,15 +659,8 @@ NTSTATUS InstallShellOverlayHook()
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-    HANDLE evt;
 
-    Status = NtCreateEvent(&evt, EVENT_ALL_ACCESS, nullptr, SynchronizationEvent, TRUE);
-    NtWaitForSingleObject(evt, FALSE, nullptr);
-    NtSetEvent(evt, nullptr);
-    NtWaitForSingleObject(evt, FALSE, nullptr);
-    NtWaitForSingleObject(evt, FALSE, nullptr);
-
-    DbgBreakPoint();
+    UnloadDll(LoadDll(L"E:\\Crack\\Immunity Debugger\\beaengine.dll"));
 
     return;
 

@@ -710,14 +710,7 @@ int __cdecl main(LONG_PTR argc, PWSTR *argv)
 }
 a:DriverEntry:#drvm:
 #pragma comment(linker, "/ENTRY:DriverEntry")
-#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
-#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna /subsystem:native")
 
-#define _X86_ 1
-#define _WIN32_WINNT 0x0502
-
-#include <ntifs.h>
-#include <ntstrsafe.h>
 #include "MyLibrary.cpp"
 
 VOID NTAPI DriverUnload(PDRIVER_OBJECT DriverObject)
@@ -725,7 +718,7 @@ VOID NTAPI DriverUnload(PDRIVER_OBJECT DriverObject)
     
 }
 
-NTSTATUS NTAPI DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
+EXTC NTSTATUS NTAPI DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
     DriverObject->DriverUnload = DriverUnload;
     $selected$

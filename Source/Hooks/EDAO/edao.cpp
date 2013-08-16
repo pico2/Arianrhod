@@ -587,9 +587,9 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x91,              1, 0x2F9EE3),   // one hit
         PATCH_MEMORY(0x3FEB,            2, 0x452FD1),   // bypass savedata checksum
         PATCH_MEMORY(0x20000,           4, 0x4E71B2),   // chrimg max buffer size
-        PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4A44),   // buff verify flags
-        PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E48FA),   // buff verify flags
-        PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4972),   // buff verify flags
+        //PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4A44),   // buff verify flags
+        //PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E48FA),   // buff verify flags
+        //PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4972),   // buff verify flags
 
         PATCH_MEMORY(CraftConditions::CraftReflect, 4, 0x7E1858),    // predefined flag
 
