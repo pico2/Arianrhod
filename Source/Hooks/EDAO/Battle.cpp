@@ -397,7 +397,7 @@ BOOL CBattle::ThinkSBreak(PMONSTER_STATUS MSData, PAT_BAR_ENTRY Entry)
                             CraftConditions::Confusion      |
                             CraftConditions::OnehitKill     |
                             CraftConditions::Vanish         |
-                            CraftConditions::Reserve_3      |
+                            CraftConditions::GreenPepper    |
                             CraftConditions::Dead;
 
     if (FindEffectInfoByCondition(MSData, Conditions) != nullptr)

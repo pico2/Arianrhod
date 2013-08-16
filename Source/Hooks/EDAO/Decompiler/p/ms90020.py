@@ -19,18 +19,17 @@ def main():
                  CraftConditionFlags.Burning        | \
                  CraftConditionFlags.Rage           | \
                  CraftConditionFlags.Vanish         | \
-                 CraftConditionFlags.Reserve_1      | \
                  CraftConditionFlags.Reserve_2      | \
-                 CraftConditionFlags.Reserve_3      | \
+                 CraftConditionFlags.GreenPepper    | \
                  CraftConditionFlags.Dead           | \
-                 CraftConditionFlags.StrUp          | \
-                 CraftConditionFlags.DefUp          | \
-                 CraftConditionFlags.AtsUp          | \
-                 CraftConditionFlags.AdfUp          | \
-                 CraftConditionFlags.DexUp          | \
-                 CraftConditionFlags.AglUp          | \
-                 CraftConditionFlags.MovUp          | \
-                 CraftConditionFlags.SpdUp
+                 CraftConditionFlags.Str            | \
+                 CraftConditionFlags.Def            | \
+                 CraftConditionFlags.Ats            | \
+                 CraftConditionFlags.Adf            | \
+                 CraftConditionFlags.Dex            | \
+                 CraftConditionFlags.Agl            | \
+                 CraftConditionFlags.Mov            | \
+                 CraftConditionFlags.Spd
 
     Level              = 90
     MaximumHP          = 37170
@@ -299,7 +298,6 @@ def main():
     Arts_虚空幻域        = CreateAI(0x2,  30,   0x7,  0x1,  0x06, 0x07, 虚空幻域,        [0,     0,      1,      0])
 
     Craft_置换           = CreateAI(0x8,  100,  0x0,  0x1,  0x00, 0x12, 置换,            [100,   1,      0,      0])
-    #Craft_真实之镜       = CreateAI(0x2,  40,   0x18, 0x1,  0x00, 0x10, 真实之镜,        [0,     0,      0x40000000, 0])
     Craft_相位重置       = CreateAI(0x2,  25,   0x0,  0x1,  0x00, 0x11, 相位重置,        [0,     0,      0,      0])
     Craft_空间转移       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x14, 空间转移,        [3500,  2,      0,      2])
     Craft_死亡之指       = CreateAI(0x6,  50,   0x17, 0x1,  0x00, 0x05, 死亡之指,        [3500,  2,      0,      2])

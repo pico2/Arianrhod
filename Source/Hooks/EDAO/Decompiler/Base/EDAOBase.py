@@ -348,27 +348,25 @@ class CraftConditionFlags:
 
     MaxGuard            = 0x00004000
     Vanish              = 0x00008000
-    StrUp               = 0x00010000
-    DefUp               = 0x00020000
-    AtsUp               = 0x00040000
-    AdfUp               = 0x00080000
-    DexUp               = 0x00100000
-    AglUp               = 0x00200000
-    MovUp               = 0x00400000
-    SpdUp               = 0x00800000
+    Str                 = 0x00010000
+    Def                 = 0x00020000
+    Ats                 = 0x00040000
+    Adf                 = 0x00080000
+    Dex                 = 0x00100000
+    Agl                 = 0x00200000
+    Mov                 = 0x00400000
+    Spd                 = 0x00800000
     HPRecovery          = 0x01000000
     CPRecovery          = 0x02000000
 
     Stealth             = 0x04000000
     ArtsReflect         = 0x08000000
 
-    Reserve_1           = 0x10000000
     Boost               = 0x10000000
 
     CraftReflect        = 0x20000000
     Reserve_2           = 0x20000000
 
-    Reserve_3           = 0x40000000
     GreenPepper         = 0x40000000
 
     Dead                = 0x80000000

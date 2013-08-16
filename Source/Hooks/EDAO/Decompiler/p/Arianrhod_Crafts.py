@@ -847,14 +847,14 @@ def unmask(enemy_version = False):
 
         BuffUp = \
         [
-            BuffInfo(100,       10,     50,     CraftConditionFlags.StrUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.DefUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.AtsUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.AdfUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.DexUp),
-            BuffInfo(10,        10,     50,     CraftConditionFlags.AglUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.MovUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.SpdUp),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Str),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Def),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Ats),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Adf),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Dex),
+            BuffInfo(10,        10,     50,     CraftConditionFlags.Agl),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Mov),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Spd),
             BuffInfo(1,         1,      50,     CraftConditionFlags.MaxGuard),
         ]
 
@@ -862,14 +862,14 @@ def unmask(enemy_version = False):
 
         BuffUp = \
         [
-            BuffInfo(100,       10,     50,     CraftConditionFlags.StrUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.DefUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.AtsUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.AdfUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.DexUp),
-            BuffInfo(10,        10,     50,     CraftConditionFlags.AglUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.MovUp),
-            BuffInfo(100,       10,     50,     CraftConditionFlags.SpdUp),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Str),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Def),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Ats),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Adf),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Dex),
+            BuffInfo(10,        10,     50,     CraftConditionFlags.Agl),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Mov),
+            BuffInfo(100,       10,     50,     CraftConditionFlags.Spd),
             BuffInfo(100,       3,      50,     CraftConditionFlags.HPRecovery),
             BuffInfo(100,       3,      50,     CraftConditionFlags.CPRecovery),
             BuffInfo(1,         1,      50,     CraftConditionFlags.MaxGuard),

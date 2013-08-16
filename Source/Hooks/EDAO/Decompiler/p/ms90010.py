@@ -19,18 +19,17 @@ def main():
                  CraftConditionFlags.Burning        | \
                  CraftConditionFlags.Rage           | \
                  CraftConditionFlags.Vanish         | \
-                 CraftConditionFlags.Reserve_1      | \
                  CraftConditionFlags.Reserve_2      | \
-                 CraftConditionFlags.Reserve_3      | \
+                 CraftConditionFlags.GreenPepper    | \
                  CraftConditionFlags.Dead           | \
-                 CraftConditionFlags.StrUp          | \
-                 CraftConditionFlags.DefUp          | \
-                 CraftConditionFlags.AtsUp          | \
-                 CraftConditionFlags.AdfUp          | \
-                 CraftConditionFlags.DexUp          | \
-                 CraftConditionFlags.AglUp          | \
-                 CraftConditionFlags.MovUp          | \
-                 CraftConditionFlags.SpdUp
+                 CraftConditionFlags.Str            | \
+                 CraftConditionFlags.Def            | \
+                 CraftConditionFlags.Ats            | \
+                 CraftConditionFlags.Adf            | \
+                 CraftConditionFlags.Dex            | \
+                 CraftConditionFlags.Agl            | \
+                 CraftConditionFlags.Mov            | \
+                 CraftConditionFlags.Spd
 
     Level              = 120
     MaximumHP          = 59000

@@ -538,37 +538,6 @@ BOOL Initialize(PVOID BaseAddress)
 
     InitializeRedirectEntry();
 
-    static const ULONG BuffVerifyFlags =    CraftConditions::Poison         |
-                                            CraftConditions::Frozen         |
-                                            CraftConditions::Landification  |
-                                            CraftConditions::Sleeping       |
-                                            CraftConditions::BanArts        |
-                                            CraftConditions::Darkness       |
-                                            CraftConditions::BanCraft       |
-                                            CraftConditions::Confusion      |
-                                            CraftConditions::Stun           |
-                                            CraftConditions::OnehitKill     |
-                                            CraftConditions::Burning        |
-                                            CraftConditions::Rage           |
-                                            CraftConditions::ArtsGuard      |
-                                            CraftConditions::CraftGuard     |
-                                            CraftConditions::MaxGuard       |
-                                            CraftConditions::StrUp          |
-                                            CraftConditions::DefUp          |
-                                            CraftConditions::AtsUp          |
-                                            CraftConditions::AdfUp          |
-                                            CraftConditions::DexUp          |
-                                            CraftConditions::AglUp          |
-                                            CraftConditions::MovUp          |
-                                            CraftConditions::SpdUp          |
-                                            CraftConditions::HPRecovery     |
-                                            CraftConditions::CPRecovery     |
-                                            CraftConditions::Stealth        |
-                                            CraftConditions::ArtsReflect    |
-                                            CraftConditions::Reserve_1      |
-                                            CraftConditions::Reserve_2      |
-                                            CraftConditions::GreenPepper;
-
     static DOUBLE DefaultDistance = 0.f;
 
     BYTE PushActorDistance[6] = { 0xDD, 0x05 };
@@ -587,9 +556,6 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_MEMORY(0x91,              1, 0x2F9EE3),   // one hit
         PATCH_MEMORY(0x3FEB,            2, 0x452FD1),   // bypass savedata checksum
         PATCH_MEMORY(0x20000,           4, 0x4E71B2),   // chrimg max buffer size
-        //PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4A44),   // buff verify flags
-        //PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E48FA),   // buff verify flags
-        //PATCH_MEMORY(BuffVerifyFlags,   4, 0x5E4972),   // buff verify flags
 
         PATCH_MEMORY(CraftConditions::CraftReflect, 4, 0x7E1858),    // predefined flag
 

@@ -77,17 +77,10 @@ ML_NAMESPACE_BEGIN(CraftConditions)
 
     static const ULONG_PTR Stealth             = 0x04000000;
     static const ULONG_PTR ArtsReflect         = 0x08000000;
-
-    static const ULONG_PTR Reserve_1           = 0x10000000;
     static const ULONG_PTR Boost               = 0x10000000;
-
-    static const ULONG_PTR CraftReflect     = 0x20000000;
-
+    static const ULONG_PTR CraftReflect        = 0x20000000;
     static const ULONG_PTR Reserve_2           = 0x20000000;
-
-    static const ULONG_PTR Reserve_3           = 0x40000000;
     static const ULONG_PTR GreenPepper         = 0x40000000;
-
     static const ULONG_PTR Dead                = 0x80000000;
 
 ML_NAMESPACE_END
