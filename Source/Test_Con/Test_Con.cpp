@@ -511,7 +511,7 @@ void listfunc(PWSTR dll)
 
     funclist = (PCSTR *)AllocateMemory(0x10000 * sizeof(*funclist), HEAP_ZERO_MEMORY);
 
-    LoadPeImage(dll, &base, NULL, RELOAD_DLL_IGNORE_IAT);
+    LoadPeImage(dll, &base, NULL, LOAD_PE_IGNORE_IAT);
 
     n = 0;
     WalkExportTableT(base,
@@ -656,11 +656,285 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
+#include "../Hooks/OllyDbgEx/ExceptionDbgTypes.h"
+
+TYPE_OF(&RtlDispatchException) StubRtlDispatchException;
+HANDLE DesDevice;
+
+PVOID SearchCallRtlDispatchException()
+{
+    PBYTE Dispatcher;
+    PVOID Destination;
+
+    Dispatcher = (PBYTE)KiUserExceptionDispatcher;
+
+    for (ULONG_PTR Count = 10; Count != 0; --Count)
+    {
+    	if (Dispatcher[0] != CALL)
+        {
+            Dispatcher += GetOpCodeSize(Dispatcher);
+            continue;
+        }
+
+        Destination = GetCallDestination(Dispatcher);
+        if (Destination == NtContinue || Destination == NtRaiseHardError)
+            break;
+
+        return Dispatcher;
+    }
+
+    return nullptr;
+}
+
+BOOLEAN
+NTAPI
+ExpRtlDispatchException(
+    PEXCEPTION_RECORD   ExceptionRecord,
+    PCONTEXT            Context
+)
+{
+    BOOL        ContinueExecute;
+    NTSTATUS    Status;
+    EXCEPTION_DBGUI_WAIT_STATE_CHANGE WaitState;
+
+    if (DesDevice == nullptr)
+        goto DEFAULT_PROC;
+
+    WaitState.AppClientId.UniqueProcess = CurrentPid();
+    WaitState.AppClientId.UniqueThread  = CurrentPid();
+
+    switch (ExceptionRecord->ExceptionCode)
+    {
+        case EXCEPTION_BREAKPOINT:
+            WaitState.NewState = DbgBreakpointStateChange;
+            break;
+
+        case EXCEPTION_SINGLE_STEP:
+            WaitState.NewState = DbgSingleStepStateChange;
+
+        default:
+            WaitState.NewState = DbgExceptionStateChange;
+            break;
+    }
+
+    WaitState.ContinueStatus = DBG_EXCEPTION_NOT_HANDLED;
+
+    WaitState.StateInfo.Exception.FirstChance = TRUE;
+    WaitState.StateInfo.Exception.ExceptionRecord.ExceptionCode    = ExceptionRecord->ExceptionCode;
+    WaitState.StateInfo.Exception.ExceptionRecord.ExceptionFlags   = ExceptionRecord->ExceptionFlags;
+    WaitState.StateInfo.Exception.ExceptionRecord.ExceptionRecord  = (ULONG64)ExceptionRecord->ExceptionRecord;
+    WaitState.StateInfo.Exception.ExceptionRecord.ExceptionAddress = (ULONG64)ExceptionRecord->ExceptionAddress;
+    WaitState.StateInfo.Exception.ExceptionRecord.NumberParameters = ExceptionRecord->NumberParameters;
+
+    for (ULONG_PTR Index = 0; Index != ExceptionRecord->NumberParameters; ++Index)
+    {
+        WaitState.StateInfo.Exception.ExceptionRecord.ExceptionInformation[Index] = ExceptionRecord->ExceptionInformation[Index];
+    }
+
+    WaitState.StateInfo.Exception.Context32 = *Context;
+
+    IO_STATUS_BLOCK iob;
+    NtDeviceIoControlFile(
+        DesDevice,
+        nullptr,
+        nullptr,
+        nullptr,
+        &iob,
+        DES_QUEUE_DEBUG_EVENT,
+        nullptr,
+        0,
+        &WaitState,
+        sizeof(WaitState)
+    );
+
+    if (WaitState.ContinueStatus == DBG_EXCEPTION_HANDLED || NT_FAILED(WaitState.ContinueStatus))
+    {
+        *Context = WaitState.StateInfo.Exception.Context32;
+        return TRUE;
+    }
+
+DEFAULT_PROC:
+
+    ContinueExecute = StubRtlDispatchException(ExceptionRecord, Context);
+
+    // if (!Handled)
+        // no second chance
+
+    return ContinueExecute;
+}
+
+
+NTSTATUS HandleEvent(PEXCEPTION_DBGUI_WAIT_STATE_CHANGE wait)
+{
+    PWSTR text;
+    WCHAR buf[0x200];
+
+    switch (wait->NewState)
+    {
+    case DbgCreateThreadStateChange:
+            swprintf(buf, L"%s, start = %p", L"DbgCreateThreadStateChange", wait->StateInfo.CreateThread.NewThread.StartAddress);
+            break;
+
+        case DbgCreateProcessStateChange:
+            swprintf(buf, L"%s", L"DbgCreateProcessStateChange");
+            break;
+
+        case DbgExitThreadStateChange:
+            swprintf(buf, L"%s, exit status = %p", L"DbgExitThreadStateChange", wait->StateInfo.ExitThread.ExitStatus);
+            break;
+
+        case DbgExitProcessStateChange:
+            swprintf(buf, L"%s, exit status = %p", L"DbgExitProcessStateChange", wait->StateInfo.ExitProcess.ExitStatus);
+            break;
+
+        case DbgExceptionStateChange:
+            swprintf(buf, L"%s, addr = %p", L"DbgExceptionStateChange", wait->StateInfo.Exception.ExceptionRecord.ExceptionAddress);
+            break;
+
+        case DbgBreakpointStateChange:
+            ++wait->StateInfo.Exception.Context32.Eip;
+            swprintf(buf, L"%s, addr = %p", L"DbgBreakpointStateChange", wait->StateInfo.Exception.ExceptionRecord.ExceptionAddress);
+            break;
+
+        case DbgSingleStepStateChange:
+            swprintf(buf, L"%s, addr = %p", L"DbgSingleStepStateChange", wait->StateInfo.Exception.ExceptionRecord.ExceptionAddress);
+            break;
+
+        case DbgLoadDllStateChange:
+            swprintf(buf, L"%s\nbase = %p", L"DbgLoadDllStateChange", wait->StateInfo.LoadDll.BaseOfDll);
+            break;
+
+        case DbgUnloadDllStateChange:
+            swprintf(buf, L"%s", L"DbgUnloadDllStateChange");
+            break;
+
+        default:
+            swprintf(buf, L"%s", L"unknown");
+            break;
+    }
+
+    PrintConsoleW(L"state %p:\n%s\n", wait->NewState, buf);
+
+    return DBG_EXCEPTION_NOT_HANDLED;
+}
+
+VOID host()
+{
+    NTSTATUS st;
+    PROCESS_INFORMATION pi;
+    STARTUPINFOW si;
+    NtFileDisk dev;
+
+    st = dev.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
+    PrintConsoleW(L"open dev: %p\n", st);
+    //if (NT_FAILED(st)) return;
+
+    st = Ps::CreateProcess(FindLdrModuleByHandle(nullptr)->FullDllName.Buffer, L"-host", nullptr, CREATE_SUSPENDED | CREATE_NEW_CONSOLE, nullptr, &pi);
+    if (NT_FAILED(st))
+        return;
+
+    PROCESS_OBJECT proc;
+
+    PauseConsole(L"set client to debuggee\n");
+
+    proc.ProcessId = pi.dwProcessId;
+    proc.Flags.Debuggee = TRUE;
+
+    st = dev.DeviceIoControl(DES_SET_PROCESS_DATA, &proc, sizeof(proc), nullptr, 0, nullptr);
+    PrintConsoleW(L"set proc: %p\n", st);
+/*
+    if (NT_FAILED(st))
+    {
+        NtTerminateProcess(pi.hProcess, st);
+        return;
+    }
+*/
+    LARGE_INTEGER timeout;
+
+    FormatTimeOut(&timeout, 100);
+
+    PauseConsole(L"resume client\n");
+
+    NtResumeThread(pi.hThread, nullptr);
+
+    PROCESS_OBJECT query;
+    NTSTATUS lastst;
+
+    query.ProcessId = pi.dwProcessId;
+
+    lastst = -1;
+
+    while (NtWaitForSingleObject(pi.hProcess, 0, &timeout) == STATUS_TIMEOUT)
+    {
+        EXCEPTION_DBGUI_WAIT_STATE_CHANGE wait;
+
+        st = dev.DeviceIoControl(DES_QUERY_DEBUG_EVENT, &query, sizeof(query), &wait, sizeof(wait));
+
+        if (st != lastst)
+        {
+            //PrintConsoleW(L"query return: %p\n", st);
+            lastst = st;
+        }
+
+        FAIL_CONTINUE(st);
+
+        wait.ContinueStatus = HandleEvent(&wait);
+
+        wait.ContinueStatus = DBG_EXCEPTION_NOT_HANDLED;
+        st = dev.DeviceIoControl(DES_COMPLETE_DEBUG_EVENT, &wait, sizeof(wait), nullptr, 0);
+        PrintConsoleW(L"complete event: %p\n\n", st);
+    }
+
+    NtTerminateProcess(pi.hProcess, st);
+    NtClose(pi.hProcess);
+    NtClose(pi.hThread);
+
+    PauseConsole(L"\nclient exit");
+}
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    PVOID base;
+    HANDLE thread, event;
 
-    UnloadDll(LoadDll(L"E:\\Crack\\Immunity Debugger\\beaengine.dll"));
+    if (wcsstr(QueryCommandLine(), L"-host") == nullptr)
+    {
+        return host();
+    }
+
+    PauseConsole(L"load dll");
+    base = LoadDll(L"E:\\Crack\\Immunity Debugger\\beaengine.dll");
+
+    PauseConsole(L"unload dll");
+    UnloadDll(base);
+
+    PauseConsole(L"create thread");
+
+    NtCreateEvent(&event, EVENT_ALL_ACCESS, 0, SynchronizationEvent, FALSE);
+
+    Ps::CreateThread(
+        ThreadCallbackM(HANDLE event)
+        {
+            LARGE_INTEGER timeout;
+
+            FormatTimeOut(&timeout, 300);
+            do
+            {
+                PrintConsoleW(L"thread print\n");
+
+            } while (NtWaitForSingleObject(event, 0, &timeout) == STATUS_TIMEOUT);
+
+            return 0;
+        },
+        event,0,CurrentProcess,&thread
+    );
+
+    PauseConsole(L"exit thread");
+    NtSetEvent(event, nullptr);
+    NtWaitForSingleObject(thread, 0, 0);
+
+    PauseConsole(L"exit process");
 
     return;
 
