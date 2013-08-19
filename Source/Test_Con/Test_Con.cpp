@@ -659,7 +659,7 @@ NTSTATUS InstallShellOverlayHook()
 #include "../Hooks/OllyDbgEx/ExceptionDbgTypes.h"
 
 TYPE_OF(&RtlDispatchException) StubRtlDispatchException;
-HANDLE DesDevice;
+HANDLE GlobalDesDevice;
 
 PVOID SearchCallRtlDispatchException()
 {
@@ -698,7 +698,7 @@ ExpRtlDispatchException(
 
     LOOP_ONCE
     {
-        if (DesDevice == nullptr)
+        if (GlobalDesDevice == nullptr)
             break;
 
         EXCEPTION_DBGUI_WAIT_STATE_CHANGE WaitState;
@@ -741,7 +741,7 @@ ExpRtlDispatchException(
         IO_STATUS_BLOCK iob;
 
         NtDeviceIoControlFile(
-            DesDevice,
+            GlobalDesDevice,
             nullptr,
             nullptr,
             nullptr,
@@ -840,19 +840,25 @@ BOOL IsSystemThread(HANDLE Thread)
 
 NTSTATUS
 QueueFakeThreadMessages(
-    HANDLE Process,
-    HANDLE StartThread
+    HANDLE  DesDevice,
+    HANDLE  Process,
+    HANDLE  StartThread,
+    PHANDLE FirstThreadId
 )
 {
     BOOL                        FirstThread;
+    PVOID                       Win32StartAddress;
     HANDLE                      Thread, LastThread;
     NTSTATUS                    Status;
     THREAD_BASIC_INFORMATION    ThreadBasic;
     PROCESS_BASIC_INFORMATION   ProcessBasic;
 
+    *FirstThreadId = nullptr;
+
     if (StartThread != nullptr)
     {
         FirstThread = FALSE;
+        Status = STATUS_SUCCESS;
     }
     else
     {
@@ -878,6 +884,9 @@ QueueFakeThreadMessages(
         Status = NtQueryInformationThread(Thread, ThreadBasicInformation, &ThreadBasic, sizeof(ThreadBasic), nullptr);
         FAIL_CONTINUE(Status);
 
+        if (*FirstThreadId == nullptr)
+            *FirstThreadId = ThreadBasic.ClientId.UniqueThread;
+
         EXCEPTION_DBGUI_WAIT_STATE_CHANGE WaitStateChange;
 
         WaitStateChange.NoBlockQueue = TRUE;
@@ -890,12 +899,26 @@ QueueFakeThreadMessages(
             WaitStateChange.AppClientId.UniqueProcess = (ULONG64)ThreadBasic.ClientId.UniqueProcess;
             WaitStateChange.AppClientId.UniqueThread = (ULONG64)ThreadBasic.ClientId.UniqueThread;
 
-            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.BaseOfImage
+            /*++
+
+            filling in kernel
+
+            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.BaseOfImage          = Process->SectionBaseAddress;
+            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.DebugInfoFileOffset  = NtHeaders->FileHeader.PointerToSymbolTable;
+            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.DebugInfoSize        = NtHeaders->FileHeader.NumberOfSymbols;            
+
+            --*/
         }
         else
         {
+            Status = NtQueryInformationThread(Thread, ThreadQuerySetWin32StartAddress, &Win32StartAddress, sizeof(Win32StartAddress), nullptr);
+            FAIL_CONTINUE(Status);
+
             WaitStateChange.NewState = DbgCreateThreadStateChange;
+            WaitStateChange.StateInfo.CreateThread.NewThread.StartAddress = (ULONG64)Win32StartAddress;
         }
+
+        Status = DesQueueDebugEvent(DesDevice, &WaitStateChange);
     }
 
     if (Status == STATUS_NO_MORE_ENTRIES)
@@ -904,16 +927,73 @@ QueueFakeThreadMessages(
     return Status;
 }
 
+NTSTATUS QueueFakeModuleMessages(HANDLE DesDevice, HANDLE Process, HANDLE FirstThreadId)
+{
+    PVOID                               BaseAddress, LastAllocationBase;
+    NTSTATUS                            Status;
+    SYSTEM_BASIC_INFORMATION            SystemBasic;
+    MEMORY_BASIC_INFORMATION            MemoryBasic;
+    PROCESS_BASIC_INFORMATION           ProcessBasic;
+    MEMORY_MAPPED_FILENAME_INFORMATION2 MappedFile;
+
+    Status = NtQuerySystemInformation(SystemBasicInformation, &SystemBasic, sizeof(SystemBasic), nullptr);
+    FAIL_RETURN(Status);
+
+    Status = NtQueryInformationProcess(Process, ProcessBasicInformation, &ProcessBasic, sizeof(ProcessBasic), nullptr);
+    FAIL_RETURN(Status);
+
+    LastAllocationBase = IMAGE_INVALID_VA;
+    BaseAddress = NULL;
+
+    for (; (ULONG_PTR)BaseAddress < SystemBasic.MaximumUserModeAddress; BaseAddress = PtrAdd(BaseAddress, MemoryBasic.RegionSize))
+    {
+        MemoryBasic.RegionSize = MEMORY_PAGE_SIZE;
+        Status = NtQueryVirtualMemory(Process, BaseAddress, MemoryBasicInformation, &MemoryBasic, sizeof(MemoryBasic), nullptr);
+        FAIL_CONTINUE(Status);
+
+        BaseAddress = MemoryBasic.BaseAddress;
+
+        if (MemoryBasic.Type != MEM_IMAGE || MemoryBasic.AllocationBase == LastAllocationBase)
+            continue;
+
+        LastAllocationBase = MemoryBasic.AllocationBase;
+
+        Status = NtQueryVirtualMemory(Process, BaseAddress, MemoryMappedFilenameInformation, &MappedFile, sizeof(MappedFile), nullptr);
+        if (NT_FAILED(Status) || MappedFile.Name.Length == 0)
+            continue;
+
+        EXCEPTION_DBGUI_WAIT_STATE_CHANGE WaitStateChange;
+
+        WaitStateChange.NewState = DbgLoadDllStateChange;
+        WaitStateChange.NoBlockQueue = TRUE;
+
+        WaitStateChange.AppClientId.UniqueProcess   = (ULONG64)ProcessBasic.UniqueProcessId;
+        WaitStateChange.AppClientId.UniqueThread    = (ULONG64)FirstThreadId;
+        WaitStateChange.StateInfo.LoadDll.BaseOfDll = (ULONG64)BaseAddress;
+
+        Status = DesQueueDebugEvent(DesDevice, &WaitStateChange);
+    }
+
+    return STATUS_SUCCESS;
+}
+
 NTSTATUS
 QueueFakeProcessCreateMessages(
-    HANDLE DesDevice,
-    HANDLE Process
+    HANDLE  DesDevice,
+    HANDLE  Process,
+    BOOL    IsAttach
 )
 {
-    NTSTATUS Status;
+    NTSTATUS    Status;
+    HANDLE      FirstThreadId;
 
-    Status = QueueFakeThreadMessages(Process, nullptr);
+    Status = QueueFakeThreadMessages(DesDevice, Process, nullptr, &FirstThreadId);
     FAIL_RETURN(Status);
+
+    if (IsAttach == FALSE)
+        return Status;
+
+    Status = QueueFakeModuleMessages(DesDevice, Process, FirstThreadId);
 
     return Status;
 }
@@ -933,11 +1013,6 @@ VOID host()
     if (NT_FAILED(st))
         return;
 
-    QueueFakeProcessCreateMessages(dev, pi.hProcess);
-
-    NtTerminateProcess(pi.hProcess, 0);
-    return;
-
     PROCESS_OBJECT proc;
 
     PauseConsole(L"set client to debuggee\n");
@@ -947,6 +1022,10 @@ VOID host()
 
     st = DesSetProcessData(dev, &proc);
     PrintConsoleW(L"set proc: %p\n", st);
+
+    PauseConsole(L"post fake msgs");
+    QueueFakeProcessCreateMessages(dev, pi.hProcess, FALSE);
+
 /*
     if (NT_FAILED(st))
     {
@@ -984,6 +1063,7 @@ VOID host()
         FAIL_CONTINUE(st);
 
         wait.ContinueStatus = HandleEvent(&wait);
+
         PauseConsole(L"complete event");
         st = DesCompleteDebugEvent(dev, &wait);
         PrintConsoleW(L"complete event: %p\n\n", st);
@@ -1018,7 +1098,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     {
         NtFileDisk dev;
         dev.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
-        NtDuplicateObject(CurrentProcess, dev, CurrentProcess, &DesDevice, 0, 0, DUPLICATE_SAME_ACCESS);
+        NtDuplicateObject(CurrentProcess, dev, CurrentProcess, &GlobalDesDevice, 0, 0, DUPLICATE_SAME_ACCESS);
     }
 
     PauseConsole(L"load dll");
