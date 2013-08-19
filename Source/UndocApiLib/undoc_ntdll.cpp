@@ -5,6 +5,34 @@
 
 _MY_C_HEAD_
 
+NTSTATUS
+NTAPI
+NtGetNextThread(
+    IN  HANDLE      ProcessHandle,
+    IN  HANDLE      ThreadHandle,
+    IN  ACCESS_MASK DesiredAccess,
+    IN  ULONG       HandleAttributes,
+    IN  ULONG       Flags,
+    OUT PHANDLE     NewThreadHandle
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
+ZwGetNextThread(
+    IN  HANDLE      ProcessHandle,
+    IN  HANDLE      ThreadHandle,
+    IN  ACCESS_MASK DesiredAccess,
+    IN  ULONG       HandleAttributes,
+    IN  ULONG       Flags,
+    OUT PHANDLE     NewThreadHandle
+)
+{
+    return 0;
+}
+
 int __cdecl _vscwprintf (
         const wchar_t *format,
         va_list ap
@@ -64,7 +92,7 @@ RtlWow64EnableFsRedirectionEx(
     return 0;
 }
 
-VOID DbgBreakPoint(){}
+VOID NTAPI DbgBreakPoint(){}
 
 VOID
 NTAPI
@@ -240,17 +268,17 @@ NtCreateUserProcess(
 NTSTATUS
 NTAPI
 NtCreateThreadEx(
-    PHANDLE             ThreadHandle,
-    ACCESS_MASK         DesiredAccess,
-    POBJECT_ATTRIBUTES  ObjectAttributes,
-    HANDLE              ProcessHandle,
-    PVOID               StartAddress,
-    PVOID               Parameter,
-    BOOL                CreateSuspended,
-    ULONG               StackZeroBits,
-    ULONG               SizeOfStackCommit,
-    ULONG               SizeOfStackReserve,
-    PVOID               BytesBuffer
+    OUT PHANDLE             ThreadHandle,
+    IN  ACCESS_MASK         DesiredAccess,
+    IN  POBJECT_ATTRIBUTES  ObjectAttributes OPTIONAL,
+    IN  HANDLE              ProcessHandle,
+    IN  PVOID               StartRoutine,
+    IN  PVOID               Argument OPTIONAL,
+    IN  ULONG               CreateFlags, // THREAD_CREATE_FLAGS_*
+    IN  ULONG_PTR           ZeroBits OPTIONAL,
+    IN  ULONG_PTR           StackSize OPTIONAL,
+    IN  ULONG_PTR           MaximumStackSize OPTIONAL,
+    IN  PPS_ATTRIBUTE_LIST  AttributeList OPTIONAL
 )
 {
     return 0;

@@ -27,3 +27,5 @@ EXPORTS
     LdrUnregisterDllNotification
     NtInitializeNlsFiles
     _vscwprintf
+	NtGetNextThread
+	ZwGetNextThread
