@@ -93,7 +93,7 @@ NTSTATUS ReadFileInSystemDirectory(NtFileMemory &File, PUNICODE_STRING Path)
 
     Length = sizeof(ROOTDIR_SYSTEM32) + Path->Length + sizeof(WCHAR);
     Buffer = (PWSTR)AllocateMemoryP(Length);
-    if (Buffer == NULL)
+    if (Buffer == nullptr)
         return STATUS_NO_MEMORY;
 
     Length = CONST_STRLEN(ROOTDIR_SYSTEM32);
@@ -122,7 +122,7 @@ NTSTATUS LeGlobalData::Initialize()
     Ntdll = GetNtdllLdrModule();
 
     LePeb = OpenOrCreateLePeb();
-    if (LePeb == NULL)
+    if (LePeb == nullptr)
     {
         PVOID           ReloadedNtdll;
         PUNICODE_STRING FullDllName;
@@ -134,7 +134,7 @@ NTSTATUS LeGlobalData::Initialize()
         FullDllName = &FindLdrModuleByHandle(&__ImageBase)->FullDllName;
         CopyMemory(LePeb->LeDllFullPath, FullDllName->Buffer, FullDllName->Length + sizeof(WCHAR));
 
-        Status = LoadPeImage(Ntdll->FullDllName.Buffer, &ReloadedNtdll, NULL, LOAD_PE_IGNORE_RELOC);
+        Status = LoadPeImage(Ntdll->FullDllName.Buffer, &ReloadedNtdll, nullptr, LOAD_PE_IGNORE_RELOC);
         if (NT_SUCCESS(Status))
         {
             PVOID LdrLoadDllAddress;
@@ -163,9 +163,9 @@ NTSTATUS LeGlobalData::Initialize()
     Status = RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &SystemDirectory, &this->SystemDirectory);
     FAIL_RETURN(Status);
 
-    RtlInitEmptyUnicodeString(&NlsFileName, NULL, 0);
-    RtlInitEmptyUnicodeString(&OemNlsFileName, NULL, 0);
-    RtlInitEmptyUnicodeString(&LangFileName, NULL, 0);
+    RtlInitEmptyUnicodeString(&NlsFileName, nullptr, 0);
+    RtlInitEmptyUnicodeString(&OemNlsFileName, nullptr, 0);
+    RtlInitEmptyUnicodeString(&LangFileName, nullptr, 0);
 
     SCOPE_EXIT
     {
@@ -248,7 +248,7 @@ NTSTATUS LeGlobalData::Initialize()
     PLDR_MODULE Kernel32Ldr;
 
     Kernel32Ldr = GetKernel32Ldr();
-    if (Kernel32Ldr != NULL)
+    if (Kernel32Ldr != nullptr)
     {
         Kernel32Ldr->EntryPoint = DelayInitDllEntry;
         // HookKernel32Routines(Kernel32Ldr->DllBase);
@@ -292,7 +292,7 @@ PDLL_HOOK_ENTRY LookupDllHookEntry(PCUNICODE_STRING BaseDllName)
         return Entry;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 VOID LeGlobalData::HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllLoad)
@@ -300,7 +300,7 @@ VOID LeGlobalData::HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllL
     PDLL_HOOK_ENTRY Entry;
 
     Entry = LookupDllHookEntry(DllName);
-    if (Entry == NULL)
+    if (Entry == nullptr)
         return;
 
     DllLoad ? (this->*Entry->HookRoutine)(DllBase) : (this->*Entry->UnHookRoutine)();
@@ -338,7 +338,7 @@ VOID LeGlobalData::DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICAT
     //if (!RtlEqualUnicodeString(&SystemDirectory, &DllPath, TRUE))
     //    return;
 
-    if (LookupDllHookEntry(DllName) == NULL)
+    if (LookupDllHookEntry(DllName) == nullptr)
         return;
 
     Module = FindLdrModuleByHandle(DllBase);
@@ -390,7 +390,7 @@ LONG WINAPI GetSQLiteKeyExceptionHandler(PEXCEPTION_POINTERS ExceptionInfo)
 
 PSTR CDECL x2_strstr(PSTR Str, PCSTR SubStr)
 {
-    if (SubStr != NULL && !StrCompareA(SubStr, "+acpxmk"))
+    if (SubStr != nullptr && !StrCompareA(SubStr, "+acpxmk"))
     {
         return Str;
     }
@@ -464,7 +464,7 @@ NTSTATUS LeGlobalData::HookX2GameRoutines(PVOID X2Game)
 
         FillDecryptTable = SearchPatternSafe(Pattern, countof(Pattern), StartAddress, SearchLength);
 
-        if (FillDecryptTable == NULL)
+        if (FillDecryptTable == nullptr)
         {
             PrintConsoleW(L"can't find FillDecryptTable\n");
             continue;
@@ -480,7 +480,7 @@ NTSTATUS LeGlobalData::HookX2GameRoutines(PVOID X2Game)
                                 SearchLength
                             );
 
-        if (FillDecryptTable2 != NULL)
+        if (FillDecryptTable2 != nullptr)
         {
             PrintConsoleW(L"found multi FillDecryptTable\n");
             break;
@@ -495,7 +495,7 @@ NTSTATUS LeGlobalData::HookX2GameRoutines(PVOID X2Game)
             INLINE_HOOK_JUMP(FillDecryptTable, X2_FillDecryptTable, StubX2_FillDecryptTable),
         };
 
-        Nt_PatchMemory(NULL, 0, f, countof(f), MSVCR100);
+        Nt_PatchMemory(nullptr, 0, f, countof(f), MSVCR100);
 
         return STATUS_SUCCESS;
     }
@@ -509,10 +509,10 @@ NTSTATUS LeGlobalData::HookX2GameRoutines(PVOID X2Game)
 
 NTSTATUS LeGlobalData::UnInitialize()
 {
-    if (DllNotificationCookie != NULL)
+    if (DllNotificationCookie != nullptr)
     {
         LdrUnregisterDllNotification(DllNotificationCookie);
-        DllNotificationCookie = NULL;
+        DllNotificationCookie = nullptr;
     }
 
     UnHookGdi32Routines();
@@ -542,7 +542,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     Kernel32 = GetKernel32Ldr();
 
-    if (Kernel32 != NULL && FLAG_ON(Kernel32->Flags, LDRP_PROCESS_ATTACH_CALLED))
+    if (Kernel32 != nullptr && FLAG_ON(Kernel32->Flags, LDRP_PROCESS_ATTACH_CALLED))
     {
         ExceptionBox(L"fuck");
         return FALSE;
@@ -552,7 +552,7 @@ BOOL Initialize(PVOID BaseAddress)
     ml::MlInitialize();
 
     GlobalData = new LeGlobalData;
-    if (GlobalData == NULL)
+    if (GlobalData == nullptr)
         return FALSE;
 
     LeSetGlobalData(GlobalData);

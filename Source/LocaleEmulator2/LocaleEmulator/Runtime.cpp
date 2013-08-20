@@ -18,10 +18,10 @@ PSTR WCharToMByte(PCWSTR Unicode, ULONG_PTR Length)
     Length *= sizeof(WCHAR);
 
     AnsiString = (PSTR)AllocateMemoryP(Length);
-    if (AnsiString == NULL)
-        return NULL;
+    if (AnsiString == nullptr)
+        return nullptr;
 
-    RtlUnicodeToMultiByteN(AnsiString, Length, NULL, Unicode, Length);
+    RtlUnicodeToMultiByteN(AnsiString, Length, nullptr, Unicode, Length);
 
     return AnsiString;
 }
@@ -36,10 +36,10 @@ PWSTR MByteToWChar(PCSTR AnsiString, ULONG_PTR Length)
     ++Length;
 
     Unicode = (PWSTR)AllocateMemoryP(Length * sizeof(WCHAR));
-    if (Unicode == NULL)
-        return NULL;
+    if (Unicode == nullptr)
+        return nullptr;
 
-    RtlMultiByteToUnicodeN(Unicode, Length * sizeof(WCHAR), NULL, AnsiString, Length);
+    RtlMultiByteToUnicodeN(Unicode, Length * sizeof(WCHAR), nullptr, AnsiString, Length);
 
     return Unicode;
 }
@@ -59,8 +59,8 @@ PSTR TitleWCharToMByte(PCWSTR Unicode)
     if (Unicode[0] == 0xFFFF)
     {
         PSTR ResourceId = (PSTR)AllocateMemoryP(4);
-        if (ResourceId == NULL)
-            return NULL;
+        if (ResourceId == nullptr)
+            return nullptr;
 
         ResourceId[0] = -1;
         *(PUSHORT)&ResourceId[1] = Unicode[1];
@@ -77,8 +77,8 @@ PWSTR TitleMByteToWChar(PCSTR AnsiString)
     if (AnsiString[0] == -1)
     {
         PWSTR ResourceId = (PWSTR)AllocateMemoryP(6);
-        if (ResourceId == NULL)
-            return NULL;
+        if (ResourceId == nullptr)
+            return nullptr;
 
         ResourceId[0] = 0xFFFF;
         ResourceId[1] = *(PUSHORT)&AnsiString[1];
@@ -129,11 +129,11 @@ PLARGE_UNICODE_STRING LargeStringDuplicate(PLARGE_UNICODE_STRING LargeString, PL
     };
 
     if (LargeString->Ansi)
-        return NULL;
+        return nullptr;
 
     InitStringFromLargeString(&Unicode, LargeString);
     if (NT_FAILED(RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &Unicode, &NewUnicode)))
-        return NULL;
+        return nullptr;
 
     Destination->Ansi           = FALSE;
     Destination->Length         = NewUnicode.Length;
@@ -145,8 +145,8 @@ PLARGE_UNICODE_STRING LargeStringDuplicate(PLARGE_UNICODE_STRING LargeString, PL
 
 PLARGE_UNICODE_STRING LargeStringAnsiToUnicode(PLARGE_UNICODE_STRING LargeAnsiString, PLARGE_UNICODE_STRING LargeUnicodeString)
 {
-    if (LargeAnsiString == NULL)
-        return NULL;
+    if (LargeAnsiString == nullptr)
+        return nullptr;
 
     if (!LargeAnsiString->Ansi)
         return LargeStringDuplicate(LargeAnsiString, LargeUnicodeString);
@@ -159,7 +159,7 @@ PLARGE_UNICODE_STRING LargeStringAnsiToUnicode(PLARGE_UNICODE_STRING LargeAnsiSt
     AnsiString.MaximumLength   = LargeAnsiString->MaximumLength;
 
     if (NT_FAILED(RtlAnsiStringToUnicodeString(&UnicodeString, &AnsiString, TRUE)))
-        return NULL;
+        return nullptr;
 
     LargeUnicodeString->Ansi            = FALSE;
     LargeUnicodeString->Length          = UnicodeString.Length;
@@ -177,7 +177,7 @@ VOID FreeLargeString(PLARGE_UNICODE_STRING LargeString)
         UNICODE_STRING  Unicode;
     };
 
-    if (LargeString->Buffer == NULL)
+    if (LargeString->Buffer == 0)
         return;
 
     if (LargeString->Ansi)
@@ -202,8 +202,8 @@ PLARGE_UNICODE_STRING CaptureAnsiWindowName(PLARGE_UNICODE_STRING WindowName, PL
 {
     InitEmptyLargeString(UnicodeWindowName);
 
-    if (WindowName == NULL || WindowName->Buffer == NULL)
-        return NULL;
+    if (WindowName == nullptr || WindowName->Buffer == 0)
+        return nullptr;
 
     if (WindowName->UnicodeBuffer[0] == 0xFFFF)
     {
@@ -229,19 +229,57 @@ PLARGE_UNICODE_STRING CaptureAnsiWindowName(PLARGE_UNICODE_STRING WindowName, PL
 
 BOOL IsSystemCall(PVOID Routine)
 {
-    PBYTE Buffer;
+    PBYTE   Buffer;
+    BOOL    HasMovEax;
+    BOOL    HasCall;
+    BOOL    HasRet;
 
-    Buffer = (PBYTE)Routine;
+    Buffer      = (PBYTE)Routine;
+    HasMovEax   = FALSE;
+    HasCall     = FALSE;
+    HasRet      = FALSE;
 
-    if (Buffer[0] == 0xB8)
-        return TRUE;
-
-    for (ULONG_PTR Count = 1; Count != 0; --Count)
+    for (ULONG_PTR Count = 10; Count != 0; --Count)
     {
+        switch (Buffer[0])
+        {
+            case 0xB8:
+                if ((HasMovEax | HasCall | HasRet) != FALSE)
+                    return FALSE;
+
+                HasMovEax = TRUE;
+                break;
+
+            case 0x64:
+                if (*(PUSHORT)&Buffer[1] != 0x15FF)
+                    break;
+
+            case CALL:
+
+                if (HasMovEax == FALSE)
+                    return FALSE;
+
+                if ((HasCall | HasRet) != FALSE)
+                    return FALSE;
+
+                HasCall = TRUE;
+                break;
+
+            case 0xC2:
+            case 0xC3:
+                if (HasRet != FALSE)
+                    return FALSE;
+
+                if ((HasMovEax & HasCall) == FALSE)
+                    return FALSE;
+
+                HasRet = TRUE;
+                Count = 1;
+                continue;
+        }
+
         Buffer += GetOpCodeSize(Buffer);
-        if (Buffer[0] == 0xB8)
-            return TRUE;
     }
 
-    return FALSE;
+    return HasMovEax & HasCall & HasRet;
 }

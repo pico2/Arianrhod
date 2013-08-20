@@ -7,6 +7,22 @@ _MY_C_HEAD_
 
 NTSTATUS
 NTAPI
+LdrResSearchResource(
+    PVOID       DllHandle,
+    PULONG_PTR  ResourceIdPath,
+    ULONG       ResourceIdPathLength,
+    ULONG       Flags,
+    PVOID*      Resource,
+    PULONG      Size,
+    PVOID       Reserve1,
+    PVOID       Reserve2
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
 NtGetNextThread(
     IN  HANDLE      ProcessHandle,
     IN  HANDLE      ThreadHandle,

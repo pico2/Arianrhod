@@ -15,7 +15,7 @@ typedef struct CBT_PROC_PARAM : public TEB_ACTIVE_FRAME
     CBT_PROC_PARAM()
     {
         this->Context = CBT_PROC_PARAM_CONTEXT;
-        Hook = NULL;
+        Hook = nullptr;
     }
 
 } CBT_PROC_PARAM, *PCBT_PROC_PARAM;

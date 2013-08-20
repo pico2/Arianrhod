@@ -25,6 +25,49 @@
 #define LE_EAT_HOOK(_base, _prefix, _name)      EAT_HOOK_JUMP_HASH(_base, _prefix##_##_name, Le##_name, HookStub.Stub##_name)
 #define LE_EAT_HOOK_NULL(_base, _prefix, _name) EAT_HOOK_JUMP_HASH_NULL(_base, _prefix##_##_name, Le##_name)
 #define LE_INLINE_JUMP(_name)                   INLINE_HOOK_JUMP(_name, Le##_name, HookStub.Stub##_name)
+#define LE_INLINE_CALL(_name)                   INLINE_HOOK_CALL(_name, Le##_name, HookStub.Stub##_name)
+
+
+#define THREAD_LOCAL_BUFFER_CONTEXT TAG4('LTLB')
+
+typedef struct THREAD_LOCAL_BUFFER : public TEB_ACTIVE_FRAME
+{
+    BYTE Buffer[MEMORY_PAGE_SIZE * 2];
+
+    THREAD_LOCAL_BUFFER()
+    {
+        this->Context = THREAD_LOCAL_BUFFER_CONTEXT;
+    }
+
+    PVOID GetBuffer()
+    {
+        return this == nullptr ? nullptr : &Buffer;
+    }
+
+    NoInline static THREAD_LOCAL_BUFFER* GetTlb(BOOL Allocate)
+    {
+        PTHREAD_LOCAL_BUFFER Tlb;
+
+        Tlb = (PTHREAD_LOCAL_BUFFER)FindThreadFrame(THREAD_LOCAL_BUFFER_CONTEXT);
+
+        if (Tlb != nullptr || Allocate == FALSE)
+            return Tlb;
+
+        Tlb = new THREAD_LOCAL_BUFFER;
+        if (Tlb != nullptr)
+        {
+            Tlb->Push();
+        }
+
+        return Tlb;
+    }
+
+    NoInline static VOID ReleaseTlb()
+    {
+        delete GetTlb(FALSE);
+    }
+
+} THREAD_LOCAL_BUFFER, *PTHREAD_LOCAL_BUFFER;
 
 typedef struct
 {
@@ -69,7 +112,7 @@ GetLePebSectionName(
 
 inline NTSTATUS CloseLePeb(PLEPEB LePeb)
 {
-    return LePeb == NULL ? STATUS_INVALID_PARAMETER : ZwUnmapViewOfSection(CurrentProcess, LePeb);
+    return LePeb == nullptr ? STATUS_INVALID_PARAMETER : ZwUnmapViewOfSection(CurrentProcess, LePeb);
 }
 
 inline VOID InitDefaultLeb(PLEB Leb)
@@ -123,22 +166,22 @@ OpenOrCreateLePeb(
 
     SessionId = GetSessionId(ProcessId);
     if (SessionId == INVALID_SESSION_ID)
-        return NULL;
+        return nullptr;
 
     BaseNamedObjectsName.Length         = swprintf(SectionNameBuffer, L"\\Sessions\\%d\\BaseNamedObjects", SessionId) * sizeof(WCHAR);
     BaseNamedObjectsName.MaximumLength  = BaseNamedObjectsName.Length;
     BaseNamedObjectsName.Buffer         = SectionNameBuffer;
 
-    InitializeObjectAttributes(&ObjectAttributes, &BaseNamedObjectsName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+    InitializeObjectAttributes(&ObjectAttributes, &BaseNamedObjectsName, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
     Status = ZwOpenDirectoryObject(&BaseNamedObjects, DIRECTORY_ALL_ACCESS, &ObjectAttributes);
     if (NT_FAILED(Status))
-        return NULL;
+        return nullptr;
 
     SectionName.Length          = (USHORT)GetLePebSectionName(SectionNameBuffer, ProcessId) * sizeof(WCHAR);
     SectionName.MaximumLength   = SectionName.Length;
     SectionName.Buffer          = SectionNameBuffer;
 
-    InitializeObjectAttributes(&ObjectAttributes, &SectionName, 0, BaseNamedObjects, NULL);
+    InitializeObjectAttributes(&ObjectAttributes, &SectionName, 0, BaseNamedObjects, nullptr);
 
     Status = ZwOpenSection(&SectionHandle, SECTION_ALL_ACCESS, &ObjectAttributes);
     if (NT_FAILED(Status) && Create)
@@ -151,24 +194,24 @@ OpenOrCreateLePeb(
                     &MaximumSize,
                     PAGE_READWRITE,
                     SEC_COMMIT,
-                    NULL
+                    nullptr
                 );
     }
 
     ZwClose(BaseNamedObjects);
 
     if (NT_FAILED(Status))
-        return NULL;
+        return nullptr;
 
     ViewSize = 0;
-    LePeb = NULL;
+    LePeb = nullptr;
     Status = ZwMapViewOfSection(
                 SectionHandle,
                 CurrentProcess,
                 (PVOID *)&LePeb,
                 0,
                 sizeof(*LePeb),
-                NULL,
+                nullptr,
                 &ViewSize,
                 ViewShare,
                 0,
@@ -178,7 +221,7 @@ OpenOrCreateLePeb(
     if (NT_FAILED(Status))
     {
         ZwClose(SectionHandle);
-        return NULL;
+        return nullptr;
     }
 
     if (Create) LOOP_ONCE
@@ -186,7 +229,7 @@ OpenOrCreateLePeb(
         HANDLE ProcessHandle;
 
         ProcessHandle = PidToHandle(ProcessId);
-        if (ProcessHandle == NULL)
+        if (ProcessHandle == nullptr)
         {
             Status = STATUS_ACCESS_DENIED;
             break;
@@ -201,7 +244,7 @@ OpenOrCreateLePeb(
     if (NT_FAILED(Status))
     {
         CloseLePeb(LePeb);
-        return NULL;
+        return nullptr;
     }
 
     return LePeb;
@@ -246,6 +289,9 @@ public:
 
     struct
     {
+        API_POINTER(NtContinue)                 StubLdrInitNtContinue;
+        API_POINTER(LdrResSearchResource)       StubLdrResSearchResource;
+
         PVOID (*StubGetCurrentNlsCache)();
 
         API_POINTER(NtUserMessageCall)          StubNtUserMessageCall;
@@ -256,6 +302,7 @@ public:
         API_POINTER(GetClipboardData)           StubGetClipboardData;
         API_POINTER(SetClipboardData)           StubSetClipboardData;
         API_POINTER(GetDC)                      StubGetDC;
+        API_POINTER(GetDCEx)                    StubGetDCEx;
         API_POINTER(GetWindowDC)                StubGetWindowDC;
 
         union
@@ -267,6 +314,7 @@ public:
 
         API_POINTER(GetStockObject)             StubGetStockObject;
         API_POINTER(CreateFontIndirectExW)      StubCreateFontIndirectExW;
+        API_POINTER(NtGdiHfontCreate)           StubNtGdiHfontCreate;
         API_POINTER(CreateCompatibleDC)         StubCreateCompatibleDC;
         API_POINTER(EnumFontFamiliesExA)        StubEnumFontFamiliesExA;
         API_POINTER(EnumFontFamiliesExW)        StubEnumFontFamiliesExW;
@@ -336,7 +384,7 @@ public:
         HDC DC;
         LOGFONTW lf;
 
-        DC = HookStub.StubGetDC == NULL ? ::GetDC(NULL) : GetDC(NULL);
+        DC = HookStub.StubGetDC == nullptr ? ::GetDC(nullptr) : GetDC(nullptr);
         GetLePeb()->OriginalCharset = GetTextCharset(DC);
 
         lf.lfCharSet = GetLeb()->DefaultCharset;
@@ -353,7 +401,7 @@ public:
                 return FALSE;
             };
 
-        if (HookStub.StubEnumFontFamiliesExW == NULL)
+        if (HookStub.StubEnumFontFamiliesExW == nullptr)
         {
             ::EnumFontFamiliesExW(DC, &lf, EnumFontCallback, (LPARAM)this, 0);
         }
@@ -362,7 +410,7 @@ public:
             EnumFontFamiliesExW(DC, &lf, EnumFontCallback, (LPARAM)this, 0);
         }
 
-        ReleaseDC(NULL, DC);
+        ReleaseDC(nullptr, DC);
     }
 
     NTSTATUS Initialize();
@@ -470,6 +518,11 @@ public:
     HDC GetDC(HWND hWnd)
     {
         return HookStub.StubGetDC(hWnd);
+    }
+    
+    HDC GetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
+    {
+        return HookStub.StubGetDCEx(hWnd, hrgnClip, flags);
     }
 
     HDC GetWindowDC(HWND hWnd)

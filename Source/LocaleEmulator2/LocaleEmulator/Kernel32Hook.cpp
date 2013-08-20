@@ -9,7 +9,7 @@ PVOID LeGetCurrentNlsCache()
     NlsCache = (PULONG_PTR)GlobalData->GetCurrentNlsCache();
 
     CurrentNlsNode = (PULONG)NlsCache[2];
-    if (CurrentNlsNode == NULL)
+    if (CurrentNlsNode == nullptr)
         return NlsCache;
 
     *CurrentNlsNode = GlobalData->GetLeb()->LocaleID;
@@ -24,10 +24,10 @@ PVOID FindGetCurrentNlsCache(PVOID Kernel32)
     KernelBase = FindLdrModuleByName(&USTR(L"KERNELBASE.dll"))->DllBase;
 
     GetUserDefaultLCID = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLCID);
-    if (GetUserDefaultLCID == NULL)
-        return NULL;
+    if (GetUserDefaultLCID == nullptr)
+        return nullptr;
 
-    GetCurrentNlsCache = NULL;
+    GetCurrentNlsCache = nullptr;
 
     WalkOpCodeT(GetUserDefaultLCID, 0x30,
         WalkOpCodeM(Buffer, OpLength, Ret)
@@ -55,7 +55,7 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
     this->SetUnhandledExceptionFilter();
 
     GetCurrentNlsCache = FindGetCurrentNlsCache(Kernel32);
-    if (GetCurrentNlsCache == NULL)
+    if (GetCurrentNlsCache == nullptr)
         return STATUS_NOT_FOUND;
 
     MEMORY_FUNCTION_PATCH f[] =
@@ -63,10 +63,12 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
         LE_INLINE_JUMP(GetCurrentNlsCache),
     };
 
-    return Nt_PatchMemory(NULL, 0, f, countof(f));
+    return Nt_PatchMemory(nullptr, 0, f, countof(f));
 }
 
 NTSTATUS LeGlobalData::UnHookKernel32Routines()
 {
+    Nt_RestoreMemory(&HookStub.StubGetCurrentNlsCache);
+
     return 0;
 }

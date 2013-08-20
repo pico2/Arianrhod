@@ -27,29 +27,29 @@ UserMessageCall(INLPCREATESTRUCT)
     CreateStructW = (LPCREATESTRUCTW)lParam;
     CreateStructW->lpCreateParams = ((PCBT_CREATE_PARAM)CreateStructW->lpCreateParams)->CreateParams;
 
-    CreateStructA.lpszClass = NULL;
-    CreateStructA.lpszName = NULL;
+    CreateStructA.lpszClass = nullptr;
+    CreateStructA.lpszName = nullptr;
 
     // ResetDCCharset(LeGetGlobalData(), Window);
 
     LOOP_ONCE
     {
-        if (CreateStructW == NULL)
+        if (CreateStructW == nullptr)
             break;
 
         CreateStructA = *(LPCREATESTRUCTA)CreateStructW;
 
-        CreateStructA.lpszClass = NULL;
-        CreateStructA.lpszName = NULL;
+        CreateStructA.lpszClass = nullptr;
+        CreateStructA.lpszName = nullptr;
 
         CreateStructA.lpszClass = ClassWCharToMByte(CreateStructW->lpszClass);
-        if (CreateStructA.lpszClass == NULL)
+        if (CreateStructA.lpszClass == nullptr)
             break;
 
-        if (CreateStructW->lpszName != NULL)
+        if (CreateStructW->lpszName != nullptr)
         {
             CreateStructA.lpszName = TitleWCharToMByte(CreateStructW->lpszName);
-            if (CreateStructA.lpszName == NULL)
+            if (CreateStructA.lpszName == nullptr)
                 break;
         }
 
@@ -69,11 +69,11 @@ UserMessageCall(INSTRINGNULL)
     PSTR    Ansi;
     LRESULT Result, Length;
 
-    Ansi = NULL;
+    Ansi = nullptr;
 
     LOOP_ONCE
     {
-        if (lParam == NULL)
+        if (lParam == 0)
             break;
 
         Length = StrLengthW((PWSTR)lParam);
@@ -81,7 +81,7 @@ UserMessageCall(INSTRINGNULL)
             break;
 
         Ansi = WCharToMByte((PWSTR)lParam, Length);
-        if (Ansi == NULL)
+        if (Ansi == nullptr)
             break;
 
         lParam = (LPARAM)Ansi;
@@ -105,7 +105,7 @@ UserMessageCall(OUTSTRING)
 
     Length = OutputSize * sizeof(WCHAR);
     Ansi = AllocAnsi(Length);
-    if (Ansi == NULL)
+    if (Ansi == nullptr)
         return 0;
 
     wParam = Length;
@@ -141,7 +141,7 @@ UserMessageCall(INCNTOUTSTRING)
 
     Length = OutputSize * sizeof(WCHAR);
     Ansi = AllocAnsi(Length);
-    if (Ansi == NULL)
+    if (Ansi == nullptr)
         return 0;
 
     ParamA = (PMSG_INPUT_COUNT_OUPUT_STRING)Ansi;
@@ -176,7 +176,7 @@ UserMessageCall(OUTCBOXSTRING)
     OutputBuffer = (PWSTR)lParam;
     ++OutputSize;
     Ansi = AllocAnsi(OutputSize);
-    if (Ansi == NULL)
+    if (Ansi == nullptr)
         return 0;
 
     Length = CallWindowProcA(PrevProc, Window, Message, wParam, (LPARAM)Ansi);
@@ -215,7 +215,7 @@ UserMessageCall(GETDBCSTEXTLENGTHS)
 
     ++Length;
     Ansi = AllocAnsi(Length);
-    if (Ansi == NULL)
+    if (Ansi == nullptr)
         return 0;
 
     wParam = Message == WM_GETTEXTLENGTH ? Length : wParam;
@@ -268,27 +268,27 @@ KernelMessageCall(INLPCREATESTRUCT)
     CREATESTRUCTW   CreateStructW;
 
     CreateStructA = (LPCREATESTRUCTA)lParam;
-    CreateStructW.lpszClass = NULL;
-    CreateStructW.lpszName = NULL;
+    CreateStructW.lpszClass = nullptr;
+    CreateStructW.lpszName = nullptr;
 
     LOOP_ONCE
     {
-        if (CreateStructA == NULL)
+        if (CreateStructA == nullptr)
             break;
 
         CreateStructW = *(LPCREATESTRUCTW)CreateStructA;
 
-        CreateStructW.lpszClass = NULL;
-        CreateStructW.lpszName = NULL;
+        CreateStructW.lpszClass = nullptr;
+        CreateStructW.lpszName = nullptr;
 
         CreateStructW.lpszClass = ClassMByteToWChar(CreateStructA->lpszClass);
-        if (CreateStructW.lpszClass == NULL)
+        if (CreateStructW.lpszClass == nullptr)
             break;
 
-        if (CreateStructA->lpszName != NULL)
+        if (CreateStructA->lpszName != nullptr)
         {
             CreateStructW.lpszName = TitleMByteToWChar(CreateStructA->lpszName);
-            if (CreateStructW.lpszName == NULL)
+            if (CreateStructW.lpszName == nullptr)
                 break;
         }
 
@@ -309,11 +309,11 @@ KernelMessageCall(INSTRINGNULL)
     PWSTR   Unicode;
     LRESULT Result, Length;
 
-    Unicode = NULL;
+    Unicode = nullptr;
 
     LOOP_ONCE
     {
-        if (lParam == NULL)
+        if (lParam == 0)
             break;
 
         Length = StrLengthA((PSTR)lParam);
@@ -321,7 +321,7 @@ KernelMessageCall(INSTRINGNULL)
             break;
 
         Unicode = MByteToWChar((PSTR)lParam, Length);
-        if (Unicode == NULL)
+        if (Unicode == nullptr)
             break;
 
         lParam = (LPARAM)Unicode;
@@ -354,7 +354,7 @@ KernelMessageCall(OUTSTRING)
 
     ++Length;
     Unicode = AllocUnicode(Length);
-    if (Unicode == NULL)
+    if (Unicode == nullptr)
         return 0;
 
     Length = GlobalData->NtUserMessageCall(Window, Message, Length, (LPARAM)Unicode, xParam, xpfnProc, Flags);
@@ -385,7 +385,7 @@ KernelMessageCall(INCNTOUTSTRING)
     OutputBuffer = ParamA->AnsiBuffer;
 
     Unicode = AllocUnicode(OutputSize);
-    if (Unicode == NULL)
+    if (Unicode == nullptr)
         return 0;
 
     ParamW = (PMSG_INPUT_COUNT_OUPUT_STRING)Unicode;
@@ -425,7 +425,7 @@ KernelMessageCall(OUTCBOXSTRING)
 
     ++Length;
     Unicode = AllocUnicode(Length);
-    if (Unicode == NULL)
+    if (Unicode == nullptr)
         return 0;
 
     Length = GlobalData->NtUserMessageCall(Window, Message, wParam, (LPARAM)Unicode, xParam, xpfnProc, Flags);
@@ -464,7 +464,7 @@ KernelMessageCall(GETDBCSTEXTLENGTHS)
 
     ++Length;
     Unicode = AllocUnicode(Length);
-    if (Unicode == NULL)
+    if (Unicode == nullptr)
         return 0;
 
     wParam = Message == WM_GETTEXTLENGTH ? Length : wParam;
@@ -528,13 +528,13 @@ LeNtUserDefSetText(
 
     LOOP_ONCE
     {
-        if (Text == NULL)
+        if (Text == nullptr)
             break;
 
-        if (GlobalData->GetWindowDataA(hWnd) == NULL)
+        if (GlobalData->GetWindowDataA(hWnd) == nullptr)
             break;
 
-        if (LargeStringAnsiToUnicode(Text, &UnicodeText) == NULL)
+        if (LargeStringAnsiToUnicode(Text, &UnicodeText) == nullptr)
             break;
 
         Text = &UnicodeText;
@@ -607,7 +607,7 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 
         GlobalData = CbtParam->GlobalData;
 
-        if (GlobalData->GetWindowDataA(hWnd) != NULL)
+        if (GlobalData->GetWindowDataA(hWnd) != nullptr)
             break;
 
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
@@ -649,8 +649,8 @@ InstallCbtHook(
     PVOID&              Param
 )
 {
-    CbtParam->Hook = SetWindowsHookExA(WH_CBT, CBTProc, NULL, CurrentTid());
-    if (CbtParam->Hook == NULL)
+    CbtParam->Hook = SetWindowsHookExA(WH_CBT, CBTProc, nullptr, CurrentTid());
+    if (CbtParam->Hook == nullptr)
         return FALSE;
 
     CbtParam->GlobalData = GlobalData;
@@ -670,8 +670,8 @@ InstallUnicodeCbtHook(
     PCBT_PROC_PARAM     CbtParam
 )
 {
-    CbtParam->Hook = SetWindowsHookExA(WH_CBT, CBTProcU, NULL, CurrentTid());
-    if (CbtParam->Hook == NULL)
+    CbtParam->Hook = SetWindowsHookExA(WH_CBT, CBTProcU, nullptr, CurrentTid());
+    if (CbtParam->Hook == nullptr)
         return FALSE;
 
     CbtParam->GlobalData = GlobalData;
@@ -682,7 +682,7 @@ InstallUnicodeCbtHook(
 
 VOID UninstallCbtHook(PCBT_PROC_PARAM CbtParam)
 {
-    if (CbtParam->Hook == NULL)
+    if (CbtParam->Hook == nullptr)
         return;
 
     UnhookWindowsHookEx(CbtParam->Hook);
@@ -728,9 +728,9 @@ LeNtUserCreateWindowEx_Win7(
             break;
         }
 
-        if (WindowName != NULL)
+        if (WindowName != nullptr)
         {
-            if (CaptureAnsiWindowName(WindowName, &UnicodeWindowName) == NULL)
+            if (CaptureAnsiWindowName(WindowName, &UnicodeWindowName) == nullptr)
                 break;
         }
 
@@ -759,7 +759,7 @@ LeNtUserCreateWindowEx_Win7(
 
     LastError = RtlGetLastWin32Error();
 
-    if (hWnd != NULL)
+    if (hWnd != nullptr)
     {
         HDC hDC;
 
@@ -824,9 +824,9 @@ LeNtUserCreateWindowEx_Win8(
             break;
         }
 
-        if (WindowName != NULL)
+        if (WindowName != nullptr)
         {
-            if (CaptureAnsiWindowName(WindowName, &UnicodeWindowName) == NULL)
+            if (CaptureAnsiWindowName(WindowName, &UnicodeWindowName) == nullptr)
                 break;
         }
 
@@ -856,7 +856,7 @@ LeNtUserCreateWindowEx_Win8(
 
     LastError = RtlGetLastWin32Error();
 
-    if (hWnd != NULL)
+    if (hWnd != nullptr)
     {
         HDC hDC;
 
@@ -890,7 +890,7 @@ LONG_PTR NTAPI LeGetWindowLongA(HWND hWnd, int Index)
     {
         case GWL_WNDPROC:
             Proc = GlobalData->GetWindowDataA(hWnd);
-            if (Proc == NULL)
+            if (Proc == nullptr)
                 break;
 
             return (LONG_PTR)Proc;
@@ -908,7 +908,7 @@ LONG_PTR NTAPI LeSetWindowLongA(HWND hWnd, int Index, LONG_PTR NewLong)
     {
         case GWL_WNDPROC:
             Proc = GlobalData->GetWindowDataA(hWnd);
-            if (Proc != NULL)
+            if (Proc != nullptr)
             {
                 GlobalData->SetWindowDataA(hWnd, (PVOID)NewLong);
                 return (LONG_PTR)Proc;
@@ -923,7 +923,7 @@ BOOL NTAPI LeIsWindowUnicode(HWND hWnd)
 {
     PLeGlobalData GlobalData = LeGetGlobalData();
 
-    return GlobalData->GetWindowDataA(hWnd) == NULL ? GlobalData->IsWindowUnicode(hWnd) : FALSE;
+    return GlobalData->GetWindowDataA(hWnd) == nullptr ? GlobalData->IsWindowUnicode(hWnd) : FALSE;
 }
 
 HANDLE NTAPI LeSetClipboardData(UINT Format, HANDLE Memory)
@@ -934,13 +934,13 @@ HANDLE NTAPI LeSetClipboardData(UINT Format, HANDLE Memory)
     ULONG_PTR           Length;
     PLeGlobalData       GlobalData = LeGetGlobalData();
 
-    Ansi = NULL;
+    Ansi = nullptr;
     switch (Format)
     {
         case CF_TEXT:
 
             Ansi = (PSTR)GlobalLock(Memory);
-            if (Ansi == NULL)
+            if (Ansi == nullptr)
                 break;
 
             Length = StrLengthA(Ansi);
@@ -949,14 +949,14 @@ HANDLE NTAPI LeSetClipboardData(UINT Format, HANDLE Memory)
 
             ++Length;
             Data = GlobalAlloc(GHND, Length * sizeof(WCHAR));
-            if (Data == NULL)
+            if (Data == nullptr)
                 break;
 
             Unicode = (PWSTR)GlobalLock(Data);
             AnsiToUnicode(Unicode, Length, Ansi, Length - 1);
             GlobalUnlock(Data);
 
-            if (GlobalData->SetClipboardData(CF_UNICODETEXT, Data) == NULL)
+            if (GlobalData->SetClipboardData(CF_UNICODETEXT, Data) == nullptr)
             {
                 GlobalFree(Data);
             }
@@ -964,7 +964,7 @@ HANDLE NTAPI LeSetClipboardData(UINT Format, HANDLE Memory)
             break;
     }
 
-    if (Ansi != NULL)
+    if (Ansi != nullptr)
         GlobalUnlock(Memory);
 
     return GlobalData->SetClipboardData(Format, Memory);
@@ -982,7 +982,7 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
     {
         case CF_TEXT:
             Data = GlobalData->GetClipboardData(CF_UNICODETEXT);
-            if (Data == NULL)
+            if (Data == nullptr)
                 break;
 
             Flags = GlobalFlags(Data);
@@ -990,12 +990,12 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
                 break;
 
             Unicode = (PWSTR)GlobalLock(Data);
-            if (Unicode == NULL)
+            if (Unicode == nullptr)
                 break;
 
             Length = StrLengthW(Unicode);
             AnsiData = GlobalAlloc(GHND, Length * sizeof(WCHAR) + 1);
-            if (AnsiData == NULL)
+            if (AnsiData == nullptr)
             {
                 GlobalUnlock(Data);
                 break;
@@ -1009,7 +1009,7 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
             GlobalUnlock(Data);
 
             Data = SetClipboardData(CF_TEXT, AnsiData);
-            if (Data == NULL)
+            if (Data == nullptr)
             {
                 GlobalFree(AnsiData);
             }
@@ -1020,6 +1020,26 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
     return GlobalData->GetClipboardData(Format);
 }
 
+HDC NTAPI LeGetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
+{
+    HDC             DC;
+    HFONT           Font;
+    PLeGlobalData   GlobalData = LeGetGlobalData();
+
+    DC = GlobalData->GetDCEx(hWnd, hrgnClip, flags);
+    if (hWnd == nullptr)
+    {
+        Font = GetFontFromDC(GlobalData, DC);
+        if (Font != nullptr)
+        {
+            SelectObject(DC, Font);
+            DeleteObject(Font);
+        }
+    }
+
+    return DC;
+}
+
 HDC NTAPI LeGetDC(HWND hWnd)
 {
     HDC             DC;
@@ -1027,10 +1047,10 @@ HDC NTAPI LeGetDC(HWND hWnd)
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
     DC = GlobalData->GetDC(hWnd);
-    if (hWnd == NULL)
+    if (hWnd == nullptr)
     {
         Font = GetFontFromDC(GlobalData, DC);
-        if (Font != NULL)
+        if (Font != nullptr)
         {
             SelectObject(DC, Font);
             DeleteObject(Font);
@@ -1047,10 +1067,10 @@ HDC NTAPI LeGetWindowDC(HWND hWnd)
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
     DC = GlobalData->GetWindowDC(hWnd);
-    if (hWnd == NULL)
+    if (hWnd == nullptr)
     {
         Font = GetFontFromDC(GlobalData, DC);
-        if (Font != NULL)
+        if (Font != nullptr)
         {
             SelectObject(DC, Font);
             DeleteObject(Font);
@@ -1066,7 +1086,7 @@ HDC NTAPI LeGetWindowDC(HWND hWnd)
 
 PVOID FindNtUserMessageCall(PVOID User32)
 {
-    PVOID NtUserMessageCall = NULL;
+    PVOID NtUserMessageCall = nullptr;
     PVOID SendNotifyMessageW = EATLookupRoutineByHashPNoFix(User32, USER32_SendNotifyMessageW);
 
     NtUserMessageCall = WalkOpCodeT(SendNotifyMessageW, 0x40,
@@ -1076,7 +1096,7 @@ PVOID FindNtUserMessageCall(PVOID User32)
             {
                 case CALL:
                     Buffer = GetCallDestination(Buffer);
-                    if (!IsSystemCall(Buffer))
+                    if (IsSystemCall(Buffer) == FALSE)
                         break;
 
                     Ret = Buffer;
@@ -1104,7 +1124,7 @@ PVOID FindNtUserMessageCall2(PVOID User32)
     GlobalRoutines[1] = IATLookupRoutineByHash(User32, KERNEL32_GlobalUnlock);
     GlobalRoutines[2] = IATLookupRoutineByHash(User32, KERNEL32_GlobalFree);
 
-    NtUserMessageCall = NULL;
+    NtUserMessageCall = nullptr;
 
     Phase = 0;
 
@@ -1140,7 +1160,7 @@ PVOID FindNtUserMessageCall2(PVOID User32)
                             SEH_TRY
                             {
                                 Buffer = GetCallDestination(Buffer);
-                                if (!IsSystemCall(Buffer))
+                                if (IsSystemCall(Buffer) == FALSE)
                                     break;
                             }
                             SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
@@ -1156,7 +1176,7 @@ PVOID FindNtUserMessageCall2(PVOID User32)
                 }
             );
 
-            if (NtUserMessageCall == NULL)
+            if (NtUserMessageCall == nullptr)
             {
                 Phase = 0;
                 return STATUS_SUCCESS;
@@ -1175,10 +1195,10 @@ PVOID FindNtUserCreateWindowEx(PVOID User32)
     PVOID NtUserCreateWindowEx, IATRtlQueryInformationActiveActivationContext;
 
     IATRtlQueryInformationActiveActivationContext = IATLookupRoutineByHash(User32, NTDLL_RtlQueryInformationActiveActivationContext);
-    if (IATRtlQueryInformationActiveActivationContext == NULL)
-        return NULL;
+    if (IATRtlQueryInformationActiveActivationContext == nullptr)
+        return nullptr;
 
-    NtUserCreateWindowEx = NULL;
+    NtUserCreateWindowEx = nullptr;
 
     WalkRelocTableT(User32,
         WalkRelocCallbackM(ImageBase, RelocationEntry, Offset, Context)
@@ -1214,7 +1234,7 @@ PVOID FindNtUserCreateWindowEx(PVOID User32)
                 }
             );
 
-            return NtUserCreateWindowEx == NULL ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+            return NtUserCreateWindowEx == nullptr ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
         },
         0
     );
@@ -1244,10 +1264,10 @@ PVOID FindNtUserDefSetText(PVOID User32)
         ADD_PATTERN(Stubpush_EVENT_OBJECT_NAMECHANGE),
     };
 
-    push_EVENT_OBJECT_NAMECHANGE    = NULL;
-    CallNotifyWinEvent              = NULL;
-    DefSetText                      = NULL;
-    NtUserDefSetText                = NULL;
+    push_EVENT_OBJECT_NAMECHANGE    = nullptr;
+    CallNotifyWinEvent              = nullptr;
+    DefSetText                      = nullptr;
+    NtUserDefSetText                = nullptr;
 
     *(PVOID *)&NotifyWinEvent = EATLookupRoutineByHashPNoFix(User32, USER32_NotifyWinEvent);
 
@@ -1265,8 +1285,8 @@ PVOID FindNtUserDefSetText(PVOID User32)
                                             PtrOffset(End, Start)
                                         );
 
-        if (push_EVENT_OBJECT_NAMECHANGE == NULL)
-            return NULL;
+        if (push_EVENT_OBJECT_NAMECHANGE == nullptr)
+            return nullptr;
 
         WalkOpCodeT(push_EVENT_OBJECT_NAMECHANGE, 0x10,
             WalkOpCodeM(Buffer, OpLength, Ret)
@@ -1283,14 +1303,14 @@ PVOID FindNtUserDefSetText(PVOID User32)
             }
         );
 
-        if (CallNotifyWinEvent != NULL)
+        if (CallNotifyWinEvent != nullptr)
             break;
 
         Start = PtrAdd(push_EVENT_OBJECT_NAMECHANGE, 1);
     }
 
-    if (CallNotifyWinEvent == NULL)
-        return NULL;
+    if (CallNotifyWinEvent == nullptr)
+        return nullptr;
 
     Start = User32;
 
@@ -1303,21 +1323,21 @@ PVOID FindNtUserDefSetText(PVOID User32)
         DefSetText = GetCallDestination(Buffer);
         if (!IN_RANGEEX(Start, DefSetText, End))
         {
-            DefSetText = NULL;
+            DefSetText = nullptr;
             continue;
         }
 
         if (*(PULONG)DefSetText != 0x8B55FF8B)
         {
-            DefSetText = NULL;
+            DefSetText = nullptr;
             continue;
         }
 
         break;
     }
 
-    if (DefSetText == NULL)
-        return NULL;
+    if (DefSetText == nullptr)
+        return nullptr;
 
     WalkOpCodeT(DefSetText, 0x50,
         WalkOpCodeM(Buffer, OpLength, Ret)
@@ -1355,14 +1375,14 @@ LRESULT CALLBACK SendMessageWorkerProbe(HWND hWnd, UINT Message, WPARAM wParam, 
     AllocStack(1);
 
     StackFrame = (PVOID *)_AddressOfReturnAddress() - 1;
-    PrevFrame = NULL;
+    PrevFrame = nullptr;
     while (*StackFrame < (PVOID)lParam)
     {
         PrevFrame = StackFrame;
         StackFrame = (PVOID *)*StackFrame;
     }
 
-    if (PrevFrame != NULL)
+    if (PrevFrame != nullptr)
     {
         PBYTE Buffer = (PBYTE)PrevFrame[1] - 5;
 
@@ -1370,7 +1390,7 @@ LRESULT CALLBACK SendMessageWorkerProbe(HWND hWnd, UINT Message, WPARAM wParam, 
             return (LRESULT)GetCallDestination(Buffer);
     }
 
-    return NULL;
+    return 0;
 }
 
 PVOID FindSendMessageWorker(PVOID User32)
@@ -1414,18 +1434,18 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
     FAIL_RETURN(Status);
 */
     NtUserMessageCall = FindNtUserMessageCall2(User32);
-    if (NtUserMessageCall == NULL)
+    if (NtUserMessageCall == nullptr)
         return STATUS_NOT_FOUND;
 
     NtUserCreateWindowEx = FindNtUserCreateWindowEx(User32);
-    if (NtUserCreateWindowEx == NULL)
+    if (NtUserCreateWindowEx == nullptr)
         return STATUS_NOT_FOUND;
 
     NtUserDefSetText = FindNtUserDefSetText(User32);
-    if (NtUserDefSetText == NULL)
+    if (NtUserDefSetText == nullptr)
         return STATUS_NOT_FOUND;
 
-    if (HookStub.StubEnumFontFamiliesExW != NULL)
+    if (HookStub.StubEnumFontFamiliesExW != nullptr)
     {
         InitFontCharsetInfo();
     }
@@ -1446,10 +1466,11 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         LE_EAT_HOOK(User32, USER32, SetClipboardData),
 
         LE_EAT_HOOK(User32, USER32, GetDC),
+        LE_EAT_HOOK(User32, USER32, GetDCEx),
         LE_EAT_HOOK(User32, USER32, GetWindowDC),
     };
 
-    return Nt_PatchMemory(NULL, 0, f, countof(f), User32);
+    return Nt_PatchMemory(nullptr, 0, f, countof(f), User32);
 }
 
 NTSTATUS LeGlobalData::UnHookUser32Routines()
@@ -1465,10 +1486,14 @@ NTSTATUS LeGlobalData::UnHookUser32Routines()
     Nt_RestoreMemory(&HookStub.StubGetClipboardData);
     Nt_RestoreMemory(&HookStub.StubSetClipboardData);
 
-    if (AtomAnsiProc != NULL)
+    Nt_RestoreMemory(&HookStub.StubGetDC);
+    Nt_RestoreMemory(&HookStub.StubGetDCEx);
+    Nt_RestoreMemory(&HookStub.StubGetWindowDC);
+
+    if (AtomAnsiProc != 0)
     {
         ZwDeleteAtom(AtomAnsiProc);
-        AtomAnsiProc = NULL;
+        AtomAnsiProc = 0;
     }
 /*
     if (AtomUnicodeProc != NULL)

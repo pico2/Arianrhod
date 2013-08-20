@@ -15,7 +15,7 @@ HFONT GetFontFromFont(PLeGlobalData GlobalData, HFONT Font)
     LOGFONTW LogFont;
 
     if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
-        return NULL;
+        return nullptr;
 
     LogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
     Font = CreateFontIndirectW(&LogFont);
@@ -29,8 +29,8 @@ HFONT GetFontFromDC(PLeGlobalData GlobalData, HDC hDC)
     LOGFONTW    LogFont;
 
     Font = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
-    if (Font == NULL)
-        return NULL;
+    if (Font == nullptr)
+        return nullptr;
 
     return GetFontFromFont(GlobalData, Font);
 }
@@ -41,7 +41,7 @@ HGDIOBJ NTAPI LeGetStockObject(LONG Object)
     PULONG_PTR      Index;
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
-    StockObject = NULL;
+    StockObject = nullptr;
 
     static ULONG_PTR StockObjectIndex[] =
     {
@@ -77,7 +77,7 @@ HGDIOBJ NTAPI LeGetStockObject(LONG Object)
 
         StockObject = GlobalData->HookRoutineData.Gdi32.StockObject[Object];
 
-        if (StockObject != NULL)
+        if (StockObject != nullptr)
             return StockObject;
     }
 
@@ -89,7 +89,7 @@ HFONT NTAPI LeCreateFontIndirectExW(PENUMLOGFONTEXDVW penumlfex)
     ENUMLOGFONTEXDVW enumlfex;
     PLeGlobalData GlobalData = LeGetGlobalData();
 
-    if (penumlfex != NULL) LOOP_ONCE
+    if (penumlfex != nullptr) LOOP_ONCE
     {
         ULONG_PTR Charset;
 
@@ -121,11 +121,11 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
 
     NewDC = GlobalData->CreateCompatibleDC(hDC);
 
-    if (NewDC == NULL)
+    if (NewDC == nullptr)
         return NewDC;
 
     Font = (HFONT)GetCurrentObject(NewDC, OBJ_FONT);
-    if (Font == NULL)
+    if (Font == nullptr)
         return NewDC;
 
     if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
@@ -137,7 +137,7 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
         CopyStruct(&LogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, sizeof(LogFont.lfFaceName));
 
     Font = CreateFontIndirectW(&LogFont);
-    if (Font == NULL)
+    if (Font == nullptr)
         return NewDC;
 
     SelectObject(NewDC, Font);
@@ -189,7 +189,7 @@ int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpP
 
     LOOP_ONCE
     {
-        if (lpLogfont == NULL)
+        if (lpLogfont == nullptr)
             break;
 
         Charset = lpLogfont->lfCharSet;
@@ -212,6 +212,45 @@ int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpP
     return GlobalData->EnumFontFamiliesExA(hdc, lpLogfont, lpProc, lParam, dwFlags);
 }
 
+HFONT
+NTAPI
+LeNtGdiHfontCreate(
+    PENUMLOGFONTEXDVW   EnumLogFont,
+    ULONG               SizeOfEnumLogFont,
+    LONG                LogFontType,
+    LONG                Unknown,
+    PVOID               FreeListLocalFont
+)
+{
+    PENUMLOGFONTEXDVW   enumlfex;
+    PLeGlobalData       GlobalData = LeGetGlobalData();
+
+    if (EnumLogFont != nullptr) LOOP_ONCE
+    {
+        ULONG_PTR Charset;
+
+        Charset = EnumLogFont->elfEnumLogfontEx.elfLogFont.lfCharSet;
+
+        if (Charset != ANSI_CHARSET && Charset != DEFAULT_CHARSET)
+            break;
+
+        enumlfex = (PENUMLOGFONTEXDVW)AllocStack(SizeOfEnumLogFont);
+
+        CopyMemory(enumlfex, EnumLogFont, SizeOfEnumLogFont);
+
+        enumlfex->elfEnumLogfontEx.elfLogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
+
+        //if (GdiGetCodePage == NULL)
+        //CopyStruct(enumlfex.elfEnumLogfontEx.elfLogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, LF_FACESIZE);
+        //AllocConsole();
+        //PrintConsoleW(L"%s\n", enumlfex.elfEnumLogfontEx.elfLogFont.lfFaceName);
+
+        EnumLogFont = enumlfex;
+    }
+
+    return GlobalData->HookStub.StubNtGdiHfontCreate(EnumLogFont, SizeOfEnumLogFont, LogFontType, Unknown, FreeListLocalFont);
+}
+
 int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpProc, LPARAM lParam, DWORD dwFlags)
 {
     ULONG_PTR           Charset;
@@ -221,7 +260,7 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
 
     LOOP_ONCE
     {
-        if (lpLogfont == NULL)
+        if (lpLogfont == nullptr)
             break;
 
         Charset = lpLogfont->lfCharSet;
@@ -318,36 +357,85 @@ HGDIOBJ NTAPI LeSelectObject(HDC hdc, HGDIOBJ h)
 
     obj = StubSelectObject(hdc, h);
 
-    if (GdiGetCodePage(hdc) == 0x3A4)
+    switch (GdiGetCodePage(hdc))
     {
-        ULONG objtype = GetObjectType(h);
-
-        union
+        //case 0x3A4:
+        case 0x3A8:
         {
-            LOGFONTW lf;
-        };
+            ULONG objtype = GetObjectType(h);
 
-        switch (objtype)
-        {
-            case OBJ_FONT:
-                GetObjectW(h, sizeof(lf), &lf);
-                break;
+            union
+            {
+                LOGFONTW lf;
+            };
 
-            default:
-                return obj;
+            switch (objtype)
+            {
+                case OBJ_FONT:
+                    GetObjectW(h, sizeof(lf), &lf);
+                    ExceptionBox(lf.lfFaceName, L"FUCK");
+                    break;
+
+                default:
+                    return obj;
+            }
+
+            break;
         }
     }
 
     return obj;
 }
 
+/************************************************************************
+  init
+************************************************************************/
+
+PVOID FindNtGdiHfontCreate(PVOID Gdi32)
+{
+    PVOID CreateFontIndirectExW, NtGdiHfontCreate;
+
+    CreateFontIndirectExW = EATLookupRoutineByHashPNoFix(Gdi32, GDI32_CreateFontIndirectExW);
+
+    NtGdiHfontCreate = WalkOpCodeT(CreateFontIndirectExW, 0x100,
+                            WalkOpCodeM(Buffer, OpLength, Ret)
+                            {
+                                switch (Buffer[0])
+                                {
+                                    case CALL:
+                                        Buffer = GetCallDestination(Buffer);
+                                        if (IsSystemCall(Buffer) == FALSE)
+                                            break;
+
+                                        Ret = Buffer;
+                                        break;
+                                }
+
+                                return STATUS_NOT_FOUND;
+                            }
+                        );
+
+    return NtGdiHfontCreate;
+}
+
+
+/************************************************************************
+  init end
+************************************************************************/
+
 NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
 {
-    // *(PVOID *)&GdiGetCodePage = GetRoutineAddress(Gdi32, "GdiGetCodePage");
+    PVOID NtGdiHfontCreate;
+
+    *(PVOID *)&GdiGetCodePage = GetRoutineAddress(Gdi32, "GdiGetCodePage");
+
+    NtGdiHfontCreate = FindNtGdiHfontCreate(Gdi32);
+    if (NtGdiHfontCreate == nullptr)
+        return STATUS_NOT_FOUND;
 
     RtlInitializeCriticalSectionAndSpinCount(&HookRoutineData.Gdi32.GdiLock, 4000);
 
-    if (HookStub.StubNtUserCreateWindowEx != NULL)
+    if (HookStub.StubNtUserCreateWindowEx != nullptr)
     {
         InitFontCharsetInfo();
     }
@@ -355,7 +443,7 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
     MEMORY_FUNCTION_PATCH f[] =
     {
         LE_EAT_HOOK(Gdi32, GDI32, GetStockObject),
-        LE_EAT_HOOK(Gdi32, GDI32, CreateFontIndirectExW),
+        //LE_EAT_HOOK(Gdi32, GDI32, CreateFontIndirectExW),
         LE_EAT_HOOK(Gdi32, GDI32, CreateCompatibleDC),
         LE_EAT_HOOK(Gdi32, GDI32, EnumFontFamiliesExA),
         LE_EAT_HOOK(Gdi32, GDI32, EnumFontFamiliesExW),
@@ -365,11 +453,13 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
         LE_EAT_HOOK_NULL(Gdi32, GDI32, EnumFontFamiliesA),
         LE_EAT_HOOK_NULL(Gdi32, GDI32, EnumFontFamiliesW),
 
-        // EAT_HOOK_JUMP_HASH(Gdi32, GDI32_SelectObject,    LeSelectObject,      StubSelectObject),
+        LE_INLINE_JUMP(NtGdiHfontCreate),
+
+        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_SelectObject,    LeSelectObject,      StubSelectObject),
 
     };
 
-    return Nt_PatchMemory(NULL, 0, f, countof(f), Gdi32);
+    return Nt_PatchMemory(nullptr, 0, f, countof(f), Gdi32);
 }
 
 NTSTATUS LeGlobalData::UnHookGdi32Routines()

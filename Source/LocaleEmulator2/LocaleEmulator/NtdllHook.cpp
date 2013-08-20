@@ -1,5 +1,86 @@
 #include "stdafx.h"
 
+typedef struct
+{
+    USHORT  Size;
+    USHORT  Unknown;
+    WCHAR   Version16Name[1];
+
+} IMAGE_VERSION_INFO_DATA_ENTRY, *PIMAGE_VERSION_INFO_DATA_ENTRY;
+
+PVOID SearchLdrInitNtContinue()
+{
+    return WalkOpCodeT(LdrInitializeThunk, 0x25,
+                WalkOpCodeM(Buffer, OpLength, Ret)
+                {
+                    if (Buffer[0] == CALL && (PVOID)GetCallDestination(Buffer) == ZwContinue)
+                    {
+                        Ret = Buffer;
+                        return STATUS_SUCCESS;
+                    }
+
+                    return STATUS_NOT_FOUND;
+                }
+            );
+}
+
+NTSTATUS ReplaceMUIVersionLocaleInfo(PVOID& VersionData, ULONG& VersionSize)
+{
+    PVOID       TlbBuffer;
+    PBYTE       Buffer;
+    LONG_PTR    Size;
+    PUSHORT     LangID, CharsetID;
+    PIMAGE_VERSION_INFO_DATA_ENTRY Entry;
+
+    static WCHAR VarFileInfo[] = L"VarFileInfo";
+    static WCHAR Translation[] = L"Translation";
+
+    TlbBuffer = (PBYTE)THREAD_LOCAL_BUFFER::GetTlb(TRUE)->GetBuffer();
+    if (TlbBuffer == nullptr)
+        return STATUS_NO_MEMORY;
+
+    CopyMemory(TlbBuffer, VersionData, VersionSize);
+
+    Entry = (PIMAGE_VERSION_INFO_DATA_ENTRY)TlbBuffer;
+    Size = Entry->Size;
+
+    if (Size < 8 || Size > 0x8000)
+        return STATUS_DATA_NOT_ACCEPTED;
+
+    // ansi version
+    if (Entry->Version16Name[0] == TAG2('VS'))
+        return STATUS_DATA_NOT_ACCEPTED;
+
+    Buffer = (PBYTE)KMP(Entry, Size, VarFileInfo, sizeof(VarFileInfo));
+    if (Buffer == nullptr)
+        return STATUS_RESOURCE_DATA_NOT_FOUND;
+
+    Size = Entry->Size - PtrOffset(Buffer, Entry) - sizeof(VarFileInfo);
+    if (Size <= 0)
+        return STATUS_RESOURCE_DATA_NOT_FOUND;
+
+    Buffer += sizeof(VarFileInfo);
+
+    Buffer = (PBYTE)KMP(Buffer, Size, Translation, sizeof(Translation));
+    if (Buffer == nullptr)
+        return STATUS_RESOURCE_DATA_NOT_FOUND;
+
+    Size = Entry->Size - PtrOffset(Buffer, Entry) - sizeof(Translation);
+    if (Size <= 0)
+        return STATUS_RESOURCE_DATA_NOT_FOUND;
+
+    Entry = (PIMAGE_VERSION_INFO_DATA_ENTRY)PtrSub(Buffer, 6);
+
+    LangID = (PUSHORT)PtrAdd(Entry, ROUND_DOWN(CONST_STRSIZE(Translation) + 11, 4));
+    CharsetID = LangID + 1;
+
+    *LangID = LeGetGlobalData()->GetLeb()->LocaleID;
+
+    VersionData = TlbBuffer;
+
+    return STATUS_SUCCESS;
+}
+
 NTSTATUS QueryRegKeyFullPath(HANDLE Key, PUNICODE_STRING KeyFullPath)
 {
     NTSTATUS                    Status;
@@ -7,7 +88,7 @@ NTSTATUS QueryRegKeyFullPath(HANDLE Key, PUNICODE_STRING KeyFullPath)
     ULONG_PTR                   MaxLength;
     ULONG                       ReturnedLength;
 
-    KeyFullName = NULL;
+    KeyFullName = nullptr;
     MaxLength   = 0;
 
     LOOP_FOREVER
@@ -17,7 +98,7 @@ NTSTATUS QueryRegKeyFullPath(HANDLE Key, PUNICODE_STRING KeyFullPath)
             break;
 
         KeyFullName = (PKEY_NAME_INFORMATION)ReAllocateMemoryP(KeyFullName, ReturnedLength + sizeof(WCHAR));
-        if (KeyFullName == NULL)
+        if (KeyFullName == nullptr)
         {
             Status = STATUS_NO_MEMORY;
             break;
@@ -41,14 +122,14 @@ NoInline PVOID FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
     PVOID   BaseToFree;
     PLEPEB  LePeb;
 
-    BaseToFree = NULL;
+    BaseToFree = nullptr;
 
     LOOP_ONCE
     {
         PVOID DllHandle;
 
         LePeb = OpenOrCreateLePeb();
-        if (LePeb == NULL)
+        if (LePeb == nullptr)
             break;
 
         // LePeb->SelfShadowToFree = &__ImageBase;
@@ -59,7 +140,7 @@ NoInline PVOID FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
 
         RtlInitUnicodeString(&DllPath, LePeb->LeDllFullPath);
 
-        if (NT_FAILED(LdrLoadDll(NULL, NULL, &DllPath, &DllHandle)))
+        if (NT_FAILED(LdrLoadDll(nullptr, nullptr, &DllPath, &DllHandle)))
         {
             CloseLePeb(LePeb);
             break;
@@ -89,7 +170,7 @@ LoadFirstDll(
     //ExceptionBox(L"inject");
 
     BaseToFree = LoadSelfAsFirstDll(_ReturnAddress());
-    if (BaseToFree != NULL)
+    if (BaseToFree != nullptr)
         Mm::FreeVirtualMemory(BaseToFree);
 
     return LdrLoadDll(PathToFile, DllCharacteristics, ModuleFileName, DllHandle);
@@ -111,7 +192,7 @@ LeNtQuerySystemInformation(
     switch (SystemInformationClass)
     {
         case SystemCurrentTimeZoneInformation:
-            if (SystemInformation == NULL)
+            if (SystemInformation == nullptr)
                 break;
 
             if (SystemInformationLength < sizeof(GlobalData->GetLeb()->Timezone))
@@ -119,7 +200,7 @@ LeNtQuerySystemInformation(
 
             *((PRTL_TIME_ZONE_INFORMATION)SystemInformation) = GlobalData->GetLeb()->Timezone;
 
-            if (ReturnLength != NULL)
+            if (ReturnLength != nullptr)
                 *ReturnLength = SystemInformationLength;
 
             HPARG_FLTINFO->Action = BlockSystemCall;
@@ -188,13 +269,13 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
 
     SizeOfImage = FindLdrModuleByHandle(&__ImageBase)->SizeOfImage;
 
-    SelfShadow = NULL;
+    SelfShadow = nullptr;
     Status = AllocVirtualMemory(&SelfShadow, SizeOfImage, PAGE_EXECUTE_READWRITE, MEM_COMMIT, Process);
     if (NT_FAILED(Status))
         return Status;
 
     LocalSelfShadow = AllocateMemoryP(SizeOfImage);
-    if (LocalSelfShadow == NULL)
+    if (LocalSelfShadow == nullptr)
     {
         Mm::FreeVirtualMemory(SelfShadow, Process);
         return STATUS_NO_MEMORY;
@@ -238,7 +319,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     }
 
     TargetLePeb = OpenOrCreateLePeb((ULONG_PTR)Cid->UniqueProcess, TRUE);
-    if (TargetLePeb == NULL)
+    if (TargetLePeb == nullptr)
         return STATUS_UNSUCCESSFUL;
 
     Section = TargetLePeb->Section;
@@ -283,11 +364,11 @@ LeNtCreateUserProcess(
 
     WriteLog(L"create proc");
 
-    LocalAttributeList = NULL;
-    Attribute = NULL;
-    Cid = NULL;
+    LocalAttributeList = nullptr;
+    Attribute = nullptr;
+    Cid = nullptr;
 
-    if (AttributeList != NULL)
+    if (AttributeList != nullptr)
     {
         ULONG_PTR Count;
 
@@ -306,14 +387,14 @@ LeNtCreateUserProcess(
         }
     }
 
-    if (Cid == NULL)
+    if (Cid == nullptr)
     {
         ULONG_PTR ListLength;
 
-        ListLength = (AttributeList != NULL ? AttributeList->TotalLength : sizeof(AttributeList->TotalLength)) + sizeof(*Attribute);
+        ListLength = (AttributeList != nullptr ? AttributeList->TotalLength : sizeof(AttributeList->TotalLength)) + sizeof(*Attribute);
         LocalAttributeList = (PPS_ATTRIBUTE_LIST)AllocStack(ListLength);
 
-        if (AttributeList != NULL)
+        if (AttributeList != nullptr)
             CopyMemory(LocalAttributeList, AttributeList, AttributeList->TotalLength);
 
         LocalAttributeList->TotalLength = ListLength;
@@ -387,6 +468,22 @@ LeNtInitializeNlsFiles(
     *DefaultLocaleId = GlobalData->GetLeb()->LocaleID;
 
     return Status;
+}
+
+NTSTATUS
+HPCALL
+LeNtTerminateThread(
+    HPARGS
+    HANDLE      ThreadHandle,
+    NTSTATUS    ExitStatus
+)
+{
+    if (ThreadHandle == CurrentThread || ThreadHandle == nullptr)
+    {
+        THREAD_LOCAL_BUFFER::ReleaseTlb();
+    }
+
+    return 0;
 }
 
 NTSTATUS
@@ -482,7 +579,7 @@ LeNtQueryValueKey(
 
     if (Status == STATUS_BUFFER_TOO_SMALL)
     {
-        if (ResultLength != NULL)
+        if (ResultLength != nullptr)
             *ResultLength += BufferLength;
     }
 
@@ -529,14 +626,61 @@ LeNtQueryValueKey(
     return Status;
 }
 
+NTSTATUS NTAPI LeLdrInitNtContinue(PCONTEXT Context, BOOLEAN TestAlert)
+{
+    PLeGlobalData GlobalData = LeGetGlobalData();
+
+    CurrentTeb()->CurrentLocale = GlobalData->GetLeb()->LocaleID;
+
+    return GlobalData->HookStub.StubLdrInitNtContinue(Context, TestAlert);
+}
+
+NTSTATUS
+NTAPI
+LeLdrResSearchResource(
+    PVOID       DllHandle,
+    PULONG_PTR  ResourceIdPath,
+    ULONG       ResourceIdPathLength,
+    ULONG       Flags,
+    PVOID*      Resource,
+    PULONG      Size,
+    PVOID       Reserve1,
+    PVOID       Reserve2
+)
+{
+    NTSTATUS Status;
+    PLeGlobalData GlobalData = LeGetGlobalData();
+
+    Status = GlobalData->HookStub.StubLdrResSearchResource(DllHandle, ResourceIdPath, ResourceIdPathLength, Flags, Resource, Size, Reserve1, Reserve2);
+    FAIL_RETURN(Status);
+
+    if (ResourceIdPathLength != 3)
+        return Status;
+
+    if (ResourceIdPath[0] != (ULONG_PTR)RT_VERSION || ResourceIdPath[1] != 1 || ResourceIdPath[2] != 0)
+        return Status;
+
+    if (Resource == nullptr)
+        return Status;
+
+    ReplaceMUIVersionLocaleInfo(*Resource, *Size);
+
+    return Status;
+}
+
 NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 {
     NTSTATUS            Status;
     HANDLE              RootKey;
     OBJECT_ATTRIBUTES   ObjectAttributes;
     UNICODE_STRING      SubKey;
+    PVOID               LdrInitNtContinue;
 
-    RootKey = NULL;
+    LdrInitNtContinue = SearchLdrInitNtContinue();
+    if (LdrInitNtContinue == nullptr)
+        return STATUS_NOT_SUPPORTED;
+
+    RootKey = nullptr;
 
     LOOP_ONCE
     {
@@ -546,7 +690,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
         FAIL_BREAK(Status);
 
         RTL_CONST_STRING(SubKey, REGPATH_CODEPAGE);
-        InitializeObjectAttributes(&ObjectAttributes, &SubKey, OBJ_CASE_INSENSITIVE, RootKey, NULL);
+        InitializeObjectAttributes(&ObjectAttributes, &SubKey, OBJ_CASE_INSENSITIVE, RootKey, nullptr);
         Status = ZwOpenKey(&CodePageKey, KEY_QUERY_VALUE, &ObjectAttributes);
         FAIL_BREAK(Status);
 
@@ -565,18 +709,29 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
         ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
     }
 
-    if (RootKey != NULL)
+    if (RootKey != nullptr)
         ZwClose(RootKey);
 
     ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
     //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
     ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
+    ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
+
+    MEMORY_FUNCTION_PATCH f[] =
+    {
+        LE_INLINE_CALL(LdrInitNtContinue),
+        LE_INLINE_JUMP(LdrResSearchResource),
+    };
+
+    Nt_PatchMemory(nullptr, 0, f, countof(f));
 
     return STATUS_SUCCESS;
 }
 
 NTSTATUS LeGlobalData::UnHookNtdllRoutines()
 {
+    Nt_RestoreMemory(&HookStub.StubLdrInitNtContinue);
+
     return 0;
 }
