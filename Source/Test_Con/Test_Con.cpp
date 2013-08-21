@@ -933,7 +933,7 @@ QueueFakeThreadMessages(
 
             WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.BaseOfImage          = Process->SectionBaseAddress;
             WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.DebugInfoFileOffset  = NtHeaders->FileHeader.PointerToSymbolTable;
-            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.DebugInfoSize        = NtHeaders->FileHeader.NumberOfSymbols;            
+            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.DebugInfoSize        = NtHeaders->FileHeader.NumberOfSymbols;
 
             --*/
         }
@@ -1117,7 +1117,9 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     NTSTATUS Status;
     PVOID base;
     HANDLE thread, event;
-    
+
+    NtQueryInformationProcess(CurrentProcess, ProcessDebugPort, &event, sizeof(event), 0);
+
 //*
     if (wcsstr(QueryCommandLine(), L"-host") == nullptr)
     {
