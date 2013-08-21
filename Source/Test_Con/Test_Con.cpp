@@ -775,15 +775,38 @@ NTSTATUS HandleEvent(PEXCEPTION_DBGUI_WAIT_STATE_CHANGE wait)
     WCHAR buf[0x200];
     NTSTATUS st;
 
+    union
+    {
+        PVOID                           StateInfo;
+        PEXCEPTION_DBG_EXCEPTION        Exception;
+        PEXCEPTION_DBGUI_CREATE_THREAD  CreateThread;
+        PEXCEPTION_DBGUI_CREATE_PROCESS CreateProcessInfo;
+        PEXCEPTION_DBG_EXIT_THREAD      ExitThread;
+        PEXCEPTION_DBG_EXIT_PROCESS     ExitProcess;
+        PEXCEPTION_DBG_LOAD_DLL         LoadDll;
+        PEXCEPTION_DBG_UNLOAD_DLL       UnloadDll;
+    };
+
     st = DBG_EXCEPTION_NOT_HANDLED;
+
+    StateInfo = &wait->StateInfo;
 
     switch (wait->NewState)
     {
-    case DbgCreateThreadStateChange:
-            swprintf(buf, L"%s, start = %p", L"DbgCreateThreadStateChange", wait->StateInfo.CreateThread.NewThread.StartAddress);
+        case DbgCreateThreadStateChange:
+            if (CreateThread->HandleToThread)
+                NtClose((HANDLE)CreateThread->HandleToThread);
+
+            swprintf(buf, L"%s, start = %p", L"DbgCreateThreadStateChange", CreateThread->NewThread.StartAddress);
             break;
 
         case DbgCreateProcessStateChange:
+            if (CreateProcessInfo->HandleToProcess)
+                NtClose((HANDLE)CreateProcessInfo->HandleToProcess);
+
+            if (CreateProcessInfo->HandleToThread)
+                NtClose((HANDLE)CreateProcessInfo->HandleToThread);
+
             swprintf(buf, L"%s", L"DbgCreateProcessStateChange");
             break;
 
@@ -899,6 +922,11 @@ QueueFakeThreadMessages(
             WaitStateChange.AppClientId.UniqueProcess = (ULONG64)ThreadBasic.ClientId.UniqueProcess;
             WaitStateChange.AppClientId.UniqueThread = (ULONG64)ThreadBasic.ClientId.UniqueThread;
 
+            Status = NtQueryInformationThread(Thread, ThreadQuerySetWin32StartAddress, &Win32StartAddress, sizeof(Win32StartAddress), nullptr);
+            FAIL_RETURN(Status);
+
+            WaitStateChange.StateInfo.CreateProcessInfo.NewProcess.InitialThread.StartAddress = (ULONG64)Win32StartAddress;
+
             /*++
 
             filling in kernel
@@ -920,6 +948,9 @@ QueueFakeThreadMessages(
 
         Status = DesQueueDebugEvent(DesDevice, &WaitStateChange);
     }
+
+    if (LastThread != nullptr)
+        NtClose(LastThread);
 
     if (Status == STATUS_NO_MORE_ENTRIES)
         Status = STATUS_SUCCESS;
@@ -1024,7 +1055,9 @@ VOID host()
     PrintConsoleW(L"set proc: %p\n", st);
 
     PauseConsole(L"post fake msgs");
-    QueueFakeProcessCreateMessages(dev, pi.hProcess, FALSE);
+    st = QueueFakeProcessCreateMessages(dev, pi.hProcess, FALSE);
+
+    PrintConsoleW(L"queue: %p\n", st);
 
 /*
     if (NT_FAILED(st))
@@ -1045,6 +1078,7 @@ VOID host()
     NTSTATUS lastst;
 
     query.ProcessId = pi.dwProcessId;
+    FormatTimeOut(&query.Timeout, INFINITE);
 
     lastst = -1;
 
@@ -1056,11 +1090,13 @@ VOID host()
 
         if (st != lastst)
         {
-            //PrintConsoleW(L"query return: %p\n", st);
+            PrintConsoleW(L"query return: %p\n", st);
             lastst = st;
         }
 
         FAIL_CONTINUE(st);
+        if (st == STATUS_TIMEOUT)
+            continue;
 
         wait.ContinueStatus = HandleEvent(&wait);
 
@@ -1081,13 +1117,13 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     NTSTATUS Status;
     PVOID base;
     HANDLE thread, event;
-
+    
+//*
     if (wcsstr(QueryCommandLine(), L"-host") == nullptr)
     {
         host();
         Ps::ExitProcess(0);
     }
-
     MEMORY_FUNCTION_PATCH f[] =
     {
         INLINE_HOOK_CALL(SearchCallRtlDispatchException(), ExpRtlDispatchException, StubRtlDispatchException),
@@ -1100,6 +1136,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         dev.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
         NtDuplicateObject(CurrentProcess, dev, CurrentProcess, &GlobalDesDevice, 0, 0, DUPLICATE_SAME_ACCESS);
     }
+//*/
 
     PauseConsole(L"load dll");
     base = LoadDll(L"E:\\Crack\\Immunity Debugger\\beaengine.dll");

@@ -716,12 +716,12 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
     ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
-    ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
+    //ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
 
     MEMORY_FUNCTION_PATCH f[] =
     {
         LE_INLINE_CALL(LdrInitNtContinue),
-        LE_INLINE_JUMP(LdrResSearchResource),
+        //LE_INLINE_JUMP(LdrResSearchResource),
     };
 
     Nt_PatchMemory(nullptr, 0, f, countof(f));
