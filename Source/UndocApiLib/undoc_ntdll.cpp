@@ -23,6 +23,32 @@ LdrResSearchResource(
 
 NTSTATUS
 NTAPI
+NtGetNextProcess(
+    IN  HANDLE      ProcessHandle,
+    IN  ACCESS_MASK DesiredAccess,
+    IN  ULONG       HandleAttributes,
+    IN  ULONG       Flags,
+    OUT PHANDLE     NewProcessHandle
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
+ZwGetNextProcess(
+    IN  HANDLE      ProcessHandle,
+    IN  ACCESS_MASK DesiredAccess,
+    IN  ULONG       HandleAttributes,
+    IN  ULONG       Flags,
+    OUT PHANDLE     NewProcessHandle
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
 NtGetNextThread(
     IN  HANDLE      ProcessHandle,
     IN  HANDLE      ThreadHandle,

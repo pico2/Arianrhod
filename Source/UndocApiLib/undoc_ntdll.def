@@ -29,4 +29,6 @@ EXPORTS
     _vscwprintf
 	NtGetNextThread
 	ZwGetNextThread
+	NtGetNextProcess
+	ZwGetNextProcess
 	LdrResSearchResource
