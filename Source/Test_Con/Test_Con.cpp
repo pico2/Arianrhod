@@ -706,13 +706,13 @@ ExpRtlDispatchException(
         WaitState.AppClientId.UniqueProcess = CurrentPid();
         WaitState.AppClientId.UniqueThread  = CurrentPid();
 
-        WaitState.StateInfo.Exception.Context32 = *Context;
+        WaitState.Context32 = *Context;
 
         switch (ExceptionRecord->ExceptionCode)
         {
             case EXCEPTION_BREAKPOINT:
                 WaitState.NewState = DbgBreakpointStateChange;
-                ++WaitState.StateInfo.Exception.Context32.Eip;
+                ++WaitState.Context32.Eip;
                 break;
 
             case EXCEPTION_SINGLE_STEP:
@@ -756,7 +756,7 @@ ExpRtlDispatchException(
         if (WaitState.ContinueStatus == DBG_EXCEPTION_NOT_HANDLED || NT_FAILED(WaitState.ContinueStatus))
             break;
 
-        *Context = WaitState.StateInfo.Exception.Context32;
+        *Context = WaitState.Context32;
         return TRUE;
     }
 
@@ -1049,7 +1049,7 @@ VOID host()
     PauseConsole(L"set client to debuggee\n");
 
     proc.ProcessId = pi.dwProcessId;
-    proc.Flags.Debuggee = TRUE;
+    proc.Bits.Debuggee = TRUE;
 
     st = DesSetProcessData(dev, &proc);
     PrintConsoleW(L"set proc: %p\n", st);
@@ -1118,7 +1118,16 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     PVOID base;
     HANDLE thread, event;
 
-    NtQueryInformationProcess(CurrentProcess, ProcessDebugPort, &event, sizeof(event), 0);
+    PROCESS_IMAGE_FILE_NAME2 pfn;
+    MEMORY_MAPPED_FILENAME_INFORMATION2 mfn;
+
+    NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &pfn, sizeof(pfn), nullptr);
+    NtQueryVirtualMemory(CurrentProcess, &__ImageBase, MemoryMappedFilenameInformation, &mfn, sizeof(mfn), nullptr);
+
+    PrintConsoleW(L"%wZ\n%wZ\n", &pfn, &mfn);
+    PauseConsole();
+
+    return;
 
 //*
     if (wcsstr(QueryCommandLine(), L"-host") == nullptr)
