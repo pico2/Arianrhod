@@ -373,7 +373,7 @@ HGDIOBJ NTAPI LeSelectObject(HDC hdc, HGDIOBJ h)
             {
                 case OBJ_FONT:
                     GetObjectW(h, sizeof(lf), &lf);
-                    ExceptionBox(lf.lfFaceName, L"FUCK");
+                    ExceptionBox(lf.lfFaceName, L"FUCK FACE");
                     break;
 
                 default:
