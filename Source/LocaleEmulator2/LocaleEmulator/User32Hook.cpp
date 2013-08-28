@@ -1027,7 +1027,7 @@ HDC NTAPI LeGetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
     DC = GlobalData->GetDCEx(hWnd, hrgnClip, flags);
-    if (hWnd == nullptr)
+    //if (hWnd == nullptr)
     {
         Font = GetFontFromDC(GlobalData, DC);
         if (Font != nullptr)
@@ -1047,7 +1047,7 @@ HDC NTAPI LeGetDC(HWND hWnd)
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
     DC = GlobalData->GetDC(hWnd);
-    if (hWnd == nullptr)
+    //if (hWnd == nullptr)
     {
         Font = GetFontFromDC(GlobalData, DC);
         if (Font != nullptr)
@@ -1067,7 +1067,7 @@ HDC NTAPI LeGetWindowDC(HWND hWnd)
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
     DC = GlobalData->GetWindowDC(hWnd);
-    if (hWnd == nullptr)
+    //if (hWnd == nullptr)
     {
         Font = GetFontFromDC(GlobalData, DC);
         if (Font != nullptr)
@@ -1075,6 +1075,23 @@ HDC NTAPI LeGetWindowDC(HWND hWnd)
             SelectObject(DC, Font);
             DeleteObject(Font);
         }
+    }
+
+    return DC;
+}
+
+HDC NTAPI LeBeginPaint(HWND hWnd, LPPAINTSTRUCT lpPaint)
+{
+    HDC             DC;
+    HFONT           Font;
+    PLeGlobalData   GlobalData = LeGetGlobalData();
+
+    DC = GlobalData->BeginPaint(hWnd, lpPaint);
+    Font = GetFontFromDC(GlobalData, DC);
+    if (Font != nullptr)
+    {
+        SelectObject(DC, Font);
+        DeleteObject(Font);
     }
 
     return DC;
@@ -1468,6 +1485,8 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         LE_EAT_HOOK(User32, USER32, GetDC),
         LE_EAT_HOOK(User32, USER32, GetDCEx),
         LE_EAT_HOOK(User32, USER32, GetWindowDC),
+
+        LE_EAT_HOOK(User32, USER32, BeginPaint),
     };
 
     return Nt_PatchMemory(nullptr, 0, f, countof(f), User32);
@@ -1489,6 +1508,8 @@ NTSTATUS LeGlobalData::UnHookUser32Routines()
     Nt_RestoreMemory(&HookStub.StubGetDC);
     Nt_RestoreMemory(&HookStub.StubGetDCEx);
     Nt_RestoreMemory(&HookStub.StubGetWindowDC);
+
+    Nt_RestoreMemory(&HookStub.StubBeginPaint);
 
     if (AtomAnsiProc != 0)
     {

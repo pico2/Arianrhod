@@ -304,6 +304,7 @@ public:
         API_POINTER(GetDC)                      StubGetDC;
         API_POINTER(GetDCEx)                    StubGetDCEx;
         API_POINTER(GetWindowDC)                StubGetWindowDC;
+        API_POINTER(BeginPaint)                 StubBeginPaint;
 
         union
         {
@@ -528,6 +529,11 @@ public:
     HDC GetWindowDC(HWND hWnd)
     {
         return HookStub.StubGetWindowDC(hWnd);
+    }
+
+    HDC BeginPaint(HWND hWnd, LPPAINTSTRUCT lpPaint)
+    {
+        return HookStub.StubBeginPaint(hWnd, lpPaint);
     }
 
     LRESULT NtUserMessageCall(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam, ULONG_PTR xParam, DWORD xpfnProc, ULONG Flags)

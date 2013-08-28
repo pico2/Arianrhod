@@ -270,7 +270,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     SizeOfImage = FindLdrModuleByHandle(&__ImageBase)->SizeOfImage;
 
     SelfShadow = nullptr;
-    Status = AllocVirtualMemory(&SelfShadow, SizeOfImage, PAGE_EXECUTE_READWRITE, MEM_COMMIT, Process);
+    Status = AllocVirtualMemoryEx(Process, &SelfShadow, SizeOfImage);
     if (NT_FAILED(Status))
         return Status;
 
@@ -282,7 +282,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     }
 
     CopyMemory(LocalSelfShadow, &__ImageBase, SizeOfImage);
-    RelocPeImage(LocalSelfShadow, &__ImageBase, SelfShadow);
+    RelocPeImage(LocalSelfShadow, &__ImageBase, nullptr, SelfShadow);
 
     Status = WriteMemory(Process, SelfShadow, LocalSelfShadow, SizeOfImage);
     FreeMemoryP(LocalSelfShadow);
