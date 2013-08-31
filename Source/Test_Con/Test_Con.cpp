@@ -658,41 +658,9 @@ NTSTATUS InstallShellOverlayHook()
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
-    BOOL bExceptionHit = FALSE;
-
-    Ldr::LoadDll(L"USER32.dll");
-
-    __try
-    {
-        _asm
-        {
-            pushfd
-            or dword ptr [esp],0x100 //设置单步标志为1
-            popfd
-        }
-    }
-    __except(EXCEPTION_EXECUTE_HANDLER)
-    {
-        bExceptionHit = TRUE;
-    }
-
-    PrintConsoleW(L"exp hit = %d\n", bExceptionHit);
-    PauseConsole();
-
-    return;
-
     NTSTATUS Status;
-    PVOID base;
-    HANDLE thread, event;
 
-    PROCESS_IMAGE_FILE_NAME2 pfn;
-    MEMORY_MAPPED_FILENAME_INFORMATION2 mfn;
-
-    NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &pfn, sizeof(pfn), nullptr);
-    NtQueryVirtualMemory(CurrentProcess, &__ImageBase, MemoryMappedFilenameInformation, &mfn, sizeof(mfn), nullptr);
-
-    PrintConsoleW(L"%wZ\n%wZ\n", &pfn, &mfn);
-    PauseConsole();
+    __vmx_off();
 
     return;
 
