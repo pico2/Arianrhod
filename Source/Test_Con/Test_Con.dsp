@@ -53,10 +53,6 @@ LINK32=link.exe
 # Name "Test_Con - Win32 Release"
 # Begin Source File
 
-SOURCE=.\MlString.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\Test_Con.cpp
 # ADD CPP /W3
 # End Source File

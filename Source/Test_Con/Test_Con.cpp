@@ -660,7 +660,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    __vmx_off();
+    Io::DeleteFile(L"New folder");
 
     return;
 
