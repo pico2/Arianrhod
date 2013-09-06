@@ -15,7 +15,6 @@ Library/Qt
 Library/DXSDK
 Library/WTL80_7161_Final.zip
 Source/Drivers
-Source/Hooks/OD
 Source/Hooks/OllyDbgEx
 Source/Hooks/th135/th135.pak
 Source/Hooks/th135/th135cn

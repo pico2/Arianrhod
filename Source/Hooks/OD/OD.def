@@ -1,0 +1,5 @@
+EXPORTS
+    DragAcceptFiles = SHELL32.DragAcceptFiles
+    DragFinish      = SHELL32.DragFinish
+    DragQueryFileA  = SHELL32.DragQueryFileA
+    ShellExecuteA   = SHELL32.ShellExecuteA
