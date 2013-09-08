@@ -115,4 +115,5 @@ def XMLAppendText(xml, text, attrib = ''):
 
 def XMLSaveTo(xml, filename, RootTag = 'Arianrhod'):
     xml.append('</%s>' % RootTag)
+    xml.append('')
     open(filename, 'wb').write('\r\n'.join(xml).encode('UTF8'))

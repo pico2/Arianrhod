@@ -1,32 +1,32 @@
 from MyPyLibrary.syslib import *
 import io
 
-def ReadByte(fs):
-    return struct.unpack('<B', fs.read(1))[0]
+def ReadByte(fs, endian = '<'):
+    return struct.unpack(endian + 'B', fs.read(1))[0]
 
-def ReadShort(fs):
-    return struct.unpack('<h', fs.read(2))[0]
+def ReadShort(fs, endian = '<'):
+    return struct.unpack(endian + 'h', fs.read(2))[0]
 
-def ReadUShort(fs):
-    return struct.unpack('<H', fs.read(2))[0]
+def ReadUShort(fs, endian = '<'):
+    return struct.unpack(endian + 'H', fs.read(2))[0]
 
-def ReadLong(fs):
-    return struct.unpack('<l', fs.read(4))[0]
+def ReadLong(fs, endian = '<'):
+    return struct.unpack(endian + 'l', fs.read(4))[0]
 
-def ReadULong(fs):
-    return struct.unpack('<L', fs.read(4))[0]
+def ReadULong(fs, endian = '<'):
+    return struct.unpack(endian + 'L', fs.read(4))[0]
 
-def ReadLong64(fs):
-    return struct.unpack('<q', fs.read(8))[0]
+def ReadLong64(fs, endian = '<'):
+    return struct.unpack(endian + 'q', fs.read(8))[0]
 
-def ReadULong64(fs):
-    return struct.unpack('<Q', fs.read(8))[0]
+def ReadULong64(fs, endian = '<'):
+    return struct.unpack(endian + 'Q', fs.read(8))[0]
 
-def ReadFloat(fs):
-    return struct.unpack('<f', fs.read(4))[0]
+def ReadFloat(fs, endian = '<'):
+    return struct.unpack(endian + 'f', fs.read(4))[0]
 
-def ReadDouble(fs):
-    return struct.unpack('<d', fs.read(8))[0]
+def ReadDouble(fs, endian = '<'):
+    return struct.unpack(endian + 'd', fs.read(8))[0]
 
 def ReadAString(fs, cp = '936'):
     string = b''
@@ -56,32 +56,34 @@ def WriteByte(fs, b):
 def WriteChar(fs, b):
     return fs.write(CHAR(b & 0xFF).value)
 
-def WriteUShort(fs, ushort):
-    return fs.write(struct.pack('<H', USHORT(ushort).value))
+def WriteUShort(fs, ushort, endian = '<'):
+    return fs.write(struct.pack(endian + 'H', USHORT(ushort).value))
 
-def WriteShort(fs, short):
-    return fs.write(struct.pack('<h', SHORT(short).value))
+def WriteShort(fs, short, endian = '<'):
+    return fs.write(struct.pack(endian + 'h', SHORT(short).value))
 
-def WriteULong(fs, ulong):
-    return fs.write(struct.pack('<L', ULONG(ulong).value))
+def WriteULong(fs, ulong, endian = '<'):
+    return fs.write(struct.pack(endian + 'L', ULONG(ulong).value))
 
-def WriteLong(fs, long):
-    return fs.write(struct.pack('<l', LONG(long).value))
+def WriteLong(fs, long, endian = '<'):
+    return fs.write(struct.pack(endian + 'l', LONG(long).value))
 
-def WriteLong64(fs, l64):
-    return fs.write(struct.pack('<q', LONG64(l64).value))
+def WriteLong64(fs, l64, endian = '<'):
+    return fs.write(struct.pack(endian + 'q', LONG64(l64).value))
 
-def WriteULong64(fs, ul64):
-    return fs.write(struct.pack('<Q', ULONG64(ul64).value))
+def WriteULong64(fs, ul64, endian = '<'):
+    return fs.write(struct.pack(endian + 'Q', ULONG64(ul64).value))
 
-def WriteFloat(fs, flt):
-    return fs.write(struct.pack('<f', FLOAT(flt).value))
+def WriteFloat(fs, flt, endian = '<'):
+    return fs.write(struct.pack(endian + 'f', FLOAT(flt).value))
 
-def WriteDouble(fs, db):
-    return fs.write(struct.pack('<d', DOUBLE(db).value))
+def WriteDouble(fs, db, endian = '<'):
+    return fs.write(struct.pack(endian + 'd', DOUBLE(db).value))
 
 class BytesStream:
-    stream = None
+    def __init__(self):
+        self.stream = None
+        self.endian = '<'
 
     def open(
             self,
@@ -103,6 +105,9 @@ class BytesStream:
     def openmem(self, buffer = b''):
         self.stream = io.BytesIO(buffer)
         return self
+
+    def setendian(self, endian):
+        self.endian = endian
 
     def seek(self, offset, method = io.SEEK_SET):
         return self.stream.seek(offset, method)
@@ -130,65 +135,65 @@ class BytesStream:
         return stmsize
 
     def byte(self):
-        return ReadByte(self.stream)
+        return ReadByte(self.stream, self.endian)
 
     def short(self):
-        return ReadShort(self.stream)
+        return ReadShort(self.stream, self.endian)
 
     def ushort(self):
-        return ReadUShort(self.stream)
+        return ReadUShort(self.stream, self.endian)
 
     def long(self):
-        return ReadLong(self.stream)
+        return ReadLong(self.stream, self.endian)
 
     def ulong(self):
-        return ReadULong(self.stream)
+        return ReadULong(self.stream, self.endian)
 
     def long64(self):
-        return ReadLong64(self.stream)
+        return ReadLong64(self.stream, self.endian)
 
     def ulong64(self):
-        return ReadULong64(self.stream)
+        return ReadULong64(self.stream, self.endian)
 
     def float(self):
-        return ReadFloat(self.stream)
+        return ReadFloat(self.stream, self.endian)
 
     def double(self):
-        return ReadDouble(self.stream)
+        return ReadDouble(self.stream, self.endian)
 
     def astr(self, cp = '936'):
         return ReadAString(self.stream, cp)
 
     def wstr(self):
-        return ReadWString(self.stream)
+        return ReadWString(self.stream, self.endian)
 
     def wchar(self, b):
-        return WriteChar(self.stream, b)
+        return WriteChar(self.stream, b, self.endian)
 
     def wbyte(self, b):
-        return WriteByte(self.stream, b)
+        return WriteByte(self.stream, b, self.endian)
 
     def wshort(self, short):
-        return WriteShort(self.stream, short)
+        return WriteShort(self.stream, short, self.endian)
 
     def wushort(self, ushort):
-        return WriteUShort(self.stream, ushort)
+        return WriteUShort(self.stream, ushort, self.endian)
 
     def wlong(self, l):
-        return WriteLong(self.stream, l)
+        return WriteLong(self.stream, l, self.endian)
 
     def wulong(self, l):
-        return WriteULong(self.stream, l)
+        return WriteULong(self.stream, l, self.endian)
 
     def wlong64(self, l64):
-        return WriteLong64(self.stream, l)
+        return WriteLong64(self.stream, l, self.endian)
 
     def wulong64(self, l64):
-        return WriteULong64(self.stream, l)
+        return WriteULong64(self.stream, l, self.endian)
 
     def wfloat(self, flt):
-        return WriteFloat(self.stream, flt)
+        return WriteFloat(self.stream, flt, self.endian)
 
     def wdouble(self, db):
-        return WriteDouble(self.stream, db)
+        return WriteDouble(self.stream, db, self.endian)
 

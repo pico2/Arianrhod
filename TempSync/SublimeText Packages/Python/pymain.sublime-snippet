@@ -1,0 +1,16 @@
+<!-- See http://www.sublimetext.com/docs/snippets for more information -->
+<snippet>
+    <tabTrigger>pymain</tabTrigger>
+    <scope>source.python</scope>
+    <description>pymain</description>
+    <content><![CDATA[
+from ml import *
+
+def main():
+    ${1:$SELECTION}
+
+if __name__ == '__main__':
+    TryInvoke(main)
+
+]]></content>
+</snippet>
