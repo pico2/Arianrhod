@@ -631,16 +631,15 @@ VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Pa
 
 HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2)
 {
+    if (Type == 0x30)
+    {
+        return S_OK;
+    }
+
     WCHAR buf[0x100];
 
     swprintf(buf, L"%p", Type);
     MessageBoxW(0, buf, 0, 64);
-
-    if (Type == 0x30)
-    {
-        //MessageBoxW(0, L"kick off", 0, 64);
-        return S_OK;
-    }
 
     return StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
 }
