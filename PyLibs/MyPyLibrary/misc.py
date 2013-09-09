@@ -16,6 +16,12 @@ ForceInline ULONG HashAPI(PCChar pszName)
 '''
 
 
+def RoundDown(Value, Multiple):
+    return type(Value)(type(Value)(Value / Multiple) * Multiple)
+
+def RoundUp(Value, Multiple):
+    return RoundDown(Value + Multiple - 1, Multiple)
+
 def rol32(val, shift):
     val &= 0xFFFFFFFF
     return ((val << shift) | (val >> (32 - shift))) & 0xFFFFFFFF
