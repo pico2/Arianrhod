@@ -659,8 +659,13 @@ NTSTATUS InstallShellOverlayHook()
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    UNICODE_STRING system;
 
-    Io::DeleteFile(L"New folder");
+    Rtl::GetSystemDirectory(&system);
+
+    PauseConsole(system.Buffer);
+
+    RtlFreeUnicodeString(&system);
 
     return;
 
