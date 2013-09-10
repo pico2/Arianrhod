@@ -666,7 +666,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    fuck();
+    _asm RDRAND eax;
 
     return;
 
