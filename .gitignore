@@ -55,3 +55,5 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /PyLibs/eric5config.py
 /PyLibs/Crypto
 /PyLibs/PIL
+
+/TempSync/SublimeText Packages/User/Preferences.sublime-settings
