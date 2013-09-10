@@ -165,13 +165,13 @@ class BytesStream:
         return ReadAString(self.stream, cp)
 
     def wstr(self):
-        return ReadWString(self.stream, self.endian)
+        return ReadWString(self.stream)
 
     def wchar(self, b):
-        return WriteChar(self.stream, b, self.endian)
+        return WriteChar(self.stream, b)
 
     def wbyte(self, b):
-        return WriteByte(self.stream, b, self.endian)
+        return WriteByte(self.stream, b)
 
     def wshort(self, short):
         return WriteShort(self.stream, short, self.endian)

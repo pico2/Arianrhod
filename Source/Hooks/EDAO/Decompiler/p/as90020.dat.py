@@ -476,7 +476,7 @@ def main():
 
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
     Call("loc_50A")
-    Sleep(4000)
+    WaitChrThread(0xFF, 3)
     Yield()
     EndChrThread(0xFF, 1)
     Return()

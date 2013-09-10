@@ -659,13 +659,6 @@ NTSTATUS InstallShellOverlayHook()
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-    UNICODE_STRING system;
-
-    Rtl::GetSystemDirectory(&system);
-
-    PauseConsole(system.Buffer);
-
-    RtlFreeUnicodeString(&system);
 
     return;
 
