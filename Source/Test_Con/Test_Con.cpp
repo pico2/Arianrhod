@@ -656,61 +656,36 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
-class fuck
+template<typename... Arguments>
+class VariadicTemplate
 {
 public:
-    fuck() = delete;
+    ULONG_PTR NumberOfTemplateArguments = sizeof...(Arguments);
+};
+
+class nsdmis
+{
+public:
+    PCWSTR fuck = L"fuck";
 };
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    _asm RDRAND eax;
+    PVOID blk = AllocateMemory(0x100);
 
-    return;
+    FillMemory(blk, 0x100, -10);
 
-    Status = Nt_AdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE);
+    PrintConsole(L"%p\n", blk);
 
-    if (Status == STATUS_PRIVILEGE_NOT_HELD)
-    {
-        ShellExecuteW(NULL, L"runas", FindLdrModuleByHandle(NULL)->FullDllName.Buffer, NULL, NULL, SW_SHOW);
-        Ps::ExitProcess(0);
-    }
+    FreeMemory(blk);
 
-    if (NT_FAILED(Status))
-    {
-        Ps::ExitProcess(0);
-    }
+    _asm rdrand eax;
 
-    if (NT_FAILED(InstallShellOverlayHook()))
-    {
-        UnInstallShellOverlayHook();
-        Ps::ExitProcess(0);
-    }
+    VariadicTemplate<int, int, int, int, int, int, int, int, int> f;
 
-    ULONG ExplorerPid;
-
-    if (GetWindowThreadProcessId(GetShellWindow(), &ExplorerPid) != 0)
-    {
-        HANDLE Explorer = PidToHandle(ExplorerPid);
-        if (Explorer != NULL)
-        {
-            NtTerminateProcess(Explorer, 0);
-            NtClose(Explorer);
-
-            //Ps::CreateProcess(NULL, L"explorer.exe");
-            //ShellExecuteW(NULL, L"open", L"explorer.exe", NULL, NULL, SW_SHOW);
-        }
-    }
-
-
-    //SHChangeNotify(SHCNE_ALLEVENTS, SHCNF_FLUSH, nullptr, nullptr);
-
-    PauseConsole(L"Press any key to uninstall ...");
-    UnInstallShellOverlayHook();
-
-    Ps::ExitProcess(0);
+    PrintConsole(L"%d\n", f.NumberOfTemplateArguments);
 
     return;
 
