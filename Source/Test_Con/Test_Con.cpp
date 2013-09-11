@@ -669,23 +669,16 @@ public:
     PCWSTR fuck = L"fuck";
 };
 
+#include <string>
+#include "AMF3.cpp"
+
+using namespace std;
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    PVOID blk = AllocateMemory(0x100);
-
-    FillMemory(blk, 0x100, -10);
-
-    PrintConsole(L"%p\n", blk);
-
-    FreeMemory(blk);
-
-    _asm rdrand eax;
-
-    VariadicTemplate<int, int, int, int, int, int, int, int, int> f;
-
-    PrintConsole(L"%d\n", f.NumberOfTemplateArguments);
+    AMF3::amf_object_handle handle;
 
     return;
 
