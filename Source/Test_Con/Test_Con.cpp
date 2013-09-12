@@ -669,16 +669,9 @@ public:
     PCWSTR fuck = L"fuck";
 };
 
-#include <string>
-#include "AMF3.cpp"
-
-using namespace std;
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-
-    AMF3::amf_object_handle handle;
 
     return;
 
