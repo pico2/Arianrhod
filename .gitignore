@@ -58,3 +58,5 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
 /Source/WG/
+/Source/sources/pyv8
+/Source/sources/v8
