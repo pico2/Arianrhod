@@ -661,7 +661,7 @@ class VariadicTemplate
 {
 public:
     static const ULONG_PTR NumberOfTemplateArguments = sizeof...(Arguments);
-}; 
+};
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
