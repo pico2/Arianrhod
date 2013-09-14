@@ -1,5 +1,6 @@
 .hg
 .hgignore
+*.sdf
 *.pyc
 Source/sources/3dlearn
 Source/sources/bluepillstudy
