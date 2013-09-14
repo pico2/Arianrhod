@@ -660,20 +660,27 @@ template<typename... Arguments>
 class VariadicTemplate
 {
 public:
-    ULONG_PTR NumberOfTemplateArguments = sizeof...(Arguments);
-};
-
-class nsdmis
-{
-public:
-    PCWSTR fuck = L"fuck";
-};
+    static const ULONG_PTR NumberOfTemplateArguments = sizeof...(Arguments);
+}; 
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    int (STDCALL *add)(int, int);
+
+    *(PVOID *)&add = 
+    Ldr::GetRoutineAddress(
+        Ldr::LoadDll(L"E:\\Desktop\\Source\\Test_CSharp\\Test_CSharp\\bin\\x86\\Debug\\Test_CSharp.dll"),
+        "add"
+    );
+
+    PrintConsole(L"%d\n", add(5, 6));
 
     FreeMemory(AllocateMemory(999));
+
+    PrintConsole(L"fuck\n");
+
+    Ps::ExitProcess(0);
 
     return;
 
