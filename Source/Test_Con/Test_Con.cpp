@@ -1,3 +1,5 @@
+#if 1
+
 #define AUTHOR_NAME "Amano"
 #define SECTION_NAME "."AUTHOR_NAME
 
@@ -656,31 +658,27 @@ NTSTATUS InstallShellOverlayHook()
     return Status;
 }
 
-template<typename... Arguments>
-class VariadicTemplate
+#include <Psapi.h>
+
+HANDLE OpenExplorer()
 {
-public:
-    static const ULONG_PTR NumberOfTemplateArguments = sizeof...(Arguments);
-};
+    BOOLEAN     Enable;
+    ULONG_PTR   ExplorerPid;
+    HANDLE      ExplorerProcess;
+
+    if (GetWindowThreadProcessId(GetShellWindow(), &ExplorerPid) == 0)
+        return NULL;
+
+    ExplorerProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE, FALSE, ExplorerPid);
+
+    return ExplorerProcess;
+}
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-    int (STDCALL *add)(int, int);
 
-    *(PVOID *)&add = 
-    Ldr::GetRoutineAddress(
-        Ldr::LoadDll(L"E:\\Desktop\\Source\\Test_CSharp\\Test_CSharp\\bin\\x86\\Debug\\Test_CSharp.dll"),
-        "add"
-    );
-
-    PrintConsole(L"%d\n", add(5, 6));
-
-    FreeMemory(AllocateMemory(999));
-
-    PrintConsole(L"fuck\n");
-
-    Ps::ExitProcess(0);
+    LoadDll(L"AccOneClick.dll");
 
     return;
 
@@ -1765,3 +1763,10 @@ void CPUUsage()
 }
 */
 // & > ^ > |
+
+
+#else // global
+
+#include "E:/desktop/LoadAccOneClick_x64.cpp"
+
+#endif
