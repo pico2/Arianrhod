@@ -674,8 +674,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     ml::MlInitialize();
 
-    LoadDll(dll) || LoadDll(findnamew(dll));
-    //HookCreateProcess();
+    //LoadDll(dll) || LoadDll(findnamew(dll));
+    HookCreateProcess();
 
     Ps::CreateProcess(nullptr, L"notepad.exe");
     Ps::CreateProcess(nullptr, L"mspaint.exe");

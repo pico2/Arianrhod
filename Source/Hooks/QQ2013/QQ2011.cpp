@@ -279,7 +279,7 @@ QqGetModuleFileNameExW(
     if (Length == 0 || Filename == nullptr || Size == 0)
         return Length;
 
-    Status = ZwQueryInformationProcess(Process, ProcessBasicInformation, &BasicInfo, sizeof(BasicInfo), nullptr);
+    Status = NtQueryInformationProcess(Process, ProcessBasicInformation, &BasicInfo, sizeof(BasicInfo), nullptr);
     if (NT_FAILED(Status) || BasicInfo.UniqueProcessId != CurrentPid())
         return Length;
 
@@ -345,7 +345,7 @@ QqCreateWaitQQProtectThread(
         if (PtrAnd(Parameter, 0xFFF00000) != 0)
             continue;
 
-        Status = ZwQueryInformationProcess((HANDLE)Parameter, ProcessBasicInformation, &BasicInfo, sizeof(BasicInfo), nullptr);
+        Status = NtQueryInformationProcess((HANDLE)Parameter, ProcessBasicInformation, &BasicInfo, sizeof(BasicInfo), nullptr);
         FAIL_BREAK(Status);
 
         if (BasicInfo.UniqueProcessId != CurrentPid())
@@ -358,7 +358,7 @@ QqCreateWaitQQProtectThread(
         if (*(PBYTE)CallCreateQQProtectExchangeWindow != CALL)
             break;
 
-        ZwClose((HANDLE)Parameter);
+        NtClose((HANDLE)Parameter);
 
         *(PULONG_PTR)((PVOID *)Ebp + 1) += GetOpCodeSize(CallCreateQQProtectExchangeWindow);
 
@@ -539,7 +539,7 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
     static GUID GUID_BlackList[] =
     {
         { 0x41D26ED5, 0x7680, 0x4631, 0xBC, 0xC1, 0x5E, 0x52, 0x30, 0x37, 0xF7, 0x0A },     // GUID_PluginCenter
-        { 0xA43F2AF4, 0xA024, 0x46C6, 0xB7, 0xCE, 0xEA, 0x6C, 0xBB, 0x84, 0x93, 0x8E },     // GUID_ActiveStatus
+        //{ 0xA43F2AF4, 0xA024, 0x46C6, 0xB7, 0xCE, 0xEA, 0x6C, 0xBB, 0x84, 0x93, 0x8E },     // GUID_ActiveStatus
         { 0xC8730021, 0xE7DE, 0x4F65, 0x98, 0x8C, 0x7D, 0x69, 0x4C, 0x38, 0x83, 0x6E },     // GUID_DllHashCheckMgr
     };
 
@@ -913,10 +913,10 @@ BOOL Initialize(PVOID BaseAddress)
 
     MEMORY_FUNCTION_PATCH Function_ntdll[] =
     {
-        INLINE_HOOK_JUMP(QQUINSpecified ? ZwOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               StubNtOpenFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? ZwCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? ZwQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
-        INLINE_HOOK_JUMP(ZwQueryInformationProcess,                                 QqNtQueryInformationProcess,StubNtQueryInformationProcess),
+        INLINE_HOOK_JUMP(QQUINSpecified ? NtOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               StubNtOpenFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
+        INLINE_HOOK_JUMP(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
+        INLINE_HOOK_JUMP(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,StubNtQueryInformationProcess),
     };
 
 
