@@ -674,6 +674,48 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     ml::MlInitialize();
 
+    UNICODE_STRING  Path;
+    PLDR_MODULE     Module;
+    PWSTR           Buffer, SelfPath;
+    ULONG_PTR       Length;
+
+    Buffer = (PWSTR)AllocStack(CurrentPeb()->ProcessParameters->EnvironmentSize);
+    RtlInitEmptyString(&Path, Buffer, CurrentPeb()->ProcessParameters->EnvironmentSize);
+    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, nullptr);
+
+    Module = FindLdrModuleByHandle(&__ImageBase);
+    SelfPath = (PWSTR)AllocStack(Module->FullDllName.Length + sizeof(*SelfPath));
+
+    CopyMemory(SelfPath, Module->FullDllName.Buffer, Module->FullDllName.Length + sizeof(*SelfPath));
+    rmnamew(SelfPath);
+
+    Length = StrLengthW(SelfPath);
+
+    Buffer = Path.Buffer;
+    LOOP_FOREVER
+    {
+        Buffer = wcsstr(Buffer, SelfPath);
+        if (Buffer == nullptr)
+            break;
+
+        if (Buffer[Length] == ';' || Buffer[Length] == 0)
+            return;
+
+        Buffer += Length;
+    }
+
+    Buffer = PtrAdd(Path.Buffer, Path.Length);
+    *Buffer++ = ';';
+
+    CopyMemory(Buffer, SelfPath, (Length + 1) * sizeof(*SelfPath));
+    Path.Length += (Length + 1) * sizeof(*SelfPath);
+
+    RtlSetEnvironmentVariable(nullptr, &USTR(L"Path"), &Path);
+
+    main2(0, 0);
+
+    return;
+
     //LoadDll(dll) || LoadDll(findnamew(dll));
     HookCreateProcess();
 
