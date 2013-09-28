@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[property
+def ${1}(self):
+    return self._$1]]></content>
+    <tabTrigger>property</tabTrigger>
+    <scope>source.python</scope>
+    <description>property</description>
+</snippet>
