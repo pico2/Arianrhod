@@ -14,7 +14,7 @@ ULONG64 = ctypes.c_ulonglong
 
 
 def SetConsoleTitle(text):
-    windll.kernel32.SetConsoleTitleW(text)
+    windll.kernel32.SetConsoleTitleW(str(text))
 
 def cls():
     os.system('cls')

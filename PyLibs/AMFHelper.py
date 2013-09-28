@@ -91,7 +91,28 @@ class AMFSerializer:
         VerifyTypeAndRaise(message, AMFMessage)
         return self.PyAMFSerializer.WriteMessage(Message = message)
 
+class AMFDeserializer:
+    def __init__(self):
+        self.PyAMFDeserializer = PyAmfHelper.PyAMFDeserializer()
+
+    def ReadMessage(self, data):
+        if type(data) == bytearray:
+            data = bytes(data)
+
+        VerifyTypeAndRaise(data, bytes)
+        return self.PyAMFDeserializer.ReadMessage(ResponseData = data, MessageType = AMFMessage())
+
 def main():
+    dser = AMFDeserializer()
+
+    recv = open('E:\\Desktop\\Source\\WG\\texaspoker\\recv.bin', 'rb').read()
+    msg = dser.ReadMessage(recv)
+    print(msg._Version)
+
+    input()
+
+    return
+
     body = AMFBody()
     msg = AMFMessage()
     ser = AMFSerializer()
