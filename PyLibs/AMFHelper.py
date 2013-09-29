@@ -100,7 +100,14 @@ class AMFDeserializer:
             data = bytes(data)
 
         VerifyTypeAndRaise(data, bytes)
-        return self.PyAMFDeserializer.ReadMessage(ResponseData = data, MessageType = AMFMessage())
+        tmp = self.PyAMFDeserializer.ReadMessage(ResponseData = data)
+        if tmp is None:
+            return None
+
+        msg = AMFMessage()
+        msg._Version = tmp['Version']
+
+        return msg
 
 def main():
     dser = AMFDeserializer()
