@@ -6,7 +6,7 @@
 #define _WIN32_WINNT 0x601
 
 #pragma comment(linker,"/ENTRY:main2")
-#pragma comment(linker,"/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
+#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:"SECTION_NAME",ERW /MERGE:.text="SECTION_NAME)
 #pragma warning(disable:4995 4273)
 
@@ -664,65 +664,24 @@ API_POINTER(NtCreateUserProcess)            StubNtCreateUserProcess;
 API_POINTER(RtlCreateProcessParameters)     StubRtlCreateProcessParameters;
 API_POINTER(RtlCreateProcessParametersEx)   StubRtlCreateProcessParametersEx;
 
-#include "E:\Desktop\src\Xlacc2.0\src\ATipsShellExt\HookCreateProcess_v2.h"
+//#include "E:\Desktop\src\Xlacc2.0\src\ATipsShellExt\HookCreateProcess_v2.h"
+
+API_POINTER(NtClose) StubNtClose;
+
+NTSTATUS NTAPI xNtClose(HANDLE Handle)
+{
+    if (Handle == INVALID_HANDLE_VALUE)
+    {
+        MessageBoxW(0,0,0,0);
+        return -1;
+    }
+
+    return StubNtClose(Handle);
+}
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-
-    static WCHAR dll[] = LR"(E:\Desktop\src\Xlacc2.0\bin\productrelease\AccOneClick.dll)";
-
-    ml::MlInitialize();
-
-    UNICODE_STRING  Path;
-    PLDR_MODULE     Module;
-    PWSTR           Buffer, SelfPath;
-    ULONG_PTR       Length;
-
-    Buffer = (PWSTR)AllocStack(CurrentPeb()->ProcessParameters->EnvironmentSize);
-    RtlInitEmptyString(&Path, Buffer, CurrentPeb()->ProcessParameters->EnvironmentSize);
-    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, nullptr);
-
-    Module = FindLdrModuleByHandle(&__ImageBase);
-    SelfPath = (PWSTR)AllocStack(Module->FullDllName.Length + sizeof(*SelfPath));
-
-    CopyMemory(SelfPath, Module->FullDllName.Buffer, Module->FullDllName.Length + sizeof(*SelfPath));
-    rmnamew(SelfPath);
-
-    Length = StrLengthW(SelfPath);
-
-    Buffer = Path.Buffer;
-    LOOP_FOREVER
-    {
-        Buffer = wcsstr(Buffer, SelfPath);
-        if (Buffer == nullptr)
-            break;
-
-        if (Buffer[Length] == ';' || Buffer[Length] == 0)
-            return;
-
-        Buffer += Length;
-    }
-
-    Buffer = PtrAdd(Path.Buffer, Path.Length);
-    *Buffer++ = ';';
-
-    CopyMemory(Buffer, SelfPath, (Length + 1) * sizeof(*SelfPath));
-    Path.Length += (Length + 1) * sizeof(*SelfPath);
-
-    RtlSetEnvironmentVariable(nullptr, &USTR(L"Path"), &Path);
-
-    main2(0, 0);
-
-    return;
-
-    //LoadDll(dll) || LoadDll(findnamew(dll));
-    HookCreateProcess();
-
-    Ps::CreateProcess(nullptr, L"notepad.exe");
-    Ps::CreateProcess(nullptr, L"mspaint.exe");
-
-    UnHookCreateProcess();
 
     return;
 

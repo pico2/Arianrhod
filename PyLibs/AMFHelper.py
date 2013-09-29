@@ -54,7 +54,7 @@ class AMFBody:
 
     @Content.setter
     def Content(self, value):
-        VerifyTypeAndRaise(value, list)
+        #VerifyTypeAndRaise(value, list)
         self._Content = value
 
 class AMFMessage:
@@ -74,6 +74,14 @@ class AMFMessage:
     @property
     def BodyCount(self):
         return len(self._Bodies)
+
+    @property
+    def Headers(self):
+        return self._Headers.copy()
+
+    @property
+    def Bodies(self):
+        return self._Bodies.copy()
 
     def AddHeader(self, header):
         VerifyTypeAndRaise(header, AMFHeader)
@@ -99,8 +107,6 @@ class AMFDeserializer:
         if type(data) == bytearray:
             data = bytes(data)
 
-        #bp()
-
         VerifyTypeAndRaise(data, bytes)
         tmp = self.PyAMFDeserializer.ReadMessage(ResponseData = data)
         if tmp is None:
@@ -108,6 +114,15 @@ class AMFDeserializer:
 
         msg = AMFMessage()
         msg._Version = tmp['Version']
+
+        for xbody in tmp['Bodies']:
+            body = AMFBody()
+
+            body.Target = xbody['Target']
+            body.Response = xbody['Response']
+            body.Content = xbody['Content']
+
+            msg.AddBody(body)
 
         return msg
 
@@ -136,6 +151,18 @@ class ASObject(dict):
     def IsTypedObject(self):
         return self._TypeName is not None
 
+def printdict(data, depth = 0):
+    space = depth * '  '
+
+    for k, v in data.items():
+        if type(v) == dict:
+            print('%s%s:' % (space, k))
+            printdict(v, depth + 1)
+        else:
+            print('%s%s:%s = %s' % (space, k, type(v), v))
+
+    if depth == 0:
+        print()
 
 def main():
     print(os.getpid())
@@ -145,7 +172,12 @@ def main():
     recv = open('E:\\Desktop\\Source\\WG\\texaspoker\\recv.bin', 'rb').read()
 
     msg = dser.ReadMessage(recv)
-    print(msg._Version)
+
+    for body in msg.Bodies:
+        if type(body.Content) == dict:
+            printdict(body.Content)
+        else:
+            print(body.Content)
 
     input()
 
