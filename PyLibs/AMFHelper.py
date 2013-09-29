@@ -99,6 +99,8 @@ class AMFDeserializer:
         if type(data) == bytearray:
             data = bytes(data)
 
+        #bp()
+
         VerifyTypeAndRaise(data, bytes)
         tmp = self.PyAMFDeserializer.ReadMessage(ResponseData = data)
         if tmp is None:
@@ -109,10 +111,39 @@ class AMFDeserializer:
 
         return msg
 
+class ASObject(dict):
+    def __init__(self, initdata = None, typename = None):
+        self._TypeName = typename
+        if initdata is None:
+            return
+
+        VerifyTypeAndRaise(initdata, dict)
+        #super() = initdata
+
+        for k, v in initdata.items():
+            self[k] = v
+
+    @property
+    def TypeName(self):
+        return self._TypeName
+
+    @TypeName.setter
+    def TypeName(self, value):
+        VerifyTypeAndRaise(value, str)
+        self._TypeName = value
+
+    @property
+    def IsTypedObject(self):
+        return self._TypeName is not None
+
+
 def main():
+    print(os.getpid())
+
     dser = AMFDeserializer()
 
     recv = open('E:\\Desktop\\Source\\WG\\texaspoker\\recv.bin', 'rb').read()
+
     msg = dser.ReadMessage(recv)
     print(msg._Version)
 
