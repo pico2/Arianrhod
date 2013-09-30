@@ -42,6 +42,7 @@ struct Util
     struct Contact
     {
         static ULONG_PTR (*GetSelfUin)();
+        static BOOL (CDECL *IsSuperVip)(ULONG_PTR Uin, PULONG_PTR SVipLevel);
     };
 
     struct Group
@@ -53,6 +54,7 @@ struct Util
 INIT_STATIC_MEMBER(Util::ChatSession::OpenContactChatSession);
 INIT_STATIC_MEMBER(Util::ChatSession::GetContactChatSessionMainHWND);
 INIT_STATIC_MEMBER(Util::Contact::GetSelfUin);
+INIT_STATIC_MEMBER(Util::Contact::IsSuperVip);
 INIT_STATIC_MEMBER(Util::Group::CheckMsgImage);
 
 
@@ -78,6 +80,7 @@ inline NTSTATUS InitializeQqFunctionTable()
         { L"AppUtil.dll",       "?GetContactChatSessionMainHWnd@ChatSession@Util@@YAPAUHWND__@@K@Z",    &Util::ChatSession::GetContactChatSessionMainHWND },
 
         { L"KernelUtil.dll",    "?GetSelfUin@Contact@Util@@YAKXZ",                                      &Util::Contact::GetSelfUin },
+        { L"KernelUtil.dll",    "?IsSuperVip@Contact@Util@@YAHKPAK@Z",                                  &Util::Contact::IsSuperVip },
         { L"KernelUtil.dll",    "?CheckMsgImage@Group@Util@@YAHPAUITXMsgPack@@AAVCTXStringW@@@Z",       &Util::Group::CheckMsgImage },
     };
 

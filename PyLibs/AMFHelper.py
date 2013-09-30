@@ -54,7 +54,6 @@ class AMFBody:
 
     @Content.setter
     def Content(self, value):
-        #VerifyTypeAndRaise(value, list)
         self._Content = value
 
 class AMFMessage:
@@ -150,6 +149,7 @@ class ASObject(dict):
     @property
     def IsTypedObject(self):
         return self._TypeName is not None
+
 
 def printdict(data, depth = 0):
     space = depth * '  '

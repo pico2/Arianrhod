@@ -35,12 +35,26 @@ HRESULT
     PVOID   Unknown
 );
 
-BOOL (CDECL *StubGetPlatformCore)(PVOID *Core);
-BOOL (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
+BOOL    (CDECL *StubGetPlatformCore)(PVOID *Core);
+BOOL    (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
 HRESULT (NTAPI *StubPlatformCore_QueryInterface)(PVOID Object, REFGUID Guid, PVOID Output);
-VOID (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
+VOID    (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
 HRESULT (FASTCALL *StubOnSysDataCome)(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2);
+
+
+/************************************************************************
+  unlimited custom face
+************************************************************************/
+
 TYPE_OF(Util::Group::CheckMsgImage) StubCheckMsgImage;
+
+/************************************************************************
+  at all group member
+************************************************************************/
+
+TYPE_OF(Util::Contact::IsSuperVip)  StubIsSuperVip;
+HRESULT (NTAPI *StubGroupMgr_QueryGroupObject)(PVOID Object, ULONG_PTR GroupUin, PVOID *GroupObject);
+HRESULT (NTAPI *StubGroupMgr_GetAdminFlags)(PVOID Object, ULONG_PTR Uin, PBOOL IsAdmin, PBOOL IsCreator);
 
 
 BOOL IsQQUINSpecified()
@@ -532,15 +546,77 @@ BOOL CDECL IsTencentTrusted(PCWSTR FileName)
     return TRUE;
 }
 
+HRESULT NTAPI GroupMgr_GetAdminFlags(PVOID Object, ULONG_PTR Uin, PBOOL IsAdmin, PBOOL IsCreator)
+{
+    HRESULT Result;
+
+    Result = StubGroupMgr_GetAdminFlags(Object, Uin, IsAdmin, IsCreator);
+
+    if (Uin == Util::Contact::GetSelfUin()) LOOP_ONCE
+    {
+        if ((IsAdmin != nullptr && *IsAdmin != FALSE) || (IsCreator != nullptr && *IsCreator != FALSE))
+            break;
+
+        if (IsAdmin != nullptr)
+        {
+            *IsAdmin = TRUE;
+            break;
+        }
+
+        if (IsCreator != nullptr)
+            *IsCreator = TRUE;
+    }
+
+    return S_OK;
+}
+
+HRESULT NTAPI GroupMgr_QueryGroupObject(PVOID Object, ULONG_PTR GroupUin, PVOID *GroupObject)
+{
+    HRESULT Result;
+
+    Result = StubGroupMgr_QueryGroupObject(Object, GroupUin, GroupObject);
+
+    if (SUCCEEDED(Result) && StubGroupMgr_GetAdminFlags == nullptr)
+    {
+        MEMORY_FUNCTION_PATCH f[] =
+        {
+            INLINE_HOOK_JUMP(*(PVOID *)PtrAdd(**(PVOID **)GroupObject, 0x5C), GroupMgr_GetAdminFlags, StubGroupMgr_GetAdminFlags),
+        };
+
+        Nt_PatchMemory(nullptr, 0, f, countof(f));
+    }
+
+    return Result;
+}
+
+HRESULT NTAPI GroupMgr_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
+{
+    HRESULT Result;
+
+    Result = StubPlatformCore_QueryInterface(Object, Guid, Output);
+
+    if (SUCCEEDED(Result) && StubGroupMgr_QueryGroupObject == nullptr)
+    {
+        MEMORY_FUNCTION_PATCH f[] =
+        {
+            INLINE_HOOK_JUMP(*(PVOID *)PtrAdd(**(PVOID **)Output, 0x24), GroupMgr_QueryGroupObject, StubGroupMgr_QueryGroupObject),
+        };
+
+        Nt_PatchMemory(nullptr, 0, f, countof(f));
+    }
+
+    return Result;
+}
+
 // CTXComponentMgr
 
 HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
 {
     static GUID GUID_BlackList[] =
     {
-        { 0x41D26ED5, 0x7680, 0x4631, 0xBC, 0xC1, 0x5E, 0x52, 0x30, 0x37, 0xF7, 0x0A },     // GUID_PluginCenter
-        //{ 0xA43F2AF4, 0xA024, 0x46C6, 0xB7, 0xCE, 0xEA, 0x6C, 0xBB, 0x84, 0x93, 0x8E },     // GUID_ActiveStatus
-        { 0xC8730021, 0xE7DE, 0x4F65, 0x98, 0x8C, 0x7D, 0x69, 0x4C, 0x38, 0x83, 0x6E },     // GUID_DllHashCheckMgr
+        { 0x41D26ED5, 0x7680, 0x4631, 0xBC, 0xC1, 0x5E, 0x52, 0x30, 0x37, 0xF7, 0x0A }, // GUID_PluginCenter
+        { 0x76063A86, 0xD553, 0x44A6, 0xAF, 0x7A, 0x12, 0xAE, 0x87, 0x21, 0x1A, 0xA7 }, // GUID_GroupMgr
+        { 0xC8730021, 0xE7DE, 0x4F65, 0x98, 0x8C, 0x7D, 0x69, 0x4C, 0x38, 0x83, 0x6E }, // GUID_DllHashCheckMgr
     };
 
     GUID *BlackList;
@@ -567,6 +643,10 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
                 AppUtil = FindLdrModuleByHandle(_ReturnAddress());
                 if (AppUtil != NULL && AppUtil->DllBase == AppUtilBase)
                     continue;
+                break;
+
+            case 1:
+                return GroupMgr_QueryInterface(Object, Guid, Output);
         }
 
         return E_NOINTERFACE;
@@ -605,17 +685,13 @@ BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
     static WCHAR PluginPath[] = L"..\\Plugin\\";
 
     Module = FindLdrModuleByHandle(&__ImageBase);
-
     Length = (StrLengthW(PluginName) + 1) * sizeof(WCHAR);
-
     BufferSize = Module->FullDllName.Length + Length + sizeof(PluginPath);
     Buffer = (PWSTR)AllocStack(BufferSize);
-
     CopyMemory(Buffer, Module->FullDllName.Buffer, Module->FullDllName.Length);
 
     Name = findnamew(Buffer);
     CopyMemory(Name, PluginPath, sizeof(PluginPath));
-
     CopyMemory(Name + CONST_STRLEN(PluginPath), PluginName, Length);
 
     if (!Io::IsPathExists(Buffer))
@@ -665,7 +741,29 @@ BOOL CDECL CheckMsgImage(PVOID GroupObject, CTXStringW &Message)
     return Success;
 }
 
-PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes)
+BOOL CDECL IsSuperVip(ULONG_PTR Uin, PULONG_PTR SVipLevel)
+{
+    if (Uin == Util::Contact::GetSelfUin())
+    {
+        if (SVipLevel != nullptr)
+            *SVipLevel = 7;
+
+        return TRUE;
+    }
+
+    return StubIsSuperVip(Uin, SVipLevel);
+}
+
+ULONG CDECL GetAtAllGroupMemberUseTimes()
+{
+    return 1;
+}
+
+/************************************************************************
+  init functions
+************************************************************************/
+
+PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
 {
     PVOID StringValue, StringReference;
 
@@ -683,7 +781,7 @@ PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBy
         ADD_PATTERN(&StringValue),
     };
 
-    StringReference = SearchPattern(Stub, countof(Stub), Module->DllBase, Module->SizeOfImage);
+    StringReference = SearchPattern(Stub, countof(Stub), PtrAdd(Module->DllBase, BeginOffset), PtrSub(Module->SizeOfImage, BeginOffset));
     if (StringReference == nullptr)
         return nullptr;
 
@@ -845,6 +943,50 @@ PVOID SearchPreLogin_OnSysDataCome(PVOID ImageBase)
     return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String) - sizeof(String[0]), 0x20);
 }
 
+BOOL SearchGroupApp_AtAllGroupMember(PVOID GroupApp, PVOID *GetAdminFlag, PVOID *GetUseTimes)
+{
+    static WCHAR String[] = L"AtAllGroupMember_MsgBox_Title";
+
+    PVOID Found;
+    PBYTE Buffer;
+    PLDR_MODULE Module;
+
+    Module = FindLdrModuleByHandle(GroupApp);
+
+    Found = SearchStringReference(Module, String, sizeof(String));
+    if (Found == nullptr)
+        return FALSE;
+
+    Buffer = (PBYTE)Found - 1;
+
+    if (Buffer[0] != PUSH ||
+        Buffer[-2] != 0x6A ||
+        Buffer[-4] != 0x75)
+    {
+        return FALSE;
+    }
+
+    *GetAdminFlag = &Buffer[-4];
+
+    Found = SearchStringReference(Module, String, sizeof(String), PtrOffset(Buffer + 5, Module->DllBase));
+    if (Found == nullptr)
+        return FALSE;
+
+    Buffer = (PBYTE)Found - 1;
+
+    if (Buffer[0] != PUSH ||
+        Buffer[-2] != 0x6A ||
+        Buffer[-4] != 0x75 ||
+        Buffer[-0xB] != CALL)
+    {
+        return FALSE;
+    }
+
+    *GetUseTimes = GetCallDestination(&Buffer[-0xB]);
+
+    return TRUE;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -973,6 +1115,24 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_FUNCTION_PATCH Function_KernelUtil[] =
     {
         INLINE_HOOK_JUMP(Util::Group::CheckMsgImage, CheckMsgImage, StubCheckMsgImage),
+        INLINE_HOOK_JUMP(Util::Contact::IsSuperVip,  IsSuperVip,    StubIsSuperVip),
+    };
+
+
+    /************************************************************************
+      GroupApp
+    ************************************************************************/
+
+    BOOL AtAllGroupMemberFound;
+    PVOID GetAdminFlag, GetUseTimes;
+
+    module = Ldr::LoadDll(L"GroupApp.dll");
+
+    AtAllGroupMemberFound = SearchGroupApp_AtAllGroupMember(module, &GetAdminFlag, &GetUseTimes);
+
+    MEMORY_FUNCTION_PATCH Function_GroupApp[] =
+    {
+        INLINE_HOOK_JUMP_NULL(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
     };
 
 
@@ -1068,6 +1228,7 @@ BOOL Initialize(PVOID BaseAddress)
     {
         { nullptr,              Patch_HummerEngine,     countof(Patch_HummerEngine) },
         { nullptr,              nullptr,                0,                          Function_KernelUtil, countof(Function_KernelUtil)},
+        { nullptr,              nullptr,                0,                          Function_GroupApp,   countof(Function_GroupApp)  },
         { nullptr,              nullptr,                0,                          Function_AppUtil,    countof(Function_AppUtil)   },
         { nullptr,              nullptr,                0,                          Function_AppMisc,    countof(Function_AppMisc)   },
         { nullptr,              nullptr,                0,                          Function_MainFrame,  countof(Function_MainFrame) },
