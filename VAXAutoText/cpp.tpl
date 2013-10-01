@@ -651,6 +651,8 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    ml::MlInitialize();
+
     $selected$
 
     return TRUE;
