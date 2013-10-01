@@ -38,18 +38,19 @@
     <Reference Include="Fluent, Version=2.1.0.0, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rd\Fluent\Fluent.dll</HintPath>
-    </Reference>
-    <Reference Include="FluentTest">
-      <HintPath>..\3rd\Fluent\FluentTest.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack">
       <HintPath>..\3rd\Windows API Code Pack 1.1\binaries\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack.Shell">
       <HintPath>..\3rd\Windows API Code Pack 1.1\binaries\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\3rd\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -144,6 +145,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Fluent.dll" />
+    <EmbeddedResource Include="Microsoft.WindowsAPICodePack.dll" />
+    <EmbeddedResource Include="Microsoft.WindowsAPICodePack.Shell.dll" />
+    <EmbeddedResource Include="Newtonsoft.Json.dll" />
+    <EmbeddedResource Include="System.Windows.Interactivity.dll" />
     <Content Include="ListViewLayout\ListViewLayout2008.csproj" />
     <Content Include="ListViewLayout\ListViewLayout2010.csproj" />
   </ItemGroup>

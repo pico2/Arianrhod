@@ -184,7 +184,8 @@ namespace RecordViewer
                 treasureBoxGridView.Columns.Add(ProportionalColumn.ApplyWidth(column, GetWidth(col.WidthPercent)));
             }
 
-            String boxinfo = @"E:\Desktop\Source\Hooks\EDAO\Decompiler\GameData\box.json";
+            //String boxinfo = @"E:\Desktop\Source\Hooks\EDAO\Decompiler\GameData\box.json";
+            String boxinfo = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\box.json";
 
             try
             {
