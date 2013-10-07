@@ -57,19 +57,24 @@ VOID AppendPackage()
 
     ml::String      PathEnv, UserSite;
     PWSTR           EnvBuffer;
-    ULONG_PTR       Length;
-    UNICODE_STRING  Env;
+    ULONG           Length;
+    UNICODE_STRING  Path;
 
-    Length = CurrentPeb()->ProcessParameters->EnvironmentSize;
+    RtlInitEmptyString(&Path);
+    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, &Length);
+
     EnvBuffer = (PWSTR)AllocStack(Length);
-    RtlInitEmptyString(&Env, EnvBuffer, Length);
+    RtlInitEmptyString(&Path, EnvBuffer, Length);
 
-    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Env, nullptr);
+    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, nullptr);
 
     UserSite = SelfPath;
     UserSite += L"UserSite";
-    PathEnv = Env;
+
+    PathEnv = Path;
     PathEnv += ';';
+    PathEnv += SelfPath;
+    PathEnv += L"DLLs;";
 
     EnumDirectoryFiles(
         nullptr, L"*.*", 0, UserSite, nullptr,

@@ -682,10 +682,11 @@ NTSTATUS NTAPI xNtClose(HANDLE Handle)
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    ULONG size;
+    UNICODE_STRING Path;
 
-    ml::String x;
-
-    x = L"fuck";
+    RtlInitEmptyString(&Path);
+    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, &size);
 
     return;
 
