@@ -1,0 +1,22 @@
+<!-- See http://www.sublimetext.com/docs/snippets for more information -->
+<snippet>
+    <tabTrigger>qtmain</tabTrigger>
+    <scope>source.python</scope>
+    <description>qtmain</description>
+    <content><![CDATA[
+from ml import *
+from PyQt5.QtWidgets import QApplication, QDialog
+import PyQt5.QtWidgets as QtWidgets
+
+def main():
+    app = QApplication(sys.argv)
+
+    ${1:$SELECTION}
+
+    return app.exec_()
+
+if __name__ == '__main__':
+    TryInvoke(main)
+
+]]></content>
+</snippet>
