@@ -15,7 +15,7 @@ def main():
     selfpath =  os.path.dirname(__file__) + '\\'
     pyodir = selfpath + os.path.basename(pylib)
 
-    pythonzip = zipfile.ZipFile(selfpath + 'Python.zip', 'w')
+    pythonzip = zipfile.ZipFile(selfpath + 'python.zip', 'w')
 
     ignores = \
     [
@@ -43,10 +43,8 @@ def main():
         pythonzip.write(
             filename = pyo,
             arcname = pyo.replace(pyodir + '\\', ''),
-            compress_type = zipfile.ZIP_LZMA
+            compress_type = zipfile.ZIP_DEFLATED
         )
-
-        #os.remove(file)
 
     ForEachFile(pylib, proc, '*.py')
 
