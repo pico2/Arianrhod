@@ -1,4 +1,5 @@
 EXPORTS
+	getnameinfo
     accept
     bind
     closesocket
@@ -151,4 +152,4 @@ EXPORTS
     WSCWriteProviderOrder
     getaddrinfo
     freeaddrinfo
-    WSAFDIsSet
+	__WSAFDIsSet

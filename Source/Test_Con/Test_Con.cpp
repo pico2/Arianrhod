@@ -683,6 +683,10 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
+    ml::String x;
+
+    x = L"fuck";
+
     return;
 
 #if 0

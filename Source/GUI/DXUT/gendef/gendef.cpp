@@ -23,13 +23,13 @@ ForceInline Void main2(Int argc, WChar **argv)
 
     RtlWow64EnableFsRedirection(FALSE);
 
-    Status = ReLoadDll(argv[1], &PeBuffer, NULL, RELOAD_DLL_IGNORE_IAT);
+    Status = LoadPeImage(argv[1], &PeBuffer, NULL, LOAD_PE_IGNORE_IAT);
     if (!NT_SUCCESS(Status))
         return;
 
     SCOPE_EXIT
     {
-        UnLoadDll(PeBuffer);
+        UnloadPeImage(PeBuffer);
     }
     SCOPE_EXIT_END;
 
@@ -95,9 +95,9 @@ ForceInline Void main2(Int argc, WChar **argv)
         mask[Ordinal] = true;
 
         //Buffer += sprintf(Buffer, "    %s @%d NONAME\n", PtrAdd(*AddressOfNames, PeBuffer), Ordinal + 1);
-        //Buffer += sprintf(Buffer, "    %s = zlib2.%s\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
-        // Buffer += sprintf(Buffer, "    VOID %s() {}\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
-        Buffer += sprintf(Buffer, "#pragma comment(linker, \"/EXPORT:%s=zlib2.%s\")\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
+        //Buffer += sprintf(Buffer, "    %s = python34.%s\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
+        //Buffer += sprintf(Buffer, "    VOID %s() {}\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
+        Buffer += sprintf(Buffer, "#pragma comment(linker, \"/EXPORT:%s=python34.%s\")\n", PtrAdd(*AddressOfNames, PeBuffer), PtrAdd(*AddressOfNames, PeBuffer));
 
 #else
 

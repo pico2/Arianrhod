@@ -746,6 +746,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="undoc_apphelp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
@@ -840,6 +841,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ucidec.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
@@ -860,6 +862,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -930,6 +933,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

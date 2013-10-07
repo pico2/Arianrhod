@@ -2,7 +2,7 @@
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
 
 #include <winsock2.h>
-#include "my_headers.h"
+#include "MyLibrary.h"
 
 #undef WINSOCK_API_LINKAGE
 #define WINSOCK_API_LINKAGE
@@ -12,6 +12,22 @@
 #define _WIN32_WINNT 0x700
 
 _MY_C_HEAD_
+
+WINSOCK_API_LINKAGE
+INT
+WSAAPI
+getnameinfo(
+    _In_reads_bytes_(SockaddrLength)    const SOCKADDR *    pSockaddr,
+    _In_                                int           SockaddrLength,
+    _Out_writes_opt_(NodeBufferSize)    PCHAR               pNodeBuffer,
+    _In_                                DWORD               NodeBufferSize,
+    _Out_writes_opt_(ServiceBufferSize) PCHAR               pServiceBuffer,
+    _In_                                DWORD               ServiceBufferSize,
+    _In_                                INT                 Flags
+    )
+{
+    return 0;
+}
 
 #if INCL_WINSOCK_API_PROTOTYPES
 WINSOCK_API_LINKAGE
