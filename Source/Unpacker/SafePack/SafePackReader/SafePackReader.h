@@ -135,6 +135,20 @@ protected:
         return STATUS_NOT_IMPLEMENTED;
     }
 
+    UPK_STATUS FillEntryByPackEntry(PSAFE_PACK_READER_ENTRY Entry, PSAFE_PACK_ENTRY PackEntry, PVOID PackEntryBase)
+    {
+        PackEntry->FileName.Buffer = PtrAdd(PackEntry->FileName.Buffer, PackEntryBase);
+
+        Entry->Size.QuadPart    = PackEntry->FileSize.QuadPart;
+        Entry->Offset.QuadPart  = PackEntry->Offset.QuadPart;
+        Entry->Attributes       = PackEntry->Attributes;
+        Entry->Flags            = PackEntry->Flags;
+
+        Entry->SetFileName(&PackEntry->FileName);
+
+        return STATUS_SUCCESS;
+    }
+
     UPK_STATUS
     PreDecompressData(
         PSAFE_PACK_READER_ENTRY FileInfo,
@@ -342,16 +356,7 @@ public:
              PackEntry = PtrAdd(PackEntry, PackEntry->EntrySize), --NumberOfFiles)
         {
             ++Entry;
-
-            PackEntry->FileName.Buffer = PtrAdd(PackEntry->FileName.Buffer, EntryBuffer);
-
-            Entry->Size.QuadPart    = PackEntry->FileSize.QuadPart;
-            Entry->Offset.QuadPart  = PackEntry->Offset.QuadPart;
-            Entry->Attributes       = PackEntry->Attributes;
-            Entry->Flags            = PackEntry->Flags;
-
-            Entry->SetFileName(&PackEntry->FileName);
-
+            This->FillEntryByPackEntry(Entry, PackEntry, EntryBuffer);
             ++m_Index.FileCount.QuadPart;
         }
 
@@ -467,7 +472,7 @@ public:
 
 protected:
 
-    NoInline    
+    NoInline
     UPK_STATUS
     DecompressBlock(
         PSAFE_PACK_READER_ENTRY FileInfo,
