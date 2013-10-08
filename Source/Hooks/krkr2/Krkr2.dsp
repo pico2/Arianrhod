@@ -73,7 +73,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /Gr /MD /W4 /GR- /O2 /Ob1 /D MAHOYO=1 /D USE_NT_VER=1 /D "WIN32" /D "NDEBUG" /D "SUPPORT_AAC_DECODE" /FD /GL /GS- /MP /arch:SSE /c
-# ADD CPP /nologo /Gr /MD /W4 /GR- /O2 /Ob1 /D TENSHIN=1 /D USE_NT_VER=1 /D "WIN32" /D "NDEBUG" /D SUPPORT_AAC_DECODE=0 /FD /GL /GS- /MP /arch:SSE /c
+# ADD CPP /nologo /Gr /MD /W4 /GR- /O2 /Ob1 /D TENSHIN=1 /D USE_NT_VER=1 /D "WIN32" /D "NDEBUG" /D SUPPORT_AAC_DECODE=0 /FD /GL /GS- /MP /arch:SSE /MP /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"

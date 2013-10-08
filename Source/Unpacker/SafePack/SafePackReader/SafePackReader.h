@@ -16,6 +16,7 @@ interface ISafePackReader
     virtual UPK_STATUS STDCALL GetSize(PLARGE_INTEGER FileSize) = 0;
     virtual UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position) = 0;
     virtual UPK_STATUS STDCALL Seek(LONG64 Offset, ULONG_PTR MoveMethod = FILE_BEGIN, PLARGE_INTEGER NewPosition = nullptr) = 0;
+    virtual UPK_STATUS STDCALL Release() = 0;
 };
 
 class SafePackReaderStreamDisk : public ISafePackReader
@@ -82,7 +83,13 @@ public:
         return STATUS_SUCCESS;
     }
 
-    static UPK_STATUS CreateStream(ISafePackReader *Reader, PSAFE_PACK_READER_ENTRY Entry)
+    UPK_STATUS STDCALL Release()
+    {
+        delete this;
+        return STATUS_SUCCESS;
+    }
+
+    static UPK_STATUS CreateStream(ISafePackReader **Reader, PSAFE_PACK_READER_ENTRY Entry)
     {
         return 0;
     }

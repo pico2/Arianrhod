@@ -73,3 +73,4 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /Source/sources/Python-3.3.2/PCbuild/*.lib
 /Source/sources/Python-3.3.2/PCbuild/*.exe
 /Source/sources/Python-3.3.2/PCbuild/*.dll
+/Source/Hooks/KrKr2Protect
