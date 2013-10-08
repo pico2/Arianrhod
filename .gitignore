@@ -2,6 +2,8 @@
 .hgignore
 *.sdf
 *.pyc
+*.pdb
+*.obj
 Source/sources/3dlearn
 Source/sources/bluepillstudy
 /TempSync/Vim/_font
@@ -66,3 +68,9 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /Source/Hooks/ZWEI2Plus/zw/
 
 /PyLibs/PyQt5
+/Source/sources/Python-3.3.2/PCbuild/Win32-temp-Release/
+
+/Source/sources/Python-3.3.2/PCbuild/*.lib
+/Source/sources/Python-3.3.2/PCbuild/*.exe
+/Source/sources/Python-3.3.2/PCbuild/*.dll
+/Source/Hooks/KrKr2Protect

@@ -5,7 +5,7 @@
 #pragma comment(lib, "ucxdec/ucxdec.lib")
 
 #include "krkr2.h"
-#include "MyLibraryUser.cpp"
+#include "MyLibrary.cpp"
 #include "cxdec.cpp"
 #include "Krkr2AudioDecoder.h"
 

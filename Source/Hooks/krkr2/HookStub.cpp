@@ -23,7 +23,7 @@ BOOL InitializeHook(PVOID BaseAddress)
         INLINE_HOOK_JUMP(NtQueryDirectoryFile,  HookNtQueryDirectoryFile,   StubNtQueryDirectoryFile),
         INLINE_HOOK_JUMP(NtQueryAttributesFile, HookNtQueryAttributesFile,  StubNtQueryAttributesFile),
         INLINE_HOOK_JUMP(NtCreateFile,          HookNtCreateFile,           StubNtCreateFile),
-        INLINE_HOOK_JUMP(LdrLoadDll,            HookLdrLoadDll,             StubLdrLoadDll),
+        //INLINE_HOOK_JUMP(LdrLoadDll,            HookLdrLoadDll,             StubLdrLoadDll),
         INLINE_HOOK_JUMP(CreateFontIndirectExW, HookCreateFontIndirectExW,  StubCreateFontIndirectExW),
         INLINE_HOOK_JUMP(GetGlyphOutlineW,      HookGetGlyphOutlineW,       StubGetGlyphOutlineW),
     };

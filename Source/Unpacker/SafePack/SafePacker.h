@@ -317,6 +317,11 @@ public:
 */
     }
 
+    UPK_STATUS FinalizeEntrySize(PSAFE_PACK_ENTRY Entry)
+    {
+        return STATUS_NOT_IMPLEMENTED;
+    }
+
     UPK_STATUS
     PreCompressEntry(
         PSAFE_PACK_HEADER Header,
@@ -764,8 +769,13 @@ Pack(
         Entry->FileName.Length          = (USHORT)Length;
         Entry->FileName.MaximumLength   = (USHORT)Length + sizeof(WCHAR);
         Entry->EntrySize                = sizeof(*Entry) - sizeof(Entry->Buffer) + Entry->FileName.MaximumLength;
-        Entry->EntrySize                = ROUND_UP(Entry->EntrySize, 16);
-        Entry                           = PtrAdd(Entry, Entry->EntrySize);
+
+        Status = This->FinalizeEntrySize(Entry);
+        if (Status != STATUS_NOT_IMPLEMENTED && NT_FAILED(Status))
+            continue;
+
+        Entry->EntrySize = ROUND_UP(Entry->EntrySize, 16);
+        Entry = PtrAdd(Entry, Entry->EntrySize);
 
         BytesEntry.Data         = FileList->GetFileName();
         BytesEntry.SizeInBytes  = FileList->GetFileNameLength() * sizeof(WCHAR);

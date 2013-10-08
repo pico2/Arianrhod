@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <io.h>
+#include "crtwrap.h"
 
 #define CMD_SIZE 500
 
