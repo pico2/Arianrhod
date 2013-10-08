@@ -2,6 +2,8 @@
 .hgignore
 *.sdf
 *.pyc
+*.pdb
+*.obj
 Source/sources/3dlearn
 Source/sources/bluepillstudy
 /TempSync/Vim/_font
@@ -71,4 +73,3 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /Source/sources/Python-3.3.2/PCbuild/*.lib
 /Source/sources/Python-3.3.2/PCbuild/*.exe
 /Source/sources/Python-3.3.2/PCbuild/*.dll
-/Source/sources/Python-3.3.2/PCbuild/*.pdb
