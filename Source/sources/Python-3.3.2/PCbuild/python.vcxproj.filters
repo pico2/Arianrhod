@@ -19,7 +19,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Modules\python.c">
+    <ClCompile Include="..\Modules\python.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

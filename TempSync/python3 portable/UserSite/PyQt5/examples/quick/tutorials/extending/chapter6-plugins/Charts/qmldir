@@ -1,0 +1,2 @@
+module Charts
+plugin pyqt5qmlplugin C:/Qt/5.1.1/plugins/PyQt5

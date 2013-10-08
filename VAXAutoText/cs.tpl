@@ -289,3 +289,22 @@ using System;
 $body$$end$
 
 
+
+readme:
+VA Snippet used for refactoring: Create From Usage.
+Delete this item to restore the default upon next use.
+
+a:Refactor Create From Usage Class::
+$end$namespace $NamespaceName$
+{
+	public class $ClassName$
+	{
+		public $ClassName$($ParameterList$)
+		{
+			$InitializeMember$;
+		}
+
+		private $MemberType$ _$MemberName$;
+	}
+}
+

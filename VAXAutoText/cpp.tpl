@@ -910,3 +910,97 @@ a:Refactor Create Source File::
 $body$$end$
 
 
+
+readme:
+VA Snippet used for refactoring: Create From Usage.
+Delete this item to restore the default upon next use.
+
+a:Refactor Create From Usage Class::
+$end$class $ClassName$
+{
+public:
+	$ClassName$($ParameterList$) $colon$
+		$MemberInitializationList$
+	{
+	}
+
+	~$ClassName$()
+	{
+	}
+
+protected:
+
+private:
+	$MemberType$			m$MemberName$;
+
+};
+
+
+readme:
+VA Snippet used for refactoring: Create From Usage.
+Delete this item to restore the default upon next use.
+
+a:Refactor Create From Usage Class (C)::
+$end$struct $ClassName$
+{
+	$ClassName$($ParameterList$)
+	{
+		$InitializeMember$;
+	}
+
+	$MemberType$			m$MemberName$;
+};
+
+
+readme:
+VA Snippet used for refactoring: Create From Usage.
+Delete this item to restore the default upon next use.
+
+a:Refactor Create From Usage Class (Managed)::
+$end$public ref class $ClassName$
+{
+public:
+	$ClassName$($ParameterList$) $colon$
+		$MemberInitializationList$
+	{
+	}
+
+	~$ClassName$()
+	{
+	}
+
+protected:
+
+private:
+	$MemberType$			m$MemberName$;
+
+};
+
+
+readme:
+VA Snippet used for refactoring: Create From Usage.
+Delete this item to restore the default upon next use.
+
+a:Refactor Create From Usage Class (Platform)::
+$end$namespace $NamespaceName$
+{
+	public ref class $ClassName$
+	{
+	public:
+		$ClassName$($ParameterList$) $colon$
+			$MemberInitializationList$
+		{
+		}
+
+		~$ClassName$()
+		{
+		}
+
+	protected:
+
+	private:
+		$MemberType$			m$MemberName$;
+
+	};
+}
+

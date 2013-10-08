@@ -129,4 +129,7 @@
 #include "fileutils.h"
 #include "pyfpe.h"
 
+
+#include "crtwrap.h"
+
 #endif /* !Py_PYTHON_H */
