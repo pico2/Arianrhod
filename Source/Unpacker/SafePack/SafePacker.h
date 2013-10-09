@@ -4,15 +4,27 @@
 #include "UnpackerBase.h"
 #include "aes.h"
 
-#define SAFE_PACK_MAGIC         TAG4('ARIA')
-#define NRV2E_MAGIC             TAG4('NRV2')
-#define LZNT1_MAGIC             TAG4('LZNT')
-#define LZMA_MAGIC              TAG4('LZMA')
+#if !defined(SAFE_PACK_MAGIC)
+    #define SAFE_PACK_MAGIC         TAG4('ARIA')
+#endif
+
+#if !defined(NRV2E_MAGIC)
+    #define NRV2E_MAGIC             TAG4('NRV2')
+#endif
+
+#if !defined(LZNT1_MAGIC)
+    #define LZNT1_MAGIC             TAG4('LZNT')
+#endif
+
+#if !defined(LZMA_MAGIC)
+    #define LZMA_MAGIC              TAG4('LZMA')
+#endif
 
 #define DebugInfo(...) PrintConsoleW(__VA_ARGS__), PrintConsoleW(L"\n")
 
 #define DEFAULT_COMPRESS_DATA   1
-
+#define FILE_NAME_HASH_SIZE         (sizeof(ULONG) * 8)
+#define FILE_NAME_SHORT_HASH_SIZE   (sizeof(ULONG) * 4)
 
 #pragma pack(push, 1)
 
@@ -86,7 +98,7 @@ typedef struct
 
 struct SAFE_PACK_ENTRY2 : public UNPACKER_FILE_ENTRY_BASE
 {
-    ULONG           UnicodeHash[8];
+    ULONG           UnicodeHash[FILE_NAME_HASH_SIZE / sizeof(ULONG)];
     LARGE_INTEGER   CreationTime;
     LARGE_INTEGER   LastAccessTime;
     LARGE_INTEGER   LastWriteTime;
@@ -317,9 +329,40 @@ public:
 */
     }
 
-    UPK_STATUS FinalizeEntrySize(PSAFE_PACK_ENTRY Entry)
+    UPK_STATUS
+    FinalizeEntrySize(
+        PSAFE_PACK_ENTRY Entry
+    )
     {
         return STATUS_NOT_IMPLEMENTED;
+    }
+
+    UPK_STATUS
+    GetEntryLookupData(
+        PTRIE_BYTES_ENTRY BytesEntry,
+        PSAFE_PACK_ENTRY2 FileInfo
+    )
+    {
+        ml::String FileNameLower = FileInfo->FileName.ToLower();
+
+        BytesEntry->SizeInBytes = FileNameLower.GetCount() * sizeof(WCHAR);
+
+        BytesEntry->Data = AllocateMemoryP(BytesEntry->SizeInBytes);
+        if (BytesEntry->Data == nullptr)
+            return STATUS_NO_MEMORY;
+
+        CopyMemory(BytesEntry->Data, FileNameLower.GetBuffer(), BytesEntry->SizeInBytes);
+
+        return STATUS_SUCCESS;
+    }
+
+    UPK_STATUS
+    FreeEntryLookupData(
+        PTRIE_BYTES_ENTRY BytesEntry
+    )
+    {
+        FreeMemoryP(BytesEntry->Data);
+        return STATUS_SUCCESS;
     }
 
     UPK_STATUS
@@ -444,7 +487,7 @@ public:
 
     static VOID HashFileNameShort(PULONG Hash, PCWSTR FileName, ULONG_PTR Length)
     {
-        ULONG LongHash[8];
+        ULONG LongHash[FILE_NAME_HASH_SIZE / sizeof(ULONG)];
 
         HashFileName(LongHash, FileName, Length);
 
@@ -454,7 +497,7 @@ public:
         Hash[3]  = LongHash[3] ^ LongHash[7];
     }
 
-    static VOID HashFileName(PULONG Hash, PCWSTR FileName, ULONG_PTR Length)
+    static VOID HashFileName(PVOID Hash, PCWSTR FileName, ULONG_PTR Length)
     {
         PWSTR Buffer, Text;
 
@@ -777,11 +820,16 @@ Pack(
         Entry->EntrySize = ROUND_UP(Entry->EntrySize, 16);
         Entry = PtrAdd(Entry, Entry->EntrySize);
 
-        BytesEntry.Data         = FileList->GetFileName();
-        BytesEntry.SizeInBytes  = FileList->GetFileNameLength() * sizeof(WCHAR);
-        BytesEntry.Context      = (NODE_CONTEXT)PackedFileNumber;
+        BytesEntry.Context = (NODE_CONTEXT)PackedFileNumber;
+
+        Status = This->GetEntryLookupData(&BytesEntry, FileList);
+        if (NT_FAILED(Status))
+            goto CLEAN_UP;
 
         Status = EntryLookupTable.InsertBytesEntry(&BytesEntry);
+
+        This->FreeEntryLookupData(&BytesEntry);
+
         if (NT_FAILED(Status))
             goto CLEAN_UP;
 

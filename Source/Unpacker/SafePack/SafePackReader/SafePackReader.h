@@ -368,17 +368,27 @@ public:
         return Status;
     }
 
+    NoInline PSAFE_PACK_READER_ENTRY Lookup(PVOID LookupData, ULONG_PTR SizeInBytes)
+    {
+        NODE_CONTEXT        Index;
+        TRIE_BYTES_ENTRY    Bytes;
+        NTSTATUS            Status;
+
+        Bytes.Data = LookupData;
+        Bytes.SizeInBytes = SizeInBytes;
+
+        Status = this->LookupTable.Lookup(&Bytes, &Index);
+        if (UPK_FAILED(Status))
+            return nullptr;
+
+        return (PSAFE_PACK_READER_ENTRY)PtrAdd(m_Index.Entry, Index * m_Index.EntrySize);
+    }
+
     NoInline PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName, ULONG_PTR Length)
     {
-        PWSTR               Buffer;
-        NODE_CONTEXT        Index;
-        UPK_STATUS          Status;
-        TRIE_BYTES_ENTRY    Bytes;
+        PWSTR Buffer;
 
         Buffer = (PWSTR)AllocStack(Length * sizeof(FileName[0]));
-
-        Bytes.Data = Buffer;
-        Bytes.SizeInBytes = Length * sizeof(FileName[0]);
 
         for (ULONG_PTR Count = Length; Count != 0; --Count)
         {
@@ -389,26 +399,26 @@ public:
                 case '/':
                     ch = '\\';
                     break;
+
+                default:
+                    ch = CHAR_LOWER(ch);
+                    break;
             }
 
             *Buffer++ = ch;
         }
 
-        Status = this->LookupTable.Lookup(&Bytes, &Index);
-        if (UPK_FAILED(Status))
-            return nullptr;
-
-        return (PSAFE_PACK_READER_ENTRY)PtrAdd(m_Index.Entry, Index * m_Index.EntrySize);
+        return Lookup((PVOID)Buffer, Length * sizeof(FileName[0]));
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName)
     {
-        return Lookup(FileName, StrLengthW(FileName));
+        return GetTopClass()->Lookup(FileName, StrLengthW(FileName));
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCUNICODE_STRING FileName)
     {
-        return Lookup(FileName->Buffer, FileName->Length);
+        return GetTopClass()->Lookup(FileName->Buffer, FileName->Length);
     }
 
     UPK_STATUS
