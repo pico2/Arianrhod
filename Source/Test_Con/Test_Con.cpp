@@ -570,123 +570,47 @@ BOOL IsRunningInVMWare()
 
 #endif
 
-#pragma comment(lib, NT6_LIB(kernel32))
-#pragma comment(lib, NT6_LIB(ws2_32))
+typedef ml::String String;
 
-#include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
-
-
-// {5a936bef-668d-4f6e-b057-7da30869c871}
-SET_GUID(GUID_ShellOverlayHook,
-0x5a936bef, 0x668d, 0x4f6e, 0xb0, 0x57, 0x7d, 0xa3, 0x08, 0x69, 0xc8, 0x71);
-
-WCHAR IconOverlayKey[] = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers\\" L"\x01" L"Arianrhod";
-
-ULONG_PTR FormatDllClassId(PWSTR Buffer, PCUNICODE_STRING GuidString)
+void foo(String x)
 {
-    return swprintf(Buffer, L"CLSID\\%wZ\\InprocServer32", GuidString);
 }
 
-#pragma comment(lib, "advapi32.lib")
-
-NTSTATUS UnInstallShellOverlayHook()
+void bar(const String& x)
 {
-    WCHAR           DllClassIdKey[MAX_NTPATH];
-    ULONG_PTR       Length;
-    NTSTATUS        Status;
-    UNICODE_STRING  GuidString;
-
-    Status = RtlStringFromGUID(GUID_ShellOverlayHook, &GuidString);
-    FAIL_RETURN(Status);
-
-    Length = FormatDllClassId(DllClassIdKey, &GuidString);
-
-    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey, KEY_WOW64_64KEY);
-
-    DllClassIdKey[Length - countof(L"\\InprocServer32") + 1] = 0;
-
-    Reg::DeleteKey(HKEY_MACHINE_CLASS, DllClassIdKey, KEY_WOW64_64KEY);
-
-    Reg::DeleteKey(HKEY_LOCAL_MACHINE, IconOverlayKey, KEY_WOW64_64KEY);
-
-    RtlFreeUnicodeString(&GuidString);
-
-    return 0;
 }
 
-NTSTATUS InstallShellOverlayHook()
+String baz()
 {
-    WCHAR           DllClassIdKey[MAX_NTPATH];
-    PWSTR           DllFullPath;
-    ULONG_PTR       Length;
-    NTSTATUS        Status;
-    UNICODE_STRING  GuidString, DllPath, ThreadingModel;
-    PLDR_MODULE     ExeModule;
-
-    static WCHAR DllFileName[] = L"ATipsShellExt.dll";
-
-    ExeModule               = FindLdrModuleByHandle(NULL);
-    DllPath                 = ExeModule->FullDllName;
-    DllPath.Length          = (USHORT)PtrOffset(findnamew(DllPath.Buffer), DllPath.Buffer);
-    DllPath.MaximumLength   = DllPath.Length;
-
-    Status = RtlStringFromGUID(GUID_ShellOverlayHook, &GuidString);
-    FAIL_RETURN(Status);
-
-    SCOPE_EXIT
-    {
-        RtlFreeUnicodeString(&GuidString);
-    }
-    SCOPE_EXIT_END;
-
-    FormatDllClassId(DllClassIdKey, &GuidString);
-
-    DllFullPath = (PWSTR)AllocStack(DllPath.Length + sizeof(DllFileName));
-    Length = swprintf(DllFullPath, L"%wZ%s", &DllPath, DllFileName);
-
-    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, NULL, REG_SZ, DllFullPath, Length * sizeof(WCHAR), KEY_WOW64_64KEY);
-    FAIL_RETURN(Status);
-
-
-    RTL_CONST_STRING(ThreadingModel, L"Apartment");
-
-    Status = Reg::SetKeyValue(HKEY_MACHINE_CLASS, DllClassIdKey, L"ThreadingModel", REG_SZ, ThreadingModel.Buffer, ThreadingModel.Length, KEY_WOW64_64KEY);
-    FAIL_RETURN(Status);
-
-    Status = Reg::SetKeyValue(HKEY_LOCAL_MACHINE, IconOverlayKey, NULL, REG_SZ, GuidString.Buffer, GuidString.Length, KEY_WOW64_64KEY);
-
-    return Status;
+  String ret(L"world");
+  return ret;
 }
 
-API_POINTER(NtOpenFile)                     StubNtOpenFile;
-API_POINTER(NtCreateProcessEx)              StubNtCreateProcessEx;
-API_POINTER(NtCreateUserProcess)            StubNtCreateUserProcess;
-API_POINTER(RtlCreateProcessParameters)     StubRtlCreateProcessParameters;
-API_POINTER(RtlCreateProcessParametersEx)   StubRtlCreateProcessParametersEx;
-
-//#include "E:\Desktop\src\Xlacc2.0\src\ATipsShellExt\HookCreateProcess_v2.h"
-
-API_POINTER(NtClose) StubNtClose;
-
-NTSTATUS NTAPI xNtClose(HANDLE Handle)
-{
-    if (Handle == INVALID_HANDLE_VALUE)
-    {
-        MessageBoxW(0,0,0,0);
-        return -1;
-    }
-
-    return StubNtClose(Handle);
-}
+#include <vector>
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-    ULONG size;
-    UNICODE_STRING Path;
 
-    RtlInitEmptyString(&Path);
-    RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, &size);
+    ml::MlInitialize();
+
+    String s0;
+    String s1(L"hello");
+    String s2(s0);
+    String s3 = s1;
+    s2 = s1;
+
+    foo(s1);
+    bar(s1);
+    foo(L"temporary");
+    bar(L"temporary");
+    String s4 = baz();
+
+    std::vector<String> svec;
+    svec.push_back(s0);
+    svec.push_back(s1);
+    svec.push_back(baz());
+    svec.push_back(L"good job");
 
     return;
 
