@@ -7,7 +7,7 @@ AddRelativePath('.')
 
 del AddRelativePath
 
-from syslib import *
+from Console import *
 from misc import *
 from PyImage import *
 from FileIo import *

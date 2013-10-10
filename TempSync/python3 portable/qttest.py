@@ -14,9 +14,12 @@ class QuitButton(QWidget):
         quit = QtWidgets.QPushButton('Close', self)
         quit.setGeometry(10, 10, 64, 35)
 
-        quit.clicked.connect(self.close)
+        quit.clicked.connect(self.fuck)
 
         self.centerOnScreen()
+
+    def fuck(self):
+        self.close()
 
     def centerOnScreen (self):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
