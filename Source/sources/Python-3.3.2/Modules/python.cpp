@@ -71,9 +71,7 @@ VOID AppendPackage()
     UserSite = SelfPath;
     UserSite += L"UserSite";
 
-    PathEnv = Path;
-    PathEnv += ';';
-    PathEnv += SelfPath;
+    PathEnv = SelfPath;
     PathEnv += L"DLLs;";
 
     EnumDirectoryFiles(
@@ -94,6 +92,9 @@ VOID AppendPackage()
         EDF_PROCDIR | EDF_BEFORE
     );
 
+
+    PathEnv += Path;
+    PathEnv += ';';
     RtlSetEnvironmentVariable(nullptr, &USTR(L"Path"), PathEnv);
 }
 
