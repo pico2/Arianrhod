@@ -21,8 +21,12 @@ def main():
     [
         'test',
         'lib2to3',
+        'site-packages\\PyQt',
         'site-packages\\PIL',
         'site-packages\\Crypto',
+        'site-packages\\IPython',
+        'site-packages\\pyreadline',
+        'site-packages\\readline.py',
     ]
 
     for i in range(len(ignores)):

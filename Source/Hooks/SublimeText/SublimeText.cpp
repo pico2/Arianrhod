@@ -179,6 +179,110 @@ NAKED ULONG NakedACPToUnicode_3()
     }
 }
 
+PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
+{
+    PVOID StringValue, StringReference;
+
+    SEARCH_PATTERN_DATA Str[] =
+    {
+        ADD_PATTERN_(String, SizeInBytes),
+    };
+
+    StringValue = SearchPattern(Str, countof(Str), Module->DllBase, Module->SizeOfImage);
+    if (StringValue == nullptr)
+        return nullptr;
+
+    SEARCH_PATTERN_DATA Stub[] =
+    {
+        ADD_PATTERN(&StringValue),
+    };
+
+    StringReference = SearchPattern(Stub, countof(Stub), PtrAdd(Module->DllBase, BeginOffset), PtrSub(Module->SizeOfImage, BeginOffset));
+    if (StringReference == nullptr)
+        return nullptr;
+
+    return StringReference;
+}
+
+PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
+{
+    PBYTE Buffer;
+
+    Buffer = (PBYTE)Start;
+
+    for (; Length != 0; --Buffer, --Length)
+    {
+        switch (Buffer[0])
+        {
+            case CALL:
+                // push    local_var_size
+                // mov     eax, exception_handler
+                // call    _SEH_prolog
+
+                if (Buffer[-5] != 0xB8)
+                    continue;
+
+                if (Buffer[-10] == 0x68)
+                {
+                    Buffer -= 10;
+                }
+                else if (Buffer[-7] == 0x6A)
+                {
+                    Buffer -= 7;
+                }
+                else
+                {
+                    continue;
+                }
+
+                break;
+
+            case 0x55:
+                if (Buffer[1] != 0x8B || Buffer[2] != 0xEC)
+                    continue;
+
+                // push ebp
+                // mov ebp, esp
+
+                break;
+
+            default:
+                continue;
+        }
+
+        return Buffer;
+    }
+
+    return nullptr;
+}
+
+PVOID
+SearchStringAndReverseSearchHeader(
+    PVOID       ImageBase,
+    PVOID       BytesSequence,
+    ULONG_PTR   SizeInBytes,
+    ULONG_PTR   SearchRange
+)
+{
+    PVOID       StringReference;
+    PLDR_MODULE Module;
+
+    Module = FindLdrModuleByHandle(ImageBase);
+
+    StringReference = SearchStringReference(Module, BytesSequence, SizeInBytes);
+    if (StringReference == nullptr)
+        return IMAGE_INVALID_VA;
+
+    StringReference = ReverseSearchFunctionHeader(PtrAdd(StringReference, 4), SearchRange);
+
+    return StringReference == nullptr ? IMAGE_INVALID_VA : StringReference;
+}
+
+NTSTATUS CDECL StCalcRegKey()
+{
+    return STATUS_SUCCESS;
+}
+
 #endif // ST_VERSION_AUTO
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -228,7 +332,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     sprintf(Acp, "ACP %d", CurrentPeb()->AnsiCodePageData[1]);
 
-    Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
+    Nt_PatchMemory(p, countof(p), f, 0*countof(f), GetExeModuleHandle());
 
 #elif ST_VERSION == ST_VERSION_AUTO
 
@@ -243,15 +347,19 @@ BOOL Initialize(PVOID BaseAddress)
         0x1e, 0x72, 0xda
     };
 
+    static CHAR RegisterKey[] = "30819D300D06092A864886F70D010101050003818B0030818702818100D87BA24562F7C5D14A0CFB12B9740C195C6BDC7E6D6EC92BAC0EB29D59E1D9AE67890C2B88C3ABDCAFFE7D4A33DCC1BFBE531A251CEF0C923F06BE79B2328559ACFEE986D5E15E4D1766EA56C4E10657FA74DB0977C3FB7582B78CD47BB2C7F9B252B4A9463D15F6AE6EE9237D54C5481BF3E0B09920190BCFB31E5BE509C33B020111";
+
     static CHAR WithEncodingString[] = " with encoding ";
 
-    PVOID ACPToUnicodeStub, UnicodeToACPStub, WithEncodingStub;
+    PVOID ACPToUnicodeStub, UnicodeToACPStub, WithEncodingStub, CalcRegKey;
     PLDR_MODULE module;
 
     ACPToUnicodeStub = NULL;
     UnicodeToACPStub = NULL;
 
     module = FindLdrModuleByHandle(NULL);
+
+    CalcRegKey = SearchStringAndReverseSearchHeader(module->DllBase, RegisterKey, CONST_STRLEN(RegisterKey), 0x30);
 
     {
 
@@ -317,7 +425,8 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_FUNCTION_PATCH f[] =
     {
         INLINE_HOOK_CALL_NULL(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
-        INLINE_HOOK_JUMP_RVA(UnicodeToACPStub, UnicodeToACP, StubUnicodeToACP),
+        INLINE_HOOK_JUMP(UnicodeToACPStub, UnicodeToACP, StubUnicodeToACP),
+        INLINE_HOOK_JUMP_NULL(CalcRegKey, StCalcRegKey),
     };
 
     Nt_PatchMemory(0, 0, f, countof(f));
