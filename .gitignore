@@ -4,6 +4,7 @@
 *.pyc
 *.pdb
 *.obj
+__pycache__
 Source/sources/3dlearn
 Source/sources/bluepillstudy
 /TempSync/Vim/_font
@@ -75,3 +76,6 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /Source/sources/Python-3.3.2/PCbuild/*.dll
 /Source/Hooks/KrKr2Protect
 /TempSync/python3 portable/UserSite/
+/PyLibs/IPython
+/PyLibs/pyreadline
+/PyLibs/readline.py
