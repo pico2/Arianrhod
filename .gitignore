@@ -78,3 +78,6 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /PyLibs/IPython
 /PyLibs/pyreadline
 /PyLibs/readline.py
+
+/TempSync/SublimeText Packages/User/Package Control.last-run
+/TempSync/SublimeText Packages/User/encoding_cache.json
