@@ -1,13 +1,13 @@
 {
+	"always_show_minimap_viewport": true,
 	"color_scheme": "Packages/Color Scheme - Default/Asuna.tmTheme",
 	"default_encoding": "UTF-8",
 	"draw_white_space": "all",
+	"fade_fold_buttons": false,
 	"fallback_encoding": "",
-	"font_size": 14.0,
+	"font_size": 15.0,
 	"highlight_line": true,
 	"hot_exit": false,
-	"fade_fold_buttons": false,
-	"always_show_minimap_viewport": true,
 	"ignored_packages":
 	[
 		"Vintage",
