@@ -571,11 +571,120 @@ BOOL IsRunningInVMWare()
 #endif
 
 
+/*++
+
+IID_IClassFactory
+
+--*/
+
+#include <comdef.h>
+
+namespace MODI
+{
+    #include "MDIVWCTL.h"
+}
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
+    PVOID               MDIVWCTL;
+    HRESULT             hr;
+    BSTR                tif, text;
+    IClassFactory*      factory;
+    MODI::IDocument*    doc;
+    MODI::IImages*      imgs;
+    MODI::IImage*       img;
+    MODI::ILayout*      layout;
+    MODI::IWords*       words;
+    MODI::IWord*        word;
+    LONG                wordcount;
+
+    API_POINTER(DllGetClassObject) GetClassObject;
+
     ml::MlInitialize();
+
+    Rtl::SetWorkingDirectory(&USTR(LR"(E:\Desktop\MODI_OCR_CHN\MODI\12.0)"));
+
+    MDIVWCTL = Ldr::LoadDll(L"MDIVWCTL.DLL");
+    *(PVOID *)&GetClassObject = Ldr::GetRoutineAddress(MDIVWCTL, "DllGetClassObject");
+
+    factory = nullptr;
+    doc     = nullptr;
+    imgs    = nullptr;
+    img     = nullptr;
+    layout  = nullptr;
+    words   = nullptr;
+    word    = nullptr;
+
+    CoInitialize(nullptr);
+
+    LOOP_ONCE
+    {
+        GUID ClsId;
+
+        CLSIDFromProgID(L"MODI.Document", &ClsId);
+        hr = CoCreateInstance(ClsId, nullptr, CLSCTX_ALL, IID_IUnknown, (PVOID *)&factory);
+
+        OleRun(factory);
+
+        if (FAILED(hr))
+        {
+            hr = GetClassObject(MODI::CLSID_Document, IID_IClassFactory, (PVOID *)&factory);
+            FAIL_BREAK(hr);
+        }
+
+        hr = factory->CreateInstance(nullptr, MODI::IID_IDocument, (PVOID *)&doc);
+        FAIL_BREAK(hr);
+
+        tif = SysAllocString(LR"(E:\Desktop\Î´±êÌâ-1.tif)");
+        hr = doc->Create(tif);
+        SysFreeString(tif);
+        FAIL_BREAK(hr);
+
+        hr = doc->OCR(MODI::miLANG_CHINESE_SIMPLIFIED, TRUE, TRUE);
+        FAIL_BREAK(hr);
+
+        hr = doc->get_Images(&imgs);
+        FAIL_BREAK(hr);
+
+        hr = imgs->get_Item(0, (IDispatch**)&img);
+        FAIL_BREAK(hr);
+
+        hr = img->get_Layout(&layout);
+        FAIL_BREAK(hr);
+
+        hr = layout->get_Words(&words);
+        FAIL_BREAK(hr);
+
+        hr = words->get_Count(&wordcount);
+        FAIL_BREAK(hr);
+
+        for (LONG_PTR Index = 0; Index != wordcount; ++Index)
+        {
+            hr = words->get_Item(Index, (IDispatch **)&word);
+            FAIL_BREAK(hr);
+
+            hr = word->get_Text(&text);
+            FAIL_BREAK(hr);
+
+            PrintConsole(L"%s", text);
+
+            SysFreeString(text);
+
+            SafeReleaseT(word);
+        }
+
+        FAIL_BREAK(hr);
+    }
+
+    SafeReleaseT(factory);
+    SafeReleaseT(doc);
+    SafeReleaseT(imgs);
+    SafeReleaseT(img);
+    SafeReleaseT(layout);
+    SafeReleaseT(words);
+    SafeReleaseT(word);
 
     return;
 
