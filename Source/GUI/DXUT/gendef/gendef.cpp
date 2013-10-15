@@ -56,7 +56,7 @@ ForceInline Void main2(Int argc, WChar **argv)
     NumberOfNames   = ExportDirectory->NumberOfNames;
     AddressOfNames  = PtrAdd((PCSTR *)PeBuffer, ExportDirectory->AddressOfNames);
 
-#define GEN_DEF 1
+#define GEN_DEF 0
 
 #if GEN_DEF
 

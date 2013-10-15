@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\NativeCode">
+      <UniqueIdentifier>{a3c3d4ac-9a55-436c-b98f-6d02d3738f64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NativeCode\PyObjects">
+      <UniqueIdentifier>{4e0b356c-14a7-4ed3-843a-1c99090bd4ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ManagedCode">
+      <UniqueIdentifier>{c44ecf0e-e224-44aa-92f5-67d751d6b4df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ManagedCode\PyObjects">
+      <UniqueIdentifier>{52bad895-74f3-46bd-9ce6-8350b90d1511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reference">
+      <UniqueIdentifier>{709a3b97-1cb4-45c5-b71f-d7a998a65447}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PyAmfHelperObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PyAMFHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="NativeCode.cpp">
+      <Filter>Source Files\NativeCode</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source Files\ManagedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Stdafx.cpp">
+      <Filter>Source Files\ManagedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PyAmfHelperObject.cpp">
+      <Filter>Source Files\NativeCode\PyObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Stdafx_Native.cpp">
+      <Filter>Source Files\NativeCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PyAMFHelper.cpp">
+      <Filter>Source Files\ManagedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PyAMFSerializer.cpp">
+      <Filter>Source Files\NativeCode\PyObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="PyAMFSerializer_Managed.cpp">
+      <Filter>Source Files\ManagedCode\PyObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagedCode.cpp">
+      <Filter>Source Files\ManagedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PyAmfDeserializer.cpp">
+      <Filter>Source Files\NativeCode\PyObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="PyAmfDeserializer_Managed.cpp">
+      <Filter>Source Files\ManagedCode\PyObjects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Exports.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <_EmbedManagedResourceFile Include="..\..\..\..\..\..\Library\.Net\FluorineFx\Bin\net\3.5\antlr.runtime.dll">
+      <Filter>Reference</Filter>
+    </_EmbedManagedResourceFile>
+    <_EmbedManagedResourceFile Include="..\..\..\..\..\..\Library\.Net\FluorineFx\Bin\net\3.5\log4net.dll">
+      <Filter>Reference</Filter>
+    </_EmbedManagedResourceFile>
+    <_EmbedManagedResourceFile Include="..\..\..\..\..\..\Library\.Net\FluorineFx\Bin\net\3.5\FluorineFx.dll">
+      <Filter>Reference</Filter>
+    </_EmbedManagedResourceFile>
+  </ItemGroup>
+</Project>
