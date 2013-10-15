@@ -22,7 +22,7 @@ VOID PyOcrHelper_dealloc(PPyOcrHelper self)
     Py_TYPE(self)->tp_free(self);
 }
 
-NTSTATUS InvokeOcrHelper(const ml::String CmdLine, ml::String OcrResult)
+NTSTATUS InvokeOcrHelper(const ml::String &CmdLine, ml::String &OcrResult)
 {
     NTSTATUS            Status;
     HANDLE              PipeRead, PipeWrite;
@@ -36,15 +36,18 @@ NTSTATUS InvokeOcrHelper(const ml::String CmdLine, ml::String OcrResult)
     PipeAttributes.bInheritHandle = TRUE;
     PipeAttributes.lpSecurityDescriptor = nullptr;
 
-    if (CreatePipe(&PipeRead, &PipeWrite, &PipeAttributes, 0) == FALSE)
-    {
-        return STATUS_UNSUCCESSFUL;
-    }
+    //FAIL_RETURN(Io::CreateNamedPipe(&PipeRead, &PipeWrite, nullptr, &PipeAttributes));
+    CreatePipe(&PipeRead, &PipeWrite, &PipeAttributes, 0);
+
+    PrintConsole(L"%p\n", PipeWrite);
 
     ZeroMemory(&StartupInfo, sizeof(StartupInfo));
     StartupInfo.cb          = sizeof(StartupInfo);
-    StartupInfo.dwFlags     = STARTF_USESTDHANDLES;
+    StartupInfo.dwFlags     = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+    StartupInfo.hStdInput   = PipeWrite;
     StartupInfo.hStdOutput  = PipeWrite;
+    StartupInfo.hStdError   = PipeWrite;
+    StartupInfo.wShowWindow = SW_HIDE;
 
     Status = Ps::CreateProcessW(nullptr, CmdLine, nullptr, 0, &StartupInfo, &ProcessInfo);
     if (NT_FAILED(Status))
@@ -95,7 +98,7 @@ PyObject* PyOcrHelper_Ocr(PyObject *self, PyObject *args, PyObject *kwargs)
     SelfPath = Self->FullDllName;
     SelfPath.Length -= Self->BaseDllName.Length;
 
-    CmdLine = ml::String::Format(L"%wZModiOcrHelper.exe %s", &SelfPath, TiffPath);
+    CmdLine = ml::String::Format(L"\"%wZModiOcrHelper.exe\" \"%s\"", &SelfPath, TiffPath);
     PyRelease(PyTiffPath);
 
     Status = InvokeOcrHelper(CmdLine, OcrResult);

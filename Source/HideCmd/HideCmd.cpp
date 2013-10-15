@@ -79,7 +79,7 @@ Int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWChar lpCmdLi
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(STARTUPINFOW);
     si.dwFlags = STARTF_USESHOWWINDOW;
-	si.wShowWindow = SW_HIDE;
+    si.wShowWindow = SW_HIDE;
 
     return CreateProcessInternalW(
                 NULL,

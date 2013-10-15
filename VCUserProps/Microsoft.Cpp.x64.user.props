@@ -27,10 +27,10 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <OutputFile>$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>undoc_ntdll.lib;undoc_k32.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress />
       <DataExecutionPrevention />

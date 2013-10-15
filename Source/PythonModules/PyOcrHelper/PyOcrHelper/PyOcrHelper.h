@@ -6,6 +6,8 @@
 #include "MyLibrary.h"
 #include "PythonHelper/PythonHelper.h"
 
+using ml::String;
+
 
 #define PY_OCR_HELPER_MODULE "PyOcrHelper"
 
