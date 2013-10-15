@@ -22,38 +22,84 @@ VOID PyOcrHelper_dealloc(PPyOcrHelper self)
     Py_TYPE(self)->tp_free(self);
 }
 
+HANDLE CreateSection()
+{
+    NTSTATUS            Status;
+    WCHAR               SectionNameBuffer[MAX_NTPATH];
+    OBJECT_ATTRIBUTES   ObjectAttributes;
+    UNICODE_STRING      BaseNamedObjectsName;
+    HANDLE              SectionHandle, BaseNamedObjects;
+    ULONG_PTR           SessionId;
+    LARGE_INTEGER       MaximumSize;
+
+    SessionId = GetSessionId(CurrentProcess);
+    if (SessionId == INVALID_SESSION_ID)
+        return nullptr;
+
+    BaseNamedObjectsName.Length         = (USHORT)swprintf(SectionNameBuffer, L"\\Sessions\\%d\\BaseNamedObjects", SessionId) * sizeof(WCHAR);
+    BaseNamedObjectsName.MaximumLength  = BaseNamedObjectsName.Length;
+    BaseNamedObjectsName.Buffer         = SectionNameBuffer;
+
+    InitializeObjectAttributes(&ObjectAttributes, &BaseNamedObjectsName, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
+    Status = NtOpenDirectoryObject(&BaseNamedObjects, DIRECTORY_ALL_ACCESS, &ObjectAttributes);
+    if (NT_FAILED(Status))
+        return nullptr;
+
+    InitializeObjectAttributes(&ObjectAttributes, nullptr, OBJ_INHERIT, nullptr, nullptr);
+
+    MaximumSize.QuadPart = 0x1000;
+    Status = NtCreateSection(
+                &SectionHandle,
+                SECTION_ALL_ACCESS,
+                &ObjectAttributes,
+                &MaximumSize,
+                PAGE_READWRITE,
+                SEC_COMMIT,
+                nullptr
+            );
+
+    NtClose(BaseNamedObjects);
+
+    if (NT_FAILED(Status))
+        return nullptr;
+
+    return SectionHandle;
+}
+
 NTSTATUS InvokeOcrHelper(const ml::String &CmdLine, ml::String &OcrResult)
 {
     NTSTATUS            Status;
-    HANDLE              PipeRead, PipeWrite;
+    HANDLE              PipeRead, PipeWrite, Section;
     SECURITY_ATTRIBUTES PipeAttributes;
     STARTUPINFOW        StartupInfo;
     PROCESS_INFORMATION ProcessInfo;
     WCHAR               Buffer[0x1000];
-    LARGE_INTEGER       BytesRead;
+    LARGE_INTEGER       BytesRead, TimeOut;
 
     PipeAttributes.nLength = sizeof(PipeAttributes);
     PipeAttributes.bInheritHandle = TRUE;
     PipeAttributes.lpSecurityDescriptor = nullptr;
 
-    //FAIL_RETURN(Io::CreateNamedPipe(&PipeRead, &PipeWrite, nullptr, &PipeAttributes));
-    CreatePipe(&PipeRead, &PipeWrite, &PipeAttributes, 0);
+    FAIL_RETURN(Io::CreateNamedPipe(&PipeRead, &PipeWrite, nullptr, &PipeAttributes));
+
+    Section = CreateSection();
 
     PrintConsole(L"%p\n", PipeWrite);
 
     ZeroMemory(&StartupInfo, sizeof(StartupInfo));
     StartupInfo.cb          = sizeof(StartupInfo);
-    StartupInfo.dwFlags     = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+    StartupInfo.dwFlags     = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
     StartupInfo.hStdInput   = PipeWrite;
     StartupInfo.hStdOutput  = PipeWrite;
     StartupInfo.hStdError   = PipeWrite;
     StartupInfo.wShowWindow = SW_HIDE;
 
-    Status = Ps::CreateProcessW(nullptr, CmdLine, nullptr, 0, &StartupInfo, &ProcessInfo);
+    Status = Ps::CreateProcessW(nullptr, String::Format(L"%s %p", CmdLine, Section), nullptr, CREATE_NEW_CONSOLE, &StartupInfo, &ProcessInfo);
     if (NT_FAILED(Status))
     {
         NtClose(PipeRead);
         NtClose(PipeWrite);
+        NtClose(Section);
 
         return Status;
     }
@@ -62,15 +108,47 @@ NTSTATUS InvokeOcrHelper(const ml::String &CmdLine, ml::String &OcrResult)
     NtClose(ProcessInfo.hProcess);
     NtClose(ProcessInfo.hThread);
 
-    while (NT_SUCCESS(NtFileDisk::Read(PipeRead, Buffer, sizeof(Buffer), &BytesRead)))
+    ULONG_PTR ViewSize = 0;
+    PVOID BufferReturned;
+
+    ViewSize = 0;
+    BufferReturned = nullptr;
+    Status = NtMapViewOfSection(
+                Section,
+                CurrentProcess,
+                &BufferReturned,
+                0,
+                0x1000,
+                nullptr,
+                &ViewSize,
+                ViewShare,
+                0,
+                PAGE_READWRITE
+            );
+
+    if (NT_SUCCESS(Status))
     {
-        *PtrAdd(Buffer, BytesRead.QuadPart) = 0;
+        OcrResult = (PWSTR)BufferReturned;
+
+        NtUnmapViewOfSection(CurrentProcess, BufferReturned);
+    }
+
+    NtClose(Section);
+/*
+    FormatTimeOut(&TimeOut, 1);
+
+    while (PeekNamedPipe(PipeRead, Buffer, sizeof(Buffer), &BytesRead.LowPart, (PULONG)&BytesRead.HighPart, nullptr) != FALSE)
+    {
+        ReadFile(PipeRead, Buffer, sizeof(Buffer), &BytesRead.LowPart, nullptr);
+
+        *PtrAdd(Buffer, BytesRead.LowPart) = 0;
         OcrResult += Buffer;
+        PrintConsole(L"%s\n", OcrResult);
     }
 
     NtClose(PipeRead);
     NtClose(PipeWrite);
-
+*/
     return STATUS_SUCCESS;
 }
 

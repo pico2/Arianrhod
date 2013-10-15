@@ -438,27 +438,61 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     ml::MlInitialize();
 
-    ExceptionBox(ml::String::Format(L"%p", GetStdHandle(STD_OUTPUT_HANDLE)));
+    ExceptionBox(ml::String::Format(L"%p", CurrentPeb()->ProcessParameters->StandardOutput));
 
     if (argc < 2)
     {
-        PrintConsole(L"");
+        //PrintConsole(L"");
         return;
     }
-
+    
+    HANDLE Section;
     NTSTATUS Status;
     ml::String ret;
 
     Status = MODI::InitializeModi();
     if (NT_FAILED(Status))
     {
-        PrintConsole(L"");
+        //PrintConsole(L"");
         return;
     }
 
     MODI::OcrTiff(argv[1], ret);
 
-    PrintConsole(L"%s", ret);
+    if (argc > 2)
+    {
+        ULONG_PTR ViewSize = 0;
+        PVOID Buffer;
+
+        Section = (HANDLE)StringToInt64HexW(argv[2]);
+
+        ViewSize = 0;
+        Buffer = nullptr;
+        Status = NtMapViewOfSection(
+                    Section,
+                    CurrentProcess,
+                    &Buffer,
+                    0,
+                    0x1000,
+                    nullptr,
+                    &ViewSize,
+                    ViewShare,
+                    0,
+                    PAGE_READWRITE
+                );
+
+        if (NT_SUCCESS(Status))
+        {
+            CopyMemory(Buffer, ret.GetBuffer(), ret.GetCount() * 2);
+            NtUnmapViewOfSection(CurrentProcess, Buffer);
+        }
+
+        NtClose(Section);
+    }
+    else
+    {
+        PrintConsole(L"%s", ret);
+    }
     
     MODI::UnInitializeModi();
 
