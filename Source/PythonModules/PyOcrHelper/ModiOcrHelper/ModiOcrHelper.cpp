@@ -298,6 +298,7 @@ NTSTATUS InitializeModi()
     MSPCORE = Ldr::LoadDll(L"MSPCORE.DLL");
 
     SetWorkingDirectory(&WorkingDirectory);
+    RtlFreeUnicodeString(&WorkingDirectory);
 
     if (MDIVWCTL == nullptr || MSPGIMME == nullptr || MSPCORE == nullptr)
     {
