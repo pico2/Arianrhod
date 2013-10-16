@@ -146,7 +146,7 @@
       <AdditionalLibraryDirectories>E:\Python\libs</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages
+      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\MyPyLibrary\AMFHelper
 del/s/q ..\$(TargetName).lib &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName).exp &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
