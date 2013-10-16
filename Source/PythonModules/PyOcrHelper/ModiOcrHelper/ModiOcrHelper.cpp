@@ -459,7 +459,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     if (argc > 2)
     {
-        WriteFile(CurrentPeb()->ProcessParameters->StandardOutput, ret.GetBuffer(), ret.GetSize(), (PULONG)&argc, nullptr);
+        NtFileDisk::Write(CurrentPeb()->ProcessParameters->StandardOutput, ret.GetBuffer(), ret.GetSize());
     }
     else
     {

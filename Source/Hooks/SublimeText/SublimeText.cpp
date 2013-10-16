@@ -46,7 +46,16 @@ enum
     STCP_UTF_8_LE_BOM   = 0x22,
     STCP_UTF_8_BOM      = 0x23,
 
+#if ST_VERSION == ST_VERSION_AUTO
+
+    STCP_ACP            = 1,
+
+#else
+
     STCP_ACP            = ~0u,
+
+#endif
+
 };
 
 ULONG (CDECL *StubUnicodeToACP)(ULONG CpIndex, PSUBLIME_TEXT_WSTRING Unicode, PSTR Ansi, LONG AnsiSize);
@@ -179,6 +188,18 @@ NAKED ULONG NakedACPToUnicode_3()
     }
 }
 
+NTSTATUS CDECL StCalcRegKey()
+{
+    return STATUS_SUCCESS;
+}
+
+BOOL (CDECL *StubIsUnicodeEncoding)(ULONG CpIndex);
+
+BOOL CDECL IsUnicodeEncoding(ULONG CpIndex)
+{
+    return CpIndex == STCP_ACP || StubIsUnicodeEncoding(CpIndex);
+}
+
 PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
 {
     PVOID StringValue, StringReference;
@@ -278,11 +299,6 @@ SearchStringAndReverseSearchHeader(
     return StringReference == nullptr ? IMAGE_INVALID_VA : StringReference;
 }
 
-NTSTATUS CDECL StCalcRegKey()
-{
-    return STATUS_SUCCESS;
-}
-
 #endif // ST_VERSION_AUTO
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -348,10 +364,13 @@ BOOL Initialize(PVOID BaseAddress)
     };
 
     static CHAR RegisterKey[] = "30819D300D06092A864886F70D010101050003818B0030818702818100D87BA24562F7C5D14A0CFB12B9740C195C6BDC7E6D6EC92BAC0EB29D59E1D9AE67890C2B88C3ABDCAFFE7D4A33DCC1BFBE531A251CEF0C923F06BE79B2328559ACFEE986D5E15E4D1766EA56C4E10657FA74DB0977C3FB7582B78CD47BB2C7F9B252B4A9463D15F6AE6EE9237D54C5481BF3E0B09920190BCFB31E5BE509C33B020111";
-
+    static CHAR CheckEncodingWhenSave[] = "Not all characters are representable in ";
     static CHAR WithEncodingString[] = " with encoding ";
 
-    PVOID ACPToUnicodeStub, UnicodeToACPStub, WithEncodingStub, CalcRegKey;
+    PVOID ACPToUnicodeStub, UnicodeToACPStub, WithEncodingStub;
+    PVOID CalcRegKey;
+    PVOID NotAllCharactersRepresentable, IsUnicodeEncodingAddress;
+
     PLDR_MODULE module;
 
     ACPToUnicodeStub = NULL;
@@ -359,7 +378,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = FindLdrModuleByHandle(NULL);
 
-    CalcRegKey = SearchStringAndReverseSearchHeader(module->DllBase, RegisterKey, CONST_STRLEN(RegisterKey), 0x30);
+    CalcRegKey = SearchStringAndReverseSearchHeader(module->DllBase, RegisterKey, sizeof(RegisterKey), 0x30);
 
     {
 
@@ -422,11 +441,37 @@ BOOL Initialize(PVOID BaseAddress)
             return FALSE;
     }
 
+    {
+        NotAllCharactersRepresentable = SearchStringAndReverseSearchHeader(module->DllBase, CheckEncodingWhenSave, sizeof(CheckEncodingWhenSave), 0x120);
+        if (NotAllCharactersRepresentable == nullptr)
+            return FALSE;
+
+        ULONG_PTR NumberOfCall = 0;
+
+        IsUnicodeEncodingAddress = nullptr;
+        WalkOpCodeT(NotAllCharactersRepresentable, 0x70,
+            WalkOpCodeM(Buffer, OpLength, Ret)
+            {
+                if (Buffer[0] == CALL && ++NumberOfCall == 2)
+                {
+                    IsUnicodeEncodingAddress = GetCallDestination(Buffer);
+                    return STATUS_SUCCESS;
+                }
+
+                return STATUS_NOT_FOUND;
+            }
+        );
+
+        if (IsUnicodeEncodingAddress == nullptr)
+            return FALSE;
+    }
+
     MEMORY_FUNCTION_PATCH f[] =
     {
         INLINE_HOOK_CALL_NULL(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
         INLINE_HOOK_JUMP(UnicodeToACPStub, UnicodeToACP, StubUnicodeToACP),
         INLINE_HOOK_JUMP_NULL(CalcRegKey, StCalcRegKey),
+        INLINE_HOOK_JUMP(IsUnicodeEncodingAddress, IsUnicodeEncoding, StubIsUnicodeEncoding)
     };
 
     Nt_PatchMemory(0, 0, f, countof(f));
