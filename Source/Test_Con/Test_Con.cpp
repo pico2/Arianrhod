@@ -574,9 +574,6 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    Io::CreateNamedPipe(0, 0);
-    CoCreateInstance(GUID_NULL, 0, 0, GUID_NULL, 0);
-
     return;
 
 #if 0
