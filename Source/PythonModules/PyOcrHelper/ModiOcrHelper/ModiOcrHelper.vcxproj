@@ -55,7 +55,9 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <OutputFile>..\$(TargetName)$(TargetExt)</OutputFile>
+      <FixedBaseAddress>true</FixedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -77,7 +79,7 @@
       <FixedBaseAddress>true</FixedBaseAddress>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\PyOcrHelper\</Command>
+      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\MyPyLibrary\PyOcrHelper</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

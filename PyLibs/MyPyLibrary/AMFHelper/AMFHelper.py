@@ -1,5 +1,5 @@
 from ml import *
-import PyAmfHelper
+import AMFHelper.PyAmfHelper as PyAmfHelper
 
 def VerifyTypeAndRaise(value, _type):
     if type(value) != _type:
