@@ -85,3 +85,4 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 
 /TempSync/SublimeText Packages/User/Package Control.cache
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
+/PyLibs/*.pth
