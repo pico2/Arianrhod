@@ -130,7 +130,7 @@
       <OutputFile>..\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages
+      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\PyOcrHelper
 del/s/q ..\$(TargetName).lib &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName).exp &gt;NUL 2&gt;NUL</Command>
     </PostBuildEvent>

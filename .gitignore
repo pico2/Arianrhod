@@ -4,6 +4,8 @@
 *.pyc
 *.pdb
 *.obj
+*egg-info
+*.egg
 __pycache__
 Source/sources/3dlearn
 Source/sources/bluepillstudy
@@ -84,4 +86,4 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/User/Package Control.cache
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
 
-/PyLibs/PyOcrHelper/
+/PyLibs/PyOcrHelper/MODI

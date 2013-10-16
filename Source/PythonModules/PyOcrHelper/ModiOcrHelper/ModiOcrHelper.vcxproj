@@ -76,6 +76,9 @@
       <OutputFile>..\$(TargetName)$(TargetExt)</OutputFile>
       <FixedBaseAddress>true</FixedBaseAddress>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\PyOcrHelper\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ModiOcrHelper.cpp" />

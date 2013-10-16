@@ -69,7 +69,7 @@ HANDLE CreateSection()
 NTSTATUS InvokeOcrHelper(const ml::String &CmdLine, ml::String &OcrResult)
 {
     NTSTATUS            Status;
-    HANDLE              PipeRead, PipeWrite, Section;
+    HANDLE              StdoutRead, StdoutWrite, StdoutWrite2;
     SECURITY_ATTRIBUTES PipeAttributes;
     STARTUPINFOW        StartupInfo;
     PROCESS_INFORMATION ProcessInfo;
@@ -77,29 +77,35 @@ NTSTATUS InvokeOcrHelper(const ml::String &CmdLine, ml::String &OcrResult)
     LARGE_INTEGER       BytesRead, TimeOut;
 
     PipeAttributes.nLength = sizeof(PipeAttributes);
-    PipeAttributes.bInheritHandle = TRUE;
+    PipeAttributes.bInheritHandle = FALSE;
     PipeAttributes.lpSecurityDescriptor = nullptr;
 
-    FAIL_RETURN(Io::CreateNamedPipe(&PipeRead, &PipeWrite, nullptr, &PipeAttributes));
+    //FAIL_RETURN(Io::CreateNamedPipe(&StdoutRead, &StdoutWrite, nullptr, &PipeAttributes));
+    //FAIL_RETURN(Io::CreateNamedPipe(&StdinRead, &StdinWrite, nullptr, &PipeAttributes));
+    CreatePipe(&StdoutRead, &StdoutWrite, &PipeAttributes, 0);
 
-    Section = CreateSection();
+    NtDuplicateObject(CurrentProcess, StdoutWrite, CurrentProcess, &StdoutWrite2, 0, OBJ_INHERIT, DUPLICATE_SAME_ACCESS);
 
-    PrintConsole(L"%p\n", PipeWrite);
+    PrintConsole(L"%p\n", StdoutWrite);
 
     ZeroMemory(&StartupInfo, sizeof(StartupInfo));
     StartupInfo.cb          = sizeof(StartupInfo);
-    StartupInfo.dwFlags     = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-    StartupInfo.hStdInput   = PipeWrite;
-    StartupInfo.hStdOutput  = PipeWrite;
-    StartupInfo.hStdError   = PipeWrite;
+    StartupInfo.dwFlags     = STARTF_USESTDHANDLES;
+    StartupInfo.hStdOutput  = StdoutWrite2;
     StartupInfo.wShowWindow = SW_HIDE;
 
-    Status = Ps::CreateProcessW(nullptr, String::Format(L"%s %p", CmdLine, Section), nullptr, CREATE_NEW_CONSOLE, &StartupInfo, &ProcessInfo);
+    Status = Ps::CreateProcessW(
+                nullptr,
+                String::Format(L"%s %s", CmdLine, L"STD_OUTPUT_IS_PIPE"),
+                nullptr,
+                0,
+                &StartupInfo,
+                &ProcessInfo
+            );
     if (NT_FAILED(Status))
     {
-        NtClose(PipeRead);
-        NtClose(PipeWrite);
-        NtClose(Section);
+        NtClose(StdoutRead);
+        NtClose(StdoutWrite);
 
         return Status;
     }
@@ -108,47 +114,23 @@ NTSTATUS InvokeOcrHelper(const ml::String &CmdLine, ml::String &OcrResult)
     NtClose(ProcessInfo.hProcess);
     NtClose(ProcessInfo.hThread);
 
-    ULONG_PTR ViewSize = 0;
-    PVOID BufferReturned;
-
-    ViewSize = 0;
-    BufferReturned = nullptr;
-    Status = NtMapViewOfSection(
-                Section,
-                CurrentProcess,
-                &BufferReturned,
-                0,
-                0x1000,
-                nullptr,
-                &ViewSize,
-                ViewShare,
-                0,
-                PAGE_READWRITE
-            );
-
-    if (NT_SUCCESS(Status))
-    {
-        OcrResult = (PWSTR)BufferReturned;
-
-        NtUnmapViewOfSection(CurrentProcess, BufferReturned);
-    }
-
-    NtClose(Section);
-/*
     FormatTimeOut(&TimeOut, 1);
 
-    while (PeekNamedPipe(PipeRead, Buffer, sizeof(Buffer), &BytesRead.LowPart, (PULONG)&BytesRead.HighPart, nullptr) != FALSE)
+    ULONG aval;
+
+    while (PeekNamedPipe(StdoutRead, nullptr, 0, nullptr, &aval, nullptr) != FALSE && aval != 0)
     {
-        ReadFile(PipeRead, Buffer, sizeof(Buffer), &BytesRead.LowPart, nullptr);
+        ReadFile(StdoutRead, Buffer, aval, &BytesRead.LowPart, nullptr);
 
         *PtrAdd(Buffer, BytesRead.LowPart) = 0;
         OcrResult += Buffer;
         PrintConsole(L"%s\n", OcrResult);
     }
 
-    NtClose(PipeRead);
-    NtClose(PipeWrite);
-*/
+    NtClose(StdoutRead);
+    NtClose(StdoutWrite);
+    NtClose(StdoutWrite2);
+
     return STATUS_SUCCESS;
 }
 

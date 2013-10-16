@@ -438,11 +438,10 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     ml::MlInitialize();
 
-    ExceptionBox(ml::String::Format(L"%p", CurrentPeb()->ProcessParameters->StandardOutput));
+    //ExceptionBox(ml::String::Format(L"%p, %p", CurrentPeb()->ProcessParameters->StandardOutput, GetStdHandle(STD_OUTPUT_HANDLE)));
 
     if (argc < 2)
     {
-        //PrintConsole(L"");
         return;
     }
     
@@ -453,7 +452,6 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     Status = MODI::InitializeModi();
     if (NT_FAILED(Status))
     {
-        //PrintConsole(L"");
         return;
     }
 
@@ -461,33 +459,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     if (argc > 2)
     {
-        ULONG_PTR ViewSize = 0;
-        PVOID Buffer;
-
-        Section = (HANDLE)StringToInt64HexW(argv[2]);
-
-        ViewSize = 0;
-        Buffer = nullptr;
-        Status = NtMapViewOfSection(
-                    Section,
-                    CurrentProcess,
-                    &Buffer,
-                    0,
-                    0x1000,
-                    nullptr,
-                    &ViewSize,
-                    ViewShare,
-                    0,
-                    PAGE_READWRITE
-                );
-
-        if (NT_SUCCESS(Status))
-        {
-            CopyMemory(Buffer, ret.GetBuffer(), ret.GetCount() * 2);
-            NtUnmapViewOfSection(CurrentProcess, Buffer);
-        }
-
-        NtClose(Section);
+        WriteFile(CurrentPeb()->ProcessParameters->StandardOutput, ret.GetBuffer(), ret.GetSize(), (PULONG)&argc, nullptr);
     }
     else
     {
