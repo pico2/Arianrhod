@@ -7,7 +7,8 @@
 #include <comdef.h>
 #include <Msi.h>
 
-#define DebugLog(...)
+#define DebugLog(...) AllocConsole(), PrintConsole(__VA_ARGS__)
+//#define DebugLog(...)
 
 ML_NAMESPACE_BEGIN(MODI);
 
@@ -381,6 +382,9 @@ NTSTATUS OcrTiff(PCWSTR TiffFile, ml::String &ResultText)
 
         hr = doc->get_Images(&imgs);
         FAIL_BREAK(hr);
+
+        imgs->get_Count(&wordcount);
+        DebugLog(L"imgs count = %d\n", wordcount);
 
         DebugLog(L"imgs->get_Item\n");
 
