@@ -8,7 +8,11 @@
 #include <Msi.h>
 
 #define DebugLog(...) AllocConsole(), PrintConsole(__VA_ARGS__)
-//#define DebugLog(...)
+
+#pragma warning(push)
+#pragma warning(disable:4005)
+#define DebugLog(...)
+#pragma warning(pop)
 
 ML_NAMESPACE_BEGIN(MODI);
 
@@ -357,6 +361,8 @@ NTSTATUS OcrTiff(PCWSTR TiffFile, ml::String &ResultText)
     words   = nullptr;
     word    = nullptr;
 
+    ResultText = L"";
+
     LOOP_ONCE
     {
         hr = ModiGetObjectFromModule(
@@ -448,10 +454,8 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
     {
         return;
     }
-    
-    HANDLE Section;
+
     NTSTATUS Status;
-    ml::String ret;
 
     Status = MODI::InitializeModi();
     if (NT_FAILED(Status))
@@ -459,14 +463,53 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         return;
     }
 
-    MODI::OcrTiff(argv[1], ret);
+    ml::String ret;
 
-    if (argc > 2)
+    if (argc > 1)
     {
-        NtFileDisk::Write(CurrentPeb()->ProcessParameters->StandardOutput, ret.GetBuffer(), ret.GetSize());
+        WCHAR Tiff[0x1000];
+        HANDLE StandardIntput, StandardError, ParentProcess;
+        LARGE_INTEGER BytesRead, Timeout;
+
+        StandardIntput = CurrentPeb()->ProcessParameters->StandardInput;
+        StandardError = CurrentPeb()->ProcessParameters->StandardError;
+
+        FormatTimeOut(&Timeout, 1);
+
+        ParentProcess = PidToHandle(StringToInt64W(argv[1]));
+
+        LOOP_FOREVER
+        {
+            if (ParentProcess != nullptr)
+            {
+                Status = NtWaitForSingleObject(ParentProcess, FALSE, &Timeout);
+                if (Status != STATUS_TIMEOUT)
+                {
+                    NtClose(ParentProcess);
+                    break;
+                }
+            }
+
+            Status = NtFileDisk::Read(StandardIntput, Tiff, sizeof(Tiff), &BytesRead);
+            if (NT_FAILED(Status))
+            {
+                Ps::Sleep(1);
+                continue;
+            }
+
+            *PtrAdd(Tiff, BytesRead.QuadPart) = 0;
+
+            Status = MODI::OcrTiff(Tiff, ret);
+
+            BytesRead.QuadPart = ret.GetSize();
+            NtFileDisk::Write(StandardError, &BytesRead.QuadPart, 8);
+            if (BytesRead.QuadPart != 0)
+                NtFileDisk::Write(StandardError, ret.GetBuffer(), BytesRead.QuadPart);
+        }
     }
     else
     {
+        MODI::OcrTiff(argv[1], ret);
         PrintConsole(L"%s", ret);
     }
     
