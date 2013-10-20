@@ -200,6 +200,25 @@ BOOL CDECL IsUnicodeEncoding(ULONG CpIndex)
     return CpIndex == STCP_ACP || StubIsUnicodeEncoding(CpIndex);
 }
 
+BOOL
+NTAPI
+StReplaceFile(
+    PCWSTR  ReplacedFileName,
+    PCWSTR  ReplacementFileName,
+    PCWSTR  BackupFileName,
+    ULONG   ReplaceFlags,
+    PVOID   Exclude,
+    PVOID   Reserved
+)
+{
+    NTSTATUS Status;
+
+    Status = Io::MoveFile(ReplacementFileName, ReplacedFileName);
+    BaseSetLastNTError(Status);
+
+    return NT_SUCCESS(Status);
+}
+
 PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
 {
     PVOID StringValue, StringReference;
@@ -373,10 +392,10 @@ BOOL Initialize(PVOID BaseAddress)
 
     PLDR_MODULE module;
 
-    ACPToUnicodeStub = NULL;
-    UnicodeToACPStub = NULL;
+    ACPToUnicodeStub = nullptr;
+    UnicodeToACPStub = nullptr;
 
-    module = FindLdrModuleByHandle(NULL);
+    module = FindLdrModuleByHandle(nullptr);
 
     CalcRegKey = SearchStringAndReverseSearchHeader(module->DllBase, RegisterKey, sizeof(RegisterKey), 0x30);
 
@@ -389,7 +408,7 @@ BOOL Initialize(PVOID BaseAddress)
         };
 
         ACPToUnicodeStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
-        if (ACPToUnicodeStub == NULL)
+        if (ACPToUnicodeStub == nullptr)
             return FALSE;
     }
 
@@ -400,7 +419,7 @@ BOOL Initialize(PVOID BaseAddress)
         };
 
         WithEncodingStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
-        if (WithEncodingStub == NULL)
+        if (WithEncodingStub == nullptr)
             return FALSE;
     }
 
@@ -411,7 +430,7 @@ BOOL Initialize(PVOID BaseAddress)
         };
 
         WithEncodingStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
-        if (WithEncodingStub == NULL)
+        if (WithEncodingStub == nullptr)
             return FALSE;
     }
 
@@ -473,6 +492,9 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP_NULL(CalcRegKey, StCalcRegKey),
         INLINE_HOOK_JUMP(IsUnicodeEncodingAddress, IsUnicodeEncoding, StubIsUnicodeEncoding)
     };
+
+    PVOID addr = StReplaceFile;
+    WriteProtectMemory(CurrentProcess, PtrAdd(module->DllBase, IATLookupRoutineRVAByHashNoFix(module->DllBase, KERNEL32_ReplaceFileW)), &addr, sizeof(addr));
 
     Nt_PatchMemory(0, 0, f, countof(f));
 

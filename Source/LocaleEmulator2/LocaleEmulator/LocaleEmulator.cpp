@@ -271,13 +271,15 @@ PDLL_HOOK_ENTRY LookupDllHookEntry(PCUNICODE_STRING BaseDllName)
 {
     static DLL_HOOK_ENTRY DllHookEntries[] =
     {
-        { RTL_CONSTANT_STRING(L"USER32.dll"),       &LeGlobalData::HookUser32Routines,      &LeGlobalData::UnHookUser32Routines },
-        { RTL_CONSTANT_STRING(L"GDI32.dll"),        &LeGlobalData::HookGdi32Routines,       &LeGlobalData::UnHookGdi32Routines },
-        { RTL_CONSTANT_STRING(L"KERNEL32.dll"),     &LeGlobalData::HookKernel32Routines,    &LeGlobalData::UnHookKernel32Routines },
-
 #if ARCHEAGE_VER
 
         { RTL_CONSTANT_STRING(L"x2game.dll"),       &LeGlobalData::HookX2GameRoutines },
+
+#else
+
+        { RTL_CONSTANT_STRING(L"USER32.dll"),       &LeGlobalData::HookUser32Routines,      &LeGlobalData::UnHookUser32Routines },
+        { RTL_CONSTANT_STRING(L"GDI32.dll"),        &LeGlobalData::HookGdi32Routines,       &LeGlobalData::UnHookGdi32Routines },
+        { RTL_CONSTANT_STRING(L"KERNEL32.dll"),     &LeGlobalData::HookKernel32Routines,    &LeGlobalData::UnHookKernel32Routines },
 
 #endif // ARCHEAGE_VER
     };
@@ -390,6 +392,8 @@ LONG WINAPI GetSQLiteKeyExceptionHandler(PEXCEPTION_POINTERS ExceptionInfo)
 
 PSTR CDECL x2_strstr(PSTR Str, PCSTR SubStr)
 {
+    PrintConsole(L"%S -> %S\n", Str, SubStr);
+
     if (SubStr != nullptr && !StrCompareA(SubStr, "+acpxmk"))
     {
         return Str;
