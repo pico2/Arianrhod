@@ -211,10 +211,22 @@ StReplaceFile(
     PVOID   Reserved
 )
 {
-    NTSTATUS Status;
+    ULONG       Attributes;
+    NTSTATUS    Status;
 
-    Status = Io::MoveFile(ReplacementFileName, ReplacedFileName);
+    Attributes = Io::QueryFileAttributes(ReplacedFileName);
+    if (Attributes == INVALID_FILE_ATTRIBUTES)
+    {
+        BaseSetLastNTError(STATUS_ACCESS_DENIED);
+        return FALSE;
+    }
+
+    Status = Io::MoveFile(ReplacementFileName, ReplacedFileName, TRUE);
     BaseSetLastNTError(Status);
+    if (NT_SUCCESS(Status))
+    {
+        Io::ApplyFileAttributes(ReplacedFileName, Attributes);
+    }
 
     return NT_SUCCESS(Status);
 }

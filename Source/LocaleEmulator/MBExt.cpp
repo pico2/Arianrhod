@@ -231,7 +231,7 @@ NTSTATUS GetPathFromLinkFile(PCWSTR LinkFilePath, PWCHAR FullPath, ULONG BufferC
 {
     HRESULT         hResult;
     IShellLinkW    *ShellLink;
-	IPersistFile   *PersistFile;
+    IPersistFile   *PersistFile;
 
     CoInitialize(NULL);
 
