@@ -72,6 +72,15 @@ BOOL Initialize(PVOID BaseAddress)
 
     Nt_PatchMemory(NULL, 0, f, countof(f), devshl->DllBase);
 
+    PVOID mfc42 = Ldr::LoadDll(L"MFC42.dll");
+
+    PVOID mbscmp = PtrAdd(mfc42, IATLookupRoutineRVAByHashNoFix(mfc42, CONST_STRHASH("_mbscmp")));
+    PVOID orig;
+
+    orig = EATLookupRoutineByHashPNoFix(Ldr::LoadDll(L"msvcrt.dll"), CONST_STRHASH("_mbscmp"));
+
+    Mm::WriteProtectMemory(CurrentProcess, mbscmp, &orig, sizeof(orig));
+
     return TRUE;
 }
 
