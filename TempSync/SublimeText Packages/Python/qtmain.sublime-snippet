@@ -5,13 +5,16 @@
     <description>qtmain</description>
     <content><![CDATA[
 from ml import *
-from PyQt5.QtWidgets import QApplication, QDialog
-import PyQt5.QtWidgets as QtWidgets
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+${1:$SELECTION}
 
 def main():
     app = QApplication(sys.argv)
 
-    ${1:$SELECTION}
+    
 
     return app.exec_()
 
