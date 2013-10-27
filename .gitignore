@@ -87,3 +87,4 @@ Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
 /PyLibs/*.pth
 /PyLibs/MyPyLibrary/AMFHelper/PyAmfHelper.pyd
+/Source/Android/.metadata

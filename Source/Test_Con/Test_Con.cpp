@@ -578,6 +578,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     //GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IDEFAULTANSICODEPAGE | LOCALE_USE_CP_ACP, buf, countof(buf));
     setlocale(LC_ALL, ".936");
+    CloseHandle(0);
 
     return;
 
