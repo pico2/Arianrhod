@@ -211,13 +211,17 @@ StReplaceFile(
     PVOID   Reserved
 )
 {
-    ULONG       Attributes;
+    ULONG_PTR   Attributes;
     NTSTATUS    Status;
 
-    Attributes = Io::QueryFileAttributes(ReplacedFileName);
-    if (Attributes == INVALID_FILE_ATTRIBUTES)
+    Status = Io::QueryFileAttributesEx(ReplacedFileName, &Attributes);
+    if (Status == STATUS_OBJECT_NAME_NOT_FOUND)
     {
-        BaseSetLastNTError(STATUS_ACCESS_DENIED);
+        Attributes = FILE_ATTRIBUTE_NORMAL;
+    }
+    else if (NT_FAILED(Status))
+    {
+        BaseSetLastNTError(Status);
         return FALSE;
     }
 
