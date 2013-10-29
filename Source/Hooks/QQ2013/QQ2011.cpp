@@ -759,6 +759,12 @@ ULONG CDECL GetAtAllGroupMemberUseTimes()
     return 1;
 }
 
+HRESULT CDECL GetCurrentAtNumber(PVOID Object, PULONG Number)
+{
+    *Number = 0;
+    return S_OK;
+}
+
 /************************************************************************
   init functions
 ************************************************************************/
@@ -987,6 +993,56 @@ BOOL SearchGroupApp_AtAllGroupMember(PVOID GroupApp, PVOID *GetAdminFlag, PVOID 
     return TRUE;
 }
 
+BOOL SearchGroupApp_AtAllGroupMemberMax(PVOID GroupApp, PVOID *ConditionJump)
+{
+    PVOID Found, Buffer;
+    PLDR_MODULE Module;
+
+    /************************************************************************
+    360C9908    .  E8 93F0FFFF         call    0x360C89A0
+    360C990D    .  83BD 74FFFFFF 14    cmp     dword ptr [ebp-0x8C], 0x14
+    360C9914    .  59                  pop     ecx
+    360C9915    .  59                  pop     ecx
+    360C9916    .  EB 12               jl      short 0x360C992A
+    ************************************************************************/
+
+    BYTE CallStub[]      = { CALL };
+    BYTE CmpEbp[]        = { 0x83, 0xBD };
+    BYTE CmpR32_0x14[]   = { 0x14 };
+
+    SEARCH_PATTERN_DATA Pattern[] =
+    {
+        ADD_PATTERN(CallStub,       0, 5),
+        ADD_PATTERN(CmpEbp,         0, 6),
+        ADD_PATTERN(CmpR32_0x14),
+    };
+
+    Module = FindLdrModuleByHandle(GroupApp);
+    Buffer = SearchPattern(Pattern, countof(Pattern), Module->DllBase, Module->SizeOfImage);
+    if (Buffer == nullptr)
+        return FALSE;
+
+    Found = IMAGE_INVALID_VA;
+
+    WalkOpCodeT(Buffer, 0x20,
+        WalkOpCodeM(Buffer, OpLength, Ret)
+        {
+            switch (Buffer[0])
+            {
+                case 0x7C:  // jl short
+                    Found = Buffer;
+                    return STATUS_SUCCESS;
+            }
+
+            return STATUS_NOT_FOUND;
+        }
+    );
+
+    *ConditionJump = Buffer;
+
+    return Found != IMAGE_INVALID_VA;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -1123,16 +1179,18 @@ BOOL Initialize(PVOID BaseAddress)
       GroupApp
     ************************************************************************/
 
-    BOOL AtAllGroupMemberFound;
-    PVOID GetAdminFlag, GetUseTimes;
+    BOOL AtAllGroupMemberFound, AtGroupMemberMaxFound;
+    PVOID GetAdminFlag, GetUseTimes, AtGroupMemberMax;
 
     module = Ldr::LoadDll(L"GroupApp.dll");
 
     AtAllGroupMemberFound = SearchGroupApp_AtAllGroupMember(module, &GetAdminFlag, &GetUseTimes);
+    AtGroupMemberMaxFound = SearchGroupApp_AtAllGroupMemberMax(module, &AtGroupMemberMax);
 
     MEMORY_FUNCTION_PATCH Function_GroupApp[] =
     {
         INLINE_HOOK_JUMP_NULL(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
+        INLINE_HOOK_CALL_NULL(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, GetCurrentAtNumber),
     };
 
 
