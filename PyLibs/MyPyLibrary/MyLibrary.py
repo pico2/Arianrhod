@@ -73,7 +73,6 @@ def ForEachFileMP(filelist, callback, filter = '*.*'):
     for t in process:
         t.join()
 
-
 def TryInvoke(method, *values):
     try:
         return method(*values) if len(values) != 0 else method()
