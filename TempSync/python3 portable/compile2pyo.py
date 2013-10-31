@@ -25,6 +25,7 @@ def main():
         'site-packages\\PIL',
         'site-packages\\Crypto',
         'site-packages\\IPython',
+        'site-packages\\ipdb',
         'site-packages\\pyreadline',
         'site-packages\\readline.py',
     ]
