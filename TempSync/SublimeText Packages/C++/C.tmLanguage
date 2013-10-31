@@ -78,7 +78,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(NULL|true|false|TRUE|FALSE|True|False)\b</string>
+			<string>\b(NULL|nullptr|true|false|TRUE|FALSE|True|False)\b</string>
 			<key>name</key>
 			<string>constant.language.c</string>
 		</dict>
