@@ -30,8 +30,34 @@ def main():
         'site-packages\\readline.py',
     ]
 
+    copytrees = \
+    [
+        'site-packages\\MyPyLibrary\\AMFHelper',
+        'site-packages\\MyPyLibrary\\PyOcrHelper',
+    ]
+
+    ignores += copytrees
+
     for i in range(len(ignores)):
         ignores[i] = (pylib + '\\' + ignores[i]).lower()
+
+    for x in copytrees:
+        src = pylib + '\\' + x + '\\'
+        dst = selfpath + 'UserSite\\' + os.path.basename(x) + '\\'
+        ignore_patterns = ['__pycache__']
+        for f in EnumDirectoryFiles(src):
+            found = False
+            for ignore in ignore_patterns:
+                if f.lower().find(ignore.lower()) != -1:
+                    found = True
+                    break
+
+            if found:
+                continue
+
+            o = f.replace(src, dst, 1)
+            os.makedirs(os.path.dirname(o), exist_ok = True)
+            shutil.copy2(f, o)
 
     def proc(file):
         for x in ignores:
