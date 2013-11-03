@@ -1,11 +1,12 @@
-def AddRelativePath(path):
+def AppendRelativePath(path, file = __file__):
     import sys, os
-    path = os.path.abspath(os.path.dirname(__file__) + '\\' + path)
-    sys.path.append(path)
+    path = os.path.abspath(os.path.dirname(file) + '\\' + path)#.lower()
+    if path not in sys.path:
+        sys.path.append(path)
 
-AddRelativePath('.')
+AppendRelativePath('.')
 
-del AddRelativePath
+#del AppendRelativePath
 
 from Console import *
 from misc import *
