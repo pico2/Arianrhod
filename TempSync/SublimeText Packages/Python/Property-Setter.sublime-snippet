@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[$1.setter
+def ${1}(self, value):
+    self._$1 = value]]></content>
+    <tabTrigger>setter</tabTrigger>
+    <scope>source.python</scope>
+    <description>property</description>
+</snippet>

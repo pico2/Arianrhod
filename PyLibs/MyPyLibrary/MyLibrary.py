@@ -79,7 +79,6 @@ def TryInvoke(method, *values):
         return method(*values) if len(values) != 0 else method()
     except Exception as e:
         traceback.print_exception(type(e), e, e.__traceback__)
-        print(type(e))
         input()
 
     return None
@@ -89,7 +88,6 @@ def TryInvokeDbg(method, *values):
         return method(*values) if len(values) != 0 else method()
     except Exception as e:
         traceback.print_exception(type(e), e, e.__traceback__)
-        print(type(e))
         bp()
 
     return None

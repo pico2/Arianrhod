@@ -1,0 +1,10 @@
+<snippet>
+    <content><![CDATA[
+##################################################
+# ${1:$SELECTION}
+##################################################
+]]></content>
+    <tabTrigger>mlc</tabTrigger>
+    <scope>source.python</scope>
+    <description>multi line comment</description>
+</snippet>
