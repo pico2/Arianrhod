@@ -6,10 +6,24 @@ from ctypes.wintypes import *
 from ctypes import windll
 from pdb import set_trace as bp
 
-try:
-    from ipdb import set_trace as ibp
-except:
+
+def ibp_init():
+    global ibp
+    try:
+        from ipdb import set_trace as ibp
+    except:
+        ibp = ibp_stub
+
+    return ibp()
+
+def ibp_stub():
+    bp()
+
+def ibp_worker():
     pass
+
+ibp = ibp_init
+
 
 CHAR = ctypes.c_char
 BYTE = ctypes.c_ubyte      # fix bug: BYTE == CHAR
