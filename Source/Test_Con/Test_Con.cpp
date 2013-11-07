@@ -574,7 +574,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    _asm PMOVZXBD xmm0, xmm1
+    SendMessageW((HWND)0x208DC, WM_CLOSE, 0, 0);
 
     return;
 
