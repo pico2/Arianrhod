@@ -574,7 +574,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    AllocateMemory(100);
+    FreeMemory(AllocateMemory(100));
 
     return;
 
