@@ -574,7 +574,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    SendMessageW((HWND)0x208DC, WM_CLOSE, 0, 0);
+    AllocateMemory(100);
 
     return;
 
