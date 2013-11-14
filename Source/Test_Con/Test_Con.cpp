@@ -570,11 +570,42 @@ BOOL IsRunningInVMWare()
 
 #endif
 
+#include "E:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    BYTE buf[0x2000];
 
-    FreeMemory(AllocateMemory(100));
+    ULONG_PTR n, len = 0x1000;
+    PVOID b = 0;
+    Mm::AllocVirtualMemory(&b, len);
+    FillMemory(b, len, -2);
+    ProtectVirtualMemory(b, len, PAGE_EXECUTE);
+
+    NtFileDisk dev;
+
+    if (NT_FAILED(dev.OpenDevice(L"\\DosDevices\\DebugEventSimulator")))
+        return;
+
+    Status = DesReadMemory(dev, CurrentProcess, b, buf, len*2, &n);
+    //Status = ReadMemory(CurrentProcess, b, buf, len*2, &n);
+    PrintConsole(L"read = %p, %p\n", Status, n);
+    PauseConsole();
+
+    if (Status != STATUS_PARTIAL_COPY && NT_FAILED(Status))
+        return;
+
+    FillMemory(buf, sizeof(buf), -3);
+    Status = DesWriteMemory(dev, CurrentProcess, b, buf, len*2, &n);
+
+    PrintConsole(L"write %p, %p\n", Status, n);
+
+    MEMORY_BASIC_INFORMATION mbi;
+    Status = NtQueryVirtualMemory(CurrentProcess, b, MemoryBasicInformation, &mbi, sizeof(mbi), nullptr);
+    PrintConsole(L"query = %p, %p\n", Status, mbi.Protect);
+
+    PauseConsole();
 
     return;
 
