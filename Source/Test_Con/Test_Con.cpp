@@ -574,9 +574,20 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    ML_OBJECT_TYPE_INITIALIZER objinit;
+    ml::MlInitialize();
 
-    PrintConsole(L"%p\n", objinit->GenericMapping.GenericRead);
+    POBJECT_TYPES_INFORMATION obj = QuerySystemObjectTypes();
+    POBJECT_TYPE_INFORMATION type;
+
+    ULONG_PTR Index = 0;
+    FOR_EACH(type, obj->TypeInformation, obj->NumberOfObjectsTypes)
+    {
+        PrintConsole(L"%02X, %wZ\n", ++Index, &type->TypeName);
+
+        type = PtrAdd(type, ROUND_UP(type->TypeName.MaximumLength, sizeof(ULONG_PTR)));
+    }
+
+    PauseConsole();
 
     return;
 
