@@ -236,6 +236,12 @@ namespace RecordViewer
 
             foreach (var y in items)
             {
+                if (y.SavePath != null)
+                {
+                    GlobalData.SavePath = y.SavePath;
+                    continue;
+                }
+
                 var item = new ItemInformation();
 
                 item.ID                     = y.ID;

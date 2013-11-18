@@ -170,6 +170,11 @@ def main():
 
     lines.append('[')
 
+    lines.append('    {')
+    lines.append('        "SavePath" : "J:\\\\Falcom\\\\ED_AO\\\\savedata"')
+    lines.append('    },')
+    lines.append('')
+
     for info, item in items:
         #lines.append('    "item_%X_%d" : {' % (item.Offset, item.Bit))
         lines.append('    {')

@@ -7,6 +7,8 @@ namespace RecordViewer
 {
     public class GlobalData
     {
+        public static String SavePath = @"J:\Falcom\ED_AO\savedata";
+
         public delegate void SaveDataChangeDelegate(EDAOSaveData NewSaveData, bool SwitchToMainWindow = false);
         public static SaveDataChangeDelegate SaveDataChangeHandler;
 

@@ -41,6 +41,7 @@ namespace RecordViewer
             OriginalTitle = this.Title;
 
             GlobalData.SaveDataChangeHandler = SaveDataChangeDelegate;
+            this.saveDataList.Refresh();
         }
 
         void SaveDataChangeDelegate(EDAOSaveData NewSaveData, bool SwitchToMainWindow = false)

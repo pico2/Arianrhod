@@ -19,13 +19,11 @@ namespace RecordViewer
     /// </summary>
     public partial class SaveDataList : PanelContext
     {
-        String savePath = @"J:\Falcom\ED_AO\savedata";
-
         public SaveDataList()
         {
             InitializeComponent();
 
-            saveDataPathTextBox.Text = savePath;
+            saveDataPathTextBox.Text = GlobalData.SavePath;
 
             RefreshSaveData();
         }
@@ -33,6 +31,12 @@ namespace RecordViewer
         List<String> QuerySaveDatas(String SaveDataPath)
         {
             return new List<String>(Directory.EnumerateDirectories(SaveDataPath));
+        }
+
+        override public void Refresh()
+        {
+            saveDataPathTextBox.Text = GlobalData.SavePath;
+            RefreshSaveData();
         }
 
         void RefreshSaveData()
@@ -43,7 +47,7 @@ namespace RecordViewer
 
             try
             {
-                list = QuerySaveDatas(savePath);
+                list = QuerySaveDatas(GlobalData.SavePath);
             }
             catch
             {
@@ -72,36 +76,36 @@ namespace RecordViewer
                 var dialog = new Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog();
 
                 dialog.IsFolderPicker = true;
-                dialog.InitialDirectory = savePath;
-                dialog.DefaultFileName = savePath;
+                dialog.InitialDirectory = GlobalData.SavePath;
+                dialog.DefaultFileName = GlobalData.SavePath;
 
                 var result = dialog.ShowDialog();
 
                 if (result != Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
                     return;
 
-                savePath = dialog.FileName;
+                GlobalData.SavePath = dialog.FileName;
             }
             catch (System.PlatformNotSupportedException)
             {
                 var dialog = new System.Windows.Forms.FolderBrowserDialog();
 
-                dialog.SelectedPath = savePath;
+                dialog.SelectedPath = GlobalData.SavePath;
 
                 var result = dialog.ShowDialog();
 
                 if (result != System.Windows.Forms.DialogResult.OK)
                     return;
 
-                savePath = dialog.SelectedPath;
+                GlobalData.SavePath = dialog.SelectedPath;
             }
 
-            saveDataPathTextBox.Text = savePath;
+            saveDataPathTextBox.Text = GlobalData.SavePath;
         }
 
         private void refreshSaveList_Click(object sender, RoutedEventArgs e)
         {
-            savePath = saveDataPathTextBox.Text;
+            GlobalData.SavePath = saveDataPathTextBox.Text;
 
             RefreshSaveData();
         }
