@@ -570,23 +570,24 @@ BOOL IsRunningInVMWare()
 
 #endif
 
+#include "E:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
     ml::MlInitialize();
 
-    POBJECT_TYPES_INFORMATION obj = QuerySystemObjectTypes();
-    POBJECT_TYPE_INFORMATION type;
+    NtFileDisk f;
+    HANDLE handle;
+    CLIENT_ID cid;
 
-    ULONG_PTR Index = 0;
-    FOR_EACH(type, obj->TypeInformation, obj->NumberOfObjectsTypes)
-    {
-        PrintConsole(L"%02X, %wZ\n", ++Index, &type->TypeName);
+    f.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
 
-        type = PtrAdd(type, ROUND_UP(type->TypeName.MaximumLength, sizeof(ULONG_PTR)));
-    }
+    Status = DesOpenThread(f, &handle, THREAD_ALL_ACCESS, &CurrentTeb()->ClientId);
+    Status = DesOpenProcess(f, &handle, PROCESS_ALL_ACCESS, &CurrentTeb()->ClientId);
 
+    PrintConsole(L"%p\n", handle);
     PauseConsole();
 
     return;
