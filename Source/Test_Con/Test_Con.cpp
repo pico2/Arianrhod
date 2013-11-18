@@ -572,23 +572,42 @@ BOOL IsRunningInVMWare()
 
 #include "E:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
 
+
+inline ULONG GetWindowsVersion()
+{
+    NTSTATUS                        Status;
+    ULONG                           CSDVersion;
+    RTL_OSVERSIONINFOEXW            Version;
+    PKEY_VALUE_PARTIAL_INFORMATION  Value;
+
+    Version.dwOSVersionInfoSize = sizeof(Version);
+    Status = RtlGetVersion((PRTL_OSVERSIONINFOW)&Version);
+    if (NT_FAILED(Status))
+        return -1;
+
+    Status = Reg::GetKeyValue(HKEY_LOCAL_MACHINE, L"System\\ControlSet001\\Control\\Windows", L"CSDVersion", &Value);
+    if (NT_FAILED(Status))
+        return -1;
+
+    if (Value->Type != REG_DWORD || Value->DataLength != sizeof(CSDVersion))
+    {
+        FreeKeyInfo(Value);
+        return -1;
+    }
+
+    CSDVersion = *(PULONG)Value->Data;
+    FreeKeyInfo(Value);
+
+    return (Version.dwMajorVersion << 8 | Version.dwMinorVersion | ((CSDVersion << 16) & 0x0FFF0000)) | (Version.wProductType != VER_NT_WORKSTATION ? 0x80000000 : 0);
+}
+
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
     ml::MlInitialize();
 
-    NtFileDisk f;
-    HANDLE handle;
-    CLIENT_ID cid;
-
-    f.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
-
-    Status = DesOpenThread(f, &handle, THREAD_ALL_ACCESS, &CurrentTeb()->ClientId);
-    Status = DesOpenProcess(f, &handle, PROCESS_ALL_ACCESS, &CurrentTeb()->ClientId);
-
-    PrintConsole(L"%p\n", handle);
-    PauseConsole();
+    PrintConsole(L"%p\n", GetWindowsVersion());
 
     return;
 
