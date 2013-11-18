@@ -4,7 +4,7 @@
     xmlns:RecordViewer="clr-namespace:RecordViewer"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
-    x:Class="RecordViewer.TreasureBoxHunter"
+    x:Class="RecordViewer.BonusBoxHunter"
     d:DesignWidth="634.141" d:DesignHeight="373.535"
 >
 
@@ -32,7 +32,7 @@
   
     <Grid/>
         <ListView
-            x:Name="treasureBoxList"
+            x:Name="bonusBoxList"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler"
@@ -43,7 +43,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
-                <GridView x:Name="treasureBoxGridView">
+                <GridView x:Name="bonusBoxGridView">
                 </GridView>
         </ListView.View>
     </ListView>

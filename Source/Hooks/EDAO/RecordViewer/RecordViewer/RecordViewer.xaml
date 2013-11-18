@@ -48,7 +48,7 @@
             </Fluent:Ribbon.Menu>
 
             <RV:RVTabItem
-                x:Name="tabTreasureBox"
+                x:Name="tabBonusBox"
                 Header="宝箱猎人"
                 Fluent:KeyTip.Keys="G"
             >

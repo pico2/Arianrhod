@@ -16,9 +16,9 @@ using Newtonsoft.Json;
 namespace RecordViewer
 {
     /// <summary>
-    /// Interaction logic for TreasureBoxHunter.xaml
+    /// Interaction logic for BonusBoxHunter.xaml
     /// </summary>
-    public partial class TreasureBoxHunter : PanelContext
+    public partial class BonusBoxHunter : PanelContext
     {
         Dictionary<String, ItemInformation> ItemIdMap;
         Dictionary<String, String> HeaderPropertyMap;
@@ -136,7 +136,7 @@ namespace RecordViewer
             return XamlReader.Parse(xaml, context) as DataTemplate;
         }
 
-        public TreasureBoxHunter()
+        public BonusBoxHunter()
         {
             InitializeComponent();
 
@@ -160,7 +160,7 @@ namespace RecordViewer
                                                 return (long)Math.Ceiling(percent * Columns.Length / 100);
                                             };
 
-            var lvlmgr = new ListViewLayoutManager(treasureBoxList);
+            var lvlmgr = new ListViewLayoutManager(bonusBoxList);
 
             lvlmgr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             lvlmgr.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -169,7 +169,7 @@ namespace RecordViewer
             Style headerStyle = new Style();
             headerStyle.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.White));
 
-            treasureBoxGridView.SetValue(GridView.ColumnHeaderContainerStyleProperty, headerStyle);
+            bonusBoxGridView.SetValue(GridView.ColumnHeaderContainerStyleProperty, headerStyle);
 
             foreach (var col in Columns)
             {
@@ -181,7 +181,7 @@ namespace RecordViewer
                 column.CellTemplate = CreateColumnTemplate(col.Binding, col.Alignment);
                 column.SetValue(GridViewColumn.HeaderContainerStyleProperty, headerStyle);
 
-                treasureBoxGridView.Columns.Add(ProportionalColumn.ApplyWidth(column, GetWidth(col.WidthPercent)));
+                bonusBoxGridView.Columns.Add(ProportionalColumn.ApplyWidth(column, GetWidth(col.WidthPercent)));
             }
 
             //String boxinfo = @"E:\Desktop\Source\Hooks\EDAO\Decompiler\GameData\box.json";
@@ -189,7 +189,7 @@ namespace RecordViewer
 
             try
             {
-                InitializeTreasureBoxInfo(boxinfo);
+                InitializeBonusBoxInfo(boxinfo);
             }
             catch (Exception e)
             {
@@ -202,7 +202,7 @@ namespace RecordViewer
         {
             EDAOSaveData saveData = GlobalData.CurrentSaveData;
 
-            treasureBoxList.Items.Clear();
+            bonusBoxList.Items.Clear();
 
             foreach (var pair in ItemIdMap)
             {
@@ -224,7 +224,7 @@ namespace RecordViewer
             }
         }
 
-        public void InitializeTreasureBoxInfo(String boxinfo)
+        public void InitializeBonusBoxInfo(String boxinfo)
         {
             String json;
             using (System.IO.StreamReader reader = new System.IO.StreamReader(boxinfo))
@@ -263,7 +263,7 @@ namespace RecordViewer
 
         public void InsertItemInfo(ItemInformation item)
         {
-            treasureBoxList.Items.Add(item);
+            bonusBoxList.Items.Add(item);
         }
 
         void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
@@ -312,7 +312,7 @@ namespace RecordViewer
 
         private void Sort(GridViewColumnHeader headerClicked, ListSortDirection direction)
         {
-            var lv = treasureBoxList;
+            var lv = bonusBoxList;
             lv.Items.SortDescriptions.Clear();
             SortDescription sd = new SortDescription(HeaderPropertyMap[headerClicked.Column.Header as String], direction);
             lv.Items.SortDescriptions.Add(sd);

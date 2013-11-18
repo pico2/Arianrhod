@@ -32,7 +32,7 @@ namespace RecordViewer
 
             TabPanelMap = new Dictionary<RVTabItem, PanelContext>();
 
-            TabPanelMap[tabTreasureBox] = new TreasureBoxHunter();
+            TabPanelMap[tabBonusBox] = new BonusBoxHunter();
 
             ribbon.SelectedTabChanged += Ribbon_SelectedTabChanged;
             this.Drop += OnDrop;
