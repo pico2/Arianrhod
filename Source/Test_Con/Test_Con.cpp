@@ -32,9 +32,6 @@ ML_OVERLOAD_NEW
     #define WSTRING(str) (str)
 #endif
 
-// OVERLOAD_CPP_NEW_WITH_HEAP(MemoryAllocator::GetGlobalHeap())
-
-#include "../Drivers/AntiAntiKernelDebug/ShadowSysCall.h"
 
 ULONG GetBitSetCount(ULONG Value)
 {
@@ -48,211 +45,18 @@ ULONG GetBitSetCount(ULONG Value)
     return Value;
 }
 
-NTSTATUS MapNtdll(HANDLE Process)
-{
-    NTSTATUS            Status;
-    SIZE_T              ViewSize;
-    HANDLE              FileHandle, SectionHandle;
-    PVOID               NtdllModule;
-    OBJECT_ATTRIBUTES   ObjectAttributes;
-    UNICODE_STRING      NtPath;
-    IO_STATUS_BLOCK     IoStatus;
-    PVOID BaseAddress;
-
-    BaseAddress = NULL;
-
-    RtlDosPathNameToNtPathName_U(GetNtdllLdrModule()->FullDllName.Buffer, &NtPath, NULL, NULL);
-    InitializeObjectAttributes(&ObjectAttributes, &NtPath, OBJ_CASE_INSENSITIVE, NULL, NULL);
-    Status = NtCreateFile(
-                &FileHandle,
-                GENERIC_READ | SYNCHRONIZE | FILE_READ_ATTRIBUTES,
-                &ObjectAttributes,
-                &IoStatus,
-                NULL,
-                FILE_ATTRIBUTE_NORMAL,
-                FILE_SHARE_READ,
-                FILE_OPEN,
-                FILE_SYNCHRONOUS_IO_ALERT | FILE_OPEN_FOR_BACKUP_INTENT,
-                NULL,
-                0
-             );
-    RtlFreeUnicodeString(&NtPath);
-    if (!NT_SUCCESS(Status))
-        return Status;
-
-    Status = NtCreateSection(
-                &SectionHandle,
-                GENERIC_READ,
-                NULL,
-                NULL,
-                PAGE_READONLY,
-                SEC_IMAGE,
-                FileHandle
-             );
-
-    NtClose(FileHandle);
-    if (!NT_SUCCESS(Status))
-        return Status;
-
-    ViewSize = 0;
-    Status = NtMapViewOfSection(
-                SectionHandle,
-                Process,
-                &BaseAddress,
-                0,
-                0,
-                NULL,
-                &ViewSize,
-                ViewShare,
-                0,
-                PAGE_READONLY
-             );
-
-    NtUnmapViewOfSection(Process, BaseAddress);
-
-    NtClose(SectionHandle);
-
-    return Status;
-}
-
-ULONG NTAPI StubThread(PVOID)
-{
-    return NtTerminateThread(NtCurrentThread(), 0);
-}
-
-#if !ML_AMD64
-
-ULONG NTAPI UnMapSectionThread(HANDLE Thread)
-{
-    MapNtdll(NtCurrentProcess());
-
-    SEH_TRY
-    {
-        INLINE_ASM int 3;
-    }
-    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
-    {
-    }
-
-//    NtResumeThread(Thread, NULL);
-//    NtClose(Thread);
-
-    if (NT_SUCCESS(Nt_CreateThread(StubThread, NULL, FALSE, NtCurrentProcess(), &Thread)))
-    {
-        NtWaitForSingleObject(Thread, TRUE, NULL);
-        NtClose(Thread);
-    }
-
-    return NtTerminateProcess(NtCurrentProcess(), 0);
-}
-
-#endif // amd64
-
-#if !ML_AMD64
-
-NAKED VOID X64_Mode_Start()
-{
-    INLINE_ASM
-    {
-        push    [esp];
-        mov     dword ptr [esp + 4], 33h;
-        retf;
-    }
-}
-
-NAKED VOID X64_Mode_End()
-{
-    INLINE_ASM
-    {
-        mov     dword ptr [esp + 4], 23h;
-        retf;
-    }
-}
-
-typedef LARGE_INTEGER LARGE_POINTER;
-
-#define PUSH_R8 _asm __emit 0x41 _asm __emit 0x50
-#define PREFIX_44 _asm __emit 0x44 _asm
-#define PREFIX_48 _asm __emit 0x48 _asm
-#define PREFIX_4C _asm __emit 0x4C _asm
-
-NAKED
-LARGE_POINTER
-STDCALL
-Nt_LoadLibraryWow64(
-    PUNICODE_STRING64   LibraryPath,
-    PVOID               LdrLoadDll64
-)
-{
-    INLINE_ASM
-    {
-        call X64_Mode_Start;
-
-        push ebp;                                   // push rbp
-
-        PREFIX_48 mov ebp, esp;                     // mov rbp, rsp
-        PREFIX_48 and esp, -10h;                    // and rsp, -10h
-        PREFIX_48 add esp, -20h;                    // shadow space
-
-        PREFIX_48 xor edx, edx;                     // xor rdx, rdx                 Flags
-        PREFIX_48 xor ecx, ecx;                     // xor rcx, rcx                 PathToFile
-        PREFIX_44 mov eax, dword ptr [ebp+0Ch];     // mov r8d, [rbp+0Ch]           LibraryPath
-        mov     eax, [ebp + 10h];                   //                              LdrLoadDll64
-        push    ecx;                                // sub rsp, 4
-        PREFIX_4C lea ecx, dword ptr [esp];         // lea r9, [rsp]                ModuleHandle
-        call    eax;                                //                              LdrLoadDll
-        pop     eax;                                // pop rax
-        PREFIX_48 mov edx, eax;                     // mov rdx, rax
-        PREFIX_48 shr edx, 32;                      // shr rdx, 32
-
-        PREFIX_48 mov esp, ebp;                     // mov rsp, rbp
-        pop ebp;                                    // pop rbp
-
-        call X64_Mode_End;
-
-        ret 8;
-    }
-}
-
-NAKED VOID FASTCALL Callx64Routine(PVOID Routine, PVOID Parameter)
-{
-    INLINE_ASM
-    {
-        call X64_Mode_Start;
-
-        push ebp;
-
-        PREFIX_48 mov ebp, esp;
-        PREFIX_48 and esp, -16;
-        PREFIX_48 add esp, -100h;
-        PREFIX_48 mov eax, ecx;
-        PREFIX_48 mov ecx, edx;
-
-        call eax;
-
-        PREFIX_48 mov esp, ebp;
-        pop ebp;
-
-        call X64_Mode_End;
-
-        ret;
-    }
-}
-
-PVOID Findx64NtdllBase()
+PVOID FindDllBaseByName(PCWSTR DllName)
 {
     HANDLE                              Process;
     NTSTATUS                            Status;
-    PVOID                               Wow64Ntdll, BaseAddress, LastAllocationBase;
+    PVOID                               BaseAddress, LastAllocationBase;
     SYSTEM_BASIC_INFORMATION            SystemBasic;
     MEMORY_BASIC_INFORMATION            MemoryBasic;
     MEMORY_MAPPED_FILENAME_INFORMATION2 MappedFile;
 
-    Wow64Ntdll = GetNtdllHandle();
-
     NtQuerySystemInformation(SystemBasicInformation, &SystemBasic, sizeof(SystemBasic), NULL);
 
-    Process = NtCurrentProcess();
+    Process = CurrentProcess;
     LastAllocationBase = (PVOID)IMAGE_INVALID_RVA;
     BaseAddress = (PVOID)SystemBasic.MinimumUserModeAddress;
 
@@ -268,240 +72,16 @@ PVOID Findx64NtdllBase()
             continue;
 
         LastAllocationBase = MemoryBasic.AllocationBase;
-        if (LastAllocationBase == Wow64Ntdll)
-            continue;
 
         Status = NtQueryVirtualMemory(Process, BaseAddress, MemoryMappedFilenameInformation, &MappedFile, sizeof(MappedFile), NULL);
         if (!NT_SUCCESS(Status) || MappedFile.Name.Length == 0)
             continue;
 
-        if (!StrICompareW(findnamew(MappedFile.Name.Buffer), L"ntdll.dll"))
+        if (wcsstr(wcslwr(MappedFile.Name.Buffer), DllName) != nullptr)
             return LastAllocationBase;
     }
 
-    return NULL;
-}
-
-BOOL FuckX64Ntdll(PVOID ntdll)
-{
-    BYTE LdrpLdrDatabaseIsSetupHeader[] = { 0x48, 0x89, 0x11, 0x48, 0x89, 0x41, 0x08, 0x48, 0x89, 0x08, 0x48, 0x89 };
-    BYTE LdrpLdrDatabaseIsSetupCmpHeader[] = { 0x80, 0x3D };
-    BYTE LdrpLdrDatabaseIsSetupCmpTailAndJzHeader[] = { 0x00, 0x0F, 0x84 };
-
-    SEARCH_PATTERN_DATA LdrpLdrDatabaseIsSetupPattern[] =
-    {
-        ADD_PATTERN(LdrpLdrDatabaseIsSetupHeader,               PATTERN_AUTO_SEARCH),
-        ADD_PATTERN_F(LdrpLdrDatabaseIsSetupCmpHeader,          PATTERN_AUTO_SEARCH, 0, 0x11),
-        ADD_PATTERN_F(LdrpLdrDatabaseIsSetupCmpTailAndJzHeader, PATTERN_AUTO_SEARCH, 0, 0x06),
-    };
-
-    NTSTATUS                Status;
-    PBOOLEAN                LdrpLdrDatabaseIsSetup;
-    ULONG                   Protect, SectionCount;
-    PIMAGE_DOS_HEADER       DosHeader;
-    PIMAGE_NT_HEADERS64     NtHeaders;
-    PIMAGE_SECTION_HEADER   Section;
-
-    DosHeader   = (PIMAGE_DOS_HEADER)ntdll;
-    NtHeaders   = (PIMAGE_NT_HEADERS64)PtrAdd(DosHeader, DosHeader->e_lfanew);
-    Section     = (PIMAGE_SECTION_HEADER)PtrAdd(&NtHeaders->OptionalHeader, NtHeaders->FileHeader.SizeOfOptionalHeader);
-
-    LdrpLdrDatabaseIsSetup = (PBOOLEAN)SearchPattern(
-                                LdrpLdrDatabaseIsSetupPattern,
-                                countof(LdrpLdrDatabaseIsSetupPattern),
-                                PtrAdd(ntdll, Section->VirtualAddress),
-                                Section->Misc.VirtualSize
-                             );
-
-    if (LdrpLdrDatabaseIsSetup == NULL)
-        return FALSE;
-
-    LdrpLdrDatabaseIsSetup = PtrAdd(LdrpLdrDatabaseIsSetup, 0x12);
-    LdrpLdrDatabaseIsSetup = GetCallDestination(LdrpLdrDatabaseIsSetup) + 1;
-
-    for (SectionCount = NtHeaders->FileHeader.NumberOfSections - 1; SectionCount != 0; --SectionCount)
-    {
-        ++Section;
-        if (!StrNCompareA((PSTR)Section->Name, ".rdata", countof(Section->Name)))
-            break;
-    }
-
-    if (SectionCount == 0)
-        return FALSE;
-
-    PWSTR LdrpKernel32DllNameBuffer;
-
-    SEARCH_PATTERN_DATA LdrpKernel32DllNamePattern[] =
-    {
-        ADD_PATTERN(L"KERNEL32.DLL"),
-    };
-
-    LdrpKernel32DllNameBuffer = (PWSTR)SearchPattern(
-                                    LdrpKernel32DllNamePattern,
-                                    countof(LdrpKernel32DllNamePattern),
-                                    PtrAdd(ntdll, Section->VirtualAddress),
-                                    Section->Misc.VirtualSize
-                                );
-
-    if (LdrpKernel32DllNameBuffer == NULL)
-        return FALSE;
-
-    Status = Nt_ProtectMemory(NtCurrentProcess(), LdrpKernel32DllNameBuffer, sizeof(*LdrpKernel32DllNameBuffer), PAGE_READWRITE, &Protect);
-    if (!NT_SUCCESS(Status))
-        return FALSE;
-
-    LdrpKernel32DllNameBuffer[0] = 0;
-    if (Protect != PAGE_READWRITE)
-        Nt_ProtectMemory(NtCurrentProcess(), LdrpKernel32DllNameBuffer, sizeof(*LdrpKernel32DllNameBuffer), Protect, &Protect);
-
-    *LdrpLdrDatabaseIsSetup = TRUE;
-
-    return TRUE;
-}
-
-#endif // ML_AMD64
-
-#include "../ShimEngine/BypassUACDriver/DriverHelper.h"
-
-typedef struct
-{
-    ULONG_PTR   IconIndex;
-    HRSRC       Resource;
-
-} LOAD_ICON_PARAM, *PLOAD_ICON_PARAM;
-
-BOOL CALLBACK LoadPeIconEnumResProc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, PLOAD_ICON_PARAM lParam)
-{
-    if (lParam->IconIndex-- != 0)
-        return TRUE;
-
-    lParam->Resource = FindResourceExW(hModule, lpszType, lpszName, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
-
-    return FALSE;
-}
-
-NTSTATUS
-LoadIconFromPePrivate(
-    HMODULE     Module,
-    ULONG_PTR   IconIndex,
-    PVOID*      IcoBuffer,
-    PULONG_PTR  IcoSize
-)
-{
-    PVOID                   Buffer;
-    ULONG_PTR               IconCount, Offset, Size, HeaderSize;
-    PGROUP_ICON_ENTRY       GroupIconEntry;
-    PGROUP_ICON             GroupIcon;
-    PIMAGE_ICO_HEADER       IcoHeader;
-    PIMAGE_ICO_IMAGE_ENTRY  IcoEntry;
-    LOAD_ICON_PARAM         Param;
-
-    Param.Resource = NULL;
-    Param.IconIndex = IconIndex;
-
-    EnumResourceNamesW(Module, RT_GROUP_ICON, (ENUMRESNAMEPROCW)LoadPeIconEnumResProc, (LONG_PTR)&Param);
-    if (Param.Resource == NULL)
-        return STATUS_UNSUCCESSFUL;
-
-    GroupIcon = (PGROUP_ICON)LockResource(LoadResource(Module, Param.Resource));
-
-    IconCount = GroupIcon->Count;
-    IcoHeader = (PIMAGE_ICO_HEADER)AllocateMemoryP(IconCount * sizeof(IcoHeader->Entry) + RTL_SIZEOF_THROUGH_FIELD(IMAGE_ICO_HEADER, NumberOfImage));
-    if (IcoHeader == NULL)
-        return STATUS_NO_MEMORY;
-
-    IcoHeader->Reserve = 0;
-    IcoHeader->FileType = 1;
-    IcoHeader->NumberOfImage = IconCount;
-
-    IcoEntry = IcoHeader->Entry;
-
-    Offset = PtrOffset(IcoEntry + IconCount, IcoHeader);
-    HeaderSize = Offset;
-
-    GroupIconEntry = GroupIcon->Entries;
-    FOR_EACH(GroupIconEntry, GroupIconEntry, IconCount)
-    {
-        IcoEntry->Width = GroupIconEntry->Width;
-        IcoEntry->Height = GroupIconEntry->Height;
-        IcoEntry->NumberOfColorInPalette = GroupIconEntry->ColorCount;
-        IcoEntry->Reserve = 0;
-
-        IcoEntry->Ico.Planes = GroupIconEntry->Planes;
-        IcoEntry->Ico.BitsPerPixel = GroupIconEntry->BitCount;
-
-        IcoEntry->ImageOffset = Offset;
-        IcoEntry->ImageSize = GroupIconEntry->BytesInRes;
-
-        Offset += IcoEntry->ImageSize;
-
-        ++IcoEntry;
-    }
-
-    Size = Offset;
-    Buffer = AllocateMemoryP(Size);
-    if (Buffer == NULL)
-    {
-        FreeMemoryP(IcoHeader);
-        return STATUS_NO_MEMORY;
-    }
-
-    *IcoBuffer = Buffer;
-    *IcoSize = Size;
-
-    CopyMemory(Buffer, IcoHeader, HeaderSize);
-
-    Buffer = PtrAdd(Buffer, HeaderSize);
-    GroupIconEntry = GroupIcon->Entries;
-    FOR_EACH(GroupIconEntry, GroupIconEntry, IconCount)
-    {
-        Param.Resource = FindResourceExW(Module, RT_ICON, MAKEINTRESW(GroupIconEntry->ID), 0);
-        if (Param.Resource == NULL)
-            break;
-
-        Size = GroupIconEntry->BytesInRes;
-        CopyMemory(Buffer, LockResource(LoadResource(Module, Param.Resource)), Size);
-        Buffer = PtrAdd(Buffer, Size);
-    }
-
-    FreeMemoryP(IcoHeader);
-
-    if (Param.Resource == NULL)
-    {
-        FreeMemoryP(*IcoBuffer);
-        *IcoBuffer = NULL;
-
-        return STATUS_NO_MEMORY;
-    }
-
-    return STATUS_SUCCESS;;
-}
-
-NTSTATUS
-LoadIconFromPe(
-    PWSTR       File,
-    ULONG_PTR   IconIndex,
-    PVOID*      IcoBuffer,
-    PULONG_PTR  IcoSize
-)
-{
-    HMODULE mod;
-    NTSTATUS st;
-
-    mod = LoadLibraryExW(File, NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-    if (mod == NULL)
-        return STATUS_UNSUCCESSFUL;
-
-    st = LoadIconFromPePrivate(mod, IconIndex, IcoBuffer, IcoSize);
-
-    FreeLibrary(mod);
-
-    return st;
-}
-
-VOID ReleaseIcon(PVOID Buffer)
-{
-    FreeMemoryP(Buffer);
+    return nullptr;
 }
 
 void listfunc(PWSTR dll)
@@ -572,42 +152,55 @@ BOOL IsRunningInVMWare()
 
 #include "E:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
 
-
-inline ULONG GetWindowsVersion()
-{
-    NTSTATUS                        Status;
-    ULONG                           CSDVersion;
-    RTL_OSVERSIONINFOEXW            Version;
-    PKEY_VALUE_PARTIAL_INFORMATION  Value;
-
-    Version.dwOSVersionInfoSize = sizeof(Version);
-    Status = RtlGetVersion((PRTL_OSVERSIONINFOW)&Version);
-    if (NT_FAILED(Status))
-        return -1;
-
-    Status = Reg::GetKeyValue(HKEY_LOCAL_MACHINE, L"System\\ControlSet001\\Control\\Windows", L"CSDVersion", &Value);
-    if (NT_FAILED(Status))
-        return -1;
-
-    if (Value->Type != REG_DWORD || Value->DataLength != sizeof(CSDVersion))
-    {
-        FreeKeyInfo(Value);
-        return -1;
-    }
-
-    CSDVersion = *(PULONG)Value->Data;
-    FreeKeyInfo(Value);
-
-    return (Version.dwMajorVersion << 8 | Version.dwMinorVersion | ((CSDVersion << 16) & 0x0FFF0000)) | (Version.wProductType != VER_NT_WORKSTATION ? 0x80000000 : 0);
-}
-
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
+    PVOID p;
+    PIMAGE_NT_HEADERS64 NtHeaders;
+    PIMAGE_SECTION_HEADER Section;
 
-    ml::MlInitialize();
+    p = FindDllBaseByName(L"wow64.dll");
+    PrintConsole(L"%p\n", p);
 
-    PrintConsole(L"%p\n", GetWindowsVersion());
+    if (p != nullptr)
+    {
+        NtHeaders = (PIMAGE_NT_HEADERS64)ImageNtHeaders(p);
+        Section = (PIMAGE_SECTION_HEADER)PtrAdd(&NtHeaders->OptionalHeader, NtHeaders->FileHeader.SizeOfOptionalHeader);
+
+        for (ULONG_PTR n = NtHeaders->FileHeader.NumberOfSections; n; ++Section, --n)
+        {
+            if (strnicmp((PSTR)&Section->Name, ".data", countof(Section->Name)) != 0)
+                continue;
+
+            PVOID Ntdll32KiUserExceptionDispatcher;
+            PVOID KiUserExceptionDispatcher = ::KiUserExceptionDispatcher;
+            ULONG Size;
+
+            SEARCH_PATTERN_DATA pattern[] =
+            {
+                ADD_PATTERN(&KiUserExceptionDispatcher),
+            };
+
+            p = PtrAdd(p, Section->VirtualAddress);
+            Ntdll32KiUserExceptionDispatcher = PtrSub(p, 4);
+            Size = Section->Misc.VirtualSize;
+
+            do
+            {
+                Ntdll32KiUserExceptionDispatcher = SearchPatternSafe(
+                                                        pattern,
+                                                        countof(pattern),
+                                                        PtrAdd(Ntdll32KiUserExceptionDispatcher, 4),
+                                                        Size - PtrOffset(Ntdll32KiUserExceptionDispatcher, p)
+                                                    );
+
+                PrintConsole(L"Ntdll32KiUserExceptionDispatcher @ %p\n", Ntdll32KiUserExceptionDispatcher);
+
+            } while (Ntdll32KiUserExceptionDispatcher != nullptr);
+        }
+    }
+
+    PauseConsole();
 
     return;
 
