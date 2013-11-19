@@ -45,81 +45,6 @@ ULONG GetBitSetCount(ULONG Value)
     return Value;
 }
 
-PVOID FindDllBaseByName(PCWSTR DllName)
-{
-    HANDLE                              Process;
-    NTSTATUS                            Status;
-    PVOID                               BaseAddress, LastAllocationBase;
-    SYSTEM_BASIC_INFORMATION            SystemBasic;
-    MEMORY_BASIC_INFORMATION            MemoryBasic;
-    MEMORY_MAPPED_FILENAME_INFORMATION2 MappedFile;
-
-    NtQuerySystemInformation(SystemBasicInformation, &SystemBasic, sizeof(SystemBasic), NULL);
-
-    Process = CurrentProcess;
-    LastAllocationBase = (PVOID)IMAGE_INVALID_RVA;
-    BaseAddress = (PVOID)SystemBasic.MinimumUserModeAddress;
-
-    for (; (ULONG_PTR)BaseAddress < SystemBasic.MaximumUserModeAddress; BaseAddress = PtrAdd(BaseAddress, MemoryBasic.RegionSize))
-    {
-        MemoryBasic.RegionSize = MEMORY_PAGE_SIZE;
-        Status = NtQueryVirtualMemory(Process, BaseAddress, MemoryBasicInformation, &MemoryBasic, sizeof(MemoryBasic), NULL);
-        FAIL_CONTINUE(Status);
-
-        BaseAddress = MemoryBasic.BaseAddress;
-
-        if (MemoryBasic.Type != MEM_IMAGE || MemoryBasic.AllocationBase == LastAllocationBase)
-            continue;
-
-        LastAllocationBase = MemoryBasic.AllocationBase;
-
-        Status = NtQueryVirtualMemory(Process, BaseAddress, MemoryMappedFilenameInformation, &MappedFile, sizeof(MappedFile), NULL);
-        if (!NT_SUCCESS(Status) || MappedFile.Name.Length == 0)
-            continue;
-
-        if (wcsstr(wcslwr(MappedFile.Name.Buffer), DllName) != nullptr)
-            return LastAllocationBase;
-    }
-
-    return nullptr;
-}
-
-void listfunc(PWSTR dll)
-{
-    PVOID base;
-
-    PCSTR *funclist;
-    ULONG n;
-
-    funclist = (PCSTR *)AllocateMemory(0x10000 * sizeof(*funclist), HEAP_ZERO_MEMORY);
-
-    LoadPeImage(dll, &base, NULL, LOAD_PE_IGNORE_IAT);
-
-    n = 0;
-    WalkExportTableT(base,
-        WalkEATCallbackM(ImageBase, AddressOfFunction, Dll, Ordinal, Func, Context)
-        {
-            ++n;
-            funclist[Ordinal] = Func;
-            return 0;
-        },
-        0
-    );
-
-    ++n;
-    while (--n)
-    {
-        if (*funclist == NULL)
-        {
-            ++funclist;
-            continue;
-        }
-        PrintConsoleA("    '%s',\n", *funclist++);
-    }
-
-    UnloadPeImage(base);
-}
-
 #if ML_X86
 
 BOOL IsRunningInVMWare()
@@ -155,52 +80,9 @@ BOOL IsRunningInVMWare()
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-    PVOID p;
-    PIMAGE_NT_HEADERS64 NtHeaders;
-    PIMAGE_SECTION_HEADER Section;
-
-    p = FindDllBaseByName(L"wow64.dll");
-    PrintConsole(L"%p\n", p);
-
-    if (p != nullptr)
-    {
-        NtHeaders = (PIMAGE_NT_HEADERS64)ImageNtHeaders(p);
-        Section = (PIMAGE_SECTION_HEADER)PtrAdd(&NtHeaders->OptionalHeader, NtHeaders->FileHeader.SizeOfOptionalHeader);
-
-        for (ULONG_PTR n = NtHeaders->FileHeader.NumberOfSections; n; ++Section, --n)
-        {
-            if (strnicmp((PSTR)&Section->Name, ".data", countof(Section->Name)) != 0)
-                continue;
-
-            PVOID Ntdll32KiUserExceptionDispatcher;
-            PVOID KiUserExceptionDispatcher = ::KiUserExceptionDispatcher;
-            ULONG Size;
-
-            SEARCH_PATTERN_DATA pattern[] =
-            {
-                ADD_PATTERN(&KiUserExceptionDispatcher),
-            };
-
-            p = PtrAdd(p, Section->VirtualAddress);
-            Ntdll32KiUserExceptionDispatcher = PtrSub(p, 4);
-            Size = Section->Misc.VirtualSize;
-
-            do
-            {
-                Ntdll32KiUserExceptionDispatcher = SearchPatternSafe(
-                                                        pattern,
-                                                        countof(pattern),
-                                                        PtrAdd(Ntdll32KiUserExceptionDispatcher, 4),
-                                                        Size - PtrOffset(Ntdll32KiUserExceptionDispatcher, p)
-                                                    );
-
-                PrintConsole(L"Ntdll32KiUserExceptionDispatcher @ %p\n", Ntdll32KiUserExceptionDispatcher);
-
-            } while (Ntdll32KiUserExceptionDispatcher != nullptr);
-        }
-    }
 
     PauseConsole();
+    DbgBreakPoint();
 
     return;
 
