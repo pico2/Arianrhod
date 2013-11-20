@@ -81,8 +81,11 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
+    NtFileDisk f;
+
+    f.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
+    DesWriteMemory(f, CurrentProcess, LdrInitializeThunk, DbgBreakPoint, 1);
     PauseConsole();
-    DbgBreakPoint();
 
     return;
 
