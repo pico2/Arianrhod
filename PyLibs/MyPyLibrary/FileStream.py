@@ -84,6 +84,7 @@ class BytesStream:
     def __init__(self):
         self.stream = None
         self.endian = '<'
+        self.encoding = '936'
 
     def open(
             self,
@@ -96,7 +97,7 @@ class BytesStream:
             closefd     = True,
             opener      = None
         ):
-        if type(file) == bytes or type(file) == bytearray:
+        if isinstance(file, bytes) or isinstance(file, bytearray):
             return self.openmem(file)
 
         self.stream = open(file, mode, buffering, encoding, errors, newline, closefd, opener)
@@ -108,6 +109,9 @@ class BytesStream:
 
     def setendian(self, endian):
         self.endian = endian
+
+    def setencoding(self, encoding):
+        self.encoding = encoding
 
     def seek(self, offset, method = io.SEEK_SET):
         return self.stream.seek(offset, method)
@@ -161,8 +165,8 @@ class BytesStream:
     def double(self):
         return ReadDouble(self.stream, self.endian)
 
-    def astr(self, cp = '936'):
-        return ReadAString(self.stream, cp)
+    def astr(self, cp = None):
+        return ReadAString(self.stream, self.encoding if cp is None else cp)
 
     def wstr(self):
         return ReadWString(self.stream)
