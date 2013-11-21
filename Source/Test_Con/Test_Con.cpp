@@ -81,13 +81,10 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    _alloca(-sizeof(PVOID));
+    bool isBigAttachExist = argc;
 
-    NtFileDisk f;
-    
-    f.OpenDevice(DEBUG_EVENT_SIMULATOR_SYMBOLIC);
-    DesWriteMemory(f, CurrentProcess, LdrInitializeThunk, DbgBreakPoint, 1);
-    PauseConsole();
+    if (isBigAttachExist == true)
+        return;
 
     return;
 
