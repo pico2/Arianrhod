@@ -1,31 +1,33 @@
 from MyPyLibrary.syslib import *
 import io
 
-def ReadByte(fs, endian = '<'):
+_DEFAULT_ENDIAN = '<'
+
+def ReadByte(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'B', fs.read(1))[0]
 
-def ReadShort(fs, endian = '<'):
+def ReadShort(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'h', fs.read(2))[0]
 
-def ReadUShort(fs, endian = '<'):
+def ReadUShort(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'H', fs.read(2))[0]
 
-def ReadLong(fs, endian = '<'):
+def ReadLong(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'l', fs.read(4))[0]
 
-def ReadULong(fs, endian = '<'):
+def ReadULong(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'L', fs.read(4))[0]
 
-def ReadLong64(fs, endian = '<'):
+def ReadLong64(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'q', fs.read(8))[0]
 
-def ReadULong64(fs, endian = '<'):
+def ReadULong64(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'Q', fs.read(8))[0]
 
-def ReadFloat(fs, endian = '<'):
+def ReadFloat(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'f', fs.read(4))[0]
 
-def ReadDouble(fs, endian = '<'):
+def ReadDouble(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'd', fs.read(8))[0]
 
 def ReadAString(fs, cp = '936'):
@@ -56,34 +58,34 @@ def WriteByte(fs, b):
 def WriteChar(fs, b):
     return fs.write(CHAR(b & 0xFF).value)
 
-def WriteUShort(fs, ushort, endian = '<'):
+def WriteUShort(fs, ushort, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'H', USHORT(ushort).value))
 
-def WriteShort(fs, short, endian = '<'):
+def WriteShort(fs, short, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'h', SHORT(short).value))
 
-def WriteULong(fs, ulong, endian = '<'):
+def WriteULong(fs, ulong, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'L', ULONG(ulong).value))
 
-def WriteLong(fs, long, endian = '<'):
+def WriteLong(fs, long, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'l', LONG(long).value))
 
-def WriteLong64(fs, l64, endian = '<'):
+def WriteLong64(fs, l64, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'q', LONG64(l64).value))
 
-def WriteULong64(fs, ul64, endian = '<'):
+def WriteULong64(fs, ul64, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'Q', ULONG64(ul64).value))
 
-def WriteFloat(fs, flt, endian = '<'):
+def WriteFloat(fs, flt, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'f', FLOAT(flt).value))
 
-def WriteDouble(fs, db, endian = '<'):
+def WriteDouble(fs, db, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'd', DOUBLE(db).value))
 
 class BytesStream:
     def __init__(self):
         self.stream = None
-        self.endian = '<'
+        self.endian = _DEFAULT_ENDIAN
         self.encoding = '936'
 
     def open(
@@ -109,6 +111,9 @@ class BytesStream:
 
     def setendian(self, endian):
         self.endian = endian
+
+    def getendian(self):
+        return self.endian
 
     def setencoding(self, encoding):
         self.encoding = encoding
@@ -137,6 +142,9 @@ class BytesStream:
         stmsize = self.tell()
         self.seek(pos)
         return stmsize
+
+    def eof(self):
+        return self.tell() >= self.size()
 
     def byte(self):
         return ReadByte(self.stream, self.endian)

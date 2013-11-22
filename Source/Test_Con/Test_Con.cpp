@@ -81,10 +81,13 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    bool isBigAttachExist = argc;
+    HANDLE h = PidToHandle(0x5092);
 
-    if (isBigAttachExist == true)
-        return;
+    LOOP_FOREVER
+    {
+        NtResumeProcess(h);
+        NtTerminateProcess(h, 0);
+    }
 
     return;
 
