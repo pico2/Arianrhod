@@ -1145,7 +1145,7 @@
                 (
                     Arithmetic|Assertion|Attribute|Buffer|EOF|Environment|FloatingPoint|IO|
                     Import|Indentation|Index|Key|Lookup|Memory|Name|NotImplemented|OS|Overflow|
-                    Reference|Runtime|Standard|Syntax|System|Tab|Type|UnboundLocal|
+                    Reference|Runtime|Standard|Syntax|System|Tab|Type|UnboundLocal|Interrupted|
                     Unicode(Encode|Decode|Translate)?|
                     Value|VMS|Windows|ZeroDivision
                 )Error|

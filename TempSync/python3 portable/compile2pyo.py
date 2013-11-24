@@ -57,7 +57,8 @@ def main():
 
             o = f.replace(src, dst, 1)
             os.makedirs(os.path.dirname(o), exist_ok = True)
-            shutil.copy2(f, o)
+            if not os.path.samefile(f, o):
+                shutil.copy2(f, o)
 
     def proc(file):
         for x in ignores:
