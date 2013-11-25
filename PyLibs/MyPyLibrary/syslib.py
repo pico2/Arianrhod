@@ -25,10 +25,11 @@ def ibp_worker():
 ibp = ibp_init
 
 
-CHAR = ctypes.c_char
-BYTE = ctypes.c_ubyte      # fix bug: BYTE == CHAR
+CHAR    = ctypes.c_char
+BYTE    = ctypes.c_ubyte      # fix bug: BYTE == CHAR
 
-LONG64 = ctypes.c_longlong
+LONG64  = ctypes.c_longlong
 ULONG64 = ctypes.c_ulonglong
 
-
+PVOID   = ctypes.c_void_p
+PSTR    = ctypes.c_char_p

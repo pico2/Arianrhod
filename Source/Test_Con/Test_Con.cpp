@@ -81,14 +81,6 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    HANDLE h = PidToHandle(0x5092);
-
-    LOOP_FOREVER
-    {
-        NtResumeProcess(h);
-        NtTerminateProcess(h, 0);
-    }
-
     return;
 
 #if 0

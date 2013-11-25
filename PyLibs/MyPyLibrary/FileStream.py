@@ -3,7 +3,10 @@ import io
 
 _DEFAULT_ENDIAN = '<'
 
-def _ReadByte(fs, endian = _DEFAULT_ENDIAN):
+def _ReadChar(fs, endian = _DEFAULT_ENDIAN):
+    return struct.unpack(endian + 'b', fs.read(1))[0]
+
+def _ReadUChar(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'B', fs.read(1))[0]
 
 def _ReadShort(fs, endian = _DEFAULT_ENDIAN):
@@ -149,8 +152,17 @@ class BytesStream:
     def eof(self):
         return self.tell() >= self.size()
 
+    def boolean(self):
+        return bool(self.uchar())
+
+    def char(self):
+        return _ReadChar(self.stream, self.endian)
+
+    def uchar(self):
+        return _ReadUChar(self.stream, self.endian)
+
     def byte(self):
-        return _ReadByte(self.stream, self.endian)
+        return _ReadUChar(self.stream, self.endian)
 
     def short(self):
         return _ReadShort(self.stream, self.endian)
