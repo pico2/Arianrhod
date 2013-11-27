@@ -127,6 +127,14 @@ class BytesStream:
     def seek(self, offset, method = io.SEEK_SET):
         return self.stream.seek(offset, method)
 
+    @property
+    def position(self):
+        return self.tell()
+
+    @position.setter
+    def position(self, value):
+        self.seek(value, io.SEEK_SET)
+
     def rewind(self):
         return self.stream.seek(0)
 
@@ -166,6 +174,17 @@ class BytesStream:
 
     def byte(self):
         return _ReadUChar(self.stream, self.endian)
+
+    def __getitem__(self, offset):
+        if offset >= self.size():
+            raise IndexError('offset larger than file size')
+
+        pos = self.position
+        self.position = offset
+        b = self.byte()
+        self.position = pos
+
+        return b
 
     def short(self):
         return _ReadShort(self.stream, self.endian)

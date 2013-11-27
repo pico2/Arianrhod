@@ -15,10 +15,16 @@ class QuitButton(QWidget):
         quit.setGeometry(10, 10, 64, 35)
 
         quit.clicked.connect(self.fuck)
+        quit.clicked.connect(self.fuck2)
 
         self.centerOnScreen()
 
     def fuck(self):
+        print('fuck')
+        #self.close()
+
+    def fuck2(self):
+        print('fuck2')
         self.close()
 
     def centerOnScreen (self):
