@@ -317,13 +317,17 @@ class FileStream:
         self._stream.close()
 
     def __getitem__(self, args):
-        if len(args) == 1:
-            offset = args[0]
-            size = 1
-        elif len(args) == 2:
-            offset, size = args
+        if isinstance(args, tuple):
+            if len(args) == 1:
+                offset = args[0]
+                size = 1
+            elif len(args) == 2:
+                offset, size = args
+            else:
+                raise Exception('invalid parameter number')
         else:
-            raise Exception('invalid parameter number')
+            offset = args
+            size = 1
 
         if offset >= self.Length:
             raise IndexError('offset larger than file size')
@@ -345,6 +349,43 @@ class FileStream:
                 b = self.Read(size)
 
         return b
+
+    def __setitem__(self, args, data):
+        if isinstance(args, tuple):
+            if len(args) == 1:
+                offset = args[0]
+                size = 1
+            elif len(args) == 2:
+                offset, size = args
+            else:
+                raise Exception('invalid parameter number')
+        else:
+            offset = args
+            size = 1
+
+        if size == 0:
+            return
+
+        if isinstance(data, bytes) or isinstance(data, bytearray):
+            size = -1
+
+        with FileStreamPositionHolder(self):
+            self.Position = offset
+            if size == 1:
+                b = self.WriteByte(data)
+            elif size == 2:
+                b = self.WriteUShort(data)
+            elif size == 4:
+                b = self.WriteULong(data)
+            elif size == 8:
+                b = self.WriteULong64(data)
+            else:
+                b = self.Write(data)
+
+        return b
+
+    def __len__(self):
+        return self.Length
 
     @property
     def Length(self):
