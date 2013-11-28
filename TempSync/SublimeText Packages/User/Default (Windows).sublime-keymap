@@ -4,6 +4,7 @@
     { "keys": ["f1"], "command": "prev_view" },
     { "keys": ["f4"], "command": "close" },
     { "keys": ["alt+z"], "command": "reopen_last_file" },
+    { "keys": ["alt+="], "command": "jump_forward" },
 
     { "keys": ["shift+space"], "command": "" },
     { "keys": ["shift+space"], "command": "", "":

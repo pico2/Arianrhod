@@ -1,4 +1,4 @@
-from MyPyLibrary.syslib import *
+from syslib import *
 import io
 
 _DEFAULT_ENDIAN = '<'
@@ -246,3 +246,250 @@ class BytesStream:
     def wdouble(self, db):
         return _WriteDouble(self.stream, db, self.endian)
 
+
+class FileStreamPositionHolder:
+    def __init__(self, fs):
+        self.fs = fs
+
+    def __enter__(self):
+        self.pos = self.fs.Position
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.fs.Position = self.pos
+
+class FileStream:
+
+    LITTLE_ENDIAN = '<'
+    BIG_ENDIAN = '>'
+
+    END_OF_FILE = None
+
+    def __init__(self, file = None, mode = 'rb'):
+        self._stream = None
+        self._endian = self.LITTLE_ENDIAN
+        self._encoding = '936'
+
+        if file is not None:
+            self.Open(file, mode)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.Close()
+
+    @property
+    def Stream(self):
+        return self._stream
+
+    @property
+    def Endian(self):
+        return self._endian
+
+    @Endian.setter
+    def Endian(self, value):
+        self._endian = value
+
+    @property
+    def Encoding(self):
+        return self._encoding
+
+    @Encoding.setter
+    def Encoding(self, value):
+        self._encoding = value
+
+    def Open(self, file, mode = 'rb'):
+        if isinstance(file, bytes) or isinstance(file, bytearray):
+            return self.OpenMemory(file)
+        else:
+            return self.OpenFile(file, mode)
+
+    def OpenFile(self, file, mode = 'rb'):
+        self._stream = open(file, mode)
+        return self
+
+    def OpenMemory(self, buffer = b''):
+        self._stream = io.BytesIO(buffer)
+        return self
+
+    def Close(self):
+        self._stream.close()
+
+    def __getitem__(self, args):
+        if len(args) == 1:
+            offset = args[0]
+            size = 1
+        elif len(args) == 2:
+            offset, size = args
+        else:
+            raise Exception('invalid parameter number')
+
+        if offset >= self.Length:
+            raise IndexError('offset larger than file size')
+
+        if size == 0:
+            return b''
+
+        with FileStreamPositionHolder(self):
+            self.Position = offset
+            if size == 1:
+                b = self.ReadByte()
+            elif size == 2:
+                b = self.ReadUShort()
+            elif size == 4:
+                b = self.ReadULong()
+            elif size == 8:
+                b = self.ReadULong64()
+            else:
+                b = self.Read(size)
+
+        return b
+
+    @property
+    def Length(self):
+        return self.GetSize()
+
+    @Length.setter
+    def Length(self, length):
+        if length == self.Length:
+            return
+
+        pos = self.Position
+
+        if length > self.Length:
+            self.Position = length
+            self.WriteByte(0)
+
+        self.Truncate(length)
+        pos = min(pos, length)
+        self.Position = pos
+
+    @property
+    def Position(self):
+        return self.GetPosition()
+
+    @Position.setter
+    def Position(self, offset):
+        if offset == self.END_OF_FILE:
+            self.Seek(0, io.SEEK_END)
+            return
+
+        if offset < 0:
+            self.Seek(offset, io.SEEK_END)
+        else:
+            self.Seek(offset, io.SEEK_SET)
+
+    def Truncate(self, size):
+        return self._stream.truncate(size)
+
+    def Seek(self, offset, method = io.SEEK_SET):
+        return self._stream.seek(offset, method)
+
+    def Read(self, n = -1):
+        return self._stream.read(n)
+
+    def Write(self, buf):
+        if isinstance(buf, FileStream):
+            with FileStreamPositionHolder(buf):
+                buf.Position = 0
+                buf = buf.Read()
+
+        return self._stream.write(buf)
+
+    def GetPosition(self):
+        return self._stream.tell()
+
+    def Flush(self):
+        return self._stream.flush()
+
+    def GetSize(self):
+        pos = self.Position
+        self.Seek(0, io.SEEK_END)
+        size = self.GetPosition()
+        self.Position = pos
+        return size
+
+    def IsEndOfFile(self):
+        return self.Position >= self.Length
+
+    def ReadBoolean(self):
+        return bool(self.ReadUChar())
+
+    def ReadChar(self):
+        return _ReadChar(self._stream, self._endian)
+
+    def ReadUchar(self):
+        return _ReadUChar(self._stream, self._endian)
+
+    def ReadByte(self):
+        return _ReadUChar(self._stream, self._endian)
+
+    def ReadShort(self):
+        return _ReadShort(self._stream, self._endian)
+
+    def ReadUShort(self):
+        return _ReadUShort(self._stream, self._endian)
+
+    def ReadLong(self):
+        return _ReadLong(self._stream, self._endian)
+
+    def ReadULong(self):
+        return _ReadULong(self._stream, self._endian)
+
+    def ReadLong64(self):
+        return _ReadLong64(self._stream, self._endian)
+
+    def ReadULong64(self):
+        return _ReadULong64(self._stream, self._endian)
+
+    def ReadFloat(self):
+        return _ReadFloat(self._stream, self._endian)
+
+    def ReadDouble(self):
+        return _ReadDouble(self._stream, self._endian)
+
+    def ReadMultiByte(self, cp = None):
+        return _ReadAString(self._stream, cp or self._encoding)
+
+    def ReadUTF16(self):
+        return _ReadWString(self._stream)
+
+    def WriteBoolean(self, boolean):
+        return self.WriteByte(bool(boolean))
+
+    def WriteChar(self, b):
+        return _WriteChar(self._stream, b)
+
+    def WriteByte(self, b):
+        return _WriteByte(self._stream, b)
+
+    def WriteShort(self, short):
+        return _WriteShort(self._stream, short, self._endian)
+
+    def WriteUShort(self, ushort):
+        return _WriteUShort(self._stream, ushort, self._endian)
+
+    def WriteLong(self, l):
+        return _WriteLong(self._stream, l, self._endian)
+
+    def WriteULong(self, l):
+        return _WriteULong(self._stream, l, self._endian)
+
+    def WriteLong64(self, l64):
+        return _WriteLong64(self._stream, l, self._endian)
+
+    def WriteULong64(self, l64):
+        return _WriteULong64(self._stream, l, self._endian)
+
+    def WriteFloat(self, flt):
+        return _WriteFloat(self._stream, flt, self._endian)
+
+    def WriteDouble(self, db):
+        return _WriteDouble(self._stream, db, self._endian)
+
+    def WriteMultiByte(self, mb, cp = None):
+        return self.Write(mb.encode(cp or self._encoding))
+
+    def WriteUTF16(self, u16):
+        return self.Write(u16.encode('U16')[2:])
