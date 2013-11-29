@@ -253,7 +253,7 @@ class FileStreamPositionHolder:
 
     def __enter__(self):
         self.pos = self.fs.Position
-        return self
+        return self.fs
 
     def __exit__(self, type, value, traceback):
         self.fs.Position = self.pos
@@ -432,9 +432,9 @@ class FileStream:
 
     def Write(self, buf):
         if isinstance(buf, FileStream):
-            with FileStreamPositionHolder(buf):
-                buf.Position = 0
-                buf = buf.Read()
+            with FileStreamPositionHolder(buf) as fs:
+                fs.Position = 0
+                buf = fs.Read()
 
         return self._stream.write(buf)
 
@@ -514,14 +514,14 @@ class FileStream:
     def WriteLong(self, l):
         return _WriteLong(self._stream, l, self._endian)
 
-    def WriteULong(self, l):
-        return _WriteULong(self._stream, l, self._endian)
+    def WriteULong(self, ul):
+        return _WriteULong(self._stream, ul, self._endian)
 
     def WriteLong64(self, l64):
-        return _WriteLong64(self._stream, l, self._endian)
+        return _WriteLong64(self._stream, l64, self._endian)
 
-    def WriteULong64(self, l64):
-        return _WriteULong64(self._stream, l, self._endian)
+    def WriteULong64(self, ul64):
+        return _WriteULong64(self._stream, ul64, self._endian)
 
     def WriteFloat(self, flt):
         return _WriteFloat(self._stream, flt, self._endian)
