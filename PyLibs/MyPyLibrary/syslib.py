@@ -33,3 +33,4 @@ ULONG64 = ctypes.c_ulonglong
 
 PVOID   = ctypes.c_void_p
 PSTR    = ctypes.c_char_p
+

@@ -416,10 +416,11 @@ class FileStream:
             self.Seek(0, io.SEEK_END)
             return
 
-        if offset < 0:
-            self.Seek(offset, io.SEEK_END)
-        else:
-            self.Seek(offset, io.SEEK_SET)
+        #if offset < 0:
+        #    self.Seek(offset, io.SEEK_END)
+        #else:
+        #    print('seek %s' % offset)
+        self.Seek(offset, io.SEEK_SET)
 
     def Truncate(self, size):
         return self._stream.truncate(size)
