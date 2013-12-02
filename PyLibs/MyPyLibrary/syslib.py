@@ -34,3 +34,27 @@ ULONG64 = ctypes.c_ulonglong
 PVOID   = ctypes.c_void_p
 PSTR    = ctypes.c_char_p
 
+
+class dict2(dict):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+        self.convert_all(self)
+
+    def convert_all(self, obj):
+        for k, v in obj.items():
+            if not isinstance(v, dict):
+                continue
+
+            v = dict2(v)
+            obj[k] = v
+            self.convert_all(v)
+
+    def __getattr__(self, name):
+        try:
+            attr = super().__getattr__(name)
+        except AttributeError:
+            attr = super().__getitem__(name)
+
+        return attr
+

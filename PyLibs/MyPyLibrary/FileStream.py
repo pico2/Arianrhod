@@ -56,34 +56,34 @@ def _ReadWString(fs):
     return string.decode('U16')
 
 def _WriteByte(fs, b):
-    return fs.write(struct.pack('<B', BYTE(b & 0xFF).value))
+    return fs.write(struct.pack('<B', BYTE(int(b) & 0xFF).value))
 
 def _WriteChar(fs, b):
-    return fs.write(CHAR(b & 0xFF).value)
+    return fs.write(CHAR(int(b) & 0xFF).value)
 
 def _WriteUShort(fs, ushort, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'H', USHORT(ushort).value))
+    return fs.write(struct.pack(endian + 'H', USHORT(int(ushort)).value))
 
 def _WriteShort(fs, short, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'h', SHORT(short).value))
+    return fs.write(struct.pack(endian + 'h', SHORT(int(short)).value))
 
 def _WriteULong(fs, ulong, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'L', ULONG(ulong).value))
+    return fs.write(struct.pack(endian + 'L', ULONG(int(ulong)).value))
 
 def _WriteLong(fs, long, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'l', LONG(long).value))
+    return fs.write(struct.pack(endian + 'l', LONG(int(long)).value))
 
 def _WriteLong64(fs, l64, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'q', LONG64(l64).value))
+    return fs.write(struct.pack(endian + 'q', LONG64(int(l64)).value))
 
 def _WriteULong64(fs, ul64, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'Q', ULONG64(ul64).value))
+    return fs.write(struct.pack(endian + 'Q', ULONG64(int(ul64)).value))
 
 def _WriteFloat(fs, flt, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'f', FLOAT(flt).value))
+    return fs.write(struct.pack(endian + 'f', FLOAT(float(flt)).value))
 
 def _WriteDouble(fs, db, endian = _DEFAULT_ENDIAN):
-    return fs.write(struct.pack(endian + 'd', DOUBLE(db).value))
+    return fs.write(struct.pack(endian + 'd', DOUBLE(float(db)).value))
 
 class BytesStream:
     def __init__(self):
