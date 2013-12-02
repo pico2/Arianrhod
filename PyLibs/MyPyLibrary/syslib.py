@@ -58,3 +58,6 @@ class dict2(dict):
 
         return attr
 
+    def __deepcopy__(self, memo):
+        import copy
+        return copy._deepcopy_dict(self, memo)

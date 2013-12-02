@@ -1164,7 +1164,7 @@
                 divmod|eval|execfile|filter|getattr|globals|hasattr|hash|hex|id|
                 input|intern|isinstance|issubclass|iter|len|locals|map|max|min|oct|
                 ord|pow|range|raw_input|reduce|reload|repr|round|setattr|sorted|
-                sum|unichr|vars|zip
+                sum|unichr|vars|zip|deepcopy
 			)\b</string>
 			<key>name</key>
 			<string>support.function.builtin.python</string>
@@ -1543,7 +1543,7 @@
 						long|lshift|lt|mod|mul|ne|neg|new|nonzero|oct|or|pos|pow|
 						radd|rand|rdiv|rdivmod|repr|rfloordiv|rlshift|rmod|rmul|ror|
 						rpow|rrshift|rshift|rsub|rtruediv|rxor|set|setattr|setitem|
-						setslice|str|sub|truediv|unicode|xor
+						setslice|str|sub|truediv|unicode|xor|deepcopy
 					)__)\b</string>
 			<key>name</key>
 			<string>support.function.magic.python</string>
