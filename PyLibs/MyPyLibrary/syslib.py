@@ -50,6 +50,9 @@ class dict2(dict):
             obj[k] = v
             self.convert_all(v)
 
+    def __setattr__(self, name, value):
+        return super().__setitem__(name, value)
+
     def __getattr__(self, name):
         try:
             attr = super().__getattr__(name)

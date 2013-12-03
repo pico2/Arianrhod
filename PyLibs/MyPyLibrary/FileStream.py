@@ -461,7 +461,7 @@ class FileStream:
     def ReadChar(self):
         return _ReadChar(self._stream, self._endian)
 
-    def ReadUchar(self):
+    def ReadUChar(self):
         return _ReadUChar(self._stream, self._endian)
 
     def ReadByte(self):
