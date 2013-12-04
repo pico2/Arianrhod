@@ -455,7 +455,7 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
 
         LE_INLINE_JUMP(NtGdiHfontCreate),
 
-        EAT_HOOK_JUMP_HASH(Gdi32, GDI32_SelectObject,    LeSelectObject,      StubSelectObject),
+        //EAT_HOOK_JUMP_HASH(Gdi32, GDI32_SelectObject,    LeSelectObject,      StubSelectObject),
 
     };
 

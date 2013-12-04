@@ -1890,7 +1890,7 @@ layer: 1
 MenuCmd(0x1, 1, '莉夏')
 cmd: 1 = add item
 layer: 1
-text: 
+text:
 
 MenuCmd(0x2, 1, 15, 45, 0x1)
 cmd: 2 = show
@@ -1920,10 +1920,7 @@ OP_50(chr_offset, (scpexpr(EXPR_PUSH_LONG, const), scpexpr(EXPR_ADD_SAVE), scpex
 
 
 
-
-enable_stat = 0
-
-if enable_stat != 0:
+if __name__ == '__main__':
     valid = 0
     for inst in edao_op_list:
         if inst.OpName[:3] != 'OP_':

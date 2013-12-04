@@ -612,12 +612,7 @@ AS_8D(0x7, 0x13, 0x28A, 0x28A, 0x28A)
 
 '''
 
-
-
-
-enable_stat = 0
-
-if enable_stat != 0:
+if __name__ == '__main__':
     valid = 0
     for inst in edao_as_op_list:
         if inst.OpName[:3] != 'AS_':
