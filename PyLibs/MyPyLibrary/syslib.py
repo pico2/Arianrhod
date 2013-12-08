@@ -35,6 +35,9 @@ PVOID   = ctypes.c_void_p
 PSTR    = ctypes.c_char_p
 
 
+ANSI_CODE_PAGE = 'mbcs'
+
+
 class dict2(dict):
     def __init__(self, *args):
         super().__init__(*args)

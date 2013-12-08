@@ -812,13 +812,13 @@ PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
                 if (Buffer[-5] != 0xB8)
                     continue;
 
-                if (Buffer[-10] == 0x68)
-                {
-                    Buffer -= 10;
-                }
-                else if (Buffer[-7] == 0x6A)
+                if (Buffer[-7] == 0x6A)
                 {
                     Buffer -= 7;
+                }
+                else if (Buffer[-10] == 0x68)
+                {
+                        Buffer -= 10;
                 }
                 else
                 {
