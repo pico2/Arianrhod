@@ -39,10 +39,11 @@ ANSI_CODE_PAGE = 'mbcs'
 
 
 class dict2(dict):
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args)
 
-        self.convert_all(self)
+        if kwargs.get('deep_convert') is not False:
+            self.convert_all(self)
 
     def convert_all(self, obj):
         for k, v in obj.items():
