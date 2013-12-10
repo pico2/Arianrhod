@@ -110,6 +110,9 @@ if sys.winver == '2.7':
         def __getitem__(self, key):
             return super(CaseInsensitiveDict, self).__getitem__(key.lower())
 
+        def __delitem__(self, key):
+            return super(CaseInsensitiveDict, self).__delitem__(key.lower())
+
     def PrintException(e = None):
         excinfo = FormatException(e)
         for line in excinfo:
