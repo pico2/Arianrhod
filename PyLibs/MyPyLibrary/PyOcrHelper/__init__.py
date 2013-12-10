@@ -2,9 +2,10 @@ from ml import *
 import subprocess, os, struct, threading
 
 class PyOcrHelper:
+    mutex = threading.Lock()
+
     def __init__(self):
         self.HelperProcess = None
-        self.mutex = threading.Lock()
 
         ModiOcrHelper = os.path.join(os.path.dirname(__file__), 'ModiOcrHelper.exe')
         self.HelperProcess = subprocess.Popen(
