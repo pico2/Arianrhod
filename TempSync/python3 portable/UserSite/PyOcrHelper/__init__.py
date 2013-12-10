@@ -1,7 +1,9 @@
-import subprocess, os, struct
 from ml import *
+import subprocess, os, struct, threading
 
 class PyOcrHelper:
+    mutex = threading.Lock()
+
     def __init__(self):
         self.HelperProcess = None
 
@@ -22,12 +24,13 @@ class PyOcrHelper:
 
     def Ocr(self, tiff):
         tiff = tiff.encode('U16')[2:]
-        self.HelperProcess.stdin.write(tiff)
-        self.HelperProcess.stdin.flush()
+        with self.mutex:
+            self.HelperProcess.stdin.write(tiff)
+            self.HelperProcess.stdin.flush()
 
-        retlen = self.HelperProcess.stderr.read(8)
-        retlen = struct.unpack('<Q', retlen)[0]
-        if retlen == 0:
-            return ''
+            retlen = self.HelperProcess.stderr.read(8)
+            retlen = struct.unpack('<Q', retlen)[0]
+            if retlen == 0:
+                return ''
 
-        return self.HelperProcess.stderr.read(retlen).decode('U16')
+            return self.HelperProcess.stderr.read(retlen).decode('U16')
