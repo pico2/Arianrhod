@@ -80,9 +80,6 @@ BOOL IsRunningInVMWare()
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
-    KERNEL_USER_TIMES times;
-
-    NtQueryInformationThread(CurrentThread, ThreadTimes, &times, sizeof(times), 0);
 
     return;
 
