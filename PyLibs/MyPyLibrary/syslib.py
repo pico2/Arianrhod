@@ -59,11 +59,14 @@ class dict2(dict):
 
     def __getattr__(self, name):
         try:
-            attr = super().__getattr__(name)
+            return super().__getattr__(name)
         except AttributeError:
-            attr = super().__getitem__(name)
+            pass
 
-        return attr
+        try:
+            return super().__getitem__(name)
+        except KeyError:
+            raise AttributeError(''''%s' object has no attribute '%s' ''' % (type(self), name))
 
     def __deepcopy__(self, memo):
         import copy
