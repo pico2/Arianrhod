@@ -82,7 +82,9 @@ def TryInvoke(method, *values):
     try:
         return method(*values) if len(values) != 0 else method()
     except Exception as e:
-        traceback.print_exception(type(e), e, e.__traceback__)
+        #traceback.print_exception(type(e), e, e.__traceback__)
+        #exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(*sys.exc_info())
         input()
 
     return None
