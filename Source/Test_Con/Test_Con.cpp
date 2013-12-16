@@ -81,9 +81,15 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    ULONG_PTR param[] = {4, (ULONG_PTR)"fuck"};
+    ULONG_PTR param[] = { 4, (ULONG_PTR)"fuck" };
 
-    RaiseException(DBG_PRINTEXCEPTION_C, 0, countof(param), param);
+    SEH_TRY
+    {
+        RaiseException(DBG_PRINTEXCEPTION_C, 0, countof(param), param);
+    }
+    SEH_EXCEPT(1)
+    {}
+
     PrintConsoleW(L"%p\n", param[1]);
     PauseConsole();
 
