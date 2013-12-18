@@ -239,10 +239,14 @@ BOOL IsSystemCall(PVOID Routine)
     HasCall     = FALSE;
     HasRet      = FALSE;
 
-    for (ULONG_PTR Count = 10; Count != 0; --Count)
+    for (ULONG_PTR Count = 6; Count != 0; --Count)
     {
         switch (Buffer[0])
         {
+            case 0xFF:
+                if (Buffer[1] == 0x15 || Buffer[1] == 0x25)
+                    return FALSE;
+
             case 0xB8:
                 if ((HasMovEax | HasCall | HasRet) != FALSE)
                     return FALSE;
