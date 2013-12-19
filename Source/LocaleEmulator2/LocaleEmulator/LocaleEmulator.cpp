@@ -151,7 +151,7 @@ NTSTATUS LeGlobalData::Initialize()
     {
         *GetLePeb() = *LePeb;
 
-        ZwClose(LePeb->Section);
+        NtClose(LePeb->Section);
         CloseLePeb(LePeb);
     }
 

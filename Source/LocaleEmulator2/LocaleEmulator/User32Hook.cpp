@@ -1444,10 +1444,10 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
     PVOID       HookNtUserCreateWindowEx;
     NTSTATUS    Status;
 
-    Status = ZwAddAtom(PROP_WINDOW_ANSI_PROC, CONST_STRLEN(PROP_WINDOW_ANSI_PROC) * sizeof(WCHAR), &this->AtomAnsiProc);
+    Status = NtAddAtom(PROP_WINDOW_ANSI_PROC, CONST_STRLEN(PROP_WINDOW_ANSI_PROC) * sizeof(WCHAR), &this->AtomAnsiProc);
     FAIL_RETURN(Status);
 /*
-    Status = ZwAddAtom(PROP_WINDOW_UNICODE_PROC, CONST_STRLEN(PROP_WINDOW_UNICODE_PROC) * sizeof(WCHAR), &this->AtomUnicodeProc);
+    Status = NtAddAtom(PROP_WINDOW_UNICODE_PROC, CONST_STRLEN(PROP_WINDOW_UNICODE_PROC) * sizeof(WCHAR), &this->AtomUnicodeProc);
     FAIL_RETURN(Status);
 */
     NtUserMessageCall = FindNtUserMessageCall2(User32);
@@ -1513,13 +1513,13 @@ NTSTATUS LeGlobalData::UnHookUser32Routines()
 
     if (AtomAnsiProc != 0)
     {
-        ZwDeleteAtom(AtomAnsiProc);
+        NtDeleteAtom(AtomAnsiProc);
         AtomAnsiProc = 0;
     }
 /*
     if (AtomUnicodeProc != NULL)
     {
-        ZwDeleteAtom(AtomUnicodeProc);
+        NtDeleteAtom(AtomUnicodeProc);
         AtomUnicodeProc = NULL;
     }
 */

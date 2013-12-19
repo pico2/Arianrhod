@@ -13,7 +13,7 @@ PVOID SearchLdrInitNtContinue()
     return WalkOpCodeT(LdrInitializeThunk, 0x25,
                 WalkOpCodeM(Buffer, OpLength, Ret)
                 {
-                    if (Buffer[0] == CALL && (PVOID)GetCallDestination(Buffer) == ZwContinue)
+                    if (Buffer[0] == CALL && (PVOID)GetCallDestination(Buffer) == NtContinue)
                     {
                         Ret = Buffer;
                         return STATUS_SUCCESS;
@@ -93,7 +93,7 @@ NTSTATUS QueryRegKeyFullPath(HANDLE Key, PUNICODE_STRING KeyFullPath)
 
     LOOP_FOREVER
     {
-        Status = ZwQueryKey(Key, KeyNameInformation, KeyFullName, MaxLength, &ReturnedLength);
+        Status = NtQueryKey(Key, KeyNameInformation, KeyFullName, MaxLength, &ReturnedLength);
         if (Status != STATUS_BUFFER_TOO_SMALL)
             break;
 
@@ -691,26 +691,26 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 
         RTL_CONST_STRING(SubKey, REGPATH_CODEPAGE);
         InitializeObjectAttributes(&ObjectAttributes, &SubKey, OBJ_CASE_INSENSITIVE, RootKey, nullptr);
-        Status = ZwOpenKey(&CodePageKey, KEY_QUERY_VALUE, &ObjectAttributes);
+        Status = NtOpenKey(&CodePageKey, KEY_QUERY_VALUE, &ObjectAttributes);
         FAIL_BREAK(Status);
 
         Status = QueryRegKeyFullPath(CodePageKey, &HookRoutineData.Ntdll.CodePageKey);
-        ZwClose(CodePageKey);
+        NtClose(CodePageKey);
         FAIL_BREAK(Status);
 
         RTL_CONST_STRING(SubKey, REGPATH_LANGUAGE);
-        Status = ZwOpenKey(&LanguageKey, KEY_QUERY_VALUE, &ObjectAttributes);
+        Status = NtOpenKey(&LanguageKey, KEY_QUERY_VALUE, &ObjectAttributes);
         FAIL_BREAK(Status);
 
         Status = QueryRegKeyFullPath(LanguageKey, &HookRoutineData.Ntdll.LanguageKey);
-        ZwClose(LanguageKey);
+        NtClose(LanguageKey);
         FAIL_BREAK(Status);
 
         ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
     }
 
     if (RootKey != nullptr)
-        ZwClose(RootKey);
+        NtClose(RootKey);
 
     ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
     //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);

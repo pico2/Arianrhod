@@ -112,7 +112,7 @@ GetLePebSectionName(
 
 inline NTSTATUS CloseLePeb(PLEPEB LePeb)
 {
-    return LePeb == nullptr ? STATUS_INVALID_PARAMETER : ZwUnmapViewOfSection(CurrentProcess, LePeb);
+    return LePeb == nullptr ? STATUS_INVALID_PARAMETER : NtUnmapViewOfSection(CurrentProcess, LePeb);
 }
 
 inline VOID InitDefaultLeb(PLEB Leb)
@@ -173,7 +173,7 @@ OpenOrCreateLePeb(
     BaseNamedObjectsName.Buffer         = SectionNameBuffer;
 
     InitializeObjectAttributes(&ObjectAttributes, &BaseNamedObjectsName, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
-    Status = ZwOpenDirectoryObject(&BaseNamedObjects, DIRECTORY_ALL_ACCESS, &ObjectAttributes);
+    Status = NtOpenDirectoryObject(&BaseNamedObjects, DIRECTORY_ALL_ACCESS, &ObjectAttributes);
     if (NT_FAILED(Status))
         return nullptr;
 
@@ -183,11 +183,11 @@ OpenOrCreateLePeb(
 
     InitializeObjectAttributes(&ObjectAttributes, &SectionName, 0, BaseNamedObjects, nullptr);
 
-    Status = ZwOpenSection(&SectionHandle, SECTION_ALL_ACCESS, &ObjectAttributes);
+    Status = NtOpenSection(&SectionHandle, SECTION_ALL_ACCESS, &ObjectAttributes);
     if (NT_FAILED(Status) && Create)
     {
         MaximumSize.QuadPart = sizeof(*LePeb);
-        Status = ZwCreateSection(
+        Status = NtCreateSection(
                     &SectionHandle,
                     SECTION_ALL_ACCESS,
                     &ObjectAttributes,
@@ -198,14 +198,14 @@ OpenOrCreateLePeb(
                 );
     }
 
-    ZwClose(BaseNamedObjects);
+    NtClose(BaseNamedObjects);
 
     if (NT_FAILED(Status))
         return nullptr;
 
     ViewSize = 0;
     LePeb = nullptr;
-    Status = ZwMapViewOfSection(
+    Status = NtMapViewOfSection(
                 SectionHandle,
                 CurrentProcess,
                 (PVOID *)&LePeb,
@@ -220,7 +220,7 @@ OpenOrCreateLePeb(
 
     if (NT_FAILED(Status))
     {
-        ZwClose(SectionHandle);
+        NtClose(SectionHandle);
         return nullptr;
     }
 
@@ -235,12 +235,12 @@ OpenOrCreateLePeb(
             break;
         }
 
-        Status = ZwDuplicateObject(CurrentProcess, SectionHandle, ProcessHandle, &LePeb->Section, 0, 0, DUPLICATE_SAME_ACCESS);
-        ZwClose(ProcessHandle);
+        Status = NtDuplicateObject(CurrentProcess, SectionHandle, ProcessHandle, &LePeb->Section, 0, 0, DUPLICATE_SAME_ACCESS);
+        NtClose(ProcessHandle);
         FAIL_BREAK(Status);
     }
 
-    ZwClose(SectionHandle);
+    NtClose(SectionHandle);
     if (NT_FAILED(Status))
     {
         CloseLePeb(LePeb);
@@ -520,7 +520,7 @@ public:
     {
         return HookStub.StubGetDC(hWnd);
     }
-    
+
     HDC GetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
     {
         return HookStub.StubGetDCEx(hWnd, hrgnClip, flags);

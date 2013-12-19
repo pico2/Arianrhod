@@ -247,6 +247,8 @@ BOOL IsSystemCall(PVOID Routine)
                 if (Buffer[1] == 0x15 || Buffer[1] == 0x25)
                     return FALSE;
 
+                break;
+
             case 0xB8:
                 if ((HasMovEax | HasCall | HasRet) != FALSE)
                     return FALSE;
