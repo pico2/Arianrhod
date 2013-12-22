@@ -468,6 +468,12 @@ VA Snippet used for suggestions of types:
 a:SuggestionsForType HRESULT::
 S_OK
 S_FALSE
+E_FAIL
+E_NOTIMPL
+E_OUTOFMEMORY
+E_INVALIDARG
+E_NOINTERFACE
+E_UNEXPECTED
 
 readme:
 VA Snippet used for refactoring: Change Signature, Create Implementation, and Move Implementation to Source File.
@@ -523,7 +529,7 @@ readme:
 VA Snippet used by Surround With #ifdef.
 Delete this item to restore the default upon next use.
 
-a:#ifdef (VA X):#if:
+a:#ifdef (VA):#if:
 #ifdef $condition=_DEBUG$$end$
 $selected$
 #endif // $condition$
@@ -532,7 +538,7 @@ readme:
 VA Snippet used by Surround With #region.
 Delete this item to restore the default upon next use.
 
-a:#region (VA X):#r:
+a:#region (VA):#r:
 #pragma region $end$$regionName$
 $selected$
 #pragma endregion $regionName$

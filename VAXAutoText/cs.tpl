@@ -228,7 +228,7 @@ readme:
 VA Snippet used by Surround With #region.
 Delete this item to restore the default upon next use.
 
-a:#region (VA X):#r:
+a:#region (VA):#r:
 #region $end$
 $selected$
 #endregion

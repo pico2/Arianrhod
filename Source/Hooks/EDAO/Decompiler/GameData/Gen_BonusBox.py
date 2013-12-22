@@ -113,10 +113,10 @@ def main():
                 item = l[idx + len(prefix):]
                 item = item[:item.find(', ')]
 
-                if not eval('%s in ItemTrueNameMap' % item):
-                    continue
-
-                current_item = eval('ItemTrueNameMap[%s]' % item)
+                #if not eval('%s in ItemTrueNameMap' % item):
+                #    continue
+                #current_item = eval('ItemTrueNameMap[%s]' % item)
+                current_item = eval(item)
 
             elif l.startswith('SetScenarioFlags'):
 

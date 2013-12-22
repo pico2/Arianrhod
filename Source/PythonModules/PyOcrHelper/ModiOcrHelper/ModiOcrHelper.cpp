@@ -465,7 +465,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     ml::String ret;
 
-    if (argc > 1)
+    if (argc > 2)
     {
         WCHAR Tiff[0x1000];
         HANDLE StandardIntput, StandardError, ParentProcess;
@@ -512,7 +512,7 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
         MODI::OcrTiff(argv[1], ret);
         PrintConsole(L"%s", ret);
     }
-    
+
     MODI::UnInitializeModi();
 
     return;
