@@ -98,6 +98,8 @@ a:white body:<b:
 $end$
 </body>
 
+a:hyperlink::
+<a href="$end$">$selected$</a>
 a::ru:
 runat="Server"
 a::but:

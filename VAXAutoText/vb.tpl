@@ -2,16 +2,8 @@ a::Pr:
 Private
 a::Pu:
 Public
-a::T:
-True
-a::t:
-True
-a::F:
-False
 a::E:
 Else
-a::f:
-False
 a::D:
 Dim
 a::If:
@@ -42,21 +34,51 @@ a:File header::
 '	purpose:	$end$
 '*************************************************************************
 
+
 readme:
-VA Snippet used for suggestions of types:
+VA Snippet used by Surround With #region.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:#region (VA):#r:
+#Region "$end$"
+$selected$
+#End Region
+
+
+readme:
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:(...)::
+($selected$)
+
+readme:
+VA Snippet used for suggestions in class definitions.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:SuggestionsForType class::
+Public
+Private
+Protected
+
+
+readme:
+VA Snippet used for suggestions of type Boolean.
+If you have modified this item, you may delete it to restore the default upon next use.
 
 a:SuggestionsForType Boolean::
 True
 False
+
 
 readme:
 VA Snippet used for refactoring.
 Delete this item to restore the default upon next use.
 
 a:Refactor Create Implementation::
-$SymbolPrivileges$ Sub $SymbolName$( $ParameterList$ )
+$SymbolPrivileges$ Sub $SymbolName$($ParameterList$)
 	$end$$MethodBody$
 End Sub
+
 
 readme:
 VA Snippet used for refactoring.
@@ -72,6 +94,7 @@ a:Refactor Document Method::
 ' Parameter: $MethodArg$
 '//////////////////////////////////////////////////
 
+
 readme:
 VA Snippet used for refactoring.
 Delete this item to restore the default upon next use.
@@ -86,36 +109,14 @@ a:Refactor Encapsulate Field::
 		End Set
 	End Property
 
+
 readme:
 VA Snippet used for refactoring.
 Delete this item to restore the default upon next use.
 
 a:Refactor Extract Method::
 
-$end$$SymbolPrivileges$ Sub $SymbolName$( $ParameterList$ )
+$end$$SymbolPrivileges$ Sub $SymbolName$($ParameterList$)
 	$MethodBody$
 End Sub
-
-readme:
-VA Snippet used by Surround With #region.
-Delete this item to restore the default upon next use.
-
-a:#region (VA):#r:
-#Region "$end$"
-$selected$
-#End Region
-
-readme:
-Delete this item to restore the default when the IDE starts.
-
-a:(...)::
-($selected$)
-readme:
-VA Snippet used for suggestions in class definitions.
-Delete this item to restore the default upon next use.
-
-a:SuggestionsForType class::
-Public
-Private
-Protected
 
