@@ -22,22 +22,6 @@ typedef struct
 API_POINTER(IsIconic) StubIsIconic;
 
 
-BOOL WINAPI PpUpdateWindow(HWND hWnd)
-{
-    int  x, y;
-    RECT rcWindow, rcDesktop;
-
-    SystemParametersInfoW(SPI_GETWORKAREA, 0, &rcDesktop, 0);
-    GetWindowRect(hWnd, &rcWindow);
-
-    x = ((rcDesktop.right - rcDesktop.left) - (rcWindow.right - rcWindow.left)) >> 1;
-    y = ((rcDesktop.bottom - rcDesktop.top) - (rcWindow.bottom - rcWindow.top)) >> 1;
-
-    SetWindowPos(hWnd, HWND_NOTOPMOST, x, y, 0, 0, SWP_NOSIZE);
-
-    return UpdateWindow(hWnd);
-}
-
 BOOL NTAPI PpChooseFontW(LPCHOOSEFONTW Font)
 {
     SET_FLAG(Font->Flags, 0x3000000);
