@@ -75,22 +75,13 @@ BOOL IsRunningInVMWare()
 
 #endif
 
-#include "E:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
+#include "D:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    ULONG_PTR param[] = { 4, (ULONG_PTR)"fuck" };
-
-    SEH_TRY
-    {
-        RaiseException(DBG_PRINTEXCEPTION_C, 0, countof(param), param);
-    }
-    SEH_EXCEPT(1)
-    {}
-
-    PrintConsoleW(L"%p\n", param[1]);
+    NtSetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED, (EXECUTION_STATE *)&argc);
     PauseConsole();
 
     return;

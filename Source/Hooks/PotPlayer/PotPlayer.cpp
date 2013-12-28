@@ -1,12 +1,28 @@
-#pragma comment(linker,"/MERGE:.text=.Kanade /SECTION:.Kanade,ERW")
-#pragma comment(linker,"/MERGE:.rdata=.Kanade")
-#pragma comment(linker,"/MERGE:.data=.Kanade")
-#pragma comment(linker,"/ENTRY:DllMain")
+#pragma comment(linker, "/ENTRY:DllMain")
+#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
+#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 #pragma comment(lib, "vfw32.lib")
 
 #include "MyLibrary.cpp"
 
-BOOL WINAPI MyUpdateWindow(HWND hWnd)
+#define METHOD_PTR(_method) PtrAdd((PVOID)NULL, _method)
+
+typedef struct
+{
+    ULONG       Message;    // windows message
+    ULONG       Code;       // control code or WM_NOTIFY code
+    ULONG       ID;         // control ID (or 0 for windows messages)
+    ULONG       LastID;     // used for entries specifying a range of control id's
+    UINT_PTR    Signature;  // signature type (action) or pointer to message #
+    PVOID       Function;   // routine to call (or special value)
+
+} PP_MESSAGE_MAP_ENTRY, *PPP_MESSAGE_MAP_ENTRY;
+
+
+API_POINTER(IsIconic) StubIsIconic;
+
+
+BOOL WINAPI PpUpdateWindow(HWND hWnd)
 {
     int  x, y;
     RECT rcWindow, rcDesktop;
@@ -18,38 +34,143 @@ BOOL WINAPI MyUpdateWindow(HWND hWnd)
     y = ((rcDesktop.bottom - rcDesktop.top) - (rcWindow.bottom - rcWindow.top)) >> 1;
 
     SetWindowPos(hWnd, HWND_NOTOPMOST, x, y, 0, 0, SWP_NOSIZE);
-    
+
     return UpdateWindow(hWnd);
 }
 
-ASM Void STDCALL SetChooseFontFlag(LPCHOOSEFONTW pcf)
+BOOL NTAPI PpChooseFontW(LPCHOOSEFONTW Font)
 {
-    __asm
-    {
-        or  eax, 0x3000000;
-        mov [edi]pcf.Flags, eax;
-        ret;
-    }
+    SET_FLAG(Font->Flags, 0x3000000);
+    return ChooseFontW(Font);
 }
 
-BOOL WINAPI DllMain(HINSTANCE hInstance, ULONG ulReason, LPVOID lpReserved)
+PVOID NTAPI PpGetProcAddress(PVOID DllHandle, PCSTR Function)
 {
-    switch (ulReason)
+    if ((ULONG_PTR)Function >= 0x10000) switch (HashAPI(Function))
     {
-        case DLL_PROCESS_ATTACH:
-            MEMORY_FUNCTION_PATCH f[] = 
-            {
-                //   const:7006
-    //            { CALL , 0x0C6657, MyUpdateWindow,    1 },  // 29490 9th ref
-    //            { CALL , 0x50AA57, SetChooseFontFlag, 1 },  // 29490  const:7006
-                PATCH_FUNCTION(CALL, AUTO_DISASM, 0x5643E8, SetChooseFontFlag),
-                PATCH_FUNCTION(CALL, AUTO_DISASM, 0x0D6BC7, MyUpdateWindow),
-            };
-
-            LdrDisableThreadCalloutsForDll(hInstance);
-
-            Nt_PatchMemory(0, 0, f, countof(f), Nt_FindLdrModuleByName(&WCS2US(L"PotPlayer.dll"))->DllBase);
+        case COMDLG32_ChooseFontW:
+            return PpChooseFontW;
     }
 
-    return True;
+    return GetRoutineAddress(DllHandle, Function);
+}
+
+#define CMD_RANGE_TRAP_CONTEXT TAG4('CRTC')
+
+BOOL NTAPI PpIsIconic(HWND hWnd)
+{
+    PTEB_ACTIVE_FRAME Frame;
+
+    Frame = FindThreadFrame(CMD_RANGE_TRAP_CONTEXT);
+    if (Frame != nullptr)
+        Frame->Data = (ULONG_PTR)hWnd;
+
+    return StubIsIconic(hWnd);
+}
+
+struct PpCmdTarget
+{
+    READONLY_PROPERTY(HWND, m_hWnd)
+    {
+        return *(HWND *)PtrAdd(this, 0x20);
+    }
+
+    VOID OnCmdRange(ULONG ID)
+    {
+
+        HWND hWnd;
+        int  x, y;
+        RECT rcWindow, rcDesktop;
+
+        {
+            TEB_ACTIVE_FRAME Frame;
+
+            Frame.Context = CMD_RANGE_TRAP_CONTEXT;
+            Frame.Data = NULL;
+            Frame.Push();
+
+            (this->*StubOnCmdRange)(ID);
+
+            hWnd = (HWND)Frame.Data;
+        }
+
+        if (hWnd == NULL)
+            return;
+
+        if (IsZoomed(hWnd))
+            return;
+
+        SystemParametersInfoW(SPI_GETWORKAREA, 0, &rcDesktop, 0);
+        GetWindowRect(hWnd, &rcWindow);
+
+        x = ((rcDesktop.right - rcDesktop.left) - (rcWindow.right - rcWindow.left)) >> 1;
+        y = ((rcDesktop.bottom - rcDesktop.top) - (rcWindow.bottom - rcWindow.top)) >> 1;
+
+        SetWindowPos(hWnd, HWND_NOTOPMOST, x, y, 0, 0, SWP_NOSIZE);
+    }
+
+    static TYPE_OF(&PpCmdTarget::OnCmdRange) StubOnCmdRange;
+};
+
+TYPE_OF(PpCmdTarget::StubOnCmdRange) PpCmdTarget::StubOnCmdRange = nullptr;
+
+PPP_MESSAGE_MAP_ENTRY SearchMessageEntry(PVOID PotPlayer)
+{
+    PPP_MESSAGE_MAP_ENTRY MessageEntry;
+    ULONG Entry[] = { WM_COMMAND, 0, 10230, 10238 };
+
+    SEARCH_PATTERN_DATA Pattern[] =
+    {
+        ADD_PATTERN(Entry),
+    };
+
+    MessageEntry = (PPP_MESSAGE_MAP_ENTRY)SearchPatternSafe(Pattern, countof(Pattern), PotPlayer, FindLdrModuleByHandle(PotPlayer)->SizeOfImage);
+
+    return MessageEntry == nullptr ? (PPP_MESSAGE_MAP_ENTRY)IMAGE_INVALID_VA : MessageEntry;
+}
+
+BOOL UnInitialize(PVOID BaseAddress)
+{
+    return FALSE;
+}
+
+BOOL Initialize(PVOID BaseAddress)
+{
+    ml::MlInitialize();
+
+    LdrDisableThreadCalloutsForDll(BaseAddress);
+
+    BaseAddress = FindLdrModuleByName(&USTR(L"PotPlayer.dll"))->DllBase;
+
+    MEMORY_PATCH p[] =
+    {
+        PATCH_MEMORY(METHOD_PTR(&PpCmdTarget::OnCmdRange), sizeof(PVOID), PtrOffset(&SearchMessageEntry(BaseAddress)->Function, BaseAddress)),
+    };
+
+    MEMORY_FUNCTION_PATCH f[] =
+    {
+        INLINE_HOOK_JUMP_NULL(EATLookupRoutineByHashPNoFix(GetKernel32Handle(), KERNEL32_GetProcAddress), PpGetProcAddress),
+        INLINE_HOOK_JUMP(IsIconic, PpIsIconic, StubIsIconic),
+    };
+
+    Nt_PatchMemory(p, countof(p), f, countof(f), BaseAddress);
+
+    *(PULONG_PTR)&PpCmdTarget::StubOnCmdRange = p[0].DataBak;
+
+    return TRUE;
+}
+
+BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
+{
+    switch (Reason)
+    {
+        case DLL_PROCESS_ATTACH:
+            return Initialize(BaseAddress) || UnInitialize(BaseAddress);
+
+        case DLL_PROCESS_DETACH:
+            UnInitialize(BaseAddress);
+            break;
+    }
+
+    return TRUE;
 }
