@@ -1003,7 +1003,7 @@ BOOL SearchGroupApp_AtAllGroupMemberMax(PVOID GroupApp, PVOID *ConditionJump)
     360C990D    .  83BD 74FFFFFF 14    cmp     dword ptr [ebp-0x8C], 0x14
     360C9914    .  59                  pop     ecx
     360C9915    .  59                  pop     ecx
-    360C9916    .  EB 12               jl      short 0x360C992A
+    360C9916    .  7C 12               jl      short 0x360C992A
     ************************************************************************/
 
     BYTE CallStub[]      = { CALL };
