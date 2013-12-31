@@ -131,7 +131,7 @@
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <CallingConvention>Cdecl</CallingConvention>
-      <AdditionalIncludeDirectories>E:\Python\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Dev\Python\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -143,10 +143,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalLibraryDirectories>E:\Python\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Dev\Python\libs</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\MyPyLibrary\AMFHelper
+      <Command>copy /y ..\$(TargetName)$(TargetExt) D:\Dev\Python\Lib\site-packages\MyPyLibrary\AMFHelper
 del/s/q ..\$(TargetName).lib &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName).exp &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
@@ -160,7 +160,7 @@ del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <CallingConvention>Cdecl</CallingConvention>
-      <AdditionalIncludeDirectories>E:\Python\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Dev\Python\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -172,10 +172,10 @@ del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalLibraryDirectories>E:\Python\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Dev\Python\libs</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y ..\$(TargetName)$(TargetExt) E:\Python\Lib\site-packages\MyPyLibrary\AMFHelper
+      <Command>copy /y ..\$(TargetName)$(TargetExt) D:\Dev\Python\Lib\site-packages\MyPyLibrary\AMFHelper
 del/s/q ..\$(TargetName).lib &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName).exp &gt;NUL 2&gt;NUL
 del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
@@ -183,7 +183,7 @@ del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="FluorineFx">
-      <HintPath>..\..\..\..\..\..\Sync\Library\.Net\FluorineFx\Bin\net\3.5\FluorineFx.dll</HintPath>
+      <HintPath>D:\Dev\Sync\Library\.Net\FluorineFx\Bin\net\3.5\FluorineFx.dll</HintPath>
       <Private>true</Private>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
@@ -254,15 +254,15 @@ del/s/q ..\$(TargetName)$(TargetExt).metagen &gt;NUL 2&gt;NUL</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <_EmbedManagedResourceFile Include="..\..\..\..\..\..\Library\.Net\FluorineFx\Bin\net\3.5\antlr.runtime.dll">
+    <_EmbedManagedResourceFile Include="D:\Dev\Sync\Library\.Net\FluorineFx\Bin\net\3.5\antlr.runtime.dll">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </DeploymentContent>
       <FileType>Document</FileType>
     </_EmbedManagedResourceFile>
-    <_EmbedManagedResourceFile Include="..\..\..\..\..\..\Library\.Net\FluorineFx\Bin\net\3.5\FluorineFx.dll">
+    <_EmbedManagedResourceFile Include="D:\Dev\Sync\Library\.Net\FluorineFx\Bin\net\3.5\FluorineFx.dll">
       <FileType>Document</FileType>
     </_EmbedManagedResourceFile>
-    <_EmbedManagedResourceFile Include="..\..\..\..\..\..\Library\.Net\FluorineFx\Bin\net\3.5\log4net.dll">
+    <_EmbedManagedResourceFile Include="D:\Dev\Sync\Library\.Net\FluorineFx\Bin\net\3.5\log4net.dll">
       <FileType>Document</FileType>
     </_EmbedManagedResourceFile>
     <None Include="Exports.def" />
