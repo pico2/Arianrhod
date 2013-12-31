@@ -1,5 +1,0 @@
-EXPORTS
-;	EnumFontFamiliesExW = GDI32.EnumFontFamiliesExW
-	CoCreateInstance    = ole32.CoCreateInstance
-	CoCreateGuid        = ole32.CoCreateGuid
-    CoInitializeEx      = ole32.CoInitializeEx

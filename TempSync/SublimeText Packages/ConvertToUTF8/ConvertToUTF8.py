@@ -316,8 +316,8 @@ class ConvertToUtf8Command(sublime_plugin.TextCommand):
             contents = fp.read()
         except LookupError as e:
             clean_encoding_vars(view)
-            sublime.error_message('Encoding {0} is not supported.'.format(encoding))
-            view.window().new_file().run_command('py_instruction', {'encoding': encoding})
+            #sublime.error_message('Encoding {0} is not supported.'.format(encoding))
+            #view.window().new_file().run_command('py_instruction', {'encoding': encoding})
             return
         except UnicodeDecodeError as e:
             if detect_on_fail:
