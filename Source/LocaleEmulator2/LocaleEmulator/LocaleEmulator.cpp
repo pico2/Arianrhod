@@ -110,6 +110,8 @@ NTSTATUS ReadFileInSystemDirectory(NtFileMemory &File, PUNICODE_STRING Path)
 
 NTSTATUS LeGlobalData::Initialize()
 {
+#if !ARCHEAGE_VER
+
     PLEPEB          LePeb;
     PLDR_MODULE     Ntdll;
     PPEB_BASE       Peb;
@@ -225,6 +227,8 @@ NTSTATUS LeGlobalData::Initialize()
     Peb->OemCodePageData        = (PUSHORT)PtrAdd(CodePageMapView, OemCodePageOffset);
     Peb->UnicodeCaseTableData   = (PUSHORT)PtrAdd(CodePageMapView, UnicodeCaseTableOffset);
 
+#endif
+
     // LdrInitShimEngineDynamic(&__ImageBase);
 
     LdrRegisterDllNotification(0,
@@ -235,6 +239,12 @@ NTSTATUS LeGlobalData::Initialize()
         this,
         &DllNotificationCookie
     );
+
+#if ARCHEAGE_VER
+
+    return STATUS_SUCCESS;
+
+#else
 
     Status = InstallHookPort();
     FAIL_RETURN(Status);
@@ -257,6 +267,8 @@ NTSTATUS LeGlobalData::Initialize()
     WriteLog(L"init %p", Status);
 
     return Status;
+
+#endif
 }
 
 typedef struct
@@ -356,6 +368,8 @@ VOID LeGlobalData::DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICAT
 
 #if ARCHEAGE_VER
 
+#pragma comment(linker, "/EXPORT:ShellExecuteA=SHELL32.ShellExecuteA")
+
 LONG WINAPI GetSQLiteKeyExceptionHandler(PEXCEPTION_POINTERS ExceptionInfo)
 {
     PDR7_INFO   Dr7;
@@ -414,6 +428,8 @@ VOID X2_FillDecryptTable()
 
     KeyBuffer += 8 + 0xC;
 
+    PrintConsole(L"return address %p\n", _ReturnAddress());
+
     Context.ContextFlags = CONTEXT_DEBUG_REGISTERS;
     NtGetContextThread(CurrentThread, &Context);
 
@@ -429,6 +445,36 @@ VOID X2_FillDecryptTable()
     RtlAddVectoredExceptionHandler(TRUE, GetSQLiteKeyExceptionHandler);
 
     StubX2_FillDecryptTable();
+}
+
+VOID FASTCALL PrintKey(PBYTE SQLiteKeyBuffer)
+{
+    NtFileDisk f;
+
+    f.Create(L"dump.bin");
+    f.Write(SQLiteKeyBuffer, 0x100);
+
+    SQLiteKeyBuffer += 8;
+
+    for (ULONG_PTR Count = 0x10; Count; --Count)
+    {
+        PrintConsoleW(L"0x%02X, ", *SQLiteKeyBuffer++);
+        if (Count == 9)
+            PrintConsoleW(L"\n");
+    }
+
+    PrintConsoleW(L"\nPress any key to exit...");
+    PauseConsole();
+    Ps::ExitProcess(0);
+}
+
+NAKED VOID GetKey()
+{
+    INLINE_ASM
+    {
+        mov     ecx, esi;
+        call    PrintKey
+    }
 }
 
 NTSTATUS LeGlobalData::HookX2GameRoutines(PVOID X2Game)
@@ -495,7 +541,7 @@ NTSTATUS LeGlobalData::HookX2GameRoutines(PVOID X2Game)
 
         MEMORY_FUNCTION_PATCH f[] =
         {
-            INLINE_HOOK_JUMP_NULL(STRSTR, x2_strstr),
+            //INLINE_HOOK_JUMP_NULL(STRSTR, x2_strstr),
             INLINE_HOOK_JUMP(FillDecryptTable, X2_FillDecryptTable, StubX2_FillDecryptTable),
         };
 
@@ -544,6 +590,8 @@ BOOL Initialize(PVOID BaseAddress)
     PLDR_MODULE         Kernel32;
     PLeGlobalData       GlobalData;
 
+#if !ARCHEAGE_VER
+
     Kernel32 = GetKernel32Ldr();
 
     if (Kernel32 != nullptr && FLAG_ON(Kernel32->Flags, LDRP_PROCESS_ATTACH_CALLED))
@@ -551,6 +599,8 @@ BOOL Initialize(PVOID BaseAddress)
         ExceptionBox(L"fuck");
         return FALSE;
     }
+
+#endif
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
@@ -561,11 +611,28 @@ BOOL Initialize(PVOID BaseAddress)
 
     LeSetGlobalData(GlobalData);
 
+#if ARCHEAGE_VER
+
+    MEMORY_FUNCTION_PATCH f[] =
+    {
+        INLINE_HOOK_JUMP_RVA_NULL(0x4FF7FA, GetKey),
+    };
+
+    AllocConsole();
+
+    Nt_PatchMemory(0, 0, f, countof(f), FindLdrModuleByName(&USTR(L"x2game.dll"))->DllBase);
+
+    //GlobalData->HookX2GameRoutines(FindLdrModuleByName(&USTR(L"x2game.dll"))->DllBase);
+
+#else
+
     Status = GlobalData->Initialize();
     if (NT_FAILED(Status))
         return FALSE;
 
     GlobalData->SetUnhandledExceptionFilter();
+
+#endif
 
     WriteLog(L"init ret");
 

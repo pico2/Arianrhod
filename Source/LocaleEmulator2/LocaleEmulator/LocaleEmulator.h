@@ -4,7 +4,7 @@
 #include "MyLibrary.h"
 
 
-#define ARCHEAGE_VER 0
+#define ARCHEAGE_VER 1
 
 
 #define ROOTDIR_SYSTEM32            L"\\SystemRoot\\system32\\"

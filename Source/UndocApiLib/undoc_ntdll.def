@@ -15,9 +15,9 @@ EXPORTS
     MD5Init
     MD5Update
     MD5Final
-	memset = _memset
-	memcpy = _memcpy
-	_vsnwprintf
+    memset = _memset
+    memcpy = _memcpy
+    _vsnwprintf
     RtlQueryPerformanceCounter
     RtlSetUnhandledExceptionFilter
     DbgBreakPoint
@@ -27,8 +27,8 @@ EXPORTS
     LdrUnregisterDllNotification
     NtInitializeNlsFiles
     _vscwprintf
-	NtGetNextThread
-	ZwGetNextThread
-	NtGetNextProcess
-	ZwGetNextProcess
-	LdrResSearchResource
+    NtGetNextThread
+    ZwGetNextThread
+    NtGetNextProcess
+    ZwGetNextProcess
+    LdrResSearchResource
