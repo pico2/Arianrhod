@@ -1,3 +1,0 @@
-module QtQuick.Window
-plugin windowplugin
-typeinfo plugins.qmltypes

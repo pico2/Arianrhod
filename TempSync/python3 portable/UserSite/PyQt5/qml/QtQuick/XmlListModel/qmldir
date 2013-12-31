@@ -1,3 +1,0 @@
-module QtQuick.XmlListModel
-plugin qmlxmllistmodelplugin
-typeinfo plugins.qmltypes

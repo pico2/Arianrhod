@@ -1,3 +1,0 @@
-module QtSensors
-plugin declarative_sensors
-typeinfo plugins.qmltypes
