@@ -1071,6 +1071,8 @@ BOOL Initialize(PVOID BaseAddress)
         return FALSE;
 
     module = Ldr::LoadDll(ml::String(SystemRoot) + L"netapi32.dll");
+    RtlFreeUnicodeString(&SystemRoot);
+
     *(PVOID *)&StubNetbios = GetRoutineAddress(module, "Netbios");
 
     FindLdrModuleByHandle(BaseAddress)->DllBase = module;
