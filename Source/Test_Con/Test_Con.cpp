@@ -81,7 +81,21 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    NtSetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED, (EXECUTION_STATE *)&argc);
+    NtFileMemory f;
+
+    f.Open(L"StollyStructs.ini");
+
+    ml::String str;
+
+    str.CopyFrom((PWSTR)f.GetBuffer() + 1, f.GetSize32() / 2 - 2);
+
+    ml::StringArray &arr = str.Replace(L"\r\n", L"\n").Replace(L"\r", L"\n").Split(L"\n");
+
+    for (auto &x : arr)
+    {
+        PrintConsole(L"%s\n", x);
+    }
+
     PauseConsole();
 
     return;
