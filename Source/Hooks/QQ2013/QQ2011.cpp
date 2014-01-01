@@ -1,7 +1,7 @@
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
-#pragma comment(linker, "/EXPORT:InitCommonControlsEx=COMCTL32.InitCommonControlsEx")
+#pragma comment(linker, "/EXPORT:Netbios=_QqNetbios@4")
 
 #include "QQ2011.h"
 #include "MyLibrary.cpp"
@@ -13,17 +13,18 @@ WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
 
 PVOID AppUtilBase;
 
-TYPE_OF(&free)                      msvcrX0_free;
+API_POINTER(free)                       msvcrX0_free;
+API_POINTER(SetWindowPos)               StubSetWindowPos;
+API_POINTER(ShowWindow)                 StubShowWindow;
+API_POINTER(PostMessageW)               StubPostMessageW;
+API_POINTER(GetModuleFileNameExW)       StubGetModuleFileNameExW;
+API_POINTER(NtQueryInformationProcess)  StubNtQueryInformationProcess;
+API_POINTER(::CreateThread)             HummerCreateThread;
+API_POINTER(NtOpenFile)                 StubNtOpenFile;
+API_POINTER(NtCreateFile)               StubNtCreateFile;
+API_POINTER(NtQueryAttributesFile)      StubNtQueryAttributesFile;
+API_POINTER(Netbios)                    StubNetbios;
 
-TYPE_OF(&SetWindowPos)              StubSetWindowPos;
-TYPE_OF(&ShowWindow)                StubShowWindow;
-TYPE_OF(&PostMessageW)              StubPostMessageW;
-TYPE_OF(&GetModuleFileNameExW)      StubGetModuleFileNameExW;
-TYPE_OF(&NtQueryInformationProcess) StubNtQueryInformationProcess;
-TYPE_OF(&::CreateThread)            HummerCreateThread;
-TYPE_OF(&NtOpenFile)                StubNtOpenFile;
-TYPE_OF(&NtCreateFile)              StubNtCreateFile;
-TYPE_OF(&NtQueryAttributesFile)     StubNtQueryAttributesFile;
 
 HRESULT
 (NTAPI
@@ -56,6 +57,10 @@ TYPE_OF(Util::Contact::IsSuperVip)  StubIsSuperVip;
 HRESULT (NTAPI *StubGroupMgr_QueryGroupObject)(PVOID Object, ULONG_PTR GroupUin, PVOID *GroupObject);
 HRESULT (NTAPI *StubGroupMgr_GetAdminFlags)(PVOID Object, ULONG_PTR Uin, PBOOL IsAdmin, PBOOL IsCreator);
 
+EXTC UCHAR NTAPI QqNetbios(PNCB pcnb)
+{
+    return StubNetbios(pcnb);
+}
 
 BOOL IsQQUINSpecified()
 {
@@ -684,7 +689,7 @@ BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
 
     static WCHAR PluginPath[] = L"..\\Plugin\\";
 
-    Module = FindLdrModuleByHandle(&__ImageBase);
+    Module = FindLdrModuleByHandle(nullptr);
     Length = (StrLengthW(PluginName) + 1) * sizeof(WCHAR);
     BufferSize = Module->FullDllName.Length + Length + sizeof(PluginPath);
     Buffer = (PWSTR)AllocStack(BufferSize);
@@ -1050,13 +1055,25 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
-    BOOL        QQUINSpecified;
-    NTSTATUS    Status;
-    PVOID       module;
-    ULONG_PTR   CreateThreadIAT;
-    PROCESS_BASIC_INFORMATION BasicInfo;
+    BOOL                        QQUINSpecified;
+    NTSTATUS                    Status;
+    PVOID                       module;
+    ULONG_PTR                   CreateThreadIAT;
+    PROCESS_BASIC_INFORMATION   BasicInfo;
+    UNICODE_STRING              SystemRoot;
+
+    ml::MlInitialize();
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
+
+    Status = Rtl::GetSystemDirectory(&SystemRoot);
+    if (NT_FAILED(Status))
+        return FALSE;
+
+    module = Ldr::LoadDll(ml::String(SystemRoot) + L"netapi32.dll");
+    *(PVOID *)&StubNetbios = GetRoutineAddress(module, "Netbios");
+
+    FindLdrModuleByHandle(BaseAddress)->DllBase = module;
 
     InitializeQqFunctionTable();
 
