@@ -5,7 +5,7 @@
 
 #include "pragma_once.h"
 #include "my_headers.h"
-#include "E:\\Desktop\\Source\\sources\\faad2-2.7\\include\\neaacdec.h"
+#include "D:\\Desktop\\Source\\sources\\faad2-2.7\\include\\neaacdec.h"
 #include "mp4ff/mp4ffint.h"
 
 #pragma pack(1)
@@ -26,9 +26,9 @@ typedef struct
 
 enum EAACFormatProfile
 {
-    PROFILE_LC, 
-    PROFILE_HE, 
-    PROFILE_HEV2, 
+    PROFILE_LC,
+    PROFILE_HE,
+    PROFILE_HEV2,
 };
 
 class CAACDecoder

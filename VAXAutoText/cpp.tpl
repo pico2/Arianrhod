@@ -657,6 +657,7 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
     $selected$
@@ -916,7 +917,6 @@ a:Refactor Create Source File::
 $body$$end$
 
 
-
 readme:
 VA Snippet used for refactoring: Create From Usage.
 Delete this item to restore the default upon next use.
@@ -941,7 +941,6 @@ private:
 
 };
 
-
 readme:
 VA Snippet used for refactoring: Create From Usage.
 Delete this item to restore the default upon next use.
@@ -956,7 +955,6 @@ $end$struct $ClassName$
 
 	$MemberType$			m$MemberName$;
 };
-
 
 readme:
 VA Snippet used for refactoring: Create From Usage.
@@ -981,7 +979,6 @@ private:
 	$MemberType$			m$MemberName$;
 
 };
-
 
 readme:
 VA Snippet used for refactoring: Create From Usage.

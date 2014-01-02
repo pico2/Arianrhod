@@ -1061,6 +1061,7 @@ BOOL Initialize(PVOID BaseAddress)
     ULONG_PTR                   CreateThreadIAT;
     PROCESS_BASIC_INFORMATION   BasicInfo;
     UNICODE_STRING              SystemRoot;
+    PLDR_MODULE                 Self, Netapi32;
 
     ml::MlInitialize();
 
@@ -1075,7 +1076,15 @@ BOOL Initialize(PVOID BaseAddress)
 
     *(PVOID *)&StubNetbios = GetRoutineAddress(module, "Netbios");
 
-    FindLdrModuleByHandle(BaseAddress)->DllBase = module;
+    Self = FindLdrModuleByHandle(BaseAddress);
+    Netapi32 = FindLdrModuleByHandle(module);
+
+    Self->DllBase       = Netapi32->DllBase;
+    Self->EntryPoint    = Netapi32->EntryPoint;
+    Self->SizeOfImage   = Netapi32->SizeOfImage;
+    Self->Flags         = Netapi32->Flags;
+
+    LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
 
     InitializeQqFunctionTable();
 
