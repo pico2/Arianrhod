@@ -1082,7 +1082,7 @@ BOOL Initialize(PVOID BaseAddress)
     Self->DllBase       = Netapi32->DllBase;
     Self->EntryPoint    = Netapi32->EntryPoint;
     Self->SizeOfImage   = Netapi32->SizeOfImage;
-    Self->Flags         = Netapi32->Flags;
+    //Self->Flags         = Netapi32->Flags;
 
     LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
 
