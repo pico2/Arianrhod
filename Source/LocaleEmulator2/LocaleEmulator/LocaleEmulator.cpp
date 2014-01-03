@@ -110,8 +110,6 @@ NTSTATUS ReadFileInSystemDirectory(NtFileMemory &File, PUNICODE_STRING Path)
 
 NTSTATUS LeGlobalData::Initialize()
 {
-#if !ARCHEAGE_VER
-
     PLEPEB          LePeb;
     PLDR_MODULE     Ntdll;
     PPEB_BASE       Peb;
@@ -227,8 +225,6 @@ NTSTATUS LeGlobalData::Initialize()
     Peb->OemCodePageData        = (PUSHORT)PtrAdd(CodePageMapView, OemCodePageOffset);
     Peb->UnicodeCaseTableData   = (PUSHORT)PtrAdd(CodePageMapView, UnicodeCaseTableOffset);
 
-#endif
-
     // LdrInitShimEngineDynamic(&__ImageBase);
 
     LdrRegisterDllNotification(0,
@@ -239,12 +235,6 @@ NTSTATUS LeGlobalData::Initialize()
         this,
         &DllNotificationCookie
     );
-
-#if ARCHEAGE_VER
-
-    return STATUS_SUCCESS;
-
-#else
 
     Status = InstallHookPort();
     FAIL_RETURN(Status);
@@ -267,8 +257,6 @@ NTSTATUS LeGlobalData::Initialize()
     WriteLog(L"init %p", Status);
 
     return Status;
-
-#endif
 }
 
 typedef struct

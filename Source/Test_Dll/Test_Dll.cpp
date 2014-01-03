@@ -81,22 +81,22 @@ VOID CDECL InitNodeName(STL60_STRING& NewString, STL60_STRING& String, PCSTR App
     AllocStack(16);
 
     PVOID*                      Ebp;
-    STL60_VECTOR<PNODE_OBJECT>* NodeList;
     CHAR                        Buffer[0x500];
     STL60_STRING                EmptyString;
 
     Ebp = (PVOID *)*((PVOID *)_AddressOfReturnAddress() - 1);
 
-    *(PVOID *)&NodeList  = *PtrSub(Ebp, 0x2C);
+    STL60_VECTOR<PNODE_OBJECT>& NodeList = **(STL60_VECTOR<PNODE_OBJECT> **)PtrSub(Ebp, 0x2C);
 
-    sprintf(
+    snprintf(
         Buffer,
+        countof(Buffer),
         "%s %d.%d.%d.%d %s",
         String.GetBuffer(),
-        LOBYTE((*NodeList)[NodeIndex]->Ip),
-        HIBYTE((*NodeList)[NodeIndex]->Ip),
-        LOBYTE(HIWORD((*NodeList)[NodeIndex]->Ip)),
-        HIBYTE(HIWORD((*NodeList)[NodeIndex]->Ip)),
+        LOBYTE(NodeList[NodeIndex]->Ip),
+        HIBYTE(NodeList[NodeIndex]->Ip),
+        LOBYTE(HIWORD(NodeList[NodeIndex]->Ip)),
+        HIBYTE(HIWORD(NodeList[NodeIndex]->Ip)),
         Append
     );
 
@@ -160,9 +160,10 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_PATCH p[] =
     {
         PATCH_MEMORY(0x00, 4, 0x73779),
-        PATCH_MEMORY(0xEB, 1, 0x6D382),
+        PATCH_MEMORY(0xEB, 1, 0x6D382),     // ping
         PATCH_MEMORY(0xEB, 1, 0x6D56D),
         PATCH_MEMORY(0xEB, 1, 0x6D477),
+        PATCH_MEMORY(1, 4, 0x6FA73),      // timer
     };
 
     MEMORY_FUNCTION_PATCH f[] =
