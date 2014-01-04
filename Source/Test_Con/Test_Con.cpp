@@ -83,20 +83,12 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 
     NtFileMemory f;
 
-    f.Open(L"StollyStructs.ini");
+    f.Open(LR"(D:\Desktop\new.txt)");
 
-    ml::String str;
+    auto &str = ml::String::Decode(f.GetBuffer(), f.GetSize32(), CP_GB2312);
+    auto &bytes = str.Encode(CP_SHIFTJIS);
 
-    str.CopyFrom((PWSTR)f.GetBuffer() + 1, f.GetSize32() / 2 - 2);
-
-    ml::StringArray &arr = str.Replace(L"\r\n", L"\n").Replace(L"\r", L"\n").Split(L"\n");
-
-    for (auto &x : arr)
-    {
-        PrintConsole(L"%s\n", x);
-    }
-
-    PauseConsole();
+    PauseConsole(str);
 
     return;
 

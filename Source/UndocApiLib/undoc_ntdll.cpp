@@ -3,7 +3,48 @@
 
 #include "MyLibrary.h"
 
-_MY_C_HEAD_
+_ML_C_HEAD_
+
+int __cdecl _snwprintf(wchar_t * _DstBuf, size_t _MaxCount, const wchar_t * _Format, ...)
+{
+    return 0;
+}
+
+VOID
+NTAPI
+KiUserCallbackDispatcher(
+    ULONG_PTR,
+    ULONG_PTR   apfnDispatchIndex,
+    PVOID       Parameter
+)
+{
+}
+
+NTSTATUS
+NTAPI
+RtlUnicodeToUTF8N(
+    OUT PSTR    UTF8StringDestination,
+    IN  ULONG   UTF8StringMaxByteCount,
+    OUT PULONG  UTF8StringActualByteCount,
+    IN  PCWSTR  UnicodeStringSource,
+    IN  ULONG   UnicodeStringByteCount
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
+RtlUTF8ToUnicodeN(
+    OUT PWSTR   UnicodeStringDestination,
+    IN  ULONG   UnicodeStringMaxByteCount,
+    OUT PULONG  UnicodeStringActualByteCount,
+    IN  PCSTR   UTF8StringSource,
+    IN  ULONG   UTF8StringByteCount
+)
+{
+    return 0;
+}
 
 NTSTATUS
 NTAPI
@@ -326,4 +367,4 @@ NtCreateThreadEx(
     return 0;
 }
 
-_MY_C_TAIL_
+_ML_C_TAIL_

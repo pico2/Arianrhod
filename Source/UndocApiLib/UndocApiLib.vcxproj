@@ -269,7 +269,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:/MyLib/MyLibrary/Library/ucidec.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\ucidec.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -310,7 +310,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:/MyLib/MyLibrary/Library/ucidec.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\ucidec.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -352,7 +352,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\zlib1.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\zlib1.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -393,7 +393,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\zlib1.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\zlib1.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -435,7 +435,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\undoc_ntdll.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\undoc_ntdll.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>
       </AdditionalDependencies>
@@ -481,7 +481,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\undoc_k32.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\undoc_k32.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>
       </AdditionalDependencies>
@@ -526,7 +526,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library64\undoc_ntdll.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library64\undoc_ntdll.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -567,7 +567,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library64\undoc_k32.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library64\undoc_k32.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -609,7 +609,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\ws2_32.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\ws2_32.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -650,7 +650,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\ws2_32.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\ws2_32.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -692,7 +692,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library\undoc_apphelp.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\undoc_apphelp.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
@@ -733,7 +733,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>E:\MyLib\MyLibrary\Library64\undoc_apphelp.lib</ImportLibrary>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library64\undoc_apphelp.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
