@@ -433,15 +433,6 @@ QqSetWindowPos(
     UINT    Flags
 )
 {
-    BOOL IsMessageBox;
-
-    LONG BuddyWidth     = 553;
-    LONG BuddyHeight    = 526;
-    LONG GroupWidth     = 603;
-    LONG GroupHeight    = 527;
-    LONG DiscussWidth   = 556;
-    LONG DiscussHeight  = 526;
-
 #define GROUP_WIDTH     722
 #define GROUP_HEIGHT    671
 #define BUDDY_WIDTH     506
@@ -450,45 +441,100 @@ QqSetWindowPos(
 #if 0
 
     AllocConsole();
+    ShowWindow(GetConsoleWindow(), SW_SHOW);
     PrintConsoleW(L"%d, %d\n", cx, cy);
 
     {
         FILE *fp;
 
-        fp = fopen("E:\\desktop\\qqlog.txt", "ab");
+        fp = fopen("D:\\desktop\\qqlog.txt", "ab");
         fprintf(fp, "%d, %d\r\n", cx, cy);
         fclose(fp);
     }
 
 #endif
 
-    IsMessageBox = IsWindowMessageBox(hWnd);
+    enum
+    {
+        UnknownWindow,
+        BuddyWindow,
+        GroupWindow,
+        DiscussWindow,
+        MessageBox,
+    };
 
-    if (
-        IsMessageBox                            ||
-        (cx == BuddyWidth && cy == BuddyHeight) ||
-        (cx == GroupWidth && cy == GroupHeight) ||
-        (cx == DiscussWidth && cy == DiscussHeight)
-       )
+    auto GetWindowType = [] (HWND hWnd, INT cx, INT cy)
+    {
+        BOOL IsMessageBox;
+        PSIZE Size;
+
+        static SIZE BuddySize[] =
+        {
+            { 553, 526 },
+        };
+
+        static SIZE GroupSize[] =
+        {
+            { 614, 546 },
+            { 603, 527 },
+        };
+
+        static SIZE DiscussSize[] =
+        {
+            { 567, 545 },
+            { 556, 526 },
+        };
+
+        IsMessageBox = IsWindowMessageBox(hWnd);
+        if (IsMessageBox)
+            return MessageBox;
+
+        FOR_EACH_ARRAY(Size, BuddySize)
+        {
+            if (Size->cx == cx && Size->cy == cy)
+                return BuddyWindow;
+        }
+
+        FOR_EACH_ARRAY(Size, GroupSize)
+        {
+            if (Size->cx == cx && Size->cy == cy)
+                return GroupWindow;
+        }
+
+        FOR_EACH_ARRAY(Size, DiscussSize)
+        {
+            if (Size->cx == cx && Size->cy == cy)
+                return DiscussWindow;
+        }
+
+        return UnknownWindow;
+    };
+
+    ULONG WindowType = GetWindowType(hWnd, cx, cy);
+
+    if (WindowType != UnknownWindow)
     {
         RECT WorkArea;
 
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &WorkArea, 0);
 
-        if (IsMessageBox)
+        switch (WindowType)
         {
-            cx = (WorkArea.right - WorkArea.left) * 80 / 100;
-            cy = (WorkArea.bottom - WorkArea.top) * 90 / 100;
-        }
-        else if (cx == BuddyWidth)
-        {
-            //cx = BUDDY_WIDTH;
-            //cy = BUDDY_HEIGHT;
-        }
-        else
-        {
-            cx = GROUP_WIDTH;
-            cy = GROUP_HEIGHT;
+            case MessageBox:
+                cx = (WorkArea.right - WorkArea.left) * 80 / 100;
+                cy = (WorkArea.bottom - WorkArea.top) * 90 / 100;
+                break;
+
+            case BuddyWindow:
+                //cx = BUDDY_WIDTH;
+                //cy = BUDDY_HEIGHT;
+                break;
+
+            case GroupWindow:
+            case DiscussWindow:
+                cx = GROUP_WIDTH;
+                cy = GROUP_HEIGHT;
+                break;
         }
 
         X = ((WorkArea.right - WorkArea.left) - cx) / 2;
