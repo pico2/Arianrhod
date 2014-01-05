@@ -36,3 +36,5 @@ EXPORTS
 	RtlUTF8ToUnicodeN
 	KiUserCallbackDispatcher
 	_snwprintf
+	swprintf
+	wcsstr

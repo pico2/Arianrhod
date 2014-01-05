@@ -5,6 +5,16 @@
 
 _ML_C_HEAD_
 
+wchar_t* __cdecl wcsstr(const wchar_t *_Str, const wchar_t *_SubStr)
+{
+    return 0;
+}
+
+int __cdecl swprintf(wchar_t * _DstBuf, const wchar_t * _Format, ...)
+{
+    return 0;
+}
+
 int __cdecl _snwprintf(wchar_t * _DstBuf, size_t _MaxCount, const wchar_t * _Format, ...)
 {
     return 0;
