@@ -75,20 +75,32 @@ BOOL IsRunningInVMWare()
 
 #endif
 
+VOID PrintLocaleDefaultAnsiCodePage()
+{
+    WCHAR Buffer[8];
+    GetLocaleInfoW(GetUserDefaultLangID(), LOCALE_IDEFAULTANSICODEPAGE, Buffer, countof(Buffer));
+    PrintConsole(L"%s\n", Buffer);
+
+    Ps::ExitProcess(0);
+}
+
 #include "D:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
 
 ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
+    PrintLocaleDefaultAnsiCodePage();
+
     NtFileMemory f;
 
     f.Open(LR"(D:\Desktop\new.txt)");
 
     auto &str = ml::String::Decode(f.GetBuffer(), f.GetSize32(), CP_GB2312);
-    auto &bytes = str.Encode(CP_SHIFTJIS);
+    auto &arr = str.Replace(L"\r\n", L"\n").Replace(L"\r", L"\n").Split(L"\n");
+    auto &join = ml::String(L"\n").Join(arr);
 
-    PauseConsole(str);
+    PauseConsole(join);
 
     return;
 
