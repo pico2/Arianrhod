@@ -204,6 +204,8 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>ntdll</TargetName>
     <TargetExt>.dll</TargetExt>
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -528,7 +530,8 @@
       <SubSystem>Console</SubSystem>
       <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library64\undoc_ntdll.lib</ImportLibrary>
       <NoEntryPoint>true</NoEntryPoint>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalOptions> /ltcg</AdditionalOptions>
       <ModuleDefinitionFile>.\undoc_ntdll.def</ModuleDefinitionFile>
     </Link>
