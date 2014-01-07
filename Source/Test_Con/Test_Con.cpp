@@ -90,19 +90,11 @@ ForceInline Void main2(LongPtr argc, TChar **argv)
 {
     NTSTATUS Status;
 
-    PrintLocaleDefaultAnsiCodePage();
+    VOID (*pypy_main_startup)();
 
-    NtFileMemory f;
+    *(PVOID *)&pypy_main_startup = GetRoutineAddress(Ldr::LoadDll(L"libpypy-c.dll"), "pypy_main_startup");
 
-    f.Open(LR"(D:\Desktop\new.txt)");
-
-    auto &str = ml::String::Decode(f.GetBuffer(), f.GetSize32(), CP_GB2312);
-    auto &arr = str.Replace(L"\r\n", L"\n").Replace(L"\r", L"\n").Split(L"\n");
-    auto &join = ml::String(L"\n").Join(arr);
-
-    PauseConsole(join);
-
-    return;
+    return pypy_main_startup();
 
 #if 0
 
