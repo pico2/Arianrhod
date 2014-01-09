@@ -5,4 +5,4 @@ QMenuBar
 
 .. class:: QMenuBar
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.1/qtwidgets/qmenubar.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtwidgets/qmenubar.html>`_

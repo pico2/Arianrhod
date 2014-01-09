@@ -42,8 +42,8 @@ import QtQuick 2.1
 
 /*!
     \qmltype TableViewColumn
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup viewitems
     \brief Used to define columns in a \l TableView.
 */
@@ -68,6 +68,16 @@ QtObject {
     /*! The visible status of the column. */
     property bool visible: true
 
+    /*! Determines if the column should be resizable.
+    \since QtQuick.Controls 1.1 */
+    property bool resizable: true
+
+    /*! Determines if the column should be movable.
+    The default value is \c true.
+    \note A non-movable column may get indirectly moved if adjacent columns are movable.
+    \since QtQuick.Controls 1.1 */
+    property bool movable: true
+
     /*! \qmlproperty enumeration TableViewColumn::elideMode
     The text elide mode of the column.
     Allowed values are:
@@ -85,7 +95,7 @@ QtObject {
     Allowed values are:
     \list
         \li Text.AlignLeft - the default
-        \li Text.AligntRight
+        \li Text.AlignRight
         \li Text.AlignHCenter
         \li Text.AlignJustify
     \endlist
@@ -93,7 +103,19 @@ QtObject {
     property int horizontalAlignment: Text.AlignLeft
 
     /*! The delegate of the column. This can be used to set the
-    \l TableView::itemDelegate for a specific column. */
+    \l TableView::itemDelegate for a specific column.
+
+    In the delegate you have access to the following special properties:
+    \list
+    \li  styleData.selected - if the item is currently selected
+    \li  styleData.value - the value or text for this item
+    \li  styleData.textColor - the default text color for an item
+    \li  styleData.row - the index of the row
+    \li  styleData.column - the index of the column
+    \li  styleData.elideMode - the elide mode of the column
+    \li  styleData.textAlignment - the horizontal text alignment of the column
+    \endlist
+    */
     property Component delegate
 
     Accessible.role: Accessible.ColumnHeader

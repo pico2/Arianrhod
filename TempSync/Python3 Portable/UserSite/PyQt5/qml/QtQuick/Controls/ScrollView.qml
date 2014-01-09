@@ -39,14 +39,14 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Controls.Styles 1.1
 
 /*!
     \qmltype ScrollView
-    \inqmlmodule QtQuick.Controls 1.0
-    \since  QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since  5.1
     \ingroup views
     \brief Provides a scrolling view within another Item.
 
@@ -81,7 +81,7 @@ import QtQuick.Controls.Styles 1.0
     \l flickableItem.
 
     You can create a custom appearance for a ScrollView by
-    assigning a \l ScrollViewStyle.
+    assigning a \l {QtQuick.Controls.Styles::ScrollViewStyle}{ScrollViewStyle}.
 */
 
 FocusScope {
@@ -137,6 +137,8 @@ FocusScope {
     /*! \internal */
     property Item __scroller: scroller
     /*! \internal */
+    property alias __wheelAreaScrollSpeed: wheelArea.scrollSpeed
+    /*! \internal */
     property int __scrollBarTopMargin: 0
     /*! \internal */
     property int __viewTopMargin: 0
@@ -144,7 +146,12 @@ FocusScope {
     property alias __horizontalScrollBar: scroller.horizontalScrollBar
     /*! \internal */
     property alias __verticalScrollBar: scroller.verticalScrollBar
-    /*! \internal */
+    /*! \qmlproperty Component ScrollView::style
+
+        The style Component for this control.
+        \sa {Qt Quick Controls Styles QML Types}
+
+    */
     property Component style: Qt.createComponent(Settings.style + "/ScrollViewStyle.qml", root)
 
     /*! \internal */
@@ -163,7 +170,8 @@ FocusScope {
             contentItem.parent = internal.flickableItem.contentItem
         }
         internal.flickableItem.anchors.fill = viewportItem
-        internal.flickableItem.interactive = false
+        if (!Settings.hasTouchScreen)
+            internal.flickableItem.interactive = false
     }
 
 
@@ -280,13 +288,13 @@ FocusScope {
         ScrollViewHelper {
             id: scroller
             anchors.fill: parent
+            active: wheelArea.active
             property bool outerFrame: !frameVisible || !(__style ? __style.__externalScrollBars : 0)
             property int scrollBarSpacing: outerFrame ? 0 : (__style ? __style.__scrollBarSpacing : 0)
             property int verticalScrollbarOffset: verticalScrollBar.visible && !verticalScrollBar.isTransient ?
                                                       verticalScrollBar.width + scrollBarSpacing : 0
             property int horizontalScrollbarOffset: horizontalScrollBar.visible && !horizontalScrollBar.isTransient ?
                                                         horizontalScrollBar.height + scrollBarSpacing : 0
-
             Loader {
                 id: frameLoader
                 sourceComponent: __style ? __style.frame : null

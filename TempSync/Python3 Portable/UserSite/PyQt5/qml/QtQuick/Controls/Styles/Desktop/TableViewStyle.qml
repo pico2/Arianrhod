@@ -38,8 +38,9 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
+import "."
 
 ScrollViewStyle {
     id: root
@@ -81,18 +82,18 @@ ScrollViewStyle {
                                                                                   styleData.column === 0 ? "beginning" : ""
     }
 
-    property Component rowDelegate: StyleItem {
-        id: rowstyle
-        elementType: "itemrow"
-        activeControl: styleData.alternate ? "alternate" : ""
-        selected: styleData.selected ? true : false
-        height: Math.max(16, rowstyle.implicitHeight)
-        active: styleData.hasActiveFocus
+    property Component rowDelegate: BorderImage {
+        visible: styleData.selected || styleData.alternate
+        source: "image://__tablerow/" + (styleData.alternate ? "alternate_" : "")
+                + (styleData.selected ? "selected_" : "")
+                + (styleData.hasActiveFocus ? "active" : "")
+        height: Math.max(16, RowItemSingleton.implicitHeight)
+        border.left: 4 ; border.right: 4
     }
 
     property Component itemDelegate: Item {
         height: Math.max(16, label.implicitHeight)
-        property int implicitWidth: sizehint.paintedWidth + 16
+        property int implicitWidth: label.implicitWidth + 16
 
         Text {
             id: label
@@ -108,12 +109,6 @@ ScrollViewStyle {
             text: styleData.value !== undefined ? styleData.value : ""
             color: styleData.textColor
             renderType: Text.NativeRendering
-        }
-        Text {
-            id: sizehint
-            font: label.font
-            text: styleData.value ? styleData.value : ""
-            visible: false
         }
     }
 }

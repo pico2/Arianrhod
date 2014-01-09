@@ -38,13 +38,13 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype TableViewStyle
-    \inqmlmodule QtQuick.Controls.Styles 1.0
-    \since QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
+    \since 5.1
     \ingroup viewsstyling
     \brief Provides custom styling for TableView
 
@@ -61,10 +61,10 @@ ScrollViewStyle {
     property color textColor: __syspal.text
 
     /*! The background color. */
-    property color backgroundColor: __syspal.base
+    property color backgroundColor: control.backgroundVisible ? __syspal.base : "transparent"
 
     /*! The alternate background color. */
-    property color alternateBackgroundColor: Qt.darker(__syspal.base, 1.06)
+    property color alternateBackgroundColor: "#f5f5f5"
 
     /*! The text highlight color, used within selections. */
     property color highlightedTextColor: "white"
@@ -78,9 +78,13 @@ ScrollViewStyle {
     Delegate for header. This delegate is described in \l {TableView::headerDelegate}
     */
     property Component headerDelegate: BorderImage {
+        height: textItem.implicitHeight * 1.2
         source: "images/header.png"
         border.left: 4
+        border.bottom: 2
+        border.top: 2
         Text {
+            id: textItem
             anchors.fill: parent
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignLeft
@@ -95,6 +99,7 @@ ScrollViewStyle {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 1
+            anchors.topMargin: 1
             width: 1
             color: "#ccc"
         }
@@ -104,31 +109,10 @@ ScrollViewStyle {
     Delegate for header. This delegate is described in \l {TableView::rowDelegate}
     */
     property Component rowDelegate: Rectangle {
-        height: 20
-        property color selectedColor: styleData.hasActiveFocus ? "#38d" : "#999"
-        gradient: Gradient {
-            GradientStop {
-                color: styleData.selected ? Qt.lighter(selectedColor, 1.3) :
-                                            styleData.alternate ? alternateBackgroundColor : backgroundColor
-                position: 0
-            }
-            GradientStop {
-                color: styleData.selected ? Qt.lighter(selectedColor, 1.0) :
-                                            styleData.alternate ? alternateBackgroundColor : backgroundColor
-                position: 1
-            }
-        }
-        Rectangle {
-            anchors.bottom: parent.bottom
-            width: parent.width
-            height: 1
-            color: styleData.selected ? Qt.darker(selectedColor, 1.4) : "transparent"
-        }
-        Rectangle {
-            anchors.top: parent.top
-            width: parent.width ; height: 1
-            color: styleData.selected ? Qt.darker(selectedColor, 1.1) : "transparent"
-        }
+        height: Math.round(TextSingleton.implicitHeight * 1.2)
+        property color selectedColor: styleData.hasActiveFocus ? "#07c" : "#999"
+        color: styleData.selected ? selectedColor :
+                                    !styleData.alternate ? alternateBackgroundColor : backgroundColor
     }
 
     /*! \qmlproperty Component TableViewStyle::itemDelegate
@@ -136,7 +120,7 @@ ScrollViewStyle {
     */
     property Component itemDelegate: Item {
         height: Math.max(16, label.implicitHeight)
-        property int implicitWidth: sizehint.paintedWidth + 20
+        property int implicitWidth: label.implicitWidth + 20
 
         Text {
             id: label
@@ -152,12 +136,6 @@ ScrollViewStyle {
             text: styleData.value !== undefined ? styleData.value : ""
             color: styleData.textColor
             renderType: Text.NativeRendering
-        }
-        Text {
-            id: sizehint
-            font: label.font
-            text: styleData.value ? styleData.value : ""
-            visible: false
         }
     }
 }

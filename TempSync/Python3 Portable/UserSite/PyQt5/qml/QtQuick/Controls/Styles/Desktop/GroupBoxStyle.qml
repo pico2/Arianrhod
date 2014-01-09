@@ -38,7 +38,7 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 
@@ -70,5 +70,7 @@ Style {
         hasFocus: control.__checkbox.activeFocus
         activeControl: control.checkable ? "checkbox" : ""
         properties: { "checkable" : control.checkable , "sunken" : !control.flat}
+        textureHeight: 128
+        border {top: 32 ; bottom: 8}
     }
 }

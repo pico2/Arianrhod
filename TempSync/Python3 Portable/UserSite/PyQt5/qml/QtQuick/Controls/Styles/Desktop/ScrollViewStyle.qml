@@ -38,7 +38,7 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 Style {
@@ -58,7 +58,15 @@ Style {
         id: styleitem
         elementType: "frame"
         sunken: true
-        visible: frameVisible
+        visible: control.frameVisible
+        textureHeight: 64
+        textureWidth: 64
+        border {
+            top: 16
+            left: 16
+            right: 16
+            bottom: 16
+        }
     }
 
     property Component corner: StyleItem { elementType: "scrollareacorner" }
@@ -68,7 +76,6 @@ Style {
     readonly property bool scrollToClickedPosition: __styleitem.styleHint("scrollToClickPosition") !== 0
 
     property Component __scrollbar: StyleItem {
-        readonly property bool isTransient: __styleitem.parent && __styleitem.transient
         anchors.fill:parent
         elementType: "scrollbar"
         hover: activeControl != "none"

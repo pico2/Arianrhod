@@ -38,17 +38,21 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Window 2.1
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.1
 import QtQuick.Controls.Private 1.0
+import "." as Desktop
 
 Style {
     readonly property ComboBox control: __control
+    property int drowDownButtonWidth: 24
     property Component panel: Item {
         property bool popup: !!styleItem.styleHint("comboboxpopup")
 
-        implicitWidth: 115
+        implicitWidth: 125
         implicitHeight: styleItem.implicitHeight
+        baselineOffset: styleItem.baselineOffset
         anchors.fill: parent
         StyleItem {
             id: styleItem
@@ -70,7 +74,8 @@ Style {
 
             hints: control.styleHints
             properties: {
-                "popup": control.__popup
+                "popup": control.__popup,
+                "editable" : control.editable
             }
         }
     }
@@ -85,6 +90,8 @@ Style {
 
             width: (parent ? parent.contentWidth : 0)
             height: (parent ? parent.contentHeight : 0) + 2 * pixelMetric("defaultframewidth")
+            property real maxHeight: 600
+            property int margin: pixelMetric("menuvmargin") + pixelMetric("menupanelwidth")
         }
 
         property Component menuItem: StyleItem {
@@ -105,6 +112,10 @@ Style {
                 text: parent && parent.parent ? parent.parent.text : ""
                 selected: parent ? parent.selected : false
             }
+        }
+
+        property Component scrollerStyle: Desktop.ScrollViewStyle {
+            property bool useScrollers: false
         }
     }
 }

@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype Slider
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief Provides a vertical or horizontal slider control.
 
@@ -63,7 +63,7 @@ import QtQuick.Controls.Private 1.0
     needed, you can set the \l stepSize.
 
     You can create a custom appearance for a Slider by
-    assigning a \l SliderStyle.
+    assigning a \l {QtQuick.Controls.Styles::SliderStyle}{SliderStyle}.
 */
 
 Control {
@@ -161,7 +161,8 @@ Control {
         \qmlproperty bool Slider::tickmarksEnabled
 
         This property indicates whether the Slider should display tickmarks
-        at step intervals.
+        at step intervals. Tick mark spacing is calculated based on the
+        \l stepSize property.
 
         The default value is \c false.
     */

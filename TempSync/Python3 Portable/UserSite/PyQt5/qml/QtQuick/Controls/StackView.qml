@@ -39,15 +39,15 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype StackView
     \inherits Item
     \ingroup views
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
 
     \brief Provides a stack-based navigation model.
 

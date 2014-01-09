@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype Button
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief A push button with a text label.
 
@@ -57,7 +57,7 @@ import QtQuick.Controls.Private 1.0
     Button is similar to the QPushButton widget.
 
     You can create a custom appearance for a Button by
-    assigning a \l ButtonStyle.
+    assigning a \l {QtQuick.Controls.Styles::ButtonStyle}{ButtonStyle}.
  */
 BasicButton {
     id: button
@@ -78,10 +78,7 @@ BasicButton {
      */
     property Menu menu: null
 
-    /*! \qmlproperty bool BasicButton::pressed
-
-        This property holds whether the button is being pressed. */
-    readonly property bool pressed: __behavior.effectivePressed || menu && menu.__popupVisible
+    __effectivePressed: __behavior.effectivePressed || menu && menu.__popupVisible
 
     activeFocusOnTab: true
 
@@ -114,7 +111,10 @@ BasicButton {
         interval: 10
         onTriggered: {
             __behavior.keyPressed = false
-            menu.__popup(0, button.height, 0)
+            if (Qt.application.layoutDirection === Qt.RightToLeft)
+                menu.__popup(button.width, button.height, 0)
+            else
+                menu.__popup(0, button.height, 0)
         }
     }
 }

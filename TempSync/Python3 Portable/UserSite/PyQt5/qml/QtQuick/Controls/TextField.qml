@@ -38,14 +38,14 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick 2.2
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype TextField
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief Displays a single line of editable plain text.
 
@@ -55,7 +55,7 @@ import QtQuick.Controls.Private 1.0
     TextField to be used for a password input field.
 
     You can create a custom appearance for a TextField by
-    assigning a \l TextFieldStyle.
+    assigning a \l {QtQuick.Controls.Styles::TextFieldStyle}{TextFieldStyle}.
 
     \sa TextArea, TextInput
 */
@@ -380,7 +380,7 @@ Control {
 
         \code
         import QtQuick 2.1
-        import QtQuick.Controls 1.0
+        import QtQuick.Controls 1.1
 
         TextField {
             validator: IntValidator {bottom: 11; top: 31;}
@@ -401,6 +401,18 @@ Control {
         state.
     */
     signal accepted()
+
+    /*!
+        \qmlsignal TextField::editingFinished()
+        \since 5.2
+
+        This signal is emitted when the Return or Enter key is pressed or
+        the text field loses focus. Note that if there is a validator or
+        inputMask set on the text field and enter/return is pressed, this
+        signal will only be emitted if the input follows
+        the inputMask and the validator returns an acceptable state.
+    */
+    signal editingFinished()
 
     /*!
         \qmlmethod TextField::copy()
@@ -557,11 +569,11 @@ Control {
         font: textInput.font
         horizontalAlignment: textInput.horizontalAlignment
         verticalAlignment: textInput.verticalAlignment
-        opacity: !textInput.text.length ? 1 : 0
+        opacity: !textInput.text.length && !textInput.inputMethodComposing ? 1 : 0
         color: __panel ? __panel.placeholderTextColor : "darkgray"
-        clip: true
+        clip: contentWidth > width;
         elide: Text.ElideRight
-        renderType: Text.NativeRendering
+        renderType: __style ? __style.renderType : Text.NativeRendering
         Behavior on opacity { NumberAnimation { duration: 90 } }
     }
 
@@ -582,9 +594,16 @@ Control {
         verticalAlignment: Text.AlignVCenter
 
         color: __panel ? __panel.textColor : "darkgray"
-        clip: true
-        renderType: Text.NativeRendering
+        clip: contentWidth > width
 
-        onAccepted: textfield.accepted()
+        renderType: __style ? __style.renderType : Text.NativeRendering
+
+        onAccepted: {
+            Qt.inputMethod.commit()
+            Qt.inputMethod.hide()
+            textfield.accepted()
+        }
+
+        onEditingFinished: textfield.editingFinished()
     }
 }

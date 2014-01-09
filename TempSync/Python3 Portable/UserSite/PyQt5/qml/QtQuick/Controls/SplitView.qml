@@ -39,14 +39,14 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Private 1.0 as Private
 
 /*!
     \qmltype SplitView
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup views
     \brief Lays out items with a draggable splitter between each item.
 
@@ -195,6 +195,8 @@ Item {
                     handleLoader.createObject(splitterHandles, {"__handleIndex":splitterItems.children.length - 1})
                 item.parent = splitterItems
                 i-- // item was removed from list
+
+                // should match disconnections in Component.onDestruction
                 item.widthChanged.connect(d.updateLayout)
                 item.heightChanged.connect(d.updateLayout)
                 item.Layout.maximumWidthChanged.connect(d.updateLayout)
@@ -293,17 +295,18 @@ Item {
             // calculate their acummulated width.
             var w = 0
             for (var i=firstIndex; i<lastIndex; ++i) {
+
                 var item = __items[i]
                 if (item.visible || i == d.fillIndex) {
                     if (i !== d.fillIndex)
                         w += item[d.size];
                     else if (includeFillItemMinimum && item.Layout[minimum] !== undefined)
                         w += item.Layout[minimum]
-
-                    var handle = __handles[i]
-                    if (handle && handle.visible)
-                        w += handle[d.size]
                 }
+
+                var handle = __handles[i]
+                if (handle && handle.visible)
+                    w += handle[d.size]
             }
             return w
         }
@@ -351,14 +354,14 @@ Item {
                     item[d.otherOffset] = 0
                     item[d.otherSize] = clampedMinMax(root[otherSize], item.Layout[otherMinimum], item.Layout[otherMaximum])
                     lastVisibleItem = item
+                }
 
-                    handle = __handles[i]
-                    if (handle && handle.visible) {
-                        handle[d.offset] = lastVisibleItem[d.offset] + Math.max(0, lastVisibleItem[d.size])
-                        handle[d.otherOffset] = 0
-                        handle[d.otherSize] = root[d.otherSize]
-                        lastVisibleHandle = handle
-                    }
+                handle = __handles[i]
+                if (handle && handle.visible) {
+                    handle[d.offset] = lastVisibleItem[d.offset] + Math.max(0, lastVisibleItem[d.size])
+                    handle[d.otherOffset] = 0
+                    handle[d.otherSize] = root[d.otherSize]
+                    lastVisibleHandle = handle
                 }
             }
 
@@ -395,6 +398,7 @@ Item {
                 anchors.topMargin: (parent.height <= 1) ? -2 : 0
                 anchors.bottomMargin: (parent.height <= 1) ? -2 : 0
                 hoverEnabled: true
+                drag.threshold: 0
                 drag.target: parent
                 drag.axis: root.orientation === Qt.Horizontal ? Drag.XAxis : Drag.YAxis
                 cursorShape: root.orientation === Qt.Horizontal ? Qt.SplitHCursor : Qt.SplitVCursor
@@ -484,6 +488,14 @@ Item {
     Component.onDestruction: {
         for (var i=0; i<splitterItems.children.length; ++i) {
             var item = splitterItems.children[i];
+
+            // should match connections in init()
+            item.widthChanged.disconnect(d.updateLayout)
+            item.heightChanged.disconnect(d.updateLayout)
+            item.Layout.maximumWidthChanged.disconnect(d.updateLayout)
+            item.Layout.minimumWidthChanged.disconnect(d.updateLayout)
+            item.Layout.maximumHeightChanged.disconnect(d.updateLayout)
+            item.Layout.minimumHeightChanged.disconnect(d.updateLayout)
             item.visibleChanged.disconnect(d.updateFillIndex)
             item.Layout.fillWidthChanged.disconnect(d.updateFillIndex)
             item.Layout.fillHeightChanged.disconnect(d.updateFillIndex)

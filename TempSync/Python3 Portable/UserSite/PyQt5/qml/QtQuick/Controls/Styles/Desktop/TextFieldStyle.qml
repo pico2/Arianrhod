@@ -38,10 +38,12 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 Style {
+    property int renderType: Text.NativeRendering
+
     property Component panel: StyleItem {
         id: textfieldstyle
         elementType: "edit"
@@ -79,5 +81,8 @@ Style {
             anchors.fill: parent
             visible: textfield.activeFocus && textfieldstyle.styleHint("focuswidget") && !rounded
         }
+        textureHeight: implicitHeight
+        textureWidth: 32
+        border {top: 8 ; bottom: 8 ; left: 8 ; right: 8}
     }
 }

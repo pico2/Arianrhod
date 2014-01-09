@@ -38,7 +38,7 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 Style {
@@ -57,7 +57,8 @@ Style {
 
         properties: {
             "icon": control.__iconAction.__icon,
-            "position": control.__position
+            "position": control.__position,
+            "menu" : control.menu !== null
         }
     }
 }

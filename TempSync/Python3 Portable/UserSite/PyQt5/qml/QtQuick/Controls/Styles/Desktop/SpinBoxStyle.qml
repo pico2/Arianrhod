@@ -38,7 +38,7 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 Style {
@@ -57,14 +57,16 @@ Style {
    }
     StyleItem {id: styleitem ; visible: false}
 
+    property int renderType: Text.NativeRendering
+
     property Component panel: Item {
         id: style
 
         property rect upRect
         property rect downRect
 
-        property int horizontalTextAlignment: Qt.AlignLeft
-        property int verticalTextAlignment: Qt.AlignVCenter
+        property int horizontalAlignment: Qt.platform.os === "osx" ? Qt.AlignRight : Qt.AlignLeft
+        property int verticalAlignment: Qt.AlignVCenter
 
         property color foregroundColor: __syspal.text
         property color backgroundColor: __syspal.base
@@ -72,15 +74,16 @@ Style {
         property color selectedTextColor: __syspal.highlightedText
 
         property int topPadding: edit.anchors.topMargin
-        property int leftPadding: 2 + edit.anchors.leftMargin
-        property int rightPadding: 2 + edit.anchors.leftMargin
+        property int leftPadding: 3 + edit.anchors.leftMargin
+        property int rightPadding: 3 + edit.anchors.rightMargin
         property int bottomPadding: edit.anchors.bottomMargin
 
         width: 100
         height: styleitem.implicitHeight
 
-        implicitWidth: styleitem.implicitWidth
+        implicitWidth: 2 + styleitem.implicitWidth
         implicitHeight: styleitem.implicitHeight
+        baselineOffset: styleitem.baselineOffset
 
         Item {
             id: edit
@@ -126,6 +129,8 @@ Style {
                    (styleData.downEnabled ? (1<<3) : 0)
             contentWidth: styleData.contentWidth
             contentHeight: styleData.contentHeight
+            textureHeight: implicitHeight
+            border {top: 6 ; bottom: 6}
         }
     }
 }

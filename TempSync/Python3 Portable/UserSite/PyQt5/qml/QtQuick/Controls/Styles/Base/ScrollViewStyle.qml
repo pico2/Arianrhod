@@ -38,13 +38,13 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype ScrollViewStyle
-    \inqmlmodule QtQuick.Controls.Styles 1.0
-    \since QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
+    \since 5.1
     \ingroup viewsstyling
     \brief Provides custom styling for ScrollView
 */
@@ -69,9 +69,15 @@ Style {
     mouse location when clicked. */
     property bool scrollToClickedPosition: true
 
+    /*! This property holds whether the scroll bars are transient. Transient scroll bars
+        appear when the content is scrolled and disappear when they are no longer needed.
+
+        The default value is platform dependent. */
+    property bool transientScrollBars: Settings.hasTouchScreen
+
     /*! This Component paints the frame around scroll bars. */
     property Component frame: Rectangle {
-        color: "white"
+        color: control["backgroundVisible"] ? "white": "transparent"
         border.color: "#999"
         border.width: 1
         radius: 1
@@ -105,9 +111,13 @@ Style {
     */
 
     property Component scrollBarBackground: Item {
-        implicitWidth: 16
-        implicitHeight: 16
+        property bool sticky: false
+        property bool hovered: styleData.hovered
+        implicitWidth: Math.round(TextSingleton.implicitHeight)
+        implicitHeight: Math.round(TextSingleton.implicitHeight)
         clip: true
+        opacity: transientScrollBars ? 0.5 : 1.0
+        visible: !transientScrollBars || sticky
         Rectangle {
             anchors.fill: parent
             color: "#ddd"
@@ -117,6 +127,8 @@ Style {
             anchors.topMargin: styleData.horizontal ? 0 : -2
             anchors.bottomMargin: styleData.horizontal ? -1 : -2
         }
+        onHoveredChanged: if (hovered) sticky = true
+        onVisibleChanged: if (!visible) sticky = false
     }
 
     /*! This component controls the appearance of the
@@ -131,13 +143,31 @@ Style {
         \endtable
     */
 
-    property Component handle: BorderImage{
-        opacity: styleData.pressed ? 0.5 : styleData.hovered ? 1 : 0.8
-        source: "images/scrollbar-handle-" + (styleData.horizontal ? "horizontal" : "vertical") + ".png"
-        border.left: 2
-        border.top: 2
-        border.right: 2
-        border.bottom: 2
+    property Component handle: Item {
+        property bool sticky: false
+        property bool hovered: __activeControl !== "none"
+        implicitWidth: Math.round(TextSingleton.implicitHeight) + 1
+        implicitHeight: Math.round(TextSingleton.implicitHeight) + 1
+        BorderImage {
+            id: img
+            opacity: styleData.pressed && !transientScrollBars ? 0.5 : styleData.hovered ? 1 : 0.8
+            source: "images/scrollbar-handle-" + (transientScrollBars ? "transient" : styleData.horizontal ? "horizontal" : "vertical") + ".png"
+            border.left: transientScrollBars ? 5 : 2
+            border.top: transientScrollBars ? 5 : 2
+            border.right: transientScrollBars ? 5 : 2
+            border.bottom: transientScrollBars ? 5 : 2
+            anchors.top: !styleData.horizontal ? parent.top : undefined
+            anchors.margins: transientScrollBars ? 2 : 0
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.left: styleData.horizontal ? parent.left : undefined
+            width: !styleData.horizontal && transientScrollBars ? sticky ? 13 : 10 : parent.width
+            height: styleData.horizontal && transientScrollBars ? sticky ? 13 : 10 : parent.height
+            Behavior on width { enabled: !styleData.horizontal && transientScrollBars; NumberAnimation { duration: 100 } }
+            Behavior on height { enabled: styleData.horizontal && transientScrollBars; NumberAnimation { duration: 100 } }
+        }
+        onHoveredChanged: if (hovered) sticky = true
+        onVisibleChanged: if (!visible) sticky = false
     }
 
     /*! This component controls the appearance of the
@@ -152,8 +182,9 @@ Style {
         \endtable
     */
     property Component incrementControl: Rectangle {
-        implicitWidth: 16
-        implicitHeight: 16
+        visible: !transientScrollBars
+        implicitWidth: transientScrollBars ? 0 : Math.round(TextSingleton.implicitHeight)
+        implicitHeight: transientScrollBars ? 0 : Math.round(TextSingleton.implicitHeight)
         Rectangle {
             anchors.fill: parent
             anchors.bottomMargin: -1
@@ -163,12 +194,12 @@ Style {
                 anchors.fill: parent
                 anchors.margins: 1
                 color: "transparent"
-                border.color: "#88ffffff"
+                border.color: "#44ffffff"
             }
             Image {
                 source: styleData.horizontal ? "images/arrow-right.png" : "images/arrow-down.png"
                 anchors.centerIn: parent
-                opacity: control.enabled ? 0.7 : 0.5
+                opacity: control.enabled ? 0.6 : 0.5
             }
             gradient: Gradient {
                 GradientStop {color: styleData.pressed ? "lightgray" : "white" ; position: 0}
@@ -189,8 +220,9 @@ Style {
         \endtable
     */
     property Component decrementControl: Rectangle {
-        implicitWidth: 16
-        implicitHeight: 16
+        visible: !transientScrollBars
+        implicitWidth: transientScrollBars ? 0 : Math.round(TextSingleton.implicitHeight)
+        implicitHeight: transientScrollBars ? 0 : Math.round(TextSingleton.implicitHeight)
         Rectangle {
             anchors.fill: parent
             anchors.topMargin: styleData.horizontal ? 0 : -1
@@ -202,14 +234,14 @@ Style {
                 anchors.fill: parent
                 anchors.margins: 1
                 color: "transparent"
-                border.color: "#88ffffff"
+                border.color: "#44ffffff"
             }
             Image {
                 source: styleData.horizontal ? "images/arrow-left.png" : "images/arrow-up.png"
                 anchors.centerIn: parent
                 anchors.verticalCenterOffset: styleData.horizontal ? 0 : -1
                 anchors.horizontalCenterOffset: styleData.horizontal ? -1 : 0
-                opacity: control.enabled ? 0.7 : 0.5
+                opacity: control.enabled ? 0.6 : 0.5
             }
             gradient: Gradient {
                 GradientStop {color: styleData.pressed ? "lightgray" : "white" ; position: 0}
@@ -222,8 +254,28 @@ Style {
     /*! \internal */
     property Component __scrollbar: Item {
         id: panel
-        property string activeControl: ""
+        property string activeControl: "none"
         property bool scrollToClickPosition: true
+        property bool isTransient: transientScrollBars
+
+        property bool on: false
+        property bool raised: false
+        property bool sunken: __styleData.upPressed | __styleData.downPressed | __styleData.handlePressed
+
+        states: State {
+            name: "out"
+            when: isTransient && panel.activeControl === "none" && !panel.on && !panel.raised
+            PropertyChanges { target: panel; opacity: 0 }
+        }
+
+        transitions: Transition {
+            to: "out"
+            SequentialAnimation {
+                PauseAnimation { duration: 450 }
+                NumberAnimation { properties: "opacity"; duration: 200 }
+                PropertyAction { target: panel; property: "visible"; value: false }
+            }
+        }
 
         implicitWidth: __styleData.horizontal ? 200 : bg.implicitWidth
         implicitHeight: __styleData.horizontal ? bg.implicitHeight : 200
@@ -335,6 +387,7 @@ Style {
                 readonly property bool pressed: __styleData.handlePressed
                 readonly property bool horizontal: __styleData.horizontal
             }
+            readonly property alias __activeControl: panel.activeControl
         }
     }
 

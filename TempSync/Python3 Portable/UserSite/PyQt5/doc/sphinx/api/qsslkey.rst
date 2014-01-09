@@ -5,4 +5,4 @@ QSslKey
 
 .. class:: QSslKey
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.1/qtnetwork/qsslkey.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtnetwork/qsslkey.html>`_

@@ -38,13 +38,13 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype TextFieldStyle
-    \inqmlmodule QtQuick.Controls.Styles 1.0
-    \since QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
+    \since 5.1
     \ingroup controlsstyling
     \brief Provides custom styling for TextField.
 
@@ -77,7 +77,7 @@ Style {
     readonly property TextField control: __control
 
     /*! The content margins of the text field. */
-    padding { top: 4 ; left: 6 ; right: 6 ; bottom:4 }
+    padding { top: 4 ; left: TextSingleton.implicitHeight/3 ; right: TextSingleton.implicitHeight/3 ; bottom:4 }
 
     /*! The current font. */
     property font font
@@ -91,30 +91,46 @@ Style {
     /*! The highlighted text color, used in selections. */
     property color selectedTextColor: __syspal.highlightedText
 
+    /*!
+        \qmlproperty enumeration renderType
+
+        Override the default rendering type for the control.
+
+        Supported render types are:
+        \list
+        \li Text.QtRendering
+        \li Text.NativeRendering - the default
+        \endlist
+
+        \sa Text::renderType
+    */
+    property int renderType: Text.NativeRendering
+
+    /*! The placeholder text color, used when the text field is empty.
+        \since 5.2
+    */
+    property color placeholderTextColor: Qt.rgba(0, 0, 0, 0.5)
+
     /*! The background of the text field. */
     property Component background: Item {
-        implicitWidth: 100
-        implicitHeight: 25
-        BorderImage {
+        implicitWidth: Math.round(TextSingleton.implicitHeight * 8)
+        implicitHeight: Math.max(25, Math.round(TextSingleton.implicitHeight * 1.2))
+        Rectangle {
             anchors.fill: parent
-            source: "images/editbox.png"
-            border.left: 4
-            border.right: 4
-            border.top: 4
-            border.bottom: 4
-            BorderImage {
-                anchors.fill: parent
-                anchors.margins: -1
-                anchors.topMargin: -2
-                anchors.rightMargin: 0
-                anchors.bottomMargin: 1
-                source: "images/focusframe.png"
-                visible: control.activeFocus
-                border.left: 4
-                border.right: 4
-                border.top: 4
-                border.bottom: 4
+            anchors.bottomMargin: -1
+            color: "#44ffffff"
+            radius: baserect.radius
+        }
+        Rectangle {
+            id: baserect
+            gradient: Gradient {
+                GradientStop {color: "#e0e0e0" ; position: 0}
+                GradientStop {color: "#fff" ; position: 0.1}
+                GradientStop {color: "#fff" ; position: 1}
             }
+            radius: TextSingleton.implicitHeight * 0.16
+            anchors.fill: parent
+            border.color: control.activeFocus ? "#47b" : "#999"
         }
     }
 
@@ -134,7 +150,7 @@ Style {
         implicitWidth: backgroundLoader.implicitWidth ? backgroundLoader.implicitWidth : 100
         implicitHeight: backgroundLoader.implicitHeight ? backgroundLoader.implicitHeight : 20
 
-        property color placeholderTextColor: Qt.rgba(0, 0, 0, 0.5)
+        property color placeholderTextColor: style.placeholderTextColor
         property font font: style.font
 
         Loader {

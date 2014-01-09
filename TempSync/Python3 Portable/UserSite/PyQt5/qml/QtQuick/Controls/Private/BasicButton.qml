@@ -39,15 +39,15 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Controls.Styles 1.1
 
 /*!
     \qmltype BasicButton
     \internal
     \qmlabstract
-    \inqmlmodule QtQuick.Controls.Private 1.0
+    \inqmlmodule QtQuick.Controls.Private
 */
 
 Control {
@@ -59,7 +59,7 @@ Control {
     /*! \qmlproperty bool BasicButton::pressed
 
         This property holds whether the button is being pressed. */
-    readonly property alias pressed: behavior.effectivePressed
+    readonly property alias pressed: button.__effectivePressed
 
     /*! \qmlproperty bool BasicButton::hovered
 
@@ -145,7 +145,7 @@ Control {
 
     /*! \internal */
     function accessiblePressAction() {
-        __action.trigger()
+        __action.trigger(button)
     }
 
     Action {
@@ -166,10 +166,13 @@ Control {
             behavior.keyPressed = true;
     }
 
+    onFocusChanged: if (!focus) behavior.keyPressed = false
+
     Keys.onReleased: {
         if (event.key === Qt.Key_Space && !event.isAutoRepeat && behavior.keyPressed) {
             behavior.keyPressed = false;
-            __action.trigger()
+            __action.trigger(button)
+            behavior.toggle()
         }
     }
 
@@ -182,14 +185,22 @@ Control {
         hoverEnabled: true
         enabled: !keyPressed
 
-        onReleased: if (containsMouse) __action.trigger()
+        function toggle() {
+            if (button.checkable && !button.action && !(button.checked && button.exclusiveGroup))
+                button.checked = !button.checked
+        }
+
+        onReleased: {
+            if (containsMouse) {
+                toggle()
+                __action.trigger(button)
+            }
+        }
         onExited: Tooltip.hideText()
         onCanceled: Tooltip.hideText()
         onPressed: {
             if (activeFocusOnPress)
                 button.forceActiveFocus()
-            if (button.checkable && !button.action && !(button.checked && button.exclusiveGroup))
-                button.checked = !button.checked
         }
 
         Timer {
@@ -201,6 +212,9 @@ Control {
 
     /*! \internal */
     property var __behavior: behavior
+
+    /*! \internal */
+    property bool __effectivePressed: behavior.effectivePressed
 
     SystemPalette { id: syspal }
 

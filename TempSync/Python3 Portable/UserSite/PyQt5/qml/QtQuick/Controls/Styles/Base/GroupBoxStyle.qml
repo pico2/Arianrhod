@@ -38,15 +38,15 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype GroupBoxStyle
     \internal
-    \inqmlmodule QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
     \ingroup controlsstyling
-    \since QtQuick.Controls.Styles 1.0
+    \since 5.1
 */
 Style {
 
@@ -60,7 +60,7 @@ Style {
 
     /*! The margin from the content item to the groupbox. */
     padding {
-        top: (control.title.length > 0 || control.checkable ? 16 : 0) + 10
+        top: (control.title.length > 0 || control.checkable ? TextSingleton.implicitHeight : 0) + 10
         left: 8
         right: 8
         bottom: 6
@@ -104,9 +104,6 @@ Style {
         BorderImage {
             anchors.fill: parent
             anchors.margins: -1
-            anchors.topMargin: -2
-            anchors.rightMargin: 0
-            anchors.bottomMargin: 1
             source: "images/focusframe.png"
             visible: control.activeFocus
             border.left: 4

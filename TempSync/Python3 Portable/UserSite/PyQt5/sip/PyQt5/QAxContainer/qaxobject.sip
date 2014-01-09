@@ -1,6 +1,6 @@
 // This is the SIP interface definition for QAxObject.
 //
-// Copyright (c) 2013 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2014 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt5.
 // 
@@ -17,8 +17,6 @@
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-
-%If (WS_WIN)
 
 class QAxObject : QObject, QAxBase /PyQt4NoQMetaObject/
 {
@@ -66,5 +64,3 @@ public:
 protected:
     void connectNotify(const QMetaMethod &);
 };
-
-%End

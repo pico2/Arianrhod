@@ -39,12 +39,12 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 
 /*!
         \qmltype TabBar
         \internal
-        \inqmlmodule QtQuick.Controls.Private 1.0
+        \inqmlmodule QtQuick.Controls.Private
 */
 FocusScope {
     id: tabbar
@@ -103,17 +103,26 @@ FocusScope {
         }
         return false;
     }
+    Loader {
+        id: background
+        anchors.fill: parent
+        sourceComponent: styleItem ? styleItem.tabBar : undefined
+    }
 
     ListView {
         id: tabrow
         objectName: "tabrow"
         Accessible.role: Accessible.PageTabList
+        LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
         spacing: -tabOverlap
         orientation: Qt.Horizontal
         interactive: false
         focus: true
 
-        width: Math.min(availableWidth, count ? contentWidth : availableWidth)
+        // Note this will silence the binding loop warnings caused by QTBUG-35038
+        // and should be removed when this issue is resolved.
+        property int contentWidthWorkaround: contentWidth > 0 ? contentWidth: 0
+        width: Math.min(availableWidth, count ? contentWidthWorkaround : availableWidth)
         height: currentItem ? currentItem.height : 0
 
         highlightMoveDuration: 0
@@ -178,11 +187,22 @@ FocusScope {
             implicitWidth: tabloader.implicitWidth
             implicitHeight: tabloader.implicitHeight
 
-            onPressed: {
+            function changeTab() {
                 tabView.currentIndex = index;
                 var next = tabbar.nextItemInFocusChain(true);
                 if (__isAncestorOf(tabView.getTab(currentIndex), next))
                     next.forceActiveFocus();
+            }
+
+            onClicked: {
+                if (tabrow.interactive) {
+                    changeTab()
+                }
+            }
+            onPressed: {
+                if (!tabrow.interactive) {
+                    changeTab()
+                }
             }
 
             Loader {

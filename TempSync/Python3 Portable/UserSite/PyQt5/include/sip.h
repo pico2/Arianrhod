@@ -1,7 +1,7 @@
 /*
  * The SIP module interface.
  *
- * Copyright (c) 2013 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2014 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -54,8 +54,8 @@ extern "C" {
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x040f02
-#define SIP_VERSION_STR     "4.15.2"
+#define SIP_VERSION         0x040f04
+#define SIP_VERSION_STR     "4.15.4"
 
 
 /*
@@ -227,6 +227,7 @@ typedef unsigned int uint;
 #if PY_VERSION_HEX >= 0x02050000
 
 #define SIP_SSIZE_T         Py_ssize_t
+#define SIP_SSIZE_T_FORMAT  "%zd"
 
 #define SIP_MLNAME_CAST(s)  (s)
 #define SIP_MLDOC_CAST(s)   (s)
@@ -235,6 +236,7 @@ typedef unsigned int uint;
 #else
 
 #define SIP_SSIZE_T         int
+#define SIP_SSIZE_T_FORMAT  "%d"
 
 #define SIP_MLNAME_CAST(s)  ((char *)(s))
 #define SIP_MLDOC_CAST(s)   ((char *)(s))

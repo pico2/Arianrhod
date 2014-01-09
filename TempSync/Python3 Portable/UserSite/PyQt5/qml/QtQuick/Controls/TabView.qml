@@ -39,18 +39,18 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype TabView
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup views
     \brief A control that allows the user to select one of multiple stacked items.
 
     You can create a custom appearance for a TabView by
-    assigning a \l TabViewStyle.
+    assigning a \l {QtQuick.Controls.Styles::TabViewStyle}{TabViewStyle}.
 */
 
 FocusScope {
@@ -95,12 +95,16 @@ FocusScope {
         Returns the newly added tab.
     */
     function insertTab(index, title, component) {
-        var tab = tabcomp.createObject(stack)
+        // 'loader' parent is a pending workaround while waiting for:
+        // https://codereview.qt-project.org/#change,65788
+        var tab = tabcomp.createObject(loader)
         tab.sourceComponent = component
-        tab.parent = stack
         tab.title = title
-        tab.__inserted = true
+        // insert at appropriate index first, then set the parent to
+        // avoid onChildrenChanged appending it to the end of the list
         __tabs.insert(index, {tab: tab})
+        tab.__inserted = true
+        tab.parent = stack
         __setOpacities()
         return tab
     }
@@ -203,8 +207,17 @@ FocusScope {
 
             property int frameWidth
             property string style
+            property bool completed: false
 
-            Component.onCompleted: addTabs(stack.children)
+            Component.onCompleted: {
+                addTabs(stack.children)
+                completed = true
+            }
+
+            onChildrenChanged: {
+                if (completed)
+                    stack.addTabs(stack.children)
+            }
 
             function addTabs(tabs) {
                 var tabAdded = false
@@ -212,12 +225,11 @@ FocusScope {
                     var tab = tabs[i]
                     if (!tab.__inserted && tab.Accessible.role === Accessible.LayeredPane) {
                         tab.__inserted = true
-                        if (tab.parent === root) {
-                            tab.parent = stack
-                            // a tab added dynamically by Component::createObject() and passing the
-                            // tab view as a parent should also get automatically removed when destructed
+                        // reparent tabs created dynamically by createObject(tabView)
+                        tab.parent = stack
+                        // a dynamically added tab should also get automatically removed when destructed
+                        if (completed)
                             tab.Component.onDestruction.connect(stack.onDynamicTabDestroyed.bind(tab))
-                        }
                         __tabs.append({tab: tab})
                         tabAdded = true
                     }
@@ -227,9 +239,10 @@ FocusScope {
             }
 
             function onDynamicTabDestroyed() {
-                for (var i = 0; i < stack.children.length; ++i) {
-                    if (this === stack.children[i]) {
-                        root.removeTab(i)
+                for (var i = 0; i < __tabs.count; ++i) {
+                    if (__tabs.get(i).tab === this) {
+                        __tabs.remove(i, 1)
+                        __setOpacities()
                         break
                     }
                 }

@@ -39,20 +39,22 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Window 2.1
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype MenuStyle
     \internal
     \ingroup menusstyling
-    \inqmlmodule QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
 */
 
 Style {
     id: styleRoot
 
     property string __menuItemType: "menuitem"
+    property real maxPopupHeight: 600 // ### FIXME Screen.desktopAvailableHeight * 0.99
 
     property Component frame: Rectangle {
         width: (parent ? parent.contentWidth : 0) + 2
@@ -62,6 +64,8 @@ Style {
         border { width: 1; color: "darkgray" }
 
         property int subMenuOverlap: -1
+        property real maxHeight: maxPopupHeight
+        property int margin: 1
     }
 
     property Component menuItem: Rectangle {
@@ -69,7 +73,7 @@ Style {
         y: 1
         implicitWidth: Math.max((parent ? parent.width : 0),
                                 18 + text.paintedWidth + (rightDecoration.visible ? rightDecoration.width + 40 : 12))
-        implicitHeight: isSeparator ? text.font.pixelSize / 2 : text.paintedHeight + 4
+        implicitHeight: isSeparator ? text.font.pixelSize / 2 : !!scrollerDirection ? text.font.pixelSize * 0.75 : text.paintedHeight + 4
         color: selected && enabled ? "" : backgroundColor
         gradient: selected && enabled ? selectedGradient : undefined
         border.width: 1
@@ -91,10 +95,11 @@ Style {
         }
 
         readonly property string itemText: parent ? parent.text : ""
+        readonly property bool mirrored: Qt.application.layoutDirection === Qt.RightToLeft
 
         Loader {
             id: checkMark
-            x: 4
+            x: mirrored ? parent.width - width - 4 : 4
             y: 6
             active: __menuItemType === "menuitem" && !!menuItem && !!menuItem["checkable"]
             sourceComponent: exclusive ? exclusiveCheckMark : nonExclusiveCheckMark
@@ -162,7 +167,8 @@ Style {
             id: text
             visible: !isSeparator
             text: StyleHelpers.stylizeMnemonics(itemText)
-            x: __menuItemType === "menuitem" ? 24 : 6
+            readonly property real offset: __menuItemType === "menuitem" ? 24 : 6
+            x: mirrored ? parent.width - width - offset : offset
             anchors.verticalCenter: parent.verticalCenter
             renderType: Text.NativeRendering
             color: selected && enabled ? "white" : syspal.text
@@ -172,8 +178,9 @@ Style {
             id: rightDecoration
             readonly property string shortcut: !!menuItem && menuItem["shortcut"] || ""
             visible: isSubmenu || shortcut !== ""
-            text: isSubmenu ? "\u25b8" // BLACK RIGHT-POINTING SMALL TRIANGLE
+            text: isSubmenu ? mirrored ? "\u25c2" : "\u25b8" // BLACK LEFT/RIGHT-POINTING SMALL TRIANGLE
                             : shortcut
+            LayoutMirroring.enabled: mirrored
             anchors {
                 right: parent.right
                 rightMargin: 6
@@ -185,6 +192,13 @@ Style {
             style: selected || !isSubmenu ? Text.Normal : Text.Raised; styleColor: Qt.lighter(color, 4)
         }
 
+        Image {
+            id: scrollerDecoration
+            visible: !!scrollerDirection
+            anchors.centerIn: parent
+            source: scrollerDirection === "up" ? "images/arrow-up.png" : "images/arrow-down.png"
+        }
+
         Rectangle {
             visible: isSeparator
             width: parent.width - 2
@@ -193,5 +207,14 @@ Style {
             anchors.verticalCenter: parent.verticalCenter
             color: "darkgray"
         }
+    }
+
+    property Component scrollerStyle: Style {
+        padding { left: 0; right: 0; top: 0; bottom: 0 }
+        property bool scrollToClickedPosition: false
+        property Component frame: Item { visible: false }
+        property Component corner: Item { visible: false }
+        property Component __scrollbar: Item { visible: false }
+        property bool useScrollers: true
     }
 }

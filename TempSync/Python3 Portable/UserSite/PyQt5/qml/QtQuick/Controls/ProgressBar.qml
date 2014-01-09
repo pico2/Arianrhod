@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype ProgressBar
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief A progress indicator.
 
@@ -53,7 +53,7 @@ import QtQuick.Controls.Private 1.0
     \l value is updated regularly and must be between \l minimumValue and \l maximumValue.
 
     You can create a custom appearance for a ProgressBar by
-    assigning a \l ProgressBarStyle.
+    assigning a \l {QtQuick.Controls.Styles::ProgressBarStyle}{ProgressBarStyle}.
 */
 
 Control {

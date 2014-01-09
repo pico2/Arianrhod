@@ -39,14 +39,14 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype Menu
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup menus
     \brief Provides a menu component for use in menu bars, as context menu,
     and other popup menus.
@@ -133,7 +133,7 @@ MenuPrivate {
     property Component style: Qt.createComponent(Settings.style + "/MenuStyle.qml", root)
 
     /*! \internal */
-    property var __menuBar: null
+    property var __parentContentItem: __parentMenu.__contentItem
     /*! \internal */
     property int __currentIndex: -1
     /*! \internal */
@@ -141,197 +141,12 @@ MenuPrivate {
 
     /*! \internal */
     __contentItem: Loader {
-        sourceComponent: __menuComponent
+        sourceComponent: MenuContentItem {
+            menu: root
+        }
         active: !root.__isNative && root.__popupVisible
         focus: true
-    }
-
-    /*! \internal */
-    property Component __menuComponent: Loader {
-        id: menuFrameLoader
-
-        property Style __style: styleLoader.item
-        property Component menuItemStyle: __style ? __style.menuItem : null
-
-        property var control: root
-        property alias contentWidth: column.width
-        property alias contentHeight: column.height
-
-        property int subMenuXPos: width + (item && item["subMenuOverlap"] || 0)
-
-        visible: status === Loader.Ready
-        sourceComponent: __style ? __style.frame : undefined
-
-        Loader {
-            id: styleLoader
-            active: !root.isNative
-            sourceComponent: root.style
-            property alias __control: menuFrameLoader
-            onStatusChanged: {
-                if (status === Loader.Error)
-                    console.error("Failed to load Style for", root)
-            }
-        }
-
-        focus: true
-        Keys.forwardTo: __menuBar ? [__menuBar] : []
-        Keys.onEscapePressed: root.__dismissMenu()
-
-        Keys.onDownPressed: {
-            if (root.__currentIndex < 0) {
-                root.__currentIndex = 0
-                return
-            }
-
-            for (var i = root.__currentIndex + 1;
-                 i < root.items.length && !canBeHovered(i); i++)
-                ;
-        }
-
-        Keys.onUpPressed: {
-            for (var i = root.__currentIndex - 1;
-                 i >= 0 && !canBeHovered(i); i--)
-                ;
-        }
-
-        function canBeHovered(index) {
-            var item = itemsRepeater.itemAt(index)
-            if (!item["isSeparator"] && item.enabled) {
-                root.__currentIndex = index
-                return true
-            }
-            return false
-        }
-
-        Keys.onLeftPressed: {
-            if (root.__parentMenu)
-                __closeMenu()
-        }
-
-        Keys.onRightPressed: {
-            var item = itemsRepeater.itemAt(root.__currentIndex)
-            if (item && item.isSubmenu) {
-                item.showSubMenu(true)
-                item.menuItem.__currentIndex = 0
-            }
-        }
-
-        Keys.onSpacePressed: menuFrameLoader.triggerAndDismiss()
-        Keys.onReturnPressed: menuFrameLoader.triggerAndDismiss()
-        Keys.onEnterPressed: menuFrameLoader.triggerAndDismiss()
-
-        function triggerAndDismiss() {
-            var item = itemsRepeater.itemAt(root.__currentIndex)
-            if (item && !item.isSeparator) {
-                root.__dismissMenu()
-                if (!item.isSubmenu)
-                    item.menuItem.trigger()
-            }
-        }
-
-        Binding {
-            // Make sure the styled frame is in the background
-            target: menuFrameLoader.item
-            property: "z"
-            value: menuMouseArea.z - 1
-        }
-
-        MouseArea {
-            id: menuMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.AllButtons
-
-            onPositionChanged: updateCurrentItem(mouse)
-            onReleased: menuFrameLoader.triggerAndDismiss()
-            onExited: {
-                if (currentItem && !currentItem.menuItem.__popupVisible) {
-                    currentItem = null
-                    root.__currentIndex = -1
-                }
-            }
-
-            property Item currentItem: null
-
-            function updateCurrentItem(mouse) {
-                var pos = mapToItem(column, mouse.x, mouse.y)
-                if (!currentItem || !currentItem.contains(Qt.point(pos.x - currentItem.x, pos.y - currentItem.y))) {
-                    if (currentItem && !pressed && currentItem.isSubmenu)
-                        currentItem.closeSubMenu()
-                    currentItem = column.childAt(pos.x, pos.y)
-                    if (currentItem) {
-                        root.__currentIndex = currentItem.menuItemIndex
-                        if (currentItem.isSubmenu && !currentItem.menuItem.__popupVisible)
-                            currentItem.showSubMenu(false)
-                    } else {
-                        root.__currentIndex = -1
-                    }
-                }
-            }
-
-            // Each menu item has its own mouse area, and for events to be
-            // propagated to the menu mouse area, they need to be embedded.
-            Column {
-                id: column
-
-                Repeater {
-                    id: itemsRepeater
-                    model: root.items
-
-                    Loader {
-                        id: menuItemLoader
-
-                        property var menuItem: modelData
-                        readonly property bool isSeparator: !!menuItem && menuItem.type === MenuItemType.Separator
-                        readonly property bool isSubmenu: !!menuItem && menuItem.type === MenuItemType.Menu
-                        property bool selected: !isSeparator && root.__currentIndex === index
-                        property string text: isSubmenu ? menuItem.title : !isSeparator ? menuItem.text : ""
-
-                        property int menuItemIndex: index
-
-                        sourceComponent: menuFrameLoader.menuItemStyle
-                        enabled: visible && !isSeparator && !!menuItem && menuItem.enabled
-                        visible: menuItem.visible
-                        active: visible
-
-                        function showSubMenu(immediately) {
-                            if (immediately) {
-                                if (root.__currentIndex === menuItemIndex)
-                                    menuItem.__popup(menuFrameLoader.subMenuXPos, 0, -1)
-                            } else {
-                                openMenuTimer.start()
-                            }
-                        }
-
-                        Timer {
-                            id: openMenuTimer
-                            interval: 50
-                            onTriggered: menuItemLoader.showSubMenu(true)
-                        }
-
-                        function closeSubMenu() { closeMenuTimer.start() }
-
-                        Timer {
-                            id: closeMenuTimer
-                            interval: 1
-                            onTriggered: {
-                                if (root.__currentIndex !== menuItemIndex)
-                                    menuItem.__closeMenu()
-                            }
-                        }
-
-                        Component.onCompleted: menuItem.__visualItem = menuItemLoader
-                    }
-                }
-
-                onWidthChanged: {
-                    for (var i = 0; i < children.length; i++) {
-                        var item = children[i]["item"]
-                        if (item)
-                            item.implicitWidth = Math.max(root.__minimumWidth, implicitWidth)
-                    }
-                }
-            }
-        }
+        Keys.forwardTo: item ? [item, root.__parentContentItem] : []
+        property bool altPressed: root.__parentContentItem ? root.__parentContentItem.altPressed : false
     }
 }

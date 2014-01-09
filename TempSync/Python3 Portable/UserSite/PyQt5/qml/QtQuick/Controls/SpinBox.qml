@@ -38,14 +38,14 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick 2.2
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype SpinBox
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief Provides a spin box control.
 
@@ -140,12 +140,40 @@ Control {
     */
     property bool activeFocusOnPress: true
 
+    /*! \qmlproperty enumeration horizontalAlignment
+        \since 5.2
+
+        This property indicates how the content is horizontally aligned
+        within the text field.
+
+        The supported values are:
+        \list
+        \li Qt.AlignLeft
+        \li Qt.AlignHCenter
+        \li Qt.AlignRight
+        \endlist
+
+      The default value is style dependent.
+    */
+    property int horizontalAlignment: __panel ? __panel.horizontalAlignment : Qt.AlignLeft
+
     /*!
         \qmlproperty bool SpinBox::hovered
 
         This property indicates whether the control is being hovered.
     */
     readonly property alias hovered: mouseArea.containsMouse
+
+    /*!
+        \qmlsignal SpinBox::editingFinished()
+        \since 5.2
+
+        This signal is emitted when the Return or Enter key is pressed or
+        the control loses focus. Note that if there is a validator
+        set on the control and enter/return is pressed, this signal will
+        only be emitted if the validator returns an acceptable state.
+    */
+    signal editingFinished()
 
     style: Qt.createComponent(Settings.style + "/SpinBoxStyle.qml", spinbox)
 
@@ -213,7 +241,7 @@ Control {
 
     TextInput {
         id: input
-        clip: true
+        clip: contentWidth > width
         anchors.fill: parent
         anchors.leftMargin: __style ? __style.padding.left : 0
         anchors.topMargin: __style ? __style.padding.top : 0
@@ -223,26 +251,29 @@ Control {
         focus: true
         activeFocusOnPress: spinbox.activeFocusOnPress
 
-        horizontalAlignment: __panel ? __panel.horizontalTextAlignment : Qt.AlignLeft
-        verticalAlignment: __panel ? __panel.verticalTextAlignment : Qt.AlignVCenter
+        horizontalAlignment: spinbox.horizontalAlignment
+        verticalAlignment: __panel ? __panel.verticalAlignment : Qt.AlignVCenter
         selectByMouse: true
 
         validator: SpinBoxValidator {
             id: validator
-            onTextChanged: input.text = validator.text
-            Component.onCompleted: input.text = validator.text
+            property bool ready: false // Delay validation until all properties are ready
+            onTextChanged: if (ready) input.text = validator.text
+            Component.onCompleted: {input.text = validator.text ; ready = true}
         }
         onAccepted: {
             input.text = validator.text
             selectValue()
         }
 
+        onEditingFinished: spinbox.editingFinished()
+
         color: __panel ? __panel.foregroundColor : "black"
         selectionColor: __panel ? __panel.selectionColor : "black"
         selectedTextColor: __panel ? __panel.selectedTextColor : "black"
 
         opacity: parent.enabled ? 1 : 0.5
-        renderType: Text.NativeRendering
+        renderType: __style ? __style.renderType : Text.NativeRendering
 
         function selectValue() {
             select(prefix.length, text.length - suffix.length)
@@ -253,6 +284,7 @@ Control {
 
     MouseArea {
         id: mouseUp
+        objectName: "mouseUp"
         hoverEnabled: true
 
         property var upRect: __panel  ?  __panel.upRect : null
@@ -267,6 +299,7 @@ Control {
         height: upRect ? upRect.height : 0
 
         onClicked: __increment()
+        onPressed: if (activeFocusOnPress) input.forceActiveFocus()
 
         property bool autoincrement: false;
         onReleased: autoincrement = false
@@ -278,9 +311,12 @@ Control {
 
     MouseArea {
         id: mouseDown
+        objectName: "mouseDown"
         hoverEnabled: true
 
         onClicked: __decrement()
+        onPressed: if (activeFocusOnPress) input.forceActiveFocus()
+
         property var downRect: __panel ? __panel.downRect : null
 
         anchors.left: parent.left

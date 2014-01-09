@@ -351,7 +351,7 @@ class TetrixBoard(QFrame):
         painter = QPainter(pixmap)
         painter.fillRect(pixmap.rect(), self.nextPieceLabel.palette().background())
 
-        for int in range(4):
+        for i in range(4):
             x = self.nextPiece.x(i) - self.nextPiece.minX()
             y = self.nextPiece.y(i) - self.nextPiece.minY()
             self.drawSquare(painter, x * self.squareWidth(),

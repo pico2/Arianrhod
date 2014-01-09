@@ -39,14 +39,14 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Controls.Styles 1.1
 
 /*!
    \qmltype TableView
-   \inqmlmodule QtQuick.Controls 1.0
-   \since QtQuick.Controls 1.0
+   \inqmlmodule QtQuick.Controls
+   \since 5.1
    \ingroup views
    \brief Provides a list view with scroll bars, styling and header sections.
 
@@ -91,6 +91,9 @@ import QtQuick.Controls.Styles 1.0
     \li bool sortIndicatorVisible - Whether the sort indicator should be enabled
     \li enum sortIndicatorOrder - Qt.AscendingOrder or Qt.DescendingOrder depending on state
 \endlist
+
+    You can create a custom appearance for a TableView by
+    assigning a \l {QtQuick.Controls.Styles::TableViewStyle}{TableViewStyle}.
 */
 
 ScrollView {
@@ -178,6 +181,7 @@ ScrollView {
     \li  styleData.column - the index of the column
     \li  styleData.pressed - true when the column is being pressed
     \li  styleData.containsMouse - true when the column is under the mouse
+    \li  styleData.textAlignment - the horizontal text alignment of the column (since QtQuickControls 1.1)
     \endlist
     */
     property Component headerDelegate: __style ? __style.headerDelegate : null
@@ -382,6 +386,79 @@ ScrollView {
         return columnModel.get(index).columnItem
     }
 
+    /*! \qmlproperty Selection TableView::selection
+    \since QtQuick.Controls 1.1
+
+    This property contains the current row-selection of the \l TableView.
+    The selection allows you to select, deselect or iterate over selected rows.
+
+    \list
+    \li function \b clear() - deselects all rows
+    \li function \b selectAll() - selects all rows
+    \li function \b select(from, to) - select a range
+    \li functton \b deselect(from, to) - de-selects a range
+    \li function \b forEach(callback) - Allows you to iterate over selected rows
+    \li function \b contains(index) - Allows you to iterate over selected rows
+    \li signal \b selectionChanged() - The current row selection changed
+    \li readonly property int \b count - The number of selected rows
+    \endlist
+
+    \b Example:
+    \code
+        tableview.selection.select(0)       // select row index 0
+
+        tableview.selection.select(1, 3)    // select row indexes 1, 2 and 3
+
+        tableview.selection.deselect(0, 1)  // deselects row index 0 and 1
+
+        tableview.selection.deselect(2)     // deselects row index 2
+    \endcode
+
+    \b Example: To iterate over selected indexes, you can pass a callback function.
+                \a rowIndex is passed as as an argument to the callback function.
+    \code
+        tableview.selection.forEach( function(rowIndex) {console.log(rowIndex)} )
+    \endcode
+
+    */
+
+    readonly property alias selection: selectionObject
+
+    /*!
+        \qmlproperty enumeration TableView::selectionMode
+        \since QtQuick.Controls 1.1
+
+        This enum indicates how the view responds to user selections:
+
+        The possible modes are:
+
+        \list
+
+        \li SelectionMode.NoSelection - Items cannot be selected.
+
+        \li SelectionMode.SingleSelection - When the user selects an item,
+            any already-selected item becomes unselected, and the user cannot
+            unselect the selected item. (Default)
+
+        \li SelectionMode.MultiSelection - When the user selects an item in the usual way,
+            the selection status of that item is toggled and the other items are left alone.
+
+        \li SelectionMode.ExtendedSelection - When the user selects an item in the usual way,
+            the selection is cleared and the new item selected. However, if the user presses the
+            Ctrl key when clicking on an item, the clicked item gets toggled and all other items
+            are left untouched. If the user presses the Shift key while clicking
+            on an item, all items between the current item and the clicked item are selected or unselected,
+            depending on the state of the clicked item. Multiple items can be selected by dragging the
+            mouse over them.
+
+        \li SelectionMode.ContiguousSelection - When the user selects an item in the usual way,
+            the selection is cleared and the new item selected. However, if the user presses the Shift key while
+            clicking on an item, all items between the current item and the clicked item are selected.
+
+        \endlist
+    */
+    property int selectionMode: SelectionMode.SingleSelection
+
     Component.onCompleted: {
         for (var i = 0; i < __columns.length; ++i) {
             var column = __columns[i]
@@ -399,7 +476,7 @@ ScrollView {
     implicitHeight: 150
 
     frameVisible: true
-    __scrollBarTopMargin: Qt.platform.os === "osx" ? headerrow.height : 0
+    __scrollBarTopMargin: (__style && __style.transientScrollBars || Qt.platform.os === "osx") ? headerrow.height : 0
     __viewTopMargin: headerrow.height
 
     /*! \internal */
@@ -410,6 +487,14 @@ ScrollView {
         __scroller.blockUpdates = true;
         listView.decrementCurrentIndex();
         __scroller.blockUpdates = false;
+
+        var newIndex = listView.indexAt(0, listView.contentY)
+        if (newIndex !== -1) {
+            if (selectionMode > SelectionMode.SingleSelection)
+                mousearea.dragRow = newIndex
+            else if (selectionMode === SelectionMode.SingleSelection)
+                selection.__selectOne(newIndex)
+        }
     }
 
     /*! \internal */
@@ -417,7 +502,17 @@ ScrollView {
         __scroller.blockUpdates = true;
         listView.incrementCurrentIndex();
         __scroller.blockUpdates = false;
+
+        var newIndex = Math.max(0, listView.indexAt(0, listView.height + listView.contentY))
+        if (newIndex !== -1) {
+            if (selectionMode > SelectionMode.SingleSelection)
+                mousearea.dragRow = newIndex
+            else if (selectionMode === SelectionMode.SingleSelection)
+                selection.__selectOne(newIndex)
+        }
     }
+
+    onModelChanged: selection.clear()
 
     ListView {
         id: listView
@@ -427,7 +522,7 @@ ScrollView {
         anchors.fill: parent
         currentIndex: -1
         visible: columnCount > 0
-        interactive: false
+        interactive: Settings.hasTouchScreen
 
         SystemPalette {
             id: palette
@@ -451,10 +546,28 @@ ScrollView {
 
             property bool autoincrement: false
             property bool autodecrement: false
+            property int mouseModifiers: 0
+            property int previousRow: 0
+            property int clickedRow: -1
+            property int dragRow: -1
+            property int firstKeyRow: -1
 
             onReleased: {
                 autoincrement = false
                 autodecrement = false
+                var clickIndex = listView.indexAt(0, mouseY + listView.contentY)
+                if (clickIndex > -1) {
+                    if (Settings.hasTouchScreen) {
+                        listView.currentIndex = clickIndex
+                        mouseSelect(clickIndex, mouse.modifiers)
+                    }
+                    previousRow = clickIndex
+                }
+
+                if (mousearea.dragRow >= 0) {
+                    selection.__select(selection.contains(mousearea.clickedRow), mousearea.clickedRow, mousearea.dragRow)
+                    mousearea.dragRow = -1
+                }
             }
 
             // Handle vertical scrolling whem dragging mouse outside boundraries
@@ -475,11 +588,18 @@ ScrollView {
                     autodecrement = false;
                 }
 
-                if (pressed) {
-                    var newIndex = listView.indexAt(0, mouseY + listView.contentY)
-                    if (newIndex >= 0)
+                if (pressed && !Settings.hasTouchScreen) {
+                    var newIndex = Math.max(0, listView.indexAt(0, mouseY + listView.contentY))
+                    if (newIndex >= 0 && newIndex != currentRow) {
                         listView.currentIndex = newIndex;
+                        if (selectionMode === SelectionMode.SingleSelection) {
+                            selection.__selectOne(newIndex)
+                        } else if (selectionMode > 1) {
+                            dragRow = newIndex
+                        }
+                    }
                 }
+                mouseModifiers = mouse.modifiers
             }
 
             onClicked: {
@@ -494,8 +614,24 @@ ScrollView {
             onPressed: {
                 var newIndex = listView.indexAt(0, mouseY + listView.contentY)
                 listView.forceActiveFocus()
-                if (newIndex > -1) {
+                if (newIndex > -1 && !Settings.hasTouchScreen) {
                     listView.currentIndex = newIndex
+                    mouseSelect(newIndex, mouse.modifiers)
+                    mousearea.clickedRow = newIndex
+                }
+                mouseModifiers = mouse.modifiers
+            }
+
+            function mouseSelect(index, modifiers) {
+                if (selectionMode) {
+                    if (modifiers & Qt.ShiftModifier && (selectionMode === SelectionMode.ExtendedSelection)) {
+                        selection.select(previousRow, index)
+                    } else if (selectionMode === SelectionMode.MultiSelection ||
+                               (selectionMode === SelectionMode.ExtendedSelection && modifiers & Qt.ControlModifier)) {
+                        selection.__select(!selection.contains(index) , index)
+                    } else {
+                        selection.__selectOne(index)
+                    }
                 }
             }
 
@@ -510,19 +646,30 @@ ScrollView {
 
             // Note:  with boolean preventStealing we are keeping the flickable from
             // eating our mouse press events
-            preventStealing: true
+            preventStealing: !Settings.hasTouchScreen
 
+            TableViewSelection { id: selectionObject }
         }
 
         // Fills extra rows with alternate color
         Column {
             id: rowfiller
-            property int rowHeight: count ? listView.contentHeight/count : height
+            Loader {
+                id: rowSizeItem
+                sourceComponent: root.rowDelegate
+                visible: false
+                property QtObject styleData: QtObject {
+                    property bool alternate: false
+                    property bool selected: false
+                    property bool hasActiveFocus: false
+                }
+            }
+            property int rowHeight: rowSizeItem.implicitHeight
             property int paddedRowCount: height/rowHeight
             property int count: listView.count
             y: listView.contentHeight
             width: parent.width
-            visible: listView.contentHeight > 0 && alternatingRowColors
+            visible: alternatingRowColors
             height: viewport.height - listView.contentHeight
             Repeater {
                 model: visible ? parent.paddedRowCount : 0
@@ -548,21 +695,54 @@ ScrollView {
         highlightFollowsCurrentItem: true
         model: root.model
 
+        function keySelect(shiftPressed, row) {
+            if (row < 0 || row === rowCount - 1)
+                return
+            if (shiftPressed && (selectionMode >= SelectionMode.ExtendedSelection)) {
+                selection.__ranges = new Array()
+                selection.select(mousearea.firstKeyRow, row)
+            } else {
+                selection.__selectOne(row)
+            }
+        }
+
         Keys.onUpPressed: {
             event.accepted = false
-            root.__decrementCurrentIndex()
+            __scroller.blockUpdates = true;
+            listView.decrementCurrentIndex();
+            __scroller.blockUpdates = false;
+            if (selectionMode)
+                keySelect(event.modifiers & Qt.ShiftModifier, currentRow)
         }
 
         Keys.onDownPressed: {
             event.accepted = false
-            root.__incrementCurrentIndex()
+            __scroller.blockUpdates = true;
+            listView.incrementCurrentIndex();
+            __scroller.blockUpdates = false;
+            if (selectionMode)
+                keySelect(event.modifiers & Qt.ShiftModifier, currentRow)
         }
 
         Keys.onPressed: {
             if (event.key === Qt.Key_PageUp) {
-                verticalScrollBar.value = __verticalScrollBar.value - listView.height
+                __verticalScrollBar.value = __verticalScrollBar.value - listView.height
             } else if (event.key === Qt.Key_PageDown)
-                verticalScrollBar.value = __verticalScrollBar.value + listView.height
+                __verticalScrollBar.value = __verticalScrollBar.value + listView.height
+
+            if (event.key === Qt.Key_Shift) {
+                mousearea.firstKeyRow = currentRow
+            }
+
+            if (event.key === Qt.Key_A && event.modifiers & Qt.ControlModifier) {
+                if (selectionMode > 1)
+                    selection.selectAll()
+            }
+        }
+
+        Keys.onReleased: {
+            if (event.key === Qt.Key_Shift)
+                mousearea.firstKeyRow = -1
         }
 
         Keys.onReturnPressed: {
@@ -576,11 +756,18 @@ ScrollView {
             width: itemrow.width
             height: rowstyle.height
 
+            function selected() {
+                if (mousearea.dragRow > -1 && (rowIndex >= mousearea.clickedRow && rowIndex <= mousearea.dragRow
+                        || rowIndex <= mousearea.clickedRow && rowIndex >=mousearea.dragRow))
+                    return selection.contains(mousearea.clickedRow)
+
+                return selection.count && selection.contains(rowIndex)
+            }
             readonly property int rowIndex: model.index
             readonly property bool alternate: alternatingRowColors && rowIndex % 2 == 1
             readonly property var itemModelData: typeof modelData == "undefined" ? null : modelData
             readonly property var itemModel: model
-            readonly property bool itemSelected: ListView.isCurrentItem
+            readonly property bool itemSelected: selected()
             readonly property color itemTextColor: itemSelected ? __style.highlightedTextColor : __style.textColor
 
             onActiveFocusChanged: {
@@ -618,31 +805,29 @@ ScrollView {
 
                     Loader {
                         id: itemDelegateLoader
-                        width:  __column.width
+                        width:  columnItem.width
                         height: parent ? parent.height : 0
-                        visible: __column.visible
-                        sourceComponent: __column.delegate ? __column.delegate : itemDelegate
+                        visible: columnItem.visible
+                        sourceComponent: columnItem.delegate ? columnItem.delegate : itemDelegate
 
                         // these properties are exposed to the item delegate
                         readonly property var model: listView.model
                         readonly property var modelData: itemModelData
 
                         property QtObject styleData: QtObject {
-                            readonly property var value: __hasModelRole ? itemModel[role] // Qml ListModel and QAbstractItemModel
-                                                                            : __hasModelDataRole ? modelData[role] // QObjectList / QObject
-                                                                                                 : modelData != undefined ? modelData : "" // Models without role
                             readonly property int row: rowitem.rowIndex
                             readonly property int column: index
-                            readonly property int elideMode: __column.elideMode
-                            readonly property int textAlignment: __column.horizontalAlignment
+                            readonly property int elideMode: columnItem.elideMode
+                            readonly property int textAlignment: columnItem.horizontalAlignment
                             readonly property bool selected: rowitem.itemSelected
                             readonly property color textColor: rowitem.itemTextColor
-                            readonly property string role: __column.role
+                            readonly property string role: columnItem.role
+                            readonly property var value: itemModel.hasOwnProperty(role)
+                                                         ? itemModel[role] // Qml ListModel and QAbstractItemModel
+                                                         : modelData && modelData.hasOwnProperty(role)
+                                                           ? modelData[role] // QObjectList / QObject
+                                                           : modelData != undefined ? modelData : "" // Models without role
                         }
-
-                        readonly property TableViewColumn __column: columnItem
-                        readonly property bool __hasModelRole: styleData.role && itemModel.hasOwnProperty(styleData.role)
-                        readonly property bool __hasModelDataRole: styleData.role && modelData && modelData.hasOwnProperty(styleData.role)
                     }
                 }
                 onWidthChanged: listView.contentWidth = width
@@ -697,6 +882,7 @@ ScrollView {
                                 readonly property bool pressed: headerClickArea.pressed
                                 readonly property bool containsMouse: headerClickArea.containsMouse
                                 readonly property int column: index
+                                readonly property int textAlignment: modelData.horizontalAlignment
                             }
                         }
                         Rectangle{
@@ -706,6 +892,7 @@ ScrollView {
                             opacity: (index == repeater.targetIndex && repeater.targetIndex != repeater.dragIndex) ? 0.5 : 0
                             Behavior on opacity { NumberAnimation{duration:160}}
                             color: palette.highlight
+                            visible: modelData.movable
                         }
 
                         MouseArea{
@@ -722,7 +909,7 @@ ScrollView {
                             // NOTE: the direction is different from the master branch
                             // so this indicates that I am using an invalid assumption on item ordering
                             onPositionChanged: {
-                                if (pressed && columnCount > 1) { // only do this while dragging
+                                if (modelData.movable && pressed && columnCount > 1) { // only do this while dragging
                                     for (var h = columnCount-1 ; h >= 0 ; --h) {
                                         if (drag.target.x > headerrow.children[h].x) {
                                             repeater.targetIndex = h
@@ -739,15 +926,18 @@ ScrollView {
 
                             onReleased: {
                                 if (repeater.targetIndex >= 0 && repeater.targetIndex != index ) {
-                                    columnModel.move(index, repeater.targetIndex, 1)
-                                    if (sortIndicatorColumn == index)
-                                        sortIndicatorColumn = repeater.targetIndex
+                                    var targetColumn = columnModel.get(repeater.targetIndex).columnItem
+                                    if (targetColumn.movable) {
+                                        columnModel.move(index, repeater.targetIndex, 1)
+                                        if (sortIndicatorColumn == index)
+                                            sortIndicatorColumn = repeater.targetIndex
+                                    }
                                 }
                                 repeater.targetIndex = -1
                             }
                             drag.maximumX: 1000
                             drag.minimumX: -1000
-                            drag.target: columnCount > 1 ? draghandle : null
+                            drag.target: modelData.movable && columnCount > 1 ? draghandle : null
                         }
 
                         Loader {
@@ -757,6 +947,7 @@ ScrollView {
                                 readonly property bool pressed: headerClickArea.pressed
                                 readonly property bool containsMouse: headerClickArea.containsMouse
                                 readonly property int column: index
+                                readonly property int textAlignment: modelData.horizontalAlignment
                             }
 
                             parent: tableHeader
@@ -775,7 +966,7 @@ ScrollView {
                             anchors.rightMargin: -width/2
                             width: 16 ; height: parent.height
                             anchors.right: parent.right
-                            enabled: columnCount > 1
+                            enabled: modelData.resizable && columnCount > 1
                             onPositionChanged:  {
                                 var newHeaderWidth = modelData.width + (mouseX - offset)
                                 modelData.width = Math.max(minimumSize, newHeaderWidth)
@@ -808,6 +999,7 @@ ScrollView {
                     readonly property bool pressed: false
                     readonly property bool containsMouse: false
                     readonly property int column: -1
+                    readonly property int textAlignment: Text.AlignLeft
                 }
 
                 anchors.top: parent.top

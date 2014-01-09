@@ -5,4 +5,4 @@ QCloseEvent
 
 .. class:: QCloseEvent
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.1/qtgui/qcloseevent.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtgui/qcloseevent.html>`_

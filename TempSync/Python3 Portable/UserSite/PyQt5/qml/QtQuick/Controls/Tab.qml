@@ -42,8 +42,8 @@ import QtQuick 2.1
 
 /*!
     \qmltype Tab
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup viewaddons
     \brief Tab represents the content of a tab in a TabView.
 

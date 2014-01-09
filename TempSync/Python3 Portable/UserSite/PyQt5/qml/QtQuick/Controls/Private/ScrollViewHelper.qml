@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
         \qmltype ScrollViewHeader
         \internal
-        \inqmlmodule QtQuick.Controls.Private 1.0
+        \inqmlmodule QtQuick.Controls.Private
 */
 Item {
     id: wheelarea
@@ -59,6 +59,7 @@ Item {
     property int contentWidth
     property real originX
     property real originY
+    property bool active
 
     property int leftMargin: outerFrame ? root.__style.padding.left : 0
     property int rightMargin: outerFrame ? root.__style.padding.right : 0
@@ -121,7 +122,7 @@ Item {
 
     ScrollBar {
         id: hscrollbar
-        isTransient: !!__panel && !!__panel.transient
+        isTransient: !!__panel && !!__panel.isTransient
         active: !!__panel && (__panel.sunken || __panel.activeControl !== "none")
         enabled: !isTransient || __panel.visible
         orientation: Qt.Horizontal
@@ -143,26 +144,32 @@ Item {
         Binding {
             target: hscrollbar.__panel
             property: "raised"
-            value: vscrollbar.active
+            value: vscrollbar.active || wheelarea.active
             when: hscrollbar.isTransient
         }
         Binding {
             target: hscrollbar.__panel
             property: "visible"
             value: true
-            when: !hscrollbar.isTransient
+            when: !hscrollbar.isTransient || wheelarea.active
         }
         function flash() {
             if (hscrollbar.isTransient) {
                 hscrollbar.__panel.on = true
                 hscrollbar.__panel.visible = true
+                hFlasher.start()
             }
+        }
+        Timer {
+            id: hFlasher
+            interval: 10
+            onTriggered: hscrollbar.__panel.on = false
         }
     }
 
     ScrollBar {
         id: vscrollbar
-        isTransient: !!__panel && !!__panel.transient
+        isTransient: !!__panel && !!__panel.isTransient
         active: !!__panel && (__panel.sunken || __panel.activeControl !== "none")
         enabled: !isTransient || __panel.visible
         orientation: Qt.Vertical
@@ -184,20 +191,26 @@ Item {
         Binding {
             target: vscrollbar.__panel
             property: "raised"
-            value: hscrollbar.active
+            value: hscrollbar.active || wheelarea.active
             when: vscrollbar.isTransient
         }
         Binding {
             target: vscrollbar.__panel
             property: "visible"
             value: true
-            when: !vscrollbar.isTransient
+            when: !vscrollbar.isTransient || wheelarea.active
         }
         function flash() {
             if (vscrollbar.isTransient) {
                 vscrollbar.__panel.on = true
                 vscrollbar.__panel.visible = true
+                vFlasher.start()
             }
+        }
+        Timer {
+            id: vFlasher
+            interval: 10
+            onTriggered: vscrollbar.__panel.on = false
         }
     }
 }

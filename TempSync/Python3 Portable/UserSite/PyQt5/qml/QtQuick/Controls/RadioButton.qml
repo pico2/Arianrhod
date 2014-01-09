@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype RadioButton
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief A radio button with a text label.
 
@@ -74,7 +74,7 @@ import QtQuick.Controls.Private 1.0
     \endqml
 
     You can create a custom appearance for a RadioButton by
-    assigning a \l RadioButtonStyle.
+    assigning a \l {QtQuick.Controls.Styles::RadioButtonStyle}{RadioButtonStyle}.
 */
 
 AbstractCheckable {

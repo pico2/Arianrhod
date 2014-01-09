@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype CheckBox
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief A checkbox with a text label.
 
@@ -87,7 +87,7 @@ import QtQuick.Controls.Private 1.0
     Whenever a CheckBox is clicked, it emits the \l {AbstractCheckable::clicked}{clicked()} signal.
 
     You can create a custom appearance for a CheckBox by
-    assigning a \l CheckBoxStyle.
+    assigning a \l {QtQuick.Controls.Styles::CheckBoxStyle}{CheckBoxStyle}.
 */
 
 AbstractCheckable {

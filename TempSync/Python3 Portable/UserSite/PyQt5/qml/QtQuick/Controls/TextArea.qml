@@ -38,13 +38,13 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick 2.2
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 /*!
     \qmltype TextArea
-    \inqmlmodule QtQuick.Controls 1.0
-    \since QtQuick.Controls 1.0
+    \inqmlmodule QtQuick.Controls
+    \since 5.1
     \ingroup controls
     \brief Displays multiple lines of editable formatted text.
 
@@ -63,6 +63,9 @@ import QtQuick.Controls.Private 1.0
 
     You can translate between cursor positions (characters from the start of the document) and pixel
     points using positionAt() and positionToRectangle().
+
+    You can create a custom appearance for a TextArea by
+    assigning a \l{QtQuick.Controls.Styles::TextAreaStyle}{TextAreaStyle}.
 
     \sa TextField, TextEdit
 */
@@ -118,7 +121,7 @@ ScrollView {
         The text color.
 
         \qml
-         TextArea { color: "orange" }
+         TextArea { textColor: "orange" }
         \endqml
     */
     property alias textColor: edit.color
@@ -383,14 +386,36 @@ ScrollView {
     signal linkActivated(string link)
 
     /*!
+        \qmlsignal TextArea::linkHovered(string link)
+        \since 5.2
+
+        This signal is emitted when the user hovers a link embedded in the text.
+        The link must be in rich text or HTML format and the
+        \a link string provides access to the particular link.
+
+        \sa hoveredLink
+    */
+    signal linkHovered(string link)
+
+    /*!
+        \qmlproperty string TextArea::hoveredLink
+        \since QtQuick.Controls 1.1
+
+        This property contains the link string when user hovers a link
+        embedded in the text. The link must be in rich text or HTML format
+        and the link string provides access to the particular link.
+
+        \sa onLinkHovered
+    */
+    readonly property alias hoveredLink: edit.hoveredLink
+
+    /*!
         \qmlmethod TextArea::append(string)
 
         Appends \a string as a new line to the end of the text area.
     */
     function append (string) {
-        if (length)
-            string = "\n" + string
-        text += string
+        edit.append(string)
         __verticalScrollBar.value = __verticalScrollBar.maximumValue
     }
 
@@ -610,14 +635,20 @@ ScrollView {
     /*! \internal */
     default property alias data: area.data
 
-    /*! \internal */
-    property alias __documentMargin: edit.textMargin
+    /*! \qmlproperty real TextArea::textMargin
+        \since QtQuick.Controls 1.1
+
+        The margin, in pixels, around the text in the TextArea.
+    */
+    property alias textMargin: edit.textMargin
 
     frameVisible: true
 
     activeFocusOnTab: true
 
     Accessible.role: Accessible.EditableText
+
+    style: Qt.createComponent(Settings.style + "/TextAreaStyle.qml", area)
 
     /*!
         \qmlproperty TextDocument TextArea::textDocument
@@ -637,16 +668,11 @@ ScrollView {
             id: edit
             focus: true
 
-            SystemPalette {
-                id: palette
-                colorGroup: enabled ? SystemPalette.Active : SystemPalette.Disabled
-            }
-
             Rectangle {
                 id: colorRect
                 parent: viewport
                 anchors.fill: parent
-                color: palette.base
+                color: __style ? __style.backgroundColor : "white"
                 z: -1
             }
 
@@ -683,11 +709,11 @@ ScrollView {
             onContentHeightChanged: edit.doLayout()
             onWrapModeChanged: edit.doLayout()
 
-            renderType: Text.NativeRendering
-
-            color: palette.text
-            selectionColor: palette.highlight
-            selectedTextColor: palette.highlightedText
+            renderType: __style ? __style.renderType : Text.NativeRendering
+            font: __style ? __style.font : font
+            color: __style ? __style.textColor : "darkgray"
+            selectionColor: __style ? __style.selectionColor : "darkred"
+            selectedTextColor: __style ? __style.selectedTextColor : "white"
             wrapMode: TextEdit.WordWrap
             textMargin: 4
 
@@ -717,11 +743,12 @@ ScrollView {
                 }
             }
             onLinkActivated: area.linkActivated(link)
+            onLinkHovered: area.linkHovered(link)
 
             MouseArea {
                 parent: area.viewport
                 anchors.fill: parent
-                cursorShape: Qt.IBeamCursor
+                cursorShape: edit.hoveredLink ? Qt.PointingHandCursor : Qt.IBeamCursor
                 acceptedButtons: Qt.NoButton
             }
         }

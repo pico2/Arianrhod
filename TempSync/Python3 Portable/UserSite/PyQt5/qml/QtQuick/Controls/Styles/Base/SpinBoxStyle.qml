@@ -38,16 +38,29 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype SpinBoxStyle
-    \internal
-    \inqmlmodule QtQuick.Controls.Styles 1.0
-    \since QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
+    \since 5.2
     \ingroup controlsstyling
     \brief Provides custom styling for SpinBox
+
+    Example:
+    \qml
+    SpinBox {
+        style: SpinBoxStyle{
+            background: Rectangle {
+                implicitWidth: 100
+                implicitHeight: 20
+                border.color: "gray"
+                radius: 2
+            }
+        }
+    }
+    \endqml
 */
 
 Style {
@@ -63,7 +76,22 @@ Style {
     }
 
     /*! The content margins of the text field. */
-    padding { top: 0 ; left: 5 ; right: 12 ; bottom: 0 }
+    padding { top: 1 ; left: Math.round(TextSingleton.implicitHeight/2) ; right: Math.round(TextSingleton.implicitHeight) ; bottom: 0 }
+
+    /*! \qmlproperty enumeration horizontalAlignment
+
+        This property defines the default text aligment.
+
+        The supported values are:
+        \list
+        \li Qt.AlignLeft
+        \li Qt.AlignHCenter
+        \li Qt.AlignRight
+        \endlist
+
+        The default value is Qt.AlignRight
+    */
+    property int horizontalAlignment: Qt.AlignRight
 
     /*! The text color. */
     property color textColor: __syspal.text
@@ -74,63 +102,70 @@ Style {
     /*! The highlighted text color, used in selections. */
     property color selectedTextColor: __syspal.highlightedText
 
+    /*!
+        \qmlproperty enumeration renderType
+
+        Override the default rendering type for the control.
+
+        Supported render types are:
+        \list
+        \li Text.QtRendering
+        \li Text.NativeRendering - the default
+        \endlist
+
+        \sa Text::renderType
+    */
+    property int renderType: Text.NativeRendering
+
     /*! The button used to increment the value. */
     property Component incrementControl: Item {
-        implicitWidth: 18
+        implicitWidth: padding.right
         Image {
             source: "images/arrow-up.png"
             anchors.centerIn: parent
             anchors.verticalCenterOffset: 1
-            opacity: control.enabled ? 0.7 : 0.5
-            anchors.horizontalCenterOffset:  -1
+            opacity: control.enabled ? (styleData.upPressed ? 1 : 0.6) : 0.5
         }
     }
 
     /*! The button used to decrement the value. */
     property Component decrementControl: Item {
-        implicitWidth: 18
+        implicitWidth: padding.right
         Image {
             source: "images/arrow-down.png"
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -2
-            anchors.horizontalCenterOffset:  -1
-            opacity: control.enabled ? 0.7 : 0.5
+            opacity: control.enabled ? (styleData.downPressed ? 1 : 0.6) : 0.5
         }
     }
 
     /*! The background of the SpinBox. */
     property Component background: Item {
-        implicitHeight: 25
-        implicitWidth: 80
-        BorderImage {
-            id: image
+        implicitHeight: Math.max(25, Math.round(TextSingleton.implicitHeight * 1.2))
+        implicitWidth: styleData.contentWidth + 26
+        Rectangle {
             anchors.fill: parent
-            source: "images/editbox.png"
-            border.left: 4
-            border.right: 4
-            border.top: 4
-            border.bottom: 4
             anchors.bottomMargin: -1
-            BorderImage {
-                anchors.fill: parent
-                anchors.margins: -1
-                anchors.topMargin: -2
-                anchors.bottomMargin: 1
-                anchors.rightMargin: 0
-                source: "images/focusframe.png"
-                visible: control.activeFocus
-                border.left: 4
-                border.right: 4
-                border.top: 4
-                border.bottom: 4
+            color: "#44ffffff"
+            radius: baserect.radius
+        }
+        Rectangle {
+            id: baserect
+            gradient: Gradient {
+                GradientStop {color: "#eee" ; position: 0}
+                GradientStop {color: "#fff" ; position: 0.1}
+                GradientStop {color: "#fff" ; position: 1}
             }
+            radius: TextSingleton.implicitHeight * 0.16
+            anchors.fill: parent
+            border.color: control.activeFocus ? "#47b" : "#999"
         }
     }
 
     /*! \internal */
     property Component panel: Item {
         id: styleitem
-        implicitWidth: styleData.contentWidth + 26
+        implicitWidth: backgroundLoader.implicitWidth
         implicitHeight: backgroundLoader.implicitHeight
 
         property color foregroundColor: spinboxStyle.textColor
@@ -142,8 +177,8 @@ Style {
         property rect upRect: Qt.rect(width - incrementControlLoader.implicitWidth, 0, incrementControlLoader.implicitWidth, height / 2 + 1)
         property rect downRect: Qt.rect(width - decrementControlLoader.implicitWidth, height / 2, decrementControlLoader.implicitWidth, height / 2)
 
-        property int horizontalTextAlignment: Qt.AlignLeft
-        property int verticalTextAlignment: Qt.AlignVCenter
+        property int horizontalAlignment: spinboxStyle.horizontalAlignment
+        property int verticalAlignment: Qt.AlignVCenter
 
         Loader {
             id: backgroundLoader

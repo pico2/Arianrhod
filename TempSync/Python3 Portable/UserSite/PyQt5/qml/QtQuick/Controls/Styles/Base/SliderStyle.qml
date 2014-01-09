@@ -38,13 +38,13 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype SliderStyle
-    \inqmlmodule QtQuick.Controls.Styles 1.0
-    \since QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
+    \since 5.1
     \ingroup controlsstyling
     \brief Provides custom styling for Slider
 
@@ -95,47 +95,91 @@ Style {
     /*! This property holds the item for the slider handle.
         You can access the slider through the \c control property
     */
-    property Component handle: Item {
-        implicitWidth: 20
-        implicitHeight: 18
-        BorderImage {
-            anchors.fill: parent
-            source: "images/button.png"
-            border.top: 6
-            border.bottom: 6
-            border.left: 6
-            border.right: 6
-            BorderImage {
-                anchors.fill: parent
-                anchors.margins: -1
-                anchors.topMargin: -2
-                anchors.rightMargin: 0
-                anchors.bottomMargin: 1
-                source: "images/focusframe.png"
-                visible: control.activeFocus
-                border.left: 4
-                border.right: 4
-                border.top: 4
-                border.bottom: 4
-            }
-        }
-    }
+    property Component handle: Item{
+            implicitWidth:  implicitHeight
+            implicitHeight: TextSingleton.implicitHeight * 1.2
 
+            FastGlow {
+                source: handle
+                anchors.fill: parent
+                anchors.bottomMargin: -1
+                anchors.topMargin: 1
+                smooth: true
+                color: "#11000000"
+                spread: 0.8
+                transparentBorder: true
+                blur: 0.1
+
+            }
+            Rectangle {
+                id: handle
+                anchors.fill: parent
+
+                radius: width/2
+                gradient: Gradient {
+                    GradientStop { color: control.pressed ? "#e0e0e0" : "#fff" ; position: 1 }
+                    GradientStop { color: "#eee" ; position: 0 }
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    radius: width/2
+                    border.color: "#99ffffff"
+                    color: control.activeFocus ? "#224f7fbf" : "transparent"
+                }
+                border.color: control.activeFocus ? "#47b" : "#777"
+            }
+
+    }
     /*! This property holds the background groove of the slider.
 
         You can access the handle position through the \c styleData.handlePosition property.
     */
     property Component groove: Item {
+        property color fillColor: "#49d"
         anchors.verticalCenter: parent.verticalCenter
-        implicitWidth: 100
-        implicitHeight: 8
-        BorderImage {
+        implicitWidth: Math.round(TextSingleton.implicitHeight * 4.5)
+        implicitHeight: Math.max(6, Math.round(TextSingleton.implicitHeight * 0.3))
+        Rectangle {
+            radius: height/2
             anchors.fill: parent
-            source: "images/button_down.png"
-            border.top: 3
-            border.bottom: 3
-            border.left: 6
-            border.right: 6
+            border.width: 1
+            border.color: "#888"
+            gradient: Gradient {
+                GradientStop { color: "#bbb" ; position: 0 }
+                GradientStop { color: "#ccc" ; position: 0.6 }
+                GradientStop { color: "#ccc" ; position: 1 }
+            }
+        }
+        Item {
+            clip: true
+            width: styleData.handlePosition
+            height: parent.height
+            Rectangle {
+                anchors.fill: parent
+                border.color: Qt.darker(fillColor, 1.2)
+                radius: height/2
+                gradient: Gradient {
+                    GradientStop {color: Qt.lighter(fillColor, 1.3)  ; position: 0}
+                    GradientStop {color: fillColor ; position: 1.4}
+                }
+            }
+        }
+    }
+
+    /*! This property holds the tick mark labels
+        \since QtQuick.Controls.Styles 1.1
+
+        You can access the handle width through the \c styleData.handleWidth property.
+    */
+    property Component tickmarks: Repeater {
+        id: repeater
+        model: control.stepSize > 0 ? 1 + (control.maximumValue - control.minimumValue) / control.stepSize : 0
+        Rectangle {
+            color: "#777"
+            width: 1 ; height: 3
+            y: repeater.height
+            x: styleData.handleWidth / 2 + index * ((repeater.width - styleData.handleWidth) / (repeater.count-1))
         }
     }
 
@@ -171,7 +215,13 @@ Style {
                 x: padding.left
                 sourceComponent: groove
                 width: (horizontal ? parent.width : parent.height) - padding.left - padding.right
-                y:  padding.top +  (Math.round(horizontal ? parent.height : parent.width - padding.top - padding.bottom) - grooveLoader.item.height)/2
+                y:  Math.round(padding.top + (Math.round(horizontal ? parent.height : parent.width - padding.top - padding.bottom) - grooveLoader.item.height)/2)
+            }
+            Loader {
+                id: tickMarkLoader
+                anchors.fill: parent
+                sourceComponent: control.tickmarksEnabled ? tickmarks : null
+                property QtObject styleData: QtObject { readonly property int handleWidth: control.__panel.handleWidth }
             }
             Loader {
                 id: handleLoader

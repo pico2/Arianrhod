@@ -38,13 +38,13 @@
 **
 ****************************************************************************/
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
     \qmltype TabViewStyle
-    \inqmlmodule QtQuick.Controls.Styles 1.0
-    \since QtQuick.Controls.Styles 1.0
+    \inqmlmodule QtQuick.Controls.Styles
+    \since 5.1
     \ingroup viewsstyling
     \brief Provides custom styling for TabView
 
@@ -156,22 +156,22 @@ Style {
                 border.right: 6
                 anchors.topMargin: styleData.selected ? 0 : 1
             }
-            BorderImage {
-                anchors.fill: parent
-                anchors.topMargin: -2
-                anchors.leftMargin: -2
-                anchors.rightMargin: -1
-                source: "images/focusframe.png"
-                visible: styleData.activeFocus && styleData.selected
-                border.left: 4
-                border.right: 4
-                border.top: 4
-                border.bottom: 4
-            }
+        }
+        Rectangle {
+            anchors.fill: textitem
+            anchors.margins: -1
+            anchors.leftMargin: -3
+            anchors.rightMargin: -3
+            visible: (styleData.activeFocus && styleData.selected)
+            height: 6
+            radius: 3
+            color: "#224f9fef"
+            border.color: "#47b"
         }
         Text {
             id: textitem
             anchors.centerIn: parent
+            anchors.alignWhenCentered: true
             text: styleData.title
             renderType: Text.NativeRendering
             scale: control.tabPosition === Qt.TopEdge ? 1 : -1
@@ -184,4 +184,7 @@ Style {
 
     /*! This defines the right corner. */
     property Component rightCorner: null
+
+    /*! This defines the tab bar background. */
+    property Component tabBar: null
 }

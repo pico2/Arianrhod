@@ -39,13 +39,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.1
 import QtQuick.Controls.Private 1.0
 
 /*!
         \qmltype ScrollBar
         \internal
-        \inqmlmodule QtQuick.Controls.Private 1.0
+        \inqmlmodule QtQuick.Controls.Private
 */
 Item {
     id: scrollbar
@@ -56,6 +56,7 @@ Item {
     property alias minimumValue: slider.minimumValue
     property alias maximumValue: slider.maximumValue
     property alias value: slider.value
+    property int singleStep: 20
 
     activeFocusOnTab: false
 
@@ -89,7 +90,6 @@ Item {
         id: internal
         property bool horizontal: orientation === Qt.Horizontal
         property int pageStep: internal.horizontal ? width : height
-        property int singleStep: 20
         property bool scrollToClickposition: internal.scrollToClickPosition
         anchors.fill: parent
         cursorShape: __panel.visible ? Qt.ArrowCursor : Qt.IBeamCursor // forces a cursor change
@@ -143,10 +143,9 @@ Item {
             __panel.activeControl = __panel.hitTest(mouseX, mouseY)
             scrollToClickposition = scrollToClickPosition
             var handleRect = __panel.subControlRect("handle")
-            grooveSize =  horizontal ? __panel.subControlRect("groove").width -
-                                       handleRect.width:
-                                       __panel.subControlRect("groove").height -
-                                       handleRect.height;
+            var grooveRect = __panel.subControlRect("groove")
+            grooveSize =  horizontal ? grooveRect.width - handleRect.width:
+                                       grooveRect.height - handleRect.height;
             if (__panel.activeControl === "handle") {
                 pressedX = mouseX;
                 pressedY = mouseY;
@@ -166,9 +165,13 @@ Item {
                     incrementPage();
                     pageDownPressed = true;
                 }
-            } else {
-                slider.position = horizontal ? mouseX -  handleRect.width/2
-                                             : mouseY - handleRect.height/2
+            } else { // scroll to click position
+                slider.position = horizontal ? mouseX -  handleRect.width/2 - grooveRect.x
+                                             : mouseY - handleRect.height/2 - grooveRect.y
+                pressedX = mouseX;
+                pressedY = mouseY;
+                handlePressed = true;
+                oldPosition = slider.position;
             }
         }
 
@@ -182,28 +185,40 @@ Item {
             pageDownPressed = false;
         }
 
-        function incrementPage() {
-            value += pageStep
-            if (value > maximumValue)
-                value = maximumValue
+        onWheel: {
+            var stepCount = -(wheel.angleDelta.x ? wheel.angleDelta.x : wheel.angleDelta.y) / 120
+            if (stepCount != 0) {
+                if (wheel.modifiers & Qt.ControlModifier || wheel.modifiers & Qt.ShiftModifier)
+                   incrementPage(stepCount)
+                else
+                   increment(stepCount)
+            }
         }
 
-        function decrementPage() {
-            value -= pageStep
-            if (value < minimumValue)
-                value = minimumValue
+        function incrementPage(stepCount) {
+            value = boundValue(value + getSteps(pageStep, stepCount))
         }
 
-        function increment() {
-            value += singleStep
-            if (value > maximumValue)
-                value = maximumValue
+        function decrementPage(stepCount) {
+            value = boundValue(value - getSteps(pageStep, stepCount))
         }
 
-        function decrement() {
-            value -= singleStep
-            if (value < minimumValue)
-                value = minimumValue
+        function increment(stepCount) {
+            value = boundValue(value + getSteps(singleStep, stepCount))
+        }
+
+        function decrement(stepCount) {
+            value = boundValue(value - getSteps(singleStep, stepCount))
+        }
+
+        function boundValue(val) {
+            return Math.min(Math.max(val, minimumValue), maximumValue)
+        }
+
+        function getSteps(step, count) {
+            if (count)
+                step *= count
+            return step
         }
 
         RangeModel {
