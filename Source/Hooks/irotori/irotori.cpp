@@ -1,5 +1,5 @@
 #pragma comment(linker, "/ENTRY:DllMain")
-#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
+#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.CRT=.text")
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
 #pragma comment(linker, "/EXPORT:Direct3DCreate9=d3d9.Direct3DCreate9")
 
@@ -9,11 +9,10 @@
 #include "cxdec.cpp"
 #include "HookPort.cpp"
 
-TYPE_OF(LdrInitializeThunk) *g_LdrInitializeThunk;
+ML_OVERLOAD_NEW
 
+API_POINTER(LdrInitializeThunk) g_LdrInitializeThunk;
 BOOL Initialize(PVOID BaseAddress);
-
-OVERLOAD_CPP_NEW_WITH_HEAP(MemoryAllocator::GetGlobalHeap())
 
 PIROTORI_INFO g_Info;
 
@@ -132,7 +131,7 @@ PTEXT_NODE FindTextByHash(PIROTORI_INFO Info, PULONG Hash)
     if (Hash[0] < Nt_DecodePointer(TextBase[Left], *(PULONG)g_LdrInitializeThunk)->Hash[0] ||
         Hash[0] > Nt_DecodePointer(TextBase[Right], *(PULONG)Info->LdrInitializeThunk)->Hash[0])
     {
-        return NULL;
+        return nullptr;
     }
 
     while (Left < Right)
@@ -155,7 +154,7 @@ PTEXT_NODE FindTextByHash(PIROTORI_INFO Info, PULONG Hash)
             Text->Hash[1] == Hash[1] &&
             Text->Hash[2] == Hash[2] &&
             Text->Hash[3] == Hash[3]
-           ) ? Text : NULL;
+           ) ? Text : nullptr;
 }
 
 #pragma pop_macro("COMPARE_HASH")
@@ -165,7 +164,7 @@ PTEB_ACTIVE_FRAME Nt_FindThreadFrameByContext2(ULONG_PTR Context)
     PTEB_ACTIVE_FRAME Frame;
 
     Frame = g_Info->RtlGetFrame();
-    while (Frame != NULL && Frame->Context != Context)
+    while (Frame != nullptr && Frame->Context != Context)
         Frame = Frame->Previous;
 
     return Frame;
@@ -187,7 +186,7 @@ DecryptAPCTimer(
     PTHREAD_TEXT_BUFFER TextBuffer;
 
     TextBuffer  = (PTHREAD_TEXT_BUFFER)Nt_FindThreadFrameByContext2(THREAD_TEXT_BUFFER_MAGIC);
-    if (TextBuffer == NULL)
+    if (TextBuffer == nullptr)
         return;
 
     TextSize = TextBuffer->TextLength;
@@ -268,14 +267,14 @@ DecryptAPCTimer(
     );
 
 #else
-  
+
     Info->cxdec.Decrypt2(
     0,
     TextBuffer->Buffer,
     TextBuffer->TextLength,
     &TextBuffer->Hash[4]
     );
-    
+
     TextBuffer->TextLength = 0;
 
 #endif
@@ -308,7 +307,7 @@ HookNtDeviceIoControlFile(
     HPARG_FLTINFO->Action = BlockSystemCall;
 
     TextBuffer = (PTHREAD_TEXT_BUFFER)Nt_FindThreadFrameByContext2(THREAD_TEXT_BUFFER_MAGIC);
-    if (TextBuffer == NULL)
+    if (TextBuffer == nullptr)
         return STATUS_SUCCESS;
 
 #if 1
@@ -402,29 +401,29 @@ PSTR GetTextBuffer(PIROTORI_SCRIPT_OBJECT Object, PSTR String)
     Index[3] = Hash[3] ^ Hash[7];
 
     Text = FindTextByHash(Info, Index);
-    if (Text == NULL)
+    if (Text == nullptr)
         return String;
 
     Length = Text->Length ^ Text->Hash[0] ^ Text->Hash[1] ^ Text->Hash[2] ^ Text->Hash[3];
 
     TextBuffer = (PTHREAD_TEXT_BUFFER)Nt_FindThreadFrameByContext2(THREAD_TEXT_BUFFER_MAGIC);
-    if (TextBuffer == NULL)
+    if (TextBuffer == nullptr)
     {
         TextBuffer = new THREAD_TEXT_BUFFER;
-        if (TextBuffer == NULL)
+        if (TextBuffer == nullptr)
             return String;
 
         Info->RtlPushFrame(TextBuffer);
 
-        TextBuffer->Buffer = NULL;
+        TextBuffer->Buffer = nullptr;
         TextBuffer->Length = 0;
     }
 
     if (TextBuffer->Length <= Length)
     {
         TextBuffer->Length = Length + 1;
-        TextBuffer->Buffer = (PCHAR)MemoryAllocator::ReAllocateMemory(TextBuffer->Buffer, Length + 1);
-        if (TextBuffer->Buffer == NULL)
+        TextBuffer->Buffer = (PCHAR)ReAllocateMemoryP(TextBuffer->Buffer, Length + 1);
+        if (TextBuffer->Buffer == nullptr)
             return String;
     }
 
@@ -573,11 +572,11 @@ NTSTATUS LoadText(PIROTORI_INFO Info)
 
     Length = File.GetSize32();
     Buffer = new BYTE[Length];
-    if (Buffer == NULL)
+    if (Buffer == nullptr)
         return STATUS_INSUFFICIENT_RESOURCES;
 
     Info->TextBuffer = Buffer;
-    TextBase = NULL;
+    TextBase = nullptr;
 
     SCOPE_EXIT
     {
@@ -586,9 +585,9 @@ NTSTATUS LoadText(PIROTORI_INFO Info)
 
         delete[] Buffer;
 
-        MemoryAllocator::FreeMemory(TextBase);
+        FreeMemoryP(TextBase);
 
-        Info->TextBuffer = NULL;
+        Info->TextBuffer = nullptr;
     }
     SCOPE_EXIT_END;
 
@@ -597,8 +596,8 @@ NTSTATUS LoadText(PIROTORI_INFO Info)
         return Status;
 
     MaxCount = 0x2000;
-    TextBase = (PTEXT_NODE*)MemoryAllocator::AllocateMemory(MaxCount * sizeof(*TextBase));
-    if (TextBase == NULL)
+    TextBase = (PTEXT_NODE*)AllocateMemoryP(MaxCount * sizeof(*TextBase));
+    if (TextBase == nullptr)
         return STATUS_INSUFFICIENT_RESOURCES;
 
     Text    = TextBase;
@@ -612,8 +611,8 @@ NTSTATUS LoadText(PIROTORI_INFO Info)
         {
             Count = MaxCount;
             MaxCount *= 2;
-            TextBase = (PTEXT_NODE *)MemoryAllocator::ReAllocateMemory(TextBase, MaxCount * sizeof(*TextBase));
-            if (TextBase == NULL)
+            TextBase = (PTEXT_NODE *)ReAllocateMemoryP(TextBase, MaxCount * sizeof(*TextBase));
+            if (TextBase == nullptr)
                 return STATUS_INSUFFICIENT_RESOURCES;
 
             Text = TextBase + Count - 1;
@@ -629,8 +628,8 @@ NTSTATUS LoadText(PIROTORI_INFO Info)
     Count = Text - TextBase;
     if (Count != MaxCount)
     {
-        TextBase = (PTEXT_NODE *)MemoryAllocator::ReAllocateMemory(TextBase, Count * sizeof(*TextBase));
-        if (TextBase == NULL)
+        TextBase = (PTEXT_NODE *)ReAllocateMemoryP(TextBase, Count * sizeof(*TextBase));
+        if (TextBase == nullptr)
             return STATUS_INSUFFICIENT_RESOURCES;
     }
 
@@ -645,15 +644,11 @@ ULONG STDCALL StubThreadStart(THREAD_START_PARAMETER*)
     return 0;
 }
 
-THREAD_START_PARAMETER*
-AllocateThreadParameter(
-    PVOID StartAddress,
-    PVOID Parameter
-)
+PTHREAD_START_PARAMETER AllocateThreadParameter(PVOID StartAddress, PVOID Parameter)
 {
-    THREAD_START_PARAMETER *StartParameter;
+    PTHREAD_START_PARAMETER StartParameter;
 
-    StartParameter = (THREAD_START_PARAMETER *)MemoryAllocator::AllocateMemory(sizeof(*StartParameter));
+    StartParameter = (PTHREAD_START_PARAMETER)AllocateMemoryP(sizeof(*StartParameter));
 
     StartParameter->Context              = THREAD_START_PARAMETER_MAGIC;
     StartParameter->Parameter            = Parameter;
@@ -667,7 +662,7 @@ FreeThreadParameter(
     THREAD_START_PARAMETER *Parameter
 )
 {
-    return MemoryAllocator::FreeMemory(Parameter);
+    return FreeMemoryP(Parameter);
 }
 
 NTSTATUS
@@ -678,18 +673,18 @@ HookNtCreateThreadEx(
     ACCESS_MASK         DesiredAccess,
     POBJECT_ATTRIBUTES  ObjectAttributes,
     HANDLE              ProcessHandle,
-    PVOID               StartAddress,
-    PVOID               Parameter,
-    BOOL                CreateSuspended,
-    ULONG               StackZeroBits,
-    ULONG               SizeOfStackCommit,
-    ULONG               SizeOfStackReserve,
-    PVOID               BytesBuffer
+    PVOID               StartRoutine,
+    PVOID               Argument,
+    ULONG               CreateFlags, // THREAD_CREATE_FLAGS_*
+    ULONG_PTR           ZeroBits,
+    ULONG_PTR           StackSize,
+    ULONG_PTR           MaximumStackSize,
+    PPS_ATTRIBUTE_LIST  AttributeList
 )
 {
     THREAD_START_PARAMETER *StartParameter;
 
-    StartParameter = AllocateThreadParameter(StartAddress, Parameter);
+    StartParameter = AllocateThreadParameter(StartRoutine, Argument);
 
     HPARG_FLTINFO->Action = BlockSystemCall;
 
@@ -701,11 +696,11 @@ HookNtCreateThreadEx(
                 ProcessHandle,
                 (PVOID)DEFAULT_THREAD_START_ADDRESS,
                 StartParameter,
-                CreateSuspended,
-                StackZeroBits,
-                SizeOfStackCommit,
-                SizeOfStackReserve,
-                BytesBuffer
+                CreateFlags,
+                ZeroBits,
+                StackSize,
+                MaximumStackSize,
+                AttributeList
            );
 }
 
@@ -747,7 +742,7 @@ HookNtCreateThread(
            );
 }
 
-THREAD_START_PARAMETER SystemThreadParameter;
+PTHREAD_START_PARAMETER SystemThreadParameter;
 
 VOID NTAPI HookLdrInitializeThunk_Win8(PVOID Unknown, PCONTEXT ThreadContext, PVOID NtdllBase)
 {
@@ -762,7 +757,7 @@ VOID NTAPI HookLdrInitializeThunk_Win8(PVOID Unknown, PCONTEXT ThreadContext, PV
 
     ThreadStartAddress = ThreadContext->Eax;
 
-    Info->RtlPushFrame(&SystemThreadParameter);
+    Info->RtlPushFrame(SystemThreadParameter);
 
     if (ThreadStartAddress + 1 == 0)
     {
@@ -783,8 +778,8 @@ VOID NTAPI HookLdrInitializeThunk_Win8(PVOID Unknown, PCONTEXT ThreadContext, PV
         ThreadContext->Eax = (ULONG_PTR)StubThreadStart;
     }
 
-    if (NtdllBase != NULL)
-        return ((TYPE_OF(HookLdrInitializeThunk_Win8) *)Info->StubLdrInitializeThunk)(Unknown, ThreadContext, NtdllBase);
+    if (NtdllBase != nullptr)
+        return ((API_POINTER(HookLdrInitializeThunk_Win8))Info->StubLdrInitializeThunk)(Unknown, ThreadContext, NtdllBase);
 }
 
 VOID NTAPI HookLdrInitializeThunk_Win7(PCONTEXT ThreadContext, PVOID NtdllBase)
@@ -800,7 +795,7 @@ VOID NTAPI HookLdrInitializeThunk_Win7(PCONTEXT ThreadContext, PVOID NtdllBase)
 
     ThreadStartAddress = ThreadContext->Eax;
 
-    Info->RtlPushFrame(&SystemThreadParameter);
+    Info->RtlPushFrame(SystemThreadParameter);
 
     if (ThreadStartAddress + 1 == 0)
     {
@@ -821,7 +816,7 @@ VOID NTAPI HookLdrInitializeThunk_Win7(PCONTEXT ThreadContext, PVOID NtdllBase)
         ThreadContext->Eax = (ULONG_PTR)StubThreadStart;
     }
 
-    if (NtdllBase != NULL)
+    if (NtdllBase != nullptr)
         return Info->StubLdrInitializeThunk(ThreadContext, NtdllBase);
 }
 
@@ -866,7 +861,7 @@ HookNtContinue(
     Info = g_Info;
 
     Probe = (PTHREAD_TEXT_BUFFER)Nt_FindThreadFrameByContext2(THREAD_TEXT_BUFFER_MAGIC);
-    if (Probe != NULL)
+    if (Probe != nullptr)
     {
         if (Probe != HPARG_FLTINFO->FilterContext)
             return STATUS_SUCCESS;
@@ -874,11 +869,11 @@ HookNtContinue(
         if (Context->Eax != (ULONG_PTR)Probe->Buffer)
             return STATUS_SUCCESS;
 
-        if (Context->Ebx != (ULONG_PTR)Nt_CurrentPeb())
+        if (Context->Ebx != (ULONG_PTR)CurrentPeb())
             return STATUS_SUCCESS;
 
         Info->RtlPopFrame(Probe);
-        MemoryAllocator::FreeMemory(Probe);
+        FreeMemoryP(Probe);
 
         if (*(PBYTE)Context->Eax * 2 == 0xCC * 2)
         {
@@ -886,14 +881,14 @@ HookNtContinue(
         }
         else
         {
-            Initialize(NULL);
+            Initialize(nullptr);
         }
 
         return STATUS_SUCCESS;
     }
 
     Parameter = (PTHREAD_START_PARAMETER)Nt_FindThreadFrameByContext2(THREAD_START_PARAMETER_MAGIC);
-    if (Parameter == NULL)
+    if (Parameter == nullptr)
         return STATUS_SUCCESS;
 
     Info->RtlPopFrame(Parameter);
@@ -915,7 +910,7 @@ HookNtContinue(
     Context->Eax = (ULONG_PTR)Parameter->ThreadStartRoutine;
     Context->Ebx = (ULONG_PTR)Parameter->Parameter;
 
-    MemoryAllocator::FreeMemory(Parameter);
+    FreeMemoryP(Parameter);
 
     return STATUS_SUCCESS;
 }
@@ -926,13 +921,13 @@ BOOL UnInitialize(PVOID BaseAddress)
 
     UnInstallHookPort();
 
-    if (Info == NULL)
+    if (Info == nullptr)
         return FALSE;
 
 //    Nt_FreeMemory(NtCurrentProcess(), Info->CP932);
 
-    MemoryAllocator::FreeMemory(Info->TextBuffer);
-    MemoryAllocator::FreeMemory(Info->Text);
+    FreeMemoryP(Info->TextBuffer);
+    FreeMemoryP(Info->Text);
 
     delete Info;
 
@@ -977,18 +972,18 @@ BOOL Initialize(PVOID BaseAddress)
     if (!NT_SUCCESS(Status))
         return FALSE;
 */
-    Status = Info->NtCreateTimer(&Timer, TIMER_ALL_ACCESS, NULL, SynchronizationTimer);
+    Status = Info->NtCreateTimer(&Timer, TIMER_ALL_ACCESS, nullptr, SynchronizationTimer);
     if (!NT_SUCCESS(Status))
         return FALSE;
 
     FormatTimeOut(&DueTime, 100);
 
-    Status = Info->NtSetTimer(Timer, &DueTime, DecryptAPCTimer, Info, FALSE, 1, NULL);
+    Status = Info->NtSetTimer(Timer, &DueTime, DecryptAPCTimer, Info, FALSE, 1, nullptr);
     NtClose(Timer);
     if (!NT_SUCCESS(Status))
         return FALSE;
 
-    Info->Device = Nt_CurrentPeb()->ProcessParameters->CurrentDirectory.Handle;
+    Info->Device = CurrentPeb()->ProcessParameters->CurrentDirectory.Handle;
 
     CXDEC_OPTION Option;
 
@@ -1014,15 +1009,19 @@ BOOL Initialize(PVOID BaseAddress)
     static CHAR FontFace[] = "SIMHEI";
 
     PVOID HookLdrInitializeThunk;
-    ULONG OSMajorVersion;
+    ULONG OSBuildNumber;
 
-    OSMajorVersion = Nt_CurrentPeb()->OSMajorVersion;
+    OSBuildNumber = CurrentPeb()->OSBuildNumber;
 
-    if (OSMajorVersion >= 9000)
+    if (OSBuildNumber >= 9600)
+    {
+        HookLdrInitializeThunk = HookLdrInitializeThunk_Win7;
+    }
+    else if (OSBuildNumber >= 9000)
     {
         HookLdrInitializeThunk = HookLdrInitializeThunk_Win8;
     }
-    else if (OSMajorVersion >= 7000)
+    else if (OSBuildNumber >= 7000)
     {
         HookLdrInitializeThunk = HookLdrInitializeThunk_Win7;
     }
@@ -1045,10 +1044,10 @@ BOOL Initialize(PVOID BaseAddress)
         PATCH_FUNCTION(CALL, 0, 0x41C7D, HookEnumFontFamiliesExA,   1),
         PATCH_FUNCTION(CALL, 0, 0x4049B, HooklstrcmpiA,             1),
 
-        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x42B4D, PtrAdd((PVOID)NULL, &IrotoriScriptObject::HookCopyPrefix),         0, &StubCopyPrefix),
-        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x42B64, PtrAdd((PVOID)NULL, &IrotoriScriptObject::HookCatString),          0, &StubCatString),
-        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x42C06, PtrAdd((PVOID)NULL, &IrotoriScriptObject::HookCatQuote),           0, &StubCatQuote),
-        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x3AD31, PtrAdd((PVOID)NULL, &IrotoriScriptObject::HookCopyDescription),    0, &StubCopyDescription),
+        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x42B4D, PtrAdd((PVOID)nullptr, &IrotoriScriptObject::HookCopyPrefix),         0, &StubCopyPrefix),
+        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x42B64, PtrAdd((PVOID)nullptr, &IrotoriScriptObject::HookCatString),          0, &StubCatString),
+        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x42C06, PtrAdd((PVOID)nullptr, &IrotoriScriptObject::HookCatQuote),           0, &StubCatQuote),
+        PATCH_FUNCTION(CALL, FIRST_CALL_TO_JUMP | AUTO_DISASM2, 0x3AD31, PtrAdd((PVOID)nullptr, &IrotoriScriptObject::HookCopyDescription),    0, &StubCopyDescription),
 
         INLINE_HOOK_JUMP(Info->LdrInitializeThunk, HookLdrInitializeThunk, Info->StubLdrInitializeThunk),
     };
@@ -1056,14 +1055,6 @@ BOOL Initialize(PVOID BaseAddress)
     Status = Nt_PatchMemory(p, countof(p), f, countof(f), Nt_GetExeModuleHandle());
 
     Info->Initialized = NT_SUCCESS(LoadText(Info));
-
-    RtlSetUnhandledExceptionFilter(
-        [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG_PTR
-        {
-            CreateMiniDump(ExceptionPointers);
-            return ExceptionContinueSearch;
-        }
-    );
 
     return NT_SUCCESS(Status);
 }
@@ -1074,13 +1065,23 @@ BOOL InitializeBase(PVOID BaseAddress)
     PTHREAD_TEXT_BUFFER Probe;
     PIROTORI_INFO       Info;
 
-    MemoryAllocator::CreateGlobalHeap();
+    RtlSetUnhandledExceptionFilter(
+        [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG_PTR
+        {
+            CreateMiniDump(ExceptionPointers);
+            return ExceptionContinueSearch;
+        }
+    );
+
+    ml::MlInitialize();
 
     Info = new IROTORI_INFO;
-    if (Info == NULL)
+    if (Info == nullptr)
         return FALSE;
 
     g_Info = Info;
+
+    SystemThreadParameter = AllocateThreadParameter(nullptr, nullptr);
 
     ZeroMemory(Info, sizeof(*Info));
 
@@ -1103,7 +1104,7 @@ BOOL InitializeBase(PVOID BaseAddress)
     *(PVOID *)&Info->RtlCreateUserThread        = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_RtlCreateUserThread);
     *(PVOID *)&Info->DbgUiRemoteBreakin         = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_DbgUiRemoteBreakin);
 
-    Status = ReLoadDll(NtdllModule->FullDllName.Buffer, &NtdllBase, NtdllModule->DllBase, RELOAD_DLL_IGNORE_IAT);
+    Status = Ldr::LoadPeImage(NtdllModule->FullDllName.Buffer, &NtdllBase, NtdllModule->DllBase, LOAD_PE_IGNORE_IAT);
     if (!NT_SUCCESS(Status))
         return FALSE;
 
@@ -1126,23 +1127,41 @@ BOOL InitializeBase(PVOID BaseAddress)
     g_LdrInitializeThunk = Info->LdrInitializeThunk;
 
     Probe = new THREAD_TEXT_BUFFER;
-    if (Probe == NULL)
+    if (Probe == nullptr)
         return FALSE;
 
     ADD_FILTER(NtContinue,          Probe);
     ADD_FILTER(NtCreateThread,      Info);
     ADD_FILTER(NtCreateThreadEx,    Info);
 
-    NtSystemDebugControl(SysDbgDisableKernelDebugger, NULL, 0, NULL, 0, NULL);
+    NtSystemDebugControl(SysDbgDisableKernelDebugger, nullptr, 0, nullptr, 0, nullptr);
 
     Info->RtlPushFrame(Probe);
 
-    Probe->Buffer = (PCHAR)Nt_FindLdrModuleByHandle(NULL)->EntryPoint;
+    Probe->Buffer = (PCHAR)FindLdrModuleByHandle(nullptr)->EntryPoint;
     Probe->Object = (PIROTORI_SCRIPT_OBJECT)NtdllBase;
 
     return TRUE;
 
 #else
+
+    PVOID NtdllBase = GetNtdllHandle();
+
+    *(PVOID *)&Info->NtCreateThread             = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtCreateThread);
+    *(PVOID *)&Info->NtCreateThreadEx           = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtCreateThreadEx);
+    *(PVOID *)&Info->RtlCreateUserThread        = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_RtlCreateUserThread);
+    *(PVOID *)&Info->DbgUiRemoteBreakin         = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_DbgUiRemoteBreakin);
+    *(PVOID *)&Info->RtlPushFrame               = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_RtlPushFrame);
+    *(PVOID *)&Info->RtlGetFrame                = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_RtlGetFrame);
+    *(PVOID *)&Info->RtlPopFrame                = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_RtlPopFrame);
+    *(PVOID *)&Info->LdrInitializeThunk         = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_LdrInitializeThunk);
+    *(PVOID *)&Info->NtProtectVirtualMemory     = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtProtectVirtualMemory);
+    *(PVOID *)&Info->NtGetContextThread         = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtGetContextThread);
+    *(PVOID *)&Info->NtSetContextThread         = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtSetContextThread);
+    *(PVOID *)&Info->NtCreateTimer              = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtCreateTimer);
+    *(PVOID *)&Info->NtSetTimer                 = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtSetTimer);
+    *(PVOID *)&Info->NtTestAlert                = EATLookupRoutineByHashPNoFix(NtdllBase, NTDLL_NtTestAlert);
+    *(PVOID *)&Info->CompareStringA             = EATLookupRoutineByHashPNoFix(GetKernel32Handle(), KERNEL32_CompareStringA);
 
     return Initialize(BaseAddress);
 
