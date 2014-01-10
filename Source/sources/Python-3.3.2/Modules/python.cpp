@@ -26,39 +26,20 @@ extern "C" {
 
 #include "MyLibrary.cpp"
 
-VOID AppendPackage()
+PVOID InitAndLoadPython()
 {
-    PLDR_MODULE Self;
-    UNICODE_STRING SelfPath;
-
-    static WCHAR PythonZip[] = L"python.zip";
-
     ml::MlInitialize();
 
-    //Py_IgnoreEnvironmentFlag = TRUE;
-    //Py_NoSiteFlag = TRUE;
-    Py_DontWriteBytecodeFlag = TRUE;
-    //Py_NoUserSiteDirectory = TRUE;
+    ml::String      PathEnv, UserSite;
+    PWSTR           EnvBuffer;
+    ULONG           Length;
+    UNICODE_STRING  Path, SelfPath;
+    PLDR_MODULE     Self;
 
     Self = FindLdrModuleByHandle(nullptr);
 
     SelfPath = Self->FullDllName;
     SelfPath.Length -= Self->BaseDllName.Length;
-
-    Py_SetPath(ml::String::Format(
-        L"%wZ;%wZ%s;%wZ%s\\site-packages;%wZlib;%wZDLLs;%wZUserSite",
-        &SelfPath,                      // exe path
-        &SelfPath, PythonZip,           // ./python.zip
-        &SelfPath, PythonZip,           // ./python.zip/site-packages
-        &SelfPath,                      // ./lib
-        &SelfPath,                      // ./DLLs
-        &SelfPath                       // ./UserSite
-    ));
-
-    ml::String      PathEnv, UserSite;
-    PWSTR           EnvBuffer;
-    ULONG           Length;
-    UNICODE_STRING  Path;
 
     RtlInitEmptyString(&Path);
     RtlExpandEnvironmentStrings_U(nullptr, &USTR(L"%Path%"), &Path, &Length);
@@ -95,12 +76,35 @@ VOID AppendPackage()
     PathEnv += Path;
     PathEnv += ';';
     RtlSetEnvironmentVariable(nullptr, &USTR(L"Path"), PathEnv);
+
+    PVOID python;
+
+    static WCHAR PythonZip[] = L"python.zip";
+
+    python = Ldr::LoadDll(L"python33.dll");
+
+    //Py_IgnoreEnvironmentFlag = TRUE;
+    //Py_NoSiteFlag = TRUE;
+    //Py_DontWriteBytecodeFlag = TRUE;
+    *(int *)GetRoutineAddress(python, "Py_DontWriteBytecodeFlag") = TRUE;
+    //Py_NoUserSiteDirectory = TRUE;
+
+    (API_POINTER(Py_SetPath)(GetRoutineAddress(python, "Py_SetPath")))(ml::String::Format(
+        L"%wZ;%wZ%s;%wZ%s\\site-packages;%wZlib;%wZDLLs;%wZUserSite",
+        &SelfPath,                      // exe path
+        &SelfPath, PythonZip,           // ./python.zip
+        &SelfPath, PythonZip,           // ./python.zip/site-packages
+        &SelfPath,                      // ./lib
+        &SelfPath,                      // ./DLLs
+        &SelfPath                       // ./UserSite
+    ));
+
+    return python;
 }
 
 ForceInline int main2(LONG_PTR argc, PWSTR *argv)
 {
-    AppendPackage();
-    return Py_Main(argc, argv);
+    return (API_POINTER(Py_Main)(GetRoutineAddress(InitAndLoadPython(), "Py_Main")))(argc, argv);
 }
 
 int __cdecl main(LONG_PTR argc, PWSTR *argv)
