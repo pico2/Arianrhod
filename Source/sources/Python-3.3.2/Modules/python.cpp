@@ -78,20 +78,19 @@ VOID AppendPackage()
         nullptr, L"*.*", 0, UserSite, nullptr,
         [] (PVOID Buffer, PWIN32_FIND_DATAW FindData, ULONG_PTR Context) -> LONG
         {
-            ml::String *PathEnv = (ml::String *)Context;
+            ml::String &PathEnv = *(ml::String *)Context;
 
             if (FLAG_OFF(FindData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
                 return 0;
 
-            (*PathEnv) += FindData->cFileName;
-            (*PathEnv) += ';';
+            PathEnv += FindData->cFileName;
+            PathEnv += ';';
 
             return 0;
         },
         (ULONG_PTR)&PathEnv,
         EDF_PROCDIR | EDF_BEFORE
     );
-
 
     PathEnv += Path;
     PathEnv += ';';

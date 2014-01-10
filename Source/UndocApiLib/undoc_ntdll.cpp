@@ -5,7 +5,17 @@
 
 _ML_C_HEAD_
 
+long __cdecl _ftol(float)
+{
+    return 0;
+}
+
 wchar_t* __cdecl wcsstr(const wchar_t *_Str, const wchar_t *_SubStr)
+{
+    return 0;
+}
+
+int __cdecl sprintf(char * _DstBuf, const char * _Format, ...)
 {
     return 0;
 }

@@ -168,8 +168,8 @@ NTSTATUS InitializeRedirectEntry()
 
     static FILE_REDIRECT_ENTRY RedirectSubDirectory[] =
     {
-        REDIRECT_PATH(L"data\\", L"patch\\"),
         REDIRECT_PATH(L"data\\", L"patch2\\"),
+        REDIRECT_PATH(L"data\\", L"patch\\"),
     };
 
     Module = FindLdrModuleByHandle(nullptr);
@@ -658,11 +658,11 @@ BOOL Initialize(PVOID BaseAddress)
 
         // file redirection
 
-        INLINE_HOOK_JUMP         (ZwOpenFile,               AoOpenFile,             StubNtOpenFile),
-        INLINE_HOOK_JUMP         (ZwCreateFile,             AoCreateFile,           StubNtCreateFile),
-        INLINE_HOOK_JUMP         (ZwQueryAttributesFile,    AoQueryAttributesFile,  StubNtQueryAttributesFile),
+        INLINE_HOOK_JUMP         (NtOpenFile,               AoOpenFile,             StubNtOpenFile),
+        INLINE_HOOK_JUMP         (NtCreateFile,             AoCreateFile,           StubNtCreateFile),
+        INLINE_HOOK_JUMP         (NtQueryAttributesFile,    AoQueryAttributesFile,  StubNtQueryAttributesFile),
         INLINE_HOOK_CALL_RVA_NULL(0x48C1EA,                 AoFindFirstFileA),
-        INLINE_HOOK_CALL_RVA_NULL(0x48C206,                 ZwClose),
+        INLINE_HOOK_CALL_RVA_NULL(0x48C206,                 NtClose),
         INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B,                 EDAO::GetCampImage),
         INLINE_HOOK_CALL_RVA_NULL(0x5A05B4,                 EDAO::GetBattleFace),
         INLINE_HOOK_CALL_RVA_NULL(0x2F9101,                 EDAO::GetFieldAttackChr),

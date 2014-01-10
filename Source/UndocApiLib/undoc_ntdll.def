@@ -37,4 +37,6 @@ EXPORTS
 	KiUserCallbackDispatcher
 	_snwprintf
 	swprintf
+	sprintf
 	wcsstr
+	_ftol
