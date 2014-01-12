@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>name</key>
-	<string>Monokai Bright(Asuna)</string>
+	<string>Monokai Bright</string>
 	<key>settings</key>
 	<array>
 		<dict>
@@ -11,10 +11,12 @@
 			<dict>
 				<key>background</key>
 				<string>#1B181A</string>
+				<!--string>#272822</string-->
 				<key>caret</key>
 				<string>#F8F8F0</string>
 				<key>foreground</key>
-				<string>#F8F8F2</string>
+				<string>#DCDCCC</string>
+				<!--string>#F8F8F2</string-->
 				<key>invisibles</key>
 				<string>#3B3A32</string>
 				<key>lineHighlight</key>
