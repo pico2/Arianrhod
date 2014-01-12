@@ -86,7 +86,7 @@ VOID PrintLocaleDefaultAnsiCodePage()
 
 #include "D:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
 
-ForceInline Void main2(LongPtr argc, TChar **argv)
+ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 

@@ -52,7 +52,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(const|extern|register|restrict|static|volatile|inline)\b</string>
+			<string>\b(const|extern|register|restrict|static|volatile|inline|ForceInline|FORCEINLINE)\b</string>
 			<key>name</key>
 			<string>storage.modifier.c</string>
 		</dict>
