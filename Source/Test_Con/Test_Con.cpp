@@ -89,12 +89,7 @@ VOID PrintLocaleDefaultAnsiCodePage()
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-
-    VOID (*pypy_main_startup)();
-
-    *(PVOID *)&pypy_main_startup = GetRoutineAddress(Ldr::LoadDll(L"libpypy-c.dll"), "pypy_main_startup");
-
-    return pypy_main_startup();
+    return;
 
 #if 0
 
