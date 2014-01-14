@@ -86,9 +86,43 @@ VOID PrintLocaleDefaultAnsiCodePage()
 
 #include "D:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
 
+VOID
+NTAPI
+DecryptAPCTimer(
+    PVOID   TimerContext,
+    ULONG   TimerLowValue,
+    LONG    TimerHighValue
+)
+{
+    PrintConsole(L"%p\n", TimerContext);
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    HANDLE Timer;
+
+    PauseConsole();
+
+    for (ULONG_PTR Count = 1; Count != 0; --Count)
+    {
+        LARGE_INTEGER DueTime;
+
+        Status = NtCreateTimer(&Timer, TIMER_ALL_ACCESS, nullptr, SynchronizationTimer);
+        if (!NT_SUCCESS(Status))
+            return;
+
+        FormatTimeOut(&DueTime, 5000);
+
+        Status = NtSetTimer(Timer, &DueTime, DecryptAPCTimer, (PVOID)Count, FALSE, 5000, nullptr);
+        NtClose(Timer);
+        if (!NT_SUCCESS(Status))
+            return;
+    }
+
+    PrintConsole(L"start\n");
+    Ps::Sleep(INFINITE, ThreadAlertable);
+
     return;
 
 #if 0
