@@ -97,10 +97,97 @@ DecryptAPCTimer(
     PrintConsole(L"%p\n", TimerContext);
 }
 
+
+ULARGE_INTEGER
+KeComputeReciprocal (
+    IN LONG Divisor,
+    OUT PCHAR Shift
+    )
+
+/*++
+
+Routine Description:
+
+    This function computes the 64-bit reciprocal of the specified value.
+
+Arguments:
+
+    Divisor - Supplies the value for which the large integer reciprocal is
+        computed.
+
+    Shift - Supplies a pointer to a variable that receives the computed
+        shift count.
+
+Return Value:
+
+    The 64-bit reciprocal is returned as the function value.
+
+--*/
+
+{
+
+    LARGE_INTEGER Fraction;
+    LONG NumberBits;
+    LONG Remainder;
+
+    //
+    // Compute the large integer reciprocal of the specified value.
+    //
+
+    NumberBits = 0;
+    Remainder = 1;
+    Fraction.LowPart = 0;
+    Fraction.HighPart = 0;
+    while (Fraction.HighPart >= 0) {
+        NumberBits += 1;
+        Fraction.HighPart = (Fraction.HighPart << 1) | (Fraction.LowPart >> 31);
+        Fraction.LowPart <<= 1;
+        Remainder <<= 1;
+        if (Remainder >= Divisor) {
+            Remainder -= Divisor;
+            Fraction.LowPart |= 1;
+        }
+    }
+
+    if (Remainder != 0) {
+        if ((Fraction.LowPart == 0xffffffff) && (Fraction.HighPart == 0xffffffff)) {
+            Fraction.LowPart = 0;
+            Fraction.HighPart = 0x80000000;
+            NumberBits -= 1;
+
+        } else {
+            if (Fraction.LowPart == 0xffffffff) {
+                Fraction.LowPart = 0;
+                Fraction.HighPart += 1;
+
+            } else {
+                Fraction.LowPart += 1;
+            }
+        }
+    }
+
+    //
+    // Compute the shift count value and return the reciprocal fraction.
+    //
+
+    *Shift = (CCHAR)(NumberBits - 64);
+    return *((PULARGE_INTEGER)&Fraction);
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
     HANDLE Timer;
+
+    ULONG MaximumTime, MinimumTime, CurrentTime;
+    CCHAR KiTimeIncrementShiftCount;
+    ULARGE_INTEGER KiTimeIncrementReciprocal;
+
+    NtQueryTimerResolution(&MaximumTime, &MinimumTime, &CurrentTime);
+
+    KiTimeIncrementReciprocal = KeComputeReciprocal((LONG)MaximumTime, &KiTimeIncrementShiftCount);
+
+    PrintConsole(L"%u %I64u %u\n", MaximumTime, KiTimeIncrementReciprocal, KiTimeIncrementShiftCount);
 
     PauseConsole();
 

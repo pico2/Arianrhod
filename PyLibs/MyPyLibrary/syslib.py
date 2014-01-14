@@ -28,12 +28,16 @@ ibp = ibp_init
 CHAR    = ctypes.c_char
 BYTE    = ctypes.c_ubyte      # fix bug: BYTE == CHAR
 
+PLONG = ctypes.POINTER(LONG)
+PULONG = ctypes.POINTER(ULONG)
+
 LONG64  = ctypes.c_longlong
 ULONG64 = ctypes.c_ulonglong
 
 PVOID   = ctypes.c_void_p
 PSTR    = ctypes.c_char_p
 
+NTSTATUS = LONG
 
 ANSI_CODE_PAGE = 'mbcs'
 
