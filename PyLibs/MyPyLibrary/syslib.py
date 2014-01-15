@@ -34,6 +34,9 @@ PULONG = ctypes.POINTER(ULONG)
 LONG64  = ctypes.c_longlong
 ULONG64 = ctypes.c_ulonglong
 
+PLONG64  = ctypes.POINTER(LONG64)
+PULONG64 = ctypes.POINTER(ULONG64)
+
 PVOID   = ctypes.c_void_p
 PSTR    = ctypes.c_char_p
 

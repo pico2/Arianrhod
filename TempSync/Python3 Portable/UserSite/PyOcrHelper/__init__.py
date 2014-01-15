@@ -6,10 +6,9 @@ class PyOcrHelper:
 
     def __init__(self):
         self.HelperProcess = None
-
         ModiOcrHelper = os.path.join(os.path.dirname(__file__), 'ModiOcrHelper.exe')
         self.HelperProcess = subprocess.Popen(
-                                '"%s" %d' % (ModiOcrHelper, os.getpid()),
+                                '"%s" %d USE_STDIN_AS_INPUT' % (ModiOcrHelper, os.getpid()),
                                 stdin = subprocess.PIPE,
                                 stderr = subprocess.PIPE
                             )

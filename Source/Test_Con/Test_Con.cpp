@@ -179,15 +179,11 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     NTSTATUS Status;
     HANDLE Timer;
 
-    ULONG MaximumTime, MinimumTime, CurrentTime;
-    CCHAR KiTimeIncrementShiftCount;
-    ULARGE_INTEGER KiTimeIncrementReciprocal;
+    LARGE_INTEGER t;
 
-    NtQueryTimerResolution(&MaximumTime, &MinimumTime, &CurrentTime);
+    FormatTimeOut(&t, 1);
 
-    KiTimeIncrementReciprocal = KeComputeReciprocal((LONG)MaximumTime, &KiTimeIncrementShiftCount);
-
-    PrintConsole(L"%u %I64u %u\n", MaximumTime, KiTimeIncrementReciprocal, KiTimeIncrementShiftCount);
+    PrintConsole(L"%X %X\n", t);
 
     PauseConsole();
 
