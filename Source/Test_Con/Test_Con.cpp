@@ -1,4 +1,4 @@
-#if 1
+#if 0
 
 #define AUTHOR_NAME "Amano"
 #define SECTION_NAME "."AUTHOR_NAME
@@ -102,6 +102,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     NTSTATUS Status;
     HANDLE Timer;
 
+    CloseHandle(0);
+/*
     for (ULONG_PTR Count = 50000; Count != 0; --Count)
     {
         LARGE_INTEGER DueTime;
@@ -120,7 +122,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     PrintConsole(L"start\n");
     Ps::Sleep(INFINITE, ThreadAlertable);
-
+*/
     return;
 
 #if 0
@@ -1208,6 +1210,13 @@ void CPUUsage()
 
 #else // global
 
-#include "E:/desktop/LoadAccOneClick_x64.cpp"
+#pragma comment(linker, "/ENTRY:main")
+
+#include <Windows.h>
+
+void __cdecl main()
+{
+    CloseHandle(0);
+}
 
 #endif
