@@ -85,16 +85,16 @@ LeCreateProcess(
         StrCopyW(LePeb->LeDllFullPath, DllFullPath);
 
         if (!FLAG_ON(CreationFlags, CREATE_SUSPENDED))
-            Status = ZwResumeProcess(ProcessInfo.hProcess);
+            Status = NtResumeProcess(ProcessInfo.hProcess);
     }
 
     CloseLePeb(LePeb);
 
     if (NT_FAILED(Status))
     {
-        ZwTerminateProcess(ProcessInfo.hProcess, Status);
-        ZwClose(ProcessInfo.hProcess);
-        ZwClose(ProcessInfo.hThread);
+        NtTerminateProcess(ProcessInfo.hProcess, Status);
+        NtClose(ProcessInfo.hProcess);
+        NtClose(ProcessInfo.hThread);
     }
     else if (ProcessInformation != NULL)
     {
@@ -102,8 +102,8 @@ LeCreateProcess(
     }
     else
     {
-        ZwClose(ProcessInfo.hProcess);
-        ZwClose(ProcessInfo.hThread);
+        NtClose(ProcessInfo.hProcess);
+        NtClose(ProcessInfo.hThread);
     }
 
     return Status;
