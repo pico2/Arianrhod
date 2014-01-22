@@ -1094,6 +1094,27 @@ BOOL SearchGroupApp_AtAllGroupMemberMax(PVOID GroupApp, PVOID *ConditionJump)
     return Found != IMAGE_INVALID_VA;
 }
 
+API_POINTER(NtFreeVirtualMemory) StubNtFreeVirtualMemory;
+PVOID netapi32_base;
+
+NTSTATUS
+NTAPI
+QqNtFreeVirtualMemory(
+    HANDLE  ProcessHandle,
+    PVOID  *BaseAddress,
+    PSIZE_T RegionSize,
+    ULONG   FreeType
+)
+{
+    NTSTATUS Status = StubNtFreeVirtualMemory(ProcessHandle, BaseAddress, RegionSize, FreeType);
+    if (NT_SUCCESS(Status) && *BaseAddress == netapi32_base)
+    {
+        MessageBoxW(0, L"netapi32 released", 0, 64);
+    }
+
+    return Status;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -1118,6 +1139,10 @@ BOOL Initialize(PVOID BaseAddress)
         return FALSE;
 
     module = Ldr::LoadDll(ml::String(SystemRoot) + L"netapi32.dll");
+    LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
+
+    netapi32_base = module;
+
     RtlFreeUnicodeString(&SystemRoot);
 
     *(PVOID *)&StubNetbios = GetRoutineAddress(module, "Netbios");
@@ -1125,11 +1150,15 @@ BOOL Initialize(PVOID BaseAddress)
     Self = FindLdrModuleByHandle(BaseAddress);
     Netapi32 = FindLdrModuleByHandle(module);
 
+    //RemoveEntryList(&Self->InLoadOrderLinks);
+    //RemoveEntryList(&Self->InMemoryOrderLinks);
+    //RemoveEntryList(&Self->InInitializationOrderLinks);
+
+    //RtlFreeHeap(CurrentPeb()->ProcessHeap, 0, Self);
+
     Self->DllBase       = Netapi32->DllBase;
     Self->EntryPoint    = Netapi32->EntryPoint;
     Self->SizeOfImage   = Netapi32->SizeOfImage;
-
-    LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
 
     InitializeQqFunctionTable();
 
@@ -1188,6 +1217,7 @@ BOOL Initialize(PVOID BaseAddress)
         INLINE_HOOK_JUMP(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
         INLINE_HOOK_JUMP(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
         INLINE_HOOK_JUMP(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,StubNtQueryInformationProcess),
+        INLINE_HOOK_JUMP(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      StubNtFreeVirtualMemory),
     };
 
 
