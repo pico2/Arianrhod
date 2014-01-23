@@ -1,4 +1,4 @@
-#if 0
+#if 1
 
 #define AUTHOR_NAME "Amano"
 #define SECTION_NAME "."AUTHOR_NAME
@@ -425,7 +425,7 @@ int CDECL main(Long_Ptr argc, TChar **argv)
 
 //    MyLib_UnInitialize();
 
-    Nt_ExitProcess(0);
+    Ps::ExitProcess(0);
 }
 
 #if 0
