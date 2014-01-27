@@ -8,6 +8,19 @@
 	<array>
 		<dict>
 			<key>name</key>
+			<string>Support</string>
+			<key>scope</key>
+			<string>support</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#9B859D</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
 			<string>Entity</string>
 			<key>scope</key>
 			<string>entity</string>
