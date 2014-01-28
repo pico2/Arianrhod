@@ -1,5 +1,12 @@
 from syslib import *
 
+getch = ctypes.CFUNCTYPE(ctypes.c_int32)(('_getch', windll.msvcrt))
+
+def PauseConsole(text = None):
+    if text is not None:
+        print(text)
+    getch()
+
 def SetConsoleTitle(text):
     windll.kernel32.SetConsoleTitleW(str(text))
 
