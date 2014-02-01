@@ -13,7 +13,7 @@ AppendRelativePath('.', __file__)
 #del AppendRelativePath
 
 from Console import *
-from misc import *
+from Misc import *
 from PyImage import *
 from FileIo import *
 
@@ -85,7 +85,7 @@ def TryInvoke(method, *values):
         #traceback.print_exception(type(e), e, e.__traceback__)
         #exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(*sys.exc_info())
-        input()
+        PauseConsole()
 
     return None
 

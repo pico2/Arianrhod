@@ -1,49 +1,44 @@
 #include "stdafx.h"
 
-PVOID LeGetCurrentNlsCache()
+NTSTATUS LeGlobalData::HackUserDefaultLCID(PVOID Kernel32)
 {
-    PULONG          CurrentNlsNode;
-    PULONG_PTR      NlsCache;
-    PLeGlobalData   GlobalData = LeGetGlobalData();
+    LCID        Lcid;
+    PVOID       gNlsProcessLocalCache;
+    PLDR_MODULE Kernel;
+    API_POINTER(GetUserDefaultLCID) GetUserDefaultLCID;
 
-    NlsCache = (PULONG_PTR)GlobalData->GetCurrentNlsCache();
+    *(PVOID *)&GetUserDefaultLCID = EATLookupRoutineByHashPNoFix(Kernel32, KERNEL32_GetUserDefaultLCID);
+    Lcid = GetUserDefaultLCID();
 
-    CurrentNlsNode = (PULONG)NlsCache[2];
-    if (CurrentNlsNode == nullptr)
-        return NlsCache;
+    Kernel = FindLdrModuleByName(&USTR(L"KERNELBASE.dll"));
+    if (Kernel == nullptr)
+        Kernel = FindLdrModuleByHandle(Kernel32);
 
-    *CurrentNlsNode = GlobalData->GetLeb()->LocaleID;
+    gNlsProcessLocalCache = nullptr;
 
-    return NlsCache;
-}
-
-PVOID FindGetCurrentNlsCache(PVOID Kernel32)
-{
-    PVOID KernelBase, GetUserDefaultLCID, GetCurrentNlsCache;
-
-    KernelBase = FindLdrModuleByName(&USTR(L"KERNELBASE.dll"))->DllBase;
-
-    GetUserDefaultLCID = EATLookupRoutineByHashPNoFix(KernelBase, KERNEL32_GetUserDefaultLCID);
-    if (GetUserDefaultLCID == nullptr)
-        return nullptr;
-
-    GetCurrentNlsCache = nullptr;
-
-    WalkOpCodeT(GetUserDefaultLCID, 0x30,
-        WalkOpCodeM(Buffer, OpLength, Ret)
+    WalkRelocTableT(Kernel->DllBase,
+        WalkRelocCallbackM(ImageBase, RelocationEntry, Offset, Context)
         {
-            switch (Buffer[0])
+            SEH_TRY
             {
-                case CALL:
-                    GetCurrentNlsCache = GetCallDestination(Buffer);
-                    return STATUS_SUCCESS;
+                PULONG_PTR Memory = *(PULONG_PTR *)PtrAdd(ImageBase, RelocationEntry->VirtualAddress + Offset->Offset);
+                if (*(PLCID)Memory[2] == Lcid)
+                {
+                    gNlsProcessLocalCache = Memory;
+                    return STATUS_UNSUCCESSFUL;
+                }
             }
-
-            return STATUS_NOT_FOUND;
+            SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+            return STATUS_SUCCESS;
         }
     );
 
-    return GetCurrentNlsCache;
+    if (gNlsProcessLocalCache != nullptr)
+        *(PLCID)(((PULONG_PTR)gNlsProcessLocalCache)[2]) = GetLeb()->LocaleID;
+
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
@@ -54,21 +49,21 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
 
     this->SetUnhandledExceptionFilter();
 
-    GetCurrentNlsCache = FindGetCurrentNlsCache(Kernel32);
-    if (GetCurrentNlsCache == nullptr)
-        return STATUS_NOT_FOUND;
+    return this->HackUserDefaultLCID(Kernel32);
 
-    MEMORY_FUNCTION_PATCH f[] =
-    {
-        LE_INLINE_JUMP(GetCurrentNlsCache),
-    };
+    //GetCurrentNlsCache = FindGetCurrentNlsCache(Kernel32);
+    //if (GetCurrentNlsCache == nullptr)
+    //    return STATUS_NOT_FOUND;
 
-    return Nt_PatchMemory(nullptr, 0, f, countof(f));
+    //MEMORY_FUNCTION_PATCH f[] =
+    //{
+    //    LE_INLINE_JUMP(GetCurrentNlsCache),
+    //};
+
+    //return Nt_PatchMemory(nullptr, 0, f, countof(f));
 }
 
 NTSTATUS LeGlobalData::UnHookKernel32Routines()
 {
-    Nt_RestoreMemory(&HookStub.StubGetCurrentNlsCache);
-
     return 0;
 }

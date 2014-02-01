@@ -187,7 +187,7 @@ LeNtQuerySystemInformation(
 )
 {
     NTSTATUS Status = 0;
-    PLeGlobalData GlobalData = (PLeGlobalData)HPARG_FLTINFO->FilterContext;
+    PLeGlobalData GlobalData = (PLeGlobalData)HpGetFilterContext();
 
     switch (SystemInformationClass)
     {
@@ -203,7 +203,7 @@ LeNtQuerySystemInformation(
             if (ReturnLength != nullptr)
                 *ReturnLength = SystemInformationLength;
 
-            HPARG_FLTINFO->Action = BlockSystemCall;
+            HpSetFilterAction(BlockSystemCall);
 
             return STATUS_SUCCESS;
     }
@@ -233,7 +233,7 @@ LeNtQueryInformationThread(
             return 0;
     }
 
-    HPARG_FLTINFO->Action = BlockSystemCall;
+    HpSetFilterAction(BlockSystemCall);
 
     Status = HpCallSysCall(NtQueryInformationThread, ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength, ReturnLength);
     FAIL_RETURN(Status);
@@ -360,7 +360,7 @@ LeNtCreateUserProcess(
     LONG                Offset;
     PVOID               SelfShadow;
 
-    HPARG_FLTINFO->Action = BlockSystemCall;
+    HpSetFilterAction(BlockSystemCall);
 
     WriteLog(L"create proc");
 
@@ -431,7 +431,7 @@ LeNtCreateUserProcess(
     if (NT_FAILED(Status))
         return Status;
 
-    GlobalData = (PLeGlobalData)HPARG_FLTINFO->FilterContext;
+    GlobalData = (PLeGlobalData)HpGetFilterContext();
 
     Status2 = GlobalData->InjectSelfToChildProcess(*ProcessHandle, Cid);
 
@@ -452,7 +452,7 @@ LeNtInitializeNlsFiles(
     NTSTATUS Status;
     PLeGlobalData GlobalData;
 
-    HPARG_FLTINFO->Action = BlockSystemCall;
+    HpSetFilterAction(BlockSystemCall);
 
     Status = HpCallSysCall(
                 NtInitializeNlsFiles,
@@ -463,7 +463,7 @@ LeNtInitializeNlsFiles(
 
     FAIL_RETURN(Status);
 
-    GlobalData = (PLeGlobalData)HPARG_FLTINFO->FilterContext;
+    GlobalData = (PLeGlobalData)HpGetFilterContext();
 
     *DefaultLocaleId = GlobalData->GetLeb()->LocaleID;
 
@@ -512,7 +512,7 @@ LeNtQueryValueKey(
     Status = QueryRegKeyFullPath(KeyHandle, &KeyFulPath);
     FAIL_RETURN(Status);
 
-    GlobalData = (PLeGlobalData)HPARG_FLTINFO->FilterContext;
+    GlobalData = (PLeGlobalData)HpGetFilterContext();
 
     if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.Ntdll.CodePageKey, TRUE))
     {
@@ -565,7 +565,7 @@ LeNtQueryValueKey(
     ++BufferLength;
     BufferLength *= sizeof(WCHAR);
 
-    HPARG_FLTINFO->Action = BlockSystemCall;
+    HpSetFilterAction(BlockSystemCall);
 
     Status = HpCallSysCall(
                 NtQueryValueKey,
@@ -624,6 +624,67 @@ LeNtQueryValueKey(
     }
 
     return Status;
+}
+
+NTSTATUS
+HPCALL
+LeNtQueryDefaultLocale(
+    HPARGS
+    BOOLEAN UserProfile,
+    PLCID   DefaultLocaleId
+)
+{
+    HpSetFilterAction(BlockSystemCall);
+
+    SEH_TRY
+    {
+        *DefaultLocaleId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
+        return STATUS_SUCCESS;
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return GetExceptionCode();
+    }
+}
+
+NTSTATUS
+HPCALL
+LeNtQueryDefaultUILanguage(
+    HPARGS
+    LANGID *DefaultUILanguageId
+)
+{
+    HpSetFilterAction(BlockSystemCall);
+
+    SEH_TRY
+    {
+        *DefaultUILanguageId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
+        return STATUS_SUCCESS;
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return GetExceptionCode();
+    }
+}
+
+NTSTATUS
+HPCALL
+LeNtQueryInstallUILanguage(
+    HPARGS
+    LANGID *InstallUILanguageId
+)
+{
+    HpSetFilterAction(BlockSystemCall);
+
+    SEH_TRY
+    {
+        *InstallUILanguageId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
+        return STATUS_SUCCESS;
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        return GetExceptionCode();
+    }
 }
 
 NTSTATUS NTAPI LeLdrInitNtContinue(PCONTEXT Context, BOOLEAN TestAlert)
@@ -716,6 +777,9 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
     ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
+    ADD_FILTER_(NtQueryDefaultLocale,       LeNtQueryDefaultLocale,     this);
+    ADD_FILTER_(NtQueryDefaultUILanguage,   LeNtQueryDefaultUILanguage, this);
+    ADD_FILTER_(NtQueryInstallUILanguage,   LeNtQueryInstallUILanguage, this);
     //ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
 
     MEMORY_FUNCTION_PATCH f[] =

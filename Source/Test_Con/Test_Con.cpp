@@ -80,49 +80,28 @@ VOID PrintLocaleDefaultAnsiCodePage()
     WCHAR Buffer[8];
     GetLocaleInfoW(GetUserDefaultLangID(), LOCALE_IDEFAULTANSICODEPAGE, Buffer, countof(Buffer));
     PrintConsole(L"%s\n", Buffer);
+    PauseConsole();
 
     Ps::ExitProcess(0);
-}
-
-#include "D:\Desktop\Source\Hooks\OllyDbgEx\ExceptionDbgTypes.h"
-
-VOID
-NTAPI
-DecryptAPCTimer(
-    PVOID   TimerContext,
-    ULONG   TimerLowValue,
-    LONG    TimerHighValue
-)
-{
-    PrintConsole(L"%p\n", TimerContext);
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    HANDLE Timer;
+    LCID lcid;
+    LANGID langid;
 
-    CloseHandle(0);
-/*
-    for (ULONG_PTR Count = 50000; Count != 0; --Count)
-    {
-        LARGE_INTEGER DueTime;
+    NtQueryDefaultLocale(FALSE, &lcid);
+    PrintConsole(L"lcid %p\n", lcid);
+    
+    NtQueryDefaultUILanguage(&langid);
+    PrintConsole(L"uilang %p\n", langid);
 
-        Status = NtCreateTimer(&Timer, TIMER_ALL_ACCESS, nullptr, SynchronizationTimer);
-        if (!NT_SUCCESS(Status))
-            return;
-
-        FormatTimeOut(&DueTime, 5000);
-
-        Status = NtSetTimer(Timer, &DueTime, DecryptAPCTimer, (PVOID)Count, FALSE, 5000, nullptr);
-        NtClose(Timer);
-        if (!NT_SUCCESS(Status))
-            return;
-    }
-
-    PrintConsole(L"start\n");
-    Ps::Sleep(INFINITE, ThreadAlertable);
-*/
+    PrintConsole(L"%p\n", GetSystemDefaultLangID());
+    PrintConsole(L"%p\n", GetUserDefaultLCID());
+    PrintConsole(L"%p\n", GetUserDefaultLangID());
+    PrintConsole(L"%p\n", GetUserDefaultUILanguage());
+    PrintLocaleDefaultAnsiCodePage();
     return;
 
 #if 0

@@ -1,4 +1,4 @@
-from syslib import *
+from SysLib import *
 
 getch = ctypes.CFUNCTYPE(ctypes.c_int32)(('_getch', windll.msvcrt))
 

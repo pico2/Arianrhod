@@ -292,8 +292,6 @@ public:
         API_POINTER(NtContinue)                 StubLdrInitNtContinue;
         API_POINTER(LdrResSearchResource)       StubLdrResSearchResource;
 
-        PVOID (*StubGetCurrentNlsCache)();
-
         API_POINTER(NtUserMessageCall)          StubNtUserMessageCall;
         API_POINTER(NtUserDefSetText)           StubNtUserDefSetText;
         API_POINTER(SetWindowLongA)             StubSetWindowLongA;
@@ -440,6 +438,7 @@ public:
 #endif // ARCHEAGE_VER
 
 
+    NTSTATUS HackUserDefaultLCID(PVOID Kernel32);
     NTSTATUS InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid);
 
     VOID SetUnhandledExceptionFilter()
@@ -461,11 +460,6 @@ public:
     /************************************************************************
       kernelbase
     ************************************************************************/
-
-    PVOID GetCurrentNlsCache()
-    {
-        return HookStub.StubGetCurrentNlsCache();
-    }
 
     /************************************************************************
       user32

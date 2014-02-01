@@ -1,4 +1,4 @@
-from syslib import *
+from SysLib import *
 import io
 
 _DEFAULT_ENDIAN = '<'
@@ -300,8 +300,11 @@ class FileStream:
         self._encoding = value
 
     def Open(self, file, mode = 'rb'):
-        if isinstance(file, bytes) or isinstance(file, bytearray):
+        if isinstance(file, (bytes, bytearray)):
             return self.OpenMemory(file)
+        elif isinstance(file, type(self)):
+            self._stream = file
+            return self
         else:
             return self.OpenFile(file, mode)
 
