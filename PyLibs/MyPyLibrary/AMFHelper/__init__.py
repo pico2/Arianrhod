@@ -1,1 +1,3 @@
-from AMFHelper.AMFHelper import *
+from .AMFDeserializer import *
+from .AMFSerializer import *
+from .AMFTypes import *
