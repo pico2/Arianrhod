@@ -15,6 +15,8 @@ class AMFWriter(FileStream):
             dict                : self.AMF0WriteASObject,
             dict2               : self.AMF0WriteASObject,
             ASObject            : self.AMF0WriteASObject,
+            OrderedDict         : self.AMF0WriteASObject,
+            OrderedDictEx       : self.AMF0WriteASObject,
             type(None)          : self.AMF0WriteNull,
             AMFUndefinedType    : self.AMF0WriteUndefined,
             AssociativeArray    : self.AMF0WriteASObject,
