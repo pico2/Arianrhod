@@ -32,7 +32,7 @@ def main():
 
     copytrees = \
     [
-        'site-packages\\MyPyLibrary\\AMFHelper',
+        #'site-packages\\MyPyLibrary\\AMFHelper',
         'site-packages\\MyPyLibrary\\PyOcrHelper',
     ]
 
@@ -57,7 +57,12 @@ def main():
 
             o = f.replace(src, dst, 1)
             os.makedirs(os.path.dirname(o), exist_ok = True)
-            if not os.path.samefile(f, o):
+            try:
+                samefile = os.path.samefile(f, o)
+            except FileNotFoundError:
+                samefile = False
+
+            if not samefile:
                 shutil.copy2(f, o)
 
     def proc(file):

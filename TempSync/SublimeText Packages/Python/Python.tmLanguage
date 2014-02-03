@@ -1143,7 +1143,7 @@
 			<key>match</key>
 			<string>(?x)\b(
                 (
-                    Arithmetic|Assertion|Attribute|Buffer|BlockingIO|EOF|Environment|FloatingPoint|IO|
+                    Arithmetic|Assertion|Attribute|Buffer|BlockingIO|EOF|Environment|FileNotFound|FloatingPoint|IO|
                     Import|Indentation|Index|Key|Lookup|Memory|Name|NotImplemented|OS|Overflow|
                     Reference|Runtime|Standard|Syntax|System|Tab|Type|UnboundLocal|Interrupted|
                     Unicode(Encode|Decode|Translate)?|

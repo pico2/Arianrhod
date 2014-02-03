@@ -125,7 +125,7 @@ class AMFMessage:
         if self._Version == 3:
             return AMFVersion.AMF3
 
-        raise UnexpectedAMFVersionError(self._Version)
+        raise UnexpectedAMFEncodingError(self._Version)
 
     @property
     def Version(self):
