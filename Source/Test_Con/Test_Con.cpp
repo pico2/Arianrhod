@@ -85,11 +85,15 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+#include "PatchMemory.h"
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
     LCID lcid;
     LANGID langid;
+
+    PrintConsole(L"%p\n", Mp::PatchMemory(main2, 0, 0, 0).Memory.RVA);
 
     NtQueryDefaultLocale(FALSE, &lcid);
     PrintConsole(L"lcid %p\n", lcid);
