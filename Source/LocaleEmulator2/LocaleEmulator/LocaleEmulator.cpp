@@ -286,7 +286,7 @@ PDLL_HOOK_ENTRY LookupDllHookEntry(PCUNICODE_STRING BaseDllName)
 
     PDLL_HOOK_ENTRY Entry;
 
-    FOR_EACH(Entry, DllHookEntries, countof(DllHookEntries))
+    FOR_EACH_ARRAY(Entry, DllHookEntries)
     {
         if (!RtlEqualUnicodeString(BaseDllName, &Entry->DllName, TRUE))
             continue;
