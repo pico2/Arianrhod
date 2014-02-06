@@ -869,7 +869,7 @@ PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
                 }
                 else if (Buffer[-10] == 0x68)
                 {
-                        Buffer -= 10;
+                    Buffer -= 10;
                 }
                 else
                 {
