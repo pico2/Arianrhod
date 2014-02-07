@@ -351,8 +351,6 @@ NTSTATUS OcrTiff(PCWSTR TiffFile, ml::String &ResultText)
     MODI::IWord*        word;
     LONG                wordcount;
 
-    API_POINTER(DllGetClassObject)  GetClassObject;
-
     factory = nullptr;
     doc     = nullptr;
     imgs    = nullptr;

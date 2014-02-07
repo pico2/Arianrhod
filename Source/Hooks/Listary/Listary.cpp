@@ -253,11 +253,14 @@ BOOL Initialize(PVOID BaseAddress)
     ml::MlInitialize();
 
     {
+        PVOID msimg32;
         ml::String SystemDirectory;
 
         Rtl::GetModuleDirectory(SystemDirectory, GetNtdllHandle());
 
-        *(PVOID *)&StubAlphaBlend = GetRoutineAddress(Ldr::LoadDll(SystemDirectory + L"msimg32.dll"), "AlphaBlend");
+        msimg32 = Ldr::LoadDll(SystemDirectory + L"msimg32.dll");
+        LdrAddRefDll(LDR_ADDREF_DLL_PIN, msimg32);
+        *(PVOID *)&StubAlphaBlend = GetRoutineAddress(msimg32, "AlphaBlend");
     }
 
     PVOID GetLicenseManagerAddress;
