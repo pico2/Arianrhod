@@ -1,6 +1,18 @@
 {
 	"installed_packages":
 	[
-		"Origami"
+		"Alignment",
+		"Origami",
+		"SideBarEnhancements",
+		"Sublime Text 3 Snippets",
+		"sublime-jsdocs",
+		"SublimeFileDiffs"
+	],
+	"repositories":
+	[
+		"https://github.com/titoBouzout/SideBarEnhancements/tree/st3",
+		"https://github.com/wbond/sublime_alignment",
+		"https://github.com/colinta/SublimeFileDiffs",
+		"https://github.com/spadgos/sublime-jsdocs"
 	]
 }
