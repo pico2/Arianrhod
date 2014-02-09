@@ -1,3 +1,19 @@
 [
+    { "keys": [""], "command": "next_bookmark" },
+    { "keys": ["f2"], "command": "next_view" },
+    { "keys": ["f1"], "command": "prev_view" },
+    { "keys": ["f4"], "command": "close" },
+    { "keys": ["alt+z"], "command": "reopen_last_file" },
+    { "keys": ["alt+="], "command": "jump_forward" },
+
+    { "keys": ["shift+space"], "command": "" },
+    { "keys": ["shift+space"], "command": "", "":
+        [
+            { "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
+            { "key": "auto_complete_visible", "operator": "equal", "operand": false },
+            { "key": "setting.tab_completion", "operator": "equal", "operand": true }
+        ]
+    },
+
     { "keys": ["ctrl+shift+a"], "command": "alignment" }
 ]
