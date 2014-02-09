@@ -40,7 +40,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while|__stdcall|STDCALL|WINAPI|CALLBACK|NTAPI|__fastcall|FASTCALL|__thiscall|THISCALL|IN|OUT|OPTIONAL)\b</string>
+			<string>\b(break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while|__stdcall|EXTC(_IMPORT|_EXPORT)?|STDCALL|WINAPI|CALLBACK|NTAPI|__fastcall|FASTCALL|__thiscall|THISCALL|IN|OUT|OPTIONAL)\b</string>
 			<key>name</key>
 			<string>keyword.control.c</string>
 		</dict>

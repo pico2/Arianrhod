@@ -171,14 +171,14 @@ PVOID FASTCALL GetLicenseManager(PVOID This)
         PLICENSE_DATA LicenseData;
 
     } LICENSE_MANAGER, *PLICENSE_MANAGER;
-    
+
     static LICENSE_DATA LicenseData;
 
     ULONG_PTR           Data;
     PSTR                Buffer;
     PWSTR               BufferW;
     PLICENSE_MANAGER    Manager;
-    
+
     Manager = *(PLICENSE_MANAGER *)PtrAdd(This, 0x24);
     if (Manager != nullptr)
         return Manager;
