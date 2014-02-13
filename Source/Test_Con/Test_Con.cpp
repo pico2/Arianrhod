@@ -90,22 +90,10 @@ VOID PrintLocaleDefaultAnsiCodePage()
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    LCID lcid;
-    LANGID langid;
 
-    PrintConsole(L"%p\n", Mp::PatchMemory(main2, 0, 0, 0).Memory.RVA);
+    RtlAdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE, (PBOOLEAN)&Status);
+    PrintConsole(L"%d\n", PidToHandle(CsrGetProcessId()));
 
-    NtQueryDefaultLocale(FALSE, &lcid);
-    PrintConsole(L"lcid %p\n", lcid);
-    
-    NtQueryDefaultUILanguage(&langid);
-    PrintConsole(L"uilang %p\n", langid);
-
-    PrintConsole(L"%p\n", GetSystemDefaultLangID());
-    PrintConsole(L"%p\n", GetUserDefaultLCID());
-    PrintConsole(L"%p\n", GetUserDefaultLangID());
-    PrintConsole(L"%p\n", GetUserDefaultUILanguage());
-    PrintLocaleDefaultAnsiCodePage();
     return;
 
 #if 0
