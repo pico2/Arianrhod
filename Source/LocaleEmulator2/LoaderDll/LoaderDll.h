@@ -73,15 +73,15 @@ WINAPI
 LeCreateProcess(
     PLEB                    Leb,
     PCWSTR                  ApplicationName,
-    PWSTR                   DEF_VAL(CommandLine, NULL),
-    PCWSTR                  DEF_VAL(CurrentDirectory, NULL),
-    ULONG                   DEF_VAL(CreationFlags, 0),
-    LPSTARTUPINFOW          DEF_VAL(StartupInfo, NULL),
-    PML_PROCESS_INFORMATION DEF_VAL(ProcessInformation, NULL),
-    LPSECURITY_ATTRIBUTES   DEF_VAL(ProcessAttributes, NULL),
-    LPSECURITY_ATTRIBUTES   DEF_VAL(ThreadAttributes, NULL),
-    PVOID                   DEF_VAL(Environment, NULL),
-    HANDLE                  DEF_VAL(Token, NULL)
+    PWSTR                   CommandLine         = nullptr,
+    PCWSTR                  CurrentDirectory    = nullptr,
+    ULONG                   CreationFlags       = 0,
+    LPSTARTUPINFOW          StartupInfo         = nullptr,
+    PML_PROCESS_INFORMATION ProcessInformation  = nullptr,
+    LPSECURITY_ATTRIBUTES   ProcessAttributes   = nullptr,
+    LPSECURITY_ATTRIBUTES   ThreadAttributes    = nullptr,
+    PVOID                   Environment         = nullptr,
+    HANDLE                  Token               = nullptr
 );
 
 #endif // _LOADERDLL_H_586bc656_348b_4b12_ba74_d39366b67f23_
