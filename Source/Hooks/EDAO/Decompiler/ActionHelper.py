@@ -1,8 +1,10 @@
 from BattleActionScript import *
-import random
+#import random
+import uuid
 
 def GenerateUniqueLable():
-    return '%X' % int(random.random() * 100000000000)
+    return uuid.uuid4().hex
+    #return '%X' % int(random.random() * 100000000000)
 
 def JumpToLabelIfHasTarget(label_name):
     Jc(0x16, 0x1, 0x0, label_name)
@@ -23,7 +25,7 @@ def ForeachTargetEx(func, reset = True):
     label(foreach_begin)
 
     ForeachTarget(foreach_end)
-    
+
     func()
 
     NextTarget()
