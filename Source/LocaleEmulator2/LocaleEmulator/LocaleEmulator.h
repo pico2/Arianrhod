@@ -71,14 +71,32 @@ typedef struct THREAD_LOCAL_BUFFER : public TEB_ACTIVE_FRAME
 
 typedef struct
 {
-    ULONG AnsiCodePage;
-    ULONG OemCodePage;
-    ULONG LocaleID;
-    ULONG DefaultCharset;
+    ULONG64             Root;
+    UNICODE_STRING64    SubKey;
+    UNICODE_STRING64    Value;
+    ULONG               DataType;
+    PVOID64             Data;
+    ULONG64             DataSize;
 
-    WCHAR DefaultFaceName[LF_FACESIZE];
+} REGISTRY_ENTRY;
 
-    RTL_TIME_ZONE_INFORMATION Timezone;
+typedef struct
+{
+    REGISTRY_ENTRY Origin;
+    REGISTRY_ENTRY Replacement;
+
+} REGISTRY_REPLACEMENT_ENTRY, *PREGISTRY_REPLACEMENT_ENTRY;
+
+typedef struct
+{
+    ULONG                       AnsiCodePage;
+    ULONG                       OemCodePage;
+    ULONG                       LocaleID;
+    ULONG                       DefaultCharset;
+    WCHAR                       DefaultFaceName[LF_FACESIZE];
+    RTL_TIME_ZONE_INFORMATION   Timezone;
+    ULONG                       NumberOfRegistryReplacementEntry;
+    REGISTRY_REPLACEMENT_ENTRY  RegistryReplacement[1];
 
 } LOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, LEB, *PLEB;
 
@@ -97,6 +115,8 @@ typedef struct
     BYTE        LdrLoadDllBackup[16];
     PVOID       SelfShadowToFree;
     WCHAR       LeDllFullPath[MAX_NTPATH];
+
+    ml::GrowableArray<REGISTRY_REPLACEMENT_ENTRY> RegistryReplacementEntry;
 
 } LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK, LEPEB, *PLEPEB;
 
