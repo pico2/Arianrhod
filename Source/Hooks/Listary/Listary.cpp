@@ -7,7 +7,8 @@
 
 #include "MyLibrary.cpp"
 
-API_POINTER(AlphaBlend) StubAlphaBlend;
+API_POINTER(AlphaBlend)         StubAlphaBlend;
+API_POINTER(ShellExecuteExW)    StubShellExecuteExW;
 
 EXTC
 BOOL
@@ -236,6 +237,17 @@ PVOID FASTCALL GetLicenseManager(PVOID This)
     return Manager;
 }
 
+BOOL NTAPI Listary_ShellExecuteExW(SHELLEXECUTEINFOW *ExecInfo)
+{
+    BOOL PreviousState, Success;
+
+    RtlWow64EnableFsRedirectionEx(TRUE, &PreviousState);
+    Success = StubShellExecuteExW(ExecInfo);
+    RtlWow64EnableFsRedirectionEx(PreviousState, &PreviousState);
+
+    return Success;
+}
+
 PVOID SearchGetLicenseManager(PVOID ImageBase)
 {
     static CHAR String[] = "no_pro";
@@ -274,6 +286,7 @@ BOOL Initialize(PVOID BaseAddress)
     MEMORY_FUNCTION_PATCH f[] =
     {
         INLINE_HOOK_JUMP(GetLicenseManagerAddress, GetLicenseManager, StubGetLicenseManager),
+        INLINE_HOOK_JUMP(GetRoutineAddress(Ldr::LoadDll(L"SHELL32.dll"), "ShellExecuteExW"), Listary_ShellExecuteExW, StubShellExecuteExW),
     };
 
     Nt_PatchMemory(nullptr, 0, f, countof(f));
