@@ -1,15 +1,12 @@
-#pragma comment(linker,"/ENTRY:main")
-#pragma comment(linker,"/SECTION:.text,ERW /MERGE:.rdata=.text")
-#pragma comment(linker,"/SECTION:.Amano,ERW /MERGE:.text=.Amano")
+#pragma comment(linker, "/ENTRY:main")
+#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
+#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include <Windows.h>
 #include "krkr2.h"
-#include "my_commsrc.h"
 #include "zlib/zlib.h"
+#include "MyLibrary.cpp"
 
-INIT_CONSOLE_HANDLER
-
-ForceInline Void main2(Int argc, WCHAR **argv)
+ForceInline Void main2(LONG_PTR argc, PWSTR *argv)
 {
     if (argc == 1)
         return;
@@ -19,10 +16,10 @@ ForceInline Void main2(Int argc, WCHAR **argv)
         rs.Auto(*++argv);
 }
 
-void __cdecl main(Int argc, WCHAR **argv)
+int __cdecl main(LONG_PTR argc, PWSTR *argv)
 {
-//    getargsW(&argc, &argv);
-    argv = CmdLineToArgvW(Nt_GetCommandLine(), &argc);
+    getargsW(&argc, &argv);
     main2(argc, argv);
-    Nt_ExitProcess(0);
+    ReleaseArgv(argv);
+    Ps::ExitProcess(0);
 }

@@ -184,7 +184,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /Gr /MD /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "REAL_SISTER" /FD /GL /GS- /c
-# ADD CPP /nologo /Gr /MD /W4 /O2 /Ob1 /I "E:\MyLib\OldLib\include" /I "E:\MyLib\OldLib\cls" /I "E:\MyLib\OldLib\galgame" /I "E:\MyLib\OldLib\src" /I "E:\MyLib\OldLib\wndbase" /D USE_NT_VER=1 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "NO_DECRYPT" /FD /GL /GS- /MP /c
+# ADD CPP /nologo /Gr /MD /W4 /O2 /Ob1 /D "WIN32" /D "NDEBUG" /D "NO_DECRYPT" /FD /GL /GS- /MP /c
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
 # ADD RSC /l 0x804 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -323,7 +323,7 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=E:\Library\zlib\adler32.c
+SOURCE=D:\Dev\Library\zlib\adler32.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -362,7 +362,7 @@ SOURCE=E:\Library\zlib\adler32.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\compress.c
+SOURCE=D:\Dev\Library\zlib\compress.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -401,7 +401,7 @@ SOURCE=E:\Library\zlib\compress.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\crc32.c
+SOURCE=D:\Dev\Library\zlib\crc32.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -440,7 +440,7 @@ SOURCE=E:\Library\zlib\crc32.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\deflate.c
+SOURCE=D:\Dev\Library\zlib\deflate.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -479,7 +479,7 @@ SOURCE=E:\Library\zlib\deflate.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\inffast.c
+SOURCE=D:\Dev\Library\zlib\inffast.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -518,7 +518,7 @@ SOURCE=E:\Library\zlib\inffast.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\inflate.c
+SOURCE=D:\Dev\Library\zlib\inflate.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -557,7 +557,7 @@ SOURCE=E:\Library\zlib\inflate.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\inftrees.c
+SOURCE=D:\Dev\Library\zlib\inftrees.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -596,7 +596,7 @@ SOURCE=E:\Library\zlib\inftrees.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\trees.c
+SOURCE=D:\Dev\Library\zlib\trees.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -635,7 +635,7 @@ SOURCE=E:\Library\zlib\trees.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\uncompr.c
+SOURCE=D:\Dev\Library\zlib\uncompr.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -674,7 +674,7 @@ SOURCE=E:\Library\zlib\uncompr.c
 # End Source File
 # Begin Source File
 
-SOURCE=E:\Library\zlib\zutil.c
+SOURCE=D:\Dev\Library\zlib\zutil.c
 
 !IF  "$(CFG)" == "krkr2 - Win32 realsister"
 
@@ -712,14 +712,6 @@ SOURCE=E:\Library\zlib\zutil.c
 
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\cxdec.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\cxdec.h
-# End Source File
 # Begin Source File
 
 SOURCE=.\krkr2.cpp

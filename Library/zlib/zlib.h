@@ -37,15 +37,7 @@
 
 #if 1
 
-#if FORCE_USE_OLD_LIB
-
-#include "my_headers.h"
-
-#else
-
 #include "MyLibrary.h"
-
-#endif  // FORCE_USE_OLD_LIB
 
 #else
 

@@ -1,8 +1,7 @@
 #ifndef _TLGDECODER_H_
 #define _TLGDECODER_H_
 
-#include <Windows.h>
-#include "my_headers.h"
+#include "krkr2.h"
 
 #pragma pack(1)
 

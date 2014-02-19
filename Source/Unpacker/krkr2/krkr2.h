@@ -1,9 +1,10 @@
 #ifndef _KRKR2_H_09b8f202_d41f_4cef_85c4_75e7f1515607
 #define _KRKR2_H_09b8f202_d41f_4cef_85c4_75e7f1515607
 
-#include "my_headers.h"
-#include "upk_common.h"
+#include "MyLibrary.h"
+#include "UnpackerBase.h"
 #include "cxdec.h"
+
 #include "zlib/zlib.h"
 
 #pragma pack(1)
@@ -99,7 +100,7 @@ typedef struct
     KRKR2_XP3_INDEX_CHUNK_ADLR  adlr;
 } SMyXP3Index;
 
-struct MY_XP3_ENTRY : public MY_FILE_ENTRY_BASE
+struct MY_XP3_ENTRY : public UNPACKER_FILE_ENTRY_BASE
 {
     KRKR2_XP3_INDEX_CHUNK_FILE *file;
     KRKR2_XP3_INDEX_CHUNK_INFO *info;
