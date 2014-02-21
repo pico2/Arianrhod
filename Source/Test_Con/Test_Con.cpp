@@ -91,9 +91,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    RtlAdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE, (PBOOLEAN)&Status);
-    PrintConsole(L"%d\n", PidToHandle(CsrGetProcessId()));
-
     return;
 
 #if 0
