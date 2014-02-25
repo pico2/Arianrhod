@@ -87,21 +87,10 @@ VOID PrintLocaleDefaultAnsiCodePage()
 
 #include "PatchMemory.h"
 
-#define DETOURS_X86 1
-#define DETOURS_32BIT 1
-
-#include "detours.cpp"
-#include "disasm.cpp"
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    API_POINTER(NtClose) XNtClose;
-
-    DetourTransactionBegin();
-    DetourAttach((PVOID *)&XNtClose, NtClose);
-    DetourTransactionCommit();
-
     return;
 
 #if 0
