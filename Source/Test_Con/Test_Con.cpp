@@ -91,6 +91,18 @@ VOID PrintLocaleDefaultAnsiCodePage()
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    {
+        using namespace Mp;
+
+        PATCH_MEMORY_DATA p[] =
+        {
+            FunctionPatchJump(NtClose, [](HANDLE Handle) { return STATUS_SUCCESS; }),
+        };
+
+        PatchMemory(p, countof(p));
+    }
+
     return;
 
 #if 0
