@@ -85,19 +85,24 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
-#include "PatchMemory.h"
-
+VOID MP_CALL fuck(Mp::PTRAMPOLINE_NAKED_CONTEXT Context)
+{
+    Context->ReturnAddress = (ULONG_PTR)NtClose;
+}
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    static API_POINTER(NtClose) XClose;
 
     {
         using namespace Mp;
 
         PATCH_MEMORY_DATA p[] =
         {
-            FunctionJump(NtClose, [](HANDLE Handle) { return STATUS_SUCCESS; }),
+            // MemoryPatchVa(0xCC, 1, main2),
+
+            FunctionJumpVa(NtClose, fuck, nullptr, OpJRax | NakedTrampoline),
         };
 
         PatchMemory(p, countof(p));
