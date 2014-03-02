@@ -85,15 +85,144 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
-VOID MP_CALL fuck(Mp::PTRAMPOLINE_NAKED_CONTEXT Context)
+#if 1
+
+template<typename F>
+class Function;
+
+template<typename RETURN_TYPE, typename... PARAMETER_LIST>
+class Function<RETURN_TYPE(PARAMETER_LIST ...args)>
 {
-    Context->ReturnAddress = (ULONG_PTR)NtClose;
-}
+    class Invoker
+    {
+    public:
+        virtual RETURN_TYPE Invoke(PARAMETER_LIST ...args) = 0;
+    };
+
+    template<typename F>
+    class ObjectInvoker : public Invoker
+    {
+    protected:
+        F func;
+
+    public:
+        ObjectInvoker(const F& function) : func(function)
+        {
+        }
+
+        RETURN_TYPE Invoke(PARAMETER_LIST ...args)
+        {
+            return func(args...);
+        }
+    };
+
+    template<typename F, typename C>
+    class MethodInvoker : public Invoker
+    {
+    protected:
+        F func;
+        C *obj;
+
+    public:
+        MethodInvoker(const F& function, C *object) : func(function), obj(object)
+        {
+        }
+
+        RETURN_TYPE Invoke(PARAMETER_LIST ...args)
+        {
+            return (obj->*func)(args...);
+        }
+    };
+
+    Invoker *invoker;
+
+public:
+
+    typedef RETURN_TYPE(          *FunctionCType)(PARAMETER_LIST ...args);
+    typedef RETURN_TYPE(CDECL     *FunctionCType_CDECL)(PARAMETER_LIST ...args);
+    typedef RETURN_TYPE(STDCALL   *FunctionCType_STDCALL)(PARAMETER_LIST ...args);
+
+#if !CPP_CLI_DEFINED
+
+    typedef RETURN_TYPE(FASTCALL  *FunctionCType_FASTCALL)(PARAMETER_LIST ...args);
+
+#endif
+
+    Function()
+    {
+        invoker = NULL;
+    }
+
+    ~Function()
+    {
+        delete invoker;
+    }
+
+    Function(RETURN_TYPE(*func)(PARAMETER_LIST ...args))
+    {
+        *this = func;
+    }
+
+    template<typename F>
+    Function(const F &func)
+    {
+        *this = func;
+    }
+
+    template<typename F, typename C>
+    Function(const F &func, C *object)
+    {
+        invoker = new MethodInvoker<F, C>(func, object);
+    }
+
+    template<typename F>
+    Function<RETURN_TYPE(PARAMETER_LIST ...args)>& operator=(const F &func)
+    {
+        invoker = new ObjectInvoker<F>(func);
+        return *this;
+    }
+
+    RETURN_TYPE operator()(PARAMETER_LIST ...args)
+    {
+        return invoker->Invoke(args...);
+    }
+};
+
+#endif
+
+template<typename T> class Invoker;
+
+template<typename R, typename... ARGS>
+class Invoker<R(ARGS...)>
+{
+public:
+    typedef R RETURN_TYPE;
+};
+
+template<class FUNCTION_TYPE>
+class Function2
+{
+protected:
+    FUNCTION_TYPE *_func;
+    typedef Invoker<FUNCTION_TYPE> Invoker2;
+
+public:
+    Function2()
+    {
+        Invoker2 inv;
+    }
+
+    Function2(FUNCTION_TYPE *func)
+    {
+        _func = func;
+    }
+};
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    PVOID Trampoline;
+
+    Function2<TYPE_OF(NtClose)> fuck;
 
     PrintConsole(L"%p\n", LookupExportTable(GetNtdllHandle(), NTDLL_NtCreateFile));
 
@@ -1187,10 +1316,13 @@ void CPUUsage()
 #pragma comment(linker, "/ENTRY:main")
 
 #include <Windows.h>
+#include <functional>
 
-void __cdecl main()
+NTSTATUS NTAPI NtClose2(HANDLE Handle);
+
+NTSTATUS __cdecl main(HANDLE)
 {
-    CloseHandle(0);
+    std::function<decltype(NtClose2)> fuck = main;
 }
 
 #endif
