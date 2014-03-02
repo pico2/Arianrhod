@@ -95,6 +95,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     NTSTATUS Status;
     PVOID Trampoline;
 
+    PrintConsole(L"%d\n", LookupExportTable(GetNtdllHandle(), NTDLL_NtCreateFile));
+
     {
         using namespace Mp;
 

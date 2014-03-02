@@ -349,7 +349,7 @@ int NTAPI LeEnumFontsW(HDC hDC, PCWSTR lpLogfont, FONTENUMPROCW lpProc, LPARAM l
             );
 }
 
-TYPE_OF(SelectObject)*  StubSelectObject;
+API_POINTER(SelectObject)  StubSelectObject;
 
 HGDIOBJ NTAPI LeSelectObject(HDC hdc, HGDIOBJ h)
 {
@@ -440,34 +440,36 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
         InitFontCharsetInfo();
     }
 
-    MEMORY_FUNCTION_PATCH f[] =
+    Mp::PATCH_MEMORY_DATA p[] =
     {
-        LE_EAT_HOOK(Gdi32, GDI32, GetStockObject),
-        //LE_EAT_HOOK(Gdi32, GDI32, CreateFontIndirectExW),
-        LE_EAT_HOOK(Gdi32, GDI32, CreateCompatibleDC),
-        LE_EAT_HOOK(Gdi32, GDI32, EnumFontFamiliesExA),
-        LE_EAT_HOOK(Gdi32, GDI32, EnumFontFamiliesExW),
-        LE_EAT_HOOK(Gdi32, GDI32, EnumFontsW),
-        LE_EAT_HOOK(Gdi32, GDI32, EnumFontsA),
+        LeHookFromEAT(Gdi32, GDI32, GetStockObject),
+        //LeHookFromEAT(Gdi32, GDI32, CreateFontIndirectExW),
+        LeHookFromEAT(Gdi32, GDI32, CreateCompatibleDC),
+        LeHookFromEAT(Gdi32, GDI32, EnumFontFamiliesExA),
+        LeHookFromEAT(Gdi32, GDI32, EnumFontFamiliesExW),
+        LeHookFromEAT(Gdi32, GDI32, EnumFontsW),
+        LeHookFromEAT(Gdi32, GDI32, EnumFontsA),
 
-        LE_EAT_HOOK_NULL(Gdi32, GDI32, EnumFontFamiliesA),
-        LE_EAT_HOOK_NULL(Gdi32, GDI32, EnumFontFamiliesW),
+        LeHookFromEAT2(Gdi32, GDI32, EnumFontFamiliesA),
+        LeHookFromEAT2(Gdi32, GDI32, EnumFontFamiliesW),
 
-        LE_INLINE_JUMP(NtGdiHfontCreate),
+        LeFunctionJump(NtGdiHfontCreate),
 
-        //EAT_HOOK_JUMP_HASH(Gdi32, GDI32_SelectObject,    LeSelectObject,      StubSelectObject),
-
+        //Mp::FunctionJumpVa(LookupExportTable(Gdi32, GDI32_SelectObject), LeSelectObject, &StubSelectObject),
     };
 
-    return Nt_PatchMemory(nullptr, 0, f, countof(f), Gdi32);
+    return Mp::PatchMemory(p, countof(p));
 }
 
 NTSTATUS LeGlobalData::UnHookGdi32Routines()
 {
-    Nt_RestoreMemory(&HookStub.StubCreateFontIndirectExW);
-    Nt_RestoreMemory(&HookStub.StubCreateCompatibleDC);
-    Nt_RestoreMemory(&HookStub.StubEnumFontFamiliesExA);
-    Nt_RestoreMemory(&HookStub.StubEnumFontFamiliesExW);
+    Mp::RestoreMemory(HookStub.StubGetStockObject);
+    Mp::RestoreMemory(HookStub.StubCreateCompatibleDC);
+    Mp::RestoreMemory(HookStub.StubEnumFontFamiliesExA);
+    Mp::RestoreMemory(HookStub.StubEnumFontFamiliesExW);
+    Mp::RestoreMemory(HookStub.StubEnumFontsA);
+    Mp::RestoreMemory(HookStub.StubEnumFontsW);
+    Mp::RestoreMemory(HookStub.StubNtGdiHfontCreate);
 
     return 0;
 }

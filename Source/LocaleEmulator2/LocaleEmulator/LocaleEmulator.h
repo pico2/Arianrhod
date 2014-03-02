@@ -27,6 +27,10 @@
 #define LE_INLINE_JUMP(_name)                   INLINE_HOOK_JUMP(_name, Le##_name, HookStub.Stub##_name)
 #define LE_INLINE_CALL(_name)                   INLINE_HOOK_CALL(_name, Le##_name, HookStub.Stub##_name)
 
+#define LeHookFromEAT(_Base, _Prefix, _Name)    Mp::FunctionJumpVa(LookupExportTable(_Base, _Prefix##_##_Name), Le##_Name, &HookStub.Stub##_Name)
+#define LeHookFromEAT2(_Base, _Prefix, _Name)   Mp::FunctionJumpVa(LookupExportTable(_Base, _Prefix##_##_Name), Le##_Name)
+#define LeFunctionJump(_Name)                   Mp::FunctionJumpVa(_Name, Le##_Name, &HookStub.Stub##_Name)
+#define LeFunctionCall(_Name)                   Mp::FunctionCallVa(_Name, Le##_Name, &HookStub.Stub##_Name)
 
 #define THREAD_LOCAL_BUFFER_CONTEXT TAG4('LTLB')
 

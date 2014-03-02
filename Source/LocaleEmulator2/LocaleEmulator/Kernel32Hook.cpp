@@ -50,17 +50,6 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
     this->SetUnhandledExceptionFilter();
 
     return this->HackUserDefaultLCID(Kernel32);
-
-    //GetCurrentNlsCache = FindGetCurrentNlsCache(Kernel32);
-    //if (GetCurrentNlsCache == nullptr)
-    //    return STATUS_NOT_FOUND;
-
-    //MEMORY_FUNCTION_PATCH f[] =
-    //{
-    //    LE_INLINE_JUMP(GetCurrentNlsCache),
-    //};
-
-    //return Nt_PatchMemory(nullptr, 0, f, countof(f));
 }
 
 NTSTATUS LeGlobalData::UnHookKernel32Routines()

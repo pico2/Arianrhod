@@ -1441,7 +1441,7 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
     PVOID       NtUserCreateWindowEx;
     PVOID       NtUserDefSetText;
     PVOID       SendMessageWorker;
-    PVOID       HookNtUserCreateWindowEx;
+    PVOID       LeNtUserCreateWindowEx;
     NTSTATUS    Status;
 
     Status = NtAddAtom(PROP_WINDOW_ANSI_PROC, CONST_STRLEN(PROP_WINDOW_ANSI_PROC) * sizeof(WCHAR), &this->AtomAnsiProc);
@@ -1467,49 +1467,49 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         InitFontCharsetInfo();
     }
 
-    HookNtUserCreateWindowEx = CurrentPeb()->OSBuildNumber >= 8000 ? (PVOID)LeNtUserCreateWindowEx_Win8 : LeNtUserCreateWindowEx_Win7;
+    LeNtUserCreateWindowEx = CurrentPeb()->OSBuildNumber >= 8000 ? (PVOID)LeNtUserCreateWindowEx_Win8 : LeNtUserCreateWindowEx_Win7;
 
-    MEMORY_FUNCTION_PATCH f[] =
+    Mp::PATCH_MEMORY_DATA p[] =
     {
-        INLINE_HOOK_JUMP(NtUserCreateWindowEx,  HookNtUserCreateWindowEx,   HookStub.StubNtUserCreateWindowEx),
+        LeFunctionJump(NtUserCreateWindowEx),
+        LeFunctionJump(NtUserMessageCall),
+        LeFunctionJump(NtUserDefSetText),
 
-        LE_INLINE_JUMP(NtUserMessageCall),
-        LE_INLINE_JUMP(NtUserDefSetText),
+        LeHookFromEAT(User32, USER32, SetWindowLongA),
+        LeHookFromEAT(User32, USER32, GetWindowLongA),
+        LeHookFromEAT(User32, USER32, IsWindowUnicode),
 
-        LE_EAT_HOOK(User32, USER32, SetWindowLongA),
-        LE_EAT_HOOK(User32, USER32, GetWindowLongA),
-        LE_EAT_HOOK(User32, USER32, IsWindowUnicode),
-        LE_EAT_HOOK(User32, USER32, GetClipboardData),
-        LE_EAT_HOOK(User32, USER32, SetClipboardData),
+        LeHookFromEAT(User32, USER32, GetClipboardData),
+        LeHookFromEAT(User32, USER32, SetClipboardData),
 
-        LE_EAT_HOOK(User32, USER32, GetDC),
-        LE_EAT_HOOK(User32, USER32, GetDCEx),
-        LE_EAT_HOOK(User32, USER32, GetWindowDC),
+        LeHookFromEAT(User32, USER32, GetDC),
+        LeHookFromEAT(User32, USER32, GetDCEx),
+        LeHookFromEAT(User32, USER32, GetWindowDC),
 
-        LE_EAT_HOOK(User32, USER32, BeginPaint),
+        LeHookFromEAT(User32, USER32, BeginPaint),
     };
 
-    return Nt_PatchMemory(nullptr, 0, f, countof(f), User32);
+    return Mp::PatchMemory(p, countof(p));
 }
 
 NTSTATUS LeGlobalData::UnHookUser32Routines()
 {
-    Nt_RestoreMemory(&HookStub.StubNtUserCreateWindowEx);
-    Nt_RestoreMemory(&HookStub.StubNtUserMessageCall);
-    Nt_RestoreMemory(&HookStub.StubNtUserDefSetText);
+    Mp::RestoreMemory(HookStub.StubNtUserCreateWindowEx);
+    Mp::RestoreMemory(HookStub.StubNtUserMessageCall);
+    Mp::RestoreMemory(HookStub.StubNtUserDefSetText);
 
-    Nt_RestoreMemory(&HookStub.StubSetWindowLongA);
-    Nt_RestoreMemory(&HookStub.StubGetWindowLongA);
-    Nt_RestoreMemory(&HookStub.StubIsWindowUnicode);
+    Mp::RestoreMemory(HookStub.StubSetWindowLongA);
+    Mp::RestoreMemory(HookStub.StubGetWindowLongA);
+    Mp::RestoreMemory(HookStub.StubIsWindowUnicode);
 
-    Nt_RestoreMemory(&HookStub.StubGetClipboardData);
-    Nt_RestoreMemory(&HookStub.StubSetClipboardData);
+    Mp::RestoreMemory(HookStub.StubGetClipboardData);
+    Mp::RestoreMemory(HookStub.StubSetClipboardData);
 
-    Nt_RestoreMemory(&HookStub.StubGetDC);
-    Nt_RestoreMemory(&HookStub.StubGetDCEx);
-    Nt_RestoreMemory(&HookStub.StubGetWindowDC);
+    Mp::RestoreMemory(HookStub.StubGetDC);
+    Mp::RestoreMemory(HookStub.StubGetDCEx);
+    Mp::RestoreMemory(HookStub.StubGetWindowDC);
 
-    Nt_RestoreMemory(&HookStub.StubBeginPaint);
+    Mp::RestoreMemory(HookStub.StubBeginPaint);
 
     if (AtomAnsiProc != 0)
     {
