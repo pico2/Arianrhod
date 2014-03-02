@@ -93,7 +93,7 @@ VOID MP_CALL fuck(Mp::PTRAMPOLINE_NAKED_CONTEXT Context)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    static API_POINTER(NtClose) XClose;
+    PVOID Trampoline;
 
     {
         using namespace Mp;
@@ -102,13 +102,14 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         {
             // MemoryPatchVa(0xCC, 1, main2),
 
-            FunctionJumpVa(CloseHandle, fuck, nullptr, OpJRax | NakedTrampoline),
+            FunctionJumpVa(CloseHandle, fuck, &Trampoline, OpJRax | NakedTrampoline),
         };
 
         PatchMemory(p, countof(p));
     }
 
     CloseHandle(0);
+    Mp::RestoreMemory(Trampoline);
 
     return;
 

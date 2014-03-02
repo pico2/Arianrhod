@@ -782,20 +782,32 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     ADD_FILTER_(NtQueryInstallUILanguage,   LeNtQueryInstallUILanguage, this);
     //ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
 
-    MEMORY_FUNCTION_PATCH f[] =
     {
-        LE_INLINE_CALL(LdrInitNtContinue),
-        //LE_INLINE_JUMP(LdrResSearchResource),
-    };
+        using namespace Mp;
 
-    Nt_PatchMemory(nullptr, 0, f, countof(f));
+        PATCH_MEMORY_DATA p[] =
+        {
+            FunctionCallVa(LdrInitNtContinue, LeLdrInitNtContinue, &HookStub.StubLdrInitNtContinue),
+        };
+
+        PatchMemory(p, countof(p));
+    }
+
+    // MEMORY_FUNCTION_PATCH f[] =
+    // {
+    //     LE_INLINE_CALL(LdrInitNtContinue),
+    //     //LE_INLINE_JUMP(LdrResSearchResource),
+    // };
+
+    // Nt_PatchMemory(nullptr, 0, f, countof(f));
 
     return STATUS_SUCCESS;
 }
 
 NTSTATUS LeGlobalData::UnHookNtdllRoutines()
 {
-    Nt_RestoreMemory(&HookStub.StubLdrInitNtContinue);
+    //Nt_RestoreMemory(&HookStub.StubLdrInitNtContinue);
+    Mp::RestoreMemory(HookStub.StubLdrInitNtContinue);
 
     return 0;
 }
