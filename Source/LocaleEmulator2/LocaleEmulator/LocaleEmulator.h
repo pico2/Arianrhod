@@ -22,11 +22,6 @@
 #define FORMAT_LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK   L"Local\\LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK_SECTION_%p"
 
 
-#define LE_EAT_HOOK(_base, _prefix, _name)      EAT_HOOK_JUMP_HASH(_base, _prefix##_##_name, Le##_name, HookStub.Stub##_name)
-#define LE_EAT_HOOK_NULL(_base, _prefix, _name) EAT_HOOK_JUMP_HASH_NULL(_base, _prefix##_##_name, Le##_name)
-#define LE_INLINE_JUMP(_name)                   INLINE_HOOK_JUMP(_name, Le##_name, HookStub.Stub##_name)
-#define LE_INLINE_CALL(_name)                   INLINE_HOOK_CALL(_name, Le##_name, HookStub.Stub##_name)
-
 #define LeHookFromEAT(_Base, _Prefix, _Name)    Mp::FunctionJumpVa(LookupExportTable(_Base, _Prefix##_##_Name), Le##_Name, &HookStub.Stub##_Name)
 #define LeHookFromEAT2(_Base, _Prefix, _Name)   Mp::FunctionJumpVa(LookupExportTable(_Base, _Prefix##_##_Name), Le##_Name)
 #define LeFunctionJump(_Name)                   Mp::FunctionJumpVa(_Name, Le##_Name, &HookStub.Stub##_Name)

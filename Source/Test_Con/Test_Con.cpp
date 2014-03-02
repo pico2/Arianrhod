@@ -95,23 +95,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     NTSTATUS Status;
     PVOID Trampoline;
 
-    PrintConsole(L"%d\n", LookupExportTable(GetNtdllHandle(), NTDLL_NtCreateFile));
-
-    {
-        using namespace Mp;
-
-        PATCH_MEMORY_DATA p[] =
-        {
-            // MemoryPatchVa(0xCC, 1, main2),
-
-            FunctionJumpVa(CloseHandle, fuck, &Trampoline, OpJRax | NakedTrampoline),
-        };
-
-        PatchMemory(p, countof(p));
-    }
-
-    CloseHandle(0);
-    Mp::RestoreMemory(Trampoline);
+    PrintConsole(L"%p\n", LookupExportTable(GetNtdllHandle(), NTDLL_NtCreateFile));
 
     return;
 
