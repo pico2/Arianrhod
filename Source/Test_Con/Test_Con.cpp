@@ -102,11 +102,13 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         {
             // MemoryPatchVa(0xCC, 1, main2),
 
-            FunctionJumpVa(NtClose, fuck, nullptr, OpJRax | NakedTrampoline),
+            FunctionJumpVa(CloseHandle, fuck, nullptr, OpJRax | NakedTrampoline),
         };
 
         PatchMemory(p, countof(p));
     }
+
+    CloseHandle(0);
 
     return;
 
