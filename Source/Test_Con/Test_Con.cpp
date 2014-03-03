@@ -219,6 +219,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     Function<TYPE_OF(close3)> fuck2 = fuck1;
 
     fuck1(argc);
+    argc = fuck1.NumberOfArguments;
     fuck2(argc);
 
     //Function2<TYPE_OF(close2)> fuck2;
