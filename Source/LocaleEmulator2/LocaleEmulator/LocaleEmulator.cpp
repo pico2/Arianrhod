@@ -139,7 +139,7 @@ NTSTATUS LeGlobalData::Initialize()
         {
             PVOID LdrLoadDllAddress;
 
-            LdrLoadDllAddress = EATLookupRoutineByHashPNoFix(ReloadedNtdll, NTDLL_LdrLoadDll);
+            LdrLoadDllAddress = LookupExportTable(ReloadedNtdll, NTDLL_LdrLoadDll);
             LePeb->LdrLoadDllAddress = PtrAdd(LdrLoadDllAddress, PtrOffset(Ntdll->DllBase, ReloadedNtdll));
             CopyMemory(LePeb->LdrLoadDllBackup, LdrLoadDllAddress, LDR_LOAD_DLL_BACKUP_SIZE);
             LePeb->LdrLoadDllBackupSize = LDR_LOAD_DLL_BACKUP_SIZE;

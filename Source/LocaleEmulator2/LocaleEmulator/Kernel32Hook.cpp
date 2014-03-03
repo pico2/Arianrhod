@@ -7,7 +7,7 @@ NTSTATUS LeGlobalData::HackUserDefaultLCID(PVOID Kernel32)
     PLDR_MODULE Kernel;
     API_POINTER(GetUserDefaultLCID) GetUserDefaultLCID;
 
-    *(PVOID *)&GetUserDefaultLCID = EATLookupRoutineByHashPNoFix(Kernel32, KERNEL32_GetUserDefaultLCID);
+    *(PVOID *)&GetUserDefaultLCID = LookupExportTable(Kernel32, KERNEL32_GetUserDefaultLCID);
     Lcid = GetUserDefaultLCID();
 
     Kernel = FindLdrModuleByName(&USTR(L"KERNELBASE.dll"));

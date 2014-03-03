@@ -395,7 +395,7 @@ PVOID FindNtGdiHfontCreate(PVOID Gdi32)
 {
     PVOID CreateFontIndirectExW, NtGdiHfontCreate;
 
-    CreateFontIndirectExW = EATLookupRoutineByHashPNoFix(Gdi32, GDI32_CreateFontIndirectExW);
+    CreateFontIndirectExW = LookupExportTable(Gdi32, GDI32_CreateFontIndirectExW);
 
     NtGdiHfontCreate = WalkOpCodeT(CreateFontIndirectExW, 0x100,
                             WalkOpCodeM(Buffer, OpLength, Ret)

@@ -190,41 +190,38 @@ public:
 
 #endif
 
-template<typename T> class Invoker;
-
-template<typename R, typename... ARGS>
-class Invoker<R(ARGS...)>
+int FASTCALL close1(int n)
 {
-public:
-    typedef R RETURN_TYPE;
-};
+    return 0;
+}
 
-template<class FUNCTION_TYPE>
-class Function2
+int STDCALL close2(int n)
 {
-protected:
-    FUNCTION_TYPE *_func;
-    typedef Invoker<FUNCTION_TYPE> Invoker2;
+    return 0;
+}
 
-public:
-    Function2()
-    {
-        Invoker2 inv;
-    }
-
-    Function2(FUNCTION_TYPE *func)
-    {
-        _func = func;
-    }
-};
+int CDECL close3(int n)
+{
+    return 0;
+}
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    Function2<TYPE_OF(NtClose)> fuck;
+    ml::MlInitialize();
 
-    PrintConsole(L"%p\n", LookupExportTable(GetNtdllHandle(), NTDLL_NtCreateFile));
+    using ml::Function;
+
+    argc = GetRandom32();
+
+    Function<TYPE_OF(close1)> fuck1 = [&] (int n) { return printf("%d\n", argc); };
+    Function<TYPE_OF(close3)> fuck2 = fuck1;
+
+    fuck1(argc);
+    fuck2(argc);
+
+    //Function2<TYPE_OF(close2)> fuck2;
 
     return;
 

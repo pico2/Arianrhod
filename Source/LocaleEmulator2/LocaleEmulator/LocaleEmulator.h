@@ -139,6 +139,8 @@ inline VOID InitDefaultLeb(PLEB Leb)
     static WCHAR StandardName[] = L"@tzres.dll,-632";
     static WCHAR DaylightName[] = L"@tzres.dll,-631";
 
+    ZeroMemory(Leb, sizeof(*Leb));
+
 #if 1
 
     static WCHAR FaceName[]     = L"MS Gothic";

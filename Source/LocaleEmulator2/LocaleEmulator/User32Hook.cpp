@@ -1104,7 +1104,7 @@ HDC NTAPI LeBeginPaint(HWND hWnd, LPPAINTSTRUCT lpPaint)
 PVOID FindNtUserMessageCall(PVOID User32)
 {
     PVOID NtUserMessageCall = nullptr;
-    PVOID SendNotifyMessageW = EATLookupRoutineByHashPNoFix(User32, USER32_SendNotifyMessageW);
+    PVOID SendNotifyMessageW = LookupExportTable(User32, USER32_SendNotifyMessageW);
 
     NtUserMessageCall = WalkOpCodeT(SendNotifyMessageW, 0x40,
         WalkOpCodeM(Buffer, OpLength, Ret)
@@ -1286,7 +1286,7 @@ PVOID FindNtUserDefSetText(PVOID User32)
     DefSetText                      = nullptr;
     NtUserDefSetText                = nullptr;
 
-    *(PVOID *)&NotifyWinEvent = EATLookupRoutineByHashPNoFix(User32, USER32_NotifyWinEvent);
+    *(PVOID *)&NotifyWinEvent = LookupExportTable(User32, USER32_NotifyWinEvent);
 
     Module = FindLdrModuleByHandle(User32);
 
@@ -1421,10 +1421,10 @@ PVOID FindSendMessageWorker(PVOID User32)
     LONG_PTR    WndProc;
     PVOID       SendMessageWorker;
 
-    *(PVOID *)&CreateWindowExA      = EATLookupRoutineByHashPNoFix(User32, USER32_CreateWindowExA);
-    *(PVOID *)&SetWindowLongPtrA    = EATLookupRoutineByHashPNoFix(User32, USER32_SetWindowLongA);
-    *(PVOID *)&SendMessageA         = EATLookupRoutineByHashPNoFix(User32, USER32_SendMessageA);
-    *(PVOID *)&DestroyWindow        = EATLookupRoutineByHashPNoFix(User32, USER32_DestroyWindow);
+    *(PVOID *)&CreateWindowExA      = LookupExportTable(User32, USER32_CreateWindowExA);
+    *(PVOID *)&SetWindowLongPtrA    = LookupExportTable(User32, USER32_SetWindowLongA);
+    *(PVOID *)&SendMessageA         = LookupExportTable(User32, USER32_SendMessageA);
+    *(PVOID *)&DestroyWindow        = LookupExportTable(User32, USER32_DestroyWindow);
 
     ProbeButton         = CreateWindowExA(0, WC_BUTTONA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     WndProc             = SetWindowLongPtrA(ProbeButton, GWLP_WNDPROC, (LONG_PTR)SendMessageWorkerProbe);

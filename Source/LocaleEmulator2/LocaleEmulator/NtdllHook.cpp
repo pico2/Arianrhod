@@ -264,7 +264,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
 
     // Process = CurrentProcess;
 
-    if (Wow64 && !Ps::IsWow64Process(Process))
+    if (this->Wow64 && !Ps::IsWow64Process(Process))
         return STATUS_NOT_SUPPORTED;
 
     SizeOfImage = FindLdrModuleByHandle(&__ImageBase)->SizeOfImage;
