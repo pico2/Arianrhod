@@ -215,14 +215,12 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     argc = GetRandom32();
 
-    Function<TYPE_OF(close1)> fuck1 = [&] (int n) { return printf("%d\n", argc); };
+    Function<TYPE_OF(close1)> fuck1 = [&] (int n) { return PrintConsole(L"%d\n", argc); };
     Function<TYPE_OF(close3)> fuck2 = fuck1;
 
     fuck1(argc);
     argc = fuck1.NumberOfArguments;
     fuck2(argc);
-
-    //Function2<TYPE_OF(close2)> fuck2;
 
     return;
 
