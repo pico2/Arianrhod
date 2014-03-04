@@ -31,7 +31,7 @@ LeCreateProcess(
 
     static WCHAR Dll[] = L"LocaleEmulator.dll";
 
-    Module = FindLdrModuleByHandle(NULL);
+    Module = FindLdrModuleByHandle(nullptr);
 
     Length = Module->FullDllName.Length - Module->BaseDllName.Length;
     DllFullPath = (PWSTR)AllocStack(Length + sizeof(Dll));
@@ -58,16 +58,23 @@ LeCreateProcess(
 
     PLEPEB LePeb;
 
-    LePeb = NULL;
+    LePeb = nullptr;
 
     LOOP_ONCE
     {
+        if (Leb == nullptr)
+            break;
+
         LePeb = OpenOrCreateLePeb(ProcessInfo.dwProcessId, TRUE);
-        if (LePeb == NULL)
+        if (LePeb == nullptr)
         {
             Status = STATUS_NONE_MAPPED;
             break;
         }
+
+        LePeb->Leb = *Leb;
+
+        /*
 
         if (Leb != NULL)
         {
@@ -84,11 +91,13 @@ LeCreateProcess(
 
         StrCopyW(LePeb->LeDllFullPath, DllFullPath);
 
-        if (!FLAG_ON(CreationFlags, CREATE_SUSPENDED))
-            Status = NtResumeProcess(ProcessInfo.hProcess);
+        */
     }
 
     CloseLePeb(LePeb);
+
+    if (NT_SUCCESS(Status) && FLAG_OFF(CreationFlags, CREATE_SUSPENDED))
+        Status = NtResumeProcess(ProcessInfo.hProcess);
 
     if (NT_FAILED(Status))
     {
@@ -96,7 +105,7 @@ LeCreateProcess(
         NtClose(ProcessInfo.hProcess);
         NtClose(ProcessInfo.hThread);
     }
-    else if (ProcessInformation != NULL)
+    else if (ProcessInformation != nullptr)
     {
         *ProcessInformation = ProcessInfo;
     }

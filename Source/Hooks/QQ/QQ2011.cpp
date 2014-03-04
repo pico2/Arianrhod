@@ -477,12 +477,14 @@ QqSetWindowPos(
         {
             { 614, 546 },
             { 603, 527 },
+            { 623, 546 },
         };
 
         static SIZE DiscussSize[] =
         {
             { 567, 545 },
             { 556, 526 },
+            { 571, 545 },
         };
 
         IsMessageBox = IsWindowMessageBox(hWnd);
@@ -629,12 +631,12 @@ HRESULT NTAPI GroupMgr_QueryGroupObject(PVOID Object, ULONG_PTR GroupUin, PVOID 
 
     if (SUCCEEDED(Result) && StubGroupMgr_GetAdminFlags == nullptr)
     {
-        MEMORY_FUNCTION_PATCH f[] =
+        Mp::PATCH_MEMORY_DATA p[] =
         {
-            INLINE_HOOK_JUMP(*(PVOID *)PtrAdd(**(PVOID **)GroupObject, 0x5C), GroupMgr_GetAdminFlags, StubGroupMgr_GetAdminFlags),
+            Mp::FunctionJumpVa(*(PVOID *)PtrAdd(**(PVOID **)GroupObject, 0x5C), GroupMgr_GetAdminFlags, &StubGroupMgr_GetAdminFlags),
         };
 
-        Nt_PatchMemory(nullptr, 0, f, countof(f));
+        Mp::PatchMemory(p, countof(p));
     }
 
     return Result;
@@ -648,12 +650,12 @@ HRESULT NTAPI GroupMgr_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
 
     if (SUCCEEDED(Result) && StubGroupMgr_QueryGroupObject == nullptr)
     {
-        MEMORY_FUNCTION_PATCH f[] =
+        Mp::PATCH_MEMORY_DATA p[] =
         {
-            INLINE_HOOK_JUMP(*(PVOID *)PtrAdd(**(PVOID **)Output, 0x24), GroupMgr_QueryGroupObject, StubGroupMgr_QueryGroupObject),
+            Mp::FunctionJumpVa(*(PVOID *)PtrAdd(**(PVOID **)Output, 0x24), GroupMgr_QueryGroupObject, &StubGroupMgr_QueryGroupObject),
         };
 
-        Nt_PatchMemory(nullptr, 0, f, countof(f));
+        Mp::PatchMemory(p, countof(p));
     }
 
     return Result;
@@ -717,12 +719,12 @@ BOOL CDECL GetPlatformCore(PVOID *Core)
     if (StubPlatformCore_QueryInterface != nullptr)
         return Success;
 
-    MEMORY_FUNCTION_PATCH f[] =
+    Mp::PATCH_MEMORY_DATA f[] =
     {
-        INLINE_HOOK_JUMP(*(PVOID *)PtrAdd(**(PVOID **)Core, 0x20), PlatformCore_QueryInterface, StubPlatformCore_QueryInterface),
+        Mp::FunctionJumpVa(*(PVOID *)PtrAdd(**(PVOID **)Core, 0x20), PlatformCore_QueryInterface, &StubPlatformCore_QueryInterface),
     };
 
-    Nt_PatchMemory(nullptr, 0, f, countof(f));
+    Mp::PatchMemory(f, countof(f));
 
     return Success;
 }
@@ -1197,11 +1199,11 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = Ldr::LoadDll(L"USER32.dll");
 
-    MEMORY_FUNCTION_PATCH Function_user32[] =
+    Mp::PATCH_MEMORY_DATA Function_user32[] =
     {
-        EAT_HOOK_JUMP_HASH(module, USER32_SetWindowPos, QqSetWindowPos, StubSetWindowPos),
+        Mp::FunctionJumpVa(LookupExportTable(module, USER32_SetWindowPos), QqSetWindowPos, &StubSetWindowPos),
         //EAT_HOOK_JUMP_HASH(module, USER32_ShowWindow,   QqShowWindow,   StubShowWindow),
-        EAT_HOOK_JUMP_HASH(module, USER32_PostMessageW, QqPostMessageW, StubPostMessageW)
+        Mp::FunctionJumpVa(LookupExportTable(module, USER32_PostMessageW), QqPostMessageW, &StubPostMessageW)
     };
 
 
@@ -1211,13 +1213,13 @@ BOOL Initialize(PVOID BaseAddress)
 
     QQUINSpecified = IsQQUINSpecified();
 
-    MEMORY_FUNCTION_PATCH Function_ntdll[] =
+    Mp::PATCH_MEMORY_DATA Function_ntdll[] =
     {
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               StubNtOpenFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             StubNtCreateFile),
-        INLINE_HOOK_JUMP(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    StubNtQueryAttributesFile),
-        INLINE_HOOK_JUMP(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,StubNtQueryInformationProcess),
-        INLINE_HOOK_JUMP(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      StubNtFreeVirtualMemory),
+        Mp::FunctionJumpVa(QQUINSpecified ? NtOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               &StubNtOpenFile),
+        Mp::FunctionJumpVa(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             &StubNtCreateFile),
+        Mp::FunctionJumpVa(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    &StubNtQueryAttributesFile),
+        Mp::FunctionJumpVa(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,&StubNtQueryInformationProcess),
+        Mp::FunctionJumpVa(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      &StubNtFreeVirtualMemory),
     };
 
 
@@ -1227,9 +1229,9 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = Ldr::LoadDll(L"psapi.dll");
 
-    MEMORY_FUNCTION_PATCH Function_psapi[] =
+    Mp::PATCH_MEMORY_DATA Function_psapi[] =
     {
-        EAT_HOOK_JUMP_HASH(module, PSAPI_GetModuleFileNameExW, QqGetModuleFileNameExW, StubGetModuleFileNameExW),
+        Mp::FunctionJumpVa(LookupExportTable(module, PSAPI_GetModuleFileNameExW), QqGetModuleFileNameExW, &StubGetModuleFileNameExW),
     };
 
 
@@ -1239,11 +1241,11 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = Ldr::LoadDll(L"Common.dll");
 
-    MEMORY_FUNCTION_PATCH Function_Common[] =
+    Mp::PATCH_MEMORY_DATA Function_Common[] =
     {
-        EAT_HOOK_JUMP_NULL(module, "?IsTencentTrusted@Misc@Util@@YAHPB_W@Z",            IsTencentTrusted),
-        EAT_HOOK_JUMP     (module, "?InitPluginFileSystem@Boot@Util@@YAHPA_W@Z",        InitPluginFileSystem,   StubInitPluginFileSystem),
-        EAT_HOOK_JUMP     (module, "?GetPlatformCore@Core@Util@@YAHPAPAUITXCore@@@Z",   GetPlatformCore,        StubGetPlatformCore),
+        Mp::FunctionJumpVa(LookupExportTable(module, "?IsTencentTrusted@Misc@Util@@YAHPB_W@Z"),            IsTencentTrusted),
+        Mp::FunctionJumpVa(LookupExportTable(module, "?InitPluginFileSystem@Boot@Util@@YAHPA_W@Z"),        InitPluginFileSystem,   &StubInitPluginFileSystem),
+        Mp::FunctionJumpVa(LookupExportTable(module, "?GetPlatformCore@Core@Util@@YAHPAPAUITXCore@@@Z"),   GetPlatformCore,        &StubGetPlatformCore),
     };
 
 
@@ -1259,9 +1261,9 @@ BOOL Initialize(PVOID BaseAddress)
 
     *(PVOID *)&HummerCreateThread = *(PVOID *)CreateThreadIAT;
 
-    MEMORY_PATCH Patch_HummerEngine[] =
+    Mp::PATCH_MEMORY_DATA Patch_HummerEngine[] =
     {
-        PATCH_MEMORY(QqCreateWaitQQProtectThread, sizeof(PVOID), CreateThreadIAT),
+        Mp::MemoryPatchVa((ULONG64)QqCreateWaitQQProtectThread, sizeof(PVOID), CreateThreadIAT),
     };
 
 
@@ -1271,10 +1273,10 @@ BOOL Initialize(PVOID BaseAddress)
         CF_Group_Image_TooManyImage
     ************************************************************************/
 
-    MEMORY_FUNCTION_PATCH Function_KernelUtil[] =
+    Mp::PATCH_MEMORY_DATA Function_KernelUtil[] =
     {
-        INLINE_HOOK_JUMP(Util::Group::CheckMsgImage, CheckMsgImage, StubCheckMsgImage),
-        INLINE_HOOK_JUMP(Util::Contact::IsSuperVip,  IsSuperVip,    StubIsSuperVip),
+        Mp::FunctionJumpVa(Util::Group::CheckMsgImage, CheckMsgImage, &StubCheckMsgImage),
+        Mp::FunctionJumpVa(Util::Contact::IsSuperVip,  IsSuperVip,    &StubIsSuperVip),
     };
 
 
@@ -1290,10 +1292,10 @@ BOOL Initialize(PVOID BaseAddress)
     AtAllGroupMemberFound = SearchGroupApp_AtAllGroupMember(module, &GetAdminFlag, &GetUseTimes);
     AtGroupMemberMaxFound = SearchGroupApp_AtAllGroupMemberMax(module, &AtGroupMemberMax);
 
-    MEMORY_FUNCTION_PATCH Function_GroupApp[] =
+    Mp::PATCH_MEMORY_DATA Function_GroupApp[] =
     {
-        INLINE_HOOK_JUMP_NULL(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
-        INLINE_HOOK_CALL_NULL(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, GetCurrentAtNumber),
+        Mp::FunctionJumpVa(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, &GetAtAllGroupMemberUseTimes),
+        Mp::FunctionCallVa(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, &GetCurrentAtNumber),
     };
 
 
@@ -1308,10 +1310,10 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = Ldr::LoadDll(L"AppMisc.dll");
 
-    MEMORY_FUNCTION_PATCH Function_AppMisc[] =
+    Mp::PATCH_MEMORY_DATA Function_AppMisc[] =
     {
-        INLINE_HOOK_JUMP_NULL(SearchAppMisc_PluginListCheck(module),    CheckPluginList), // addition SetTimeOut
-        INLINE_HOOK_JUMP     (SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture, StubShowDBClickPicture),
+        Mp::FunctionJumpVa(SearchAppMisc_PluginListCheck(module),    CheckPluginList), // addition SetTimeOut
+        Mp::FunctionJumpVa(SearchAppMisc_ShowPicInMultiPic(module),  ShowDBClickPicture, &StubShowDBClickPicture),
     };
 
 
@@ -1321,9 +1323,9 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = Ldr::LoadDll(L"MainFrame.dll");
 
-    MEMORY_FUNCTION_PATCH Function_MainFrame[] =
+    Mp::PATCH_MEMORY_DATA Function_MainFrame[] =
     {
-        INLINE_HOOK_JUMP_NULL(SearchMainFrame_SecurityFrame(module),    PopupSecurityFrame),
+        Mp::FunctionJumpVa(SearchMainFrame_SecurityFrame(module),    PopupSecurityFrame),
     };
 
 
@@ -1336,7 +1338,7 @@ BOOL Initialize(PVOID BaseAddress)
 /*
     module = Ldr::LoadDll(L"ChatFrameApp.dll");
 
-    MEMORY_FUNCTION_PATCH Function_ChatFrame[] =
+    Mp::PATCH_MEMORY_DATA Function_ChatFrame[] =
     {
         //INLINE_HOOK_JUMP_RVA_NULL(0x93C3, IsTencentTrusted),
         INLINE_HOOK_JUMP_RVA_NULL(SearchChatFrame_CheckModule(module), IsTencentTrusted),
@@ -1360,11 +1362,11 @@ BOOL Initialize(PVOID BaseAddress)
 
     AppUtilBase = module;
 
-    MEMORY_FUNCTION_PATCH Function_AppUtil[] =
+    Mp::PATCH_MEMORY_DATA Function_AppUtil[] =
     {
-        EAT_HOOK_JUMP_NULL(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z", ReportScanResult),
-        EAT_HOOK_JUMP_NULL(module, "?PluginSecurityCheck@Misc@Util@@YAHXZ",             PluginSecurityCheck),
-        INLINE_HOOK_JUMP_NULL(SearchAppUtil_CheckImportantModule(module),               CheckPluginList),
+        Mp::FunctionJumpVa(LookupExportTable(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z"),  ReportScanResult),
+        Mp::FunctionJumpVa(LookupExportTable(module, "?PluginSecurityCheck@Misc@Util@@YAHXZ"),              PluginSecurityCheck),
+        Mp::FunctionJumpVa(SearchAppUtil_CheckImportantModule(module),                                      CheckPluginList),
     };
 
 
@@ -1374,10 +1376,10 @@ BOOL Initialize(PVOID BaseAddress)
 
     module = Ldr::LoadDll(L"PreloginLogic.dll");
 
-    MEMORY_FUNCTION_PATCH Function_PreLogin[] =
+    Mp::PATCH_MEMORY_DATA Function_PreLogin[] =
     {
         //INLINE_HOOK_JUMP(SearchPreLogin_OnConnectionBroken(module), OnConnectionBroken, StubOnConnectionBroken),
-        INLINE_HOOK_JUMP(SearchPreLogin_OnSysDataCome(module), OnSysDataCome, StubOnSysDataCome),
+        Mp::FunctionJumpVa(SearchPreLogin_OnSysDataCome(module), OnSysDataCome, &StubOnSysDataCome),
     };
 
 
@@ -1387,18 +1389,17 @@ BOOL Initialize(PVOID BaseAddress)
 
     PATCH_ARRAY *Entry, Array[] =
     {
-        { nullptr,              Patch_HummerEngine,     countof(Patch_HummerEngine) },
-        { nullptr,              nullptr,                0,                          Function_KernelUtil, countof(Function_KernelUtil)},
-        { nullptr,              nullptr,                0,                          Function_GroupApp,   countof(Function_GroupApp)  },
-        { nullptr,              nullptr,                0,                          Function_AppUtil,    countof(Function_AppUtil)   },
-        { nullptr,              nullptr,                0,                          Function_AppMisc,    countof(Function_AppMisc)   },
-        { nullptr,              nullptr,                0,                          Function_MainFrame,  countof(Function_MainFrame) },
-        { nullptr,              nullptr,                0,                          Function_PreLogin,   countof(Function_PreLogin)  },
-        { nullptr,              nullptr,                0,                          Function_Common,     countof(Function_Common)    },
-
-        { nullptr,              nullptr,                0,                          Function_ntdll,      countof(Function_ntdll)     },
-        { nullptr,              nullptr,                0,                          Function_psapi,      countof(Function_psapi)     },
-        { nullptr,              nullptr,                0,                          Function_user32,     countof(Function_user32)    },
+        { nullptr,  Patch_HummerEngine,     countof(Patch_HummerEngine)  },
+        { nullptr,  Function_KernelUtil,    countof(Function_KernelUtil) },
+        { nullptr,  Function_GroupApp,      countof(Function_GroupApp)   },
+        { nullptr,  Function_AppUtil,       countof(Function_AppUtil)    },
+        { nullptr,  Function_AppMisc,       countof(Function_AppMisc)    },
+        { nullptr,  Function_MainFrame,     countof(Function_MainFrame)  },
+        { nullptr,  Function_PreLogin,      countof(Function_PreLogin)   },
+        { nullptr,  Function_Common,        countof(Function_Common)     },
+        { nullptr,  Function_ntdll,         countof(Function_ntdll)      },
+        { nullptr,  Function_psapi,         countof(Function_psapi)      },
+        { nullptr,  Function_user32,        countof(Function_user32)     },
     };
 
     FOR_EACH_ARRAY(Entry, Array)
@@ -1407,7 +1408,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         Base = Entry->DllName == nullptr ? nullptr : Ldr::LoadDll(Entry->DllName);
 
-        Nt_PatchMemory(Entry->Patch, Entry->PatchCount, Entry->FunctionPatch, Entry->FunctionCount, Base);
+        Mp::PatchMemory(Entry->PatchData, Entry->PatchCount, Base);
     }
 
     return TRUE;

@@ -271,11 +271,11 @@ OpenOrCreateLePeb(
     return LePeb;
 }
 
-#define ENABLE_LOG 0
+#define ENABLE_LOG 1
 
 #if ENABLE_LOG
 
-#define InitLog() { WCHAR LogFilePath[MAX_NTPATH]; swprintf(LogFilePath, L"C:\\lelog\\%p_log.txt", CurrentPid()); ULONG BOM = BOM_UTF16_LE; LogFile.Create(LogFilePath); LogFile.Write(&BOM, 2); PROCESS_IMAGE_FILE_NAME2 proc; NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &proc, sizeof(proc), NULL); LogFile.Print(NULL, L"%wZ", &proc.ImageFileName); }
+#define InitLog() { WCHAR LogFilePath[MAX_NTPATH]; swprintf(LogFilePath, L"C:\\%p_log.txt", CurrentPid()); ULONG BOM = BOM_UTF16_LE; LogFile.Create(LogFilePath); LogFile.Write(&BOM, 2); PROCESS_IMAGE_FILE_NAME2 proc; NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &proc, sizeof(proc), NULL); LogFile.Print(NULL, L"%wZ", &proc.ImageFileName); }
 #define WriteLog(...) { LeGetGlobalData()->LogFile.Print(NULL, __VA_ARGS__); LeGetGlobalData()->LogFile.Print(NULL, L"\r\n"); }
 
 #else

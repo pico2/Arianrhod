@@ -38,11 +38,7 @@ ForceInline Void main2(Long_Ptr argc, WChar **argv)
             ++CommandLine;
     }
 
-    LEB Leb;
-
-    InitDefaultLeb(&Leb);
-
-    Status = LeCreateProcess(&Leb, argv[1], CommandLine, CurrentDirectory);
+    Status = LeCreateProcess(nullptr, argv[1], CommandLine, CurrentDirectory);
 
     RtlFreeUnicodeString(&CurrentDirectoryString);
 

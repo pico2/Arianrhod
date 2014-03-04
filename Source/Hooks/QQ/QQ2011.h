@@ -6,12 +6,14 @@
 typedef struct
 {
     PCWSTR                  DllName;
-    PMEMORY_PATCH           Patch;
+    Mp::PPATCH_MEMORY_DATA  PatchData;
     ULONG_PTR               PatchCount;
-    PMEMORY_FUNCTION_PATCH  FunctionPatch;
-    ULONG_PTR               FunctionCount;
 
 } PATCH_ARRAY, *PPATCH_ARRAY;
+
+#define CALL 0xE8
+#define JUMP 0xE9
+#define PUSH 0x68
 
 // contracts.dll 61948343 age
 
