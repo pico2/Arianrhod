@@ -81,10 +81,10 @@ typedef struct
 
 typedef struct
 {
-    REGISTRY_ENTRY64 Origin;
-    REGISTRY_ENTRY64 Replacement;
+    REGISTRY_ENTRY64 Original;
+    REGISTRY_ENTRY64 Redirected;
 
-} REGISTRY_REPLACEMENT_ENTRY64, *PREGISTRY_REPLACEMENT_ENTRY64;
+} REGISTRY_REDIRECTION_ENTRY64, *PREGISTRY_REDIRECTION_ENTRY64;
 
 typedef struct
 {
@@ -95,7 +95,7 @@ typedef struct
     WCHAR                           DefaultFaceName[LF_FACESIZE];
     RTL_TIME_ZONE_INFORMATION       Timezone;
     ULONG                           NumberOfRegistryReplacementEntry;
-    REGISTRY_REPLACEMENT_ENTRY64    RegistryReplacement[1];
+    REGISTRY_REDIRECTION_ENTRY64    RegistryReplacement[1];
 
 } LOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, LEB, *PLEB;
 
@@ -109,6 +109,7 @@ typedef struct REGISTRY_ENTRY
     ULONG_PTR       DataType;
     PVOID           Data;
     ULONG_PTR       DataSize;
+    ml::String      FullPath;
 
     REGISTRY_ENTRY()
     {
@@ -125,10 +126,10 @@ typedef struct REGISTRY_ENTRY
 
 typedef struct
 {
-    REGISTRY_ENTRY Origin;
-    REGISTRY_ENTRY Replacement;
+    REGISTRY_ENTRY Original;
+    REGISTRY_ENTRY Redirected;
 
-} REGISTRY_REPLACEMENT_ENTRY, *PREGISTRY_REPLACEMENT_ENTRY;
+} REGISTRY_REDIRECTION_ENTRY, *PREGISTRY_REDIRECTION_ENTRY;
 
 typedef struct
 {
@@ -144,7 +145,7 @@ typedef struct
     PVOID       SelfShadowToFree;
     WCHAR       LeDllFullPath[MAX_NTPATH];
 
-    ml::GrowableArray<REGISTRY_REPLACEMENT_ENTRY> RegistryReplacementEntry;
+    ml::GrowableArray<REGISTRY_REDIRECTION_ENTRY> RegistryRedirectionEntry;
 
 } LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK, LEPEB, *PLEPEB;
 
@@ -484,6 +485,12 @@ public:
 
 #endif // ARCHEAGE_VER
 
+    NTSTATUS
+    LookupRegistryRedirectionEntry(
+        HANDLE                          KeyHandle,
+        PUNICODE_STRING                 ValueName,
+        PREGISTRY_REDIRECTION_ENTRY*    RedirectionEntry
+    );
 
     NTSTATUS HackUserDefaultLCID(PVOID Kernel32);
     NTSTATUS InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid);

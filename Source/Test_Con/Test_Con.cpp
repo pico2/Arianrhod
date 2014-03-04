@@ -208,19 +208,21 @@ int CDECL close3(int n)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    union
+    {
+        KEY_VALUE_FULL_INFORMATION value;
+        BYTE buf[0x200];
+    };
 
-    ml::MlInitialize();
+    OBJECT_ATTRIBUTES oa;
+    HANDLE k;
 
-    using ml::Function;
+    UNICODE_STRING name = USTR(L"\\REGISTRY\\MACHINE\\SOFTWARE\\Classes\\._sln");
 
-    argc = GetRandom32();
+    InitializeObjectAttributes(&oa, &name, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
+    NtOpenKey(&k, KEY_ALL_ACCESS, &oa);
 
-    Function<TYPE_OF(close1)> fuck1 = [&] (int n) { return PrintConsole(L"%d\n", argc); };
-    Function<TYPE_OF(close3)> fuck2 = fuck1;
-
-    fuck1(argc);
-    argc = fuck1.NumberOfArguments;
-    fuck2(argc);
+    Reg::GetKeyValue(HKEY_CLASSES_ROOT, L"._sln", nullptr, KeyValueFullInformation, &value, sizeof(buf));
 
     return;
 

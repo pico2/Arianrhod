@@ -163,9 +163,9 @@ NTSTATUS LeGlobalData::Initialize()
     Status = RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &SystemDirectory, &this->SystemDirectory);
     FAIL_RETURN(Status);
 
-    RtlInitEmptyUnicodeString(&NlsFileName, nullptr, 0);
-    RtlInitEmptyUnicodeString(&OemNlsFileName, nullptr, 0);
-    RtlInitEmptyUnicodeString(&LangFileName, nullptr, 0);
+    RtlInitEmptyString(&NlsFileName, nullptr, 0);
+    RtlInitEmptyString(&OemNlsFileName, nullptr, 0);
+    RtlInitEmptyString(&LangFileName, nullptr, 0);
 
     SCOPE_EXIT
     {

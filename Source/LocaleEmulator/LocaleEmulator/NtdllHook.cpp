@@ -318,15 +318,15 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
         return Status;
     }
 
-    ExtraSize = this->GetLePeb()->RegistryReplacementEntry.GetSize() * sizeof(TargetLePeb->Leb.RegistryReplacement[0]);
+    ExtraSize = this->GetLePeb()->RegistryRedirectionEntry.GetSize() * sizeof(TargetLePeb->Leb.RegistryReplacement[0]);
     if (ExtraSize != 0)
     {
-        PREGISTRY_REPLACEMENT_ENTRY Entry;
-        FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryReplacementEntry)
+        PREGISTRY_REDIRECTION_ENTRY Entry;
+        FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryRedirectionEntry)
         {
-            ExtraSize += Entry->Origin.DataSize + Entry->Replacement.DataSize;
-            ExtraSize += Entry->Origin.SubKey.GetSize() + Entry->Replacement.SubKey.GetSize();
-            ExtraSize += Entry->Origin.Value.GetSize() + Entry->Replacement.Value.GetSize();
+            ExtraSize += Entry->Original.DataSize + Entry->Redirected.DataSize;
+            ExtraSize += Entry->Original.SubKey.GetSize() + Entry->Redirected.SubKey.GetSize();
+            ExtraSize += Entry->Original.Value.GetSize() + Entry->Redirected.Value.GetSize();
         }
     }
 
@@ -499,6 +499,41 @@ LeNtTerminateThread(
 }
 
 NTSTATUS
+LeGlobalData::
+LookupRegistryRedirectionEntry(
+    HANDLE                          KeyHandle,
+    PUNICODE_STRING                 ValueName,
+    PREGISTRY_REDIRECTION_ENTRY*    RedirectionEntry
+)
+{
+    NTSTATUS Status;
+    PREGISTRY_REDIRECTION_ENTRY Entry;
+    UNICODE_STRING KeyFullPath;
+
+    Status = QueryRegKeyFullPath(KeyHandle, &KeyFullPath);
+    FAIL_RETURN(Status);
+
+    Status = STATUS_NOT_FOUND;
+
+    FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryRedirectionEntry)
+    {
+        if (ValueName != nullptr && RtlEqualUnicodeString(Entry->Original.Value, ValueName, TRUE) == FALSE)
+            continue;
+
+        if (RtlEqualUnicodeString(Entry->Original.FullPath, &KeyFullPath, TRUE) == FALSE)
+            continue;
+
+        *RedirectionEntry = Entry;
+        Status = STATUS_SUCCESS;
+        break;
+    }
+
+    RtlFreeUnicodeString(&KeyFullPath);
+
+    return Status;
+}
+
+NTSTATUS
 HPCALL
 LeNtQueryValueKey(
     HPARGS
@@ -510,129 +545,64 @@ LeNtQueryValueKey(
     PULONG                      ResultLength
 )
 {
-    NTSTATUS        Status;
-    UNICODE_STRING  KeyFulPath;
-    PLeGlobalData   GlobalData;
-    ULONG_PTR       KeyType, BufferLength;
-    WCHAR           Buffer[MAX_NTPATH];
-
-    enum { CodePageKeyHandle, LanguageKeyHandle };
+    NTSTATUS                    Status;
+    ULONG_PTR                   BufferLength;
+    PLeGlobalData               GlobalData;
+    OBJECT_ATTRIBUTES           ObjectAttributes;
+    PREGISTRY_REDIRECTION_ENTRY Entry;
 
     if (NT_FAILED(RtlValidateUnicodeString(0, ValueName)))
         return 0;
 
-    Status = QueryRegKeyFullPath(KeyHandle, &KeyFulPath);
-    FAIL_RETURN(Status);
-
     GlobalData = (PLeGlobalData)HpGetFilterContext();
 
-    if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.Ntdll.CodePageKey, TRUE))
-    {
-        KeyType = CodePageKeyHandle;
-    }
-    else if (RtlEqualUnicodeString(&KeyFulPath, &GlobalData->HookRoutineData.Ntdll.LanguageKey, TRUE))
-    {
-        KeyType = LanguageKeyHandle;
-    }
-    else
-    {
-        RtlFreeUnicodeString(&KeyFulPath);
-        return 0;
-    }
-
-    RtlFreeUnicodeString(&KeyFulPath);
-
-    switch (KeyType)
-    {
-        default:
-            return 0;
-
-        case CodePageKeyHandle:
-            if (RtlEqualUnicodeString(ValueName, &USTR(REGKEY_ACP), TRUE))
-            {
-                BufferLength = swprintf(Buffer, L"%d", GlobalData->GetLeb()->AnsiCodePage);
-            }
-            else if (RtlEqualUnicodeString(ValueName, &USTR(REGKEY_OEMCP), TRUE))
-            {
-                BufferLength = swprintf(Buffer, L"%d", GlobalData->GetLeb()->OemCodePage);
-            }
-            else
-            {
-                return 0;
-            }
-            break;
-
-        case LanguageKeyHandle:
-            if (RtlEqualUnicodeString(ValueName, &USTR(REGKEY_DEFAULT_LANGUAGE), TRUE))
-            {
-                BufferLength = swprintf(Buffer, L"%04x", GlobalData->GetLeb()->LocaleID);
-            }
-            else
-            {
-                return 0;
-            }
-            break;
-    }
-
-    ++BufferLength;
-    BufferLength *= sizeof(WCHAR);
+    Status = GlobalData->LookupRegistryRedirectionEntry(KeyHandle, ValueName, &Entry);
+    FAIL_RETURN(Status);
 
     HpSetFilterAction(BlockSystemCall);
 
-    Status = HpCallSysCall(
-                NtQueryValueKey,
-                KeyHandle,
-                ValueName,
-                KeyValueInformationClass,
-                KeyValueInformation,
-                Length,
-                ResultLength
-            );
+    // KeyValueFullInformation
 
-    if (Status == STATUS_BUFFER_TOO_SMALL)
+    if (Entry->Redirected.Data != nullptr)
     {
-        if (ResultLength != nullptr)
-            *ResultLength += BufferLength;
+        switch (KeyValueInformationClass)
+        {
+            default:
+                return STATUS_INVALID_PARAMETER;
+
+            case KeyValueBasicInformation:
+                break;
+
+            case KeyValueFullInformation:
+                break;
+
+            case KeyValuePartialInformation:
+                break;
+
+            case KeyValueFullInformationAlign64:
+                break;
+
+            case KeyValuePartialInformationAlign64:
+                break;
+        }
     }
-
-    if (NT_FAILED(Status))
-        return Status;
-
-    union
+    else
     {
-        PKEY_VALUE_PARTIAL_INFORMATION          PartialInfo;
-        PKEY_VALUE_PARTIAL_INFORMATION_ALIGN64  PartialInfoAlign64;
-        PKEY_VALUE_FULL_INFORMATION             FullInfo;
-        PVOID                                   ValueInformation;
-    };
+        InitializeObjectAttributes(&ObjectAttributes, Entry->Redirected.FullPath, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
+        Status = NtOpenKey(&KeyHandle, KEY_QUERY_VALUE, &ObjectAttributes);
+        FAIL_RETURN(Status);
 
-    ValueInformation = KeyValueInformation;
+        Status = HpCallSysCall(
+                    NtQueryValueKey,
+                    KeyHandle,
+                    ValueName,
+                    KeyValueInformationClass,
+                    KeyValueInformation,
+                    Length,
+                    ResultLength
+                );
 
-    switch (KeyValueInformationClass)
-    {
-        case KeyValuePartialInformation:
-            if (PartialInfo->Type != REG_SZ)
-                break;
-
-            CopyMemory(PartialInfo->Data, Buffer, BufferLength);
-            PartialInfo->DataLength = BufferLength - sizeof(WCHAR);
-            break;
-
-        case KeyValueFullInformation:
-            if (FullInfo->Type != REG_SZ)
-                break;
-
-            CopyMemory(PtrAdd(FullInfo, FullInfo->DataOffset), Buffer, BufferLength);
-            FullInfo->DataLength = BufferLength - sizeof(WCHAR);
-            break;
-
-        case KeyValuePartialInformationAlign64:
-            if (PartialInfoAlign64->Type != REG_SZ)
-                break;
-
-            CopyMemory(PartialInfoAlign64->Data, Buffer, BufferLength);
-            PartialInfoAlign64->DataLength = BufferLength - sizeof(WCHAR);
-            break;
+        NtClose(KeyHandle);
     }
 
     return Status;
@@ -744,7 +714,6 @@ LeLdrResSearchResource(
 NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 {
     NTSTATUS            Status;
-    HANDLE              RootKey;
     OBJECT_ATTRIBUTES   ObjectAttributes;
     UNICODE_STRING      SubKey;
     PVOID               LdrInitNtContinue;
@@ -753,6 +722,8 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     if (LdrInitNtContinue == nullptr)
         return STATUS_NOT_SUPPORTED;
 
+    /*
+    HANDLE              RootKey;
     RootKey = nullptr;
 
     LOOP_ONCE
@@ -784,14 +755,18 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 
     if (RootKey != nullptr)
         NtClose(RootKey);
+    */
+
+    if (this->GetLePeb()->RegistryRedirectionEntry.GetSize() != 0)
+        ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
 
     ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
-    //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
     ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
     ADD_FILTER_(NtQueryDefaultLocale,       LeNtQueryDefaultLocale,     this);
     ADD_FILTER_(NtQueryDefaultUILanguage,   LeNtQueryDefaultUILanguage, this);
     ADD_FILTER_(NtQueryInstallUILanguage,   LeNtQueryInstallUILanguage, this);
+    //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     //ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
 
     Mp::PATCH_MEMORY_DATA p[] =
