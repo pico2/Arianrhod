@@ -77,7 +77,51 @@ typedef struct
     PVOID64             Data;
     ULONG64             DataSize;
 
-} REGISTRY_ENTRY;
+} REGISTRY_ENTRY64;
+
+typedef struct
+{
+    REGISTRY_ENTRY64 Origin;
+    REGISTRY_ENTRY64 Replacement;
+
+} REGISTRY_REPLACEMENT_ENTRY64, *PREGISTRY_REPLACEMENT_ENTRY64;
+
+typedef struct
+{
+    ULONG                           AnsiCodePage;
+    ULONG                           OemCodePage;
+    ULONG                           LocaleID;
+    ULONG                           DefaultCharset;
+    WCHAR                           DefaultFaceName[LF_FACESIZE];
+    RTL_TIME_ZONE_INFORMATION       Timezone;
+    ULONG                           NumberOfRegistryReplacementEntry;
+    REGISTRY_REPLACEMENT_ENTRY64    RegistryReplacement[1];
+
+} LOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, LEB, *PLEB;
+
+#define LDR_LOAD_DLL_BACKUP_SIZE 5
+
+typedef struct REGISTRY_ENTRY
+{
+    ULONG_PTR       Root;
+    ml::String      SubKey;
+    ml::String      Value;
+    ULONG_PTR       DataType;
+    PVOID           Data;
+    ULONG_PTR       DataSize;
+
+    REGISTRY_ENTRY()
+    {
+        Data = nullptr;
+    }
+
+    ~REGISTRY_ENTRY()
+    {
+        FreeMemoryP(this->Data);
+        this->Data = nullptr;
+    }
+
+} REGISTRY_ENTRY, *PREGISTRY_ENTRY;
 
 typedef struct
 {
@@ -85,21 +129,6 @@ typedef struct
     REGISTRY_ENTRY Replacement;
 
 } REGISTRY_REPLACEMENT_ENTRY, *PREGISTRY_REPLACEMENT_ENTRY;
-
-typedef struct
-{
-    ULONG                       AnsiCodePage;
-    ULONG                       OemCodePage;
-    ULONG                       LocaleID;
-    ULONG                       DefaultCharset;
-    WCHAR                       DefaultFaceName[LF_FACESIZE];
-    RTL_TIME_ZONE_INFORMATION   Timezone;
-    ULONG                       NumberOfRegistryReplacementEntry;
-    REGISTRY_REPLACEMENT_ENTRY  RegistryReplacement[1];
-
-} LOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, LEB, *PLEB;
-
-#define LDR_LOAD_DLL_BACKUP_SIZE 5
 
 typedef struct
 {
@@ -173,7 +202,8 @@ inline
 PLEPEB
 OpenOrCreateLePeb(
     ULONG_PTR   ProcessId   = CurrentPid(),
-    BOOL        Create      = FALSE
+    BOOL        Create      = FALSE,
+    ULONG_PTR   ExtraSize   = 0
 )
 {
     NTSTATUS            Status;
@@ -207,7 +237,7 @@ OpenOrCreateLePeb(
     Status = NtOpenSection(&SectionHandle, SECTION_ALL_ACCESS, &ObjectAttributes);
     if (NT_FAILED(Status) && Create)
     {
-        MaximumSize.QuadPart = sizeof(*LePeb);
+        MaximumSize.QuadPart = sizeof(*LePeb) + ExtraSize;
         Status = NtCreateSection(
                     &SectionHandle,
                     SECTION_ALL_ACCESS,
@@ -249,12 +279,8 @@ OpenOrCreateLePeb(
     {
         HANDLE ProcessHandle;
 
-        ProcessHandle = PidToHandle(ProcessId);
-        if (ProcessHandle == nullptr)
-        {
-            Status = STATUS_ACCESS_DENIED;
-            break;
-        }
+        Status = PidToHandleEx(&ProcessHandle, ProcessId);
+        FAIL_BREAK(Status);
 
         Status = NtDuplicateObject(CurrentProcess, SectionHandle, ProcessHandle, &LePeb->Section, 0, 0, DUPLICATE_SAME_ACCESS);
         NtClose(ProcessHandle);

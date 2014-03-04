@@ -256,7 +256,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
 {
     NTSTATUS    Status;
     PVOID       SelfShadow, LocalSelfShadow, ShadowLoadFirstDll;
-    ULONG_PTR   SizeOfImage;
+    ULONG_PTR   SizeOfImage, ExtraSize;
     LONG        Offset;
     PLEPEB      TargetLePeb, LePeb;
     HANDLE      Section;
@@ -318,7 +318,19 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
         return Status;
     }
 
-    TargetLePeb = OpenOrCreateLePeb((ULONG_PTR)Cid->UniqueProcess, TRUE);
+    ExtraSize = this->GetLePeb()->RegistryReplacementEntry.GetSize() * sizeof(TargetLePeb->Leb.RegistryReplacement[0]);
+    if (ExtraSize != 0)
+    {
+        PREGISTRY_REPLACEMENT_ENTRY Entry;
+        FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryReplacementEntry)
+        {
+            ExtraSize += Entry->Origin.DataSize + Entry->Replacement.DataSize;
+            ExtraSize += Entry->Origin.SubKey.GetSize() + Entry->Replacement.SubKey.GetSize();
+            ExtraSize += Entry->Origin.Value.GetSize() + Entry->Replacement.Value.GetSize();
+        }
+    }
+
+    TargetLePeb = OpenOrCreateLePeb((ULONG_PTR)Cid->UniqueProcess, TRUE, ExtraSize);
     if (TargetLePeb == nullptr)
         return STATUS_UNSUCCESSFUL;
 

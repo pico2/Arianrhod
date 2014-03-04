@@ -41,11 +41,11 @@ Source/sources/ph.part*.rar
 Source/sources/windows_2000_source_code.zip
 Source/sources/WRK-v1.2
 Source/Test_Drv
-Source/LocaleEmulator2/LocaleEmulator/win32k_x64_win8.i64
-Source/LocaleEmulator2/LocaleEmulator/win32k_x64_win8.sys
-Source/LocaleEmulator2/LocaleEmulator/Loader.exe
-Source/LocaleEmulator2/LocaleEmulator/LocaleEmulator.dll
-Source/LocaleEmulator2/LocaleEmulator/LoaderDll.dll
+Source/LocaleEmulator/LocaleEmulator/win32k_x64_win8.i64
+Source/LocaleEmulator/LocaleEmulator/win32k_x64_win8.sys
+Source/LocaleEmulator/LocaleEmulator/Loader.exe
+Source/LocaleEmulator/LocaleEmulator/LocaleEmulator.dll
+Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 
 /TempSync/ChromeUpdater/LATEST_CHANGE
 /TempSync/ChromeUpdater/CHECK
