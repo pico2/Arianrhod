@@ -326,7 +326,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
         {
             ExtraSize += Entry->Original.DataSize + Entry->Redirected.DataSize;
             ExtraSize += Entry->Original.SubKey.GetSize() + Entry->Redirected.SubKey.GetSize();
-            ExtraSize += Entry->Original.Value.GetSize() + Entry->Redirected.Value.GetSize();
+            ExtraSize += Entry->Original.ValueName.GetSize() + Entry->Redirected.ValueName.GetSize();
         }
     }
 
@@ -517,7 +517,7 @@ LookupRegistryRedirectionEntry(
 
     FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryRedirectionEntry)
     {
-        if (ValueName != nullptr && RtlEqualUnicodeString(Entry->Original.Value, ValueName, TRUE) == FALSE)
+        if (ValueName != nullptr && RtlEqualUnicodeString(Entry->Original.ValueName, ValueName, TRUE) == FALSE)
             continue;
 
         if (RtlEqualUnicodeString(Entry->Original.FullPath, &KeyFullPath, TRUE) == FALSE)
@@ -561,33 +561,110 @@ LeNtQueryValueKey(
 
     HpSetFilterAction(BlockSystemCall);
 
-    // KeyValueFullInformation
-
     if (Entry->Redirected.Data != nullptr)
     {
+        union
+        {
+            PVOID                           Information;
+            PKEY_VALUE_BASIC_INFORMATION    BasicInformation;
+            PKEY_VALUE_FULL_INFORMATION     FullInformation;
+            PKEY_VALUE_PARTIAL_INFORMATION  PartialInformation;
+        };
+
+        ULONG_PTR Aligned, Offset, DataSize, RequiredLength, MinimumSize;
+        PVOID LocalBuffer;
+
+        DataSize = Entry->Redirected.DataSize;
+        RequiredLength = 0;
+        Information = nullptr;
+
+        Offset = ROUND_UP((ULONG_PTR)Information, sizeof(ULONG_PTR)) - (ULONG_PTR)Information;
+        Aligned = Offset > Length ? 0 : (Length - Offset);
+
         switch (KeyValueInformationClass)
         {
             default:
                 return STATUS_INVALID_PARAMETER;
 
             case KeyValueBasicInformation:
-                break;
-
-            case KeyValueFullInformation:
-                break;
-
-            case KeyValuePartialInformation:
-                break;
+                goto REDIRECT_ONLY;
 
             case KeyValueFullInformationAlign64:
+                Offset = ROUND_UP((ULONG_PTR)Information, sizeof(ULONG64)) - (ULONG_PTR)Information;
+                Aligned = Offset > Length ? 0 : Length - Offset;
+                NO_BREAK;
+
+            case KeyValueFullInformation:
+                MinimumSize = FIELD_OFFSET(KEY_VALUE_FULL_INFORMATION, Name);
+                RequiredLength = MinimumSize + Entry->Redirected.ValueName.GetCount() + DataSize;
+                RequiredLength = ROUND_UP(RequiredLength, KeyValueInformationClass == KeyValueFullInformationAlign64 ? sizeof(ULONG64) : sizeof(ULONG));
+                if (KeyValueInformation == nullptr || Aligned < MinimumSize)
+                    break;
+
+                Information = AllocateMemoryP(RequiredLength);
+                if (Information == nullptr)
+                    return STATUS_NO_MEMORY;
+
+                FullInformation->TitleIndex = 0;
+                FullInformation->Type = Entry->Redirected.DataType;
+                FullInformation->NameLength = Entry->Redirected.ValueName.GetSize() + sizeof(WCHAR);
+                FullInformation->DataOffset = MinimumSize + FullInformation->NameLength;
+                FullInformation->DataLength = DataSize;
+
+                CopyMemory(FullInformation->Name, (PWSTR)Entry->Redirected.ValueName, FullInformation->NameLength);
+                CopyMemory(PtrAdd(FullInformation, FullInformation->DataOffset), Entry->Redirected.Data, FullInformation->DataLength);
+                CopyMemory(KeyValueInformation, FullInformation, ML_MIN(RequiredLength, Aligned));
+
                 break;
 
             case KeyValuePartialInformationAlign64:
+                Offset = ROUND_UP((ULONG_PTR)Information, sizeof(ULONG64)) - (ULONG_PTR)Information;
+                Aligned = Offset > Length ? 0 : Length - Offset;
+                NO_BREAK;
+
+            case KeyValuePartialInformation:
+                MinimumSize = FIELD_OFFSET(KEY_VALUE_PARTIAL_INFORMATION, Data);
+                RequiredLength = MinimumSize + DataSize;
+                RequiredLength = ROUND_UP(RequiredLength, KeyValueInformationClass == KeyValuePartialInformation ? sizeof(ULONG64) : sizeof(ULONG));
+                if (KeyValueInformation == nullptr || Aligned < MinimumSize)
+                    break;
+
+                Information = AllocateMemoryP(RequiredLength);
+                if (Information == nullptr)
+                    return STATUS_NO_MEMORY;
+
+                Information = AllocateMemoryP(RequiredLength);
+                if (Information == nullptr)
+                    return STATUS_NO_MEMORY;
+
+                PartialInformation->TitleIndex = 0;
+                PartialInformation->Type = Entry->Redirected.DataType;
+                PartialInformation->DataLength = DataSize;
+
+                CopyMemory(PartialInformation->Data, Entry->Redirected.Data, PartialInformation->DataLength);
+                CopyMemory(KeyValueInformation, PartialInformation, ML_MIN(RequiredLength, Aligned));
+
                 break;
         }
+
+        FreeMemoryP(Information);
+
+        if (ResultLength != nullptr)
+            *ResultLength = RequiredLength;
+
+        if (Aligned < MinimumSize)
+            return STATUS_BUFFER_TOO_SMALL;
+
+        if (Aligned < RequiredLength)
+            return STATUS_BUFFER_OVERFLOW;
+
+        return STATUS_SUCCESS;
     }
     else
     {
+
+REDIRECT_ONLY:
+
         InitializeObjectAttributes(&ObjectAttributes, Entry->Redirected.FullPath, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
         Status = NtOpenKey(&KeyHandle, KEY_QUERY_VALUE, &ObjectAttributes);
         FAIL_RETURN(Status);
@@ -722,43 +799,10 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     if (LdrInitNtContinue == nullptr)
         return STATUS_NOT_SUPPORTED;
 
-    /*
-    HANDLE              RootKey;
-    RootKey = nullptr;
-
-    LOOP_ONCE
+    if (this->GetLePeb()->RegistryRedirectionEntry.GetSize() != 0)
     {
-        HANDLE CodePageKey, LanguageKey;
-
-        Status = OpenPredefinedKeyHandle(&RootKey, REGKEY_ROOT, KEY_QUERY_VALUE);
-        FAIL_BREAK(Status);
-
-        RTL_CONST_STRING(SubKey, REGPATH_CODEPAGE);
-        InitializeObjectAttributes(&ObjectAttributes, &SubKey, OBJ_CASE_INSENSITIVE, RootKey, nullptr);
-        Status = NtOpenKey(&CodePageKey, KEY_QUERY_VALUE, &ObjectAttributes);
-        FAIL_BREAK(Status);
-
-        Status = QueryRegKeyFullPath(CodePageKey, &HookRoutineData.Ntdll.CodePageKey);
-        NtClose(CodePageKey);
-        FAIL_BREAK(Status);
-
-        RTL_CONST_STRING(SubKey, REGPATH_LANGUAGE);
-        Status = NtOpenKey(&LanguageKey, KEY_QUERY_VALUE, &ObjectAttributes);
-        FAIL_BREAK(Status);
-
-        Status = QueryRegKeyFullPath(LanguageKey, &HookRoutineData.Ntdll.LanguageKey);
-        NtClose(LanguageKey);
-        FAIL_BREAK(Status);
-
         ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
     }
-
-    if (RootKey != nullptr)
-        NtClose(RootKey);
-    */
-
-    if (this->GetLePeb()->RegistryRedirectionEntry.GetSize() != 0)
-        ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
 
     ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
     ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
@@ -775,7 +819,6 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     };
 
     Mp::PatchMemory(p, countof(p));
-
 
     return STATUS_SUCCESS;
 }

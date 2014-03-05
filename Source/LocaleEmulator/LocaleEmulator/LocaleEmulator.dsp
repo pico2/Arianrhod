@@ -93,6 +93,10 @@ SOURCE=.\NtdllHook.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\NtdllHook.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Runtime.cpp
 # ADD CPP /Yu"stdafx.h"
 # End Source File

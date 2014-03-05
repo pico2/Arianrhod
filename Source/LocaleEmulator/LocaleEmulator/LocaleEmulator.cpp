@@ -124,6 +124,8 @@ NTSTATUS LeGlobalData::Initialize()
     LePeb = OpenOrCreateLePeb();
     if (LePeb == nullptr)
     {
+        ULONG_PTR       DefaultACPLength, DefaultLCIDLength, DefaultOEMCPLength;
+        WCHAR           DefaultACP[0x20], DefaultOEMCP[0x20], DefaultLCID[0x20];
         PVOID           ReloadedNtdll;
         PUNICODE_STRING FullDllName;
 
@@ -146,10 +148,33 @@ NTSTATUS LeGlobalData::Initialize()
 
             UnloadPeImage(ReloadedNtdll);
         }
+
+        DefaultACPLength    = (swprintf(DefaultACP, L"%d", LePeb->Leb.AnsiCodePage) + 1) * sizeof(WCHAR);
+        DefaultOEMCPLength  = (swprintf(DefaultOEMCP, L"%d", LePeb->Leb.OemCodePage) + 1) * sizeof(WCHAR);
+        DefaultLCIDLength   = (swprintf(DefaultLCID, L"%d", LePeb->Leb.LocaleID) + 1) * sizeof(WCHAR);
+
+        REGISTRY_REDIRECTION_ENTRY64 *Entry, Entries[] =
+        {
+            {
+                { (ULONG64)HKEY_LOCAL_MACHINE, USTR64(REGPATH_CODEPAGE), USTR64(REGKEY_ACP), REG_SZ, },
+                { (ULONG64)HKEY_LOCAL_MACHINE, USTR64(REGPATH_CODEPAGE), USTR64(REGKEY_ACP), REG_SZ, DefaultACP, DefaultACPLength },
+            },
+            {
+                { (ULONG64)HKEY_LOCAL_MACHINE, USTR64(REGPATH_CODEPAGE), USTR64(REGKEY_OEMCP), REG_SZ, },
+                { (ULONG64)HKEY_LOCAL_MACHINE, USTR64(REGPATH_CODEPAGE), USTR64(REGKEY_OEMCP), REG_SZ, DefaultOEMCP, DefaultOEMCPLength },
+            },
+            {
+                { (ULONG64)HKEY_LOCAL_MACHINE, USTR64(REGPATH_LANGUAGE), USTR64(REGKEY_DEFAULT_LANGUAGE), REG_SZ, },
+                { (ULONG64)HKEY_LOCAL_MACHINE, USTR64(REGPATH_LANGUAGE), USTR64(REGKEY_DEFAULT_LANGUAGE), REG_SZ, DefaultLCID, DefaultLCIDLength },
+            },
+        };
+
+        Status = this->InitRegistryRedirection(Entries, countof(Entries), nullptr);
     }
     else
     {
         *GetLePeb() = *LePeb;
+        Status = this->InitRegistryRedirection(LePeb->Leb.RegistryReplacement, LePeb->Leb.NumberOfRegistryReplacementEntry, LePeb);
 
         NtClose(LePeb->Section);
         CloseLePeb(LePeb);
@@ -257,6 +282,106 @@ NTSTATUS LeGlobalData::Initialize()
     WriteLog(L"init %p", Status);
 
     return Status;
+}
+
+NTSTATUS LeGlobalData::InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Entry64, ULONG_PTR Count, PVOID BaseAddress)
+{
+    NTSTATUS    Status;
+    PLEPEB      LePeb;
+    PREGISTRY_REDIRECTION_ENTRY Entry;
+
+    if (Count == 0)
+        return STATUS_NO_MORE_ENTRIES;
+
+    LePeb = this->GetLePeb();
+
+#pragma push_macro("USTR64ToUSTR")
+#undef USTR64ToUSTR
+#define USTR64ToUSTR(ustr64) UNICODE_STRING({ ustr64.Length, ustr64.MaximumLength, PtrAdd(ustr64.Buffer, BaseAddress) });
+
+    REGISTRY_REDIRECTION_ENTRY LocalEntry;
+
+    FOR_EACH(Entry64, Entry64, Count)
+    {
+        ULONG_PTR       LastIndex;
+        HANDLE          OriginalKey, RedirectedKey;
+        UNICODE_STRING  KeyFullPath;
+
+        OriginalKey     = nullptr;
+        RedirectedKey   = nullptr;
+
+        Status = Reg::OpenKey(&OriginalKey, (HANDLE)Entry64->Original.Root, KEY_QUERY_VALUE, PtrAdd(Entry64->Original.SubKey.Buffer, BaseAddress));
+        FAIL_CONTINUE(Status);
+
+        if (Entry64->Redirected.Root != NULL)
+        {
+            Status = Reg::OpenKey(&RedirectedKey, (HANDLE)Entry64->Redirected.Root, KEY_QUERY_VALUE, PtrAdd(Entry64->Redirected.SubKey.Buffer, BaseAddress));
+            if (NT_FAILED(Status))
+            {
+                Reg::CloseKeyHandle(OriginalKey);
+                continue;
+            }
+        }
+
+        LePeb->RegistryRedirectionEntry.Add(LocalEntry);
+        LastIndex = LePeb->RegistryRedirectionEntry.GetSize() - 1;
+        Entry = &LePeb->RegistryRedirectionEntry[LastIndex];
+
+        Status = QueryRegKeyFullPath(OriginalKey, &KeyFullPath);
+        Reg::CloseKeyHandle(OriginalKey);
+        if (NT_FAILED(Status))
+        {
+            Reg::CloseKeyHandle(RedirectedKey);
+            LePeb->RegistryRedirectionEntry.Remove(LastIndex);
+            continue;
+        }
+
+        Entry->Original.FullPath = KeyFullPath;
+        RtlFreeUnicodeString(&KeyFullPath);
+
+        if (RedirectedKey != nullptr)
+        {
+            Status = QueryRegKeyFullPath(RedirectedKey, &KeyFullPath);
+            Reg::CloseKeyHandle(RedirectedKey);
+            if (NT_FAILED(Status))
+            {
+                LePeb->RegistryRedirectionEntry.Remove(LastIndex);
+                continue;
+            }
+
+            Entry->Redirected.FullPath = KeyFullPath;
+            RtlFreeUnicodeString(&KeyFullPath);
+        }
+
+        Entry->Original.Root        = (HKEY)Entry64->Original.Root;
+        Entry->Original.SubKey      = USTR64ToUSTR(Entry64->Original.SubKey);
+        Entry->Original.ValueName       = USTR64ToUSTR(Entry64->Original.ValueName);
+        Entry->Original.DataType    = Entry64->Original.DataType;
+        Entry->Original.Data        = nullptr;
+        Entry->Original.DataSize    = 0;
+
+        Entry->Redirected.Root      = (HKEY)Entry64->Redirected.Root;
+        Entry->Redirected.SubKey    = USTR64ToUSTR(Entry64->Redirected.SubKey);
+        Entry->Redirected.ValueName     = USTR64ToUSTR(Entry64->Redirected.ValueName);
+        Entry->Redirected.DataType  = Entry64->Redirected.DataType;
+
+        if (Entry64->Redirected.Data != nullptr && Entry64->Redirected.DataSize != 0)
+        {
+            Entry->Redirected.DataSize = (ULONG_PTR)Entry64->Redirected.DataSize;
+            Entry->Redirected.Data = AllocateMemoryP(Entry->Redirected.DataSize);
+            if (Entry->Redirected.Data == nullptr)
+            {
+                LePeb->RegistryRedirectionEntry.Remove(LastIndex);
+                continue;
+            }
+
+            CopyMemory(Entry->Redirected.Data, PtrAdd(Entry64->Redirected.Data, BaseAddress), Entry->Redirected.DataSize);
+        }
+    }
+
+#pragma pop_macro("USTR64ToUSTR")
+
+    return STATUS_SUCCESS;
 }
 
 typedef struct

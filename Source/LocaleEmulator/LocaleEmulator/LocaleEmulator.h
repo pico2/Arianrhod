@@ -72,7 +72,7 @@ typedef struct
 {
     ULONG64             Root;
     UNICODE_STRING64    SubKey;
-    UNICODE_STRING64    Value;
+    UNICODE_STRING64    ValueName;
     ULONG               DataType;
     PVOID64             Data;
     ULONG64             DataSize;
@@ -101,11 +101,14 @@ typedef struct
 
 #define LDR_LOAD_DLL_BACKUP_SIZE 5
 
-typedef struct REGISTRY_ENTRY
+#pragma warning(push)
+#pragma warning(disable:4324)
+
+typedef struct DECL_ALIGN(16) REGISTRY_ENTRY
 {
-    ULONG_PTR       Root;
+    HKEY            Root;
     ml::String      SubKey;
-    ml::String      Value;
+    ml::String      ValueName;
     ULONG_PTR       DataType;
     PVOID           Data;
     ULONG_PTR       DataSize;
@@ -122,7 +125,12 @@ typedef struct REGISTRY_ENTRY
         this->Data = nullptr;
     }
 
+private:
+    REGISTRY_ENTRY(const REGISTRY_ENTRY&);
+
 } REGISTRY_ENTRY, *PREGISTRY_ENTRY;
+
+#pragma warning(pop)
 
 typedef struct
 {
@@ -298,7 +306,7 @@ OpenOrCreateLePeb(
     return LePeb;
 }
 
-#define ENABLE_LOG 1
+#define ENABLE_LOG 0
 
 #if ENABLE_LOG
 
@@ -462,6 +470,7 @@ public:
 
     NTSTATUS Initialize();
     NTSTATUS UnInitialize();
+    NTSTATUS InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Entry64, ULONG_PTR Count, PVOID BaseAddress);
 
     VOID DllNotification(ULONG NotificationReason, PCLDR_DLL_NOTIFICATION_DATA NotificationData);
     VOID HookModule(PVOID DllBase, PCUNICODE_STRING DllName, BOOL DllLoad);

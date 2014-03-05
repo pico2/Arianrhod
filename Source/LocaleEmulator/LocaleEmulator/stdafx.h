@@ -4,6 +4,7 @@
 #include "MyLibrary.h"
 #include <CommCtrl.h>
 #include "LocaleEmulator.h"
+#include "NtdllHook.h"
 #include "User32Hook.h"
 #include "Gdi32Hook.h"
 #include "Runtime.h"

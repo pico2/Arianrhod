@@ -214,15 +214,16 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         BYTE buf[0x200];
     };
 
-    OBJECT_ATTRIBUTES oa;
-    HANDLE k;
+    Reg::GetKeyValue(
+        HKEY_LOCAL_MACHINE,
+        L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
+        L"ACP",
+        KeyValueFullInformation,
+        &value,
+        sizeof(value)
+    );
 
-    UNICODE_STRING name = USTR(L"\\REGISTRY\\MACHINE\\SOFTWARE\\Classes\\._sln");
-
-    InitializeObjectAttributes(&oa, &name, OBJ_CASE_INSENSITIVE, nullptr, nullptr);
-    NtOpenKey(&k, KEY_ALL_ACCESS, &oa);
-
-    Reg::GetKeyValue(HKEY_CLASSES_ROOT, L"._sln", nullptr, KeyValueFullInformation, &value, sizeof(buf));
+    PrintConsole(L"%*s\n", value.DataLength / sizeof(WCHAR), PtrAdd(&value, value.DataOffset));
 
     return;
 
