@@ -288,6 +288,8 @@ OpenOrCreateLePeb(
     {
         HANDLE ProcessHandle;
 
+        ZeroMemory(LePeb, ViewSize);
+
         Status = PidToHandleEx(&ProcessHandle, ProcessId);
         FAIL_BREAK(Status);
 

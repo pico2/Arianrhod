@@ -565,21 +565,21 @@ LeNtQueryValueKey(
     {
         union
         {
-            PVOID                           Information;
-            PKEY_VALUE_BASIC_INFORMATION    BasicInformation;
-            PKEY_VALUE_FULL_INFORMATION     FullInformation;
-            PKEY_VALUE_PARTIAL_INFORMATION  PartialInformation;
+            PVOID                                   Information;
+            PKEY_VALUE_BASIC_INFORMATION            BasicInformation;
+            PKEY_VALUE_FULL_INFORMATION             FullInformation;
+            PKEY_VALUE_PARTIAL_INFORMATION          PartialInformation;
+            PKEY_VALUE_PARTIAL_INFORMATION_ALIGN64  PartialInformationAlign64;
         };
 
-        ULONG_PTR Aligned, Offset, DataSize, RequiredLength, MinimumSize;
-        PVOID LocalBuffer;
+        ULONG_PTR   Alignment, DataLength, DataOffset, RequiredLength, MinimumSize;
+        PVOID       LocalBuffer;
 
-        DataSize = Entry->Redirected.DataSize;
-        RequiredLength = 0;
-        Information = nullptr;
-
-        Offset = ROUND_UP((ULONG_PTR)Information, sizeof(ULONG_PTR)) - (ULONG_PTR)Information;
-        Aligned = Offset > Length ? 0 : (Length - Offset);
+        Alignment       = sizeof(ULONG_PTR);
+        DataOffset      = 0;
+        DataLength      = Entry->Redirected.DataSize;
+        RequiredLength  = 0;
+        Information     = nullptr;
 
         switch (KeyValueInformationClass)
         {
@@ -590,72 +590,108 @@ LeNtQueryValueKey(
                 goto REDIRECT_ONLY;
 
             case KeyValueFullInformationAlign64:
-                Offset = ROUND_UP((ULONG_PTR)Information, sizeof(ULONG64)) - (ULONG_PTR)Information;
-                Aligned = Offset > Length ? 0 : Length - Offset;
+                Alignment = sizeof(ULONG64);
                 NO_BREAK;
 
             case KeyValueFullInformation:
-                MinimumSize = FIELD_OFFSET(KEY_VALUE_FULL_INFORMATION, Name);
-                RequiredLength = MinimumSize + Entry->Redirected.ValueName.GetCount() + DataSize;
-                RequiredLength = ROUND_UP(RequiredLength, KeyValueInformationClass == KeyValueFullInformationAlign64 ? sizeof(ULONG64) : sizeof(ULONG));
-                if (KeyValueInformation == nullptr || Aligned < MinimumSize)
+                Alignment = sizeof(ULONG64);
+
+                MinimumSize     = FIELD_OFFSET(KEY_VALUE_FULL_INFORMATION, Name);
+                RequiredLength  = MinimumSize + Entry->Redirected.ValueName.GetSize();
+                RequiredLength  = ROUND_UP(RequiredLength, Alignment);
+                DataOffset      = RequiredLength;
+                RequiredLength += DataLength;
+                RequiredLength  = ROUND_UP(RequiredLength, sizeof(ULONG));
+
+                if (KeyValueInformation == nullptr || Length < MinimumSize)
                     break;
 
-                Information = AllocateMemoryP(RequiredLength);
-                if (Information == nullptr)
-                    return STATUS_NO_MEMORY;
+                if (Length < RequiredLength)
+                {
+                    Information = AllocateMemoryP(RequiredLength);
+                    if (Information == nullptr)
+                        return STATUS_NO_MEMORY;
+                }
+                else
+                {
+                    Information = KeyValueInformation;
+                }
 
                 FullInformation->TitleIndex = 0;
-                FullInformation->Type = Entry->Redirected.DataType;
+                FullInformation->Type       = Entry->Redirected.DataType;
                 FullInformation->NameLength = Entry->Redirected.ValueName.GetSize() + sizeof(WCHAR);
-                FullInformation->DataOffset = MinimumSize + FullInformation->NameLength;
-                FullInformation->DataLength = DataSize;
+                FullInformation->DataOffset = DataOffset;
+                FullInformation->DataLength = DataLength;
 
                 CopyMemory(FullInformation->Name, (PWSTR)Entry->Redirected.ValueName, FullInformation->NameLength);
-                CopyMemory(PtrAdd(FullInformation, FullInformation->DataOffset), Entry->Redirected.Data, FullInformation->DataLength);
-                CopyMemory(KeyValueInformation, FullInformation, ML_MIN(RequiredLength, Aligned));
-
+                CopyMemory(PtrAdd(FullInformation, DataOffset), Entry->Redirected.Data, DataLength);
                 break;
 
             case KeyValuePartialInformationAlign64:
-                Offset = ROUND_UP((ULONG_PTR)Information, sizeof(ULONG64)) - (ULONG_PTR)Information;
-                Aligned = Offset > Length ? 0 : Length - Offset;
-                NO_BREAK;
+                Alignment = sizeof(ULONG64);
+
+                MinimumSize = FIELD_OFFSET(KEY_VALUE_PARTIAL_INFORMATION_ALIGN64, Data);
+                RequiredLength = MinimumSize + DataLength;
+                RequiredLength = ROUND_UP(RequiredLength, Alignment);
+                if (KeyValueInformation == nullptr || Length < MinimumSize)
+                    break;
+
+                if (Length < RequiredLength)
+                {
+                    Information = AllocateMemoryP(RequiredLength);
+                    if (Information == nullptr)
+                        return STATUS_NO_MEMORY;
+                }
+                else
+                {
+                    Information = KeyValueInformation;
+                }
+
+                PartialInformationAlign64->Type = Entry->Redirected.DataType;
+                PartialInformationAlign64->DataLength = DataLength;
+
+                CopyMemory(PartialInformationAlign64->Data, Entry->Redirected.Data, DataLength);
+                break;
 
             case KeyValuePartialInformation:
                 MinimumSize = FIELD_OFFSET(KEY_VALUE_PARTIAL_INFORMATION, Data);
-                RequiredLength = MinimumSize + DataSize;
-                RequiredLength = ROUND_UP(RequiredLength, KeyValueInformationClass == KeyValuePartialInformation ? sizeof(ULONG64) : sizeof(ULONG));
-                if (KeyValueInformation == nullptr || Aligned < MinimumSize)
+                RequiredLength = MinimumSize + DataLength;
+                RequiredLength = ROUND_UP(RequiredLength, Alignment);
+                if (KeyValueInformation == nullptr || Length < MinimumSize)
                     break;
 
-                Information = AllocateMemoryP(RequiredLength);
-                if (Information == nullptr)
-                    return STATUS_NO_MEMORY;
+                if (Length < RequiredLength)
+                {
+                    Information = AllocateMemoryP(RequiredLength);
+                    if (Information == nullptr)
+                        return STATUS_NO_MEMORY;
+                }
+                else
+                {
+                    Information = KeyValueInformation;
+                }
 
-                Information = AllocateMemoryP(RequiredLength);
-                if (Information == nullptr)
-                    return STATUS_NO_MEMORY;
+                PartialInformation->TitleIndex  = 0;
+                PartialInformation->Type        = Entry->Redirected.DataType;
+                PartialInformation->DataLength  = DataLength;
 
-                PartialInformation->TitleIndex = 0;
-                PartialInformation->Type = Entry->Redirected.DataType;
-                PartialInformation->DataLength = DataSize;
-
-                CopyMemory(PartialInformation->Data, Entry->Redirected.Data, PartialInformation->DataLength);
-                CopyMemory(KeyValueInformation, PartialInformation, ML_MIN(RequiredLength, Aligned));
-
+                CopyMemory(PartialInformation->Data, Entry->Redirected.Data, DataLength);
                 break;
         }
 
-        FreeMemoryP(Information);
+        if (Information != nullptr && Information != KeyValueInformation)
+        {
+            CopyMemory(KeyValueInformation, Information, ML_MIN(RequiredLength, Length));
+            FreeMemoryP(Information);
+        }
 
         if (ResultLength != nullptr)
             *ResultLength = RequiredLength;
 
-        if (Aligned < MinimumSize)
+        if (Length < MinimumSize)
             return STATUS_BUFFER_TOO_SMALL;
 
-        if (Aligned < RequiredLength)
+        if (Length < RequiredLength)
             return STATUS_BUFFER_OVERFLOW;
 
         return STATUS_SUCCESS;

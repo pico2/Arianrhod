@@ -213,7 +213,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     struct
     {
-        BYTE by;
+        BYTE by[1];
         KEY_VALUE_FULL_INFORMATION value;
         BYTE buf[0x200];
     } u;
@@ -221,18 +221,17 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     int start = 6;
     PrintConsole(L"%d\n", ROUND_UP(6, 16));
 
-    u.by = GetRandom32();
-
     Reg::GetKeyValue(
         HKEY_LOCAL_MACHINE,
         L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
-        L"ACP",
-        KeyValueFullInformation,
+        L"OEMCP",
+        KeyValuePartialInformationAlign64,
         &u.value,
         sizeof(u.buf)
     );
 
     PrintConsole(L"%*s\n", u.value.DataLength / sizeof(WCHAR), PtrAdd(&u.value, u.value.DataOffset));
+    PauseConsole();
 
     return;
 
