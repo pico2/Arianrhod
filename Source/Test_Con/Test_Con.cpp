@@ -208,22 +208,31 @@ int CDECL close3(int n)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    union
+
+#pragma pack(1)
+
+    struct
     {
+        BYTE by;
         KEY_VALUE_FULL_INFORMATION value;
         BYTE buf[0x200];
-    };
+    } u;
+
+    int start = 6;
+    PrintConsole(L"%d\n", ROUND_UP(6, 16));
+
+    u.by = GetRandom32();
 
     Reg::GetKeyValue(
         HKEY_LOCAL_MACHINE,
         L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
         L"ACP",
         KeyValueFullInformation,
-        &value,
-        sizeof(value)
+        &u.value,
+        sizeof(u.buf)
     );
 
-    PrintConsole(L"%*s\n", value.DataLength / sizeof(WCHAR), PtrAdd(&value, value.DataOffset));
+    PrintConsole(L"%*s\n", u.value.DataLength / sizeof(WCHAR), PtrAdd(&u.value, u.value.DataOffset));
 
     return;
 
