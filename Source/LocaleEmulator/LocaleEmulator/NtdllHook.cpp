@@ -132,8 +132,6 @@ NoInline PVOID FASTCALL LoadSelfAsFirstDll(PVOID ReturnAddress)
         if (LePeb == nullptr)
             break;
 
-        // LePeb->SelfShadowToFree = &__ImageBase;
-
         WriteProtectMemory(CurrentProcess, LePeb->LdrLoadDllAddress, LePeb->LdrLoadDllBackup, LePeb->LdrLoadDllBackupSize);
 
         UNICODE_STRING DllPath;
@@ -318,15 +316,15 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
         return Status;
     }
 
-    ExtraSize = this->GetLePeb()->RegistryRedirectionEntry.GetSize() * sizeof(TargetLePeb->Leb.RegistryReplacement[0]);
+    ExtraSize = this->RegistryRedirectionEntry.GetSize() * sizeof(TargetLePeb->Leb.RegistryReplacement[0]);
     if (ExtraSize != 0)
     {
         PREGISTRY_REDIRECTION_ENTRY Entry;
-        FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryRedirectionEntry)
+        FOR_EACH_VEC(Entry, this->RegistryRedirectionEntry)
         {
             ExtraSize += Entry->Original.DataSize + Entry->Redirected.DataSize;
-            ExtraSize += Entry->Original.SubKey.GetSize() + Entry->Redirected.SubKey.GetSize();
-            ExtraSize += Entry->Original.ValueName.GetSize() + Entry->Redirected.ValueName.GetSize();
+            ExtraSize += 2 * sizeof(WCHAR) + Entry->Original.SubKey.GetSize()    + Entry->Redirected.SubKey.GetSize();
+            ExtraSize += 2 * sizeof(WCHAR) + Entry->Original.ValueName.GetSize() + Entry->Redirected.ValueName.GetSize();
         }
     }
 
@@ -339,6 +337,64 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     TargetLePeb->Section = Section;
     CopyStruct(TargetLePeb->LdrLoadDllBackup, Backup, LDR_LOAD_DLL_BACKUP_SIZE);
     TargetLePeb->LdrLoadDllBackupSize = LDR_LOAD_DLL_BACKUP_SIZE;
+
+    if (ExtraSize != 0)
+    {
+        ULONG_PTR                       Length;
+        PBYTE                           Buffer;
+        PREGISTRY_REDIRECTION_ENTRY     Entry;
+        PREGISTRY_REDIRECTION_ENTRY64   Entry64;
+
+        TargetLePeb->Leb.NumberOfRegistryReplacementEntry = this->RegistryRedirectionEntry.GetSize();
+        Entry64 = &TargetLePeb->Leb.RegistryReplacement[0];
+        Buffer = (PBYTE)(Entry64 + TargetLePeb->Leb.NumberOfRegistryReplacementEntry);
+
+        auto StringToUnicode64 = [&] (UNICODE_STRING64& ustr64, ml::String& str)
+        {
+            ULONG_PTR Length;
+
+            Length = (USHORT)str.GetSize();
+
+            ustr64.Length         = (USHORT)Length;
+            ustr64.MaximumLength  = (USHORT)Length;
+            ustr64.Dummy          = PtrOffset(Buffer, &TargetLePeb->Leb);
+
+            CopyMemory(Buffer, (PWSTR)str, Length);
+            Buffer += Length;
+            *Buffer++ = 0;
+            *Buffer++ = 0;
+        };
+
+        FOR_EACH_VEC(Entry, this->RegistryRedirectionEntry)
+        {
+            Entry64->Original.Root      = (ULONG64)Entry->Original.Root;
+            Entry64->Original.DataType  = Entry->Original.DataType;
+            Entry64->Original.Data      = nullptr;
+            Entry64->Original.DataSize  = 0;
+
+            StringToUnicode64(Entry64->Original.SubKey, Entry->Original.SubKey);
+            StringToUnicode64(Entry64->Original.ValueName, Entry->Original.ValueName);
+
+            Entry64->Redirected.Root      = (ULONG64)Entry->Redirected.Root;
+            Entry64->Redirected.DataType  = Entry->Redirected.DataType;
+            Entry64->Redirected.Data      = nullptr;
+            Entry64->Redirected.DataSize  = 0;
+
+            StringToUnicode64(Entry64->Redirected.SubKey, Entry->Redirected.SubKey);
+            StringToUnicode64(Entry64->Redirected.ValueName, Entry->Redirected.ValueName);
+
+            if (Entry->Redirected.Data != nullptr && Entry->Redirected.DataSize != 0)
+            {
+                Length = Entry->Redirected.DataSize;
+                Entry64->Redirected.Data = (PVOID)PtrOffset(Buffer, &TargetLePeb->Leb);
+                Entry64->Redirected.DataSize = Length;
+                CopyMemory(Buffer, Entry->Redirected.Data, Length);
+                Buffer += Length;
+            }
+
+            ++Entry64;
+        }
+    }
 
     CloseLePeb(TargetLePeb);
 
@@ -362,7 +418,6 @@ LeNtCreateUserProcess(
     PPS_ATTRIBUTE_LIST              AttributeList
 )
 {
-    PLEPEB              TargetLePeb;
     NTSTATUS            Status, Status2;
     PLeGlobalData       GlobalData;
     PPS_ATTRIBUTE_LIST  LocalAttributeList;
@@ -515,7 +570,7 @@ LookupRegistryRedirectionEntry(
 
     Status = STATUS_NOT_FOUND;
 
-    FOR_EACH_VEC(Entry, this->GetLePeb()->RegistryRedirectionEntry)
+    FOR_EACH_VEC(Entry, this->RegistryRedirectionEntry)
     {
         if (ValueName != nullptr && RtlEqualUnicodeString(Entry->Original.ValueName, ValueName, TRUE) == FALSE)
             continue;
@@ -606,16 +661,7 @@ LeNtQueryValueKey(
                 if (KeyValueInformation == nullptr || Length < MinimumSize)
                     break;
 
-                if (Length < RequiredLength)
-                {
-                    Information = AllocateMemoryP(RequiredLength);
-                    if (Information == nullptr)
-                        return STATUS_NO_MEMORY;
-                }
-                else
-                {
-                    Information = KeyValueInformation;
-                }
+                Information = Length < RequiredLength ? AllocStack(RequiredLength) : KeyValueInformation;
 
                 FullInformation->TitleIndex = 0;
                 FullInformation->Type       = Entry->Redirected.DataType;
@@ -636,16 +682,7 @@ LeNtQueryValueKey(
                 if (KeyValueInformation == nullptr || Length < MinimumSize)
                     break;
 
-                if (Length < RequiredLength)
-                {
-                    Information = AllocateMemoryP(RequiredLength);
-                    if (Information == nullptr)
-                        return STATUS_NO_MEMORY;
-                }
-                else
-                {
-                    Information = KeyValueInformation;
-                }
+                Information = Length < RequiredLength ? AllocStack(RequiredLength) : KeyValueInformation;
 
                 PartialInformationAlign64->Type = Entry->Redirected.DataType;
                 PartialInformationAlign64->DataLength = DataLength;
@@ -660,16 +697,7 @@ LeNtQueryValueKey(
                 if (KeyValueInformation == nullptr || Length < MinimumSize)
                     break;
 
-                if (Length < RequiredLength)
-                {
-                    Information = AllocateMemoryP(RequiredLength);
-                    if (Information == nullptr)
-                        return STATUS_NO_MEMORY;
-                }
-                else
-                {
-                    Information = KeyValueInformation;
-                }
+                Information = Length < RequiredLength ? AllocStack(RequiredLength) : KeyValueInformation;
 
                 PartialInformation->TitleIndex  = 0;
                 PartialInformation->Type        = Entry->Redirected.DataType;
@@ -682,11 +710,13 @@ LeNtQueryValueKey(
         if (Information != nullptr && Information != KeyValueInformation)
         {
             CopyMemory(KeyValueInformation, Information, ML_MIN(RequiredLength, Length));
-            FreeMemoryP(Information);
         }
 
         if (ResultLength != nullptr)
             *ResultLength = RequiredLength;
+
+        if (KeyValueInformation == nullptr)
+            return STATUS_ACCESS_VIOLATION;
 
         if (Length < MinimumSize)
             return STATUS_BUFFER_TOO_SMALL;
@@ -731,15 +761,8 @@ LeNtQueryDefaultLocale(
 {
     HpSetFilterAction(BlockSystemCall);
 
-    SEH_TRY
-    {
-        *DefaultLocaleId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
-        return STATUS_SUCCESS;
-    }
-    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
-    {
-        return GetExceptionCode();
-    }
+    *DefaultLocaleId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS
@@ -751,15 +774,8 @@ LeNtQueryDefaultUILanguage(
 {
     HpSetFilterAction(BlockSystemCall);
 
-    SEH_TRY
-    {
-        *DefaultUILanguageId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
-        return STATUS_SUCCESS;
-    }
-    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
-    {
-        return GetExceptionCode();
-    }
+    *DefaultUILanguageId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS
@@ -771,15 +787,8 @@ LeNtQueryInstallUILanguage(
 {
     HpSetFilterAction(BlockSystemCall);
 
-    SEH_TRY
-    {
-        *InstallUILanguageId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
-        return STATUS_SUCCESS;
-    }
-    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
-    {
-        return GetExceptionCode();
-    }
+    *InstallUILanguageId = ((PLeGlobalData)HpGetFilterContext())->GetLeb()->LocaleID;
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS NTAPI LeLdrInitNtContinue(PCONTEXT Context, BOOLEAN TestAlert)
@@ -835,7 +844,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     if (LdrInitNtContinue == nullptr)
         return STATUS_NOT_SUPPORTED;
 
-    if (this->GetLePeb()->RegistryRedirectionEntry.GetSize() != 0)
+    if (this->RegistryRedirectionEntry.GetSize() != 0)
     {
         ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
     }

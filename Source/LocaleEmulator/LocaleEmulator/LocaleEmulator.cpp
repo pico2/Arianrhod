@@ -174,7 +174,7 @@ NTSTATUS LeGlobalData::Initialize()
     else
     {
         *GetLePeb() = *LePeb;
-        Status = this->InitRegistryRedirection(LePeb->Leb.RegistryReplacement, LePeb->Leb.NumberOfRegistryReplacementEntry, LePeb);
+        Status = this->InitRegistryRedirection(LePeb->Leb.RegistryReplacement, LePeb->Leb.NumberOfRegistryReplacementEntry, &LePeb->Leb);
 
         NtClose(LePeb->Section);
         CloseLePeb(LePeb);
@@ -323,16 +323,16 @@ NTSTATUS LeGlobalData::InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Ent
             }
         }
 
-        LePeb->RegistryRedirectionEntry.Add(LocalEntry);
-        LastIndex = LePeb->RegistryRedirectionEntry.GetSize() - 1;
-        Entry = &LePeb->RegistryRedirectionEntry[LastIndex];
+        this->RegistryRedirectionEntry.Add(LocalEntry);
+        LastIndex = this->RegistryRedirectionEntry.GetSize() - 1;
+        Entry = &this->RegistryRedirectionEntry[LastIndex];
 
         Status = QueryRegKeyFullPath(OriginalKey, &KeyFullPath);
         Reg::CloseKeyHandle(OriginalKey);
         if (NT_FAILED(Status))
         {
             Reg::CloseKeyHandle(RedirectedKey);
-            LePeb->RegistryRedirectionEntry.Remove(LastIndex);
+            this->RegistryRedirectionEntry.Remove(LastIndex);
             continue;
         }
 
@@ -345,7 +345,7 @@ NTSTATUS LeGlobalData::InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Ent
             Reg::CloseKeyHandle(RedirectedKey);
             if (NT_FAILED(Status))
             {
-                LePeb->RegistryRedirectionEntry.Remove(LastIndex);
+                this->RegistryRedirectionEntry.Remove(LastIndex);
                 continue;
             }
 
@@ -355,15 +355,16 @@ NTSTATUS LeGlobalData::InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Ent
 
         Entry->Original.Root        = (HKEY)Entry64->Original.Root;
         Entry->Original.SubKey      = USTR64ToUSTR(Entry64->Original.SubKey);
-        Entry->Original.ValueName       = USTR64ToUSTR(Entry64->Original.ValueName);
+        Entry->Original.ValueName   = USTR64ToUSTR(Entry64->Original.ValueName);
         Entry->Original.DataType    = Entry64->Original.DataType;
         Entry->Original.Data        = nullptr;
         Entry->Original.DataSize    = 0;
 
         Entry->Redirected.Root      = (HKEY)Entry64->Redirected.Root;
         Entry->Redirected.SubKey    = USTR64ToUSTR(Entry64->Redirected.SubKey);
-        Entry->Redirected.ValueName     = USTR64ToUSTR(Entry64->Redirected.ValueName);
+        Entry->Redirected.ValueName = USTR64ToUSTR(Entry64->Redirected.ValueName);
         Entry->Redirected.DataType  = Entry64->Redirected.DataType;
+        Entry->Redirected.DataSize  = 0;
 
         if (Entry64->Redirected.Data != nullptr && Entry64->Redirected.DataSize != 0)
         {
@@ -371,7 +372,7 @@ NTSTATUS LeGlobalData::InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Ent
             Entry->Redirected.Data = AllocateMemoryP(Entry->Redirected.DataSize);
             if (Entry->Redirected.Data == nullptr)
             {
-                LePeb->RegistryRedirectionEntry.Remove(LastIndex);
+                this->RegistryRedirectionEntry.Remove(LastIndex);
                 continue;
             }
 

@@ -141,7 +141,6 @@ typedef struct
 
 typedef struct
 {
-    LEB         Leb;
     ULONG_PTR   OriginalCharset;
     CHAR        ScriptNameA[LF_FACESIZE];
     WCHAR       ScriptNameW[LF_FACESIZE];
@@ -150,10 +149,8 @@ typedef struct
     PVOID       LdrLoadDllAddress;
     ULONG_PTR   LdrLoadDllBackupSize;
     BYTE        LdrLoadDllBackup[16];
-    PVOID       SelfShadowToFree;
     WCHAR       LeDllFullPath[MAX_NTPATH];
-
-    ml::GrowableArray<REGISTRY_REDIRECTION_ENTRY> RegistryRedirectionEntry;
+    LEB         Leb;
 
 } LOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_PROCESS_ENVIRONMENT_BLOCK, LEPEB, *PLEPEB;
 
@@ -328,6 +325,8 @@ protected:
     BOOLEAN Wow64 : 1;
 
     LEPEB LePeb;
+
+    ml::GrowableArray<REGISTRY_REDIRECTION_ENTRY> RegistryRedirectionEntry;
 
     PVOID CodePageMapView;
     ULONG_PTR AnsiCodePageOffset, OemCodePageOffset, UnicodeCaseTableOffset;

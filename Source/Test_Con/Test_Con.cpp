@@ -85,126 +85,6 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
-#if 1
-
-template<typename F>
-class Function;
-
-template<typename RETURN_TYPE, typename... PARAMETER_LIST>
-class Function<RETURN_TYPE(PARAMETER_LIST ...args)>
-{
-    class Invoker
-    {
-    public:
-        virtual RETURN_TYPE Invoke(PARAMETER_LIST ...args) = 0;
-    };
-
-    template<typename F>
-    class ObjectInvoker : public Invoker
-    {
-    protected:
-        F func;
-
-    public:
-        ObjectInvoker(const F& function) : func(function)
-        {
-        }
-
-        RETURN_TYPE Invoke(PARAMETER_LIST ...args)
-        {
-            return func(args...);
-        }
-    };
-
-    template<typename F, typename C>
-    class MethodInvoker : public Invoker
-    {
-    protected:
-        F func;
-        C *obj;
-
-    public:
-        MethodInvoker(const F& function, C *object) : func(function), obj(object)
-        {
-        }
-
-        RETURN_TYPE Invoke(PARAMETER_LIST ...args)
-        {
-            return (obj->*func)(args...);
-        }
-    };
-
-    Invoker *invoker;
-
-public:
-
-    typedef RETURN_TYPE(          *FunctionCType)(PARAMETER_LIST ...args);
-    typedef RETURN_TYPE(CDECL     *FunctionCType_CDECL)(PARAMETER_LIST ...args);
-    typedef RETURN_TYPE(STDCALL   *FunctionCType_STDCALL)(PARAMETER_LIST ...args);
-
-#if !CPP_CLI_DEFINED
-
-    typedef RETURN_TYPE(FASTCALL  *FunctionCType_FASTCALL)(PARAMETER_LIST ...args);
-
-#endif
-
-    Function()
-    {
-        invoker = NULL;
-    }
-
-    ~Function()
-    {
-        delete invoker;
-    }
-
-    Function(RETURN_TYPE(*func)(PARAMETER_LIST ...args))
-    {
-        *this = func;
-    }
-
-    template<typename F>
-    Function(const F &func)
-    {
-        *this = func;
-    }
-
-    template<typename F, typename C>
-    Function(const F &func, C *object)
-    {
-        invoker = new MethodInvoker<F, C>(func, object);
-    }
-
-    template<typename F>
-    Function<RETURN_TYPE(PARAMETER_LIST ...args)>& operator=(const F &func)
-    {
-        invoker = new ObjectInvoker<F>(func);
-        return *this;
-    }
-
-    RETURN_TYPE operator()(PARAMETER_LIST ...args)
-    {
-        return invoker->Invoke(args...);
-    }
-};
-
-#endif
-
-int FASTCALL close1(int n)
-{
-    return 0;
-}
-
-int STDCALL close2(int n)
-{
-    return 0;
-}
-
-int CDECL close3(int n)
-{
-    return 0;
-}
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
@@ -223,9 +103,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     Reg::GetKeyValue(
         HKEY_LOCAL_MACHINE,
-        L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
-        L"OEMCP",
-        KeyValuePartialInformationAlign64,
+        L"System\\CurrentControlSet\\Control\\Nls\\Language",
+        L"Default",
+        KeyValueFullInformationAlign64,
         &u.value,
         sizeof(u.buf)
     );
