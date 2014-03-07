@@ -345,9 +345,9 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
         PREGISTRY_REDIRECTION_ENTRY     Entry;
         PREGISTRY_REDIRECTION_ENTRY64   Entry64;
 
-        TargetLePeb->Leb.NumberOfRegistryReplacementEntry = this->RegistryRedirectionEntry.GetSize();
+        TargetLePeb->Leb.NumberOfRegistryRedirectionEntries = this->RegistryRedirectionEntry.GetSize();
         Entry64 = &TargetLePeb->Leb.RegistryReplacement[0];
-        Buffer = (PBYTE)(Entry64 + TargetLePeb->Leb.NumberOfRegistryReplacementEntry);
+        Buffer = (PBYTE)(Entry64 + TargetLePeb->Leb.NumberOfRegistryRedirectionEntries);
 
         auto StringToUnicode64 = [&] (UNICODE_STRING64& ustr64, ml::String& str)
         {

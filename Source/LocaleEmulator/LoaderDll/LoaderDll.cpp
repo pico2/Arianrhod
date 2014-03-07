@@ -69,12 +69,12 @@ LeCreateProcess(
         PVOID       MaximumAddress;
         PREGISTRY_REDIRECTION_ENTRY64 Entry64;
 
-        ExtraSize = Leb->NumberOfRegistryReplacementEntry * sizeof(Leb->RegistryReplacement[0]);
+        ExtraSize = Leb->NumberOfRegistryRedirectionEntries * sizeof(Leb->RegistryReplacement[0]);
 
         if (ExtraSize != 0)
         {
-            MaximumAddress = Leb->RegistryReplacement + Leb->NumberOfRegistryReplacementEntry;
-            FOR_EACH(Entry64, Leb->RegistryReplacement, Leb->NumberOfRegistryReplacementEntry)
+            MaximumAddress = Leb->RegistryReplacement + Leb->NumberOfRegistryRedirectionEntries;
+            FOR_EACH(Entry64, Leb->RegistryReplacement, Leb->NumberOfRegistryRedirectionEntries)
             {
                 MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd(Entry64->Original.SubKey.Buffer,      Leb),   Entry64->Original.SubKey.MaximumLength));
                 MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd(Entry64->Original.ValueName.Buffer,   Leb),   Entry64->Original.ValueName.MaximumLength));
@@ -95,7 +95,7 @@ LeCreateProcess(
             break;
         }
 
-        CopyMemory(&LePeb->Leb, Leb, FIELD_OFFSET(LEB, NumberOfRegistryReplacementEntry) + ExtraSize);
+        CopyMemory(&LePeb->Leb, Leb, FIELD_OFFSET(LEB, NumberOfRegistryRedirectionEntries) + ExtraSize);
     }
 
     CloseLePeb(LePeb);

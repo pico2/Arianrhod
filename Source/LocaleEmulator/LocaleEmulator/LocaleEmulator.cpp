@@ -174,7 +174,7 @@ NTSTATUS LeGlobalData::Initialize()
     else
     {
         *GetLePeb() = *LePeb;
-        Status = this->InitRegistryRedirection(LePeb->Leb.RegistryReplacement, LePeb->Leb.NumberOfRegistryReplacementEntry, &LePeb->Leb);
+        Status = this->InitRegistryRedirection(LePeb->Leb.RegistryReplacement, LePeb->Leb.NumberOfRegistryRedirectionEntries, &LePeb->Leb);
 
         NtClose(LePeb->Section);
         CloseLePeb(LePeb);

@@ -94,7 +94,7 @@ typedef struct
     ULONG                           DefaultCharset;
     WCHAR                           DefaultFaceName[LF_FACESIZE];
     RTL_TIME_ZONE_INFORMATION       Timezone;
-    ULONG                           NumberOfRegistryReplacementEntry;
+    ULONG                           NumberOfRegistryRedirectionEntries;
     REGISTRY_REDIRECTION_ENTRY64    RegistryReplacement[1];
 
 } LOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, *PLOCALE_ENUMLATOR_ENVIRONMENT_BLOCK, LEB, *PLEB;
