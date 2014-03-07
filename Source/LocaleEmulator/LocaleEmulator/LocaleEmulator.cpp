@@ -364,6 +364,7 @@ NTSTATUS LeGlobalData::InitRegistryRedirection(PREGISTRY_REDIRECTION_ENTRY64 Ent
         Entry->Redirected.SubKey    = USTR64ToUSTR(Entry64->Redirected.SubKey);
         Entry->Redirected.ValueName = USTR64ToUSTR(Entry64->Redirected.ValueName);
         Entry->Redirected.DataType  = Entry64->Redirected.DataType;
+        Entry->Redirected.Data      = nullptr;
         Entry->Redirected.DataSize  = 0;
 
         if (Entry64->Redirected.Data != nullptr && Entry64->Redirected.DataSize != 0)

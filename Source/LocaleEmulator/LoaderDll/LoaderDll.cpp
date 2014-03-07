@@ -65,33 +65,37 @@ LeCreateProcess(
         if (Leb == nullptr)
             break;
 
-        LePeb = OpenOrCreateLePeb(ProcessInfo.dwProcessId, TRUE);
+        ULONG_PTR   ExtraSize;
+        PVOID       MaximumAddress;
+        PREGISTRY_REDIRECTION_ENTRY64 Entry64;
+
+        ExtraSize = Leb->NumberOfRegistryReplacementEntry * sizeof(Leb->RegistryReplacement[0]);
+
+        if (ExtraSize != 0)
+        {
+            MaximumAddress = Leb->RegistryReplacement + Leb->NumberOfRegistryReplacementEntry;
+            FOR_EACH(Entry64, Leb->RegistryReplacement, Leb->NumberOfRegistryReplacementEntry)
+            {
+                MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd(Entry64->Original.SubKey.Buffer,      Leb),   Entry64->Original.SubKey.MaximumLength));
+                MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd(Entry64->Original.ValueName.Buffer,   Leb),   Entry64->Original.ValueName.MaximumLength));
+                MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd((PVOID)Entry64->Original.Data,        Leb),   Entry64->Original.DataSize));
+
+                MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd(Entry64->Redirected.SubKey.Buffer,    Leb),   Entry64->Redirected.SubKey.MaximumLength));
+                MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd(Entry64->Redirected.ValueName.Buffer, Leb),   Entry64->Redirected.ValueName.MaximumLength));
+                MaximumAddress = ML_MAX(MaximumAddress, PtrAdd(PtrAdd((PVOID)Entry64->Redirected.Data,      Leb),   Entry64->Redirected.DataSize));
+            }
+
+            ExtraSize += PtrOffset(MaximumAddress, Leb);
+        }
+
+        LePeb = OpenOrCreateLePeb(ProcessInfo.dwProcessId, TRUE, ExtraSize);
         if (LePeb == nullptr)
         {
             Status = STATUS_NONE_MAPPED;
             break;
         }
 
-        LePeb->Leb = *Leb;
-
-        /*
-
-        if (Leb != NULL)
-        {
-            LePeb->Leb = *Leb;
-        }
-        else
-        {
-            InitDefaultLeb(&LePeb->Leb);
-        }
-
-        LePeb->LdrLoadDllAddress = GetCallDestination(ProcessInfo.FirstCallLdrLoadDll);
-        LePeb->LdrLoadDllBackupSize = LDR_LOAD_DLL_BACKUP_SIZE;
-        ReadMemory(ProcessInfo.hProcess, LePeb->LdrLoadDllAddress, LePeb->LdrLoadDllBackup, LDR_LOAD_DLL_BACKUP_SIZE);
-
-        StrCopyW(LePeb->LeDllFullPath, DllFullPath);
-
-        */
+        CopyMemory(&LePeb->Leb, Leb, FIELD_OFFSET(LEB, NumberOfRegistryReplacementEntry) + ExtraSize);
     }
 
     CloseLePeb(LePeb);

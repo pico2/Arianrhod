@@ -5,6 +5,8 @@
 
 #if !defined(ML_USER_MODE) && !defined(ML_KERNEL_MODE)
 
+#error stupid
+
     #if defined(__cplusplus)
         #define DEFAULT_VALUE(type, var, value) type var = value
         #define DEF_VAL(var, value)             var = value
