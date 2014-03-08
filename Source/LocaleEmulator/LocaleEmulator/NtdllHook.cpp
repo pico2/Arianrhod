@@ -396,6 +396,8 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
         }
     }
 
+    ExceptionBox(L"fuckd");
+
     CloseLePeb(TargetLePeb);
 
     return STATUS_SUCCESS;

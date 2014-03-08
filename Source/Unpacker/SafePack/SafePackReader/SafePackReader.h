@@ -12,11 +12,39 @@ typedef struct SAFE_PACK_READER_ENTRY : public UNPACKER_FILE_ENTRY_BASE
 
 interface ISafePackReader
 {
+    virtual STDCALL ~ISafePackReader() {};
+    virtual LONG STDCALL AddRef() = 0;
+    virtual LONG STDCALL Release() = 0;
+
     virtual UPK_STATUS STDCALL Read(PVOID Buffer, ULONG_PTR Size, PLARGE_INTEGER BytesRead = nullptr) = 0;
     virtual UPK_STATUS STDCALL GetSize(PLARGE_INTEGER FileSize) = 0;
     virtual UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position) = 0;
     virtual UPK_STATUS STDCALL Seek(LONG64 Offset, ULONG_PTR MoveMethod = FILE_BEGIN, PLARGE_INTEGER NewPosition = nullptr) = 0;
-    virtual UPK_STATUS STDCALL Release() = 0;
+};
+
+class SafePackReaderStreamBase : public ISafePackReader
+{
+protected:
+    LONG RefCount;
+
+public:
+    SafePackReaderStreamBase()
+    {
+        this->RefCount = 1;
+    }
+
+    virtual LONG STDCALL AddRef()
+    {
+        return ++RefCount;
+    }
+
+    virtual LONG STDCALL Release()
+    {
+        LONG Ref = --this->RefCount;
+        if (Ref == 0)
+            delete this;
+        return Ref;
+    }
 };
 
 class SafePackReaderStreamDisk : public ISafePackReader
@@ -152,17 +180,17 @@ protected:
     UPK_STATUS
     PreDecompressData(
         PSAFE_PACK_READER_ENTRY FileInfo,
-        PSAFE_PACK_BUFFER Buffer
+        PSAFE_PACK_BUFFER       Buffer
     )
     {
-        return STATUS_NOT_IMPLEMENTED;
+        return STATUS_SUCCESS;
     }
 
     UPK_STATUS
     DecompressData(
         PSAFE_PACK_READER_ENTRY FileInfo,
-        PSAFE_PACK_BUFFER SourceBuffer,
-        PSAFE_PACK_BUFFER DestinationBuffer
+        PSAFE_PACK_BUFFER       SourceBuffer,
+        PSAFE_PACK_BUFFER       DestinationBuffer
     )
     {
 
@@ -215,10 +243,10 @@ protected:
     UPK_STATUS
     PostDecompressData(
         PSAFE_PACK_READER_ENTRY FileInfo,
-        PSAFE_PACK_BUFFER Buffer
+        PSAFE_PACK_BUFFER       Buffer
     )
     {
-        return STATUS_NOT_IMPLEMENTED;
+        return STATUS_SUCCESS;
     }
 
     ULONG_PTR GetHeaderMagic()
@@ -234,6 +262,7 @@ protected:
     NtFileDisk File;
     //ml::GrowableArray<PSAFE_PACK_READER_ENTRY> LookupTable;
     CompactTrie LookupTable;
+    ml::String FileName;
 
 public:
 
@@ -248,6 +277,8 @@ public:
 
         Status = File.Open(FileName);
         FAIL_RETURN(Status);
+
+        this->FileName = FileName;
 
         Status = File.Read(&HeaderBuffer, sizeof(HeaderBuffer));
         FAIL_RETURN(Status);
@@ -421,6 +452,191 @@ public:
         return GetTopClass()->Lookup(FileName->Buffer, FileName->Length);
     }
 
+protected:
+    class PackMemoryStream : public SafePackReaderStreamBase
+    {
+    protected:
+        NtFileMemory            File;
+        BaseType*               Pack;
+        PSAFE_PACK_READER_ENTRY Entry;
+
+    public:
+        PackMemoryStream(PVOID Buffer, ULONG_PTR Size, BaseType* Pack, PSAFE_PACK_READER_ENTRY Entry, NTSTATUS &Status)
+        {
+            Status = File.Open(Buffer, Size);
+            this->Pack = Pack;
+            this->Entry = Entry;
+        }
+
+        virtual UPK_STATUS STDCALL Read(PVOID Buffer, ULONG_PTR Size, PLARGE_INTEGER BytesRead = nullptr)
+        {
+            UPK_STATUS          Status;
+            SAFE_PACK_BUFFER    DestinationBuffer;
+
+            Status = this->File.Read(Buffer, Size, BytesRead);
+            FAIL_RETURN(Status);
+
+            DestinationBuffer.Initialize(Buffer, 0, BytesRead->QuadPart, this->File.GetPosition32());
+            //Status = this->Pack->PreDecompressData(this->Entry, &DestinationBuffer);
+            //Status = this->Pack->PostDecompressData(this->Entry, &DestinationBuffer);
+
+            return Status;
+        }
+
+        virtual UPK_STATUS STDCALL GetSize(PLARGE_INTEGER FileSize)
+        {
+            FileSize->QuadPart = this->File.GetSize64();
+            return STATUS_SUCCESS;
+        }
+
+        virtual UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position)
+        {
+            Position->QuadPart = this->File.GetPosition32();
+            return STATUS_SUCCESS;
+        }
+
+        virtual UPK_STATUS STDCALL Seek(LONG64 Offset, ULONG_PTR MoveMethod = FILE_BEGIN, PLARGE_INTEGER NewPosition = nullptr)
+        {
+            return this->File.Seek(Offset, MoveMethod, NewPosition);
+        }
+    };
+
+    class PackFileStream : public SafePackReaderStreamBase
+    {
+    protected:
+        NtFileDisk              File;
+        BaseType*               Pack;
+        PSAFE_PACK_READER_ENTRY Entry;
+
+    public:
+        PackFileStream(PCWSTR FileName, BaseType* Pack, PSAFE_PACK_READER_ENTRY Entry, NTSTATUS &Status)
+        {
+            Status = this->File.Open(FileName);
+            Status = NT_SUCCESS(Status) && this->File.Seek(Entry->Offset, FILE_BEGIN);
+            this->Pack = Pack;
+            this->Entry = Entry;
+        }
+
+        virtual UPK_STATUS STDCALL Read(PVOID Buffer, ULONG_PTR Size, PLARGE_INTEGER BytesRead = nullptr)
+        {
+            UPK_STATUS          Status;
+            LARGE_INTEGER       Position, LocalBytesRead;
+            SAFE_PACK_BUFFER    DestinationBuffer;
+
+            Status = this->GetPosition(&Position);
+            FAIL_RETURN(Status);
+
+            Size = ML_MIN(Size, this->Entry->Size.QuadPart - Position.QuadPart);
+
+            Status = this->File.Read(Buffer, Size, &LocalBytesRead);
+            FAIL_RETURN(Status);
+
+            if (BytesRead != nullptr)
+                BytesRead->QuadPart = LocalBytesRead.QuadPart;
+
+            DestinationBuffer.Initialize(Buffer, 0, LocalBytesRead.QuadPart, Position.QuadPart);
+            Status = this->Pack->PreDecompressData(this->Entry, &DestinationBuffer);
+            Status = this->Pack->PostDecompressData(this->Entry, &DestinationBuffer);
+
+            return Status;
+        }
+
+        virtual UPK_STATUS STDCALL GetSize(PLARGE_INTEGER FileSize)
+        {
+            FileSize->QuadPart = this->Entry->Size.QuadPart;
+            return STATUS_SUCCESS;
+        }
+
+        virtual UPK_STATUS STDCALL GetPosition(PLARGE_INTEGER Position)
+        {
+            Position->QuadPart = this->File.GetCurrentPos64() - this->Entry->Offset.QuadPart;
+            return STATUS_SUCCESS;
+        }
+
+        virtual UPK_STATUS STDCALL Seek(LONG64 Offset, ULONG_PTR MoveMethod = FILE_BEGIN, PLARGE_INTEGER NewPosition = nullptr)
+        {
+            LARGE_INTEGER NewOffset;
+
+            switch(MoveMethod)
+            {
+                case FILE_CURRENT:
+                    NewOffset.QuadPart = this->File.GetCurrentPos64() + Offset;
+                    break;
+
+                case FILE_END:
+                    NewOffset.QuadPart = this->Entry->Offset.QuadPart + this->Entry->Size.QuadPart + Offset;
+                    break;
+
+                case FILE_BEGIN:
+                    NewOffset.QuadPart = this->Entry->Offset.QuadPart + Offset;
+                    break;
+
+                default:
+                    return STATUS_INVALID_PARAMETER_2;
+            }
+
+            if (NewOffset.QuadPart < this->Entry->Offset.QuadPart)
+                return STATUS_INVALID_PARAMETER;
+
+            if (NewPosition != nullptr)
+                NewPosition->QuadPart = NewOffset.QuadPart - this->Entry->Offset.QuadPart;
+
+            return this->File.Seek(NewOffset, FILE_BEGIN);
+        }
+    };
+
+public:
+    UPK_STATUS
+    GetFileStream(
+        ISafePackReader**           Stream,
+        PUNPACKER_FILE_ENTRY_BASE   BaseEntry,
+        ULONG                       Flags = 0
+    )
+    {
+        UPK_STATUS              Status;
+        PSAFE_PACK_READER_ENTRY Entry;
+        SAFE_PACK_BUFFER        SourceBuffer, DestinationBuffer;
+
+        *Stream = nullptr;
+        Entry = (PSAFE_PACK_READER_ENTRY)BaseEntry;
+
+        if (FLAG_OFF(Entry->Flags, UNPACKER_ENTRY_COMPRESSED))
+        {
+            Status = STATUS_UNSUCCESSFUL;
+
+            *Stream = new PackFileStream(this->FileName, GetTopClass(), Entry, Status);
+            if (*Stream == nullptr)
+                return STATUS_NO_MEMORY;
+
+            if (NT_FAILED(Status))
+            {
+                (*Stream)->Release();
+                *Stream = nullptr;
+                return Status;
+            }
+        }
+        else
+        {
+            UNPACKER_FILE_INFO FileInfo;
+
+            Status = GetTopClass()->GetFileData(&FileInfo, Entry, Flags);
+            FAIL_RETURN(Status);
+
+            *Stream = new PackMemoryStream(FileInfo.BinaryData.Buffer, FileInfo.BinaryData.Size.QuadPart, GetTopClass(), Entry, Status);
+            if (*Stream == nullptr)
+                return STATUS_NO_MEMORY;
+
+            if (NT_FAILED(Status))
+            {
+                (*Stream)->Release();
+                *Stream = nullptr;
+                return Status;
+            }
+        }
+
+        return STATUS_SUCCESS;
+    }
+
     UPK_STATUS
     GetFileData(
         PUNPACKER_FILE_INFO         FileInfo,
@@ -470,6 +686,14 @@ public:
             FAIL_RETURN(Status);
 
             Status = File.Read(FileInfo->BinaryData.Buffer, Entry->Size.QuadPart);
+            if (UPK_SUCCESS(Status))
+            {
+                SAFE_PACK_BUFFER DestinationBuffer;
+                DestinationBuffer.Initialize(FileInfo->BinaryData.Buffer, 0, Entry->Size.QuadPart, 0);
+                Status = GetTopClass()->PostDecompressData(Entry, &DestinationBuffer);
+                Status = Status == STATUS_NOT_IMPLEMENTED ? STATUS_SUCCESS : Status;
+            }
+
             if (UPK_FAILED(Status))
             {
                 FreeFileData(FileInfo);

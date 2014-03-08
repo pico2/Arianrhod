@@ -20,7 +20,7 @@
     #define LZMA_MAGIC              TAG4('LZMA')
 #endif
 
-#define DebugInfo(...) PrintConsoleW(__VA_ARGS__), PrintConsoleW(L"\n")
+#define DebugInfo(...) PrintConsole(__VA_ARGS__), PrintConsole(L"\n")
 
 #define DEFAULT_COMPRESS_DATA   1
 #define FILE_NAME_HASH_SIZE         (sizeof(ULONG) * 8)
@@ -220,8 +220,6 @@ public:
         PSAFE_PACK_BUFFER Buffer
     )
     {
-        UNREFERENCED_PARAMETER(FileInfo);
-        UNREFERENCED_PARAMETER(Buffer);
         return STATUS_NOT_IMPLEMENTED;
     }
 
@@ -596,7 +594,7 @@ Pack(
 
     EntrySize = (ULONG_PTR)FileNumber.QuadPart;
     EntrySize = EntrySize * (sizeof(*Entry) - sizeof(Entry->Buffer) + MAX_NTPATH * sizeof(WCHAR));
-    EntryBase = (PSAFE_PACK_ENTRY)AllocateMemory(EntrySize);
+    EntryBase = (PSAFE_PACK_ENTRY)AllocateMemory(EntrySize, HEAP_ZERO_MEMORY);
     if (EntryBase == nullptr)
     {
         Status = STATUS_INSUFFICIENT_RESOURCES;
@@ -707,6 +705,7 @@ Pack(
 
         Entry->Offset.QuadPart      = DataOffset.QuadPart;
         Entry->FileSize.QuadPart    = FileList->Size.QuadPart;
+        FileList->Offset.QuadPart   = Entry->Offset.QuadPart;
 
         SourceBuffer.Buffer             = Buffer;
         SourceBuffer.Flags              = Flags;
@@ -764,6 +763,9 @@ Pack(
                 goto CLEAN_UP;
             }
         }
+
+        WriteBuffer = nullptr;
+        WriteSize = (ULONG_PTR)-1;
 
         if (Status == STATUS_COMPRESSION_DISABLED || Status == STATUS_NOT_IMPLEMENTED)
         {
