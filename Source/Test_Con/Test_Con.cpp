@@ -98,18 +98,10 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         BYTE buf[0x200];
     } u;
 
-    //ShellExecuteW(0, L"runas", L"regedit.exe", 0, 0, SW_SHOW);
-    Ps::CreateProcess(L"Test_Con2.exe");
-    Ps::Sleep(INFINITE);
-    Ps::ExitProcess(0);
-
-    int start = 6;
-    PrintConsole(L"%d\n", ROUND_UP(6, 16));
-
     Reg::GetKeyValue(
         HKEY_LOCAL_MACHINE,
-        L"System\\CurrentControlSet\\Control\\Nls\\Language",
-        L"Default",
+        L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
+        L"ACP",
         KeyValueFullInformationAlign64,
         &u.value,
         sizeof(u.buf)

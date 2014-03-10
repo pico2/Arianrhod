@@ -561,22 +561,31 @@ LookupRegistryRedirectionEntry(
     PREGISTRY_REDIRECTION_ENTRY*    RedirectionEntry
 )
 {
-    NTSTATUS Status;
+    NTSTATUS                    Status;
     PREGISTRY_REDIRECTION_ENTRY Entry;
-    UNICODE_STRING KeyFullPath;
+    UNICODE_STRING              KeyFullPath;
 
     Status = QueryRegKeyFullPath(KeyHandle, &KeyFullPath);
     FAIL_RETURN(Status);
 
     Status = STATUS_NOT_FOUND;
 
+    //ml::String KeyFullPathString = KeyFullPath;
+    ml::String ValueNameString = *ValueName;
+
     FOR_EACH_VEC(Entry, this->RegistryRedirectionEntry)
     {
-        if (ValueName != nullptr && RtlEqualUnicodeString(Entry->Original.ValueName, ValueName, TRUE) == FALSE)
+        if (ValueName != nullptr)
+        {
+            if (ValueNameString.MatchExpression(Entry->Original.ValueName, TRUE) == FALSE)
+                continue;
+        }
+
+        if (RtlEqualUnicodeString(&KeyFullPath, Entry->Original.FullPath, TRUE) == FALSE)
             continue;
 
-        if (RtlEqualUnicodeString(Entry->Original.FullPath, &KeyFullPath, TRUE) == FALSE)
-            continue;
+        //if (KeyFullPathString.MatchExpression(Entry->Original.FullPath, TRUE) == FALSE)
+        //    continue;
 
         *RedirectionEntry = Entry;
         Status = STATUS_SUCCESS;
