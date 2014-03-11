@@ -85,30 +85,32 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+NoInline BOOL cond1()
+{
+    return 1;
+}
+
+NoInline BOOL cond2()
+{
+    return 2;
+}
+
+NoInline BOOL cond3()
+{
+    return 3;
+}
+
+NoInline BOOL cond4()
+{
+    return 4;
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-#pragma pack(1)
-
-    struct
-    {
-        BYTE by[1];
-        KEY_VALUE_FULL_INFORMATION value;
-        BYTE buf[0x200];
-    } u;
-
-    Reg::GetKeyValue(
-        HKEY_LOCAL_MACHINE,
-        L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
-        L"ACP",
-        KeyValueFullInformationAlign64,
-        &u.value,
-        sizeof(u.buf)
-    );
-
-    PrintConsole(L"%*s\n", u.value.DataLength / sizeof(WCHAR), PtrAdd(&u.value, u.value.DataOffset));
-    PauseConsole();
+    if (cond1() || cond2() || cond3() && cond4())
+        DebugBreakPoint();
 
     return;
 
