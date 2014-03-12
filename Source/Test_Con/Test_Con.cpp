@@ -85,32 +85,18 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
-NoInline BOOL cond1()
-{
-    return 1;
-}
-
-NoInline BOOL cond2()
-{
-    return 2;
-}
-
-NoInline BOOL cond3()
-{
-    return 3;
-}
-
-NoInline BOOL cond4()
-{
-    return 4;
-}
+#include <COMMCTRL.H>
+#pragma comment(lib, "comctl32.lib")
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    if (cond1() || cond2() || cond3() && cond4())
-        DebugBreakPoint();
+    InitCommonControls();
+
+    HWND h = CreateWindowExW(0, L"ToolbarWindow32", L"", 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    CallWindowProcA((WNDPROC)GetWindowLongA(h, GWL_WNDPROC), h, 0x401, 0, 0);
 
     return;
 
