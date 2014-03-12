@@ -9,6 +9,16 @@ ForceInline VOID CheckDC(HDC hDC)
     // if (GdiGetCodePage(hDC) == 0x3A4) _asm ud2;
 }
 
+ForceInline BOOL IsCallProcHandle(PVOID WndProc)
+{
+    return ((ULONG)WndProc & 0xFFFF0000) == 0xFFFF0000;
+}
+
+ForceInline VOID InitUnicodeProc(HWND hWnd, PVOID Proc)
+{
+    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)Proc);
+}
+
 /************************************************************************
   ansi to unicode
 ************************************************************************/
@@ -611,10 +621,9 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
 
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
-        if (PtrAnd(0xFFFF0000, OriginalProcA) == 0xFFFF0000)
-            break;
+        if (IsCallProcHandle(OriginalProcA) == FALSE)
+            InitUnicodeProc(hWnd, WindowProcW);
 
-        OriginalProcW = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProcW);
         GlobalData->SetWindowDataA(hWnd, OriginalProcA);
 
         ResetDCCharset(GlobalData, hWnd);
@@ -758,7 +767,7 @@ LeNtUserCreateWindowEx_Win7(
             );
 
     LastError = RtlGetLastWin32Error();
-
+/*
     if (hWnd != nullptr)
     {
         HDC hDC;
@@ -775,7 +784,7 @@ LeNtUserCreateWindowEx_Win7(
 
         ReleaseDC(hWnd, hDC);
     }
-
+*/
     UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
 
@@ -855,7 +864,7 @@ LeNtUserCreateWindowEx_Win8(
             );
 
     LastError = RtlGetLastWin32Error();
-
+/*
     if (hWnd != nullptr)
     {
         HDC hDC;
@@ -872,7 +881,7 @@ LeNtUserCreateWindowEx_Win8(
 
         ReleaseDC(hWnd, hDC);
     }
-
+*/
     UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
 
@@ -911,6 +920,11 @@ LONG_PTR NTAPI LeSetWindowLongA(HWND hWnd, int Index, LONG_PTR NewLong)
             if (Proc != nullptr)
             {
                 GlobalData->SetWindowDataA(hWnd, (PVOID)NewLong);
+                //if (IsCallProcHandle(Proc) && IsCallProcHandle((PVOID)NewLong) == FALSE)
+                //{
+                //    InitUnicodeProc(hWnd, WindowProcW);
+                //}
+
                 return (LONG_PTR)Proc;
             }
             break;

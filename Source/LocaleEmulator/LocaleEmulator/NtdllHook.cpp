@@ -578,7 +578,10 @@ LookupRegistryRedirectionEntry(
     Status = STATUS_NOT_FOUND;
 
     //ml::String KeyFullPathString = KeyFullPath;
-    ml::String ValueNameString = *ValueName;
+    ml::String ValueNameString;
+
+    if (ValueName != nullptr)
+        ValueNameString = *ValueName;
 
     FOR_EACH_VEC(Entry, this->RegistryRedirectionEntry)
     {

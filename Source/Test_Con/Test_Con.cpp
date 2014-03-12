@@ -85,30 +85,18 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+#include <COMMCTRL.H>
+#pragma comment(lib, "comctl32.lib")
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-#pragma pack(1)
+    InitCommonControls();
 
-    struct
-    {
-        BYTE by[1];
-        KEY_VALUE_FULL_INFORMATION value;
-        BYTE buf[0x200];
-    } u;
+    HWND h = CreateWindowExW(0, L"ToolbarWindow32", L"", 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    Reg::GetKeyValue(
-        HKEY_LOCAL_MACHINE,
-        L"System\\CurrentControlSet\\Control\\Nls\\CodePage",
-        L"ACP",
-        KeyValueFullInformationAlign64,
-        &u.value,
-        sizeof(u.buf)
-    );
-
-    PrintConsole(L"%*s\n", u.value.DataLength / sizeof(WCHAR), PtrAdd(&u.value, u.value.DataOffset));
-    PauseConsole();
+    CallWindowProcA((WNDPROC)GetWindowLongA(h, GWL_WNDPROC), h, 0x401, 0, 0);
 
     return;
 
