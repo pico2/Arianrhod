@@ -96,6 +96,13 @@ LeCreateProcess(
         }
 
         CopyMemory(&LePeb->Leb, Leb, FIELD_OFFSET(LEB, NumberOfRegistryRedirectionEntries) + ExtraSize);
+
+        LePeb->LdrLoadDllAddress = GetCallDestination(ProcessInfo.FirstCallLdrLoadDll);
+        LePeb->LdrLoadDllBackupSize = LDR_LOAD_DLL_BACKUP_SIZE;
+        ReadMemory(ProcessInfo.hProcess, LePeb->LdrLoadDllAddress, LePeb->LdrLoadDllBackup, LDR_LOAD_DLL_BACKUP_SIZE);
+
+        ULONG_PTR Length = (StrLengthW(DllFullPath) + 1) * sizeof(WCHAR);
+        CopyMemory(LePeb->LeDllFullPath, DllFullPath, ML_MIN(Length, sizeof(LePeb->LeDllFullPath)));
     }
 
     CloseLePeb(LePeb);

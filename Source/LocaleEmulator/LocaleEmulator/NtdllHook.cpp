@@ -269,10 +269,12 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
 
     SelfShadow = nullptr;
     Status = AllocVirtualMemoryEx(Process, &SelfShadow, SizeOfImage);
+    WriteLog(L"AllocVirtualMemoryEx: %p", Status);
     if (NT_FAILED(Status))
         return Status;
 
     LocalSelfShadow = AllocateMemoryP(SizeOfImage);
+    WriteLog(L"LocalSelfShadow: %p", Status);
     if (LocalSelfShadow == nullptr)
     {
         Mm::FreeVirtualMemory(SelfShadow, Process);
@@ -284,6 +286,8 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
 
     Status = WriteMemory(Process, SelfShadow, LocalSelfShadow, SizeOfImage);
     FreeMemoryP(LocalSelfShadow);
+
+    WriteLog(L"WriteMemory: %p", Status);
 
     if (NT_FAILED(Status))
     {
@@ -297,6 +301,8 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     BYTE ooxxBuffer[16];
 
     Status = ReadMemory(Process, ooxxAddress, Backup, LDR_LOAD_DLL_BACKUP_SIZE);
+    WriteLog(L"ReadMemory: %p", Status);
+    WriteLog(L"ooxxAddress: %p", ooxxAddress);
     if (NT_FAILED(Status))
     {
         Mm::FreeVirtualMemory(SelfShadow, Process);
@@ -310,6 +316,7 @@ NTSTATUS LeGlobalData::InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid)
     *(PULONG)&ooxxBuffer[1] = Offset;
 
     Status = WriteProtectMemory(Process, ooxxAddress, ooxxBuffer, 5);
+    WriteLog(L"WriteProtectMemory: %p", Status);
     if (NT_FAILED(Status))
     {
         Mm::FreeVirtualMemory(SelfShadow, Process);
