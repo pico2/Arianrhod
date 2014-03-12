@@ -611,8 +611,8 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
 
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
-        if (PtrAnd(0xFFFF0000, OriginalProcA) == 0xFFFF0000)
-            break;
+        //if (PtrAnd(0xFFFF0000, OriginalProcA) == 0xFFFF0000)
+        //    break;
 
         OriginalProcW = (WNDPROC)SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProcW);
         GlobalData->SetWindowDataA(hWnd, OriginalProcA);
@@ -758,7 +758,7 @@ LeNtUserCreateWindowEx_Win7(
             );
 
     LastError = RtlGetLastWin32Error();
-
+/*
     if (hWnd != nullptr)
     {
         HDC hDC;
@@ -775,7 +775,7 @@ LeNtUserCreateWindowEx_Win7(
 
         ReleaseDC(hWnd, hDC);
     }
-
+*/
     UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
 
@@ -855,7 +855,7 @@ LeNtUserCreateWindowEx_Win8(
             );
 
     LastError = RtlGetLastWin32Error();
-
+/*
     if (hWnd != nullptr)
     {
         HDC hDC;
@@ -872,7 +872,7 @@ LeNtUserCreateWindowEx_Win8(
 
         ReleaseDC(hWnd, hDC);
     }
-
+*/
     UninstallCbtHook(&CbtParam);
     FreeLargeString(&UnicodeWindowName);
 
