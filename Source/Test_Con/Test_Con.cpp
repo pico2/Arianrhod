@@ -92,6 +92,22 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    LOGFONTW lf;
+    lf.lfCharSet = SHIFTJIS_CHARSET;
+    lf.lfFaceName[0] = 0;
+
+    EnumFontFamiliesExW(GetDC(0), &lf, 
+        [](CONST LOGFONTW *lf, CONST TEXTMETRICW *tm, DWORD, LPARAM) -> int
+        {
+            return PrintConsole(L"%s\n", lf->lfFaceName);
+        },
+        0,
+        0
+    );
+
+    PrintConsole(L"%X\n", GetThreadUILanguage());
+    PrintConsole(L"%X\n", GetThreadLocale());
+
     return;
 
 #if 0
