@@ -37,7 +37,23 @@ UserMessageCall(INLPCREATESTRUCT)
     CREATESTRUCTA   CreateStructA;
 
     CreateStructW = (LPCREATESTRUCTW)lParam;
-    CreateStructW->lpCreateParams = ((PCBT_CREATE_PARAM)CreateStructW->lpCreateParams)->CreateParams;
+
+    //PCBT_PROC_PARAM CbtParam = (PCBT_PROC_PARAM)FindThreadFrame(CBT_PROC_PARAM_CONTEXT);
+    //if (CbtParam != nullptr && CbtParam->hWnd == Window)
+    //{
+    //    CreateStructW->lpCreateParams = ((PCBT_CREATE_PARAM)CreateStructW->lpCreateParams)->CreateParams;
+    //}
+
+    SEH_TRY
+    {
+        PCBT_CREATE_PARAM CbtCreateParam = (PCBT_CREATE_PARAM)CreateStructW->lpCreateParams;
+        if (CbtCreateParam->Magic == CBT_PROC_PARAM_CONTEXT)
+            CreateStructW->lpCreateParams = CbtCreateParam->CreateParams;
+    }
+    SEH_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        ;
+    }
 
     CreateStructA.lpszClass = nullptr;
     CreateStructA.lpszName = nullptr;
@@ -612,11 +628,10 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
         CreateWnd   = (LPCBT_CREATEWND)lParam;
         CreateParam = (PCBT_CREATE_PARAM)CreateWnd->lpcs->lpCreateParams;
 
-        if (!VerifyWindowParam(CreateParam, CbtParam))
+        if (VerifyWindowParam(CreateParam, CbtParam) == FALSE)
             break;
 
         CreateWnd->lpcs->lpCreateParams = CreateParam->CreateParams;
-
         GlobalData = CbtParam->GlobalData;
 
         if (GlobalData->GetWindowDataA(hWnd) != nullptr)
@@ -920,9 +935,14 @@ LONG_PTR NTAPI LeSetWindowLongA(HWND hWnd, int Index, LONG_PTR NewLong)
             if (OriginalProcA != nullptr)
             {
                 GlobalData->SetWindowDataA(hWnd, (PVOID)NewLong);
-                return (LONG_PTR)OriginalProcA;
             }
-            break;
+            else
+            {
+                OriginalProcA = (PVOID)GlobalData->SetWindowLongA(hWnd, Index, NewLong);
+                InitUnicodeProc(GlobalData, hWnd, WindowProcW, (PVOID)NewLong);
+            }
+
+            return (LONG_PTR)OriginalProcA;
     }
 
     return GlobalData->SetWindowLongA(hWnd, Index, NewLong);

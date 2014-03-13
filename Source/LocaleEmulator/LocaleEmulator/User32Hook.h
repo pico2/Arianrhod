@@ -20,10 +20,16 @@ typedef struct CBT_PROC_PARAM : public TEB_ACTIVE_FRAME
 
 } CBT_PROC_PARAM, *PCBT_PROC_PARAM;
 
-typedef struct
+typedef struct CBT_CREATE_PARAM
 {
     PVOID CreateParams;
     PVOID StackPointer;
+    ULONG Magic;
+
+    CBT_CREATE_PARAM()
+    {
+        this->Magic = CBT_PROC_PARAM_CONTEXT;
+    }
 
 } CBT_CREATE_PARAM, *PCBT_CREATE_PARAM;
 
