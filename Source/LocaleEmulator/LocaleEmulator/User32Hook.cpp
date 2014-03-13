@@ -14,9 +14,11 @@ ForceInline BOOL IsCallProcHandle(PVOID WndProc)
     return ((ULONG)WndProc & 0xFFFF0000) == 0xFFFF0000;
 }
 
-ForceInline VOID InitUnicodeProc(HWND hWnd, PVOID Proc)
+ForceInline VOID InitUnicodeProc(PLeGlobalData GlobalData, HWND hWnd, PVOID UnicodeProc, PVOID OriginalProcA)
 {
-    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)Proc);
+    SetWindowLongPtrW(hWnd, GWLP_WNDPROC, (LONG_PTR)UnicodeProc);
+    GlobalData->SetWindowDataA(hWnd, OriginalProcA);
+    ResetDCCharset(GlobalData, hWnd);
 }
 
 /************************************************************************
@@ -621,12 +623,10 @@ LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
 
         OriginalProcA = (WNDPROC)GlobalData->GetWindowLongA(hWnd, GWLP_WNDPROC);
-        if (IsCallProcHandle(OriginalProcA) == FALSE)
-            InitUnicodeProc(hWnd, WindowProcW);
-
-        GlobalData->SetWindowDataA(hWnd, OriginalProcA);
-
-        ResetDCCharset(GlobalData, hWnd);
+        //if (IsCallProcHandle(OriginalProcA) == FALSE)
+        {
+            InitUnicodeProc(GlobalData, hWnd, WindowProcW, OriginalProcA);
+        }
     }
 
     return CallNextHookEx(CbtParam->Hook, nCode, wParam, lParam);
@@ -910,22 +910,17 @@ LONG_PTR NTAPI LeGetWindowLongA(HWND hWnd, int Index)
 
 LONG_PTR NTAPI LeSetWindowLongA(HWND hWnd, int Index, LONG_PTR NewLong)
 {
-    PVOID           Proc;
+    PVOID           OriginalProcA;
     PLeGlobalData   GlobalData = LeGetGlobalData();
 
     switch (Index)
     {
         case GWL_WNDPROC:
-            Proc = GlobalData->GetWindowDataA(hWnd);
-            if (Proc != nullptr)
+            OriginalProcA = GlobalData->GetWindowDataA(hWnd);
+            if (OriginalProcA != nullptr)
             {
                 GlobalData->SetWindowDataA(hWnd, (PVOID)NewLong);
-                //if (IsCallProcHandle(Proc) && IsCallProcHandle((PVOID)NewLong) == FALSE)
-                //{
-                //    InitUnicodeProc(hWnd, WindowProcW);
-                //}
-
-                return (LONG_PTR)Proc;
+                return (LONG_PTR)OriginalProcA;
             }
             break;
     }

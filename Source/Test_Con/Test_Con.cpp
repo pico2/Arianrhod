@@ -92,12 +92,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    InitCommonControls();
-
-    HWND h = CreateWindowExW(0, L"ToolbarWindow32", L"", 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
-    CallWindowProcA((WNDPROC)GetWindowLongA(h, GWL_WNDPROC), h, 0x401, 0, 0);
-
     return;
 
 #if 0
