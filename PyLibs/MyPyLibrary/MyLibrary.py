@@ -17,6 +17,10 @@ from Misc import *
 from PyImage import *
 from FileIo import *
 
+def every(iter, n):
+    for i in range(0, len(iter), n):
+        yield iter[i : i + n]
+
 def ForEachFile(filelist, callback, filter = '*.*'):
     if type(filelist) == str:
         filelist = [filelist]
