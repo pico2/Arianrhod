@@ -46,12 +46,17 @@ __version__ = "1.3.5"
 from PIL import Image, ImageFile
 from PIL import ImagePalette
 from PIL import _binary
+from PIL._util import isStringType
 
 import warnings
 import array, sys
 import collections
 import itertools
 import os
+
+# Set these to true to force use of libtiff for reading or writing. 
+READ_LIBTIFF = False
+WRITE_LIBTIFF= False
 
 II = b"II" # little-endian (intel-style)
 MM = b"MM" # big-endian (motorola-style)
@@ -146,6 +151,7 @@ OPEN_INFO = {
     (II, 1, 1, 1, (8,), ()): ("L", "L"),
     (II, 1, 1, 1, (8,8), (2,)): ("LA", "LA"),
     (II, 1, 1, 2, (8,), ()): ("L", "L;R"),
+    (II, 1, 1, 1, (12,), ()): ("I;16", "I;12"),
     (II, 1, 1, 1, (16,), ()): ("I;16", "I;16"),
     (II, 1, 2, 1, (16,), ()): ("I;16S", "I;16S"),
     (II, 1, 1, 1, (32,), ()): ("I", "I;32N"),
@@ -153,6 +159,7 @@ OPEN_INFO = {
     (II, 1, 3, 1, (32,), ()): ("F", "F;32F"),
     (II, 2, 1, 1, (8,8,8), ()): ("RGB", "RGB"),
     (II, 2, 1, 2, (8,8,8), ()): ("RGB", "RGB;R"),
+    (II, 2, 1, 1, (8,8,8,8), ()): ("RGBA", "RGBA"),  # missing ExtraSamples
     (II, 2, 1, 1, (8,8,8,8), (0,)): ("RGBX", "RGBX"),
     (II, 2, 1, 1, (8,8,8,8), (1,)): ("RGBA", "RGBa"),
     (II, 2, 1, 1, (8,8,8,8), (2,)): ("RGBA", "RGBA"),
@@ -213,11 +220,45 @@ def _accept(prefix):
 # Wrapper for TIFF IFDs.
 
 class ImageFileDirectory(collections.MutableMapping):
+    """ This class represents a TIFF tag directory.  To speed things
+        up, we don't decode tags unless they're asked for.
 
-    # represents a TIFF tag directory.  to speed things up,
-    # we don't decode tags unless they're asked for.
+        Exposes a dictionary interface of the tags in the directory
+        ImageFileDirectory[key] = value
+        value = ImageFileDirectory[key]
 
-    def __init__(self, prefix):
+        Also contains a dictionary of tag types as read from the tiff
+        image file, 'ImageFileDirectory.tagtype'
+
+
+        Data Structures:
+        'public'
+        * self.tagtype = {} Key: numerical tiff tag number
+                            Value: integer corresponding to the data type from
+                            `TiffTags.TYPES`
+
+        'internal'            
+        * self.tags = {}  Key: numerical tiff tag number
+                          Value: Decoded data, Generally a tuple.
+                            * If set from __setval__ -- always a tuple
+                            * Numeric types -- always a tuple
+                            * String type -- not a tuple, returned as string
+                            * Undefined data -- not a tuple, returned as bytes
+                            * Byte -- not a tuple, returned as byte.
+        * self.tagdata = {} Key: numerical tiff tag number
+                            Value: undecoded byte string from file
+
+
+        Tags will be found in either self.tags or self.tagdata, but
+        not both. The union of the two should contain all the tags
+        from the Tiff image file.  External classes shouldn't
+        reference these unless they're really sure what they're doing.
+        """
+
+    def __init__(self, prefix=II):
+        """
+        :prefix: 'II'|'MM'  tiff endianness
+        """
         self.prefix = prefix[:2]
         if self.prefix == MM:
             self.i16, self.i32 = ib16, ib32
@@ -263,7 +304,8 @@ class ImageFileDirectory(collections.MutableMapping):
         try:
             return self.tags[tag]
         except KeyError:
-            type, data = self.tagdata[tag] # unpack on the fly
+            data = self.tagdata[tag] # unpack on the fly
+            type = self.tagtype[tag]
             size, handler = self.load_dispatch[type]
             self.tags[tag] = data = handler(self, data)
             del self.tagdata[tag]
@@ -292,6 +334,9 @@ class ImageFileDirectory(collections.MutableMapping):
             return tag in self
 
     def __setitem__(self, tag, value):
+        # tags are tuples for integers
+        # tags are not tuples for byte, string, and undefined data.
+        # see load_*
         if not isinstance(value, tuple):
             value = (value,)
         self.tags[tag] = value
@@ -406,7 +451,7 @@ class ImageFileDirectory(collections.MutableMapping):
                 warnings.warn("Possibly corrupt EXIF data.  Expecting to read %d bytes but only got %d. Skipping tag %s" % (size, len(data), tag))
                 continue
 
-            self.tagdata[tag] = typ, data
+            self.tagdata[tag] = data
             self.tagtype[tag] = typ
 
             if Image.DEBUG:
@@ -443,25 +488,42 @@ class ImageFileDirectory(collections.MutableMapping):
 
             if tag in self.tagtype:
                 typ = self.tagtype[tag]
-
+                
+            if Image.DEBUG:
+                print ("Tag %s, Type: %s, Value: %s" % (tag, typ, value))
+                   
             if typ == 1:
                 # byte data
-                data = value
+                if isinstance(value, tuple):
+                    data = value = value[-1]
+                else:
+                    data = value
             elif typ == 7:
                 # untyped data
                 data = value = b"".join(value)
-            elif isinstance(value[0], str):
+            elif isStringType(value[0]):
                 # string data
+                if isinstance(value, tuple):
+                    value = value[-1]
                 typ = 2
-                data = value = b"\0".join(value.encode('ascii', 'replace')) + b"\0"
+                # was b'\0'.join(str), which led to \x00a\x00b sorts
+                # of strings which I don't see in in the wild tiffs
+                # and doesn't match the tiff spec: 8-bit byte that
+                # contains a 7-bit ASCII code; the last byte must be
+                # NUL (binary zero). Also, I don't think this was well
+                # excersized before. 
+                data = value = b"" + value.encode('ascii', 'replace') + b"\0"
             else:
                 # integer data
                 if tag == STRIPOFFSETS:
                     stripoffsets = len(directory)
                     typ = 4 # to avoid catch-22
-                elif tag in (X_RESOLUTION, Y_RESOLUTION):
+                elif tag in (X_RESOLUTION, Y_RESOLUTION) or typ==5:
                     # identify rational data fields
                     typ = 5
+                    if isinstance(value[0], tuple):
+                        # long name for flatten
+                        value = tuple(itertools.chain.from_iterable(value))
                 elif not typ:
                     typ = 3
                     for v in value:
@@ -493,6 +555,7 @@ class ImageFileDirectory(collections.MutableMapping):
                 count = len(value)
                 if typ == 5:
                     count = count // 2        # adjust for rational data field
+
                 append((tag, typ, count, o32(offset), data))
                 offset = offset + len(data)
                 if offset & 1:
@@ -615,8 +678,8 @@ class TiffImageFile(ImageFile.ImageFile):
         return args
 
     def _load_libtiff(self):
-        """ Overload method triggered when we detect a g3/g4 tiff
-            Calls out to lib tiff """
+        """ Overload method triggered when we detect a compressed tiff
+            Calls out to libtiff """
 
         pixel = Image.Image.load(self)
 
@@ -631,7 +694,7 @@ class TiffImageFile(ImageFile.ImageFile):
             raise IOError("Not exactly one tile")
 
         d, e, o, a = self.tile[0]
-        d = Image._getdecoder(self.mode, d, a, self.decoderconfig)
+        d = Image._getdecoder(self.mode, 'libtiff', a, self.decoderconfig)
         try:
             d.setimage(self.im, e)
         except ValueError:
@@ -757,11 +820,11 @@ class TiffImageFile(ImageFile.ImageFile):
             offsets = self.tag[STRIPOFFSETS]
             h = getscalar(ROWSPERSTRIP, ysize)
             w = self.size[0]
-            if self._compression in ["tiff_ccitt", "group3", "group4",
-                                     "tiff_jpeg", "tiff_adobe_deflate",
-                                     "tiff_thunderscan", "tiff_deflate",
-                                     "tiff_sgilog", "tiff_sgilog24",
-                                     "tiff_raw_16"]:
+            if READ_LIBTIFF or self._compression in ["tiff_ccitt", "group3", "group4",
+                                                     "tiff_jpeg", "tiff_adobe_deflate",
+                                                     "tiff_thunderscan", "tiff_deflate",
+                                                     "tiff_sgilog", "tiff_sgilog24",
+                                                     "tiff_raw_16"]:
                 ## if Image.DEBUG:
                 ##     print "Activating g4 compression for whole file"
 
@@ -804,6 +867,12 @@ class TiffImageFile(ImageFile.ImageFile):
                     # fillorder==2 modes have a corresponding
                     # fillorder=1 mode
                     self.mode, rawmode = OPEN_INFO[key]
+                # libtiff always returns the bytes in native order.
+                # we're expecting image byte order. So, if the rawmode
+                # contains I;16, we need to convert from native to image
+                # byte order.
+                if self.mode in ('I;16B', 'I;16') and 'I;16' in rawmode:
+                    rawmode = 'I;16N'
 
                 # Offset in the tile tuple is 0, we go from 0,0 to
                 # w,h, and we only do this once -- eds
@@ -908,13 +977,17 @@ def _save(im, fp, filename):
 
     ifd = ImageFileDirectory(prefix)
 
-    compression = im.info.get('compression','raw')
-    libtiff = compression in ["tiff_ccitt", "group3", "group4",
-                              "tiff_jpeg", "tiff_adobe_deflate",
-                              "tiff_thunderscan", "tiff_deflate",
-                              "tiff_sgilog", "tiff_sgilog24",
-                              "tiff_raw_16"]
+    compression = im.encoderinfo.get('compression',im.info.get('compression','raw'))
 
+    libtiff = WRITE_LIBTIFF or compression in ["tiff_ccitt", "group3", "group4",
+                                               "tiff_jpeg", "tiff_adobe_deflate",
+                                               "tiff_thunderscan", "tiff_deflate",
+                                               "tiff_sgilog", "tiff_sgilog24",
+                                               "tiff_raw_16"]
+
+    # required for color libtiff images
+    ifd[PLANAR_CONFIGURATION] = getattr(im, '_planar_configuration', 1)
+    
     # -- multi-page -- skip TIFF header on subsequent pages
     if not libtiff and fp.tell() == 0:
         # tiff header (write via IFD to get everything right)
@@ -924,23 +997,34 @@ def _save(im, fp, filename):
     ifd[IMAGEWIDTH] = im.size[0]
     ifd[IMAGELENGTH] = im.size[1]
 
+    # write any arbitrary tags passed in as an ImageFileDirectory
+    info = im.encoderinfo.get("tiffinfo",{})
+    if Image.DEBUG:
+        print ("Tiffinfo Keys: %s"% info.keys)
+    keys = list(info.keys())
+    for key in keys:
+        ifd[key] = info.get(key)
+        try:
+            ifd.tagtype[key] = info.tagtype[key]
+        except:
+            pass # might not be an IFD, Might not have populated type
+
+
     # additions written by Greg Couch, gregc@cgl.ucsf.edu
     # inspired by image-sig posting from Kevin Cazabon, kcazabon@home.com
     if hasattr(im, 'tag'):
         # preserve tags from original TIFF image file
-        for key in (RESOLUTION_UNIT, X_RESOLUTION, Y_RESOLUTION):
-            if key in im.tag.tagdata:
-                ifd[key] = im.tag.tagdata.get(key)
-        # preserve some more tags from original TIFF image file
-        # -- 2008-06-06 Florian Hoech
-        ifd.tagtype = im.tag.tagtype
-        for key in (IPTC_NAA_CHUNK, PHOTOSHOP_CHUNK, XMP):
+        for key in (RESOLUTION_UNIT, X_RESOLUTION, Y_RESOLUTION,
+                    IPTC_NAA_CHUNK, PHOTOSHOP_CHUNK, XMP):
             if key in im.tag:
                 ifd[key] = im.tag[key]
+            ifd.tagtype[key] = im.tag.tagtype.get(key, None)
+
         # preserve ICC profile (should also work when saving other formats
         # which support profiles as TIFF) -- 2008-06-06 Florian Hoech
         if "icc_profile" in im.info:
             ifd[ICCPROFILE] = im.info["icc_profile"]
+            
     if "description" in im.encoderinfo:
         ifd[IMAGEDESCRIPTION] = im.encoderinfo["description"]
     if "resolution" in im.encoderinfo:
@@ -1005,37 +1089,57 @@ def _save(im, fp, filename):
             _fp = os.dup(fp.fileno())
 
         blocklist =  [STRIPOFFSETS, STRIPBYTECOUNTS, ROWSPERSTRIP, ICCPROFILE] # ICC Profile crashes.
-        atts = dict([(k,v) for (k,(v,)) in ifd.items() if k not in blocklist])
-        try:
-            # pull in more bits from the original file, e.g x,y resolution
-            # so that we can save(load('')) == original file.
-            for k,v in im.ifd.items():
-                if k not in atts and k not in blocklist:
-                    if type(v[0]) == tuple and len(v) > 1:
-                       # A tuple of more than one rational tuples
-                        # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
-                        atts[k] = [float(elt[0])/float(elt[1]) for elt in v]
-                        continue
-                    if type(v[0]) == tuple and len(v) == 1:
-                       # A tuple of one rational tuples
-                        # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
-                        atts[k] = float(v[0][0])/float(v[0][1])
-                        continue
-                    if type(v) == tuple and len(v) == 1:
-                        # int or similar
-                        atts[k] = v[0]
-                        continue
-                    if type(v) == str:
-                        atts[k] = v
-                        continue
+        atts={}
+        # bits per sample is a single short in the tiff directory, not a list. 
+        atts[BITSPERSAMPLE] = bits[0]
+        # Merge the ones that we have with (optional) more bits from
+        # the original file, e.g x,y resolution so that we can
+        # save(load('')) == original file.
+        for k,v in itertools.chain(ifd.items(), getattr(im, 'ifd', {}).items()):
+            if k not in atts and k not in blocklist:
+                if type(v[0]) == tuple and len(v) > 1:
+                    # A tuple of more than one rational tuples
+                    # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
+                    atts[k] = [float(elt[0])/float(elt[1]) for elt in v]
+                    continue
+                if type(v[0]) == tuple and len(v) == 1:
+                    # A tuple of one rational tuples
+                    # flatten to floats, following tiffcp.c->cpTag->TIFF_RATIONAL
+                    atts[k] = float(v[0][0])/float(v[0][1])
+                    continue
+                if type(v) == tuple and len(v) > 2:
+                    # List of ints?
+                    if type(v[0]) in (int, float):
+                        atts[k] = list(v)
+                    continue
+                if type(v) == tuple and len(v) == 2:
+                    # one rational tuple
+                    # flatten to float, following tiffcp.c->cpTag->TIFF_RATIONAL
+                    atts[k] = float(v[0])/float(v[1])
+                    continue
+                if type(v) == tuple and len(v) == 1:
+                    v = v[0]
+                    # drop through
+                if isStringType(v):
+                    atts[k] = bytes(v.encode('ascii', 'replace')) + b"\0"
+                    continue
+                else:
+                    # int or similar
+                    atts[k] = v
 
-        except:
-            # if we don't have an ifd here, just punt.
-            pass
         if Image.DEBUG:
             print (atts)
+
+        # libtiff always expects the bytes in native order.
+        # we're storing image byte order. So, if the rawmode
+        # contains I;16, we need to convert from native to image
+        # byte order.
+        if im.mode in ('I;16B', 'I;16'):
+            rawmode = 'I;16N'
+
         a = (rawmode, compression, _fp, filename, atts)
-        e = Image._getencoder(im.mode, compression, a, im.encoderconfig)
+        # print (im.mode, compression, a, im.encoderconfig)
+        e = Image._getencoder(im.mode, 'libtiff', a, im.encoderconfig)
         e.setimage(im.im, (0,0)+im.size)
         while 1:
             l, s, d = e.encode(16*1024) # undone, change to self.decodermaxblock

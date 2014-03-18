@@ -29,7 +29,8 @@ import unittest
 from Crypto.PublicKey import RSA
 from Crypto import Random
 from Crypto.SelfTest.st_common import list_test_cases, a2b_hex, b2a_hex
-from Crypto.Hash import *
+from Crypto.Hash import SHA1, MD2, RIPEMD160, SHA224, SHA384, SHA512,\
+                        SHA256, MD5
 from Crypto.Signature import PKCS1_PSS as PKCS
 from Crypto.Util.py3compat import *
 
@@ -357,7 +358,7 @@ class PKCS1_PSS_Tests(unittest.TestCase):
                         key._randfunc = lambda N: test_salt
                         # The real test
                         signer = PKCS.new(key)
-                        self.failUnless(signer.can_sign())
+                        self.assertTrue(signer.can_sign())
                         s = signer.sign(h)
                         self.assertEqual(s, t2b(self._testData[i][2]))
 
@@ -375,9 +376,9 @@ class PKCS1_PSS_Tests(unittest.TestCase):
                         # The real test
                         key._randfunc = lambda N: test_salt
                         verifier = PKCS.new(key)
-                        self.failIf(verifier.can_sign())
+                        self.assertFalse(verifier.can_sign())
                         result = verifier.verify(h, t2b(self._testData[i][2]))
-                        self.failUnless(result)
+                        self.assertTrue(result)
 
         def testSignVerify(self):
                         h = SHA1.new()
@@ -385,7 +386,7 @@ class PKCS1_PSS_Tests(unittest.TestCase):
 
                         rng = Random.new().read
                         key = MyKey(RSA.generate(1024,rng))
-                         
+
                         # Helper function to monitor what's request from MGF
                         global mgfcalls
                         def newMGF(seed,maskLen):
@@ -403,7 +404,7 @@ class PKCS1_PSS_Tests(unittest.TestCase):
                             key.asked = 0
                             signer = PKCS.new(key)
                             s = signer.sign(h)
-                            self.failUnless(signer.verify(h, s))
+                            self.assertTrue(signer.verify(h, s))
                             self.assertEqual(key.asked, h.digest_size)
 
                         h = SHA1.new()
@@ -415,14 +416,14 @@ class PKCS1_PSS_Tests(unittest.TestCase):
                             signer = PKCS.new(key, saltLen=sLen)
                             s = signer.sign(h)
                             self.assertEqual(key.asked, sLen)
-                            self.failUnless(signer.verify(h, s))
+                            self.assertTrue(signer.verify(h, s))
 
                         # Verify that sign() uses the custom MGF
                         mgfcalls = 0
                         signer = PKCS.new(key, newMGF)
                         s = signer.sign(h)
                         self.assertEqual(mgfcalls, 1)
-                        self.failUnless(signer.verify(h, s))
+                        self.assertTrue(signer.verify(h, s))
 
                         # Verify that sign() does not call the RNG
                         # when salt length is 0, even when a new MGF is provided
@@ -432,7 +433,7 @@ class PKCS1_PSS_Tests(unittest.TestCase):
                         s = signer.sign(h)
                         self.assertEqual(key.asked,0)
                         self.assertEqual(mgfcalls, 1)
-                        self.failUnless(signer.verify(h, s))
+                        self.assertTrue(signer.verify(h, s))
 
 def get_tests(config={}):
     tests = []

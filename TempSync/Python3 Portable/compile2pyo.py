@@ -20,7 +20,7 @@ def main():
     ignores = \
     [
         'test',
-        'lib2to3',
+        #'lib2to3',
         'site-packages\\PyQt',
         'site-packages\\PIL',
         'site-packages\\Crypto',
@@ -34,6 +34,7 @@ def main():
     [
         #'site-packages\\MyPyLibrary\\AMFHelper',
         'site-packages\\MyPyLibrary\\PyOcrHelper',
+        'lib2to3',
     ]
 
     ignores += copytrees
