@@ -5,6 +5,8 @@
 *.obj
 *egg-info
 *.egg
+ImmPyCommands/*.pyc
+ImmPyLibs/*.pyc
 __pycache__
 Source/sources/3dlearn
 Source/sources/bluepillstudy
