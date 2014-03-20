@@ -1,7 +1,6 @@
 .hg
 .hgignore
 *.sdf
-*.pyc
 *.pdb
 *.obj
 *egg-info
