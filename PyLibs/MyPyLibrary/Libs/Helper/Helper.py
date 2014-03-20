@@ -1,4 +1,5 @@
-from Libs.Misc.SysLib import *
+from Libs.Misc import *
+from Libs.IO.FileIo import *
 
 def every(iter, n):
     for i in range(0, len(iter), n):
