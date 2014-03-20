@@ -72,7 +72,7 @@ def main():
                 return
 
         SetConsoleTitle(file)
-        pyo = os.path.splitext(file)[0].replace(pylib, pyodir) + '.pyo'
+        pyo = os.path.splitext(file)[0].replace(pylib, pyodir) + '.pyc'
         os.makedirs(os.path.dirname(pyo), exist_ok = True)
         ret = py_compile.compile(file, pyo, optimize = 2)
         if ret is None:
