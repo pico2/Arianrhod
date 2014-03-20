@@ -1,4 +1,4 @@
-from SysLib import *
+from Libs.Misc.SysLib import *
 import io
 
 _DEFAULT_ENDIAN = '<'
