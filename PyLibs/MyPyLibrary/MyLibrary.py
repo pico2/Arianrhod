@@ -10,8 +10,4 @@ def AppendRelativePath(path, file = None):
 
 AppendRelativePath('.', __file__)
 
-from Libs.Misc import *
-from Libs.Image import *
-from Libs.IO import *
-from Libs.Network import *
-from Libs.Helper import *
+from Libs import *
