@@ -20,10 +20,7 @@ def main():
     ignores = \
     [
         'test',
-        #'lib2to3',
         'site-packages\\PyQt',
-        'site-packages\\PIL',
-        'site-packages\\Crypto',
         'site-packages\\IPython',
         'site-packages\\ipdb',
         'site-packages\\pyreadline',
@@ -32,17 +29,20 @@ def main():
 
     copytrees = \
     [
-        #'site-packages\\MyPyLibrary\\AMFHelper',
-        'site-packages\\MyPyLibrary\\PyOcrHelper',
-        'lib2to3',
+        (False, 'site-packages\\MyPyLibrary\\PyOcrHelper'),
+        (False, 'site-packages\\PIL'),
+        (False, 'site-packages\\Crypto'),
+        (True,  'lib2to3'),
     ]
 
-    ignores += copytrees
+    optimize = 2
+
+    ignores += [p[1] for p in copytrees]
 
     for i in range(len(ignores)):
         ignores[i] = (pylib + '\\' + ignores[i]).lower()
 
-    for x in copytrees:
+    for do_not_compile, x in copytrees:
         src = pylib + '\\' + x + '\\'
         dst = selfpath + 'UserSite\\' + os.path.basename(x) + '\\'
         ignore_patterns = ['__pycache__']
@@ -56,15 +56,27 @@ def main():
             if found:
                 continue
 
+            SetConsoleTitle(f)
+
             o = f.replace(src, dst, 1)
             os.makedirs(os.path.dirname(o), exist_ok = True)
-            try:
-                samefile = os.path.samefile(f, o)
-            except FileNotFoundError:
-                samefile = False
 
-            if not samefile:
-                shutil.copy2(f, o)
+            if f.lower().endswith('.pyd'):
+                continue
+
+            if do_not_compile is False and f.lower().endswith('.py'):
+                pyo = os.path.splitext(o)[0] + '.pyc'
+                ret = py_compile.compile(f, pyo, optimize = optimize)
+                if ret is None:
+                    raise Exception('error occured while compiling %s -> %s' % (f, pyo))
+            else:
+                try:
+                    samefile = os.path.samefile(f, o)
+                except FileNotFoundError:
+                    samefile = False
+
+                if not samefile:
+                    shutil.copy2(f, o)
 
     def proc(file):
         for x in ignores:
@@ -74,7 +86,7 @@ def main():
         SetConsoleTitle(file)
         pyo = os.path.splitext(file)[0].replace(pylib, pyodir) + '.pyc'
         os.makedirs(os.path.dirname(pyo), exist_ok = True)
-        ret = py_compile.compile(file, pyo, optimize = 2)
+        ret = py_compile.compile(file, pyo, optimize = optimize)
         if ret is None:
             return
 
