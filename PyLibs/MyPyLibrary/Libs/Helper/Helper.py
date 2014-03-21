@@ -1,6 +1,13 @@
 from Libs.Misc import *
 from Libs.IO.FileIo import *
 
+def HashBytes(bytes, method = 'md5'):
+    import hashlib
+
+    h = getattr(hashlib, method.lower())()
+    h.update(bytes)
+    return h.hexdigest()
+
 def every(iter, n):
     for i in range(0, len(iter), n):
         yield iter[i : i + n]
