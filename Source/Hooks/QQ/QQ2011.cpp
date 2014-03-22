@@ -580,7 +580,7 @@ BOOL NTAPI PopupSecurityFrame(PVOID, PVOID)
 
 BOOL CDECL ReportScanResult()
 {
-    INLINE_ASM __emit 0xCC;
+    DebugBreakPoint();
     return TRUE;
 }
 
@@ -1294,8 +1294,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     Mp::PATCH_MEMORY_DATA Function_GroupApp[] =
     {
-        Mp::FunctionJumpVa(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, &GetAtAllGroupMemberUseTimes),
-        Mp::FunctionCallVa(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, &GetCurrentAtNumber),
+        Mp::FunctionJumpVa(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
+        Mp::FunctionCallVa(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, GetCurrentAtNumber),
     };
 
 

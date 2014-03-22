@@ -43,10 +43,10 @@ class BattleCraftInfo:
         self.SkillTime              = fs.byte()     # 0x0B
         self.EP_CP                  = fs.ushort()   # 0x0C
         self.RangeSize2             = fs.ushort()   # 0x0E
-        self.State1Parameter        = fs.short()   # 0x10      e.g. damage factor
-        self.State1Time             = fs.short()   # 0x12      e.g. frozen AT
-        self.State2Parameter        = fs.short()   # 0x14
-        self.State2Time             = fs.short()   # 0x16
+        self.State1Parameter        = fs.short()    # 0x10      e.g. damage factor
+        self.State1Time             = fs.short()    # 0x12      e.g. frozen AT
+        self.State2Parameter        = fs.short()    # 0x14
+        self.State2Time             = fs.short()    # 0x16
 
         self.Name = fs.astr()
         self.Description = fs.astr()
@@ -832,18 +832,18 @@ def SaveToMS(filename, local):
     ms.SupportCraft         = local['SupportCraftAIList']
     ms.CraftInfo            = local['CraftList']
 
-    if type(ms.Attack) != BattleCraftAIInfo: raise Exception('incorrect Attack type')
-    if type(ms.Arts) != list: raise Exception(' ArtsAIList must be list')
-    if type(ms.Craft) != list: raise Exception(' CraftAIList must be list')
-    if type(ms.SCraft) != list: raise Exception(' SCraftAIList must be list')
-    if type(ms.SupportCraft) != list: raise Exception(' SupportCraftAIList must be list')
-    if type(ms.Craft) != list: raise Exception(' CraftList must be list')
+    if not isinstance(ms.Attack, BattleCraftAIInfo):    raise Exception('incorrect Attack type')
+    if not isinstance(ms.Arts, list):                   raise Exception(' ArtsAIList must be list')
+    if not isinstance(ms.Craft, list):                  raise Exception(' CraftAIList must be list')
+    if not isinstance(ms.SCraft, list):                 raise Exception(' SCraftAIList must be list')
+    if not isinstance(ms.SupportCraft, list):           raise Exception(' SupportCraftAIList must be list')
+    if not isinstance(ms.Craft, list):                  raise Exception(' CraftList must be list')
 
-    if len(ms.Arts) > MAXIMUM_ARTS_NUMBER: raise Exception('Arts >= %d' % MAXIMUM_ARTS_NUMBER)
-    if len(ms.Craft) > MAXIMUM_CRAFT_NUMBER: raise Exception('craft >= %d' % MAXIMUM_CRAFT_NUMBER)
-    if len(ms.SCraft) > MAXIMUM_SCRAFT_NUMBER: raise Exception('scraft >= %d' % MAXIMUM_SCRAFT_NUMBER)
-    if len(ms.SupportCraft) > MAXIMUM_SUPPORTCRAFT_NUMBER: raise Exception('supportcraft >= %d' % MAXIMUM_SUPPORTCRAFT_NUMBER)
-    if len(ms.CraftInfo) > MAXIMUM_CRAFT_INFO_NUMBER: raise Exception('craftinfo >= %d' % MAXIMUM_CRAFT_INFO_NUMBER)
+    if len(ms.Arts)         > MAXIMUM_ARTS_NUMBER:          raise Exception('Arts >= %d' % MAXIMUM_ARTS_NUMBER)
+    if len(ms.Craft)        > MAXIMUM_CRAFT_NUMBER:         raise Exception('craft >= %d' % MAXIMUM_CRAFT_NUMBER)
+    if len(ms.SCraft)       > MAXIMUM_SCRAFT_NUMBER:        raise Exception('scraft >= %d' % MAXIMUM_SCRAFT_NUMBER)
+    if len(ms.SupportCraft) > MAXIMUM_SUPPORTCRAFT_NUMBER:  raise Exception('supportcraft >= %d' % MAXIMUM_SUPPORTCRAFT_NUMBER)
+    if len(ms.CraftInfo)    > MAXIMUM_CRAFT_INFO_NUMBER:    raise Exception('craftinfo >= %d' % MAXIMUM_CRAFT_INFO_NUMBER)
 
     open(filename, 'wb').write(ms.binary())
 
