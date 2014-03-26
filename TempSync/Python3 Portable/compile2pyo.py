@@ -32,6 +32,7 @@ def main():
         (False, 'site-packages\\MyPyLibrary\\PyOcrHelper'),
         (False, 'site-packages\\PIL'),
         (False, 'site-packages\\Crypto'),
+        (False, 'site-packages\\sqlalchemy'),
         (True,  'lib2to3'),
     ]
 
