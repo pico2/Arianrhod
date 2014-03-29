@@ -89,10 +89,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    UNICODE_STRING str;
-
-    Rtl::GetSystemDirectory(&str);
-
     return;
 
 #if 0

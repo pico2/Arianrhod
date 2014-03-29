@@ -572,6 +572,8 @@ Pack(
 
     Length = StrLengthW(InputPath);
 
+    DebugInfo(L"");
+
     Status = STATUS_UNSUCCESSFUL;
     if (
         !EnumDirectoryFiles(
@@ -585,8 +587,11 @@ Pack(
             EDF_SUBDIR | EDF_BEFORE)
        )
     {
+        DebugInfo(L"Enum failed");
         return Status;
     }
+
+    DebugInfo(L"FileNumber %I64d", FileNumber.QuadPart);
 
     NtFileDisk          pack, file;
     Trie                EntryLookupTable;
@@ -597,13 +602,17 @@ Pack(
     EntryBase = (PSAFE_PACK_ENTRY)AllocateMemory(EntrySize, HEAP_ZERO_MEMORY);
     if (EntryBase == nullptr)
     {
-        Status = STATUS_INSUFFICIENT_RESOURCES;
+        DebugInfo(L"AllocateMemory(%d) failed", EntrySize);
+        Status = STATUS_NO_MEMORY;
         goto CLEAN_UP;
     }
 
     Status = EntryLookupTable.InitializeRootNode();
     if (NT_FAILED(Status))
+    {
+        DebugInfo(L"InitializeRootNode failed");
         goto CLEAN_UP;
+    }
 
     if (OutputFile == nullptr)
     {
@@ -625,7 +634,10 @@ Pack(
 
     Status = pack.Create(PackPath);
     if (!NT_SUCCESS(Status))
+    {
+        DebugInfo(L"create %s failed: %08X", PackPath, Status);
         goto CLEAN_UP;
+    }
 
     Header.Magic                = This->GetHeaderMagic();
     Header.HeaderSize           = sizeof(Header);
@@ -636,7 +648,10 @@ Pack(
 
     Status = pack.Seek(DataOffset, FILE_BEGIN);
     if (!NT_SUCCESS(Status))
+    {
+        DebugInfo(L"Seek %s failed: %08X", PackPath, Status);
         goto CLEAN_UP;
+    }
 
     FileName = PackPath + Length;
     if (Length != 0)
@@ -684,8 +699,11 @@ Pack(
         CopyMemory(FileName, FileList->GetFileName(), Length + sizeof(WCHAR));
 
         Status = file.Open(PackPath);
-        if (!NT_SUCCESS(Status))
+        if (NT_FAILED(Status))
+        {
+            DebugInfo(L"open %s failed: %08X", PackPath, Status);
             continue;
+        }
 
         FileSize = file.GetSize32();
         if (FileSize > BufferSize)
@@ -701,7 +719,10 @@ Pack(
 
         Status = file.Read(Buffer, FileSize);
         if (!NT_SUCCESS(Status))
+        {
+            DebugInfo(L"Read %s failed: %08X", PackPath, Status);
             goto CLEAN_UP;
+        }
 
         Entry->Offset.QuadPart      = DataOffset.QuadPart;
         Entry->FileSize.QuadPart    = FileList->Size.QuadPart;
@@ -802,7 +823,10 @@ Pack(
 
         Status = pack.Write(WriteBuffer, WriteSize);
         if (!NT_SUCCESS(Status))
+        {
+            DebugInfo(L"write %s failed: %08X", PackPath, Status);
             goto CLEAN_UP;
+        }
 
         DataOffset.QuadPart += WriteSize;
 
@@ -826,14 +850,20 @@ Pack(
 
         Status = This->GetEntryLookupData(&BytesEntry, FileList);
         if (NT_FAILED(Status))
+        {
+            DebugInfo(L"GetEntryLookupData failed");
             goto CLEAN_UP;
+        }
 
         Status = EntryLookupTable.InsertBytesEntry(&BytesEntry);
 
         This->FreeEntryLookupData(&BytesEntry);
 
         if (NT_FAILED(Status))
+        {
+            DebugInfo(L"GetEntryLookupData failed");
             goto CLEAN_UP;
+        }
 
         ++PackedFileNumber;
     }
