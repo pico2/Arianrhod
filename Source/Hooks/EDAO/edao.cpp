@@ -544,130 +544,128 @@ BOOL Initialize(PVOID BaseAddress)
 
     *(DOUBLE **)&PushActorDistance[2] = &DefaultDistance;
 
-    MEMORY_PATCH p[] =
+    using namespace Mp;
+
+    PATCH_MEMORY_DATA p[] =
     {
-        PATCH_MEMORY(0xEB,      1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking
+        MemoryPatchRva(0xEB,      1, 0x2C15B7),    // bypass CGlobal::SetStatusDataForChecking
 
 #if !DEBUG_DISABLE_PATCH
 
-        PATCH_MEMORY(0x06,              1, 0x410731),   // win
-        PATCH_MEMORY(0x06,              1, 0x410AD1),   // win
-        PATCH_MEMORY(0x01,              1, 0x40991D),   // cpu
-        PATCH_MEMORY(0x91,              1, 0x2F9EE3),   // one hit
-        PATCH_MEMORY(0x3FEB,            2, 0x452FD1),   // bypass savedata checksum
-        PATCH_MEMORY(0x20000,           4, 0x4E71B2),   // chrimg max buffer size
+        MemoryPatchRva(0x06,              1, 0x410731),   // win
+        MemoryPatchRva(0x06,              1, 0x410AD1),   // win
+        MemoryPatchRva(0x01,              1, 0x40991D),   // cpu
+        MemoryPatchRva(0x91,              1, 0x2F9EE3),   // one hit
+        MemoryPatchRva(0x3FEB,            2, 0x452FD1),   // bypass savedata checksum
+        MemoryPatchRva(0x20000,           4, 0x4E71B2),   // chrimg max buffer size
 
-        PATCH_MEMORY(CraftConditions::CraftReflect, 4, 0x7E1858),    // predefined flag
+        MemoryPatchRva(CraftConditions::CraftReflect, 4, 0x7E1858),    // predefined flag
 
         // debug AT
 
-        PATCH_MEMORY(0x49EB,    2, 0x5F668D),    // disable orig at
-        PATCH_MEMORY(0x81,      1, 0x5F66D9),    // disable orig at
-        PATCH_MEMORY(0x80,      1, 0x5F68A4),    // force show debug at
-        PATCH_MEMORY(0x2C,      1, 0x5F693D),    // debug at pos.X advance
+        MemoryPatchRva(0x49EB,    2, 0x5F668D),    // disable orig at
+        MemoryPatchRva(0x81,      1, 0x5F66D9),    // disable orig at
+        MemoryPatchRva(0x80,      1, 0x5F68A4),    // force show debug at
+        MemoryPatchRva(0x2C,      1, 0x5F693D),    // debug at pos.X advance
 
         // tweak
 
-        PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
-        PATCH_MEMORY(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
+        MemoryPatchRva(PushActorDistance, sizeof(PushActorDistance), 0x6538EF),
+        MemoryPatchRva(PushActorDistance, sizeof(PushActorDistance), 0x653BBE),
 
-        PATCH_MEMORY(0x00,      1, 0x653972),       // box height
-        PATCH_MEMORY(0x00,      1, 0x653C31),       // monster height
-        PATCH_MEMORY(0x00,      1, 0x655E64),       // actor height (mini map)
+        MemoryPatchRva(0x00ull,   1, 0x653972),       // box height
+        MemoryPatchRva(0x00ull,   1, 0x653C31),       // monster height
+        MemoryPatchRva(0x00ull,   1, 0x655E64),       // actor height (mini map)
 
-        PATCH_MEMORY(0xEB,      1,  0x2CAA98),      // enable shimmer when width > 1024
-        PATCH_MEMORY(0xEB,      1,  0x2C33BE),      // enable blur when width > 1024
-        PATCH_MEMORY(0xEB,      1,  0x2EFBB8),      // capture ?
+        MemoryPatchRva(0xEB,      1,  0x2CAA98),      // enable shimmer when width > 1024
+        MemoryPatchRva(0xEB,      1,  0x2C33BE),      // enable blur when width > 1024
+        MemoryPatchRva(0xEB,      1,  0x2EFBB8),      // capture ?
 
-        PATCH_MEMORY(0x00,      1,  0x55F6E1),      // ±¬Áé
+        MemoryPatchRva(0x00ull,   1,  0x55F6E1),      // ±¬Áé
 
         // monster info
-        PATCH_MEMORY(0xEB,      1,  0x626AC8),      // bypass check is enemy
+        MemoryPatchRva(0xEB,      1,  0x626AC8),      // bypass check is enemy
 
 
         // buf fix
-        PATCH_MEMORY(0xEB,      1,  0x60CC8F),      // burst energy
-        PATCH_MEMORY(0x32,      1,  0x54FDA4),      // text length of menu item created by MenuCmd(1, x, x)
-        // PATCH_MEMORY(0x37,      1,  0x5006B8),      // dead lock while exiting
+        MemoryPatchRva(0xEB,      1,  0x60CC8F),      // burst energy
+        MemoryPatchRva(0x32,      1,  0x54FDA4),      // text length of menu item created by MenuCmd(1, x, x)
+        // MemoryPatchRva(0x37,      1,  0x5006B8),      // dead lock while exiting
 
-        //PATCH_MEMORY(0x00,  1,  0x5304C9),      // skip op Sleep
+        //MemoryPatchRva(0x00,  1,  0x5304C9),      // skip op Sleep
 
         // iat hook
 
-        PATCH_MEMORY(AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
+        MemoryPatchRva((ULONG64)AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
 
 #if !D3D9_VER
 
-        PATCH_MEMORY(0x1CEB,                2, 0x64ACFE),       // remove crappy mouse control @ PositionWindow
-        PATCH_MEMORY(0x00,                  4, 0x329851),       // disable foolish get joy stick pos
-        PATCH_MEMORY(CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
-        PATCH_MEMORY(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
+        MemoryPatchRva(0x1CEB,                2, 0x64ACFE),       // remove crappy mouse control @ PositionWindow
+        MemoryPatchRva(0x00ull,               4, 0x329851),       // disable foolish get joy stick pos
+        MemoryPatchRva(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
+        MemoryPatchRva((ULONG64)CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
 
 #endif
 
 #endif // DEBUG_DISABLE_PATCH
 
-    };
-
-    MEMORY_FUNCTION_PATCH f[] =
-    {
         // crack
 
 #if !D3D9_VER
 
-        INLINE_HOOK_JUMP_RVA_NULL(0x27969D, METHOD_PTR(&CBattle::SetSelectedAttack)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x275DF4, METHOD_PTR(&CBattle::SetSelectedCraft)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x272AB9, METHOD_PTR(&CBattle::SetSelectedSCraft)),
+        FunctionJumpRva(0x27969D, &CBattle::SetSelectedAttack),
+        FunctionJumpRva(0x275DF4, &CBattle::SetSelectedCraft),
+        FunctionJumpRva(0x272AB9, &CBattle::SetSelectedSCraft),
 
-        INLINE_HOOK_JUMP_RVA_NULL(0x279986, METHOD_PTR(&CSSaveData::SaveData2SystemData)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x279FA8, METHOD_PTR(&CSSaveData::SystemData2SaveData)),
+        FunctionJumpRva(0x279986, &CSSaveData::SaveData2SystemData),
+        FunctionJumpRva(0x279FA8, &CSSaveData::SystemData2SaveData),
 
 #endif // D3D9_VER
 
-        INLINE_HOOK_JUMP_RVA_NULL(0x279553, METHOD_PTR(&CBattle::SetSelectedMagic)),
-        //INLINE_HOOK_CALL_RVA_NULL(0x51E1C7, xxx),
+        FunctionJumpRva(0x279553, &CBattle::SetSelectedMagic),
+        // FunctionCallRva(0x51E1C7, xxx),
 
 #if !DEBUG_DISABLE_PATCH
 
         // tweak
 
-        //INLINE_HOOK_CALL_RVA_NULL(0x40492A, ShowExitMessageBox),
-        INLINE_HOOK_CALL_RVA_NULL(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
-        INLINE_HOOK_CALL_RVA_NULL(0x3E2B42, EDAO::NakedLoadSaveDataThumb),
-        INLINE_HOOK_CALL_RVA_NULL(0x465F08, EDAO::NakedSetSaveDataScrollStep),
+        // FunctionCallRva(0x40492A, ShowExitMessageBox),
+        FunctionCallRva(0x3640A1, InitWarningItpTimeStamp),   // bypass show warning.itp
+        FunctionCallRva(0x3E2B42, EDAO::NakedLoadSaveDataThumb),
+        FunctionCallRva(0x465F08, EDAO::NakedSetSaveDataScrollStep),
 
-        INLINE_HOOK_JUMP_RVA     (0x279AA3, METHOD_PTR(&EDAO::CheckItemEquipped), EDAO::StubCheckItemEquipped),
-        INLINE_HOOK_CALL_RVA_NULL(0x5DE1D9, METHOD_PTR(&CBattle::NakedNoResistConditionUp)),
+        FunctionJumpRva(0x279AA3, &EDAO::CheckItemEquipped, &EDAO::StubCheckItemEquipped),
+        FunctionCallRva(0x5DE1D9, &CBattle::NakedNoResistConditionUp),
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5F690B, CBattle::FormatBattleChrAT),
-        INLINE_HOOK_CALL_RVA_NULL(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
+        FunctionCallRva(0x5F690B, CBattle::FormatBattleChrAT),
+        FunctionCallRva(0x5B05C6, CBattle::ShowSkipCraftAnimeButton),
 
-        INLINE_HOOK_JUMP_RVA_NULL(0x46B6A0, METHOD_PTR(&CSoundPlayer::GetSoundControlWindow)),
-        INLINE_HOOK_JUMP         (EATLookupRoutineByHashPNoFix(FindLdrModuleByName(&WCS2US(L"USER32.dll"))->DllBase, USER32_SendMessageA), CSoundPlayer::StaticDispatchCtrlCode, CSoundPlayer::StubStaticDispatchCtrlCode),
+        FunctionJumpRva(0x46B6A0, &CSoundPlayer::GetSoundControlWindow),
+        FunctionJumpVa (LookupExportTable(FindLdrModuleByName(&WCS2US(L"USER32.dll"))->DllBase, USER32_SendMessageA), CSoundPlayer::StaticDispatchCtrlCode, &CSoundPlayer::StubStaticDispatchCtrlCode),
 
-        INLINE_HOOK_CALL_RVA     (0x328C77, METHOD_PTR(&CInput::HandleMainInterfaceInputState), CInput::StubHandleMainInterfaceInputState),
+        FunctionCallRva(0x328C77, &CInput::HandleMainInterfaceInputState, &CInput::StubHandleMainInterfaceInputState),
 
         // bug fix
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5B1BE6, METHOD_PTR(&CBattleATBar::LookupReplaceAtBarEntry)),
-        INLINE_HOOK_JUMP_RVA     (0x275DAE, METHOD_PTR(&CBattle::ExecuteActionScript), CBattle::StubExecuteActionScript),
-        INLINE_HOOK_JUMP_RVA     (0x550C90, METHOD_PTR(&CScript::ScpSaveRestoreParty), CScript::StubScpSaveRestoreParty),
+        FunctionCallRva(0x5B1BE6, &CBattleATBar::LookupReplaceAtBarEntry),
+        FunctionJumpRva(0x275DAE, &CBattle::ExecuteActionScript, &CBattle::StubExecuteActionScript),
+        FunctionJumpRva(0x550C90, &CScript::ScpSaveRestoreParty, &CScript::StubScpSaveRestoreParty),
 
-        INLINE_HOOK_CALL_RVA_NULL(0x6A58FF, CMiniGame::HorrorHouse_GetMonsterPosition),
+        FunctionCallRva(0x6A58FF, CMiniGame::HorrorHouse_GetMonsterPosition),
 
 
         // file redirection
 
-        INLINE_HOOK_JUMP         (NtOpenFile,               AoOpenFile,             StubNtOpenFile),
-        INLINE_HOOK_JUMP         (NtCreateFile,             AoCreateFile,           StubNtCreateFile),
-        INLINE_HOOK_JUMP         (NtQueryAttributesFile,    AoQueryAttributesFile,  StubNtQueryAttributesFile),
-        INLINE_HOOK_CALL_RVA_NULL(0x48C1EA,                 AoFindFirstFileA),
-        INLINE_HOOK_CALL_RVA_NULL(0x48C206,                 NtClose),
-        INLINE_HOOK_CALL_RVA_NULL(0x4E6A0B,                 EDAO::GetCampImage),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A05B4,                 EDAO::GetBattleFace),
-        INLINE_HOOK_CALL_RVA_NULL(0x2F9101,                 EDAO::GetFieldAttackChr),
-        INLINE_HOOK_CALL_RVA_NULL(0x4948B9,                 METHOD_PTR(&EDAO::GetCFace)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4948DF,                 METHOD_PTR(&EDAO::GetCFace)),
+        FunctionJumpVa (NtOpenFile,               AoOpenFile,             &StubNtOpenFile),
+        FunctionJumpVa (NtCreateFile,             AoCreateFile,           &StubNtCreateFile),
+        FunctionJumpVa (NtQueryAttributesFile,    AoQueryAttributesFile,  &StubNtQueryAttributesFile),
+        FunctionCallRva(0x48C1EA,                 AoFindFirstFileA),
+        FunctionCallRva(0x48C206,                 NtClose),
+        FunctionCallRva(0x4E6A0B,                 EDAO::GetCampImage),
+        FunctionCallRva(0x5A05B4,                 EDAO::GetBattleFace),
+        FunctionCallRva(0x2F9101,                 EDAO::GetFieldAttackChr),
+        FunctionCallRva(0x4948B9,                 &EDAO::GetCFace),
+        FunctionCallRva(0x4948DF,                 &EDAO::GetCFace),
 
 
         // custom format itp / itc
@@ -676,68 +674,68 @@ BOOL Initialize(PVOID BaseAddress)
 
         // hack for boss
 
-        INLINE_HOOK_CALL_RVA_NULL(0x5D1ED5, METHOD_PTR(&CBattle::   NakedAS8DDispatcher)),
-        INLINE_HOOK_CALL_RVA_NULL(0x56F7C7, METHOD_PTR(&CBattle::   NakedGetChrIdForSCraft)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E027B, METHOD_PTR(&CBattle::   NakedGetTurnVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E1015, METHOD_PTR(&CBattle::   NakedGetRunawayVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E0CA3, METHOD_PTR(&CBattle::   NakedGetReplySupportVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E09E0, METHOD_PTR(&CBattle::   NakedGetTeamRushVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5DFA1B, METHOD_PTR(&CBattle::   NakedGetUnderAttackVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E081E, METHOD_PTR(&CBattle::   NakedGetUnderAttackVoiceChrId2)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5E062B, METHOD_PTR(&CBattle::   NakedGetSBreakVoiceChrId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A3644, METHOD_PTR(&CBattle::   NakedCopyMagicAndCraftData)),
-        INLINE_HOOK_CALL_RVA_NULL(0x5A3814, METHOD_PTR(&CBattle::   NakedOverWriteBattleStatusWithChrStatus)),
-        INLINE_HOOK_CALL_RVA_NULL(0x578368, METHOD_PTR(&CBattle::   NakedIsChrStatusNeedRefresh)),
-        INLINE_HOOK_CALL_RVA_NULL(0x622C83, METHOD_PTR(&EDAO::      NakedGetChrSBreak)),
-        INLINE_HOOK_JUMP_RVA     (0x277776, METHOD_PTR(&CGlobal::   GetMagicData),                  CGlobal::StubGetMagicData),
-        INLINE_HOOK_JUMP_RVA     (0x274E18, METHOD_PTR(&CGlobal::   GetMagicQueryTable),            CGlobal::StubGetMagicQueryTable),
-        INLINE_HOOK_JUMP_RVA     (0x2767E0, METHOD_PTR(&CGlobal::   GetMagicDescription),           CGlobal::StubGetMagicDescription),
-        INLINE_HOOK_CALL_RVA_NULL(0x332B26, METHOD_PTR(&EDAO::      GetStatusIcon)),
-        INLINE_HOOK_CALL_RVA_NULL(0x2F82B8, METHOD_PTR(&EDAO::      GetLeaderChangeVoice)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4A7487, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
-        INLINE_HOOK_CALL_RVA_NULL(0x4A74A7, METHOD_PTR(&CSSaveData::GetTeamAttackMemberId)),
-        INLINE_HOOK_CALL_RVA     (0x5EB9E7, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange),        CGlobal::StubFixWeaponShapeAndRange),  // weapon shape
-        INLINE_HOOK_CALL_RVA_NULL(0x5EC037, METHOD_PTR(&CGlobal::   FixWeaponShapeAndRange)),                                       // weapon RNG
-        INLINE_HOOK_CALL_RVA_NULL(0x5AF055, METHOD_PTR(&CBattle::   NakedFindReplaceChr)),
-        INLINE_HOOK_CALL_RVA_NULL(0x58B258, METHOD_PTR(&CBattle::   NakedCheckCraftTargetBits)),
-        INLINE_HOOK_JUMP_RVA_NULL(0x27A2A0, METHOD_PTR(&CBattle::   GetConditionIconPosByIndex)),
-        INLINE_HOOK_JUMP_RVA     (0x27AF52, METHOD_PTR(&CBattle::   IsTargetCraftReflect),       CBattle::StubIsTargetCraftReflect),
-        INLINE_HOOK_JUMP_RVA     (0x276EA2, METHOD_PTR(&CBattle::   OnSetChrConditionFlag),         CBattle::StubOnSetChrConditionFlag),
-        INLINE_HOOK_CALL_RVA_NULL(0x5AA2FF, METHOD_PTR(&CBattle::   NakedUpdateCraftReflectLeftTime)),
+        FunctionCallRva(0x5D1ED5, &CBattle::   NakedAS8DDispatcher),
+        FunctionCallRva(0x56F7C7, &CBattle::   NakedGetChrIdForSCraft),
+        FunctionCallRva(0x5E027B, &CBattle::   NakedGetTurnVoiceChrId),
+        FunctionCallRva(0x5E1015, &CBattle::   NakedGetRunawayVoiceChrId),
+        FunctionCallRva(0x5E0CA3, &CBattle::   NakedGetReplySupportVoiceChrId),
+        FunctionCallRva(0x5E09E0, &CBattle::   NakedGetTeamRushVoiceChrId),
+        FunctionCallRva(0x5DFA1B, &CBattle::   NakedGetUnderAttackVoiceChrId),
+        FunctionCallRva(0x5E081E, &CBattle::   NakedGetUnderAttackVoiceChrId2),
+        FunctionCallRva(0x5E062B, &CBattle::   NakedGetSBreakVoiceChrId),
+        FunctionCallRva(0x5A3644, &CBattle::   NakedCopyMagicAndCraftData),
+        FunctionCallRva(0x5A3814, &CBattle::   NakedOverWriteBattleStatusWithChrStatus),
+        FunctionCallRva(0x578368, &CBattle::   NakedIsChrStatusNeedRefresh),
+        FunctionCallRva(0x622C83, &EDAO::      NakedGetChrSBreak),
+        FunctionJumpRva(0x277776, &CGlobal::   GetMagicData,                    &CGlobal::StubGetMagicData),
+        FunctionJumpRva(0x274E18, &CGlobal::   GetMagicQueryTable,              &CGlobal::StubGetMagicQueryTable),
+        FunctionJumpRva(0x2767E0, &CGlobal::   GetMagicDescription,             &CGlobal::StubGetMagicDescription),
+        FunctionCallRva(0x332B26, &EDAO::      GetStatusIcon),
+        FunctionCallRva(0x2F82B8, &EDAO::      GetLeaderChangeVoice),
+        FunctionCallRva(0x4A7487, &CSSaveData::GetTeamAttackMemberId),
+        FunctionCallRva(0x4A74A7, &CSSaveData::GetTeamAttackMemberId),
+        FunctionCallRva(0x5EB9E7, &CGlobal::   FixWeaponShapeAndRange,          &CGlobal::StubFixWeaponShapeAndRange),  // weapon shape
+        FunctionCallRva(0x5EC037, &CGlobal::   FixWeaponShapeAndRange),                                                 // weapon RNG
+        FunctionCallRva(0x5AF055, &CBattle::   NakedFindReplaceChr),
+        FunctionCallRva(0x58B258, &CBattle::   NakedCheckCraftTargetBits),
+        FunctionJumpRva(0x27A2A0, &CBattle::   GetConditionIconPosByIndex),
+        FunctionJumpRva(0x27AF52, &CBattle::   IsTargetCraftReflect,            &CBattle::StubIsTargetCraftReflect),
+        FunctionJumpRva(0x276EA2, &CBattle::   OnSetChrConditionFlag,           &CBattle::StubOnSetChrConditionFlag),
+        FunctionCallRva(0x5AA2FF, &CBattle::   NakedUpdateCraftReflectLeftTime),
 
 
         // inherit custom flags
 
-        INLINE_HOOK_CALL_RVA_NULL(0x358457, METHOD_PTR(&CScript::NakedInheritSaveData)),
+        FunctionCallRva(0x358457, &CScript::NakedInheritSaveData),
 
 
         // enemy sbreak
 
-        INLINE_HOOK_CALL_RVA_NULL(0x56526F, METHOD_PTR(&CBattle::NakedGetBattleState)),
-        INLINE_HOOK_JUMP_RVA     (0x599100, METHOD_PTR(&CBattle::SetCurrentActionChrInfo), CBattle::StubSetCurrentActionChrInfo),
-        INLINE_HOOK_CALL_RVA_NULL(0x591C3A, METHOD_PTR(&CBattle::NakedEnemyThinkAction)),
+        FunctionCallRva(0x56526F, &CBattle::NakedGetBattleState),
+        FunctionJumpRva(0x599100, &CBattle::SetCurrentActionChrInfo, &CBattle::StubSetCurrentActionChrInfo),
+        FunctionCallRva(0x591C3A, &CBattle::NakedEnemyThinkAction),
 
 
         // monster info box
 
-        INLINE_HOOK_CALL_RVA_NULL(0x626AEA, METHOD_PTR(&CBattleInfoBox::SetMonsterInfoBoxSize)),
-        INLINE_HOOK_JUMP_RVA     (0x27AC8C, METHOD_PTR(&CBattleInfoBox::DrawMonsterStatus), CBattleInfoBox::StubDrawMonsterStatus),
+        FunctionCallRva(0x626AEA, &CBattleInfoBox::SetMonsterInfoBoxSize),
+        FunctionJumpRva(0x27AC8C, &CBattleInfoBox::DrawMonsterStatus, &CBattleInfoBox::StubDrawMonsterStatus),
 
 
         // acgn
 
-        INLINE_HOOK_JUMP_RVA     (0x275EFD, METHOD_PTR(&CBattle::LoadMSFile), CBattle::StubLoadMSFile),	//it3
-        INLINE_HOOK_JUMP_RVA_NULL(0x5D3545, METHOD_PTR(&CBattle::NakedAS_8D_5F)), //Ê±¿Õ´ó±À»µ
+        FunctionJumpRva(0x275EFD, &CBattle::LoadMSFile, &CBattle::StubLoadMSFile),   //it3
+        FunctionJumpRva(0x5D3545, &CBattle::NakedAS_8D_5F),                         //Ê±¿Õ´ó±À»µ
 
 
-        //INLINE_HOOK_JUMP_RVA(0x275755, METHOD_PTR(&EDAO::Fade), EDAO::StubFade),
-        //INLINE_HOOK_CALL_RVA_NULL(0x601122, FadeInRate),
+        //FunctionJumpRva(0x275755, &EDAO::Fade, &EDAO::StubFade),
+        //FunctionCallRva(0x601122, FadeInRate),
 
 #endif // DEBUG_DISABLE_PATCH
 
     };
 
-    Nt_PatchMemory(p, countof(p), f, countof(f), GetExeModuleHandle());
+    PatchMemory(p, countof(p), GetExeModuleHandle());
 
     Turbo = TRUE;
 
