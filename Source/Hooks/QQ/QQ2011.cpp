@@ -581,7 +581,7 @@ BOOL NTAPI PopupSecurityFrame(PVOID, PVOID)
 BOOL CDECL ReportScanResult()
 {
     DebugBreakPoint();
-    return TRUE;
+    //return TRUE;
 }
 
 BOOL CDECL PluginSecurityCheck()
@@ -1133,7 +1133,6 @@ BOOL Initialize(PVOID BaseAddress)
     PLDR_MODULE                 Self, Netapi32;
 
     ml::MlInitialize();
-
     LdrDisableThreadCalloutsForDll(BaseAddress);
 
     Status = Rtl::GetSystemDirectory(&SystemRoot);
@@ -1161,6 +1160,10 @@ BOOL Initialize(PVOID BaseAddress)
     Self->DllBase       = Netapi32->DllBase;
     Self->EntryPoint    = Netapi32->EntryPoint;
     Self->SizeOfImage   = Netapi32->SizeOfImage;
+
+    Self = FindLdrModuleByHandle(nullptr);
+    if (RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ.exe"), TRUE) == FALSE)
+        return TRUE;
 
     InitializeQqFunctionTable();
 

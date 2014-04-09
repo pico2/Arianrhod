@@ -85,9 +85,16 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+#include <FWPSU.h>
+#include <FWPMU.h>
+
+#pragma comment(lib, "fwpuclnt.lib")
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    FwpmEngineOpen(0, 0, 0, 0, 0);
 
     return;
 
