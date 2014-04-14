@@ -85,16 +85,37 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
-#include <FWPSU.h>
-#include <FWPMU.h>
-
-#pragma comment(lib, "fwpuclnt.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    FwpmEngineOpen(0, 0, 0, 0, 0);
+    CHOOSEFONTW choosefont;
+    LOGFONTW lf;
+
+    ZeroMemory(&lf, sizeof(lf));
+    lf.lfCharSet = SHIFTJIS_CHARSET;
+    EnumFontFamiliesExW(GetDC(nullptr), &lf, 
+        [](CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM) -> int
+        {
+            PrintConsole(L"%s\n", lf->lfFaceName);
+            return 1;
+        },
+        0,0
+    );
+
+    PauseConsole();
+    
+    ZeroMemory(&lf, sizeof(lf));
+    lf.lfCharSet = SHIFTJIS_CHARSET;
+
+    ZeroMemory(&choosefont, sizeof(choosefont));
+    choosefont.lStructSize = sizeof(choosefont);
+    choosefont.lpLogFont   = &lf;
+    choosefont.hwndOwner   = 0;
+    choosefont.Flags       = CF_BOTH|CF_TTONLY|CF_INITTOLOGFONTSTRUCT|CF_INACTIVEFONTS;
+    ChooseFontW(&choosefont);
 
     return;
 
