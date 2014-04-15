@@ -1,12 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UndocApiLib", "UndocApiLib.vcxproj", "{FD66DCDA-1F24-49F1-A599-D95790F23522}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		apphelp|Win32 = apphelp|Win32
 		apphelp|x64 = apphelp|x64
+		fms|Win32 = fms|Win32
+		fms|x64 = fms|x64
 		kernel32|Win32 = kernel32|Win32
 		kernel32|x64 = kernel32|x64
 		ntdll|Win32 = ntdll|Win32
@@ -23,6 +27,10 @@ Global
 		{FD66DCDA-1F24-49F1-A599-D95790F23522}.apphelp|Win32.Build.0 = apphelp|Win32
 		{FD66DCDA-1F24-49F1-A599-D95790F23522}.apphelp|x64.ActiveCfg = apphelp|x64
 		{FD66DCDA-1F24-49F1-A599-D95790F23522}.apphelp|x64.Build.0 = apphelp|x64
+		{FD66DCDA-1F24-49F1-A599-D95790F23522}.fms|Win32.ActiveCfg = fms|Win32
+		{FD66DCDA-1F24-49F1-A599-D95790F23522}.fms|Win32.Build.0 = fms|Win32
+		{FD66DCDA-1F24-49F1-A599-D95790F23522}.fms|x64.ActiveCfg = fms|x64
+		{FD66DCDA-1F24-49F1-A599-D95790F23522}.fms|x64.Build.0 = fms|x64
 		{FD66DCDA-1F24-49F1-A599-D95790F23522}.kernel32|Win32.ActiveCfg = kernel32|Win32
 		{FD66DCDA-1F24-49F1-A599-D95790F23522}.kernel32|Win32.Build.0 = kernel32|Win32
 		{FD66DCDA-1F24-49F1-A599-D95790F23522}.kernel32|x64.ActiveCfg = kernel32|x64

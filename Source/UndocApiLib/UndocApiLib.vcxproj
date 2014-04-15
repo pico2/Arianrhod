@@ -9,6 +9,14 @@
       <Configuration>apphelp</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="fms|Win32">
+      <Configuration>fms</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="fms|x64">
+      <Configuration>fms</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="kernel32|Win32">
       <Configuration>kernel32</Configuration>
       <Platform>Win32</Platform>
@@ -86,12 +94,22 @@
     <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='fms|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='fms|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -143,10 +161,16 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='fms|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='fms|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'" Label="PropertySheets">
@@ -196,11 +220,25 @@
     <TargetName>ntdll</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">
+    <OutDir>Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>fms</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">
     <OutDir>.\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>ntdll</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='fms|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>ntdll</TargetName>
     <TargetExt>.dll</TargetExt>
@@ -448,6 +486,52 @@
       </IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>UNDOC_LIB_NTDLL;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Release\UndocApiLib.pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>.\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <AdditionalOptions> /GS- /GL /MP </AdditionalOptions>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Release\UndocApiLib.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\UndocApiLib.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkDLL>true</LinkDLL>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library\fms2.lib</ImportLibrary>
+      <NoEntryPoint>true</NoEntryPoint>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalOptions> /ltcg</AdditionalOptions>
+      <ModuleDefinitionFile>.\undoc_fms.def</ModuleDefinitionFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -495,6 +579,48 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>UNDOC_LIB_NTDLL;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Release\UndocApiLib.pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>.\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <AdditionalOptions> /GS- /GL /MP </AdditionalOptions>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Release\UndocApiLib.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\UndocApiLib.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkDLL>true</LinkDLL>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>D:\Dev\MyLib\MyLibrary\Library64\undoc_ntdll.lib</ImportLibrary>
+      <NoEntryPoint>true</NoEntryPoint>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalOptions> /ltcg</AdditionalOptions>
+      <ModuleDefinitionFile>.\undoc_ntdll.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='fms|x64'">
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -746,9 +872,11 @@
   <ItemGroup>
     <ClCompile Include="kernel32.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="undoc_apphelp.cpp">
@@ -761,12 +889,16 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
@@ -775,6 +907,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="undoc_fms.cpp" />
     <ClCompile Include="undoc_ntdll.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|x64'">true</ExcludedFromBuild>
@@ -785,8 +918,10 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
@@ -798,6 +933,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="undoc_ws2_32.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
@@ -809,12 +945,16 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
@@ -831,12 +971,16 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
@@ -852,8 +996,10 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='zlib|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='fms|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
@@ -861,10 +1007,12 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
@@ -875,8 +1023,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
@@ -892,6 +1042,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="undoc_ws2_32.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
@@ -899,8 +1050,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
@@ -909,8 +1062,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
@@ -921,8 +1076,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
@@ -931,11 +1088,14 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="undoc_fms.def" />
     <None Include="undoc_k32.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|x64'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>

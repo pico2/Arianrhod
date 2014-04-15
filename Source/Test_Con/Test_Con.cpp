@@ -85,30 +85,158 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
-#pragma comment(lib, "ws2_32.lib")
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    if (0)
+    {
+        FMS_HANDLE handle;
+        FMS_FILTER_DATA data;
+        ULONG PropertySize, NumberOfProperty, FontId;
+        PWSTR FaceNameList;
+        ENUMLOGFONTEXW elf;
+
+        ZeroMemory(&data, sizeof(data));
+
+        FmsInitializeEnumerator(&handle, 0);
+        FmsSetFilter(handle, &data, 0);
+
+        PropertySize = 0;
+        FmsGetFilteredPropertyList(handle, FmsPropertyType::FaceNameLocale, &NumberOfProperty, &PropertySize, nullptr);
+
+        FaceNameList = (PWSTR)AllocStack(PropertySize);
+        FmsGetFilteredPropertyList(handle, FmsPropertyType::FaceNameLocale, &NumberOfProperty, &PropertySize, FaceNameList);
+
+        for (; NumberOfProperty != 0; --NumberOfProperty)
+        {
+            ULONG_PTR Length = PrintConsole(L"%s\n", FaceNameList);
+
+            Status = FmsGetBestMatchInFamily(handle, 0, L"£Í£Ó £Ð¥´¥·¥Ã¥¯", &FontId);
+            if (NT_SUCCESS(Status))
+            {
+                ULONG pplist[] =
+                {
+                    FmsPropertyType::FaceNameLocale,
+                    FmsPropertyType::FullNameLocale,
+                    FmsPropertyType::ScriptName,
+                    FmsPropertyType::FontStyleNameLocale,
+                };
+
+                WCHAR buf[0x800];
+
+                for (ULONG p = 0; FALSE; ++p)
+                {
+                    PropertySize = sizeof(buf);
+                    ZeroMemory(buf, sizeof(buf));
+
+                    Status = FmsGetFontProperty(handle, FontId, p, &PropertySize, buf);
+                    PrintConsole(L"%04X: %s\n", p, buf);
+                    PauseConsole();
+                }
+
+                for (PULONG p = pplist; p != pplist + countof(pplist); ++p)
+                {
+                    PropertySize = sizeof(buf);
+                    ZeroMemory(buf, sizeof(buf));
+
+                    Status = FmsGetFontProperty(handle, FontId, *p, &PropertySize, buf);
+                    PrintConsole(L"%04d: %s\n", *p, buf);
+                }
+                //FmsGetGDILogFont(handle, FontId, TRUE, &elf, nullptr);
+
+                break;
+            }
+
+            FaceNameList += Length;
+            PrintConsole(L"\n");
+        }
+
+        FmsFreeEnumerator(&handle);
+
+        PauseConsole();
+
+        return;
+    }
+
+    FMS_HANDLE handle;
     CHOOSEFONTW choosefont;
     LOGFONTW lf;
 
+    FmsInitializeEnumerator(&handle, 0);
+
     ZeroMemory(&lf, sizeof(lf));
     lf.lfCharSet = SHIFTJIS_CHARSET;
-    EnumFontFamiliesExW(GetDC(nullptr), &lf, 
-        [](CONST LOGFONTW *lf, CONST TEXTMETRICW *, DWORD, LPARAM) -> int
+    EnumFontFamiliesExW(GetDC(nullptr), &lf,
+        [](CONST LOGFONTW *lf2, CONST TEXTMETRICW *, DWORD, LPARAM param) -> int
         {
-            PrintConsole(L"%s\n", lf->lfFaceName);
+            FMS_HANDLE handle = (FMS_HANDLE)param;
+            LPENUMLOGFONTEXW lf = (LPENUMLOGFONTEXW)lf2;
+            ULONG FontId;
+            ENUMLOGFONTEXW lf3;
+            WCHAR buf[0x200];
+            ULONG PropertySize;
+
+            NTSTATUS st;
+
+            st = FmsGetBestMatchInFamily(handle, 0, L"MS UI Gothic", &FontId);
+            //st = FmsGetBestMatchInFamily(handle, 0, lf->elfLogFont.lfFaceName, &FontId);
+
+            if (NT_SUCCESS(st))
+                st = FmsGetGdiLogicalFont(handle, FontId, TRUE, &lf3, nullptr, nullptr);
+
+            if (NT_FAILED(st))
+                return 1;
+
+            lf = &lf3;
+
+            if (NT_SUCCESS(st))
+            {
+                PropertySize = sizeof(buf);
+                st = FmsGetFontProperty(handle, FontId, FmsPropertyType::FaceNameLocale, &PropertySize, buf);
+                if (NT_SUCCESS(st))
+                {
+                    CopyMemory(lf->elfLogFont.lfFaceName, buf, PropertySize);
+                    CopyMemory(lf->elfFullName, buf, PropertySize);
+                }
+                else
+                {
+                }
+
+                PropertySize = sizeof(buf);
+                FmsGetFontProperty(handle, FontId, FmsPropertyType::ScriptName, &PropertySize, buf);
+                if (NT_SUCCESS(st))
+                {
+                    CopyMemory(lf->elfScript, buf, PropertySize);
+                }
+
+                PropertySize = sizeof(buf);
+                FmsGetFontProperty(handle, FontId, FmsPropertyType::FontStyleNameLocale, &PropertySize, buf);
+                if (NT_SUCCESS(st))
+                {
+                    CopyMemory(lf->elfStyle, buf, PropertySize);
+                }
+            }
+
+            PrintConsole(L"lfFaceName:  %s\n", lf->elfLogFont.lfFaceName);
+            PrintConsole(L"elfFullName: %s\n", lf->elfFullName);
+            PrintConsole(L"elfScript:   %s\n", lf->elfScript);
+            PrintConsole(L"elfStyle:    %s\n", lf->elfStyle);
+
+            PrintConsole(L"\n");
+
             return 1;
         },
-        0,0
+        (LPARAM)handle,0
     );
 
     PauseConsole();
-    
+
+    //return;
+
     ZeroMemory(&lf, sizeof(lf));
     lf.lfCharSet = SHIFTJIS_CHARSET;
+    StrCopyW(lf.lfFaceName, L"SIMSUN");
 
     ZeroMemory(&choosefont, sizeof(choosefont));
     choosefont.lStructSize = sizeof(choosefont);

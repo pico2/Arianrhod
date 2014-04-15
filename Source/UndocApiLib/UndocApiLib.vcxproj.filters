@@ -19,6 +19,9 @@
     <Filter Include="kernel32">
       <UniqueIdentifier>{bed4e453-2448-4494-a707-a77e3d0387ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fms">
+      <UniqueIdentifier>{87bbb099-ddde-42ce-8855-2168bcf8d425}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="undoc_apphelp.cpp">
@@ -38,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="kernel32.cpp">
       <Filter>kernel32</Filter>
+    </ClCompile>
+    <ClCompile Include="undoc_fms.cpp">
+      <Filter>fms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +66,9 @@
   <ItemGroup>
     <None Include="undoc_k32.def">
       <Filter>kernel32</Filter>
+    </None>
+    <None Include="undoc_fms.def">
+      <Filter>fms</Filter>
     </None>
   </ItemGroup>
 </Project>
