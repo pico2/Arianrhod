@@ -8,7 +8,7 @@ _ML_C_HEAD_
 NTSTATUS
 NTAPI
 FmsInitializeEnumerator(
-    IN  PFMS_HANDLE Handle,
+    IN  PFMS_ENUMERATOR Handle,
     IN  ULONG       Flags
 )
 {
@@ -18,7 +18,7 @@ FmsInitializeEnumerator(
 NTSTATUS
 NTAPI
 FmsFreeEnumerator(
-    IN OUT PFMS_HANDLE Handle
+    IN OUT PFMS_ENUMERATOR Handle
 )
 {
     return 0;
@@ -27,7 +27,18 @@ FmsFreeEnumerator(
 NTSTATUS
 NTAPI
 FmsSetFilter(
-    IN  FMS_HANDLE          Handle,
+    IN  FMS_ENUMERATOR          Handle,
+    IN  PFMS_FILTER_DATA    FilterData,
+    IN  ULONG               NumberOfFilterData
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
+FmsAddFilter(
+    IN  FMS_ENUMERATOR      Enumerator,
     IN  PFMS_FILTER_DATA    FilterData,
     IN  ULONG               NumberOfFilterData
 )
@@ -38,7 +49,7 @@ FmsSetFilter(
 NTSTATUS
 NTAPI
 FmsGetFilteredPropertyList(
-    IN      FMS_HANDLE  Handle,
+    IN      FMS_ENUMERATOR  Handle,
     IN      ULONG       PropertyType,
     OUT     PULONG      NumberofProperty,
     IN OUT  PULONG      PropertySize,
@@ -51,7 +62,7 @@ FmsGetFilteredPropertyList(
 NTSTATUS
 NTAPI
 FmsGetFilteredFontList(
-    IN  FMS_HANDLE  Handle,
+    IN  FMS_ENUMERATOR  Handle,
     OUT PULONG      NumberOfFonts,
     OUT PULONG      FontIdList OPTIONAL
 )
@@ -62,7 +73,7 @@ FmsGetFilteredFontList(
 NTSTATUS
 NTAPI
 FmsGetGDILogFont(
-    IN  FMS_HANDLE          Handle,
+    IN  FMS_ENUMERATOR          Handle,
     IN  ULONG               FontId,
     IN  BOOLEAN             What,
     OUT LPENUMLOGFONTEXW    LogFont,
@@ -75,7 +86,7 @@ FmsGetGDILogFont(
 NTSTATUS
 NTAPI
 FmsGetGdiLogicalFont(
-    IN  FMS_HANDLE          Handle,
+    IN  FMS_ENUMERATOR          Handle,
     IN  ULONG               FontId,
     IN  BOOLEAN             What,
     OUT LPENUMLOGFONTEXW    LogFont,
@@ -89,7 +100,7 @@ FmsGetGdiLogicalFont(
 NTSTATUS
 NTAPI
 FmsGetFontProperty(
-    IN      FMS_HANDLE  Handle,
+    IN      FMS_ENUMERATOR  Handle,
     IN      ULONG       FontId,
     IN      ULONG       PropertyType,
     IN OUT  PULONG      PropertySize,
@@ -102,7 +113,7 @@ FmsGetFontProperty(
 NTSTATUS
 NTAPI
 FmsGetBestMatchInFamily(
-    IN  FMS_HANDLE          Handle,
+    IN  FMS_ENUMERATOR          Handle,
     IN  ULONG               ReservedZero,
     IN  PCWSTR              FaceName,
     OUT PULONG              FontId

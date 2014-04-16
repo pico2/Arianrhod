@@ -85,150 +85,173 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+INT NTAPI LeEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags)
+{
+    ULONG           NumberOfFonts, PropertySize;
+    PULONG          FontIdList, FontId;
+    INT             ReturnValue;
+    NTSTATUS        Status;
+    FMS_ENUMERATOR  Enumerator;
+    FMS_FILTER_DATA FilterData;
+
+    ReturnValue = 0;
+
+    Status = FmsInitializeEnumerator(&Enumerator);
+    if (NT_FAILED(Status))
+        return ReturnValue;
+
+    FmsSetFilter(Enumerator, &FilterData, 0);
+
+    if (Logfont->lfFaceName[0] != 0)
+    {
+        ZeroMemory(&FilterData, sizeof(FilterData));
+
+        FilterData.Unknown1 = 1;
+        FilterData.FilterType = FmsFilterType::FaceName;
+        CopyMemory(FilterData.FaceName, Logfont->lfFaceName, sizeof(Logfont->lfFaceName));
+        FilterData.FaceName[countof(Logfont->lfFaceName)] = 0;
+
+        FmsAddFilter(Enumerator, &FilterData, 1);
+    }
+
+    if (Logfont->lfCharSet != DEFAULT_CHARSET)
+    {
+        ZeroMemory(&FilterData, sizeof(FilterData));
+
+        FilterData.Unknown1 = 1;
+        FilterData.FilterType = FmsFilterType::CharSet;
+        FilterData.Charset = Logfont->lfCharSet;
+
+        FmsAddFilter(Enumerator, &FilterData, 1);
+    }
+
+    NumberOfFonts = 0;
+    FontIdList = nullptr;
+    Status = FmsGetFilteredFontList(Enumerator, &NumberOfFonts, FontIdList);
+    if (NT_FAILED(Status))
+    {
+        FmsFreeEnumerator(&Enumerator);
+        return ReturnValue;
+    }
+
+    FontIdList = (PULONG)AllocStack(NumberOfFonts * sizeof(*FontIdList));
+    Status = FmsGetFilteredFontList(Enumerator, &NumberOfFonts, FontIdList);
+    if (NT_FAILED(Status))
+    {
+        FmsFreeEnumerator(&Enumerator);
+        return ReturnValue;
+    }
+
+    for (PULONG FontId = FontIdList; NumberOfFonts; ++FontId, --NumberOfFonts)
+    {
+        ULONG           FontType;
+        TEXTMETRICW     TextMetric[2];
+        ENUMLOGFONTEXW  EnumLogFont;
+        WCHAR           Style[countof(EnumLogFont.elfStyle)];
+
+        FillMemory(TextMetric, sizeof(TextMetric), -1);
+
+        Status = FmsGetGdiLogicalFont(Enumerator, *FontId, TRUE, &EnumLogFont, TextMetric, nullptr);
+        if (NT_FAILED(Status))
+            continue;
+
+        PropertySize = sizeof(EnumLogFont.elfLogFont.lfFaceName);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FaceNameLocale, &PropertySize, EnumLogFont.elfLogFont.lfFaceName);
+        if (NT_FAILED(Status))
+            continue;
+
+        PropertySize = sizeof(EnumLogFont.elfFullName);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FullNameLocale, &PropertySize, EnumLogFont.elfFullName);
+        if (NT_FAILED(Status))
+            continue;
+
+        PropertySize = sizeof(Style);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FontStyleNameLocale, &PropertySize, Style);
+        if (NT_SUCCESS(Status))
+        {
+            CopyMemory(EnumLogFont.elfStyle, Style, PropertySize);
+        }
+
+        PropertySize = sizeof(FontType);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FontType, &PropertySize, &FontType);
+        if (NT_FAILED(Status))
+            FontType = 0;
+
+        ReturnValue = Proc(&EnumLogFont.elfLogFont, TextMetric, FontType, Parameter);
+    }
+
+    FmsFreeEnumerator(&Enumerator);
+
+    return ReturnValue;
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-
-    if (0)
-    {
-        FMS_HANDLE handle;
-        FMS_FILTER_DATA data;
-        ULONG PropertySize, NumberOfProperty, FontId;
-        PWSTR FaceNameList;
-        ENUMLOGFONTEXW elf;
-
-        ZeroMemory(&data, sizeof(data));
-
-        FmsInitializeEnumerator(&handle, 0);
-        FmsSetFilter(handle, &data, 0);
-
-        PropertySize = 0;
-        FmsGetFilteredPropertyList(handle, FmsPropertyType::FaceNameLocale, &NumberOfProperty, &PropertySize, nullptr);
-
-        FaceNameList = (PWSTR)AllocStack(PropertySize);
-        FmsGetFilteredPropertyList(handle, FmsPropertyType::FaceNameLocale, &NumberOfProperty, &PropertySize, FaceNameList);
-
-        for (; NumberOfProperty != 0; --NumberOfProperty)
-        {
-            ULONG_PTR Length = PrintConsole(L"%s\n", FaceNameList);
-
-            Status = FmsGetBestMatchInFamily(handle, 0, L"£Í£Ó £Ð¥´¥·¥Ã¥¯", &FontId);
-            if (NT_SUCCESS(Status))
-            {
-                ULONG pplist[] =
-                {
-                    FmsPropertyType::FaceNameLocale,
-                    FmsPropertyType::FullNameLocale,
-                    FmsPropertyType::ScriptName,
-                    FmsPropertyType::FontStyleNameLocale,
-                };
-
-                WCHAR buf[0x800];
-
-                for (ULONG p = 0; FALSE; ++p)
-                {
-                    PropertySize = sizeof(buf);
-                    ZeroMemory(buf, sizeof(buf));
-
-                    Status = FmsGetFontProperty(handle, FontId, p, &PropertySize, buf);
-                    PrintConsole(L"%04X: %s\n", p, buf);
-                    PauseConsole();
-                }
-
-                for (PULONG p = pplist; p != pplist + countof(pplist); ++p)
-                {
-                    PropertySize = sizeof(buf);
-                    ZeroMemory(buf, sizeof(buf));
-
-                    Status = FmsGetFontProperty(handle, FontId, *p, &PropertySize, buf);
-                    PrintConsole(L"%04d: %s\n", *p, buf);
-                }
-                //FmsGetGDILogFont(handle, FontId, TRUE, &elf, nullptr);
-
-                break;
-            }
-
-            FaceNameList += Length;
-            PrintConsole(L"\n");
-        }
-
-        FmsFreeEnumerator(&handle);
-
-        PauseConsole();
-
-        return;
-    }
-
-    FMS_HANDLE handle;
     CHOOSEFONTW choosefont;
     LOGFONTW lf;
 
-    FmsInitializeEnumerator(&handle, 0);
+#if 1
+
+    FMS_ENUMERATOR emu;
+
+    FmsInitializeEnumerator(&emu);
+
+    PauseConsole();
 
     ZeroMemory(&lf, sizeof(lf));
     lf.lfCharSet = SHIFTJIS_CHARSET;
-    EnumFontFamiliesExW(GetDC(nullptr), &lf,
-        [](CONST LOGFONTW *lf2, CONST TEXTMETRICW *, DWORD, LPARAM param) -> int
+    EnumFontFamiliesEx(GetDC(nullptr), &lf,
+        [](CONST LOGFONTW *lf2, CONST TEXTMETRICW *, DWORD FontType, LPARAM param) -> int
         {
-            FMS_HANDLE handle = (FMS_HANDLE)param;
+            ULONG FontNumber;
+            PULONG FontId;
+            FMS_ENUMERATOR emu = (FMS_ENUMERATOR)param;
             LPENUMLOGFONTEXW lf = (LPENUMLOGFONTEXW)lf2;
-            ULONG FontId;
             ENUMLOGFONTEXW lf3;
-            WCHAR buf[0x200];
-            ULONG PropertySize;
+            FMS_FILTER_DATA filter;
 
-            NTSTATUS st;
+            FmsSetFilter(emu, nullptr, 0);
 
-            st = FmsGetBestMatchInFamily(handle, 0, L"MS UI Gothic", &FontId);
-            //st = FmsGetBestMatchInFamily(handle, 0, lf->elfLogFont.lfFaceName, &FontId);
-
-            if (NT_SUCCESS(st))
-                st = FmsGetGdiLogicalFont(handle, FontId, TRUE, &lf3, nullptr, nullptr);
-
-            if (NT_FAILED(st))
-                return 1;
-
-            lf = &lf3;
-
-            if (NT_SUCCESS(st))
+            if (lf->elfLogFont.lfCharSet != DEFAULT_CHARSET)
             {
-                PropertySize = sizeof(buf);
-                st = FmsGetFontProperty(handle, FontId, FmsPropertyType::FaceNameLocale, &PropertySize, buf);
-                if (NT_SUCCESS(st))
-                {
-                    CopyMemory(lf->elfLogFont.lfFaceName, buf, PropertySize);
-                    CopyMemory(lf->elfFullName, buf, PropertySize);
-                }
-                else
-                {
-                }
+                ZeroMemory(&filter, sizeof(filter));
+                filter.Unknown1 = 1;
+                filter.FilterType = FmsFilterType::CharSet;
+                filter.Charset = lf->elfLogFont.lfCharSet;
 
-                PropertySize = sizeof(buf);
-                FmsGetFontProperty(handle, FontId, FmsPropertyType::ScriptName, &PropertySize, buf);
-                if (NT_SUCCESS(st))
-                {
-                    CopyMemory(lf->elfScript, buf, PropertySize);
-                }
-
-                PropertySize = sizeof(buf);
-                FmsGetFontProperty(handle, FontId, FmsPropertyType::FontStyleNameLocale, &PropertySize, buf);
-                if (NT_SUCCESS(st))
-                {
-                    CopyMemory(lf->elfStyle, buf, PropertySize);
-                }
+                FmsAddFilter(emu, &filter, 1);
             }
 
-            PrintConsole(L"lfFaceName:  %s\n", lf->elfLogFont.lfFaceName);
-            PrintConsole(L"elfFullName: %s\n", lf->elfFullName);
-            PrintConsole(L"elfScript:   %s\n", lf->elfScript);
-            PrintConsole(L"elfStyle:    %s\n", lf->elfStyle);
+            ZeroMemory(&filter, sizeof(filter));
+            filter.Unknown1 = 1;
+            filter.FilterType = FmsFilterType::FaceName;
+            CopyMemory(filter.FaceName, lf->elfLogFont.lfFaceName, sizeof(lf->elfLogFont.lfFaceName));
 
-            PrintConsole(L"\n");
+            FmsAddFilter(emu, &filter, 1);
+
+            FontId = nullptr;
+            FmsGetFilteredFontList(emu, &FontNumber, FontId);
+            FontId = (PULONG)AllocStack(FontNumber * sizeof(*FontId));
+            FmsGetFilteredFontList(emu, &FontNumber, FontId);
+
+            FontNumber = sizeof(lf->elfLogFont.lfFaceName);
+            FmsGetFontProperty(emu, *FontId, FmsPropertyType::FaceNameLocale, &FontNumber, lf->elfLogFont.lfFaceName);
+
+            PrintConsole(L"FontType:    %p\r\n", FontType);
+            PrintConsole(L"lfFaceName:  %s\r\n", lf->elfLogFont.lfFaceName);
+            PrintConsole(L"elfFullName: %s\r\n", lf->elfFullName);
+            PrintConsole(L"elfScript:   %s\r\n", lf->elfScript);
+            PrintConsole(L"elfStyle:    %s\r\n", lf->elfStyle);
+
+            PrintConsole(L"\r\n");
 
             return 1;
         },
-        (LPARAM)handle,0
+        (LPARAM)emu,0
     );
+
+#endif
 
     PauseConsole();
 
@@ -236,13 +259,14 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     ZeroMemory(&lf, sizeof(lf));
     lf.lfCharSet = SHIFTJIS_CHARSET;
+    //lf.lfCharSet = GB2312_CHARSET;
     StrCopyW(lf.lfFaceName, L"SIMSUN");
 
     ZeroMemory(&choosefont, sizeof(choosefont));
     choosefont.lStructSize = sizeof(choosefont);
     choosefont.lpLogFont   = &lf;
     choosefont.hwndOwner   = 0;
-    choosefont.Flags       = CF_BOTH|CF_TTONLY|CF_INITTOLOGFONTSTRUCT|CF_INACTIVEFONTS;
+    choosefont.Flags       = CF_BOTH | CF_TTONLY | CF_INITTOLOGFONTSTRUCT | CF_INACTIVEFONTS | CF_SELECTSCRIPT;
     ChooseFontW(&choosefont);
 
     return;

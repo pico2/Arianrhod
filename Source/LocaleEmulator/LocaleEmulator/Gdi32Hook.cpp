@@ -251,8 +251,128 @@ LeNtGdiHfontCreate(
     return GlobalData->HookStub.StubNtGdiHfontCreate(EnumLogFont, SizeOfEnumLogFont, LogFontType, Unknown, FreeListLocalFont);
 }
 
+INT FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags)
+{
+    ULONG           NumberOfFonts, PropertySize;
+    PULONG          FontIdList, FontId;
+    INT             ReturnValue;
+    NTSTATUS        Status;
+    FMS_ENUMERATOR  Enumerator;
+    FMS_FILTER_DATA FilterData;
+
+    ReturnValue = 0;
+
+    Status = FmsInitializeEnumerator(&Enumerator);
+    if (NT_FAILED(Status))
+        return ReturnValue;
+
+    FmsSetFilter(Enumerator, &FilterData, 0);
+
+    if (Logfont->lfFaceName[0] != 0)
+    {
+        ZeroMemory(&FilterData, sizeof(FilterData));
+
+        FilterData.Unknown1 = 1;
+        FilterData.FilterType = FmsFilterType::FaceName;
+        CopyMemory(FilterData.FaceName, Logfont->lfFaceName, sizeof(Logfont->lfFaceName));
+        FilterData.FaceName[countof(Logfont->lfFaceName)] = 0;
+
+        FmsAddFilter(Enumerator, &FilterData, 1);
+    }
+
+    if (Logfont->lfCharSet != DEFAULT_CHARSET)
+    {
+        ZeroMemory(&FilterData, sizeof(FilterData));
+
+        FilterData.Unknown1 = 1;
+        FilterData.FilterType = FmsFilterType::CharSet;
+        FilterData.Charset = Logfont->lfCharSet;
+
+        FmsAddFilter(Enumerator, &FilterData, 1);
+    }
+
+    NumberOfFonts = 0;
+    FontIdList = nullptr;
+    Status = FmsGetFilteredFontList(Enumerator, &NumberOfFonts, FontIdList);
+    if (NT_FAILED(Status))
+    {
+        FmsFreeEnumerator(&Enumerator);
+        return ReturnValue;
+    }
+
+    FontIdList = (PULONG)AllocStack(NumberOfFonts * sizeof(*FontIdList));
+    Status = FmsGetFilteredFontList(Enumerator, &NumberOfFonts, FontIdList);
+    if (NT_FAILED(Status))
+    {
+        FmsFreeEnumerator(&Enumerator);
+        return ReturnValue;
+    }
+
+    for (PULONG FontId = FontIdList; NumberOfFonts; ++FontId, --NumberOfFonts)
+    {
+        ULONG           FontType;
+        TEXTMETRICW     TextMetric[2];
+        ENUMLOGFONTEXW  EnumLogFont;
+        WCHAR           Style[countof(EnumLogFont.elfStyle)];
+
+        FillMemory(TextMetric, sizeof(TextMetric), -1);
+
+        Status = FmsGetGdiLogicalFont(Enumerator, *FontId, TRUE, &EnumLogFont, TextMetric, nullptr);
+        if (NT_FAILED(Status))
+            continue;
+
+        PropertySize = sizeof(EnumLogFont.elfLogFont.lfFaceName);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FaceNameLocale, &PropertySize, EnumLogFont.elfLogFont.lfFaceName);
+        if (NT_FAILED(Status))
+            continue;
+
+        PropertySize = sizeof(EnumLogFont.elfFullName);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FullNameLocale, &PropertySize, EnumLogFont.elfFullName);
+        if (NT_FAILED(Status))
+            continue;
+
+        PropertySize = sizeof(Style);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FontStyleNameLocale, &PropertySize, Style);
+        if (NT_SUCCESS(Status))
+        {
+            CopyMemory(EnumLogFont.elfStyle, Style, PropertySize);
+        }
+
+        PropertySize = sizeof(FontType);
+        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FontType, &PropertySize, &FontType);
+        if (NT_FAILED(Status))
+            FontType = 0;
+
+        ReturnValue = Proc(&EnumLogFont.elfLogFont, TextMetric, FontType, Parameter);
+    }
+
+    FmsFreeEnumerator(&Enumerator);
+
+    return ReturnValue;
+}
+
 int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpProc, LPARAM lParam, DWORD dwFlags)
 {
+
+#if 0
+
+    FMS_CALL_CONTEXT    Context;
+    PFMS_CALL_CONTEXT   PrevContext;
+    PLeGlobalData       GlobalData = LeGetGlobalData();
+
+    PrevContext = Context.Find();
+    if (PrevContext != nullptr)
+    {
+        return GlobalData->EnumFontFamiliesExW(PrevContext->hDC, lpLogfont, lpProc, lParam, dwFlags);
+    }
+
+    Context.hDC = hdc;
+    Context.Push();
+
+    return FmsEnumFontFamiliesEx(hdc, lpLogfont, lpProc, lParam, dwFlags);
+
+#else
+
     ULONG_PTR           Charset;
     LOGFONTW            lf;
     PLeGlobalData       GlobalData = LeGetGlobalData();
@@ -281,6 +401,7 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
     }
 
     return GlobalData->EnumFontFamiliesExW(hdc, lpLogfont, lpProc, lParam, dwFlags);
+#endif
 }
 
 int NTAPI LeEnumFontFamiliesA(HDC hdc, PCSTR lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam)
@@ -309,7 +430,7 @@ int NTAPI LeEnumFontFamiliesW(HDC hdc, PCWSTR lpLogfont, FONTENUMPROCW lpProc, L
     return LeEnumFontFamiliesExW(hdc, &lf, lpProc, lParam, 0);
 }
 
-int NTAPI LeEnumFontsA(HDC hDC, PCSTR lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam)
+int NTAPI LeEnumFontsA(HDC hDC, PCSTR lpFaceName, FONTENUMPROCA lpProc, LPARAM lParam)
 {
     GDI_ENUM_FONT_PARAM Param;
 
@@ -317,7 +438,7 @@ int NTAPI LeEnumFontsA(HDC hDC, PCSTR lpLogfont, FONTENUMPROCA lpProc, LPARAM lP
     Param.Callback = lpProc;
     Param.GlobalData = LeGetGlobalData();
 
-    return Param.GlobalData->EnumFontsA(hDC, lpLogfont,
+    return Param.GlobalData->EnumFontsA(hDC, lpFaceName,
                 [] (const LOGFONTA *lplf, const TEXTMETRICA *lptm, DWORD dwType, LPARAM lpData) -> int
                 {
                     PGDI_ENUM_FONT_PARAM Param = (PGDI_ENUM_FONT_PARAM)lpData;
@@ -329,7 +450,7 @@ int NTAPI LeEnumFontsA(HDC hDC, PCSTR lpLogfont, FONTENUMPROCA lpProc, LPARAM lP
             );
 }
 
-int NTAPI LeEnumFontsW(HDC hDC, PCWSTR lpLogfont, FONTENUMPROCW lpProc, LPARAM lParam)
+int NTAPI LeEnumFontsW(HDC hDC, PCWSTR lpFaceName, FONTENUMPROCW lpProc, LPARAM lParam)
 {
     GDI_ENUM_FONT_PARAM Param;
 
@@ -337,7 +458,7 @@ int NTAPI LeEnumFontsW(HDC hDC, PCWSTR lpLogfont, FONTENUMPROCW lpProc, LPARAM l
     Param.Callback = lpProc;
     Param.GlobalData = LeGetGlobalData();
 
-    return Param.GlobalData->EnumFontsW(hDC, lpLogfont,
+    return Param.GlobalData->EnumFontsW(hDC, lpFaceName,
                 [] (const LOGFONTW *lplf, const TEXTMETRICW *lptm, DWORD dwType, LPARAM lpData) -> int
                 {
                     PGDI_ENUM_FONT_PARAM Param = (PGDI_ENUM_FONT_PARAM)lpData;
