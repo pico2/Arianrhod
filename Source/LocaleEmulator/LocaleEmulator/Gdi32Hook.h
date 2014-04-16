@@ -22,6 +22,14 @@ struct FMS_CALL_CONTEXT : public TEB_ACTIVE_FRAME
 
 typedef FMS_CALL_CONTEXT *PFMS_CALL_CONTEXT;
 
+typedef struct
+{
+    LPARAM          lParam;
+    PLeGlobalData   GlobalData;
+    PVOID           Callback;
+
+} GDI_ENUM_FONT_PARAM, *PGDI_ENUM_FONT_PARAM;
+
 extern ULONG (NTAPI *GdiGetCodePage)(HDC NewDC);
 
 HFONT GetFontFromDC(PLeGlobalData GlobalData, HDC hDC);

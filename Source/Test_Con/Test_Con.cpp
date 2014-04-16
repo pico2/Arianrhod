@@ -201,6 +201,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     ZeroMemory(&lf, sizeof(lf));
     lf.lfCharSet = SHIFTJIS_CHARSET;
+    StrCopyW(lf.lfFaceName, L"SIMHEI");
     EnumFontFamiliesEx(GetDC(nullptr), &lf,
         [](CONST LOGFONTW *lf2, CONST TEXTMETRICW *, DWORD FontType, LPARAM param) -> int
         {
@@ -210,33 +211,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
             LPENUMLOGFONTEXW lf = (LPENUMLOGFONTEXW)lf2;
             ENUMLOGFONTEXW lf3;
             FMS_FILTER_DATA filter;
-
-            FmsSetFilter(emu, nullptr, 0);
-
-            if (lf->elfLogFont.lfCharSet != DEFAULT_CHARSET)
-            {
-                ZeroMemory(&filter, sizeof(filter));
-                filter.Unknown1 = 1;
-                filter.FilterType = FmsFilterType::CharSet;
-                filter.Charset = lf->elfLogFont.lfCharSet;
-
-                FmsAddFilter(emu, &filter, 1);
-            }
-
-            ZeroMemory(&filter, sizeof(filter));
-            filter.Unknown1 = 1;
-            filter.FilterType = FmsFilterType::FaceName;
-            CopyMemory(filter.FaceName, lf->elfLogFont.lfFaceName, sizeof(lf->elfLogFont.lfFaceName));
-
-            FmsAddFilter(emu, &filter, 1);
-
-            FontId = nullptr;
-            FmsGetFilteredFontList(emu, &FontNumber, FontId);
-            FontId = (PULONG)AllocStack(FontNumber * sizeof(*FontId));
-            FmsGetFilteredFontList(emu, &FontNumber, FontId);
-
-            FontNumber = sizeof(lf->elfLogFont.lfFaceName);
-            FmsGetFontProperty(emu, *FontId, FmsPropertyType::FaceNameLocale, &FontNumber, lf->elfLogFont.lfFaceName);
 
             PrintConsole(L"FontType:    %p\r\n", FontType);
             PrintConsole(L"lfFaceName:  %s\r\n", lf->elfLogFont.lfFaceName);

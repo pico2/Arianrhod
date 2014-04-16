@@ -1,13 +1,5 @@
 #include "stdafx.h"
 
-typedef struct
-{
-    LPARAM          lParam;
-    PLeGlobalData   GlobalData;
-    PVOID           Callback;
-
-} GDI_ENUM_FONT_PARAM, *PGDI_ENUM_FONT_PARAM;
-
 ULONG (NTAPI *GdiGetCodePage)(HDC NewDC);
 
 HFONT GetFontFromFont(PLeGlobalData GlobalData, HFONT Font)
@@ -180,77 +172,6 @@ EnumFontFamiliesCallback(
     return ((CallbackType)EnumParam->Callback)(&ElfLogFont->elfLogFont, TextMetric, FontType, EnumParam->lParam);
 }
 
-int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam, DWORD dwFlags)
-{
-    ULONG_PTR           Charset;
-    LOGFONTA            lf;
-    PLeGlobalData       GlobalData = LeGetGlobalData();
-    GDI_ENUM_FONT_PARAM Param;
-
-    LOOP_ONCE
-    {
-        if (lpLogfont == nullptr)
-            break;
-
-        Charset = lpLogfont->lfCharSet;
-        switch (Charset)
-        {
-            case ANSI_CHARSET:
-                break;
-
-            case DEFAULT_CHARSET:
-                Param.Callback      = lpProc;
-                Param.GlobalData    = GlobalData;
-                Param.lParam        = lParam;
-
-                lParam = (LPARAM)&Param;
-                lpProc = (FONTENUMPROCA)EnumFontFamiliesCallback<ENUMLOGFONTEXA, TEXTMETRICA, FONTENUMPROCA>;
-                break;
-        }
-    }
-
-    return GlobalData->EnumFontFamiliesExA(hdc, lpLogfont, lpProc, lParam, dwFlags);
-}
-
-HFONT
-NTAPI
-LeNtGdiHfontCreate(
-    PENUMLOGFONTEXDVW   EnumLogFont,
-    ULONG               SizeOfEnumLogFont,
-    LONG                LogFontType,
-    LONG                Unknown,
-    PVOID               FreeListLocalFont
-)
-{
-    PENUMLOGFONTEXDVW   enumlfex;
-    PLeGlobalData       GlobalData = LeGetGlobalData();
-
-    if (EnumLogFont != nullptr) LOOP_ONCE
-    {
-        ULONG_PTR Charset;
-
-        Charset = EnumLogFont->elfEnumLogfontEx.elfLogFont.lfCharSet;
-
-        if (Charset != ANSI_CHARSET && Charset != DEFAULT_CHARSET)
-            break;
-
-        enumlfex = (PENUMLOGFONTEXDVW)AllocStack(SizeOfEnumLogFont);
-
-        CopyMemory(enumlfex, EnumLogFont, SizeOfEnumLogFont);
-
-        enumlfex->elfEnumLogfontEx.elfLogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
-
-        //if (GdiGetCodePage == NULL)
-        //CopyStruct(enumlfex.elfEnumLogfontEx.elfLogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, LF_FACESIZE);
-        //AllocConsole();
-        //PrintConsoleW(L"%s\n", enumlfex.elfEnumLogfontEx.elfLogFont.lfFaceName);
-
-        EnumLogFont = enumlfex;
-    }
-
-    return GlobalData->HookStub.StubNtGdiHfontCreate(EnumLogFont, SizeOfEnumLogFont, LogFontType, Unknown, FreeListLocalFont);
-}
-
 INT FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags)
 {
     ULONG           NumberOfFonts, PropertySize;
@@ -404,70 +325,169 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
 #endif
 }
 
-int NTAPI LeEnumFontFamiliesA(HDC hdc, PCSTR lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam)
+VOID ConvertAnsiLogfontToUnicode(PLOGFONTW LogFontW, PLOGFONTA LogFontA)
+{
+    CopyMemory(LogFontW, LogFontA, PtrOffset(&LogFontA->lfFaceName, LogFontA));
+    RtlMultiByteToUnicodeN(LogFontW->lfFaceName, sizeof(LogFontW->lfFaceName), nullptr, LogFontA->lfFaceName, StrLengthA(LogFontA->lfFaceName) + 1);
+}
+
+VOID ConvertUnicodeLogfontToAnsi(PLOGFONTA LogFontA, PLOGFONTW LogFontW)
+{
+    CopyMemory(LogFontA, LogFontW, PtrOffset(&LogFontW->lfFaceName, LogFontW));
+    RtlUnicodeToMultiByteN(LogFontA->lfFaceName, sizeof(LogFontA->lfFaceName), nullptr, LogFontW->lfFaceName, (StrLengthW(LogFontW->lfFaceName) + 1) * sizeof(WCHAR));
+}
+
+VOID ConvertUnicodeTextMetricToAnsi(PTEXTMETRICA TextMetricA, CONST TEXTMETRICW* TextMetricW)
+{
+    TextMetricA->tmHeight           = TextMetricW->tmHeight;
+    TextMetricA->tmAscent           = TextMetricW->tmAscent;
+    TextMetricA->tmDescent          = TextMetricW->tmDescent;
+    TextMetricA->tmInternalLeading  = TextMetricW->tmInternalLeading;
+    TextMetricA->tmExternalLeading  = TextMetricW->tmExternalLeading;
+    TextMetricA->tmAveCharWidth     = TextMetricW->tmAveCharWidth;
+    TextMetricA->tmMaxCharWidth     = TextMetricW->tmMaxCharWidth;
+    TextMetricA->tmWeight           = TextMetricW->tmWeight;
+    TextMetricA->tmOverhang         = TextMetricW->tmOverhang;
+    TextMetricA->tmDigitizedAspectX = TextMetricW->tmDigitizedAspectX;
+    TextMetricA->tmDigitizedAspectY = TextMetricW->tmDigitizedAspectY;
+
+    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmFirstChar,     sizeof(TextMetricA->tmFirstChar),   nullptr, &TextMetricW->tmFirstChar,      sizeof(TextMetricW->tmFirstChar));
+    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmLastChar,      sizeof(TextMetricA->tmLastChar),    nullptr, &TextMetricW->tmLastChar,       sizeof(TextMetricW->tmLastChar));
+    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmDefaultChar,   sizeof(TextMetricA->tmDefaultChar), nullptr, &TextMetricW->tmDefaultChar,    sizeof(TextMetricW->tmDefaultChar));
+    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmBreakChar,     sizeof(TextMetricA->tmBreakChar),   nullptr, &TextMetricW->tmBreakChar,      sizeof(TextMetricW->tmBreakChar));
+
+    TextMetricA->tmItalic           = TextMetricW->tmItalic;
+    TextMetricA->tmUnderlined       = TextMetricW->tmUnderlined;
+    TextMetricA->tmStruckOut        = TextMetricW->tmStruckOut;
+    TextMetricA->tmPitchAndFamily   = TextMetricW->tmPitchAndFamily;
+    TextMetricA->tmCharSet          = TextMetricW->tmCharSet;
+}
+
+int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam, DWORD dwFlags)
+{
+    ULONG_PTR           Charset;
+    LOGFONTW            lf;
+    PLeGlobalData       GlobalData = LeGetGlobalData();
+    GDI_ENUM_FONT_PARAM Param;
+
+    Param.Callback      = lpProc;
+    Param.GlobalData    = GlobalData;
+    Param.lParam        = lParam;
+
+    ConvertAnsiLogfontToUnicode(&lf, lpLogfont);
+
+    return LeEnumFontFamiliesExW(hdc, &lf,
+                [](CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW, DWORD FontType, LPARAM param) -> INT
+                {
+                    TEXTMETRICA             TextMetricA;
+                    ENUMLOGFONTEXA          EnumLogFontA;
+                    LPENUMLOGFONTEXW        EnumLogFontW;
+                    PGDI_ENUM_FONT_PARAM    EnumParam;
+
+                    EnumLogFontW = (LPENUMLOGFONTEXW)lf;
+                    ConvertUnicodeLogfontToAnsi(&EnumLogFontA.elfLogFont, &EnumLogFontW->elfLogFont);
+
+                    RtlUnicodeToMultiByteN((PSTR)EnumLogFontA.elfFullName, sizeof(EnumLogFontA.elfFullName), nullptr, EnumLogFontW->elfFullName, (StrLengthW(EnumLogFontW->elfFullName) + 1) * sizeof(WCHAR));
+                    RtlUnicodeToMultiByteN((PSTR)EnumLogFontA.elfScript, sizeof(EnumLogFontA.elfScript), nullptr, EnumLogFontW->elfScript, (StrLengthW(EnumLogFontW->elfScript) + 1) * sizeof(WCHAR));
+                    RtlUnicodeToMultiByteN((PSTR)EnumLogFontA.elfStyle, sizeof(EnumLogFontA.elfStyle), nullptr, EnumLogFontW->elfStyle, (StrLengthW(EnumLogFontW->elfStyle) + 1) * sizeof(WCHAR));
+
+                    ConvertUnicodeTextMetricToAnsi(&TextMetricA, TextMetricW);
+
+                    EnumParam = (PGDI_ENUM_FONT_PARAM)param;
+                    return ((FONTENUMPROCA)(EnumParam->Callback))(&EnumLogFontA.elfLogFont, &TextMetricA, FontType, EnumParam->lParam);
+                },
+                (LPARAM)&Param,
+                dwFlags
+            );
+}
+
+int NTAPI LeEnumFontFamiliesA(HDC hdc, PCSTR lpszFamily, FONTENUMPROCA lpProc, LPARAM lParam)
 {
     LOGFONTA lf;
 
     ZeroMemory(&lf, sizeof(lf));
 
-    lf.lfPitchAndFamily = 0;
     lf.lfCharSet = DEFAULT_CHARSET;
-    StrCopyA(lf.lfFaceName, lpLogfont);
+    StrCopyA(lf.lfFaceName, lpszFamily);
 
     return LeEnumFontFamiliesExA(hdc, &lf, lpProc, lParam, 0);
 }
 
-int NTAPI LeEnumFontFamiliesW(HDC hdc, PCWSTR lpLogfont, FONTENUMPROCW lpProc, LPARAM lParam)
+int NTAPI LeEnumFontFamiliesW(HDC hdc, PCWSTR lpszFamily, FONTENUMPROCW lpProc, LPARAM lParam)
 {
     LOGFONTW lf;
 
     ZeroMemory(&lf, sizeof(lf));
 
-    lf.lfPitchAndFamily = 0;
     lf.lfCharSet = DEFAULT_CHARSET;
-    StrCopyW(lf.lfFaceName, lpLogfont);
+    StrCopyW(lf.lfFaceName, lpszFamily);
 
     return LeEnumFontFamiliesExW(hdc, &lf, lpProc, lParam, 0);
 }
 
 int NTAPI LeEnumFontsA(HDC hDC, PCSTR lpFaceName, FONTENUMPROCA lpProc, LPARAM lParam)
 {
-    GDI_ENUM_FONT_PARAM Param;
+    LOGFONTA LogFont;
 
-    Param.lParam = lParam;
-    Param.Callback = lpProc;
-    Param.GlobalData = LeGetGlobalData();
+    ZeroMemory(&LogFont, sizeof(LogFont));
+    LogFont.lfCharSet = DEFAULT_CHARSET;
 
-    return Param.GlobalData->EnumFontsA(hDC, lpFaceName,
-                [] (const LOGFONTA *lplf, const TEXTMETRICA *lptm, DWORD dwType, LPARAM lpData) -> int
-                {
-                    PGDI_ENUM_FONT_PARAM Param = (PGDI_ENUM_FONT_PARAM)lpData;
+    LogFont.lfFaceName[0] = 0;
+    StrCopyA(LogFont.lfFaceName, lpFaceName);
 
-                    ((PLOGFONTW)lplf)->lfCharSet = Param->GlobalData->GetLeb()->DefaultCharset;
-                    return ((FONTENUMPROCA)Param->Callback)(lplf, lptm, dwType, Param->lParam);
-                },
-                (LPARAM)&Param
-            );
+    return LeEnumFontFamiliesExA(hDC, &LogFont, lpProc, lParam, 0);
 }
 
 int NTAPI LeEnumFontsW(HDC hDC, PCWSTR lpFaceName, FONTENUMPROCW lpProc, LPARAM lParam)
 {
-    GDI_ENUM_FONT_PARAM Param;
+    LOGFONTW LogFont;
 
-    Param.lParam = lParam;
-    Param.Callback = lpProc;
-    Param.GlobalData = LeGetGlobalData();
+    ZeroMemory(&LogFont, sizeof(LogFont));
+    LogFont.lfCharSet = DEFAULT_CHARSET;
 
-    return Param.GlobalData->EnumFontsW(hDC, lpFaceName,
-                [] (const LOGFONTW *lplf, const TEXTMETRICW *lptm, DWORD dwType, LPARAM lpData) -> int
-                {
-                    PGDI_ENUM_FONT_PARAM Param = (PGDI_ENUM_FONT_PARAM)lpData;
+    LogFont.lfFaceName[0] = 0;
+    StrCopyW(LogFont.lfFaceName, lpFaceName);
 
-                    ((PLOGFONTW)lplf)->lfCharSet = Param->GlobalData->GetLeb()->DefaultCharset;
-                    return ((FONTENUMPROCW)Param->Callback)(lplf, lptm, dwType, Param->lParam);
-                },
-                (LPARAM)&Param
-            );
+    return LeEnumFontFamiliesExW(hDC, &LogFont, lpProc, lParam, 0);
+}
+
+HFONT
+NTAPI
+LeNtGdiHfontCreate(
+    PENUMLOGFONTEXDVW   EnumLogFont,
+    ULONG               SizeOfEnumLogFont,
+    LONG                LogFontType,
+    LONG                Unknown,
+    PVOID               FreeListLocalFont
+)
+{
+    PENUMLOGFONTEXDVW   enumlfex;
+    PLeGlobalData       GlobalData = LeGetGlobalData();
+
+    if (EnumLogFont != nullptr) LOOP_ONCE
+    {
+        ULONG_PTR Charset;
+
+        Charset = EnumLogFont->elfEnumLogfontEx.elfLogFont.lfCharSet;
+
+        if (Charset != ANSI_CHARSET && Charset != DEFAULT_CHARSET)
+            break;
+
+        enumlfex = (PENUMLOGFONTEXDVW)AllocStack(SizeOfEnumLogFont);
+
+        CopyMemory(enumlfex, EnumLogFont, SizeOfEnumLogFont);
+
+        enumlfex->elfEnumLogfontEx.elfLogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
+
+        //if (GdiGetCodePage == NULL)
+        //CopyStruct(enumlfex.elfEnumLogfontEx.elfLogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, LF_FACESIZE);
+        //AllocConsole();
+        //PrintConsoleW(L"%s\n", enumlfex.elfEnumLogfontEx.elfLogFont.lfFaceName);
+
+        EnumLogFont = enumlfex;
+    }
+
+    return GlobalData->HookStub.StubNtGdiHfontCreate(EnumLogFont, SizeOfEnumLogFont, LogFontType, Unknown, FreeListLocalFont);
 }
 
 API_POINTER(SelectObject)  StubSelectObject;
@@ -546,7 +566,7 @@ PVOID FindNtGdiHfontCreate(PVOID Gdi32)
 
 NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
 {
-    PVOID NtGdiHfontCreate;
+    PVOID NtGdiHfontCreate, Fms;
 
     *(PVOID *)&GdiGetCodePage = GetRoutineAddress(Gdi32, "GdiGetCodePage");
 
@@ -559,6 +579,12 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
     if (HookStub.StubNtUserCreateWindowEx != nullptr)
     {
         InitFontCharsetInfo();
+    }
+
+    Fms = Ldr::LoadDll(L"fms.dll");
+    if (Fms == nullptr)
+    {
+        return STATUS_DLL_NOT_FOUND;
     }
 
     Mp::PATCH_MEMORY_DATA p[] =
@@ -575,6 +601,8 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
         LeHookFromEAT2(Gdi32, GDI32, EnumFontFamiliesW),
 
         LeFunctionJump(NtGdiHfontCreate),
+
+        Mp::MemoryPatchVa(HookStub.StubEnumFontFamiliesExW, sizeof(PVOID), LookupExportTable(Gdi32, GDI32_EnumFontFamiliesExW)),
 
         //Mp::FunctionJumpVa(LookupExportTable(Gdi32, GDI32_SelectObject), LeSelectObject, &StubSelectObject),
     };
