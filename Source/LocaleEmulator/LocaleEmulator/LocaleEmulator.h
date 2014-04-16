@@ -618,6 +618,8 @@ public:
       gdi32
     ************************************************************************/
 
+    INT FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags);
+
     int EnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpFontFunc, LPARAM lParam)
     {
         return HookStub.StubEnumFontsA(hdc, lpFaceName, lpFontFunc, lParam);

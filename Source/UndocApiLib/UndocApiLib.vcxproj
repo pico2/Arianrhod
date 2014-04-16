@@ -907,7 +907,14 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='apphelp|x64'"> /GS- /GL /MP   /GS- /GL /MP </AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="undoc_fms.cpp" />
+    <ClCompile Include="undoc_fms.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="undoc_ntdll.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|x64'">true</ExcludedFromBuild>
@@ -1088,7 +1095,14 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="undoc_fms.def" />
+    <None Include="undoc_fms.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='apphelp|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='kernel32|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ucidec|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ws2_32|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='zlib|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="undoc_k32.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ntdll|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='fms|x64'">true</ExcludedFromBuild>

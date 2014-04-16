@@ -10,6 +10,16 @@ long __cdecl _ftol(float)
     return 0;
 }
 
+int __cdecl _stricmp(__in_z const char * _Str1, __in_z const char * _Str2)
+{
+    return 0;
+}
+
+int __cdecl _wcsicmp(_In_z_ const wchar_t * _Str1, _In_z_ const wchar_t * _Str2)
+{
+    return 0;
+}
+
 wchar_t* __cdecl wcsstr(const wchar_t *_Str, const wchar_t *_SubStr)
 {
     return 0;
@@ -289,7 +299,7 @@ NtSetValueKey(
     IN  PUNICODE_STRING ValueName,
     IN  ULONG           TitleIndex OPTIONAL,
     IN  ULONG           ValueType,
-    IN  LPCVOID         ValueData OPTIONAL,
+    IN  PVOID           ValueData OPTIONAL,
     IN  ULONG           ValueDataSize
 )
 {

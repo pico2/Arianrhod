@@ -40,3 +40,5 @@ EXPORTS
 	sprintf
 	wcsstr
 	_ftol
+	_stricmp
+	_wcsicmp

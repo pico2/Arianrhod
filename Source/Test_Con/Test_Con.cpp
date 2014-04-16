@@ -145,13 +145,24 @@ INT NTAPI LeEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, L
     for (PULONG FontId = FontIdList; NumberOfFonts; ++FontId, --NumberOfFonts)
     {
         ULONG           FontType;
-        TEXTMETRICW     TextMetric[2];
+        FMS_TEXTMETRIC  TextMetric;
         ENUMLOGFONTEXW  EnumLogFont;
         WCHAR           Style[countof(EnumLogFont.elfStyle)];
 
-        FillMemory(TextMetric, sizeof(TextMetric), -1);
+        WCHAR buf[1000];
+        for (int p = 0; p <= FmsPropertyType::PropertyMax ; ++p)
+        {
+            PropertySize = sizeof(buf);
+            *(PULONG)buf = 0;
+            FmsGetFontProperty(Enumerator, *FontId, p, &PropertySize, buf);
+            PrintConsole(L"%04X: %08X %s\n", p, *(PULONG)buf, buf);
+        }
 
-        Status = FmsGetGdiLogicalFont(Enumerator, *FontId, TRUE, &EnumLogFont, TextMetric, nullptr);
+        PrintConsole(L"\n");
+
+        continue;
+
+        Status = FmsGetGdiLogicalFont(Enumerator, *FontId, TRUE, &EnumLogFont, &TextMetric, nullptr);
         if (NT_FAILED(Status))
             continue;
 
@@ -172,12 +183,7 @@ INT NTAPI LeEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, L
             CopyMemory(EnumLogFont.elfStyle, Style, PropertySize);
         }
 
-        PropertySize = sizeof(FontType);
-        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FontType, &PropertySize, &FontType);
-        if (NT_FAILED(Status))
-            FontType = 0;
-
-        ReturnValue = Proc(&EnumLogFont.elfLogFont, TextMetric, FontType, Parameter);
+        ReturnValue = Proc(&EnumLogFont.elfLogFont, &TextMetric.TextMetric, FontType, Parameter);
     }
 
     FmsFreeEnumerator(&Enumerator);
@@ -193,24 +199,15 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
 #if 1
 
-    FMS_ENUMERATOR emu;
-
-    FmsInitializeEnumerator(&emu);
-
     PauseConsole();
 
     ZeroMemory(&lf, sizeof(lf));
-    lf.lfCharSet = SHIFTJIS_CHARSET;
-    StrCopyW(lf.lfFaceName, L"SIMHEI");
+    //lf.lfCharSet = SHIFTJIS_CHARSET;
+    //StrCopyW(lf.lfFaceName, L"メイリオ");
     EnumFontFamiliesEx(GetDC(nullptr), &lf,
         [](CONST LOGFONTW *lf2, CONST TEXTMETRICW *, DWORD FontType, LPARAM param) -> int
         {
-            ULONG FontNumber;
-            PULONG FontId;
-            FMS_ENUMERATOR emu = (FMS_ENUMERATOR)param;
             LPENUMLOGFONTEXW lf = (LPENUMLOGFONTEXW)lf2;
-            ENUMLOGFONTEXW lf3;
-            FMS_FILTER_DATA filter;
 
             PrintConsole(L"FontType:    %p\r\n", FontType);
             PrintConsole(L"lfFaceName:  %s\r\n", lf->elfLogFont.lfFaceName);
@@ -222,7 +219,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
             return 1;
         },
-        (LPARAM)emu,0
+        (LPARAM)0,0
     );
 
 #endif

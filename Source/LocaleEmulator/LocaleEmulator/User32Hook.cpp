@@ -1511,9 +1511,9 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         LeHookFromEAT(User32, USER32, GetClipboardData),
         LeHookFromEAT(User32, USER32, SetClipboardData),
 
-        LeHookFromEAT(User32, USER32, GetDC),
-        LeHookFromEAT(User32, USER32, GetDCEx),
-        LeHookFromEAT(User32, USER32, GetWindowDC),
+        //LeHookFromEAT(User32, USER32, GetDC),
+        //LeHookFromEAT(User32, USER32, GetDCEx),
+        //LeHookFromEAT(User32, USER32, GetWindowDC),
 
         LeHookFromEAT(User32, USER32, BeginPaint),
     };
