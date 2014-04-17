@@ -1049,6 +1049,11 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
     return GlobalData->GetClipboardData(Format);
 }
 
+HFONT GetSystemFont(...)
+{
+    return (HFONT)GetStockObject(SYSTEM_FONT);
+}
+
 HDC NTAPI LeGetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
 {
     HDC             DC;
@@ -1058,11 +1063,11 @@ HDC NTAPI LeGetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
     DC = GlobalData->GetDCEx(hWnd, hrgnClip, flags);
     //if (hWnd == nullptr)
     {
-        Font = GetFontFromDC(GlobalData, DC);
+        Font = GetSystemFont(GlobalData, DC);
         if (Font != nullptr)
         {
             SelectObject(DC, Font);
-            DeleteObject(Font);
+            //DeleteObject(Font);
         }
     }
 
@@ -1078,11 +1083,11 @@ HDC NTAPI LeGetDC(HWND hWnd)
     DC = GlobalData->GetDC(hWnd);
     //if (hWnd == nullptr)
     {
-        Font = GetFontFromDC(GlobalData, DC);
+        Font = GetSystemFont(GlobalData, DC);
         if (Font != nullptr)
         {
             SelectObject(DC, Font);
-            DeleteObject(Font);
+            //DeleteObject(Font);
         }
     }
 
@@ -1098,11 +1103,11 @@ HDC NTAPI LeGetWindowDC(HWND hWnd)
     DC = GlobalData->GetWindowDC(hWnd);
     //if (hWnd == nullptr)
     {
-        Font = GetFontFromDC(GlobalData, DC);
+        Font = GetSystemFont(GlobalData, DC);
         if (Font != nullptr)
         {
             SelectObject(DC, Font);
-            DeleteObject(Font);
+            //DeleteObject(Font);
         }
     }
 
@@ -1511,9 +1516,9 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         LeHookFromEAT(User32, USER32, GetClipboardData),
         LeHookFromEAT(User32, USER32, SetClipboardData),
 
-        //LeHookFromEAT(User32, USER32, GetDC),
-        //LeHookFromEAT(User32, USER32, GetDCEx),
-        //LeHookFromEAT(User32, USER32, GetWindowDC),
+        LeHookFromEAT(User32, USER32, GetDC),
+        LeHookFromEAT(User32, USER32, GetDCEx),
+        LeHookFromEAT(User32, USER32, GetWindowDC),
 
         LeHookFromEAT(User32, USER32, BeginPaint),
     };

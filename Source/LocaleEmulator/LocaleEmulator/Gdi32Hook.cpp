@@ -76,6 +76,23 @@ HGDIOBJ NTAPI LeGetStockObject(LONG Object)
     return GlobalData->GetStockObject(Object);
 }
 
+BOOL NTAPI LeDeleteObject(HGDIOBJ GdiObject)
+{
+    HGDIOBJ*        StockObject;
+    PLeGlobalData   GlobalData = LeGetGlobalData();
+
+    if (GdiObject == nullptr || GlobalData->HookRoutineData.Gdi32.StockObjectInitialized == FALSE)
+        return TRUE;
+
+    FOR_EACH_ARRAY(StockObject, GlobalData->HookRoutineData.Gdi32.StockObject)
+    {
+        if (GdiObject == *StockObject)
+            return TRUE;
+    }
+
+    return GlobalData->DeleteObject(GdiObject);
+}
+
 HDC NTAPI LeCreateCompatibleDC(HDC hDC)
 {
     HDC             NewDC;
@@ -620,6 +637,7 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
     Mp::PATCH_MEMORY_DATA p[] =
     {
         LeHookFromEAT(Gdi32, GDI32, GetStockObject),
+        LeHookFromEAT(Gdi32, GDI32, DeleteObject),
         //LeHookFromEAT(Gdi32, GDI32, CreateFontIndirectExW),
         LeHookFromEAT(Gdi32, GDI32, CreateCompatibleDC),
         LeHookFromEAT(Gdi32, GDI32, EnumFontFamiliesExA),
@@ -643,6 +661,7 @@ NTSTATUS LeGlobalData::HookGdi32Routines(PVOID Gdi32)
 NTSTATUS LeGlobalData::UnHookGdi32Routines()
 {
     Mp::RestoreMemory(HookStub.StubGetStockObject);
+    Mp::RestoreMemory(HookStub.StubDeleteObject);
     Mp::RestoreMemory(HookStub.StubCreateCompatibleDC);
     Mp::RestoreMemory(HookStub.StubEnumFontFamiliesExA);
     Mp::RestoreMemory(HookStub.StubEnumFontFamiliesExW);

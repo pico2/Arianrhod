@@ -369,6 +369,7 @@ public:
         };
 
         API_POINTER(GetStockObject)             StubGetStockObject;
+        API_POINTER(DeleteObject)               StubDeleteObject;
         API_POINTER(CreateFontIndirectExW)      StubCreateFontIndirectExW;
         API_POINTER(NtGdiHfontCreate)           StubNtGdiHfontCreate;
         API_POINTER(CreateCompatibleDC)         StubCreateCompatibleDC;
@@ -633,6 +634,11 @@ public:
     HGDIOBJ GetStockObject(LONG Object)
     {
         return HookStub.StubGetStockObject(Object);
+    }
+
+    BOOL DeleteObject(HGDIOBJ GdiObject)
+    {
+        return HookStub.StubDeleteObject(GdiObject);
     }
 
     HFONT CreateFontIndirectExW(PENUMLOGFONTEXDVW penumlfex)

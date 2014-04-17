@@ -191,11 +191,54 @@ INT NTAPI LeEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, L
     return ReturnValue;
 }
 
+HFONT GetFontFromFont(HFONT Font)
+{
+    LOGFONTW LogFont;
+
+    if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
+        return nullptr;
+
+    LogFont.lfCharSet = SHIFTJIS_CHARSET;
+    Font = CreateFontIndirectW(&LogFont);
+
+    return Font;
+}
+
+HFONT GetFontFromDC(HDC hDC)
+{
+    HFONT       Font;
+    LOGFONTW    LogFont;
+
+    Font = (HFONT)GetCurrentObject(hDC, OBJ_FONT);
+    if (Font == nullptr)
+        return nullptr;
+
+    return GetFontFromFont(Font);
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
     CHOOSEFONTW choosefont;
     LOGFONTW lf;
+
+    ULONG (NTAPI *GdiGetCodePage)(HDC DC);
+
+    HWND hwnd = CreateWindowExW(0, L"BUTTON", L"", 0, 0, 0, 100, 100, 0, 0, 0, 0);
+    SendMessageW(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), 1);
+
+    HDC dc;
+    HFONT font;
+
+    dc = GetDC(hwnd);
+    font = GetFontFromDC(dc);
+    font = GetFontFromFont((HFONT)GetStockObject(DEFAULT_GUI_FONT));
+
+    *(PVOID *)&GdiGetCodePage = GetRoutineAddress(LoadDll(L"GDI32.dll"), "GdiGetCodePage");
+    PrintConsole(L"%p\n", GdiGetCodePage(GetDC(0)));
+    PauseConsole();
+
+    return;
 
 #if 1
 
