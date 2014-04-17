@@ -219,66 +219,76 @@ HFONT GetFontFromDC(HDC hDC)
     return GetFontFromFont(Font);
 }
 
+NTSTATUS GetFilteredPropertyList(FMS_ENUMERATOR h, ULONG_PTR property, PVOID *buf, PULONG_PTR size, PULONG_PTR num)
+{
+    NTSTATUS st;
+    ULONG n, len;
+
+    *buf = nullptr;
+
+    n = 0;
+    len = 0;
+
+    st = FmsGetFilteredPropertyList(h, property, &n, &len, *buf);
+    FAIL_RETURN(st);
+
+    *buf = AllocateMemory(len);
+
+    st = FmsGetFilteredPropertyList(h, property, &n, &len, *buf);
+    FAIL_RETURN(st);
+
+    if (size)
+        *size = len;
+
+    if (num)
+        *num = n;
+
+    return st;
+}
+
+VOID xxFont(HFONT font)
+{
+    HDC dc = CreateCompatibleDC(0);
+    HFONT oldfont = (HFONT)SelectObject(dc, font);
+
+    FONT_REALIZATION_INFO fri;
+    FONT_FILE_INFO ffi;
+
+    fri.SizeOfSelf = sizeof(fri);
+    GetFontRealizationInfo(dc, &fri);
+
+    for (ULONG i = 0; i != fri.FontCount; ++i)
+    {
+        ULONG len;
+        GetFontFileInfo(fri.FontHandle, i, &ffi, sizeof(ffi), &len);
+
+        WCHAR name[200];
+
+        Gdi::GetFontNameFromFile(ffi.FontFile, name, countof(name));
+    }
+
+    DeleteDC(dc);
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    CHOOSEFONTW choosefont;
-    LOGFONTW lf;
 
-    HWND wnd = CreateWindowExW(0, L"BUTTON", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    HDC dc = GetDC(wnd);
+    HFONT font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+    xxFont(font);
 
-    SelectObject(dc, GetStockObject(DEFAULT_GUI_FONT));
-    ReleaseDC(wnd, dc);
+    FMS_ENUMERATOR h;
+    ULONG FontId[1000], size, n;
 
-    dc = GetWindowDC(wnd);
-    GetFontFromDC(dc);
-    ReleaseDC(wnd, dc);
+    FmsInitializeEnumerator(&h);
+    FmsSetDefaultFilter(h);
 
-    return;
+    n = countof(FontId);
+    FmsGetFilteredFontList(h, &n, FontId);
 
-#if 1
+    size = sizeof(FontId);
+    FmsGetFontProperty(h, FontId[0], FmsPropertyType::FontFileName, &size, FontId);
 
-    PauseConsole();
-
-    ZeroMemory(&lf, sizeof(lf));
-    //lf.lfCharSet = SHIFTJIS_CHARSET;
-    //StrCopyW(lf.lfFaceName, L"メイリオ");
-    EnumFontFamiliesEx(GetDC(nullptr), &lf,
-        [](CONST LOGFONTW *lf2, CONST TEXTMETRICW *, DWORD FontType, LPARAM param) -> int
-        {
-            LPENUMLOGFONTEXW lf = (LPENUMLOGFONTEXW)lf2;
-
-            PrintConsole(L"FontType:    %p\r\n", FontType);
-            PrintConsole(L"lfFaceName:  %s\r\n", lf->elfLogFont.lfFaceName);
-            PrintConsole(L"elfFullName: %s\r\n", lf->elfFullName);
-            PrintConsole(L"elfScript:   %s\r\n", lf->elfScript);
-            PrintConsole(L"elfStyle:    %s\r\n", lf->elfStyle);
-
-            PrintConsole(L"\r\n");
-
-            return 1;
-        },
-        (LPARAM)0,0
-    );
-
-#endif
-
-    PauseConsole();
-
-    //return;
-
-    ZeroMemory(&lf, sizeof(lf));
-    lf.lfCharSet = SHIFTJIS_CHARSET;
-    //lf.lfCharSet = GB2312_CHARSET;
-    StrCopyW(lf.lfFaceName, L"SIMSUN");
-
-    ZeroMemory(&choosefont, sizeof(choosefont));
-    choosefont.lStructSize = sizeof(choosefont);
-    choosefont.lpLogFont   = &lf;
-    choosefont.hwndOwner   = 0;
-    choosefont.Flags       = CF_BOTH | CF_TTONLY | CF_INITTOLOGFONTSTRUCT | CF_INACTIVEFONTS | CF_SELECTSCRIPT;
-    ChooseFontW(&choosefont);
 
     return;
 

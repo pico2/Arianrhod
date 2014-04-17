@@ -109,61 +109,20 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
     if (Font == nullptr)
         return NewDC;
 
-    if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
-        return NewDC;
-
-    LogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
-
-    //if (hDC == NULL)
-    //    CopyStruct(&LogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, sizeof(LogFont.lfFaceName));
-
     SelectObject(NewDC, GetStockObject(SYSTEM_FONT));
 
     return NewDC;
 }
 
-template
-<
-    typename ElfLogFontType,
-    typename TextMetricType,
-    typename CallbackType
->
-BOOL
-NTAPI
-EnumFontFamiliesCallback(
-    ElfLogFontType*         ElfLogFont,
-    TextMetricType*         TextMetric,
-    ULONG                   FontType,
-    PGDI_ENUM_FONT_PARAM    EnumParam
-)
-{
-    if (ElfLogFont->elfLogFont.lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
-    {
-        ElfLogFont->elfLogFont.lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
-
-        switch (sizeof(ElfLogFont->elfScript[0]))
-        {
-            case sizeof(CHAR):
-                CopyStruct(ElfLogFont->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameA, sizeof(ElfLogFont->elfScript));
-                break;
-
-            case sizeof(WCHAR):
-                CopyStruct(ElfLogFont->elfScript, EnumParam->GlobalData->GetLePeb()->ScriptNameW, sizeof(ElfLogFont->elfScript));
-                break;
-        }
-    }
-
-    return ((CallbackType)EnumParam->Callback)(&ElfLogFont->elfLogFont, TextMetric, FontType, EnumParam->lParam);
-}
-
 INT LeGlobalData::FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags)
 {
-    ULONG           NumberOfFonts, PropertySize;
+    BOOL            OverwriteCharset;
+    ULONG           NumberOfFonts, PropertySize, FilterNumber;
     PULONG          FontIdList, FontId;
     INT             ReturnValue;
     NTSTATUS        Status;
     FMS_ENUMERATOR  Enumerator;
-    FMS_FILTER_DATA FilterData;
+    FMS_FILTER_DATA FilterData[2];
 
     ReturnValue = 0;
 
@@ -171,30 +130,29 @@ INT LeGlobalData::FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROC
     if (NT_FAILED(Status))
         return ReturnValue;
 
-    FmsSetFilter(Enumerator, &FilterData, 0);
+    FilterNumber = 0;
+    ZeroMemory(FilterData, sizeof(FilterData));
 
     if (Logfont->lfFaceName[0] != 0)
     {
-        ZeroMemory(&FilterData, sizeof(FilterData));
+        FilterData[FilterNumber].Unknown1 = 1;
+        FilterData[FilterNumber].FilterType = FmsFilterType::FaceName;
+        CopyMemory(FilterData[FilterNumber].FaceName, Logfont->lfFaceName, sizeof(Logfont->lfFaceName));
+        FilterData[FilterNumber].FaceName[countof(Logfont->lfFaceName)] = 0;
 
-        FilterData.Unknown1 = 1;
-        FilterData.FilterType = FmsFilterType::FaceName;
-        CopyMemory(FilterData.FaceName, Logfont->lfFaceName, sizeof(Logfont->lfFaceName));
-        FilterData.FaceName[countof(Logfont->lfFaceName)] = 0;
-
-        FmsAddFilter(Enumerator, &FilterData, 1);
+        ++FilterNumber;
     }
 
     if (Logfont->lfCharSet != DEFAULT_CHARSET)
     {
-        ZeroMemory(&FilterData, sizeof(FilterData));
+        FilterData[FilterNumber].Unknown1 = 1;
+        FilterData[FilterNumber].FilterType = FmsFilterType::CharSet;
+        FilterData[FilterNumber].Charset = Logfont->lfCharSet;
 
-        FilterData.Unknown1 = 1;
-        FilterData.FilterType = FmsFilterType::CharSet;
-        FilterData.Charset = Logfont->lfCharSet;
-
-        FmsAddFilter(Enumerator, &FilterData, 1);
+        ++FilterNumber;
     }
+
+    FmsSetFilter(Enumerator, FilterData, FilterNumber);
 
     NumberOfFonts = 0;
     FontIdList = nullptr;
@@ -213,6 +171,8 @@ INT LeGlobalData::FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROC
         return ReturnValue;
     }
 
+    OverwriteCharset = Logfont->lfCharSet != DEFAULT_CHARSET && Logfont->lfCharSet != ANSI_CHARSET;
+
     for (PULONG FontId = FontIdList; NumberOfFonts; ++FontId, --NumberOfFonts)
     {
         ULONG           FontType;
@@ -220,6 +180,8 @@ INT LeGlobalData::FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROC
         ENUMLOGFONTEXW  EnumLogFont;
         WCHAR           Style[countof(EnumLogFont.elfStyle)];
         WCHAR           FontTypeName[LF_FULLFACESIZE];
+
+        //ZeroMemory(&EnumLogFont, sizeof(EnumLogFont));
 
         Status = FmsGetGdiLogicalFont(Enumerator, *FontId, TRUE, &EnumLogFont, &TextMetric, nullptr);
         if (NT_FAILED(Status))
@@ -229,11 +191,13 @@ INT LeGlobalData::FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROC
         Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FaceNameLocale, &PropertySize, EnumLogFont.elfLogFont.lfFaceName);
         if (NT_FAILED(Status))
             continue;
+        
+        CopyMemory(EnumLogFont.elfFullName, EnumLogFont.elfLogFont.lfFaceName, PropertySize);
 
-        PropertySize = sizeof(EnumLogFont.elfFullName);
-        Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FullNameLocale, &PropertySize, EnumLogFont.elfFullName);
-        if (NT_FAILED(Status))
-            continue;
+        //PropertySize = sizeof(EnumLogFont.elfFullName);
+        //Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FullNameLocale, &PropertySize, EnumLogFont.elfFullName);
+        //if (NT_FAILED(Status))
+        //    continue;
 
         PropertySize = sizeof(Style);
         Status = FmsGetFontProperty(Enumerator, *FontId, FmsPropertyType::FontStyleNameLocale, &PropertySize, Style);
@@ -261,11 +225,11 @@ INT LeGlobalData::FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROC
             //}
         }
 
-        //if (EnumLogFont.elfLogFont.lfCharSet == this->GetLePeb()->OriginalCharset)
-        //    EnumLogFont.elfLogFont.lfCharSet = this->GetLeb()->DefaultCharset;
-
-        if (EnumLogFont.elfLogFont.lfCharSet == this->GetLeb()->DefaultCharset)
+        if (OverwriteCharset)
+        {
+            EnumLogFont.elfLogFont.lfCharSet = Logfont->lfCharSet;
             CopyStruct(EnumLogFont.elfScript, this->GetLePeb()->ScriptNameW, sizeof(EnumLogFont.elfScript));
+        }
 
         ReturnValue = Proc(&EnumLogFont.elfLogFont, &TextMetric.TextMetric, FontType, Parameter);
     }
@@ -288,9 +252,6 @@ int NTAPI LeFmsEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW 
 
 int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpProc, LPARAM lParam, DWORD dwFlags)
 {
-
-#if 1
-
     FMS_CALL_CONTEXT    Context;
     PLeGlobalData       GlobalData = LeGetGlobalData();
 
@@ -298,38 +259,6 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
     Context.Push();
 
     return GlobalData->FmsEnumFontFamiliesEx(hdc, lpLogfont, lpProc, lParam, dwFlags);
-
-#else
-
-    ULONG_PTR           Charset;
-    LOGFONTW            lf;
-    PLeGlobalData       GlobalData = LeGetGlobalData();
-    GDI_ENUM_FONT_PARAM Param;
-
-    LOOP_ONCE
-    {
-        if (lpLogfont == nullptr)
-            break;
-
-        Charset = lpLogfont->lfCharSet;
-        switch (Charset)
-        {
-            case ANSI_CHARSET:
-                break;
-
-            case DEFAULT_CHARSET:
-                Param.Callback      = lpProc;
-                Param.GlobalData    = GlobalData;
-                Param.lParam        = lParam;
-
-                lParam = (LPARAM)&Param;
-                lpProc = (FONTENUMPROCW)EnumFontFamiliesCallback<ENUMLOGFONTEXW, TEXTMETRICW, FONTENUMPROCW>;
-                break;
-        }
-    }
-
-    return GlobalData->EnumFontFamiliesExW(hdc, lpLogfont, lpProc, lParam, dwFlags);
-#endif
 }
 
 VOID ConvertAnsiLogfontToUnicode(PLOGFONTW LogFontW, PLOGFONTA LogFontA)
@@ -342,32 +271,6 @@ VOID ConvertUnicodeLogfontToAnsi(PLOGFONTA LogFontA, PLOGFONTW LogFontW)
 {
     CopyMemory(LogFontA, LogFontW, PtrOffset(&LogFontW->lfFaceName, LogFontW));
     RtlUnicodeToMultiByteN(LogFontA->lfFaceName, sizeof(LogFontA->lfFaceName), nullptr, LogFontW->lfFaceName, (StrLengthW(LogFontW->lfFaceName) + 1) * sizeof(WCHAR));
-}
-
-VOID ConvertUnicodeTextMetricToAnsi(PTEXTMETRICA TextMetricA, CONST TEXTMETRICW* TextMetricW)
-{
-    TextMetricA->tmHeight           = TextMetricW->tmHeight;
-    TextMetricA->tmAscent           = TextMetricW->tmAscent;
-    TextMetricA->tmDescent          = TextMetricW->tmDescent;
-    TextMetricA->tmInternalLeading  = TextMetricW->tmInternalLeading;
-    TextMetricA->tmExternalLeading  = TextMetricW->tmExternalLeading;
-    TextMetricA->tmAveCharWidth     = TextMetricW->tmAveCharWidth;
-    TextMetricA->tmMaxCharWidth     = TextMetricW->tmMaxCharWidth;
-    TextMetricA->tmWeight           = TextMetricW->tmWeight;
-    TextMetricA->tmOverhang         = TextMetricW->tmOverhang;
-    TextMetricA->tmDigitizedAspectX = TextMetricW->tmDigitizedAspectX;
-    TextMetricA->tmDigitizedAspectY = TextMetricW->tmDigitizedAspectY;
-
-    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmFirstChar,     sizeof(TextMetricA->tmFirstChar),   nullptr, &TextMetricW->tmFirstChar,      sizeof(TextMetricW->tmFirstChar));
-    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmLastChar,      sizeof(TextMetricA->tmLastChar),    nullptr, &TextMetricW->tmLastChar,       sizeof(TextMetricW->tmLastChar));
-    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmDefaultChar,   sizeof(TextMetricA->tmDefaultChar), nullptr, &TextMetricW->tmDefaultChar,    sizeof(TextMetricW->tmDefaultChar));
-    RtlUnicodeToMultiByteN((PSTR)&TextMetricA->tmBreakChar,     sizeof(TextMetricA->tmBreakChar),   nullptr, &TextMetricW->tmBreakChar,      sizeof(TextMetricW->tmBreakChar));
-
-    TextMetricA->tmItalic           = TextMetricW->tmItalic;
-    TextMetricA->tmUnderlined       = TextMetricW->tmUnderlined;
-    TextMetricA->tmStruckOut        = TextMetricW->tmStruckOut;
-    TextMetricA->tmPitchAndFamily   = TextMetricW->tmPitchAndFamily;
-    TextMetricA->tmCharSet          = TextMetricW->tmCharSet;
 }
 
 VOID GetTextMetricsAFromLogFont(PTEXTMETRICA TextMetricA, CONST LOGFONTW *LogFont)

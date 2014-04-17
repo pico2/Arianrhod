@@ -7,6 +7,35 @@ _ML_C_HEAD_
 
 NTSTATUS
 NTAPI
+FmsSetDefaultFilter(
+    IN FMS_ENUMERATOR Enumerator
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
+FmsResetEnumerator(
+    IN FMS_ENUMERATOR Enumerator
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
+FmsMapGdiLogicalFont(
+    IN  FMS_ENUMERATOR      Enumerator,
+    IN  ULONG               FontId,
+    OUT LPENUMLOGFONTEXW    EnumLogFontEx
+)
+{
+    return 0;
+}
+
+NTSTATUS
+NTAPI
 FmsInitializeEnumerator(
     IN  PFMS_ENUMERATOR Handle,
     IN  ULONG       Flags
@@ -73,11 +102,11 @@ FmsGetFilteredFontList(
 NTSTATUS
 NTAPI
 FmsGetGDILogFont(
-    IN  FMS_ENUMERATOR          Handle,
+    IN  FMS_ENUMERATOR      Handle,
     IN  ULONG               FontId,
     IN  BOOLEAN             What,
     OUT LPENUMLOGFONTEXW    LogFont,
-    OUT PTEXTMETRICW        TextMetric OPTIONAL
+    OUT PFMS_TEXTMETRIC     TextMetric OPTIONAL
 )
 {
     return 0;
@@ -86,11 +115,11 @@ FmsGetGDILogFont(
 NTSTATUS
 NTAPI
 FmsGetGdiLogicalFont(
-    IN  FMS_ENUMERATOR          Handle,
+    IN  FMS_ENUMERATOR      Enumerator,
     IN  ULONG               FontId,
-    IN  BOOLEAN             What,
-    OUT LPENUMLOGFONTEXW    LogFont,
-    OUT PTEXTMETRICW        TextMetric  OPTIONAL,
+    IN  BOOLEAN             WhatTrue,
+    OUT LPENUMLOGFONTEXW    EnumLogFontEx,
+    OUT PFMS_TEXTMETRIC     FmsTextMetric  OPTIONAL,
     OUT PULONG              SomeBuffer  OPTIONAL
 )
 {

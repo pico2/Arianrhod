@@ -9,3 +9,6 @@ EXPORTS
     FmsGetGdiLogicalFont
     FmsGetFontProperty
     FmsGetBestMatchInFamily
+	FmsMapGdiLogicalFont
+	FmsResetEnumerator
+	FmsSetDefaultFilter
