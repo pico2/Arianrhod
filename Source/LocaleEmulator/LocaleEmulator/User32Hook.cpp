@@ -592,8 +592,10 @@ VOID ResetDCCharset(PLeGlobalData GlobalData, HWND hWnd)
     HDC hDC;
     HFONT Font;
 
+    Font = (HFONT)GetStockObject(SYSTEM_FONT);
+
     hDC = GetDC(hWnd);
-    Font = GetFontFromDC(GlobalData, hDC);
+    //Font = GetFontFromDC(GlobalData, hDC);
     SelectObject(hDC, Font);
     //DeleteObject(Font);
 
@@ -602,7 +604,7 @@ VOID ResetDCCharset(PLeGlobalData GlobalData, HWND hWnd)
     ReleaseDC(hWnd, hDC);
 
     hDC = GetWindowDC(hWnd);
-    Font = GetFontFromDC(GlobalData, hDC);
+    //Font = GetFontFromDC(GlobalData, hDC);
     SelectObject(hDC, Font);
 
     CheckDC(hDC);
@@ -1049,10 +1051,7 @@ HANDLE NTAPI LeGetClipboardData(UINT Format)
     return GlobalData->GetClipboardData(Format);
 }
 
-HFONT GetSystemFont(...)
-{
-    return (HFONT)GetStockObject(SYSTEM_FONT);
-}
+#define GetSystemFont(...) (HFONT)GetStockObject(SYSTEM_FONT)
 
 HDC NTAPI LeGetDCEx(HWND hWnd, HRGN hrgnClip, DWORD flags)
 {

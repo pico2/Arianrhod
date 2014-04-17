@@ -198,6 +198,9 @@ HFONT GetFontFromFont(HFONT Font)
     if (GetObjectW(Font, sizeof(LogFont), &LogFont) == 0)
         return nullptr;
 
+    PrintConsole(L"%X\n", LogFont.lfCharSet);
+    PrintConsole(L"%s\n", LogFont.lfFaceName);
+
     LogFont.lfCharSet = SHIFTJIS_CHARSET;
     Font = CreateFontIndirectW(&LogFont);
 
@@ -222,21 +225,15 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     CHOOSEFONTW choosefont;
     LOGFONTW lf;
 
-    ULONG (NTAPI *GdiGetCodePage)(HDC DC);
+    HWND wnd = CreateWindowExW(0, L"BUTTON", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    HDC dc = GetDC(wnd);
 
-    HWND hwnd = CreateWindowExW(0, L"BUTTON", L"", 0, 0, 0, 100, 100, 0, 0, 0, 0);
-    SendMessageW(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), 1);
+    SelectObject(dc, GetStockObject(DEFAULT_GUI_FONT));
+    ReleaseDC(wnd, dc);
 
-    HDC dc;
-    HFONT font;
-
-    dc = GetDC(hwnd);
-    font = GetFontFromDC(dc);
-    font = GetFontFromFont((HFONT)GetStockObject(DEFAULT_GUI_FONT));
-
-    *(PVOID *)&GdiGetCodePage = GetRoutineAddress(LoadDll(L"GDI32.dll"), "GdiGetCodePage");
-    PrintConsole(L"%p\n", GdiGetCodePage(GetDC(0)));
-    PauseConsole();
+    dc = GetWindowDC(wnd);
+    GetFontFromDC(dc);
+    ReleaseDC(wnd, dc);
 
     return;
 

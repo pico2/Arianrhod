@@ -115,14 +115,9 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
     LogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
 
     //if (hDC == NULL)
-        CopyStruct(&LogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, sizeof(LogFont.lfFaceName));
+    //    CopyStruct(&LogFont.lfFaceName, GlobalData->GetLeb()->DefaultFaceName, sizeof(LogFont.lfFaceName));
 
-    Font = CreateFontIndirectW(&LogFont);
-    if (Font == nullptr)
-        return NewDC;
-
-    SelectObject(NewDC, Font);
-    DeleteObject(Font);
+    SelectObject(NewDC, GetStockObject(SYSTEM_FONT));
 
     return NewDC;
 }
