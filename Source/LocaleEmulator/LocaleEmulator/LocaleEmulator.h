@@ -633,7 +633,13 @@ public:
 
     NTSTATUS AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR FontType);
     NTSTATUS AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData);
-    NTSTATUS LookupNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, PUNICODE_STRING LocaleFaceName);
+    NTSTATUS LookupNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, ULONG_PTR NameID, PUNICODE_STRING Name);
+
+    VOID GetTextMetricsAFromLogFont(PTEXTMETRICA TextMetricA, CONST LOGFONTW *LogFont);
+    VOID GetTextMetricsWFromLogFont(PTEXTMETRICW TextMetricW, CONST LOGFONTW *LogFont);
+
+    HFONT CreateFontIndirectBypassA(CONST LOGFONTA *lplf);
+    HFONT CreateFontIndirectBypassW(CONST LOGFONTW *lplf);
 
     int EnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpFontFunc, LPARAM lParam)
     {
