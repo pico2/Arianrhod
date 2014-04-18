@@ -261,34 +261,205 @@ VOID xxFont(HFONT font)
     {
         ULONG len;
         GetFontFileInfo(fri.FontHandle, i, &ffi, sizeof(ffi), &len);
-
-        WCHAR name[200];
-
-        Gdi::GetFontNameFromFile(ffi.FontFile, name, countof(name));
+        PrintConsole(L"%s\n", ffi.FontFile);
     }
 
+    SelectObject(dc, oldfont);
     DeleteDC(dc);
+}
+
+typedef struct
+{
+    HDC                 DC;
+    HFONT               Font;
+    HFONT               OldFont;
+    ULONG_PTR           FontType;
+    LPENUMLOGFONTEXW    EnumLogFontEx;
+
+} ADJUST_FACE_NAME_DATA, *PADJUST_FACE_NAME_DATA;
+
+NTSTATUS LookupNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, PUNICODE_STRING LocaleFaceName)
+{
+    using namespace Gdi;
+
+    ULONG_PTR               StorageOffset, NameRecordCount;
+    PTT_NAME_TABLE_HEADER   NameHeader;
+    PTT_NAME_RECORD         NameRecord, NameRecordUser, NameRecordEn;
+
+    NameHeader = (PTT_NAME_TABLE_HEADER)TableBuffer;
+
+    NameRecordCount = Bswap(NameHeader->NameRecordCount);
+    StorageOffset = Bswap(NameHeader->StorageOffset);
+
+    if (StorageOffset >= TableSize)
+        return STATUS_NOT_SUPPORTED;
+
+    if (StorageOffset < NameRecordCount * sizeof(*NameRecord))
+        return STATUS_NOT_SUPPORTED;
+
+    NameRecordUser  = nullptr;
+    NameRecordEn    = nullptr;
+    NameRecord      = (PTT_NAME_RECORD)(NameHeader + 1);
+
+    FOR_EACH(NameRecord, NameRecord, NameRecordCount)
+    {
+        if (NameRecord->PlatformID != TT_PLATFORM_ID_WINDOWS)
+            continue;
+
+        if (NameRecord->EncodingID != TT_ENCODEING_ID_UTF16_BE)
+            continue;
+
+        if (NameRecord->NameID != TT_NAME_ID_FONTNAME)
+            continue;
+
+        if (NameRecord->LanguageID == Bswap((USHORT)0x0409))
+            NameRecordEn = NameRecord;
+
+        if (NameRecord->LanguageID != Bswap((USHORT)0x0411))
+            continue;
+
+        NameRecordUser = NameRecord;
+        break;
+    }
+
+    NameRecordUser = NameRecordUser == nullptr ? NameRecordEn : NameRecordUser;
+
+    if (NameRecordUser != nullptr)
+    {
+        PWSTR     FaceName;
+        ULONG_PTR Offset, Length;
+
+        Offset = StorageOffset + Bswap(NameRecordUser->StringOffset);
+        Length = Bswap(NameRecordUser->StringLength);
+        FaceName = (PWSTR)PtrAdd(TableBuffer, Offset);
+
+        Length /= sizeof(*FaceName);
+        FOR_EACH(FaceName, FaceName, Length)
+        {
+            *FaceName = Bswap(*FaceName);
+        }
+
+        LocaleFaceName->Buffer = FaceName - Length;
+        LocaleFaceName->Length = Length * sizeof(*FaceName);
+        LocaleFaceName->MaximumLength = LocaleFaceName->Length;
+
+        return STATUS_SUCCESS;
+    }
+
+    return STATUS_NOT_FOUND;
+}
+
+NTSTATUS AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData)
+{
+    NTSTATUS        Status;
+    PVOID           Table;
+    ULONG_PTR       TableSize, TableName;
+    UNICODE_STRING  LocaleFaceName;
+
+    TableName = TAG4('name');
+    TableSize = GetFontData(AdjustData->DC, TableName, 0, 0, 0);
+
+    if (TableSize == GDI_ERROR)
+        return STATUS_UNSUCCESSFUL;
+
+    Table = AllocateMemory(TableSize);
+    if (Table == nullptr)
+        return STATUS_NO_MEMORY;
+
+    TableSize = GetFontData(AdjustData->DC, TableName, 0, Table, TableSize);
+    if (TableSize == GDI_ERROR)
+    {
+        FreeMemory(Table);
+        return STATUS_UNSUCCESSFUL;
+    }
+
+    Status = LookupNameRecordFromNameTable(Table, TableSize, &LocaleFaceName);
+    if (NT_SUCCESS(Status))
+    {
+        BOOL        Vertical;
+        PWSTR       Buffer;
+        ULONG_PTR   Length;
+
+        Vertical = AdjustData->EnumLogFontEx->elfLogFont.lfFaceName[0] == '@';
+
+        Buffer = AdjustData->EnumLogFontEx->elfLogFont.lfFaceName + Vertical;
+        Length = ML_MIN(sizeof(AdjustData->EnumLogFontEx->elfLogFont.lfFaceName) - Vertical, LocaleFaceName.Length);
+        CopyMemory(Buffer, LocaleFaceName.Buffer,Length);
+        *PtrAdd(Buffer, Length) = 0;
+
+        Buffer = AdjustData->EnumLogFontEx->elfFullName + Vertical;
+        Length = ML_MIN(sizeof(AdjustData->EnumLogFontEx->elfFullName) - Vertical, LocaleFaceName.Length);
+        CopyMemory(Buffer, LocaleFaceName.Buffer, Length);
+        *PtrAdd(Buffer, Length) = 0;
+    }
+
+    FreeMemory(Table);
+
+    return Status;
+}
+
+NTSTATUS AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR FontType)
+{
+    NTSTATUS Status;
+    ADJUST_FACE_NAME_DATA AdjustData;
+
+    ZeroMemory(&AdjustData, sizeof(AdjustData));
+    AdjustData.FontType = FontType;
+    AdjustData.EnumLogFontEx = EnumLogFontEx;
+
+    Status = STATUS_UNSUCCESSFUL;
+
+    LOOP_ONCE
+    {
+        AdjustData.Font = CreateFontIndirectW(&EnumLogFontEx->elfLogFont);
+        if (AdjustData.Font == nullptr)
+            break;
+
+        AdjustData.DC = CreateCompatibleDC(nullptr);
+        if (AdjustData.DC == nullptr)
+            break;
+
+        AdjustData.OldFont = (HFONT)SelectObject(AdjustData.DC, AdjustData.Font);
+        if (AdjustData.OldFont == nullptr)
+            break;
+
+        Status = AdjustFaceNameInternal(&AdjustData);
+    }
+
+    if (AdjustData.OldFont != nullptr)
+        SelectObject(AdjustData.DC, AdjustData.OldFont);
+
+    if (AdjustData.DC != nullptr)
+        DeleteDC(AdjustData.DC);
+
+    if (AdjustData.Font != nullptr)
+        DeleteObject(AdjustData.Font);
+
+    return Status;
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-
-    HFONT font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-    xxFont(font);
-
+    LOGFONTW lf;
     FMS_ENUMERATOR h;
-    ULONG FontId[1000], size, n;
-
     FmsInitializeEnumerator(&h);
-    FmsSetDefaultFilter(h);
 
-    n = countof(FontId);
-    FmsGetFilteredFontList(h, &n, FontId);
+    ZeroMemory(&lf, sizeof(lf));
 
-    size = sizeof(FontId);
-    FmsGetFontProperty(h, FontId[0], FmsPropertyType::FontFileName, &size, FontId);
+    EnumFontFamiliesExW(GetDC(0), &lf,
+        [](CONST LOGFONTW *lf, CONST TEXTMETRICW*, ULONG ft, LPARAM)
+        {
+            if (NT_SUCCESS(AdjustFaceName((LPENUMLOGFONTEXW)lf, ft)))
+            {
+                PrintConsole(L"%s\n", lf->lfFaceName);
+                PrintConsole(L"%s\n\n", ((LPENUMLOGFONTEXW)lf)->elfFullName);
+            }
 
+            return TRUE;
+        },
+        0,0
+    );
 
     return;
 
