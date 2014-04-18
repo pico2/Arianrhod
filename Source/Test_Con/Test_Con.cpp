@@ -442,16 +442,16 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
     LOGFONTW lf;
-    FMS_ENUMERATOR h;
-    FmsInitializeEnumerator(&h);
 
     ZeroMemory(&lf, sizeof(lf));
 
+    lf.lfCharSet = DEFAULT_CHARSET;
     EnumFontFamiliesExW(GetDC(0), &lf,
         [](CONST LOGFONTW *lf, CONST TEXTMETRICW*, ULONG ft, LPARAM)
         {
-            if (NT_SUCCESS(AdjustFaceName((LPENUMLOGFONTEXW)lf, ft)))
+            //if (NT_SUCCESS(AdjustFaceName((LPENUMLOGFONTEXW)lf, ft)))
             {
+                PrintConsole(L"%02X\n", lf->lfCharSet);
                 PrintConsole(L"%s\n", lf->lfFaceName);
                 PrintConsole(L"%s\n\n", ((LPENUMLOGFONTEXW)lf)->elfFullName);
             }
@@ -460,6 +460,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         },
         0,0
     );
+
+    PauseConsole();
 
     return;
 

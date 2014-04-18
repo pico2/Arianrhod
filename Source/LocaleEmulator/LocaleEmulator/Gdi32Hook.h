@@ -4,6 +4,7 @@
 #include "LocaleEmulator.h"
 
 #define FMS_CALL_MAGIC TAG4('FMSC')
+#define GDI_HOOK_BYPASS TAG4('GHBP')
 
 struct FMS_CALL_CONTEXT : public TEB_ACTIVE_FRAME
 {
@@ -27,6 +28,7 @@ typedef struct
     LPARAM          lParam;
     PLeGlobalData   GlobalData;
     PVOID           Callback;
+    ULONG           Charset;
 
 } GDI_ENUM_FONT_PARAM, *PGDI_ENUM_FONT_PARAM;
 

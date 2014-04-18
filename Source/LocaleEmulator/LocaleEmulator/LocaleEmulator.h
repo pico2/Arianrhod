@@ -70,6 +70,16 @@ typedef struct THREAD_LOCAL_BUFFER : public TEB_ACTIVE_FRAME
 
 typedef struct
 {
+    HDC                 DC;
+    HFONT               Font;
+    HFONT               OldFont;
+    ULONG_PTR           FontType;
+    LPENUMLOGFONTEXW    EnumLogFontEx;
+
+} ADJUST_FACE_NAME_DATA, *PADJUST_FACE_NAME_DATA;
+
+typedef struct
+{
     ULONG64             Root;
     UNICODE_STRING64    SubKey;
     UNICODE_STRING64    ValueName;
@@ -621,6 +631,10 @@ public:
 
     INT FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags);
 
+    NTSTATUS AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR FontType);
+    NTSTATUS AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData);
+    NTSTATUS LookupNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, PUNICODE_STRING LocaleFaceName);
+
     int EnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpFontFunc, LPARAM lParam)
     {
         return HookStub.StubEnumFontsA(hdc, lpFaceName, lpFontFunc, lParam);
@@ -639,11 +653,6 @@ public:
     BOOL DeleteObject(HGDIOBJ GdiObject)
     {
         return HookStub.StubDeleteObject(GdiObject);
-    }
-
-    HFONT CreateFontIndirectExW(PENUMLOGFONTEXDVW penumlfex)
-    {
-        return HookStub.StubCreateFontIndirectExW(penumlfex);
     }
 
     HDC CreateCompatibleDC(HDC hDC)
