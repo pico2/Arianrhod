@@ -27,19 +27,22 @@ HFONT GetFontFromDC(PLeGlobalData GlobalData, HDC hDC)
     return GetFontFromFont(GlobalData, Font);
 }
 
-HFONT LeGlobalData::CreateFontIndirectBypassA(CONST LOGFONTA *lplf)
+BOOL IsGdiHookBypassed()
 {
-    TEB_ACTIVE_FRAME Bypass;
-    Bypass.Context = GDI_HOOK_BYPASS;
+    return FindThreadFrame(GDI_HOOK_BYPASS) != nullptr;
+}
+
+HFONT CreateFontIndirectBypassA(CONST LOGFONTA *lplf)
+{
+    TEB_ACTIVE_FRAME Bypass(GDI_HOOK_BYPASS);
     Bypass.Push();
 
     return CreateFontIndirectA(lplf);
 }
 
-HFONT LeGlobalData::CreateFontIndirectBypassW(CONST LOGFONTW *lplf)
+HFONT CreateFontIndirectBypassW(CONST LOGFONTW *lplf)
 {
-    TEB_ACTIVE_FRAME Bypass;
-    Bypass.Context = GDI_HOOK_BYPASS;
+    TEB_ACTIVE_FRAME Bypass(GDI_HOOK_BYPASS);
     Bypass.Push();
 
     return CreateFontIndirectW(lplf);
@@ -59,7 +62,7 @@ VOID LeGlobalData::GetTextMetricsAFromLogFont(PTEXTMETRICA TextMetricA, CONST LO
 
     LOOP_ONCE
     {
-        Font = this->CreateFontIndirectBypassW(LogFont);
+        Font = CreateFontIndirectBypassW(LogFont);
         if (Font == nullptr)
             break;
 
@@ -91,7 +94,7 @@ VOID LeGlobalData::GetTextMetricsWFromLogFont(PTEXTMETRICW TextMetricW, CONST LO
 
     LOOP_ONCE
     {
-        Font = this->CreateFontIndirectBypassW(LogFont);
+        Font = CreateFontIndirectBypassW(LogFont);
         if (Font == nullptr)
             break;
 
@@ -195,7 +198,7 @@ HDC NTAPI LeCreateCompatibleDC(HDC hDC)
 
 NTSTATUS
 LeGlobalData::
-LookupNameRecordFromNameTable(
+GetNameRecordFromNameTable(
     PVOID           TableBuffer,
     ULONG_PTR       TableSize,
     ULONG_PTR       NameID,
@@ -280,33 +283,25 @@ NTSTATUS LeGlobalData::AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData)
     NTSTATUS        Status;
     PVOID           Table;
     ULONG_PTR       TableSize, TableName;
+    WCHAR           FaceNameBuffer[LF_FACESIZE];
+    WCHAR           FullNameBuffer[LF_FULLFACESIZE];
+    UNICODE_STRING  FaceName, FullName;
 
-    TableName = TAG4('name');
+    TableName = Gdi::TT_TABLE_TAG_NAME;
     TableSize = GetFontData(AdjustData->DC, TableName, 0, 0, 0);
     if (TableSize == GDI_ERROR)
         return STATUS_OBJECT_NAME_NOT_FOUND;
 
-    Table = AllocateMemory(TableSize);
-    if (Table == nullptr)
-        return STATUS_NO_MEMORY;
-
+    Table = AllocStack(TableSize);
     TableSize = GetFontData(AdjustData->DC, TableName, 0, Table, TableSize);
     if (TableSize == GDI_ERROR)
-    {
-        FreeMemory(Table);
         return STATUS_OBJECT_NAME_NOT_FOUND;
-    }
-
-    WCHAR FaceNameBuffer[LF_FACESIZE];
-    WCHAR FullNameBuffer[LF_FULLFACESIZE];
-
-    UNICODE_STRING FaceName, FullName;
 
     RtlInitEmptyString(&FaceName, FaceNameBuffer, sizeof(FaceNameBuffer));
     RtlInitEmptyString(&FullName, FullNameBuffer, sizeof(FullNameBuffer));
 
-    Status = this->LookupNameRecordFromNameTable(Table, TableSize, Gdi::TT_NAME_ID_FACENAME, &FaceName);
-    Status = NT_SUCCESS(Status) ? this->LookupNameRecordFromNameTable(Table, TableSize, Gdi::TT_NAME_ID_FULLNAME, &FullName) : Status;
+    Status = this->GetNameRecordFromNameTable(Table, TableSize, Gdi::TT_NAME_ID_FACENAME, &FaceName);
+    Status = NT_SUCCESS(Status) ? this->GetNameRecordFromNameTable(Table, TableSize, Gdi::TT_NAME_ID_FULLNAME, &FullName) : Status;
 
     if (NT_SUCCESS(Status))
     {
@@ -327,8 +322,6 @@ NTSTATUS LeGlobalData::AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData)
         *PtrAdd(Buffer, Length) = 0;
     }
 
-    FreeMemory(Table);
-
     return Status;
 }
 
@@ -348,7 +341,7 @@ NTSTATUS LeGlobalData::AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR 
 
     LOOP_ONCE
     {
-        AdjustData.Font = this->CreateFontIndirectBypassW(&EnumLogFontEx->elfLogFont);
+        AdjustData.Font = CreateFontIndirectBypassW(&EnumLogFontEx->elfLogFont);
         if (AdjustData.Font == nullptr)
             break;
 
@@ -557,7 +550,7 @@ LeNtGdiHfontCreate(
     PENUMLOGFONTEXDVW   enumlfex;
     PLeGlobalData       GlobalData = LeGetGlobalData();
 
-    if (EnumLogFont != nullptr && FindThreadFrame(GDI_HOOK_BYPASS) == nullptr) LOOP_ONCE
+    if (EnumLogFont != nullptr && IsGdiHookBypassed() == FALSE) LOOP_ONCE
     {
         ULONG_PTR Charset;
 

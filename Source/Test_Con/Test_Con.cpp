@@ -88,23 +88,25 @@ VOID PrintLocaleDefaultAnsiCodePage()
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    LOGFONTW lf;
 
-    PrintConsole(L"%p, %p\n", sizeof(TEXTMETRICW), FIELD_OFFSET(TEXTMETRICW, tmCharSet));
-    return;
+    LOGFONTA lf;
 
     ZeroMemory(&lf, sizeof(lf));
 
     lf.lfCharSet = DEFAULT_CHARSET;
-    EnumFontFamiliesExW(GetDC(0), &lf,
-        [](CONST LOGFONTW *lf, CONST TEXTMETRICW* tm, ULONG ft, LPARAM)
+    EnumFontFamiliesExA(GetDC(0), &lf,
+        [](CONST LOGFONTA *lf, CONST TEXTMETRICA* tm, ULONG ft, LPARAM)
         {
             //if (NT_SUCCESS(AdjustFaceName((LPENUMLOGFONTEXW)lf, ft)))
             {
-                PrintConsole(L"%02X\n", lf->lfCharSet);
-                PrintConsole(L"%02X\n", tm->tmCharSet);
-                PrintConsole(L"%s\n", lf->lfFaceName);
-                PrintConsole(L"%s\n\n", ((LPENUMLOGFONTEXW)lf)->elfFullName);
+                PrintConsole(L"lfCharSet:       %02X\n", lf->lfCharSet);
+                PrintConsole(L"tmCharSet:       %02X\n", tm->tmCharSet);
+                PrintConsole(L"tmFirstChar:     %02X\n", tm->tmFirstChar);
+                PrintConsole(L"tmLastChar:      %02X\n", tm->tmLastChar);
+                PrintConsole(L"tmDefaultChar:   %02X\n", tm->tmDefaultChar);
+                PrintConsole(L"tmBreakChar:     %02X\n", tm->tmBreakChar);
+                PrintConsole(L"lfFaceName:      %S\n", lf->lfFaceName);
+                PrintConsole(L"%S\n\n", ((LPENUMLOGFONTEXA)lf)->elfFullName);
             }
 
             return TRUE;
