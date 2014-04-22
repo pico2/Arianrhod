@@ -78,6 +78,26 @@ typedef struct
 
 } ADJUST_FACE_NAME_DATA, *PADJUST_FACE_NAME_DATA;
 
+typedef struct TEXT_METRIC_INTERNAL
+{
+    ULONG       Magic;
+    BOOL        Filled;
+    TEXTMETRICA TextMetricA;
+    TEXTMETRICW TextMetricW;
+
+    TEXT_METRIC_INTERNAL()
+    {
+        this->Magic = TAG4('TMIN');
+        this->Filled = FALSE;
+    }
+
+    BOOL VerifyMagic()
+    {
+        return this->Magic == TAG4('TMIN');
+    }
+
+} TEXT_METRIC_INTERNAL, *PTEXT_METRIC_INTERNAL;
+
 typedef struct
 {
     ULONG64             Root;
@@ -451,7 +471,7 @@ public:
         HDC DC;
         LOGFONTW lf;
 
-        DC = HookStub.StubGetDC == nullptr ? ::GetDC(nullptr) : GetDC(nullptr);
+        DC = HookStub.StubGetDC == nullptr ? ::GetDC(nullptr) : this->GetDC(nullptr);
         GetLePeb()->OriginalCharset = GetTextCharset(DC);
 
         lf.lfCharSet = GetLeb()->DefaultCharset;
@@ -631,7 +651,7 @@ public:
 
     INT FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags);
 
-    NTSTATUS AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR FontType);
+    NTSTATUS AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, PTEXT_METRIC_INTERNAL TextMetric, ULONG_PTR FontType);
     NTSTATUS AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData);
     NTSTATUS GetNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, ULONG_PTR NameID, PUNICODE_STRING Name);
 

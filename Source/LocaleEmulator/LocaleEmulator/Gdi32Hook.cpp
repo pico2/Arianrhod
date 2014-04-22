@@ -325,7 +325,7 @@ NTSTATUS LeGlobalData::AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData)
     return Status;
 }
 
-NTSTATUS LeGlobalData::AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR FontType)
+NTSTATUS LeGlobalData::AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, PTEXT_METRIC_INTERNAL TextMetric, ULONG_PTR FontType)
 {
     NTSTATUS Status;
     ADJUST_FACE_NAME_DATA AdjustData;
@@ -334,7 +334,6 @@ NTSTATUS LeGlobalData::AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR 
         return STATUS_NOT_SUPPORTED;
 
     ZeroMemory(&AdjustData, sizeof(AdjustData));
-    AdjustData.FontType = FontType;
     AdjustData.EnumLogFontEx = EnumLogFontEx;
 
     Status = STATUS_UNSUCCESSFUL;
@@ -354,6 +353,16 @@ NTSTATUS LeGlobalData::AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, ULONG_PTR 
             break;
 
         Status = AdjustFaceNameInternal(&AdjustData);
+        //FAIL_BREAK(Status);
+
+        if (TextMetric != nullptr)
+        {
+            if (GetTextMetricsA(AdjustData.DC, &TextMetric->TextMetricA) && 
+                GetTextMetricsW(AdjustData.DC, &TextMetric->TextMetricW))
+            {
+                TextMetric->Filled = TRUE;
+            }
+        }
     }
 
     if (AdjustData.OldFont != nullptr)
@@ -380,27 +389,31 @@ int NTAPI LeEnumFontFamiliesExW(HDC hdc, LPLOGFONTW lpLogfont, FONTENUMPROCW lpP
     Param.Charset       = lpLogfont->lfCharSet;
 
     LocalLogFont = *lpLogfont;
-    //if (LocalLogFont.lfCharSet == DEFAULT_CHARSET || LocalLogFont.lfCharSet == ANSI_CHARSET)
-    //    LocalLogFont.lfCharSet = GlobalData->GetLeb()->DefaultCharset;
 
     return GlobalData->EnumFontFamiliesExW(hdc, &LocalLogFont,
             [](CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW, DWORD FontType, LPARAM param) -> INT
             {
                 NTSTATUS                Status;
-                TEXTMETRICW             LocalTextMetric;
                 PGDI_ENUM_FONT_PARAM    EnumParam;
+                TEXT_METRIC_INTERNAL    TextMetric;
 
                 EnumParam = (PGDI_ENUM_FONT_PARAM)param;
-                Status = EnumParam->GlobalData->AdjustFaceName((LPENUMLOGFONTEXW)lf, FontType);
-                if (Status == STATUS_OBJECT_NAME_NOT_FOUND)
-                    return TRUE;
-
                 if (EnumParam->Charset == DEFAULT_CHARSET && lf->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
                 {
                     ((LPLOGFONTW)lf)->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
-                    EnumParam->GlobalData->GetTextMetricsWFromLogFont(&LocalTextMetric, lf);
-                    TextMetricW = &LocalTextMetric;
                 }
+
+                Status = EnumParam->GlobalData->AdjustFaceName((LPENUMLOGFONTEXW)lf, &TextMetric, FontType);
+                if (Status == STATUS_OBJECT_NAME_NOT_FOUND)
+                    return TRUE;
+
+                if (TextMetric.Filled == FALSE)
+                {
+                    TextMetric.TextMetricW = *TextMetricW;
+                    TextMetric.Magic = 0;
+                }
+
+                TextMetricW = &TextMetric.TextMetricW;
 
                 return ((FONTENUMPROCW)(EnumParam->Callback))(lf, TextMetricW, FontType, EnumParam->lParam);
             },
@@ -463,11 +476,14 @@ int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpP
     return LeEnumFontFamiliesExW(hdc, &lf,
                 [](CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW, DWORD FontType, LPARAM param) -> INT
                 {
-                    TEXTMETRICA             TextMetricA;
                     ENUMLOGFONTEXA          EnumLogFontA;
                     LPENUMLOGFONTEXW        EnumLogFontW;
                     PGDI_ENUM_FONT_PARAM    EnumParam;
+                    PTEXT_METRIC_INTERNAL   TextMetric;
+                    TEXTMETRICA             TextMetricA;
+                    PTEXTMETRICA            tma;
 
+                    TextMetric = FIELD_BASE(TextMetricW, TEXT_METRIC_INTERNAL, TextMetricW);
                     EnumParam = (PGDI_ENUM_FONT_PARAM)param;
 
                     EnumLogFontW = (LPENUMLOGFONTEXW)lf;
@@ -478,9 +494,18 @@ int NTAPI LeEnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpP
                     RtlUnicodeToMultiByteN((PSTR)EnumLogFontA.elfStyle, sizeof(EnumLogFontA.elfStyle), nullptr, EnumLogFontW->elfStyle, (StrLengthW(EnumLogFontW->elfStyle) + 1) * sizeof(WCHAR));
 
                     //EnumParam->GlobalData->GetTextMetricsAFromLogFont(&TextMetricA, lf);
-                    ConvertUnicodeTextMetricToAnsi(&TextMetricA, TextMetricW);
 
-                    return ((FONTENUMPROCA)(EnumParam->Callback))(&EnumLogFontA.elfLogFont, &TextMetricA, FontType, EnumParam->lParam);
+                    if (TextMetric->VerifyMagic() == FALSE)
+                    {
+                        ConvertUnicodeTextMetricToAnsi(&TextMetricA, TextMetricW);
+                        tma = &TextMetricA;
+                    }
+                    else
+                    {
+                        tma = &TextMetric->TextMetricA;
+                    }
+
+                    return ((FONTENUMPROCA)(EnumParam->Callback))(&EnumLogFontA.elfLogFont, tma, FontType, EnumParam->lParam);
                 },
                 (LPARAM)&Param,
                 dwFlags

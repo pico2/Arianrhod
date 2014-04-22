@@ -108,7 +108,7 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
             //PrintConsole(L"%d, %d\n", X, Y);
 
             //if (Y > GetSystemMetrics(SM_CYCAPTION))
-            if (Y > (30 + (IsMaximized(lpMsg->hwnd) ? 0 : 20)))
+            if (Y > (IsMaximized(lpMsg->hwnd) ? 30 : 50))
                 break;
 
             forward = WheelDistance > 0;
