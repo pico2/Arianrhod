@@ -58,11 +58,18 @@ LPCSTR MyGetCommandLineA()
     return g_pCmdLineA;
 }
 
+BOOL GetCaptionBarRectFromMainWindow(HWND MainWindow, PRECT RenderWidget)
+{
+}
+
 BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg)
 {
-    BOOL Success, forward;
-    LONG X, Y, WheelDistance, fwKeys;
-    INPUT inputs[2];
+    BOOL        Success, forward;
+    LONG        X, Y, WheelDistance, fwKeys;
+    INPUT       inputs[2];
+    POINT       point;
+
+    static LONG LastDelta;
 
     Success = StubPeekMessageW(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
     if (Success == FALSE)
@@ -71,24 +78,38 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
     switch (lpMsg->message)
     {
         case WM_MOUSEWHEEL:
-            static int n = 0;
+            //static int n = 0;
 
-            AllocConsole();;
+            //AllocConsole();
 
             fwKeys = GET_KEYSTATE_WPARAM(lpMsg->wParam);
-            X = GET_X_LPARAM(lpMsg->lParam);
-            Y = GET_Y_LPARAM(lpMsg->lParam);
-            PrintConsole(L"%d, %d\n", X, Y);
 
             if (fwKeys != 0)
+            {
+                LastDelta = 0;
+                break;
+            }
+
+            WheelDistance = GET_WHEEL_DELTA_WPARAM(lpMsg->wParam) / WHEEL_DELTA;
+            LastDelta += WheelDistance;
+            //PrintConsole(L"%04d: %d, %d\n", ++n, WheelDistance, LastDelta);
+            if (abs(LastDelta) < 2)
                 break;
 
-            if (Y > GetSystemMetrics(SM_CYCAPTION))
+            LastDelta = 0;
+
+            point.x = GET_X_LPARAM(lpMsg->lParam);
+            point.y = GET_Y_LPARAM(lpMsg->lParam);
+
+            ScreenToClient(lpMsg->hwnd, &point);
+
+            X = point.x;
+            Y = point.y;
+            //PrintConsole(L"%d, %d\n", X, Y);
+
+            //if (Y > GetSystemMetrics(SM_CYCAPTION))
+            if (Y > (30 + (IsMaximized(lpMsg->hwnd) ? 0 : 20)))
                 break;
-
-            WheelDistance = GET_WHEEL_DELTA_WPARAM(lpMsg->wParam);
-
-            PrintConsole(L"%04d: %d\n", ++n, WheelDistance);
 
             forward = WheelDistance > 0;
 

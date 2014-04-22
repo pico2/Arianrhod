@@ -89,7 +89,7 @@
       <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
-      <OutputFile>wtsapi32.dll</OutputFile>
+      <OutputFile>Z:\Chrome\wtsapi32.dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
