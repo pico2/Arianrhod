@@ -8,18 +8,20 @@
 #pragma comment(linker, "/EXPORT:WTSQueryUserToken=_PWTSQueryUserToken@8")
 
 #include "MyLibrary.cpp"
+#include <windowsx.h>
 #include "WtsApi32.h"
 #include "resource.h"
 
 LPWSTR g_pCmdLineW;
 LPSTR  g_pCmdLineA;
 
-TYPE_OF(WTSFreeMemory)*                     StubWTSFreeMemory;
-TYPE_OF(WTSQuerySessionInformationW)*       StubWTSQuerySessionInformationW;
-TYPE_OF(WTSRegisterSessionNotification)*    StubWTSRegisterSessionNotification;
-TYPE_OF(WTSUnRegisterSessionNotification)*  StubWTSUnRegisterSessionNotification;
-TYPE_OF(LoadAcceleratorsW)*                 StubLoadAcceleratorsW;
-TYPE_OF(WTSQueryUserToken)*                 StubWTSQueryUserToken;
+API_POINTER(WTSFreeMemory)                      StubWTSFreeMemory;
+API_POINTER(WTSQuerySessionInformationW)        StubWTSQuerySessionInformationW;
+API_POINTER(WTSRegisterSessionNotification)     StubWTSRegisterSessionNotification;
+API_POINTER(WTSUnRegisterSessionNotification)   StubWTSUnRegisterSessionNotification;
+API_POINTER(LoadAcceleratorsW)                  StubLoadAcceleratorsW;
+API_POINTER(WTSQueryUserToken)                  StubWTSQueryUserToken;
+API_POINTER(PeekMessageW)                       StubPeekMessageW;
 
 EXTC BOOL WINAPI PWTSQueryUserToken(ULONG SessionId, PHANDLE phToken)
 {
@@ -33,7 +35,7 @@ EXTC VOID WINAPI PWTSFreeMemory(PVOID Memory)
 
 EXTC BOOL WINAPI PWTSQuerySessionInformationW()
 {
-    return ((TYPE_OF(PWTSQuerySessionInformationW) *)StubWTSQuerySessionInformationW)();
+    return ((API_POINTER(PWTSQuerySessionInformationW))StubWTSQuerySessionInformationW)();
 }
 
 EXTC LONG WINAPI PWTSRegisterSessionNotification(HWND hWnd, DWORD Flags)
@@ -54,6 +56,65 @@ LPCWSTR MyGetCommandLineW()
 LPCSTR MyGetCommandLineA()
 {
     return g_pCmdLineA;
+}
+
+BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg)
+{
+    BOOL Success, forward;
+    LONG X, Y, WheelDistance, fwKeys;
+    INPUT inputs[2];
+
+    Success = StubPeekMessageW(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
+    if (Success == FALSE)
+        return Success;
+
+    switch (lpMsg->message)
+    {
+        case WM_MOUSEWHEEL:
+            static int n = 0;
+
+            AllocConsole();;
+
+            fwKeys = GET_KEYSTATE_WPARAM(lpMsg->wParam);
+            X = GET_X_LPARAM(lpMsg->lParam);
+            Y = GET_Y_LPARAM(lpMsg->lParam);
+            PrintConsole(L"%d, %d\n", X, Y);
+
+            if (fwKeys != 0)
+                break;
+
+            if (Y > GetSystemMetrics(SM_CYCAPTION))
+                break;
+
+            WheelDistance = GET_WHEEL_DELTA_WPARAM(lpMsg->wParam);
+
+            PrintConsole(L"%04d: %d\n", ++n, WheelDistance);
+
+            forward = WheelDistance > 0;
+
+            inputs[0].type = INPUT_KEYBOARD;
+            inputs[0].ki.wVk = VK_CONTROL;
+            inputs[0].ki.wScan = 0;
+            inputs[0].ki.time = 0;
+            inputs[0].ki.dwFlags = 0;
+            inputs[0].ki.dwExtraInfo = 0;
+            inputs[1].type = INPUT_KEYBOARD;
+            inputs[1].ki.wVk = forward ? VK_PRIOR : VK_NEXT;
+            inputs[1].ki.wScan = 0;
+            inputs[1].ki.time = 0;
+            inputs[1].ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
+            inputs[1].ki.dwExtraInfo = 0;
+            SendInput(2, inputs, sizeof(*inputs));
+
+            inputs[0].ki.dwFlags |= KEYEVENTF_KEYUP;
+            inputs[1].ki.dwFlags |= KEYEVENTF_KEYUP;
+            Swap(inputs[0], inputs[1]);
+            SendInput(2, inputs, sizeof(*inputs));
+
+            break;
+    }
+
+    return Success;
 }
 
 HACCEL WINAPI MyLoadAcceleratorsW(HINSTANCE hInstance, LPCWSTR lpTableName)
@@ -135,15 +196,16 @@ BOOL Initialize(PVOID BaseAddress)
 
     hModule = Nt_GetModuleHandle(L"chrome.dll");
 
-    MEMORY_FUNCTION_PATCH f[] =
+    Mp::PATCH_MEMORY_DATA p[] =
     {
-        INLINE_HOOK_JUMP_NULL(::GetCommandLineW, MyGetCommandLineW),
-        INLINE_HOOK_JUMP_NULL(::GetCommandLineA, MyGetCommandLineA),
+        Mp::FunctionJumpVa(::GetCommandLineW,   MyGetCommandLineW),
+        Mp::FunctionJumpVa(::GetCommandLineA,   MyGetCommandLineA),
 
-        INLINE_HOOK_JUMP(LoadAcceleratorsW, MyLoadAcceleratorsW, StubLoadAcceleratorsW),
+        Mp::FunctionJumpVa(LoadAcceleratorsW,   MyLoadAcceleratorsW,    &StubLoadAcceleratorsW),
+        Mp::FunctionJumpVa(PeekMessageW,        ChromePeekMessageW,     &StubPeekMessageW),
     };
 
-    Nt_PatchMemory(0, 0, f, countof(f), 0);    
+    Mp::PatchMemory(p, countof(p));
 
     return TRUE;
 }
