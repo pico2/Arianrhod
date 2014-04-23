@@ -80,8 +80,6 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
         case WM_MOUSEWHEEL:
             //static int n = 0;
 
-            //AllocConsole();
-
             fwKeys = GET_KEYSTATE_WPARAM(lpMsg->wParam);
 
             if (fwKeys != 0)
@@ -91,7 +89,9 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
             }
 
             WheelDistance = GET_WHEEL_DELTA_WPARAM(lpMsg->wParam) / WHEEL_DELTA;
-            LastDelta += WheelDistance;
+            LastDelta += ML_MAX(WheelDistance, 1);
+
+            //AllocConsole();
             //PrintConsole(L"%04d: %d, %d\n", ++n, WheelDistance, LastDelta);
             if (abs(LastDelta) < 2)
                 break;

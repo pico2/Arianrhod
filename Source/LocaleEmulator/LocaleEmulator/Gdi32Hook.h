@@ -23,12 +23,30 @@ struct FMS_CALL_CONTEXT : public TEB_ACTIVE_FRAME
 
 typedef FMS_CALL_CONTEXT *PFMS_CALL_CONTEXT;
 
-typedef struct
+typedef struct GDI_ENUM_FONT_PARAM
 {
-    LPARAM          lParam;
-    PLeGlobalData   GlobalData;
-    PVOID           Callback;
-    ULONG           Charset;
+    LPARAM                  lParam;
+    PLeGlobalData           GlobalData;
+    PVOID                   Callback;
+    ULONG                   Charset;
+    HDC                     DC;
+
+    GDI_ENUM_FONT_PARAM()
+    {
+        this->DC = nullptr;
+    }
+
+    NTSTATUS Prepare(PLeGlobalData GlobalData)
+    {
+        this->DC = GlobalData->CreateCompatibleDC(nullptr);
+        return this->DC == nullptr ? STATUS_UNSUCCESSFUL : STATUS_SUCCESS;
+    }
+
+    ~GDI_ENUM_FONT_PARAM()
+    {
+        if (this->DC != nullptr)
+            DeleteDC(this->DC);
+    }
 
 } GDI_ENUM_FONT_PARAM, *PGDI_ENUM_FONT_PARAM;
 

@@ -180,6 +180,17 @@ NTSTATUS LeGlobalData::Initialize()
         CloseLePeb(LePeb);
     }
 
+    PVOID           NlsBaseAddress;
+    LCID            DefaultLocaleID;
+    LARGE_INTEGER   DefaultCasingTableSize;
+
+    Status = NtInitializeNlsFiles(&NlsBaseAddress, &DefaultLocaleID, &DefaultCasingTableSize);
+    FAIL_RETURN(Status);
+
+    this->GetLePeb()->OriginalLocaleID = DefaultLocaleID;
+
+    NtUnmapViewOfSection(CurrentProcess, NlsBaseAddress);
+
     WriteLog(L"init leb %s", GetLePeb()->LeDllFullPath);
 
     SystemDirectory = Ntdll->FullDllName;

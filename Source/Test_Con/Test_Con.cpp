@@ -104,12 +104,16 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
                     PrintConsole(L"tmBreakChar:     %02X\n", tm->tmBreakChar);
                     PrintConsole(L"lfFaceName:      %S\n", lf->lfFaceName);
                     PrintConsole(L"%S\n\n", ((LPENUMLOGFONTEXA)lf)->elfFullName);
+
+                    //if (stricmp(lf->lfFaceName, "Urdu Typesetting") == 0) _asm int 4;
                 }
 
                 return TRUE;
             },
             0
         );
+
+        return;
     }
 
     LOGFONTA lf;

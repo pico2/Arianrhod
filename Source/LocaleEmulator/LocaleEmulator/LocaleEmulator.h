@@ -27,6 +27,9 @@
 #define LeFunctionJump(_Name)                   Mp::FunctionJumpVa(_Name, Le##_Name, &HookStub.Stub##_Name)
 #define LeFunctionCall(_Name)                   Mp::FunctionCallVa(_Name, Le##_Name, &HookStub.Stub##_Name)
 
+class LeGlobalData;
+typedef LeGlobalData* PLeGlobalData;
+
 #define THREAD_LOCAL_BUFFER_CONTEXT TAG4('LTLB')
 
 typedef struct THREAD_LOCAL_BUFFER : public TEB_ACTIVE_FRAME
@@ -76,7 +79,7 @@ typedef struct
     ULONG_PTR           FontType;
     LPENUMLOGFONTEXW    EnumLogFontEx;
 
-} ADJUST_FACE_NAME_DATA, *PADJUST_FACE_NAME_DATA;
+} ADJUST_FONT_DATA, *PADJUST_FONT_DATA;
 
 typedef struct TEXT_METRIC_INTERNAL
 {
@@ -172,6 +175,7 @@ typedef struct
 typedef struct
 {
     ULONG_PTR   OriginalCharset;
+    ULONG_PTR   OriginalLocaleID;
     CHAR        ScriptNameA[LF_FACESIZE];
     WCHAR       ScriptNameW[LF_FACESIZE];
 
@@ -403,10 +407,12 @@ public:
         API_POINTER(CreateFontIndirectExW)      StubCreateFontIndirectExW;
         API_POINTER(NtGdiHfontCreate)           StubNtGdiHfontCreate;
         API_POINTER(CreateCompatibleDC)         StubCreateCompatibleDC;
-        API_POINTER(EnumFontFamiliesExA)        StubEnumFontFamiliesExA;
-        API_POINTER(EnumFontFamiliesExW)        StubEnumFontFamiliesExW;
         API_POINTER(EnumFontsA)                 StubEnumFontsA;
         API_POINTER(EnumFontsW)                 StubEnumFontsW;
+        API_POINTER(EnumFontFamiliesA)          StubEnumFontFamiliesA;
+        API_POINTER(EnumFontFamiliesW)          StubEnumFontFamiliesW;
+        API_POINTER(EnumFontFamiliesExA)        StubEnumFontFamiliesExA;
+        API_POINTER(EnumFontFamiliesExW)        StubEnumFontFamiliesExW;
 
     } HookStub;
 
@@ -651,22 +657,12 @@ public:
 
     INT FmsEnumFontFamiliesEx(HDC hDC, PLOGFONTW Logfont, FONTENUMPROCW Proc, LPARAM Parameter, ULONG Flags);
 
-    NTSTATUS AdjustFaceName(LPENUMLOGFONTEXW EnumLogFontEx, PTEXT_METRIC_INTERNAL TextMetric, ULONG_PTR FontType);
-    NTSTATUS AdjustFaceNameInternal(PADJUST_FACE_NAME_DATA AdjustData);
-    NTSTATUS GetNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, ULONG_PTR NameID, PUNICODE_STRING Name);
+    NTSTATUS AdjustFontData(HDC DC, LPENUMLOGFONTEXW EnumLogFontEx, PTEXT_METRIC_INTERNAL TextMetric, ULONG_PTR FontType);
+    NTSTATUS AdjustFontDataInternal(PADJUST_FONT_DATA AdjustData);
+    NTSTATUS GetNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, ULONG_PTR NameID, ULONG_PTR LanguageID, PUNICODE_STRING Name);
 
     VOID GetTextMetricsAFromLogFont(PTEXTMETRICA TextMetricA, CONST LOGFONTW *LogFont);
     VOID GetTextMetricsWFromLogFont(PTEXTMETRICW TextMetricW, CONST LOGFONTW *LogFont);
-
-    int EnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpFontFunc, LPARAM lParam)
-    {
-        return HookStub.StubEnumFontsA(hdc, lpFaceName, lpFontFunc, lParam);
-    }
-
-    int EnumFontsW(HDC hdc, PCWSTR lpFaceName, FONTENUMPROCW lpFontFunc, LPARAM lParam)
-    {
-        return HookStub.StubEnumFontsW(hdc, lpFaceName, lpFontFunc, lParam);
-    }
 
     HGDIOBJ GetStockObject(LONG Object)
     {
@@ -683,6 +679,26 @@ public:
         return HookStub.StubCreateCompatibleDC(hDC);
     }
 
+    int EnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpFontFunc, LPARAM lParam)
+    {
+        return HookStub.StubEnumFontsA(hdc, lpFaceName, lpFontFunc, lParam);
+    }
+
+    int EnumFontsW(HDC hdc, PCWSTR lpFaceName, FONTENUMPROCW lpFontFunc, LPARAM lParam)
+    {
+        return HookStub.StubEnumFontsW(hdc, lpFaceName, lpFontFunc, lParam);
+    }
+
+    int EnumFontFamiliesA(HDC hdc, LPCSTR lpFaceName, FONTENUMPROCA lpProc, LPARAM lParam)
+    {
+        return HookStub.StubEnumFontFamiliesA(hdc, lpFaceName, lpProc, lParam);
+    }
+
+    int EnumFontFamiliesW(HDC hdc, LPCWSTR lpFaceName, FONTENUMPROCW lpProc, LPARAM lParam)
+    {
+        return HookStub.StubEnumFontFamiliesW(hdc, lpFaceName, lpProc, lParam);
+    }
+
     int EnumFontFamiliesExA(HDC hdc, LPLOGFONTA lpLogfont, FONTENUMPROCA lpProc, LPARAM lParam, DWORD dwFlags)
     {
         return HookStub.StubEnumFontFamiliesExA(hdc, lpLogfont, lpProc, lParam, dwFlags);
@@ -693,8 +709,6 @@ public:
         return HookStub.StubEnumFontFamiliesExW(hdc, lpLogfont, lpProc, lParam, dwFlags);
     }
 };
-
-typedef LeGlobalData* PLeGlobalData;
 
 ForceInline PLeGlobalData LeGetGlobalData()
 {
