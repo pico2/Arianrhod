@@ -539,7 +539,6 @@ LeNtInitializeNlsFiles(
 
     GlobalData = (PLeGlobalData)HpGetFilterContext();
 
-    GlobalData->GetLePeb()->OriginalLocaleID = *DefaultLocaleId;
     *DefaultLocaleId = GlobalData->GetLeb()->LocaleID;
 
     return Status;
