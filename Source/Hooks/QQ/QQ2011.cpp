@@ -478,6 +478,9 @@ QqSetWindowPos(
             { 614, 546 },
             { 603, 527 },
             { 623, 546 },
+
+            //{ 548, 505 },
+            { 599, 524 },
         };
 
         static SIZE DiscussSize[] =
