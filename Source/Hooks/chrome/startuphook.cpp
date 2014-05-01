@@ -83,52 +83,6 @@ KEY_MAP KeyMapTable[] =
     { { FALT,   'Z'     }, { FCONTROL | FSHIFT, 'T'         } },
 };
 
-VOID SendKey(ULONG Modifier, ULONG VirtualKey, BOOL KeyDown)
-{
-    ULONG Flags, Count;
-    INPUT inputs[4];
-
-    Flags = KeyDown ? 0 : KEYEVENTF_KEYUP;
-
-    Count = 0;
-    ZeroMemory(inputs, sizeof(inputs));
-
-    if (FLAG_ON(Modifier, FCONTROL))
-    {
-        inputs[Count].ki.wVk = VK_CONTROL;
-        inputs[Count].ki.dwFlags = Flags;
-        inputs[Count].type = INPUT_KEYBOARD;
-        ++Count;
-    }
-
-    if (FLAG_ON(Modifier, FALT))
-    {
-        inputs[Count].ki.wVk = VK_MENU;
-        inputs[Count].ki.dwFlags = Flags;
-        inputs[Count].type = INPUT_KEYBOARD;
-        ++Count;
-    }
-
-    if (FLAG_ON(Modifier, FSHIFT))
-    {
-        inputs[Count].ki.wVk = VK_SHIFT;
-        inputs[Count].ki.dwFlags = Flags;
-        inputs[Count].type = INPUT_KEYBOARD;
-        ++Count;
-    }
-
-    if (VirtualKey != 0)
-    {
-        inputs[Count].ki.wVk = VirtualKey;
-        inputs[Count].ki.dwFlags = Flags;
-        inputs[Count].type = INPUT_KEYBOARD;
-        ++Count;
-    }
-
-    if (Count != 0)
-        SendInput(Count, inputs, sizeof(inputs[0]));
-}
-
 VOID SendKeyList(ULONG Modifier, PULONG VirtualKey, ULONG KeyCount, BOOL KeyDown)
 {
     ULONG   Size, Flags, Count;
@@ -179,6 +133,11 @@ VOID SendKeyList(ULONG Modifier, PULONG VirtualKey, ULONG KeyCount, BOOL KeyDown
 
     if (Count != 0)
         SendInput(Count, inputs, sizeof(inputs[0]));
+}
+
+VOID SendKey(ULONG Modifier, ULONG VirtualKey, BOOL KeyDown)
+{
+    SendKeyList(Modifier, &VirtualKey, 1, KeyDown);
 }
 
 BOOL TranslateKeyEvent(PMSG Msg, PBYTE KeyStateTable, BOOL KeyDown)
