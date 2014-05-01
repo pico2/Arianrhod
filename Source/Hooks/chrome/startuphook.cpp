@@ -11,8 +11,6 @@
 #include <windowsx.h>
 #include <WtsApi32.h>
 
-#define KEY_FLAG_PRESSED    1
-
 LPWSTR g_pCmdLineW;
 LPSTR  g_pCmdLineA;
 
@@ -58,6 +56,8 @@ LPCSTR MyGetCommandLineA()
 {
     return g_pCmdLineA;
 }
+
+#define KeyPressed(vk) (GetKeyState(vk) < 0)
 
 typedef struct
 {
@@ -140,7 +140,7 @@ VOID SendKey(ULONG Modifier, ULONG VirtualKey, BOOL KeyDown)
     SendKeyList(Modifier, &VirtualKey, 1, KeyDown);
 }
 
-BOOL TranslateKeyEvent(PMSG Msg, PBYTE KeyStateTable, BOOL KeyDown)
+BOOL TranslateKeyEvent(PMSG Msg, BOOL KeyDown)
 {
     if (KeyDown == FALSE)
         return FALSE;
@@ -155,13 +155,13 @@ BOOL TranslateKeyEvent(PMSG Msg, PBYTE KeyStateTable, BOOL KeyDown)
 
     FOR_EACH_ARRAY(KeyMap, KeyMapTable)
     {
-        if (FLAG_ON(KeyMap->Original.Modifier, FCONTROL) != FLAG_ON(KeyStateTable[VK_CONTROL], KEY_FLAG_PRESSED))
+        if (FLAG_ON(KeyMap->Original.Modifier, FCONTROL) != KeyPressed(VK_CONTROL))
             continue;
 
-        if (FLAG_ON(KeyMap->Original.Modifier, FALT) != FLAG_ON(KeyStateTable[VK_MENU], KEY_FLAG_PRESSED))
+        if (FLAG_ON(KeyMap->Original.Modifier, FALT) != KeyPressed(VK_MENU))
             continue;
 
-        if (FLAG_ON(KeyMap->Original.Modifier, FSHIFT) != FLAG_ON(KeyStateTable[VK_SHIFT], KEY_FLAG_PRESSED))
+        if (FLAG_ON(KeyMap->Original.Modifier, FSHIFT) != KeyPressed(VK_SHIFT))
             continue;
 
         if ((BYTE)Msg->wParam != KeyMap->Original.VirtualKey)
@@ -191,26 +191,10 @@ BOOL TranslateKeyEvent(PMSG Msg, PBYTE KeyStateTable, BOOL KeyDown)
         if (FLAG_ON(KeyMap->Replacement.Modifier, FSHIFT))
             CtrlKeys[2] = VK_SHIFT;
 
-        // FOR_EACH_ARRAY(Key, KeyToRelease)
-        // {
-        //     if (*Key == 0)
-        //         continue;
-
-        //     SendKey(0, *Key, FALSE);
-        // }
-
         SendKeyList(0, KeyToRelease, countof(KeyToRelease), FALSE);
         SendKey(KeyMap->Replacement.Modifier, KeyMap->Replacement.VirtualKey, TRUE);
         SendKey(KeyMap->Replacement.Modifier, KeyMap->Replacement.VirtualKey, FALSE);
         SendKeyList(0, KeyToRelease, countof(KeyToRelease), TRUE);
-
-        // FOR_EACH_ARRAY(Key, KeyToRelease)
-        // {
-        //     if (*Key == 0)
-        //         continue;
-
-        //     SendKey(0, *Key, TRUE);
-        // }
 
         return TRUE;
     }
@@ -222,12 +206,9 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
 {
     BOOL        Success, forward;
     LONG        X, Y, WheelDistance, fwKeys;
-    INPUT       inputs[2];
     POINT       point;
 
     static LONG LastDelta;
-
-    static BYTE KeyStateTable[256];
 
     Success = StubPeekMessageW(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
     if (Success == FALSE)
@@ -272,38 +253,16 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
             forward = WheelDistance > 0;
             SendKey(FCONTROL, forward ? VK_PRIOR : VK_NEXT, TRUE);
             SendKey(FCONTROL, forward ? VK_PRIOR : VK_NEXT, FALSE);
-
-            // inputs[0].type = INPUT_KEYBOARD;
-            // inputs[0].ki.wVk = VK_CONTROL;
-            // inputs[0].ki.wScan = 0;
-            // inputs[0].ki.time = 0;
-            // inputs[0].ki.dwFlags = 0;
-            // inputs[0].ki.dwExtraInfo = 0;
-            // inputs[1].type = INPUT_KEYBOARD;
-            // inputs[1].ki.wVk = forward ? VK_PRIOR : VK_NEXT;
-            // inputs[1].ki.wScan = 0;
-            // inputs[1].ki.time = 0;
-            // inputs[1].ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
-            // inputs[1].ki.dwExtraInfo = 0;
-            // SendInput(2, inputs, sizeof(*inputs));
-
-            // inputs[0].ki.dwFlags |= KEYEVENTF_KEYUP;
-            // inputs[1].ki.dwFlags |= KEYEVENTF_KEYUP;
-            // Swap(inputs[0], inputs[1]);
-            // SendInput(2, inputs, sizeof(*inputs));
-
             break;
 
         case WM_SYSKEYDOWN:
         case WM_KEYDOWN:
-            SET_FLAG(KeyStateTable[(BYTE)lpMsg->wParam], KEY_FLAG_PRESSED);
-            Success = !TranslateKeyEvent(lpMsg, KeyStateTable, TRUE);
+            Success = !TranslateKeyEvent(lpMsg, TRUE);
             break;
 
         case WM_SYSKEYUP:
         case WM_KEYUP:
-            CLEAR_FLAG(KeyStateTable[(BYTE)lpMsg->wParam], KEY_FLAG_PRESSED);
-            Success = !TranslateKeyEvent(lpMsg, KeyStateTable, FALSE);
+            Success = !TranslateKeyEvent(lpMsg, FALSE);
             break;
     }
 
