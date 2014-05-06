@@ -89,59 +89,11 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    if (1)
-    {
-        EnumFontFamiliesA(GetDC(0), 0,
-            [](CONST LOGFONTA *lf, CONST TEXTMETRICA* tm, ULONG ft, LPARAM)
-            {
-                //if (NT_SUCCESS(AdjustFaceName((LPENUMLOGFONTEXW)lf, ft)))
-                {
-                    PrintConsole(L"lfCharSet:       %02X\n", lf->lfCharSet);
-                    PrintConsole(L"tmCharSet:       %02X\n", tm->tmCharSet);
-                    PrintConsole(L"tmFirstChar:     %02X\n", tm->tmFirstChar);
-                    PrintConsole(L"tmLastChar:      %02X\n", tm->tmLastChar);
-                    PrintConsole(L"tmDefaultChar:   %02X\n", tm->tmDefaultChar);
-                    PrintConsole(L"tmBreakChar:     %02X\n", tm->tmBreakChar);
-                    PrintConsole(L"lfFaceName:      %S\n", lf->lfFaceName);
-                    PrintConsole(L"%S\n\n", ((LPENUMLOGFONTEXA)lf)->elfFullName);
+    auto l = [&] () { return 0; };
 
-                    //if (stricmp(lf->lfFaceName, "Urdu Typesetting") == 0) _asm int 4;
-                }
+    auto fuck = &TYPE_OF(l)::operator();
 
-                return TRUE;
-            },
-            0
-        );
-
-        return;
-    }
-
-    LOGFONTA lf;
-
-    ZeroMemory(&lf, sizeof(lf));
-
-    lf.lfCharSet = DEFAULT_CHARSET;
-    EnumFontFamiliesExA(GetDC(0), &lf,
-        [](CONST LOGFONTA *lf, CONST TEXTMETRICA* tm, ULONG ft, LPARAM)
-        {
-            //if (NT_SUCCESS(AdjustFaceName((LPENUMLOGFONTEXW)lf, ft)))
-            {
-                PrintConsole(L"lfCharSet:       %02X\n", lf->lfCharSet);
-                PrintConsole(L"tmCharSet:       %02X\n", tm->tmCharSet);
-                PrintConsole(L"tmFirstChar:     %02X\n", tm->tmFirstChar);
-                PrintConsole(L"tmLastChar:      %02X\n", tm->tmLastChar);
-                PrintConsole(L"tmDefaultChar:   %02X\n", tm->tmDefaultChar);
-                PrintConsole(L"tmBreakChar:     %02X\n", tm->tmBreakChar);
-                PrintConsole(L"lfFaceName:      %S\n", lf->lfFaceName);
-                PrintConsole(L"%S\n\n", ((LPENUMLOGFONTEXA)lf)->elfFullName);
-            }
-
-            return TRUE;
-        },
-        0,0
-    );
-
-    PauseConsole();
+    (l.*fuck)();
 
     return;
 
