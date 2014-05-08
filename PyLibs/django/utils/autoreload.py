@@ -65,6 +65,7 @@ def code_changed():
     for filename in filenames + _error_files:
         if not filename:
             continue
+
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
         if filename.endswith("$py.class"):
@@ -127,8 +128,9 @@ def reloader_thread():
     ensure_echo_on()
     while RUN_RELOADER:
         if code_changed():
-            sys.exit(3) # force reload
-        time.sleep(1)
+            os._exit(3)
+        # sys.exit(3) # force reload
+        time.sleep(3)
 
 def restart_with_reloader():
     while True:
