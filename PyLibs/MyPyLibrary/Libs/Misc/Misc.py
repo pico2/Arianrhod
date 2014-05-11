@@ -87,7 +87,11 @@ def FormatDictionary(obj, depth = 0, itergen = sorted):
     space = '  ' * depth
 
     for k in itergen(obj):
-        v = obj[k]
+        try:
+            v = obj.getlist(k)
+        except AttributeError:
+            v = obj.get(k)
+
         if isinstance(v, dict):
             info.append('%s%s:\n' % (space, k))
             info.extend(FormatDictionary(v, depth + 1, itergen))
