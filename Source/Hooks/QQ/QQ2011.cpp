@@ -1123,7 +1123,7 @@ BOOL UnInitialize(PVOID BaseAddress)
     return FALSE;
 }
 
-BOOL Initialize(PVOID BaseAddress)
+BOOL Initialize2(PVOID BaseAddress)
 {
     BOOL                        QQUINSpecified;
     NTSTATUS                    Status;
@@ -1240,6 +1240,31 @@ BOOL Initialize(PVOID BaseAddress)
 
 
     /************************************************************************
+      AppUtil
+
+        L"PerfStand.CheckImportantModule.Begin"
+        L"DllCheck"
+        L"Dll Check Fail"
+
+        check:
+            QQExternal.exe
+            TXPlatform.exe
+            ...
+    ************************************************************************/
+
+    module = Ldr::LoadDll(L"AppUtil.dll");
+
+    AppUtilBase = module;
+
+    Mp::PATCH_MEMORY_DATA Function_AppUtil[] =
+    {
+        Mp::FunctionJumpVa(LookupExportTable(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z"),  ReportScanResult),
+        Mp::FunctionJumpVa(LookupExportTable(module, "?PluginSecurityCheck@Misc@Util@@YAHXZ"),              PluginSecurityCheck),
+        Mp::FunctionJumpVa(SearchAppUtil_CheckImportantModule(module),                                      CheckPluginList),
+    };
+
+
+    /************************************************************************
       Common
     ************************************************************************/
 
@@ -1349,29 +1374,6 @@ BOOL Initialize(PVOID BaseAddress)
     };
 
 */
-    /************************************************************************
-      AppUtil
-
-        L"PerfStand.CheckImportantModule.Begin"
-        L"DllCheck"
-        L"Dll Check Fail"
-
-        check:
-            QQExternal.exe
-            TXPlatform.exe
-            ...
-    ************************************************************************/
-
-    module = Ldr::LoadDll(L"AppUtil.dll");
-
-    AppUtilBase = module;
-
-    Mp::PATCH_MEMORY_DATA Function_AppUtil[] =
-    {
-        Mp::FunctionJumpVa(LookupExportTable(module, "?ReportScanResult@Misc@Util@@YAHKVCTXStringW@@0@Z"),  ReportScanResult),
-        Mp::FunctionJumpVa(LookupExportTable(module, "?PluginSecurityCheck@Misc@Util@@YAHXZ"),              PluginSecurityCheck),
-        Mp::FunctionJumpVa(SearchAppUtil_CheckImportantModule(module),                                      CheckPluginList),
-    };
 
 
     /************************************************************************
@@ -1418,12 +1420,24 @@ BOOL Initialize(PVOID BaseAddress)
     return TRUE;
 }
 
+BOOL Initialize(PVOID BaseAddress)
+{
+    auto Apc = [] (PVOID BaseAddress, PVOID, PVOID)
+    {
+        Initialize2(BaseAddress);
+    };
+
+    LdrDisableThreadCalloutsForDll(BaseAddress);
+
+    return NT_SUCCESS(NtQueueApcThread(CurrentThread, Apc, BaseAddress, 0, 0));
+}
+
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 {
     switch (Reason)
     {
         case DLL_PROCESS_ATTACH:
-            return Initialize(BaseAddress) || UnInitialize(BaseAddress);
+            return Initialize2(BaseAddress) || UnInitialize(BaseAddress);
 
         case DLL_PROCESS_DETACH:
             UnInitialize(BaseAddress);
