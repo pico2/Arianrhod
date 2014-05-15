@@ -5,6 +5,7 @@
 
 
 #define ARCHEAGE_VER 0
+#define ARCHEAGE_TX 1
 
 
 #define ROOTDIR_SYSTEM32            L"\\SystemRoot\\system32\\"
