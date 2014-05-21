@@ -5,7 +5,7 @@
 
 #define _WIN32_WINNT 0x601
 
-#pragma comment(linker,"/ENTRY:main2")
+#pragma comment(linker,"/ENTRY:main")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:"SECTION_NAME",ERW /MERGE:.text="SECTION_NAME)
 #pragma warning(disable:4995 4273)
@@ -85,15 +85,136 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+#include <Softpub.h>
+#include <wincrypt.h>
+#include <wintrust.h>
+
+#pragma comment (lib, "wintrust")
+#pragma comment(lib, "crypt32.lib")
+
+BOOL IsSourceFileContainTimestamp(HCRYPTMSG Msg)
+{
+    BOOL                Success;
+    ULONG               DataSize;
+    PVOID               Data;
+    PCMSG_SIGNER_INFO   SignerInfo;
+    PCRYPT_ATTRIBUTE    Attribute;
+
+    DataSize = 0;
+    Success = CryptMsgGetParam(Msg, CMSG_SIGNER_INFO_PARAM, 0, NULL, &DataSize);
+    if (Success == FALSE)
+        return FALSE;
+
+    SignerInfo = (PCMSG_SIGNER_INFO)malloc(DataSize);
+    if (SignerInfo == NULL)
+        return FALSE;
+
+    Success = CryptMsgGetParam(Msg, CMSG_SIGNER_INFO_PARAM, 0, SignerInfo, &DataSize);
+    if (Success == FALSE)
+    {
+        free(SignerInfo);
+        return FALSE;
+    }
+
+    Success = FALSE;
+    Attribute = SignerInfo->UnauthAttrs.rgAttr;
+    for (ULONG_PTR Count = SignerInfo->UnauthAttrs.cAttr; Count != 0; ++Attribute, --Count)
+    {
+        if (strcmp(szOID_RSA_counterSign, Attribute->pszObjId) != 0)
+            continue;
+
+        DataSize = 0;
+        Success = CryptDecodeObject(
+                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                        PKCS7_SIGNER_INFO,
+                        Attribute->rgValue[0].pbData,
+                        Attribute->rgValue[0].cbData,
+                        0,
+                        NULL,
+                        &DataSize
+                    );
+
+        break;
+    }
+
+    free(SignerInfo);
+
+    return Success;
+}
+
+BOOL VerifyEmbeddedSignature(PCWSTR SourceFile)
+{
+    BOOL                Success;
+    LONG                Status;
+    ULONG               Encoding, ContentType, FormatType;
+    HCERTSTORE          Store;
+    HCRYPTMSG           Msg;
+    WINTRUST_FILE_INFO  FileData;
+    WINTRUST_DATA       WinTrustData;
+
+    static GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+
+    ZeroMemory(&FileData, sizeof(FileData));
+    ZeroMemory(&WinTrustData, sizeof(WinTrustData));
+
+    FileData.cbStruct       = sizeof(WINTRUST_FILE_INFO);
+    FileData.pcwszFilePath  = SourceFile;
+
+    WinTrustData.cbStruct               = sizeof(WinTrustData);
+    WinTrustData.dwUIChoice             = WTD_UI_NONE;
+    WinTrustData.fdwRevocationChecks    = WTD_REVOKE_NONE;
+    WinTrustData.dwUnionChoice          = WTD_CHOICE_FILE;
+    WinTrustData.dwStateAction          = WTD_STATEACTION_VERIFY;
+    WinTrustData.pFile                  = &FileData;
+
+    Status = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
+
+    WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
+    WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
+
+    if (Status != ERROR_SUCCESS)
+        return FALSE;
+
+    // Get message handle and store handle from the signed file.
+    Success = CryptQueryObject(
+                    CERT_QUERY_OBJECT_FILE,
+                    SourceFile,
+                    CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED,
+                    CERT_QUERY_FORMAT_FLAG_BINARY,
+                    0,
+                    &Encoding,
+                    &ContentType,
+                    &FormatType,
+                    &Store,
+                    &Msg,
+                    NULL
+                );
+
+    if (Success == FALSE)
+        return FALSE;
+
+    Success = IsSourceFileContainTimestamp(Msg);
+
+    CertCloseStore(Store, 0);
+    CryptMsgClose(Msg);
+
+    return Success;
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    BOOL Success;
 
-    auto l = [&] () { return 0; };
+    if (argc == 1)
+    {
+        wprintf(L"Usage: %s target_file_name\n", argv[0]);
+        return;
+    }
 
-    auto fuck = &TYPE_OF(l)::operator();
+    Success = VerifyEmbeddedSignature(argv[1]);
 
-    (l.*fuck)();
+    wprintf(L"%s: %s\n", argv[1], Success ? L"Succeeded" : L"Failed");
 
     return;
 
