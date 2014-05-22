@@ -212,9 +212,18 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         return;
     }
 
-    Success = VerifyEmbeddedSignature(argv[1]);
+    while (--argc)
+    {
+        ++argv;
 
-    wprintf(L"%s: %s\n", argv[1], Success ? L"Succeeded" : L"Failed");
+        if (argv[0][0] == '-')
+            continue;
+
+        Success = VerifyEmbeddedSignature(argv[0]);
+        wprintf(L"%s: %s\n", argv[0], Success ? L"Succeeded" : L"Failed");
+
+        break;
+    }
 
     return;
 
