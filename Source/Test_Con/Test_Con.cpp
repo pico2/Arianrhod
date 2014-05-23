@@ -85,15 +85,17 @@ VOID PrintLocaleDefaultAnsiCodePage()
     Ps::ExitProcess(0);
 }
 
+#include <vector>
+#include <map>
+
+using namespace std;
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    for (ULONG_PTR i = STATUS_UNSUCCESSFUL; i != 0xFFFFFFFF; ++i)
-    {
-        if (RtlNtStatusToDosError(i) == ERROR_MORE_DATA)
-            PrintConsole(L"%p\n", i);
-    }
+    PrintConsole(L"%p\n", sizeof(vector<vector<int>>::difference_type));
+    PrintConsole(L"%p\n", sizeof(map<int, vector<int>>::difference_type));
 
     return;
 
