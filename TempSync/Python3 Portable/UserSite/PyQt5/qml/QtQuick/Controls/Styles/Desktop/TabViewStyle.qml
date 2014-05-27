@@ -37,8 +37,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 import QtQuick.Controls.Styles 1.1
 Style {
@@ -85,7 +85,7 @@ Style {
         property int tabHSpace: __barstyle.pixelMetric("tabhspace");
         property int tabVSpace: __barstyle.pixelMetric("tabvspace");
         property int totalOverlap: tabOverlap * (control.count - 1)
-        property real maxTabWidth: (control.width + totalOverlap) / control.count
+        property real maxTabWidth: control.count > 0 ? (control.width + totalOverlap) / control.count : 0
         implicitWidth: Math.min(maxTabWidth, Math.max(50, styleitem.textWidth(styleData.title)) + tabHSpace + 2)
         implicitHeight: Math.max(styleitem.font.pixelSize + tabVSpace + 6, 0)
 
@@ -103,6 +103,7 @@ Style {
             properties: { "hasFrame" : true, "orientation": orientation, "tabpos": tabpos, "selectedpos": selectedpos }
             hints: control.styleHints
 
+            enabled: styleData.enabled
             selected: styleData.selected
             text: elidedText(styleData.title, tabbarItem.elide, item.width - item.tabHSpace)
             hover: styleData.hovered

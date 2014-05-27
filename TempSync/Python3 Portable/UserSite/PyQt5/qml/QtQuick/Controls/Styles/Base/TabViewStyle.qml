@@ -37,8 +37,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 /*!
@@ -129,24 +129,24 @@ Style {
             \row \li readonly property bool \b styleData.nextSelected \li The next tab is selected.
             \row \li readonly property bool \b styleData.previousSelected \li The previous tab is selected.
             \row \li readonly property bool \b styleData.hovered \li The tab is being hovered.
+            \row \li readonly property bool \b styleData.enabled \li The tab is enabled. (since QtQuick.Controls.Styles 1.2)
             \row \li readonly property bool \b styleData.activeFocus \li The tab button has keyboard focus.
             \row \li readonly property bool \b styleData.availableWidth \li The available width for the tabs.
+            \row \li readonly property bool \b styleData.totalWidth \li The total width of the tabs. (since QtQuick.Controls.Styles 1.2)
         \endtable
     */
     property Component tab: Item {
         scale: control.tabPosition === Qt.TopEdge ? 1 : -1
 
         property int totalOverlap: tabOverlap * (control.count - 1)
-        property real maxTabWidth: (styleData.availableWidth + totalOverlap) / control.count
+        property real maxTabWidth: control.count > 0 ? (styleData.availableWidth + totalOverlap) / control.count : 0
 
         implicitWidth: Math.round(Math.min(maxTabWidth, textitem.implicitWidth + 20))
         implicitHeight: Math.round(textitem.implicitHeight + 10)
 
-        clip: true
         Item {
             anchors.fill: parent
             anchors.bottomMargin: styleData.selected ? 0 : 2
-            clip: true
             BorderImage {
                 anchors.fill: parent
                 source: styleData.selected ? "images/tab_selected.png" : "images/tab.png"
@@ -157,25 +157,31 @@ Style {
                 anchors.topMargin: styleData.selected ? 0 : 1
             }
         }
-        Rectangle {
-            anchors.fill: textitem
-            anchors.margins: -1
-            anchors.leftMargin: -3
-            anchors.rightMargin: -3
-            visible: (styleData.activeFocus && styleData.selected)
-            height: 6
-            radius: 3
-            color: "#224f9fef"
-            border.color: "#47b"
-        }
         Text {
             id: textitem
-            anchors.centerIn: parent
-            anchors.alignWhenCentered: true
+            anchors.fill: parent
+            anchors.leftMargin: 4
+            anchors.rightMargin: 4
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
             text: styleData.title
+            elide: Text.ElideMiddle
             renderType: Text.NativeRendering
             scale: control.tabPosition === Qt.TopEdge ? 1 : -1
+            property var __syspal: SystemPalette {
+                colorGroup: styleData.enabled ?
+                                SystemPalette.Active : SystemPalette.Disabled
+            }
             color: __syspal.text
+            Rectangle {
+                anchors.centerIn: parent
+                width: textitem.paintedWidth + 6
+                height: textitem.paintedHeight + 4
+                visible: (styleData.activeFocus && styleData.selected)
+                radius: 3
+                color: "#224f9fef"
+                border.color: "#47b"
+            }
         }
     }
 

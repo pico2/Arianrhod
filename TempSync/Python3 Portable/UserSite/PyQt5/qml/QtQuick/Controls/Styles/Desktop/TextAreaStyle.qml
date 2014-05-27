@@ -37,23 +37,21 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 ScrollViewStyle {
     property font font: __styleitem.font
-    property color textColor: __styleitem.textColor
+    property color textColor: __syspal.text
     property color selectionColor: __syspal.highlight
     property color selectedTextColor: __syspal.highlightedText
     property color backgroundColor: control.backgroundVisible ? __syspal.base : "transparent"
 
     property StyleItem __styleitem: StyleItem{
-        property color textColor: styleHint("textColor")
         elementType: "edit"
         visible: false
         active: control.activeFocus
-        onActiveChanged: textColor = styleHint("textColor")
     }
 
     property int renderType: Text.NativeRendering

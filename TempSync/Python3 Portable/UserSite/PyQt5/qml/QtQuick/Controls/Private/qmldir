@@ -1,12 +1,15 @@
 module QtQuick.Controls.Private
 AbstractCheckable 1.0 AbstractCheckable.qml
+CalendarHeaderModel 1.0 CalendarHeaderModel.qml
 Control 1.0 Control.qml
+CalendarUtils 1.0 CalendarUtils.js
 FocusFrame 1.0 FocusFrame.qml
 Margins 1.0 Margins.qml
 BasicButton 1.0 BasicButton.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollViewHelper 1.0 ScrollViewHelper.qml
 Style 1.0 Style.qml
+MenuItemSubControls 1.0 MenuItemSubControls.qml
 TabBar 1.0 TabBar.qml
 StackViewSlideDelegate 1.0 StackViewSlideDelegate.qml
 StyleHelpers 1.0 style.js
@@ -19,4 +22,6 @@ ToolButtonStyle 1.0 ../Styles/Base/ToolButtonStyle.qml
 MenuContentItem 1.0 MenuContentItem.qml
 MenuContentScroller 1.0 MenuContentScroller.qml
 ColumnMenuContent 1.0 ColumnMenuContent.qml
+ContentItem 1.0 ContentItem.qml
+HoverButton 1.0 HoverButton.qml
 singleton TextSingleton 1.0 TextSingleton.qml

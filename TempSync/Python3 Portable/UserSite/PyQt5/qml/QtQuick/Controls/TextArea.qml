@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 import QtQuick 2.2
-import QtQuick.Controls 1.1
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 /*!
     \qmltype TextArea
@@ -264,6 +264,7 @@ ScrollView {
         By default this property is \c false.
     */
     property alias readOnly: edit.readOnly
+    Accessible.readOnly: readOnly
 
     /*!
         \qmlproperty string TextArea::selectedText
@@ -336,16 +337,13 @@ ScrollView {
         \qmlproperty enumeration TextArea::wrapMode
 
         Set this property to wrap the text to the TextArea item's width.
-        The text will only wrap if an explicit width has been set.
 
         \list
-        \li TextEdit.NoWrap - no wrapping will be performed. If the text contains insufficient newlines, then implicitWidth will exceed a set width.
-        \li TextEdit.WordWrap - wrapping is done on word boundaries only. If a word is too long, implicitWidth will exceed a set width.
+        \li TextEdit.NoWrap - no wrapping will be performed.
+        \li TextEdit.WordWrap (default) - wrapping is done on word boundaries only.
         \li TextEdit.WrapAnywhere - wrapping is done at any point on a line, even if it occurs in the middle of a word.
         \li TextEdit.Wrap - if possible, wrapping occurs at a word boundary; otherwise it will occur at the appropriate point on the line, even in the middle of a word.
         \endlist
-
-        The default is \c TextEdit.NoWrap. If you set a width, consider using TextEdit.Wrap.
     */
     property alias wrapMode: edit.wrapMode
 
@@ -382,18 +380,22 @@ ScrollView {
         This signal is emitted when the user clicks on a link embedded in the text.
         The link must be in rich text or HTML format and the
         \a link string provides access to the particular link.
+
+        The corresponding handler is \c onLinkActivated.
     */
     signal linkActivated(string link)
 
     /*!
         \qmlsignal TextArea::linkHovered(string link)
-        \since 5.2
+        \since QtQuick.Controls 1.1
 
         This signal is emitted when the user hovers a link embedded in the text.
         The link must be in rich text or HTML format and the
         \a link string provides access to the particular link.
 
         \sa hoveredLink
+
+        The corresponding handler is \c onLinkHovered.
     */
     signal linkHovered(string link)
 
@@ -404,8 +406,6 @@ ScrollView {
         This property contains the link string when user hovers a link
         embedded in the text. The link must be in rich text or HTML format
         and the link string provides access to the particular link.
-
-        \sa onLinkHovered
     */
     readonly property alias hoveredLink: edit.hoveredLink
 
@@ -717,8 +717,10 @@ ScrollView {
             wrapMode: TextEdit.WordWrap
             textMargin: 4
 
-            selectByMouse: true
+            selectByMouse: Qt.platform.os !== "android" // Workaround for QTBUG-36515
             readOnly: false
+
+            Keys.forwardTo: area
 
             KeyNavigation.priority: KeyNavigation.BeforeItem
             KeyNavigation.tab: area.tabChangesFocus ? area.KeyNavigation.tab : null

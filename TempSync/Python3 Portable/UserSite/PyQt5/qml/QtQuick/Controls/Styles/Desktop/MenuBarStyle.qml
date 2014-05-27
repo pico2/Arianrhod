@@ -38,40 +38,45 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
-
+import "." as Desktop
 
 Style {
-    property Component frame: StyleItem {
+    id: styleRoot
+
+    property Component background: StyleItem {
         elementType: "menubar"
-        contentWidth: control.__contentItem.width
-        contentHeight: parent ? parent.contentHeight : 0
-        width: implicitWidth + 2 * (pixelMetric("menubarhmargin") + pixelMetric("menubarpanelwidth"))
-        height: implicitHeight + 2 * (pixelMetric("menubarvmargin") + pixelMetric("menubarpanelwidth"))
-                + pixelMetric("spacebelowmenubar")
 
         Accessible.role: Accessible.MenuBar
+
+        Component.onCompleted: {
+            styleRoot.padding.left = pixelMetric("menubarhmargin") + pixelMetric("menubarpanelwidth")
+            styleRoot.padding.right = pixelMetric("menubarhmargin") + pixelMetric("menubarpanelwidth")
+            styleRoot.padding.top = pixelMetric("menubarvmargin") + pixelMetric("menubarpanelwidth")
+            styleRoot.padding.bottom = pixelMetric("menubarvmargin") + pixelMetric("menubarpanelwidth")
+        }
     }
 
-    property Component menuItem: StyleItem {
+    property Component itemDelegate: StyleItem {
         elementType: "menubaritem"
-        x: pixelMetric("menubarhmargin") + pixelMetric("menubarpanelwidth")
-        y: pixelMetric("menubarvmargin") + pixelMetric("menubarpanelwidth")
 
-        text: menuItem.title
-        contentWidth: textWidth(text)
-        contentHeight: textHeight(text)
-        width: implicitWidth + pixelMetric("menubaritemspacing")
+        text: styleData.text
+        property string plainText: StyleHelpers.removeMnemonics(text)
+        contentWidth: textWidth(plainText)
+        contentHeight: textHeight(plainText)
+        width: implicitWidth
 
-        enabled: menuItem.enabled
-        selected: (parent && parent.selected) || sunken
-        sunken: parent && parent.sunken
+        enabled: styleData.enabled
+        sunken: styleData.open
+        selected: (parent && styleData.selected) || sunken
 
-        hints: { "showUnderlined": showUnderlined }
+        hints: { "showUnderlined": styleData.underlineMnemonic }
 
         Accessible.role: Accessible.MenuItem
-        Accessible.name: StyleHelpers.removeMnemonics(text)
+        Accessible.name: plainText
     }
+
+    property Component menuStyle: Desktop.MenuStyle { }
 }

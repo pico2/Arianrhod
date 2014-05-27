@@ -38,8 +38,8 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 
 /*!
     \qmltype AbstractCheckable
@@ -84,6 +84,8 @@ Control {
         This property is \c true if the control is checked.
     */
     property bool checked: false
+    Accessible.checked: checked
+    Accessible.checkable: true
 
     /*!
         This property is \c true if the control takes the focus when it is

@@ -38,8 +38,8 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 /*!
@@ -290,7 +290,7 @@ import QtQuick.Controls.Private 1.0
                 properties.exitItem.opacity = 1
             }
 
-            property Component pushTransition: StackViewTransition {
+            pushTransition: StackViewTransition {
                 PropertyAnimation {
                     target: enterItem
                     property: "opacity"
@@ -312,7 +312,7 @@ import QtQuick.Controls.Private 1.0
     contains the properties \c enterItem and \c exitItem. You set the target of your
     inner animations to those items. Since the same items instance can be pushed several
     times to a StackView, you should always override
-    \l {StackViewDelegate::transitionFinished(properties)}{StackViewDelegate.transitionFinished(properties)}.
+    \l {StackViewDelegate::transitionFinished()}{StackViewDelegate.transitionFinished()}.
     Implement this function to reset any properties animated on the exitItem so that later
     transitions can expect the items to be in a default state.
 
@@ -328,7 +328,7 @@ import QtQuick.Controls.Private 1.0
                 properties.exitItem.rotation = 0
             }
 
-            property Component pushTransition: StackViewTransition {
+            pushTransition: StackViewTransition {
                 SequentialAnimation {
                     ScriptAction {
                         script: enterItem.rotation = 90
@@ -360,7 +360,7 @@ import QtQuick.Controls.Private 1.0
     \section2 Advanced usage
 
     When the StackView needs a new transition, it first calls
-    \l {StackViewDelegate::getTransition(properties)}{StackViewDelegate.getTransition(properties)}.
+    \l {StackViewDelegate::getTransition()}{StackViewDelegate.getTransition()}.
     The base implementation of this function just looks for a property named \c properties.name inside
     itself (root), which is how it finds \c {property Component pushTransition} in the examples above.
 
@@ -819,7 +819,7 @@ Item {
     /*! \internal */
     function __resolveComponent(unknownObjectType, element)
     {
-        // We need this extra resolve function since we dont really
+        // We need this extra resolve function since we don't really
         // know what kind of object the user pushed. So we try to
         // figure it out by inspecting the object:
         if (unknownObjectType.hasOwnProperty("createObject")) {

@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 import QtQuick 2.2
-import QtQuick.Controls 1.1
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 /*!
@@ -156,6 +156,7 @@ Control {
         \endlist
     */
     property alias echoMode: textInput.echoMode
+    Accessible.passwordEdit: echoMode == TextInput.Password || echoMode === TextInput.PasswordEchoOnEdit
 
     /*!
         \qmlproperty font TextField::font
@@ -303,7 +304,7 @@ Control {
         \qmlproperty string TextField::placeholderText
 
         This property contains the text that is shown in the text field when the
-        text field is empty and has no focus.
+        text field is empty.
     */
     property alias placeholderText: placeholderTextComponent.text
 
@@ -319,6 +320,7 @@ Control {
         work, however.
     */
     property alias readOnly: textInput.readOnly
+    Accessible.readOnly: readOnly
 
     /*!
         \qmlproperty string TextField::selectedText
@@ -373,14 +375,14 @@ Control {
         an intermediate state. The accepted signal will only be sent
         if the text is in an acceptable state when enter is pressed.
 
-        Currently supported validators are \l{QtQuick2::IntValidator},
-        \l{QtQuick2::DoubleValidator}, and \l{QtQuick2::RegExpValidator}. An
+        Currently supported validators are \l{QtQuick::}{IntValidator},
+        \l{QtQuick::}{DoubleValidator}, and \l{QtQuick::}{RegExpValidator}. An
         example of using validators is shown below, which allows input of
         integers between 11 and 31 into the text input:
 
         \code
-        import QtQuick 2.1
-        import QtQuick.Controls 1.1
+        import QtQuick 2.2
+        import QtQuick.Controls 1.2
 
         TextField {
             validator: IntValidator {bottom: 11; top: 31;}
@@ -399,18 +401,22 @@ Control {
         Note that if there is a \l validator or \l inputMask set on the text
         field, the signal will only be emitted if the input is in an acceptable
         state.
+
+        The corresponding handler is \c onAccepted.
     */
     signal accepted()
 
     /*!
         \qmlsignal TextField::editingFinished()
-        \since 5.2
+        \since QtQuick.Controls 1.1
 
         This signal is emitted when the Return or Enter key is pressed or
         the text field loses focus. Note that if there is a validator or
         inputMask set on the text field and enter/return is pressed, this
         signal will only be emitted if the input follows
         the inputMask and the validator returns an acceptable state.
+
+        The corresponding handler is \c onEditingFinished.
     */
     signal editingFinished()
 
@@ -547,6 +553,9 @@ Control {
     /*! \internal */
     property alias __contentWidth: textInput.contentWidth
 
+    /*! \internal */
+    property alias __baselineOffset: textInput.baselineOffset
+
     style: Qt.createComponent(Settings.style + "/TextFieldStyle.qml", textInput)
 
     activeFocusOnTab: true
@@ -580,11 +589,11 @@ Control {
     TextInput {
         id: textInput
         focus: true
-        selectByMouse: true
+        selectByMouse: Qt.platform.os !== "android" // Workaround for QTBUG-36515
         selectionColor: __panel ? __panel.selectionColor : "darkred"
         selectedTextColor: __panel ? __panel.selectedTextColor : "white"
 
-        font: __panel ? __panel.font : font
+        font: __panel ? __panel.font : undefined
         anchors.leftMargin: __panel ? __panel.leftMargin : 0
         anchors.topMargin: __panel ? __panel.topMargin : 0
         anchors.rightMargin: __panel ? __panel.rightMargin : 0
@@ -597,6 +606,8 @@ Control {
         clip: contentWidth > width
 
         renderType: __style ? __style.renderType : Text.NativeRendering
+
+        Keys.forwardTo: textfield
 
         onAccepted: {
             Qt.inputMethod.commit()

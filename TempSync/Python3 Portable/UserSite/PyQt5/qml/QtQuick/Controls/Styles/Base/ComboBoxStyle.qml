@@ -37,9 +37,9 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
+import QtQuick 2.2
 import QtQuick.Window 2.1
-import QtQuick.Controls 1.1
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Controls.Private 1.0
 
@@ -52,7 +52,23 @@ import QtQuick.Controls.Private 1.0
 */
 
 Style {
+    id: cbStyle
 
+    /*!
+        \qmlproperty enumeration renderType
+        \since QtQuick.Controls.Styles 1.2
+
+        Override the default rendering type for the control.
+
+        Supported render types are:
+        \list
+        \li Text.QtRendering
+        \li Text.NativeRendering - the default
+        \endlist
+
+        \sa Text::renderType
+    */
+    property int renderType: Text.NativeRendering
     /*! \internal */
     property var __syspal: SystemPalette {
         colorGroup: control.enabled ?
@@ -65,7 +81,10 @@ Style {
     padding { top: 4 ; left: 6 ; right: 6 ; bottom:4 }
 
     /*! The size of the drop down button when the combobox is editable. */
-    property int drowDownButtonWidth: Math.round(TextSingleton.implicitHeight)
+    property int dropDownButtonWidth: Math.round(TextSingleton.implicitHeight)
+
+    /*! \internal Alias kept for backwards compatibility with a spelling mistake in 5.2.0) */
+    property alias drowDownButtonWidth: cbStyle.dropDownButtonWidth
 
     /*! This defines the background of the button. */
     property Component background: Item {
@@ -100,7 +119,7 @@ Style {
             source: "images/arrow-down.png"
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.rightMargin: drowDownButtonWidth / 2
+            anchors.rightMargin: dropDownButtonWidth / 2
             opacity: control.enabled ? 0.6 : 0.3
         }
     }
@@ -143,6 +162,7 @@ Style {
     /*! This defines the label of the button. */
     property Component label: Item {
         implicitWidth: textitem.implicitWidth + 20
+        baselineOffset: textitem.y + textitem.baselineOffset
         Text {
             id: textitem
             anchors.left: parent.left
@@ -151,7 +171,7 @@ Style {
             anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             text: control.currentText
-            renderType: Text.NativeRendering
+            renderType: cbStyle.renderType
             color: __syspal.text
             elide: Text.ElideRight
         }
@@ -164,6 +184,7 @@ Style {
         anchors.fill: parent
         implicitWidth: backgroundLoader.implicitWidth
         implicitHeight: Math.max(labelLoader.implicitHeight + padding.top + padding.bottom, backgroundLoader.implicitHeight)
+        baselineOffset: labelLoader.item ? padding.top + labelLoader.item.baselineOffset: 0
 
         Loader {
             id: backgroundLoader
@@ -175,7 +196,7 @@ Style {
         Loader {
             id: editorLoader
             anchors.fill: parent
-            anchors.rightMargin: drowDownButtonWidth + padding.right
+            anchors.rightMargin: dropDownButtonWidth + padding.right
             anchors.bottomMargin: -1
             sourceComponent: control.editable ? __editor : null
         }
@@ -194,15 +215,15 @@ Style {
 
     /*! \internal */
     property Component __dropDownStyle: MenuStyle {
-        maxPopupHeight: 600
+        __maxPopupHeight: 600
         __menuItemType: "comboboxitem"
-        scrollerStyle: ScrollViewStyle {
-            property bool useScrollers: false
-        }
+        __scrollerStyle: ScrollViewStyle { }
     }
 
     /*! \internal */
     property Component __popupStyle: Style {
+        property int __maxPopupHeight: 400
+        property int submenuOverlap: 0
 
         property Component frame: Rectangle {
             width: (parent ? parent.contentWidth : 0)
@@ -212,7 +233,7 @@ Style {
             property int margin: 1
         }
 
-        property Component menuItem: Text {
+        property Component menuItemPanel: Text {
             text: "NOT IMPLEMENTED"
             color: "red"
             font {
@@ -221,13 +242,6 @@ Style {
             }
         }
 
-        property Component scrollerStyle: Style {
-            padding { left: 0; right: 0; top: 0; bottom: 0 }
-            property bool scrollToClickedPosition: false
-            property Component frame: Item { visible: false }
-            property Component corner: Item { visible: false }
-            property Component __scrollbar: Item { visible: false }
-            property bool useScrollers: true
-        }
+        property Component __scrollerStyle: null
     }
 }

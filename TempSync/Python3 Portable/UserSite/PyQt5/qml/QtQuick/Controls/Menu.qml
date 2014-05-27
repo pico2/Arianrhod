@@ -38,8 +38,8 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Controls.Private 1.0
 
@@ -129,9 +129,17 @@ MenuPrivate {
     /*! \internal */
     property Component __selfComponent: null
 
-    /*! \internal */
-    property Component style: Qt.createComponent(Settings.style + "/MenuStyle.qml", root)
+    property Component style
 
+    Component.onCompleted: {
+        if (!style) {
+            __usingDefaultStyle = true
+            style = Qt.binding(function() { return Qt.createComponent(Settings.style + "/MenuStyle.qml", root) })
+        }
+    }
+
+    /*! \internal */
+    property bool __usingDefaultStyle: false
     /*! \internal */
     property var __parentContentItem: __parentMenu.__contentItem
     /*! \internal */
@@ -142,7 +150,7 @@ MenuPrivate {
     /*! \internal */
     __contentItem: Loader {
         sourceComponent: MenuContentItem {
-            menu: root
+           __menu: root
         }
         active: !root.__isNative && root.__popupVisible
         focus: true

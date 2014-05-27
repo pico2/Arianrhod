@@ -38,7 +38,7 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
+import QtQuick 2.2
 
 /*!
     \qmltype TableViewColumn
@@ -52,6 +52,9 @@ QtObject {
 
     /*! \internal */
     property Item __view: null
+
+    /*! \internal */
+    property int __index: -1
 
     /*! The title text of the column. */
     property string title
@@ -87,7 +90,7 @@ QtObject {
         \li Text.ElideMiddle
         \li Text.ElideRight - the default
     \endlist
-    \sa {QtQuick2::}{Text::elide} */
+    \sa {QtQuick::}{Text::elide} */
     property int elideMode: Text.ElideRight
 
     /*! \qmlproperty enumeration TableViewColumn::horizontalAlignment
@@ -99,7 +102,7 @@ QtObject {
         \li Text.AlignHCenter
         \li Text.AlignJustify
     \endlist
-    \sa {QtQuick2::}{Text::horizontalAlignment} */
+    \sa {QtQuick::}{Text::horizontalAlignment} */
     property int horizontalAlignment: Text.AlignLeft
 
     /*! The delegate of the column. This can be used to set the
@@ -119,4 +122,22 @@ QtObject {
     property Component delegate
 
     Accessible.role: Accessible.ColumnHeader
+
+    /*! Resizes the column so that the implicitWidth of the contents on every row will fit.
+        \since QtQuick.Controls 1.2 */
+    function resizeToContents() {
+        var minWidth = 0
+        var listdata = __view.__listView.children[0]
+        for (var i = 0; __index < 0 && i < __view.__columns.length; ++i)
+            if (__view.__columns[i] === this)
+                __index = i
+        for (var row = 0 ; row < listdata.children.length ; ++row) {
+            var item = listdata.children[row+1] ? listdata.children[row+1].rowItem : undefined
+            if (item && item.children[1] && item.children[1].children[__index] && item.children[1].children[__index].children[0] &&
+                    item.children[1].children[__index].children[0].hasOwnProperty("implicitWidth"))
+                minWidth = Math.max(minWidth, item.children[1].children[__index].children[0].implicitWidth)
+        }
+        if (minWidth)
+            width = minWidth
+    }
 }

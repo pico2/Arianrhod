@@ -38,8 +38,8 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 import QtQuick.Controls.Styles 1.1
 
@@ -60,7 +60,7 @@ import QtQuick.Controls.Styles 1.1
     Example:
     \code
     ScrollView {
-        Image { imageSource: "largeImage.png" }
+        Image { source: "largeImage.png" }
     }
     \endcode
 
@@ -237,7 +237,7 @@ FocusScope {
             anchors.fill: parent
 
             property int acceleration: 40
-            property int flickThreshold: 20
+            property int flickThreshold: Settings.dragThreshold
             property real speedThreshold: 3
             property real ignored: 0.001 // ## flick() does not work with 0 yVelocity
             property int maxFlick: 400

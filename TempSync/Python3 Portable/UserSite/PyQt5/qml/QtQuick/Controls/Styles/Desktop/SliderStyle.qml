@@ -37,8 +37,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 Style {
@@ -57,6 +57,7 @@ Style {
         horizontal: control.orientation === Qt.Horizontal
         enabled: control.enabled
         hasFocus: control.activeFocus
+        hover: control.hovered
         hints: control.styleHints
         activeControl: control.tickmarksEnabled ? "ticks" : ""
         property int handleWidth: 15

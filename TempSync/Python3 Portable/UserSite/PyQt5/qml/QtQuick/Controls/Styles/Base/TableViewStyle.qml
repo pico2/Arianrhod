@@ -37,8 +37,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 /*!
@@ -48,7 +48,7 @@ import QtQuick.Controls.Private 1.0
     \ingroup viewsstyling
     \brief Provides custom styling for TableView
 
-    Note that this class derives from \l ScrollViewStyle
+    \note This class derives from \l {QtQuick.Controls.Styles::}{ScrollViewStyle}
     and supports all of the properties defined there.
 */
 ScrollViewStyle {
@@ -87,7 +87,7 @@ ScrollViewStyle {
             id: textItem
             anchors.fill: parent
             verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
+            horizontalAlignment: styleData.textAlignment
             anchors.leftMargin: 12
             text: styleData.value
             elide: Text.ElideRight

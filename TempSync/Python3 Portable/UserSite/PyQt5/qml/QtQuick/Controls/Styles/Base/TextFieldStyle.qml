@@ -37,8 +37,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 /*!
@@ -77,7 +77,7 @@ Style {
     readonly property TextField control: __control
 
     /*! The content margins of the text field. */
-    padding { top: 4 ; left: TextSingleton.implicitHeight/3 ; right: TextSingleton.implicitHeight/3 ; bottom:4 }
+    padding { top: 4 ; left: Math.round(control.__contentHeight/3) ; right: control.__contentHeight/3 ; bottom: 4 }
 
     /*! The current font. */
     property font font
@@ -93,6 +93,7 @@ Style {
 
     /*!
         \qmlproperty enumeration renderType
+        \since QtQuick.Controls.Styles 1.1
 
         Override the default rendering type for the control.
 
@@ -107,14 +108,15 @@ Style {
     property int renderType: Text.NativeRendering
 
     /*! The placeholder text color, used when the text field is empty.
-        \since 5.2
+        \since QtQuick.Controls.Styles 1.1
     */
     property color placeholderTextColor: Qt.rgba(0, 0, 0, 0.5)
 
     /*! The background of the text field. */
     property Component background: Item {
-        implicitWidth: Math.round(TextSingleton.implicitHeight * 8)
-        implicitHeight: Math.max(25, Math.round(TextSingleton.implicitHeight * 1.2))
+        implicitWidth: Math.round(control.__contentHeight * 8)
+        implicitHeight: Math.max(25, Math.round(control.__contentHeight * 1.2))
+        baselineOffset: control.__baselineOffset
         Rectangle {
             anchors.fill: parent
             anchors.bottomMargin: -1
@@ -128,7 +130,7 @@ Style {
                 GradientStop {color: "#fff" ; position: 0.1}
                 GradientStop {color: "#fff" ; position: 1}
             }
-            radius: TextSingleton.implicitHeight * 0.16
+            radius: control.__contentHeight * 0.16
             anchors.fill: parent
             border.color: control.activeFocus ? "#47b" : "#999"
         }
@@ -149,6 +151,7 @@ Style {
 
         implicitWidth: backgroundLoader.implicitWidth ? backgroundLoader.implicitWidth : 100
         implicitHeight: backgroundLoader.implicitHeight ? backgroundLoader.implicitHeight : 20
+        baselineOffset: backgroundLoader.item ? padding.top + backgroundLoader.item.baselineOffset : 0
 
         property color placeholderTextColor: style.placeholderTextColor
         property font font: style.font

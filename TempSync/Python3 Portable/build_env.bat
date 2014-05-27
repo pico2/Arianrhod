@@ -1,7 +1,7 @@
 @echo off
 
-set vspath=%VS120COMNTOOLS%..\..
-set VS100COMNTOOLS=%VS120COMNTOOLS%
+set vspath=%VS100COMNTOOLS%..\..
+set VS100COMNTOOLS=%VS100COMNTOOLS%
 
 call:GET_FULL_PATH vspath "%vspath%"
 

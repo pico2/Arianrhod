@@ -37,8 +37,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Private 1.0
 
 /*!
@@ -76,7 +76,7 @@ import QtQuick.Controls.Private 1.0
 Style {
     id: buttonstyle
 
-    /*! The \l Button attached to this style. */
+    /*! The \l {QtQuick.Controls::}{Button} attached to this style. */
     readonly property Button control: __control
 
     /*! \internal */
@@ -95,19 +95,20 @@ Style {
 
     /*! This defines the background of the button. */
     property Component background: Item {
+        property bool down: control.pressed || (control.checkable && control.checked)
         implicitWidth: Math.round(TextSingleton.implicitHeight * 4.5)
         implicitHeight: Math.max(25, Math.round(TextSingleton.implicitHeight * 1.2))
         Rectangle {
             anchors.fill: parent
-            anchors.bottomMargin: control.pressed ? 0 : -1
+            anchors.bottomMargin: down ? 0 : -1
             color: "#10000000"
             radius: baserect.radius
         }
         Rectangle {
             id: baserect
             gradient: Gradient {
-                GradientStop {color: control.pressed ? "#aaa" : "#fefefe" ; position: 0}
-                GradientStop {color: control.pressed ? "#ccc" : "#e3e3e3" ; position: control.pressed ? 0.1: 1}
+                GradientStop {color: down ? "#aaa" : "#fefefe" ; position: 0}
+                GradientStop {color: down ? "#ccc" : "#e3e3e3" ; position: down ? 0.1: 1}
             }
             radius: TextSingleton.implicitHeight * 0.16
             anchors.fill: parent
@@ -135,6 +136,7 @@ Style {
     property Component label: Item {
         implicitWidth: row.implicitWidth
         implicitHeight: row.implicitHeight
+        baselineOffset: row.y + text.y + text.baselineOffset
         Row {
             id: row
             anchors.centerIn: parent
@@ -144,10 +146,11 @@ Style {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
+                id: text
                 renderType: Text.NativeRendering
                 anchors.verticalCenter: parent.verticalCenter
                 text: control.text
-                color: __syspal.text
+                color: __syspal.buttonText
             }
         }
     }
@@ -157,6 +160,7 @@ Style {
         anchors.fill: parent
         implicitWidth: Math.max(labelLoader.implicitWidth + padding.left + padding.right, backgroundLoader.implicitWidth)
         implicitHeight: Math.max(labelLoader.implicitHeight + padding.top + padding.bottom, backgroundLoader.implicitHeight)
+        baselineOffset: labelLoader.item ? padding.top + labelLoader.item.baselineOffset : 0
 
         Loader {
             id: backgroundLoader
