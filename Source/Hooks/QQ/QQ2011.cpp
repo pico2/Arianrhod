@@ -444,6 +444,7 @@ QqSetWindowPos(
     ShowWindow(GetConsoleWindow(), SW_SHOW);
     PrintConsoleW(L"%d, %d\n", cx, cy);
 
+    if (0)
     {
         FILE *fp;
 
@@ -479,6 +480,7 @@ QqSetWindowPos(
             { 603, 527 },
             { 623, 546 },
             { 599, 524 },
+            { 598, 522 },
         };
 
         static SIZE DiscussSize[] =
