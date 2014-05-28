@@ -5,4 +5,4 @@ QTextStream
 
 .. class:: QTextStream
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtcore/qtextstream.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtextstream.html>`_

@@ -1,6 +1,6 @@
 // This is the SIP interface definition for QsciScintilla.
 //
-// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2014 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of QScintilla.
 // 
@@ -547,6 +547,7 @@ signals:
 protected:
 %If (Qsci_Qt4)
     virtual bool event(QEvent *event);
+    virtual void changeEvent(QEvent *event);
     virtual void contextMenuEvent(QContextMenuEvent *event);
 %End
 

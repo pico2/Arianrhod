@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Differences Between PyQt4 and PyQt5 &mdash; PyQt 5.2 Reference Guide</title>
+    <title>Differences Between PyQt4 and PyQt5 &mdash; PyQt 5.3 Reference Guide</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '5.2',
+        URL_ROOT:    './',
+        VERSION:     '5.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/logo_tn.ico"/>
-    <link rel="top" title="PyQt 5.2 Reference Guide" href="index.html" />
+    <link rel="top" title="PyQt 5.3 Reference Guide" href="index.html" />
     <link rel="next" title="PyQt5 Class Reference" href="class_reference.html" />
     <link rel="prev" title="Installing PyQt5" href="installation.html" /> 
   </head>
@@ -46,7 +44,7 @@
         <li class="right" >
           <a href="installation.html" title="Installing PyQt5"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyQt 5.2 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt 5.3 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -97,6 +95,17 @@ equivalent that takes a bound signal or callable respectively.</p>
 <li><tt class="xref py py-meth docutils literal"><span class="pre">disconnect()</span></tt> takes no arguments and disconnects
 all connections to the <a class="reference internal" href="api/qobject.html#PyQt5.QtCore.QObject" title="PyQt5.QtCore.QObject"><tt class="xref py py-class docutils literal"><span class="pre">QObject</span></tt></a> instance.</li>
 </ul>
+</div>
+<div class="section" id="new-style-signals-and-slots">
+<h2>New-style Signals and Slots<a class="headerlink" href="#new-style-signals-and-slots" title="Permalink to this headline">¶</a></h2>
+<p>Qt implements signals with an optional argument as two separate signals, one
+with the argument and one without it.  PyQt4 exposed both of these allowing you
+to connect to each of them.  However, when emitting the signal, you had to use
+the signal appropriate to the number of arguments being emitted.</p>
+<p>PyQt5 exposes only the signal where all arguments are specified.  However it
+allows any optional arguments to be omitted when emitting the signal.</p>
+<p>Unlike PyQt4, PyQt5 supports the definition of properties, signals and slots in
+classes not sub-classed from <a class="reference internal" href="api/qobject.html#PyQt5.QtCore.QObject" title="PyQt5.QtCore.QObject"><tt class="xref py py-class docutils literal"><span class="pre">QObject</span></tt></a> (i.e. in mixins).</p>
 </div>
 <div class="section" id="qtdeclarative-qtscript-and-qtscripttools-modules">
 <h2><tt class="docutils literal"><span class="pre">QtDeclarative</span></tt>, <tt class="docutils literal"><span class="pre">QtScript</span></tt> and <tt class="docutils literal"><span class="pre">QtScriptTools</span></tt> Modules<a class="headerlink" href="#qtdeclarative-qtscript-and-qtscripttools-modules" title="Permalink to this headline">¶</a></h2>
@@ -274,6 +283,7 @@ calling the <tt class="xref py py-func docutils literal"><span class="pre">sip.s
 <li><a class="reference internal" href="#deprecated-features">Deprecated Features</a></li>
 <li><a class="reference internal" href="#multiple-apis">Multiple APIs</a></li>
 <li><a class="reference internal" href="#old-style-signals-and-slots">Old-style Signals and Slots</a></li>
+<li><a class="reference internal" href="#new-style-signals-and-slots">New-style Signals and Slots</a></li>
 <li><a class="reference internal" href="#qtdeclarative-qtscript-and-qtscripttools-modules"><tt class="docutils literal"><span class="pre">QtDeclarative</span></tt>, <tt class="docutils literal"><span class="pre">QtScript</span></tt> and <tt class="docutils literal"><span class="pre">QtScriptTools</span></tt> Modules</a></li>
 <li><a class="reference internal" href="#qtgui-module"><tt class="docutils literal"><span class="pre">QtGui</span></tt> Module</a></li>
 <li><a class="reference internal" href="#qtopengl-module"><tt class="docutils literal"><span class="pre">QtOpenGL</span></tt> Module</a></li>
@@ -334,12 +344,12 @@ calling the <tt class="xref py py-func docutils literal"><span class="pre">sip.s
         <li class="right" >
           <a href="installation.html" title="Installing PyQt5"
              >previous</a> |</li>
-        <li><a href="index.html">PyQt 5.2 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt 5.3 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2014 Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

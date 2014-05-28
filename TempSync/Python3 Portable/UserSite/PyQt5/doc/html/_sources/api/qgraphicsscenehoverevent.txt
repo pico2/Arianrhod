@@ -5,4 +5,4 @@ QGraphicsSceneHoverEvent
 
 .. class:: QGraphicsSceneHoverEvent
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtwidgets/qgraphicsscenehoverevent.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qgraphicsscenehoverevent.html>`_

@@ -1,2 +1,2 @@
 module Charts
-plugin pyqt5qmlplugin C:/Qt/5.2.0/plugins/PyQt5
+plugin pyqt5qmlplugin D:/Desktop/Python3/Lib/site-packages/PyQt5/plugins/PyQt5

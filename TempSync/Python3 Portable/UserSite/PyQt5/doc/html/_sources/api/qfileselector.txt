@@ -5,4 +5,4 @@ QFileSelector
 
 .. class:: QFileSelector
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtcore/qfileselector.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qfileselector.html>`_

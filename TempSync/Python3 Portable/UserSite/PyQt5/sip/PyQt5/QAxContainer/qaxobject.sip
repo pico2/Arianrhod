@@ -18,7 +18,7 @@
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 
-class QAxObject : QObject, QAxBase /PyQt4NoQMetaObject/
+class QAxObject : QObject, QAxBase /PyQtNoQMetaObject/
 {
 %TypeHeaderCode
 #include <qaxobject.h>

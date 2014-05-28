@@ -5,4 +5,4 @@ QXmlStreamEntityResolver
 
 .. class:: QXmlStreamEntityResolver
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtcore/qxmlstreamentityresolver.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qxmlstreamentityresolver.html>`_

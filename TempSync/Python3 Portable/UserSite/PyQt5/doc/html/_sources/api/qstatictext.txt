@@ -5,4 +5,4 @@ QStaticText
 
 .. class:: QStaticText
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtgui/qstatictext.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qstatictext.html>`_

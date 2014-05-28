@@ -1,7 +1,7 @@
 // This module defines the "official" high-level API of the Qt port of
 // Scintilla.
 //
-// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2014 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of QScintilla.
 // 
@@ -1949,6 +1949,9 @@ protected:
     virtual bool event(QEvent *e);
 
     //! \reimp
+    virtual void changeEvent(QEvent *e);
+
+    //! \reimp
     virtual void contextMenuEvent(QContextMenuEvent *e);
 
 private slots:
@@ -2008,6 +2011,7 @@ private:
     void setFoldMarker(int marknr, int mark = SC_MARK_EMPTY);
     void setLexerStyle(int style);
     void setStylesFont(const QFont &f, int style);
+    void setEnabledColors(int style, QColor &fore, QColor &back);
 
     void braceMatch();
     bool findMatchingBrace(long &brace, long &other, BraceMatch mode);

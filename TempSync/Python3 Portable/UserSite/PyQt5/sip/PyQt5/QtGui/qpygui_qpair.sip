@@ -19,6 +19,10 @@
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 
+%If (Qt_5_2_0 -)
+
+%If (PyQt_OpenGL)
+
 %MappedType QPair<QOpenGLTexture::Filter, QOpenGLTexture::Filter>
         /DocType="tuple-of-QOpenGLTexture.Filter-QOpenGLTexture.Filter"/
 {
@@ -110,6 +114,12 @@
 %End
 };
 
+%End
+
+%End
+
+
+%If (Qt_5_2_0 -)
 
 %MappedType QPair<float, float> /DocType="tuple-of-float-float"/
 {
@@ -202,3 +212,5 @@
     return sipGetState(sipTransferObj);
 %End
 };
+
+%End

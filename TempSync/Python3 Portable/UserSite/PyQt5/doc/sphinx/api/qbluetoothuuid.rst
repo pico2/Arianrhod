@@ -5,4 +5,4 @@ QBluetoothUuid
 
 .. class:: QBluetoothUuid
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtbluetooth/qbluetoothuuid.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qbluetoothuuid.html>`_

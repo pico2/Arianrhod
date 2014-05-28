@@ -5,4 +5,4 @@ QAbstractSlider
 
 .. class:: QAbstractSlider
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtwidgets/qabstractslider.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qabstractslider.html>`_

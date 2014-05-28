@@ -5,4 +5,4 @@ QDBusPendingCall
 
 .. class:: QDBusPendingCall
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtdbus/qdbuspendingcall.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qdbuspendingcall.html>`_

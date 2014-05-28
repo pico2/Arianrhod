@@ -54,8 +54,8 @@ extern "C" {
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x040f04
-#define SIP_VERSION_STR     "4.15.4"
+#define SIP_VERSION         0x041000
+#define SIP_VERSION_STR     "4.16"
 
 
 /*
@@ -67,6 +67,12 @@ extern "C" {
  * to 0.
  *
  * History:
+ *
+ * 11.1 Added sip_api_invoke_slot_ex().
+ *
+ * 11.0 Added the pyqt5QtSignal and pyqt5ClassTypeDef structures.
+ *      Removed qt_interface from pyqt4ClassTypeDef.
+ *      Added hack to pyqt4QtSignal.
  *
  * 10.1 Added ctd_final to sipClassTypeDef.
  *      Added ctd_init_mixin to sipClassTypeDef.
@@ -205,7 +211,7 @@ extern "C" {
  *
  * 0.0  Original version.
  */
-#define SIP_API_MAJOR_NR    10
+#define SIP_API_MAJOR_NR    11
 #define SIP_API_MINOR_NR    1
 
 
@@ -1509,6 +1515,13 @@ typedef struct _sipAPIDef {
             SIP_SSIZE_T len, int flags);
     int (*api_register_proxy_resolver)(const sipTypeDef *td,
             sipProxyResolverFunc resolver);
+
+    /*
+     * The following may be used by Qt support code but no other handwritten
+     * code.
+     */
+    PyObject *(*api_invoke_slot_ex)(const sipSlot *slot, PyObject *sigargs,
+            int check_receiver);
 } sipAPIDef;
 
 
@@ -1660,12 +1673,12 @@ typedef struct _sipQtAPI {
  * out to a plugin supplied by PyQt3.
  */
 
-typedef int (*pyqt3EmitFunc)(sipSimpleWrapper *, PyObject *);
-
 
 /*
  * Maps the name of a Qt signal to a wrapper function to emit it.
  */
+typedef int (*pyqt3EmitFunc)(sipSimpleWrapper *, PyObject *);
+
 typedef struct _pyqt3QtSignal {
     /* The signal name. */
     const char *st_name;
@@ -1691,12 +1704,12 @@ typedef struct _pyqt3ClassTypeDef {
 
 
 /*
- * The following are PyQt-specific extensions.  In SIP v5 they will be pushed
- * out to a plugin supplied by PyQt.
+ * The following are PyQt4-specific extensions.  In SIP v5 they will be pushed
+ * out to a plugin supplied by PyQt4.
  */
 
 /*
- * The description of a Qt signal for PyQt.
+ * The description of a Qt signal for PyQt4.
  */
 typedef struct _pyqt4QtSignal {
     /* The C++ name and signature of the signal. */
@@ -1710,11 +1723,21 @@ typedef struct _pyqt4QtSignal {
      * code that implements those methods.
      */
     PyMethodDef *non_signals;
+
+    /*
+     * The hack to apply when built against Qt5:
+     *
+     * 0 - no hack
+     * 1 - add an optional None
+     * 2 - add an optional []
+     * 3 - add an optional False
+     */
+    int hack;
 } pyqt4QtSignal;
 
 
 /*
- * This is the PyQt-specific extension to the generated class type structure.
+ * This is the PyQt4-specific extension to the generated class type structure.
  */
 typedef struct _pyqt4ClassTypeDef {
     /*
@@ -1724,23 +1747,81 @@ typedef struct _pyqt4ClassTypeDef {
     sipClassTypeDef super;
 
     /* A pointer to the QObject sub-class's staticMetaObject class variable. */
-    const void *qt4_static_metaobject;
+    const void *static_metaobject;
 
     /*
      * A set of flags.  At the moment only bit 0 is used to say if the type is
      * derived from QFlags.
      */
-    unsigned qt4_flags;
+    unsigned flags;
 
     /*
      * The table of signals emitted by the type.  These are grouped by signal
      * name.
      */
-    const pyqt4QtSignal *qt4_signals;
+    const pyqt4QtSignal *qt_signals;
+} pyqt4ClassTypeDef;
+
+
+/*
+ * The following are PyQt5-specific extensions.  In SIP v5 they will be pushed
+ * out to a plugin supplied by PyQt5.
+ */
+
+/*
+ * The description of a Qt signal for PyQt5.
+ */
+typedef int (*pyqt5EmitFunc)(void *, PyObject *);
+
+typedef struct _pyqt5QtSignal {
+    /* The normalised C++ name and signature of the signal. */
+    const char *signature;
+
+    /* The optional docstring. */
+    const char *docstring;
+
+    /*
+     * If the signal is an overload of regular methods then this points to the
+     * code that implements those methods.
+     */
+    PyMethodDef *non_signals;
+
+    /*
+     * If the signal has optional arguments then this function will implement
+     * emit() for the signal.
+     */
+    pyqt5EmitFunc emitter;
+} pyqt5QtSignal;
+
+
+/*
+ * This is the PyQt5-specific extension to the generated class type structure.
+ */
+typedef struct _pyqt5ClassTypeDef {
+    /*
+     * The super-type structure.  This must be first in the structure so that
+     * it can be cast to sipClassTypeDef *.
+     */
+    sipClassTypeDef super;
+
+    /* A pointer to the QObject sub-class's staticMetaObject class variable. */
+    const void *static_metaobject;
+
+    /*
+     * A set of flags.  At the moment only bit 0 is used to say if the type is
+     * derived from QFlags.
+     */
+    unsigned flags;
+
+    /*
+     * The table of signals emitted by the type.  These are grouped by signal
+     * name.
+     */
+    const pyqt5QtSignal *qt_signals;
 
     /* The name of the interface that the class defines. */
     const char *qt_interface;
-} pyqt4ClassTypeDef;
+} pyqt5ClassTypeDef;
 
 
 #ifdef __cplusplus

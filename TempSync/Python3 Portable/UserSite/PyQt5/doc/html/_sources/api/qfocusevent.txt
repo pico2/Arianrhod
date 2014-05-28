@@ -5,4 +5,4 @@ QFocusEvent
 
 .. class:: QFocusEvent
 
-    `C++ documentation <http://qt-project.org/doc/qt-5.2/qtgui/qfocusevent.html>`_
+    `C++ documentation <http://qt-project.org/doc/qt-5.2/qfocusevent.html>`_
