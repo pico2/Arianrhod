@@ -22,8 +22,18 @@ def ibp_stub():
 def ibp_worker():
     pass
 
-ibp = ibp_init
+def pybp_init():
+    global pybp
+    from PyQt5.QtCore import pyqtRemoveInputHook
+    pyqtRemoveInputHook()
+    ibp()
 
+def pybp_end():
+    from PyQt5.QtCore import pyqtRestoreInputHook
+    pyqtRestoreInputHook()
+
+ibp = ibp_init
+pybp = pybp_init
 
 CHAR    = ctypes.c_char
 BYTE    = ctypes.c_ubyte      # fix bug: BYTE == CHAR
