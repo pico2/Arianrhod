@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Strings>
+    <Menu>
+        <File>
+            <Open>Open</Open>
+            <Attach>Attach</Attach>
+            <Detach>Detach</Detach>
+            <Exit>Exit</Exit>
+        </File>
+    </Menu>
+</Strings>
