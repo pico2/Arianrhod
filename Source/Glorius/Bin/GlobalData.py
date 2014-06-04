@@ -1,4 +1,4 @@
-from .BaseCommon import *
+from ml import *
 from . import I18n
 
 GlobalData = None
@@ -16,4 +16,5 @@ class __GlobalData(object):
 
 def Initialize(argv):
     global GlobalData
+    print('init')
     GlobalData = __GlobalData(argv)

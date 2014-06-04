@@ -1,14 +1,15 @@
 from .MainWindow import *
 from .OperationBase import *
-from . import GlobalData as GD
-
-GlobalData = None
 
 class MainWindowOperation(OperationBase):
     def __init__(self, argv):
-        GD.Initialize(argv)
-        GlobalData = GD.GlobalData
+        print(GlobalData.Lang)
         ibp()
+
+        self.Argument = self.ParseCommandLine(argv)
+
+    def ParseCommandLine(self, argv):
+        pass
 
     def Run(self):
         pass

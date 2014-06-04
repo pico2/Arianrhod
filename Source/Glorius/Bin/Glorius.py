@@ -1,11 +1,8 @@
 from ml import *
-from . import MainWindowOperation
+from . import GlobalData
 
 def Run(argv):
+    GlobalData.Initialize(argv)
+
+    from . import MainWindowOperation
     return MainWindowOperation.Run(argv)
-
-def main():
-    Glorius.Run(sys.argv)
-
-if __name__ == '__main__':
-    TryInvoke(main)
