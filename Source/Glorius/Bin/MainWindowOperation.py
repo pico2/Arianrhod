@@ -3,9 +3,6 @@ from .OperationBase import *
 
 class MainWindowOperation(OperationBase):
     def __init__(self, argv):
-        print(GlobalData.Lang)
-        ibp()
-
         self.Argument = self.ParseCommandLine(argv)
 
     def ParseCommandLine(self, argv):
