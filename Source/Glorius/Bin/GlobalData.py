@@ -15,7 +15,7 @@ class __GlobalData(object):
             xml = os.path.join(path, 'DefaultLanguage.xml')
 
         self.Lang = I18n.LoadLanguageFile(xml)
-        self.Preferences = Preferences.LoadPreferences(self.Lang.Preferences)
+        self.Preferences = Preferences.LoadPreferences(os.path.abspath(os.path.join(program, self.Lang.Preferences)))
 
 def Initialize(argv):
     global GlobalData
