@@ -96,6 +96,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     PrintConsole(L"%p\n", sizeof(vector<vector<int>>::difference_type));
     PrintConsole(L"%p\n", sizeof(map<int, vector<int>>::difference_type));
+    PauseConsole();
 
     return;
 

@@ -1,0 +1,10 @@
+{
+    "Shortcuts": {
+        "Menu": {
+            "File": {
+                "Open": "Ctrl+O",
+                "Exit": "Alt+X"
+            }
+        }
+    }
+}

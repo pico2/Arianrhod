@@ -19,5 +19,4 @@ class __GlobalData(object):
 
 def Initialize(argv):
     global GlobalData
-    print('init')
     GlobalData = __GlobalData(argv)
