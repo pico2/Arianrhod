@@ -1,8 +1,8 @@
 from ml import *
-from . import GlobalData
+from .UI import GlobalData
 
 def Run(argv):
     GlobalData.Initialize(argv)
 
-    from . import MainWindowOperation
+    from .UI import MainWindowOperation
     return MainWindowOperation.Run(argv)

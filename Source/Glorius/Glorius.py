@@ -1,5 +1,5 @@
 from ml import *
-from Bin import Glorius
+from Glorius import Glorius
 
 def main():
     Glorius.Run(sys.argv)

@@ -1,4 +1,5 @@
 from .CommonWindow import *
+from . import WindowCpu
 
 class MainWindow(QMainWindow):
     def __init__(self, Operation):
@@ -39,7 +40,10 @@ class MainWindow(QMainWindow):
             CreateAction(Lang.Menu.File.Exit,   Shortcuts.Menu.File.get('Exit'),   Lang.Menu.get('Exit:Tip'),      self.ActionExit),
         ]
 
-        print(GlobalData.Preferences)
+        self.Actions.View = \
+        [
+            CreateAction(Lang.Menu.File.Open,   Shortcuts.Menu.File.get('Open'),   Lang.Menu.get('Open:Tip'),      self.ActionOpen),
+        ]
 
     def CreateMenus(self):
         MenuBar = self.menuBar()
@@ -51,11 +55,11 @@ class MainWindow(QMainWindow):
         self.ViewMenu = MenuBar.addMenu(GlobalData.Lang.Menu.ViewMenu)
 
     def CreateDockWindows(self):
-        dock = QDockWidget(GlobalData.Lang.Docks.Cpu, self)
+        dock = GDockWindow(GlobalData.Lang.Docks.Cpu, self)
         dock.setAllowedAreas(Qt.AllDockWidgetAreas)
-        dock.setWidget(QTextEdit())
-        dock.setTitleBarWidget(QWidget())
+        dock.setWidget(WindowCpu.WindowCpu())
         self.addDockWidget(Qt.LeftDockWidgetArea, dock)
+        self.ViewMenu.addAction(dock.toggleViewAction())
 
     def sizeHint(self):
         return QSize(800, 600)

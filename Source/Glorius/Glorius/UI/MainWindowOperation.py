@@ -1,4 +1,4 @@
-from . import MainWindowView
+from . import MainWindow
 from .OperationBase import *
 
 class MainWindowOperation(OperationBase):
@@ -10,8 +10,8 @@ class MainWindowOperation(OperationBase):
         pass
 
     def Run(self):
-        app = MainWindowView.QApplication(self.argv)
-        wnd = MainWindowView.MainWindow(self)
+        app = MainWindow.QApplication(self.argv)
+        wnd = MainWindow.MainWindow(self)
         wnd.show()
         return app.exec_()
 
