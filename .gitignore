@@ -85,3 +85,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /PyLibs/*.pth
 /PyLibs/MyPyLibrary/AMFHelper/PyAmfHelper.pyd
 /Source/Android/.metadata
+/Source/Glorius
