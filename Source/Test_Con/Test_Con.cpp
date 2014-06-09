@@ -94,8 +94,25 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintConsole(L"%p\n", sizeof(vector<vector<int>>::difference_type));
-    PrintConsole(L"%p\n", sizeof(map<int, vector<int>>::difference_type));
+    STARTUPINFOW si;
+    PROCESS_INFORMATION pi;
+
+    si.cb = sizeof(si);
+    GetStartupInfoW(&si);
+
+    PrintConsole(L"%p\n", &si);
+    PrintConsole(L"%X: %p, %S\n", si.cbReserved2, si.lpReserved2, si.lpReserved2);
+    PauseConsole();
+
+    static CHAR buf[] = "fuck";
+
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+
+    si.cbReserved2 = sizeof(buf);
+    si.lpReserved2 = (PBYTE)buf;
+
+    CreateProcessW(FindLdrModuleByHandle(nullptr)->FullDllName.Buffer, nullptr, nullptr, nullptr, FALSE, 0, 0, 0, &si, &pi);
     PauseConsole();
 
     return;

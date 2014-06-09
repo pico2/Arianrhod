@@ -1007,3 +1007,34 @@ $end$namespace $NamespaceName$
 	};
 }
 
+
+readme:
+VA Snippet used by Surround With Namespace.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:namespace (VA)::
+namespace $end$
+{
+	$selected$
+}
+
+
+readme:
+VA Snippet used for Create Implementation refactoring when used on member variables.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:Refactor Create Implementation for Member::
+
+$SymbolType$ $SymbolContext$;
+
+
+
+readme:
+VA Snippet used for Create Implementation refactoring when used on member variables and the target is a header file.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:Refactor Create Implementation for Member (header file)::
+
+__declspec(selectany) $SymbolType$ $SymbolContext$;
+
+

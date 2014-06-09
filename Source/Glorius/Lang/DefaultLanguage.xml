@@ -8,10 +8,10 @@
     <Menu>
         <FileMenu><![CDATA[&File]]></FileMenu>
         <File>
-            <Open Tip="Open">Open</Open>
-            <Attach>Attach</Attach>
-            <Detach>Detach</Detach>
-            <Exit>Exit</Exit>
+            <Open Tip="Open"><![CDATA[&Open]]></Open>
+            <Attach><![CDATA[&Attach]]></Attach>
+            <Detach><![CDATA[&Detach]]></Detach>
+            <Exit><![CDATA[E&xit]]></Exit>
         </File>
 
         <ViewMenu><![CDATA[&View]]></ViewMenu>
@@ -21,4 +21,7 @@
             <Memory><![CDATA[&Memory]]></Memory>
         </View>
     </Menu>
+    <Dialogs>
+        <OpenPE Filter="PE Files (*.exe *.dll *.pyd)">Open a PE file</OpenPE>
+    </Dialogs>
 </Strings>
