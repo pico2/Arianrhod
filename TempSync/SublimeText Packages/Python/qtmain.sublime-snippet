@@ -4,17 +4,12 @@
     <scope>source.python</scope>
     <description>qtmain</description>
     <content><![CDATA[
-from ml import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from mlqt import *
 
 ${1:$SELECTION}
 
 def main():
     app = QApplication(sys.argv)
-
-    
 
     return app.exec_()
 
