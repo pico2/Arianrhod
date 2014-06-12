@@ -90,30 +90,69 @@ VOID PrintLocaleDefaultAnsiCodePage()
 
 using namespace std;
 
+VOID setcpu(ULONG_PTR Percent, ULONG_PTR ProcessMask)
+{
+    HANDLE BusyThread;
+
+    NtSetInformationProcess(CurrentProcess, ProcessAffinityMask, &ProcessMask, sizeof(ProcessMask));
+
+    Ps::CreateThreadT(
+        [](PVOID)
+        {
+            for (;;);
+            return 0;
+        },
+        nullptr,
+        TRUE,
+        CurrentProcess,
+        &BusyThread
+    );
+
+    ULONG_PTR BusyTime, IdleTime;
+
+    Percent = ML_MAX(Percent, 0);
+    Percent = ML_MIN(Percent, 100);
+    BusyTime = Percent * 10;
+    IdleTime = 1000 - BusyTime;
+
+    LOOP_FOREVER
+    {
+        NtResumeThread(BusyThread, nullptr);
+        WaitForSingleObject(BusyThread, BusyTime);
+        NtSuspendThread(BusyThread, nullptr);
+        Ps::Sleep(IdleTime);
+    }
+}
+
+VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
+{
+    HANDLE BusyThread;
+
+    NtSetInformationProcess(CurrentProcess, ProcessAffinityMask, &ProcessMask, sizeof(ProcessMask));
+    
+    ULONG_PTR BusyTime, IdleTime;
+
+    Percent = ML_MAX(Percent, 0);
+    Percent = ML_MIN(Percent, 100);
+    BusyTime = Percent * 10;
+    IdleTime = 1000 - BusyTime;
+
+    LOOP_FOREVER
+    {
+        ULONG64 start = NtGetTickCount();
+
+        while (NtGetTickCount() - start <= BusyTime);
+        Ps::Sleep(IdleTime);
+    }
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    STARTUPINFOW si;
-    PROCESS_INFORMATION pi;
+    ml::MlInitialize();
 
-    si.cb = sizeof(si);
-    GetStartupInfoW(&si);
-
-    PrintConsole(L"%p\n", &si);
-    PrintConsole(L"%X: %p, %S\n", si.cbReserved2, si.lpReserved2, si.lpReserved2);
-    PauseConsole();
-
-    static CHAR buf[] = "fuck";
-
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-
-    si.cbReserved2 = sizeof(buf);
-    si.lpReserved2 = (PBYTE)buf;
-
-    CreateProcessW(FindLdrModuleByHandle(nullptr)->FullDllName.Buffer, nullptr, nullptr, nullptr, FALSE, 0, 0, 0, &si, &pi);
-    PauseConsole();
+    setcpu2(30, 1);
 
     return;
 
