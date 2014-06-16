@@ -3,7 +3,7 @@ from io import *
 from ctypes.wintypes import *
 import xml.etree.ElementTree as ET
 from ctypes.wintypes import *
-from ctypes import windll
+from ctypes import windll, byref, wintypes
 from pdb import set_trace as bp
 
 
