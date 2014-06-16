@@ -89,7 +89,8 @@ class dict2(dict):
         import copy
         return copy._deepcopy_dict(self, memo)
 
-from collections import OrderedDict
+from collections import *
+from .ordered_set import OrderedSet
 
 class OrderedDictEx(OrderedDict):
     def __init__(self, *args, **kwargs):
