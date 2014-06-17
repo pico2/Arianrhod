@@ -150,9 +150,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    ml::MlInitialize();
+    WIN32_FIND_DATAA fd;
 
-    setcpu2(30, 1);
+    FindFirstFileA(R"(D:\Desktop\src\xlaccsetup\SetupPack\ThirdFile\gameicons\Â¯Ê¯´«Ëµ16.png)", &fd);
 
     return;
 
