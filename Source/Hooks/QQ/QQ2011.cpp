@@ -62,7 +62,7 @@ EXTC UCHAR NTAPI QqNetbios(PNCB pcnb)
     return StubNetbios(pcnb);
 }
 
-BOOL IsQQUINSpecified()
+BOOL InitializeUin()
 {
     ULONG_PTR Length;
     WCHAR ch;
@@ -620,7 +620,10 @@ HRESULT NTAPI GroupMgr_GetAdminFlags(PVOID Object, ULONG_PTR Uin, PBOOL IsAdmin,
         }
 
         if (IsCreator != nullptr)
+        {
             *IsCreator = TRUE;
+            break;
+        }
     }
 
     return S_OK;
@@ -1217,7 +1220,7 @@ BOOL Initialize2(PVOID BaseAddress)
       ntdll
     ************************************************************************/
 
-    QQUINSpecified = IsQQUINSpecified();
+    QQUINSpecified = InitializeUin();
 
     Mp::PATCH_MEMORY_DATA Function_ntdll[] =
     {
