@@ -17,8 +17,9 @@ def PrintLog(value, *args, sep=' ', end='\n', file=sys.stdout, flush=False):
     pass
 
 class _flushstdout(TextIOWrapper):
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         self.stdout = args[0]
 
         for attr in dir(self.stdout):
@@ -33,4 +34,5 @@ class _flushstdout(TextIOWrapper):
         self.stdout.write(*args)
         self.stdout.flush()
 
-sys.stdout = _flushstdout(sys.stdout)
+if isinstance(sys.stdout, TextIOWrapper):
+    sys.stdout = _flushstdout(sys.stdout)
