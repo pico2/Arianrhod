@@ -47,7 +47,7 @@ BOOL    (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
 HRESULT (NTAPI *StubPlatformCore_QueryInterface)(PVOID Object, REFGUID Guid, PVOID Output);
 VOID    (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
 HRESULT (FASTCALL *StubOnSysDataCome)(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2);
-
+VOID (FASTCALL *StubGetBanSpeechTimeStamp)(PVOID This, PVOID Edx, PULONG* TimeStampData, PULONG* What);
 
 /************************************************************************
   unlimited custom face
@@ -893,6 +893,21 @@ HRESULT CDECL GetCurrentAtNumber(PVOID Object, PULONG Number)
     return S_OK;
 }
 
+VOID FASTCALL GetBanSpeechTimeStamp(PVOID This, PVOID Edx, PULONG* TimeStampData, PULONG* What)
+{
+    StubGetBanSpeechTimeStamp(This, Edx, TimeStampData, What);
+
+    ULONG& TimeStamp = (*TimeStampData)[4];
+
+    if (*TimeStampData == *(PULONG*)PtrAdd(PtrSub(This, 0x58), 0x5C))
+        return;
+
+    if (GetKeyState(VK_CONTROL) < 0)
+    {
+        TimeStamp = INT32_MAX;
+    }
+}
+
 /************************************************************************
   init functions
 ************************************************************************/
@@ -1171,6 +1186,37 @@ BOOL SearchGroupApp_AtAllGroupMemberMax(PVOID GroupApp, PVOID *ConditionJump)
     return Found != IMAGE_INVALID_VA;
 }
 
+PVOID SearchGroupApp_GroupBanSpeech(PVOID ImageBase)
+{
+    PVOID Function, CallGetBanSpeechTimeStamp;
+
+    static WCHAR String[] = LR"({"groupuin":%lu;"currenttime":%lu;"banspeechtime":%lu;"useruin":%lu})";
+
+    Function = SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String) - sizeof(String[0]), 0x320);
+    if (Function == IMAGE_INVALID_VA)
+        return IMAGE_INVALID_VA;
+
+    CallGetBanSpeechTimeStamp = IMAGE_INVALID_VA;
+
+    WalkOpCodeT(Function, 0x270,
+        WalkOpCodeM(Buffer, OpLength, Ret)
+        {
+            if (
+                Buffer[0] == 0x83 && Buffer[1] == 0xC1 && Buffer[2] == 0x58 &&      // add ecx, 58
+                Buffer[3] == 0xE8                                                   // call const
+               )
+            {
+                CallGetBanSpeechTimeStamp = Buffer + 3;
+                return STATUS_SUCCESS;
+            }
+
+            return STATUS_NOT_FOUND;
+        }
+    );
+
+    return CallGetBanSpeechTimeStamp;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -1351,6 +1397,7 @@ BOOL Initialize2(PVOID BaseAddress)
     {
         Mp::FunctionJumpVa(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
         Mp::FunctionCallVa(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, GetCurrentAtNumber),
+        Mp::FunctionCallVa(SearchGroupApp_GroupBanSpeech(module), GetBanSpeechTimeStamp, &StubGetBanSpeechTimeStamp),
     };
 
 
