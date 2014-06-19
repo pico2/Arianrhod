@@ -2,10 +2,13 @@
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 #pragma comment(linker, "/EXPORT:Netbios=_QqNetbios@4")
+#pragma comment(linker, "/EXPORT:NetApiBufferFree=_QqNetApiBufferFree@4")
+#pragma comment(linker, "/EXPORT:NetWkstaTransportEnum=_QqNetWkstaTransportEnum@28")
 
 #include "QQ2011.h"
 #include "MyLibrary.cpp"
 #include <Psapi.h>
+#include <Lm.h>
 #include "QQMethod.h"
 
 WCHAR GlobalRegistryDb[0x20];
@@ -23,7 +26,10 @@ API_POINTER(::CreateThread)             HummerCreateThread;
 API_POINTER(NtOpenFile)                 StubNtOpenFile;
 API_POINTER(NtCreateFile)               StubNtCreateFile;
 API_POINTER(NtQueryAttributesFile)      StubNtQueryAttributesFile;
+
 API_POINTER(Netbios)                    StubNetbios;
+API_POINTER(NetApiBufferFree)           StubNetApiBufferFree;
+API_POINTER(NetWkstaTransportEnum)      StubNetWkstaTransportEnum;
 
 
 HRESULT
@@ -57,8 +63,71 @@ TYPE_OF(Util::Contact::IsSuperVip)  StubIsSuperVip;
 HRESULT (NTAPI *StubGroupMgr_QueryGroupObject)(PVOID Object, ULONG_PTR GroupUin, PVOID *GroupObject);
 HRESULT (NTAPI *StubGroupMgr_GetAdminFlags)(PVOID Object, ULONG_PTR Uin, PBOOL IsAdmin, PBOOL IsCreator);
 
+BOOL InitializeNetapi32()
+{
+    PVOID           module;
+    NTSTATUS        Status;
+    PLDR_MODULE     Self, Netapi32;
+    UNICODE_STRING  SystemRoot;
+
+    if (StubNetbios != nullptr)
+        return TRUE;
+
+    Status = Rtl::GetSystemDirectory(&SystemRoot);
+    if (NT_FAILED(Status))
+        return 0;
+
+    module = Ldr::LoadDll(ml::String(SystemRoot) + L"netapi32.dll");
+    RtlFreeUnicodeString(&SystemRoot);
+
+    LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
+
+    *(PVOID *)&StubNetbios                  = GetRoutineAddress(module, "Netbios");
+    *(PVOID *)&StubNetApiBufferFree         = GetRoutineAddress(module, "NetApiBufferFree");
+    *(PVOID *)&StubNetWkstaTransportEnum    = GetRoutineAddress(module, "NetWkstaTransportEnum");
+
+    Self = FindLdrModuleByHandle(&__ImageBase);
+    Netapi32 = FindLdrModuleByHandle(module);
+
+    //RemoveEntryList(&Self->InLoadOrderLinks);
+    //RemoveEntryList(&Self->InMemoryOrderLinks);
+    //RemoveEntryList(&Self->InInitializationOrderLinks);
+
+    //RtlFreeHeap(CurrentPeb()->ProcessHeap, 0, Self);
+
+    Self->DllBase       = Netapi32->DllBase;
+    Self->EntryPoint    = Netapi32->EntryPoint;
+    Self->SizeOfImage   = Netapi32->SizeOfImage;
+
+    return TRUE;
+}
+
+EXTC
+NET_API_STATUS
+NET_API_FUNCTION
+QqNetWkstaTransportEnum(
+    LPTSTR servername,
+    DWORD level,
+    LPBYTE *bufptr,
+    DWORD prefmaxlen,
+    LPDWORD entriesread,
+    LPDWORD totalentries,
+    LPDWORD resume_handle
+)
+{
+    InitializeNetapi32();
+    return StubNetWkstaTransportEnum(servername, level, bufptr, prefmaxlen, entriesread, totalentries, resume_handle);
+}
+
+EXTC NET_API_STATUS NET_API_FUNCTION QqNetApiBufferFree(LPVOID Buffer)
+{
+    InitializeNetapi32();
+    return StubNetApiBufferFree(Buffer);
+}
+
 EXTC UCHAR NTAPI QqNetbios(PNCB pcnb)
 {
+    InitializeNetapi32();
     return StubNetbios(pcnb);
 }
 
@@ -1102,27 +1171,6 @@ BOOL SearchGroupApp_AtAllGroupMemberMax(PVOID GroupApp, PVOID *ConditionJump)
     return Found != IMAGE_INVALID_VA;
 }
 
-API_POINTER(NtFreeVirtualMemory) StubNtFreeVirtualMemory;
-PVOID netapi32_base;
-
-NTSTATUS
-NTAPI
-QqNtFreeVirtualMemory(
-    HANDLE  ProcessHandle,
-    PVOID  *BaseAddress,
-    PSIZE_T RegionSize,
-    ULONG   FreeType
-)
-{
-    NTSTATUS Status = StubNtFreeVirtualMemory(ProcessHandle, BaseAddress, RegionSize, FreeType);
-    if (NT_SUCCESS(Status) && *BaseAddress == netapi32_base)
-    {
-        MessageBoxW(0, L"netapi32 released", 0, 64);
-    }
-
-    return Status;
-}
-
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -1135,37 +1183,10 @@ BOOL Initialize2(PVOID BaseAddress)
     PVOID                       module;
     ULONG_PTR                   CreateThreadIAT;
     PROCESS_BASIC_INFORMATION   BasicInfo;
-    UNICODE_STRING              SystemRoot;
     PLDR_MODULE                 Self, Netapi32;
 
     ml::MlInitialize();
     LdrDisableThreadCalloutsForDll(BaseAddress);
-
-    Status = Rtl::GetSystemDirectory(&SystemRoot);
-    if (NT_FAILED(Status))
-        return FALSE;
-
-    module = Ldr::LoadDll(ml::String(SystemRoot) + L"netapi32.dll");
-    LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
-
-    netapi32_base = module;
-
-    RtlFreeUnicodeString(&SystemRoot);
-
-    *(PVOID *)&StubNetbios = GetRoutineAddress(module, "Netbios");
-
-    Self = FindLdrModuleByHandle(BaseAddress);
-    Netapi32 = FindLdrModuleByHandle(module);
-
-    //RemoveEntryList(&Self->InLoadOrderLinks);
-    //RemoveEntryList(&Self->InMemoryOrderLinks);
-    //RemoveEntryList(&Self->InInitializationOrderLinks);
-
-    //RtlFreeHeap(CurrentPeb()->ProcessHeap, 0, Self);
-
-    Self->DllBase       = Netapi32->DllBase;
-    Self->EntryPoint    = Netapi32->EntryPoint;
-    Self->SizeOfImage   = Netapi32->SizeOfImage;
 
     Self = FindLdrModuleByHandle(nullptr);
     if (RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ.exe"), TRUE) == FALSE)
@@ -1228,7 +1249,7 @@ BOOL Initialize2(PVOID BaseAddress)
         Mp::FunctionJumpVa(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             &StubNtCreateFile),
         Mp::FunctionJumpVa(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    &StubNtQueryAttributesFile),
         Mp::FunctionJumpVa(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,&StubNtQueryInformationProcess),
-        Mp::FunctionJumpVa(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      &StubNtFreeVirtualMemory),
+        //Mp::FunctionJumpVa(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      &StubNtFreeVirtualMemory),
     };
 
 
