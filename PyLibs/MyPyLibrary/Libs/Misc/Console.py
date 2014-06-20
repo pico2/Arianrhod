@@ -16,7 +16,7 @@ def cls2():
 def PrintLog(value, *args, sep=' ', end='\n', file=sys.stdout, flush=False):
     pass
 
-class _flushstdout(TextIOWrapper):
+class _flushstdout(type(sys.stdout)):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
