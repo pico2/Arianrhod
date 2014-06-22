@@ -42,8 +42,8 @@ class AsyncHttpRequest:
             #'https' : 'https://127.0.0.1:6789',
         }
 
-    def SetProxy(self, ):
-        pass
+    def SetProxy(self, Proxies):
+        self.Proxies = Proxies
 
     def Close(self):
         self.session.close()

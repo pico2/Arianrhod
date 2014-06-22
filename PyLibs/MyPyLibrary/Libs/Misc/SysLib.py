@@ -23,18 +23,18 @@ def ibp_worker():
     pass
 
 class qtbp(object):
-    def __enter__(self):
+    def __init__(self):
         from PyQt5.QtCore import pyqtRemoveInputHook
         pyqtRemoveInputHook()
         ibp()
+
+    def __enter__(self):
         return self
 
     def __exit__(self, type, value, traceback):
         from PyQt5.QtCore import pyqtRestoreInputHook
         pyqtRestoreInputHook()
 
-    def bp(self):
-        return self.__enter__()
 
 ibp = ibp_init
 
