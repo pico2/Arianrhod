@@ -38,12 +38,6 @@ UserMessageCall(INLPCREATESTRUCT)
 
     CreateStructW = (LPCREATESTRUCTW)lParam;
 
-    //PCBT_PROC_PARAM CbtParam = (PCBT_PROC_PARAM)FindThreadFrame(CBT_PROC_PARAM_CONTEXT);
-    //if (CbtParam != nullptr && CbtParam->hWnd == Window)
-    //{
-    //    CreateStructW->lpCreateParams = ((PCBT_CREATE_PARAM)CreateStructW->lpCreateParams)->CreateParams;
-    //}
-
     SEH_TRY
     {
         PCBT_CREATE_PARAM CbtCreateParam = (PCBT_CREATE_PARAM)CreateStructW->lpCreateParams;
@@ -57,8 +51,6 @@ UserMessageCall(INLPCREATESTRUCT)
 
     CreateStructA.lpszClass = nullptr;
     CreateStructA.lpszName = nullptr;
-
-    // ResetDCCharset(LeGetGlobalData(), Window);
 
     LOOP_ONCE
     {
@@ -88,6 +80,49 @@ UserMessageCall(INLPCREATESTRUCT)
 
     FreeClass((PVOID)CreateStructA.lpszClass);
     FreeString((PVOID)CreateStructA.lpszName);
+
+    return Result;
+}
+
+UserMessageCall(INLPMDICREATESTRUCT)
+{
+    LRESULT             Result;
+    LPMDICREATESTRUCTW  MdiCreateStructW;
+    MDICREATESTRUCTA    MdiCreateStructA;
+
+    MdiCreateStructW = (LPMDICREATESTRUCTW)lParam;
+
+    MdiCreateStructA.szClass = nullptr;
+    MdiCreateStructA.szTitle = nullptr;
+
+    LOOP_ONCE
+    {
+        if (MdiCreateStructW == nullptr)
+            break;
+
+        MdiCreateStructA = *(LPMDICREATESTRUCTA)MdiCreateStructW;
+
+        MdiCreateStructA.szClass = nullptr;
+        MdiCreateStructA.szTitle = nullptr;
+
+        MdiCreateStructA.szClass = ClassWCharToMByte(MdiCreateStructW->szClass);
+        if (MdiCreateStructA.szClass == nullptr)
+            break;
+
+        if (MdiCreateStructW->szTitle != nullptr)
+        {
+            MdiCreateStructA.szTitle = TitleWCharToMByte(MdiCreateStructW->szTitle);
+            if (MdiCreateStructA.szTitle == nullptr)
+                break;
+        }
+
+        lParam = (LPARAM)&MdiCreateStructA;
+    }
+
+    Result = CallUserMessageCallA();
+
+    FreeClass((PVOID)MdiCreateStructA.szClass);
+    FreeString((PVOID)MdiCreateStructA.szTitle);
 
     return Result;
 }
@@ -328,6 +363,49 @@ KernelMessageCall(INLPCREATESTRUCT)
 
     FreeClass((PVOID)CreateStructW.lpszClass);
     FreeString((PVOID)CreateStructW.lpszName);
+
+    return Result;
+}
+
+KernelMessageCall(INLPMDICREATESTRUCT)
+{
+    LRESULT             Result;
+    LPMDICREATESTRUCTA  MdiCreateStructA;
+    MDICREATESTRUCTW    MdiCreateStructW;
+
+    MdiCreateStructA = (LPMDICREATESTRUCTA)lParam;
+    MdiCreateStructW.szClass = nullptr;
+    MdiCreateStructW.szTitle = nullptr;
+
+    LOOP_ONCE
+    {
+        if (MdiCreateStructA == nullptr)
+            break;
+
+        MdiCreateStructW = *(LPMDICREATESTRUCTW)MdiCreateStructA;
+
+        MdiCreateStructW.szClass = nullptr;
+        MdiCreateStructW.szTitle = nullptr;
+
+        MdiCreateStructW.szClass = ClassMByteToWChar(MdiCreateStructA->szClass);
+        if (MdiCreateStructW.szClass == nullptr)
+            break;
+
+        if (MdiCreateStructA->szTitle != nullptr)
+        {
+            MdiCreateStructW.szTitle = TitleMByteToWChar(MdiCreateStructA->szTitle);
+            if (MdiCreateStructW.szTitle == nullptr)
+                break;
+        }
+
+        lParam = (LPARAM)&MdiCreateStructW;
+        CLEAR_FLAG(Flags, WINDOW_FLAG_ANSI);
+    }
+
+    Result = CallNtUserMessageCall();
+
+    FreeClass((PVOID)MdiCreateStructW.szClass);
+    FreeString((PVOID)MdiCreateStructW.szTitle);
 
     return Result;
 }
