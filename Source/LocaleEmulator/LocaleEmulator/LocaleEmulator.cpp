@@ -820,8 +820,6 @@ BOOL Initialize(PVOID BaseAddress)
     if (NT_FAILED(Status))
         return FALSE;
 
-    GlobalData->SetUnhandledExceptionFilter();
-
 #endif
 
     WriteLog(L"init ret");

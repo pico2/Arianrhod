@@ -381,6 +381,7 @@ public:
 
     struct
     {
+        API_POINTER(RtlKnownExceptionFilter)    StubRtlKnownExceptionFilter;
         API_POINTER(NtContinue)                 StubLdrInitNtContinue;
         API_POINTER(LdrResSearchResource)       StubLdrResSearchResource;
 
@@ -542,18 +543,6 @@ public:
 
     NTSTATUS HackUserDefaultLCID(PVOID Kernel32);
     NTSTATUS InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid);
-
-    VOID SetUnhandledExceptionFilter()
-    {
-        RtlSetUnhandledExceptionFilter(
-            [] (PEXCEPTION_POINTERS ExceptionPointers) -> LONG
-            {
-                // ExceptionBox(L"crashed");
-                CreateMiniDump(ExceptionPointers);
-                return ExceptionContinueSearch;
-            }
-        );
-    }
 
     /************************************************************************
       helper func

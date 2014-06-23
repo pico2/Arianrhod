@@ -852,6 +852,16 @@ LeLdrResSearchResource(
     return Status;
 }
 
+LONG NTAPI LeKnownExceptionFilter(PEXCEPTION_POINTERS ExceptionPointers)
+{
+    LONG Result = LeGetGlobalData()->HookStub.StubRtlKnownExceptionFilter(ExceptionPointers);
+    
+    if (Result == EXCEPTION_CONTINUE_SEARCH)
+        CreateMiniDump(ExceptionPointers);
+
+    return Result;
+}
+
 NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 {
     NTSTATUS            Status;
@@ -880,6 +890,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     Mp::PATCH_MEMORY_DATA p[] =
     {
         Mp::FunctionCallVa(LdrInitNtContinue, LeLdrInitNtContinue, &HookStub.StubLdrInitNtContinue),
+        Mp::FunctionJumpVa(RtlKnownExceptionFilter, LeKnownExceptionFilter, &HookStub.StubRtlKnownExceptionFilter),
     };
 
     Mp::PatchMemory(p, countof(p));

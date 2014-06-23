@@ -47,8 +47,6 @@ NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
 
     WriteLog(L"hook k32");
 
-    this->SetUnhandledExceptionFilter();
-
     return this->HackUserDefaultLCID(Kernel32);
 }
 
