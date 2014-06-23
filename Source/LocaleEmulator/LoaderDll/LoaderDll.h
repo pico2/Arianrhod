@@ -86,4 +86,21 @@ LeCreateProcess(
     HANDLE                  Token               = nullptr
 );
 
+LE_API
+NTSTATUS
+WINAPI
+LeCreateProcess2(
+    PLEB                    Leb,
+    PCWSTR                  ApplicationName,
+    PWSTR                   CommandLine         = nullptr,
+    PCWSTR                  CurrentDirectory    = nullptr,
+    ULONG                   CreationFlags       = 0,
+    LPSTARTUPINFOW          StartupInfo         = nullptr,
+    PML_PROCESS_INFORMATION ProcessInformation  = nullptr,
+    LPSECURITY_ATTRIBUTES   ProcessAttributes   = nullptr,
+    LPSECURITY_ATTRIBUTES   ThreadAttributes    = nullptr,
+    PVOID                   Environment         = nullptr,
+    HANDLE                  Token               = nullptr
+);
+
 #endif // _LOADERDLL_H_586bc656_348b_4b12_ba74_d39366b67f23_

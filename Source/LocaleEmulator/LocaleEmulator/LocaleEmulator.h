@@ -32,6 +32,7 @@ class LeGlobalData;
 typedef LeGlobalData* PLeGlobalData;
 
 #define THREAD_LOCAL_BUFFER_CONTEXT TAG4('LTLB')
+#define LE_LOADER_PROCESS           TAG4('LELP')
 
 typedef struct THREAD_LOCAL_BUFFER : public TEB_ACTIVE_FRAME
 {
@@ -547,6 +548,15 @@ public:
     /************************************************************************
       helper func
     ************************************************************************/
+
+    /************************************************************************
+      ntdll
+    ************************************************************************/
+
+    LONG RtlKnownExceptionFilter(PEXCEPTION_POINTERS ExceptionPointers)
+    {
+        return HookStub.StubRtlKnownExceptionFilter(ExceptionPointers);
+    }
 
     /************************************************************************
       kernelbase

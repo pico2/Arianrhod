@@ -719,11 +719,14 @@ BOOL Initialize(PVOID BaseAddress)
 
 #if !ARCHEAGE_VER
 
-    Kernel32 = GetKernel32Ldr();
-    if (Kernel32 != nullptr && FLAG_ON(Kernel32->Flags, LDRP_PROCESS_ATTACH_CALLED))
+    if (FindThreadFrame(LE_LOADER_PROCESS) == nullptr)
     {
-        ExceptionBox(L"fuck");
-        return FALSE;
+        Kernel32 = GetKernel32Ldr();
+        if (Kernel32 != nullptr && FLAG_ON(Kernel32->Flags, LDRP_PROCESS_ATTACH_CALLED))
+        {
+            ExceptionBox(L"fuck");
+            return FALSE;
+        }
     }
 
 #endif

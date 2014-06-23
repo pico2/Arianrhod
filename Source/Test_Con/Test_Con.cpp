@@ -129,7 +129,7 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     HANDLE BusyThread;
 
     NtSetInformationProcess(CurrentProcess, ProcessAffinityMask, &ProcessMask, sizeof(ProcessMask));
-    
+
     ULONG_PTR BusyTime, IdleTime;
 
     Percent = ML_MAX(Percent, 0);
@@ -149,10 +149,6 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-
-    WIN32_FIND_DATAA fd;
-
-    FindFirstFileA(R"(D:\Desktop\src\xlaccsetup\SetupPack\ThirdFile\gameicons\Â¯Ê¯´«Ëµ16.png)", &fd);
 
     return;
 
