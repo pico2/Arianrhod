@@ -7,7 +7,7 @@
 from ml import *
 
 def main():
-    ${1:$SELECTION}
+    ${1:pass$SELECTION}
 
 if __name__ == '__main__':
     TryInvoke(main)
