@@ -3,7 +3,7 @@ from io import *
 from ctypes.wintypes import *
 import xml.etree.ElementTree as ET
 from ctypes.wintypes import *
-from ctypes import windll, byref, wintypes
+from ctypes import windll, cdll, byref, wintypes
 from pdb import set_trace as bp
 
 
@@ -40,6 +40,7 @@ ibp = ibp_init
 
 CHAR    = ctypes.c_char
 BYTE    = ctypes.c_ubyte      # fix bug: BYTE == CHAR
+UCHAR   = BYTE
 
 PLONG = ctypes.POINTER(LONG)
 PULONG = ctypes.POINTER(ULONG)
