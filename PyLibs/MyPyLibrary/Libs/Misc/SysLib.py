@@ -38,23 +38,25 @@ class qtbp(object):
 
 ibp = ibp_init
 
-CHAR    = ctypes.c_char
-BYTE    = ctypes.c_ubyte      # fix bug: BYTE == CHAR
-UCHAR   = BYTE
+CHAR        = ctypes.c_char
+BYTE        = ctypes.c_ubyte      # fix bug: BYTE == CHAR
+UCHAR       = BYTE
 
-PLONG = ctypes.POINTER(LONG)
-PULONG = ctypes.POINTER(ULONG)
+PLONG       = ctypes.POINTER(LONG)
+PULONG      = ctypes.POINTER(ULONG)
 
-LONG64  = ctypes.c_longlong
-ULONG64 = ctypes.c_ulonglong
+LONG64      = ctypes.c_longlong
+LONGLONG    = LONG64
+ULONG64     = ctypes.c_ulonglong
+ULONGLONG   = ULONG64
 
-PLONG64  = ctypes.POINTER(LONG64)
-PULONG64 = ctypes.POINTER(ULONG64)
+PLONG64     = ctypes.POINTER(LONG64)
+PULONG64    = ctypes.POINTER(ULONG64)
 
-PVOID   = ctypes.c_void_p
-PSTR    = ctypes.c_char_p
+PVOID       = ctypes.c_void_p
+PSTR        = ctypes.c_char_p
 
-NTSTATUS = LONG
+NTSTATUS    = LONG
 
 ANSI_CODE_PAGE = 'mbcs'
 

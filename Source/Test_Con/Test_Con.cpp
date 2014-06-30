@@ -150,11 +150,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintConsole(L"%p\n", sizeof(IMAGE_DOS_HEADER));
-    PrintConsole(L"%p\n", sizeof(IMAGE_FILE_HEADER));
-    PrintConsole(L"%p\n", sizeof(IMAGE_DATA_DIRECTORY));
-    PrintConsole(L"%p\n", sizeof(IMAGE_OPTIONAL_HEADER32));
-    PrintConsole(L"%p\n", sizeof(IMAGE_ROM_OPTIONAL_HEADER));
+    PrintConsole(L"%p\n", sizeof(IMAGE_NT_HEADERS64));
+    PrintConsole(L"%p\n", sizeof(IMAGE_NT_HEADERS32));
+    PrintConsole(L"%p\n", sizeof(IMAGE_ROM_HEADERS));
 
     return;
 
