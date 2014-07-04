@@ -152,9 +152,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     IMAGE_AUX_SYMBOL sym;
 
-    PrintConsole(L"0x%p\n", sizeof(NON_PAGED_DEBUG_INFO));
-    PrintConsole(L"0x%p\n", sizeof(IMAGE_ARCHITECTURE_HEADER));
-    PrintConsole(L"0x%p\n", sizeof(IMAGE_COR20_HEADER));
+    sizeof INT ;
+    sizeof FLOAT ;
 
     return;
 
