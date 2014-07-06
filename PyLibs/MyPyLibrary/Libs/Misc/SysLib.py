@@ -42,8 +42,12 @@ CHAR        = ctypes.c_char
 BYTE        = ctypes.c_ubyte      # fix bug: BYTE == CHAR
 UCHAR       = BYTE
 
+
 PLONG       = ctypes.POINTER(LONG)
 PULONG      = ctypes.POINTER(ULONG)
+
+INT64       = ctypes.c_int64
+UINT64      = ctypes.c_uint64
 
 LONG64      = ctypes.c_longlong
 LONGLONG    = LONG64
@@ -54,9 +58,24 @@ PLONG64     = ctypes.POINTER(LONG64)
 PULONG64    = ctypes.POINTER(ULONG64)
 
 PVOID       = ctypes.c_void_p
-PSTR        = ctypes.c_char_p
+PSTR        = LPSTR
+PWSTR       = LPWSTR
 
 NTSTATUS    = LONG
+
+
+if ctypes.sizeof(PVOID) == ctypes.sizeof(ULONG):
+    INT_PTR     = INT
+    UINT_PTR    = UINT
+    LONG_PTR    = LONG
+    ULONG_PTR   = ULONG
+
+elif ctypes.sizeof(PVOID) == ctypes.sizeof(ULONG64):
+    INT_PTR     = INT64
+    UINT_PTR    = UINT64
+    LONG_PTR    = LONG64
+    ULONG_PTR   = ULONG64
+
 
 ANSI_CODE_PAGE = 'mbcs'
 
@@ -73,8 +92,9 @@ class StructureUnionBase(object):
             basetype.__init__(self)
             buf = args[0]
             if isinstance(buf, FileStream):
-                buf = buf.Read(len(self))
-                if len(buf) != len(self):
+                length = kwargs.get('Length', len(self))
+                buf = buf.Read(length)
+                if len(buf) != length:
                     raise IncorrectLengthOfData(type(self))
 
             self.__frombytes__(buf)
@@ -184,7 +204,7 @@ pair as the key's value (values become dictionaries)."""
     def __init__(self, initval = None):
 
         if isinstance(initval, dict):
-            for key, value in initval.iteritems():
+            for key, value in initval.items():
                 self.__setitem__(key, value)
 
         elif isinstance(initval, list):
@@ -200,7 +220,7 @@ pair as the key's value (values become dictionaries)."""
     def __setitem__(self, key, value):
         return dict.__setitem__(self, key.lower(), {'key': key, 'val': value})
 
-    def get(self, key, default=None):
+    def get(self, key, default = None):
         try:
             v = dict.__getitem__(self, key.lower())
         except KeyError:
@@ -208,29 +228,11 @@ pair as the key's value (values become dictionaries)."""
         else:
             return v['val']
 
-    def has_key(self,key):
-        if self.get(key):
-            return True
-        else:
-            return False
-
     def items(self):
-        return [(v['key'], v['val']) for v in dict.itervalues(self)]
+        return [(v['key'], v['val']) for v in dict.values(self)]
 
     def keys(self):
-        return [v['key'] for v in dict.itervalues(self)]
+        return [v['key'] for v in dict.values(self)]
 
     def values(self):
-        return [v['val'] for v in dict.itervalues(self)]
-
-    def iteritems(self):
-        for v in dict.itervalues(self):
-            yield v['key'], v['val']
-
-    def iterkeys(self):
-        for v in dict.itervalues(self):
-            yield v['key']
-
-    def itervalues(self):
-        for v in dict.itervalues(self):
-            yield v['val']
+        return [v['val'] for v in dict.values(self)]

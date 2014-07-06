@@ -150,10 +150,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    IMAGE_AUX_SYMBOL sym;
-
-    sizeof INT ;
-    sizeof FLOAT ;
+    Ps::CreateProcess(0, L"notepad.exe");
 
     return;
 

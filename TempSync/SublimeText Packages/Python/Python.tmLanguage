@@ -1173,8 +1173,8 @@
 		<dict>
 			<key>match</key>
 			<string>(?x)\b(
-				basestring|bool|buffer|classmethod|complex|dict|enumerate|file|
-				float|frozenset|int|list|long|object|open|property|reversed|set|
+				basestring|bool|buffer|classmethod|complex|dict|enumerate|
+				float|frozenset|int|list|object|open|property|reversed|set|
 				slice|staticmethod|str|super|tuple|type|unicode|xrange|bytes|bytearray
 			)\b</string>
 			<key>name</key>

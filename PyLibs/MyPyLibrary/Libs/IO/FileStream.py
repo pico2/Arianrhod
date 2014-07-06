@@ -33,7 +33,7 @@ def _ReadFloat(fs, endian = _DEFAULT_ENDIAN):
 def _ReadDouble(fs, endian = _DEFAULT_ENDIAN):
     return struct.unpack(endian + 'd', fs.read(8))[0]
 
-def _ReadAString(fs, cp = '936'):
+def _ReadAString(fs, cp = ANSI_CODE_PAGE):
     string = b''
     while True:
         buf = fs.read(1)
@@ -258,7 +258,8 @@ class FileStreamPositionHolder:
     def __exit__(self, type, value, traceback):
         self.fs.Position = self.pos
 
-class FileStream:
+class FileStream(object):
+    MemoryFile = False
 
     LITTLE_ENDIAN = '<'
     BIG_ENDIAN = '>'
@@ -268,7 +269,7 @@ class FileStream:
     def __init__(self, file = None, mode = 'rb'):
         self._stream = None
         self._endian = self.LITTLE_ENDIAN
-        self._encoding = '936'
+        self._encoding = ANSI_CODE_PAGE
 
         if file is not None:
             self.Open(file, mode)
@@ -304,20 +305,24 @@ class FileStream:
             return self.OpenMemory(file)
         elif isinstance(file, type(self)):
             self._stream = file
+            self.MemoryFile = file.MemoryFile
             return self
         else:
             return self.OpenFile(file, mode)
 
     def OpenFile(self, file, mode = 'rb'):
         self._stream = open(file, mode)
+        self.MemoryFile = False
         return self
 
     def OpenMemory(self, buffer = b''):
         self._stream = io.BytesIO(buffer)
+        self.MemoryFile = True
         return self
 
     def Close(self):
         self._stream.close()
+        self.MemoryFile = False
 
     def __getitem__(self, args):
         if isinstance(args, tuple):
