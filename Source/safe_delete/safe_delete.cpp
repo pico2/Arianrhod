@@ -1,26 +1,9 @@
-#pragma comment(linker,"/ENTRY:main")
-#pragma comment(linker,"/MERGE:.text=.Kaede /SECTION:.Kaede,ERW")
-#pragma comment(linker,"/MERGE:.rdata=.Kaede")
-#pragma comment(linker,"/MERGE:.data=.Kaede")
+#pragma comment(linker, "/ENTRY:main")
+#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
+#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 #pragma comment(lib, "Shlwapi.lib")
 
-#include <Windows.h>
-#include "crt_h.h"
-#include "my_crt.h"
-#include "my_mem.h"
-
-ForceInline UINT32 GetRandomUInt()
-{
-    __asm
-    {
-        xor edx, edx;
-        rdtsc;
-        mov ecx, eax;
-        xor ecx, edx;
-        rol eax, cl;
-        xor eax, ecx;
-    }
-}
+#include <MyLibrary.cpp>
 
 Void GetRandomName(IN OUT LPWSTR lpFileName)
 {
@@ -28,7 +11,7 @@ Void GetRandomName(IN OUT LPWSTR lpFileName)
 
     do
     {
-        swprintf(lpName, L"%X%X.%X", GetRandomUInt(), GetRandomUInt(), GetRandomUInt());
+        swprintf(lpName, L"%X%X.%X", GetRandom32(), GetRandom32(), GetRandom32());
     } while (GetFileAttributesW(lpFileName) != -1);
 }
 
@@ -62,7 +45,7 @@ Void _DeleteFile(LPWSTR lpFileName)
         memset(pbBuffer, -1, dwSize);
         WriteFile(hFile, pbBuffer, dwSize, &dwWritten, NULL);
         HeapFree(hHeap, 0, pbBuffer);
-//        FlushFileBuffers(hFile);
+        FlushFileBuffers(hFile);
     }
     else
     {
@@ -71,7 +54,7 @@ Void _DeleteFile(LPWSTR lpFileName)
         {
             if (dwSize > 100 * 1024 * 1024)
             {
-                dwSize = 100 * 1024 * 1024;
+                //dwSize = 100 * 1024 * 1024;
             }
 
             pbFile = (PBYTE)MapViewOfFile(hMap, FILE_MAP_WRITE, 0, 0, dwSize);
@@ -80,7 +63,7 @@ Void _DeleteFile(LPWSTR lpFileName)
             {
                 memset(pbFile, -1, dwSize);
                 UnmapViewOfFile(pbFile);
-//                FlushFileBuffers(hFile);
+                FlushFileBuffers(hFile);
             }
         }
     }
@@ -166,9 +149,10 @@ void ForceInline main2(int argc, wchar_t **argv)
     }
 }
 
-void __cdecl main(int argc, wchar_t **argv)
+int __cdecl main(LONG_PTR argc, PWSTR *argv)
 {
     getargsW(&argc, &argv);
     main2(argc, argv);
-    exit(0);
+    ReleaseArgv(argv);
+    Ps::ExitProcess(0);
 }
