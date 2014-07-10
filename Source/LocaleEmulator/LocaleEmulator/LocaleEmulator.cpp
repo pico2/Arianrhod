@@ -711,11 +711,62 @@ inline BOOL UnInitialize(PVOID BaseAddress)
     return FALSE;
 }
 
+VOID GenerateModuleList(ml::String &ModuleNames)
+{
+    PVOID                               Address, BaseAddress, LastAllocationBase;
+    ULONG_PTR                           Size, Need, BufferSize;
+    NTSTATUS                            Status;
+    SYSTEM_BASIC_INFORMATION            SystemBasic;
+    MEMORY_BASIC_INFORMATION            MemoryBasic;
+
+    union
+    {
+        MEMORY_MAPPED_FILENAME_INFORMATION2 MappedFile;
+        BYTE MappedFileBuffer[0x2000];
+    };
+
+    Status = NtQuerySystemInformation(SystemBasicInformation, &SystemBasic, sizeof(SystemBasic), nullptr);
+    if (!NT_SUCCESS(Status))
+        return;
+
+    LastAllocationBase = IMAGE_INVALID_VA;
+    BaseAddress = (PVOID)SystemBasic.MinimumUserModeAddress;
+    BaseAddress = nullptr;
+
+    for (; (ULONG_PTR)BaseAddress < SystemBasic.MaximumUserModeAddress; BaseAddress = PtrAdd(BaseAddress, MemoryBasic.RegionSize))
+    {
+        MemoryBasic.RegionSize = MEMORY_PAGE_SIZE;
+        Status = NtQueryVirtualMemory(CurrentProcess, BaseAddress, MemoryBasicInformation, &MemoryBasic, sizeof(MemoryBasic), nullptr);
+        FAIL_CONTINUE(Status);
+
+        BaseAddress = MemoryBasic.BaseAddress;
+
+        if (MemoryBasic.Type != MEM_IMAGE || MemoryBasic.AllocationBase == LastAllocationBase)
+            continue;
+
+        LastAllocationBase = MemoryBasic.AllocationBase;
+
+        Status = NtQueryVirtualMemory(CurrentProcess, BaseAddress, MemoryMappedFilenameInformation, &MappedFile, sizeof(MappedFileBuffer), nullptr);
+        if (NT_FAILED(Status) || MappedFile.Name.Length == 0)
+            continue;
+
+        UNICODE_STRING DosPath;
+
+        Status = Io::QueryDosPathFromNtDeviceName(&DosPath, &MappedFile.Name);
+
+        ModuleNames += ml::String::Format(L"%p: %wZ\n", BaseAddress, NT_SUCCESS(Status) ? &DosPath : &MappedFile.Name);
+
+        RtlFreeUnicodeString(&DosPath);
+    }
+}
+
 BOOL Initialize(PVOID BaseAddress)
 {
     NTSTATUS            Status;
     PLDR_MODULE         Kernel32;
     PLeGlobalData       GlobalData;
+
+    ml::MlInitialize();
 
 #if !ARCHEAGE_VER
 
@@ -724,7 +775,9 @@ BOOL Initialize(PVOID BaseAddress)
         Kernel32 = GetKernel32Ldr();
         if (Kernel32 != nullptr && FLAG_ON(Kernel32->Flags, LDRP_PROCESS_ATTACH_CALLED))
         {
-            ExceptionBox(L"fuck");
+            ml::String ModuleList = L"Module list:\n\n";
+            GenerateModuleList(ModuleList);
+            ExceptionBox(ModuleList);
             return FALSE;
         }
     }
@@ -732,7 +785,6 @@ BOOL Initialize(PVOID BaseAddress)
 #endif
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
-    ml::MlInitialize();
 
     GlobalData = new LeGlobalData;
     if (GlobalData == nullptr)
