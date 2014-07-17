@@ -293,7 +293,7 @@ class LuaFunction_51:
             lines.append('%s.Constants.Value = list((' % self.Name)
             for v in self.Constants.Value:
                 if type(v) == str:
-                    v = '"%s"' % v.replace('\n', '\\n').replace('\r', '\\r')
+                    v = '"%s"' % v.replace('\\', '\\\\')
                 lines.append('    %s,' % v)
             lines.append('))')
 
