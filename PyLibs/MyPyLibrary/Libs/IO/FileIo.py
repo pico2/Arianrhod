@@ -1,15 +1,11 @@
-import os, glob
+import os, glob, fnmatch
 from .FileStream import *
 
 def EnumDirectoryFiles(path, filter = '*.*'):
     allfiles = []
     for root, dirs, files in os.walk(path):
-        files = glob.glob(os.path.join(root, filter))
-
         for f in files:
-            if os.path.isdir(f):
-                continue
-
-            allfiles.append(f)
+            f = os.path.join(root, f)
+            fnmatch.filter(f, filter) and not os.path.isdir(f) and allfiles.append(f)
 
     return allfiles
