@@ -76,6 +76,10 @@ elif ctypes.sizeof(PVOID) == ctypes.sizeof(ULONG64):
     LONG_PTR    = LONG64
     ULONG_PTR   = ULONG64
 
+PINT_PTR        = ctypes.POINTER(INT_PTR)
+PUINT_PTR       = ctypes.POINTER(UINT_PTR)
+PLONG_PTR       = ctypes.POINTER(LONG_PTR)
+PULONG_PTR      = ctypes.POINTER(ULONG_PTR)
 
 ANSI_CODE_PAGE = 'mbcs'
 
