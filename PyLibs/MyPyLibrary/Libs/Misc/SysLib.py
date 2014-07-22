@@ -224,6 +224,9 @@ pair as the key's value (values become dictionaries)."""
     def __setitem__(self, key, value):
         return dict.__setitem__(self, key.lower(), {'key': key, 'val': value})
 
+    def __delitem__(self, key):
+        return super().__delitem__(key.lower())
+
     def get(self, key, default = None):
         try:
             v = dict.__getitem__(self, key.lower())

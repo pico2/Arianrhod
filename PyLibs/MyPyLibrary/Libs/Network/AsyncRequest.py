@@ -10,7 +10,7 @@ class _HTTPSWithoutCertVerifyAdapter(requests.adapters.HTTPAdapter):
         kwargs['verify'] = False
         return super().send(*args, **kwargs)
 
-class AsyncHttpRequest:
+class AsyncHttpRequest(object):
     class _RequestParam(dict2):
         def __init__(self):
             self.Method             = None

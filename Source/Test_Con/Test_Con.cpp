@@ -150,8 +150,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    Ps::CreateProcess(0, L"notepad.exe");
-
     return;
 
 #if 0
