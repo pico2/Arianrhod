@@ -269,6 +269,32 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
     return Success;
 }
 
+API_POINTER(CreateFontIndirectW) StubCreateFontIndirectW;
+API_POINTER(CreateFontW) StubCreateFontW;
+
+HFONT NTAPI CreateFontIndirectBypassW(LOGFONTW *lplf)
+{
+    AllocConsole();
+    PrintConsole(L"%s\n", lplf->lfFaceName);
+
+    WCHAR face[] = L"Î¢ÈíÑÅºÚ";
+    LOGFONTW f2;
+
+    f2 = *lplf;
+    lstrcpyW(f2.lfFaceName, L"Î¢ÈíÑÅºÚ");
+
+    return StubCreateFontIndirectW(lplf);
+}
+
+HFONT NTAPI CcCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement, _In_ int cOrientation, _In_ int cWeight, _In_ DWORD bItalic, _In_ DWORD bUnderline, _In_ DWORD bStrikeOut, _In_ DWORD iCharSet, _In_ DWORD iOutPrecision, _In_ DWORD iClipPrecision, _In_ DWORD iQuality, _In_ DWORD iPitchAndFamily, _In_opt_ LPCWSTR pszFaceName)
+{
+    AllocConsole();
+    PrintConsole(L"%s\n", pszFaceName);
+    WCHAR face[] = L"Î¢ÈíÑÅºÚ";
+    pszFaceName = face;
+    return StubCreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -343,6 +369,9 @@ BOOL Initialize(PVOID BaseAddress)
 
         //Mp::FunctionJumpVa(LoadAcceleratorsW,   MyLoadAcceleratorsW,    &StubLoadAcceleratorsW),
         Mp::FunctionJumpVa(PeekMessageW,        ChromePeekMessageW,     &StubPeekMessageW),
+
+        //Mp::FunctionJumpVa(CreateFontW, CcCreateFontW, &StubCreateFontW),
+        //Mp::FunctionJumpVa(CreateFontIndirectW, CreateFontIndirectBypassW, &StubCreateFontIndirectW),
     };
 
     Mp::PatchMemory(p, countof(p));
