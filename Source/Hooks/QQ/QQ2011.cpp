@@ -14,6 +14,8 @@
 WCHAR GlobalRegistryDb[0x20];
 WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
 
+TXReloginMgr* ReloginMgr;
+
 PVOID AppUtilBase;
 
 API_POINTER(free)                       msvcrX0_free;
@@ -623,7 +625,7 @@ QqSetWindowPos(
 BOOL NTAPI QqShowWindow(HWND hWnd, int CmdShow)
 {
     if (IsWindowMessageBox(hWnd))
-        QqSetWindowPos(hWnd, NULL, 0, 0, 0, 0, 0);
+        QqSetWindowPos(hWnd, nullptr, 0, 0, 0, 0, 0);
 
     return StubShowWindow(hWnd, CmdShow);
 }
@@ -636,7 +638,7 @@ BOOL NTAPI QqPostMessageW(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
         case 0x7EA:
         case 0x7EB:
         case 0x7EC:
-            if (wParam > 0x10000 && msvcrX0_free != NULL)
+            if (wParam > 0x10000 && msvcrX0_free != nullptr)
                 msvcrX0_free((PVOID)wParam);
 
             return TRUE;
@@ -740,14 +742,15 @@ HRESULT NTAPI GroupMgr_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
 
 HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
 {
-    static GUID GUID_BlackList[] =
+    static GUID GUID_FilterList[] =
     {
         { 0x41D26ED5, 0x7680, 0x4631, 0xBC, 0xC1, 0x5E, 0x52, 0x30, 0x37, 0xF7, 0x0A }, // GUID_PluginCenter
         { 0x76063A86, 0xD553, 0x44A6, 0xAF, 0x7A, 0x12, 0xAE, 0x87, 0x21, 0x1A, 0xA7 }, // GUID_GroupMgr
         { 0xC8730021, 0xE7DE, 0x4F65, 0x98, 0x8C, 0x7D, 0x69, 0x4C, 0x38, 0x83, 0x6E }, // GUID_DllHashCheckMgr
+        { 0x3A990F4E, 0x95BC, 0x4F00, 0xAE, 0x52, 0xFD, 0xD9, 0xFB, 0xFF, 0x30, 0x3E }, // GUID_ReloginMgr
     };
 
-    GUID *BlackList;
+    GUID *Filter;
 
     LOOP_ONCE
     {
@@ -756,25 +759,38 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
         if (Output != nullptr)
             *Output = nullptr;
 
-        FOR_EACH_ARRAY(BlackList, GUID_BlackList)
+        FOR_EACH_ARRAY(Filter, GUID_FilterList)
         {
-            if (Guid == *BlackList)
+            if (Guid == *Filter)
                 break;
         }
 
-        switch (BlackList - GUID_BlackList)
+        switch (Filter - GUID_FilterList)
         {
-            case countof(GUID_BlackList):
+            case countof(GUID_FilterList):
                 continue;
 
             case 0:
                 AppUtil = FindLdrModuleByHandle(_ReturnAddress());
-                if (AppUtil != NULL && AppUtil->DllBase == AppUtilBase)
+                if (AppUtil != nullptr && AppUtil->DllBase == AppUtilBase)
                     continue;
                 break;
 
             case 1:
                 return GroupMgr_QueryInterface(Object, Guid, Output);
+
+            case 3:
+            {
+                HRESULT hr = StubPlatformCore_QueryInterface(Object, Guid, Output);
+
+                if (ReloginMgr == nullptr && SUCCEEDED(hr))
+                {
+                    ReloginMgr = (TXReloginMgr *)*Output;
+                    ReloginMgr->AddRef();
+                }
+
+                return hr;
+            }
         }
 
         return E_NOINTERFACE;
@@ -838,17 +854,27 @@ VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Pa
 
 HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2)
 {
-    if (Type == 0x30)
-    {
-        return S_OK;
-    }
+    HRESULT hr;
 
     WCHAR buf[0x100];
 
-    swprintf(buf, L"%p", Type);
+    swprintf(buf, L"µôÏßÁË %p", Type);
     MessageBoxW(0, buf, 0, 64);
 
-    return StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
+    hr = StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
+
+    if (Type == 0x30 && ReloginMgr != nullptr)
+    {
+        PTX_DATA Data;
+
+        Util::Data::CreateTXData(&Data);
+        Data->SetDword(L"cReloginFlag", 2);
+
+        ReloginMgr->Relogin(nullptr, Data);
+        Data->Release();
+    }
+
+    return hr;
 }
 
 BOOL CDECL CheckMsgImage(PVOID GroupObject, CTXStringW &Message)

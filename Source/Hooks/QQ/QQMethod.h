@@ -31,6 +31,23 @@ struct CTXStringW
 INIT_STATIC_MEMBER(CTXStringW::StubEmpty);
 INIT_STATIC_MEMBER(CTXStringW::StubIsEmpty);
 
+
+typedef struct TX_DATA : public IUnknown
+{
+    VOID SetDword(PCWSTR Name, ULONG Value)
+    {
+        API_POINTER(TX_DATA::SetDword) _SetDword;
+        *(PVOID *)&_SetDword = *(PVOID *)PtrAdd(this, 0xD0);
+        return (this->*_SetDword)(Name, Value);
+    }
+
+} TX_DATA, *PTX_DATA;
+
+struct TXReloginMgr : public IUnknown
+{
+    virtual HRESULT NTAPI Relogin(PVOID Tray, PTX_DATA Data);
+};
+
 struct Util
 {
     struct ChatSession
@@ -49,6 +66,11 @@ struct Util
     {
         static BOOL (CDECL *CheckMsgImage)(PVOID GroupObject, CTXStringW &Message);
     };
+
+    struct Data
+    {
+        static BOOL (CDECL *CreateTXData)(PTX_DATA *Data);
+    };
 };
 
 INIT_STATIC_MEMBER(Util::ChatSession::OpenContactChatSession);
@@ -56,6 +78,7 @@ INIT_STATIC_MEMBER(Util::ChatSession::GetContactChatSessionMainHWND);
 INIT_STATIC_MEMBER(Util::Contact::GetSelfUin);
 INIT_STATIC_MEMBER(Util::Contact::IsSuperVip);
 INIT_STATIC_MEMBER(Util::Group::CheckMsgImage);
+INIT_STATIC_MEMBER(Util::Data::CreateTXData);
 
 
 typedef struct
@@ -75,6 +98,7 @@ inline NTSTATUS InitializeQqFunctionTable()
     {
         { L"Common.dll",        "?Empty@CTXStringW@@QAEXXZ",                                            &CTXStringW::StubEmpty },
         { L"Common.dll",        "?IsEmpty@CTXStringW@@QBE_NXZ",                                         &CTXStringW::StubIsEmpty },
+        { L"Common.dll",        "?CreateTXData@Data@Util@@YAHPAPAUITXData@@@Z",                         &Util::Data::CreateTXData },
 
         { L"AppUtil.dll",       "?OpenContactChatSession@ChatSession@Util@@YAXKPAUITXData@@@Z",         &Util::ChatSession::OpenContactChatSession },
         { L"AppUtil.dll",       "?GetContactChatSessionMainHWnd@ChatSession@Util@@YAPAUHWND__@@K@Z",    &Util::ChatSession::GetContactChatSessionMainHWND },

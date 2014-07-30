@@ -5,6 +5,7 @@
     { "keys": ["f4"], "command": "close" },
     { "keys": ["alt+z"], "command": "reopen_last_file" },
     { "keys": ["alt+="], "command": "jump_forward" },
+    { "keys": ["alt+o"], "command": "switch_file", "args": {"extensions": ["xml.lua", "cpp", "cxx", "cc", "c", "hpp", "hxx", "h", "ipp", "inl", "m", "mm"]} },
 
     { "keys": ["shift+space"], "command": "" },
     { "keys": ["shift+space"], "command": "", "":
