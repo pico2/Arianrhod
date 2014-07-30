@@ -803,6 +803,11 @@ BOOL CDECL GetPlatformCore(PVOID *Core)
 {
     BOOL Success;
 
+    //AllocConsole();
+    //ShowWindow(GetConsoleWindow(), SW_SHOW);
+    //PrintConsole(L"%p: query\n", (ULONG)NtGetTickCount());
+    NtTestAlert();
+
     Success = StubGetPlatformCore(Core);
     if (!Success)
         return Success;
@@ -865,13 +870,19 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
 
     if (Type == 0x30 && ReloginMgr != nullptr)
     {
-        PTX_DATA Data;
+        Io::SetAsyncCall(
+            [](PVOID)
+            {
+                PTX_DATA Data;
 
-        Util::Data::CreateTXData(&Data);
-        Data->SetDword(L"cReloginFlag", 2);
+                Util::Data::CreateTXData(&Data);
+                Data->SetDword(L"cReloginFlag", 2);
 
-        ReloginMgr->Relogin(nullptr, Data);
-        Data->Release();
+                ReloginMgr->Relogin(nullptr, Data);
+                Data->Release();
+            },
+            500
+        );
     }
 
     return hr;

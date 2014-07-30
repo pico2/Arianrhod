@@ -150,6 +150,17 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    SetAsyncCall(
+        [](PVOID)
+        {
+            PrintConsole(L"fuck\n");
+        },
+        500
+    );
+
+    LOOP_FOREVER
+        NtTestAlert();
+
     return;
 
 #if 0

@@ -34,10 +34,10 @@ INIT_STATIC_MEMBER(CTXStringW::StubIsEmpty);
 
 typedef struct TX_DATA : public IUnknown
 {
-    VOID SetDword(PCWSTR Name, ULONG Value)
+    VOID NTAPI SetDword(PCWSTR Name, ULONG Value)
     {
         API_POINTER(TX_DATA::SetDword) _SetDword;
-        *(PVOID *)&_SetDword = *(PVOID *)PtrAdd(this, 0xD0);
+        *(PVOID *)&_SetDword = *(PVOID *)PtrAdd(*(PVOID *)this, 0xD0);
         return (this->*_SetDword)(Name, Value);
     }
 
@@ -45,6 +45,7 @@ typedef struct TX_DATA : public IUnknown
 
 struct TXReloginMgr : public IUnknown
 {
+    virtual HRESULT NTAPI Login(PVOID Tray, PTX_DATA Data);
     virtual HRESULT NTAPI Relogin(PVOID Tray, PTX_DATA Data);
 };
 
