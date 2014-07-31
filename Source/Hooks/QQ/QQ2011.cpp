@@ -861,10 +861,9 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
 {
     HRESULT hr;
 
-    WCHAR buf[0x100];
-
-    swprintf(buf, L"掉线了 %p", Type);
-    MessageBoxW(0, buf, 0, 64);
+    //WCHAR buf[0x100];
+    //swprintf(buf, L"掉线了 %p", Type);
+    //MessageBoxW(0, buf, 0, 64);
 
     hr = StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
 
@@ -881,7 +880,7 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
                 ReloginMgr->Relogin(nullptr, Data);
                 Data->Release();
 
-                MessageBoxW(0, L"done", 0, 64);
+                //MessageBoxW(0, L"done", 0, 64);
             },
             500
         );
