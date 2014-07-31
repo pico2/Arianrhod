@@ -146,20 +146,103 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
+#pragma comment(lib, "XLMiniDownloadKernel2.lib")
+#include "D:\Desktop\src\xlacc_depend\src\XLMiniDownloadKernelSDK\XLMiniDownloadKernelSDK.h"
+
+#define TASK_NAME L"中文任务名"
+
+namespace xldl = xl::dl;
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    SetAsyncCall(
-        [](PVOID)
-        {
-            PrintConsole(L"fuck\n");
-        },
-        500
-    );
+    Rtl::SetWorkingDirectory(LR"(D:\Desktop\src\xlaccmain\bin\debug\)");
+    Ldr::LoadDll(LR"(XLMiniDownloadKernel2.dll)");
+    xldl::Initialize();
 
-    LOOP_FOREVER
-        NtTestAlert();
+    IXLDownloadTaskMgr* mgr = xldl::GetDownloadTaskMgr();
+
+    DOWNLOAD_TASK_FILE_INFO info[] =
+    {
+        {
+            L"中文文件名.7z",
+            L"http://ouroboros.github.io/bin/Tools/Android/adb-fastboot-win.7z",
+            392252,
+        },
+    };
+
+    IXLDownloadTask* task = mgr->CreateDownLoadTask(TASK_NAME, L"D:\\Desktop\\fucktest\\testfuck", info, countof(info));
+
+    BOOL Finished = FALSE;
+
+    auto TaskUIStateChange = [](LONG NewState, PVOID Finished)
+    {
+        PrintConsole(L"NewState: %p\n", NewState);
+
+        switch (NewState)
+        {
+            case DOWNLOADTASK_STATE_UI_FINISHED:
+            case DOWNLOADTASK_STATE_UI_STOPED:
+            case DOWNLOADTASK_STATE_UI_FAILED:
+                *(PBOOL)Finished = TRUE;
+                break;
+        }
+    };
+
+    auto TaskStateDetailChange = [](IXLDownloadTaskStatusDetail *Detail, PVOID Context)
+    {
+        ULONG64 recv, size;
+
+        recv = Detail->GetTotalReceiveValidSize();
+        size = Detail->GetResourceSize();
+
+        PrintConsole(
+            L"Detail:\n"
+            L"  Speed:          %I64d\n"
+            L"  Progress:       %I64d / %I64d (%d%%)\n"
+            L"  VIPCDNSpeed:    %I64d\n\n",
+
+            Detail->GetDownloadSpeed(),
+            recv, size, (ULONG)((double)recv / size * 100),
+            Detail->GetVIPCDNSpeed()
+        );
+    };
+
+    auto SubFileDownloadFinished = [](PXLDL_SUB_FILE_FINISED_INFO Info, PVOID Context)
+    {
+        PrintConsole(L"sub file: %s\n%s\n%s\n\n", Info->TaskName, Info->FileName, Info->RealFileName);
+    };
+
+    auto DownloadTaskFinished = [](PCWSTR TaskName, PVOID Finished)
+    {
+        PrintConsole(L"finish: %s\n\n", TaskName);
+    };
+
+    task->SetNotifyRoutine(DownloadTaskNotifyRoutines::TaskUIStateChange,       (PVOID)(DLTASKCB_TaskUIStateChange)TaskUIStateChange, &Finished);
+    task->SetNotifyRoutine(DownloadTaskNotifyRoutines::TaskStateDetailChange,   (PVOID)(DLTASKCB_TaskStateDetailChange)TaskStateDetailChange, 0);
+    task->SetNotifyRoutine(DownloadTaskNotifyRoutines::SubFileDownloadFinished, (PVOID)(DLTASKCB_SubFileDownloadFinished)SubFileDownloadFinished, 0);
+    task->SetNotifyRoutine(DownloadTaskNotifyRoutines::DownloadTaskFinished,    (PVOID)(DLTASKCB_DownloadTaskFinished)DownloadTaskFinished, &Finished);
+
+    task->StartTaskAsync();
+    task->UseVipCdn();
+
+    while (Finished == FALSE)
+    {
+        MSG msg;
+
+        GetMessageW(&msg, 0, 0, 0);
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
+
+    WCHAR p[MAX_NTPATH];
+    task->GetTaskName(p, countof(p));
+    PrintConsole(L"%s\n", p);
+
+    task->DeleteTaskAsync();
+
+    Ps::ExitProcess(0);
 
     return;
 
