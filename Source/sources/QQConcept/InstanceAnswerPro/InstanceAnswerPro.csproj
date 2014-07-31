@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A8F8C554-4237-413E-A117-FFD2E6AE8D71}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InstanceAnswerPro</RootNamespace>
+    <AssemblyName>InstanceAnswerPro</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Application\Bin\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>InstanceAnswerPro.AppEntryPoint</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bama.Controls">
+      <HintPath>..\Application\Bin\AppBackup\Bama.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Bama.Debug, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Application\Bin\AppBackup\Bama.Debug.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.KernelWrapper">
+      <HintPath>..\..\IMInterop\Interop.KernelWrapper.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ContactPanel.cs" />
+    <Compile Include="ElementTreeHelper.cs" />
+    <Compile Include="MemoryManager.cs" />
+    <Compile Include="MessageGroup.cs" />
+    <Compile Include="MessageListPanel.xaml.cs">
+      <DependentUpon>MessageListPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ObservableCollectionHelper.cs" />
+    <Compile Include="VerifyCodeUI\VerifyCodeWindow.xaml.cs">
+      <DependentUpon>VerifyCodeWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="VerifyCodeUI\ReLoginWindow .xaml.cs">
+      <DependentUpon>ReLoginWindow .xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RecentContactsPanel.xaml.cs">
+      <DependentUpon>RecentContactsPanel.xaml</DependentUpon>
+    </Compile>
+    <Page Include="CommunityListPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContactListPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MessageListPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="QQTips.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VerifyCodeUI\ReLoginWindow .xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AppEntryPoint.cs" />
+    <Compile Include="CommunityListPanel.xaml.cs">
+      <DependentUpon>CommunityListPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContactListPanel.xaml.cs">
+      <DependentUpon>ContactListPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="RecentContactsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VerifyCodeUI\VerifyCodeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\7.Documents\Reflector\Disassembler\Bama.QQ.Core\InstanceAnswerPro.Core.csproj">
+      <Project>{8ABD2741-2824-49E0-8A9C-A4D48BA810B9}</Project>
+      <Name>InstanceAnswerPro.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InstanceAnswerPro.API\InstanceAnswerPro.API.csproj">
+      <Project>{50AAFBBD-40E9-4AD5-B0D1-93BAA5207A65}</Project>
+      <Name>InstanceAnswerPro.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InstanceAnswerPro.Controls\InstanceAnswerPro.Controls.csproj">
+      <Project>{4039FAF3-94DA-4AA3-84ED-70D307EF7160}</Project>
+      <Name>InstanceAnswerPro.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InstanceAnswerPro.IM.Controls\InstanceAnswerPro.IM.Controls.csproj">
+      <Project>{493F38B2-3B61-4F71-8AB6-EB2022713DF0}</Project>
+      <Name>InstanceAnswerPro.IM.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InstanceAnswerPro.IM.ModuleInterface\InstanceAnswerPro.IM.ModuleInterface.csproj">
+      <Project>{CE4838D6-F7D6-4383-ABE1-3DCABC84B0D3}</Project>
+      <Name>InstanceAnswerPro.IM.ModuleInterface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

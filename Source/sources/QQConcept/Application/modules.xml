@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="gb2312"?>
+<BamaQQModules>
+	<Settings>
+		<DelayLoad Delay="2000" Interval="200"/>
+	</Settings>
+	<SystemModules>
+		
+	</SystemModules>
+	<CommonModules>
+		<Module DelayLoad="0" Identifier="InstanceAnswerPro.Conversation">InstanceAnswerPro.Conversation.dll</Module>
+	</CommonModules>
+</BamaQQModules>

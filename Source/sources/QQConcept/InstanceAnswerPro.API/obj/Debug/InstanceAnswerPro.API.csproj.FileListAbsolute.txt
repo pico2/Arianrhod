@@ -1,0 +1,5 @@
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.API\bin\Debug\InstanceAnswerPro.API.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.API\bin\Debug\InstanceAnswerPro.API.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.API\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.API\obj\Debug\InstanceAnswerPro.API.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.API\obj\Debug\InstanceAnswerPro.API.pdb

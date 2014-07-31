@@ -1,0 +1,123 @@
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\QQTips.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.lref
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.g.resources
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.Properties.Resources.resources
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.exe
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.exe
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.exe
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.exe
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\QQTips.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.cache
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.lref
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.g.resources
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.Properties.Resources.resources
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+G:\Users\Shift\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.exe
+G:\Users\Shift\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.pdb
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.csprojResolveAssemblyReference.cache
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\QQTips.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.cache
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.lref
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.baml
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.g.resources
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.Properties.Resources.resources
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.csproj.GenerateResource.Cache
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.exe
+G:\Users\Shift\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.pdb
+E:\7.TINY\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.exe
+E:\7.TINY\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\QQTips.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\App.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\CommunityListPanel.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\ContactListPanel.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MessageListPanel.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\ReLoginWindow .g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\LoginWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\RecentContactsPanel.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\VerifyCodeUI\VerifyCodeWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro_MarkupCompile.lref
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\MainWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.g.resources
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.Properties.Resources.resources
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.exe
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro\obj\x86\Debug\InstanceAnswerPro.pdb

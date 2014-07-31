@@ -1,0 +1,643 @@
+﻿<Window x:Class="InstanceAnswerPro.Conversation.ContactSessionWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local ="clr-namespace:InstanceAnswerPro.Conversation"
+            xmlns:controls ="  clr-namespace:InstanceAnswerPro.Controls;assembly=InstanceAnswerPro.Controls"
+            xmlns:imControls =" clr-namespace:InstanceAnswerPro.IM.Controls;assembly=InstanceAnswerPro.IM.Controls"
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="300"  xmlns:Bama_Controls="clr-namespace:Bama.Controls;assembly=Bama.Controls">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Bama.QQ.Conversation;component/shared.xaml" />
+                <ResourceDictionary>
+                    <Border x:Name="AIOBuddyTips"  BorderBrush="Transparent" BorderThickness="0" Background="Transparent">
+                        <Grid Width="272" Margin="10" RenderTransformOrigin="0.5,0.5">
+                            <Border Margin="0,0,0,-1" BorderBrush="Black" BorderThickness="1" CornerRadius="2" />
+                            <Grid Margin="0,1,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" HorizontalAlignment="Left" Margin="11,10,0,0" VerticalAlignment="Top" Width="78" Height="130" ClipToBounds="false" BorderBrush="#FFFFFFFF" BorderThickness="1,1,1,1" CornerRadius="1,1,1,1" >
+                                    <controls:ImageEx Width="80" Height="130" ClipToBounds="false" SnapsToDevicePixels="true" Stretch="Uniform" ForceGifAnim="true" Source="{Binding Path=GifShowPath}" />
+                                </Border>
+                                <Grid Grid.Row="0" HorizontalAlignment="Stretch" Margin="100,11,11,0" VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="17,0,0,0" Orientation="Horizontal" Height="21">
+                                        <TextBlock Style="{StaticResource HyperlinkTextBlock}" VerticalAlignment="Top" HorizontalAlignment="Left" Height="18" FontSize="13" FontWeight="Bold" TextWrapping="Wrap" Tag="{Binding Path=Uin}" ToolTip="{Binding Path=CombineName}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource StringTrimConverter}">
+                                                    <Binding Path="NickName" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <TextBlock Margin="0,0,0,1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="18" FontSize="11" FontWeight="Normal" Foreground="#FF000000" TextWrapping="Wrap" ToolTip="{Binding Path=CombineName}" Text="{Binding Path=Uin, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}, ConverterParameter=({0})}" />
+                                    </StackPanel>
+                                    <TextBlock MaxHeight="83" TextTrimming="CharacterEllipsis" Grid.Row="0" Margin="1,18,0,0" FontSize="12" FontWeight="Normal" TextWrapping="Wrap" Foreground="#FF505050" VerticalAlignment="Top" Padding="0,4,0,0" Visibility="{Binding FallbackValue=Collapsed, Path=LongNickName, Converter={StaticResource MultiFunctionConverter}}" Text="{Binding Path=LongNickName}" ToolTip="{Binding Path=LongNickName}" />
+                                    <TextBlock Grid.Row="1" FontSize="12" FontWeight="Normal" TextWrapping="Wrap" Foreground="#FF00647E" HorizontalAlignment="Left" Width="65" Text="{Binding Path=QQLevelInfo.QQLevel, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}, ConverterParameter=等级:{0}}" ToolTip="{Binding Path=QQLevelInfo.QQLevelTip, Mode=OneWay}" />
+                                    <controls:PixelBitmap Grid.Row="1" Margin="0,4,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="29" Height="13" SnapsToDevicePixels="true" Source="{Binding Path=QQLevelInfo.QQVipLevel, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}}" Visibility="{Binding FallbackValue=Collapsed, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}}" ToolTip="{Binding Path=QQLevelInfo.QQVipLevel, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}, ConverterParameter=会员成长阶段: VIP{0}}" />
+                                    
+                                </Grid>
+                                <!--<Border Margin="11,10,11,4" Grid.Row="1">
+                                    <imControls:QZoneCtrl Visibility="{Binding FallbackValue=Collapsed, Path=QZoneInfo, Converter={StaticResource MultiFunctionConverter}, ConverterParameter={Static ToVisibility_ByObject}}" />
+                                </Border>-->
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Mouse.MouseEnter" SourceName="sendfile">
+            <BeginStoryboard Storyboard="{StaticResource sendfile}" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Mouse.MouseLeave" SourceName="sendfile">
+            <BeginStoryboard Name="sendfile2_BeginStoryboard" Storyboard="{StaticResource sendfile2}" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Mouse.MouseEnter" SourceName="mail">
+            <BeginStoryboard Storyboard="{StaticResource mail}" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Mouse.MouseLeave" SourceName="mail">
+            <BeginStoryboard Name="mail2_BeginStoryboard" Storyboard="{StaticResource mail2}" />
+        </EventTrigger>
+    </Window.Triggers>
+    <Window.CommandBindings>
+        <CommandBinding Command="local:ContactSessionWindowCommands.CloseWindow" />
+    </Window.CommandBindings>
+    <Grid Name="LayoutRoot" ZIndex="0" HorizontalAlignment="Stretch" Width="Auto" RenderTransformOrigin="0.5,0.5">
+        <Image Name="big_hammer" VerticalAlignment="Top" HorizontalAlignment="Left" Height="100" Width="100" Source="res/big_hammer.png" Stretch="Fill" Margin="203,-38,0,0" Visibility="Hidden" RenderTransformOrigin="0.91,0.8">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                    <SkewTransform AngleX="0" AngleY="0" />
+                    <RotateTransform Angle="0" />
+                    <TranslateTransform X="0" Y="0" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <Grid Name="mainwndGrid" Focusable="true" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border Name="headerBackground" Height="Auto" BorderBrush="#FF000000" BorderThickness="0,1,1,0" CornerRadius="4,4,0,0" VerticalAlignment="Stretch" Grid.Row="0" RowSpan="1">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.5,0" StartPoint="0.5,0.991">
+                        <GradientStop Color="#FF001726" Offset="0.01" />
+                        <GradientStop Color="#FF27383D" Offset="0.982" />
+                        <GradientStop Color="#FF001726" Offset="0.8" />
+                        <GradientStop Color="#FF0C212D" Offset="0.867" />
+                        <GradientStop Color="#FF6994A1" Offset="1" />
+                        <GradientStop Color="#FF8B8B8B" Offset="0" />
+                        <GradientStop Color="#FF001726" Offset="0.698" />
+                        <GradientStop Color="#FF001726" Offset="0.7" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid Margin="0,0,0,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="70" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Name="toolBar" Width="Auto" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" Margin="0,-5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid Name="sendfile" Margin="8,0,0,0" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Top" Width="32" Height="32" ClipToBounds="false" RenderTransformOrigin="0.5,0.5" ToolTip="发送文件">
+                            <Grid.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    <SkewTransform AngleX="0" AngleY="0" />
+                                    <RotateTransform Angle="0" />
+                                    <TranslateTransform X="0" Y="0" />
+                                </TransformGroup>
+                            </Grid.RenderTransform>
+                            <Ellipse Name="ellipse" StrokeThickness="0.5" Margin="3.076,9.636,8.568,2.008" Fill="#FF000000" Stroke="{x:Null}" />
+                            <Rectangle Name="rectangle" StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" Margin="0,0,4.655,-15.872" VerticalAlignment="Bottom" Height="15.462" RenderTransformOrigin="0.5,0.5" Stroke="{x:Null}">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.522,0.707" StartPoint="0.522,-0.337">
+                                        <GradientStop Color="#7FC17800" Offset="0" />
+                                        <GradientStop Color="#00FFB004" Offset="0.996" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                                <Rectangle.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="0" />
+                                        <TranslateTransform X="0" Y="0" />
+                                    </TransformGroup>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+                            <Path Stretch="Fill" Margin="0.202,0,7.798,1.59" VerticalAlignment="Bottom" Height="22.356" Data="F0 M 0,1.5 C 0,0.67157288 0.45954671,2.144663E-15 0.631,2.144663E-15 L 22.5,0 C 23.328427,0 24,0.67157288 24,1.5 L 24,20.856 C 24,21.684427 23.328427,22.356 22.5,22.356 L 1.5,22.356 C 0.67157288,22.356 0,19.328427 0,18.5 Z" Stroke="{x:Null}">
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.506,-0.035" StartPoint="0.506,0.957">
+                                        <GradientStop Color="#FF916116" Offset="0.92" />
+                                        <GradientStop Color="#FFCEA058" Offset="0.947" />
+                                        <GradientStop Color="#FF160E02" Offset="0.098" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                            <Path Name="_1" Stretch="Fill" Margin="2.511,10.279,6.701,2.832" Data="F0 M 0,1 C 0,0.44771525 -0.10375128,6.5522789E-15 0.44853347,6.5522789E-15 L 22.256023,-5.5511151E-16 C 22.808307,-5.5511151E-16 22.78,0.44771525 22.78,1 L 22.78,17.889 C 22.78,18.441285 22.332285,18.889 21.78,18.889 L 1,18.889 C 0.44771525,18.889 0,18.441285 0,17.889 Z" StrokeThickness="0.5" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+                                <Path.Stroke>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Stroke>
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.499,-0.035" StartPoint="0.499,0.965">
+                                        <GradientStop Color="#00727272" Offset="0" />
+                                        <GradientStop Color="#99ECECEC" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="0" />
+                                        <TranslateTransform X="0" Y="0" />
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                            <Path Name="_2" Stretch="Fill" Margin="2.511,10.279,6.701,2.832" Data="F0 M 0,1 C 0,0.44771525 -0.10375128,6.5522789E-15 0.44853347,6.5522789E-15 L 22.256023,-5.5511151E-16 C 22.808307,-5.5511151E-16 22.78,0.44771525 22.78,1 L 22.78,17.889 C 22.78,18.441285 22.332285,18.889 21.78,18.889 L 1,18.889 C 0.44771525,18.889 0,18.441285 0,17.889 Z" StrokeThickness="0.5" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+                                <Path.Stroke>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Stroke>
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.499,-0.035" StartPoint="0.499,0.965">
+                                        <GradientStop Color="#00727272" Offset="0" />
+                                        <GradientStop Color="#99ECECEC" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="0" />
+                                        <TranslateTransform X="0" Y="0" />
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                            <Path Name="path" Stretch="Fill" Margin="2.511,10.279,6.701,2.832" Data="F0 M 0,1 C 0,0.44771525 -0.10375128,6.5522789E-15 0.44853347,6.5522789E-15 L 22.256023,-5.5511151E-16 C 22.808307,-5.5511151E-16 22.78,0.44771525 22.78,1 L 22.78,17.889 C 22.78,18.441285 22.332285,18.889 21.78,18.889 L 1,18.889 C 0.44771525,18.889 0,18.441285 0,17.889 Z" StrokeThickness="0.5" RenderTransformOrigin="0.5,0.5">
+                                <Path.Stroke>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF101010" Offset="0" />
+                                        <GradientStop Color="#FF414141" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Stroke>
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.499,-0.035" StartPoint="0.499,0.965">
+                                        <GradientStop Color="#FF727272" Offset="0" />
+                                        <GradientStop Color="#FFECECEC" Offset="0.924" />
+                                        <GradientStop Color="#FFFFFFFF" Offset="0.924" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="0" />
+                                        <TranslateTransform X="0" Y="0" />
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                            <Path Stretch="Fill" Margin="4.052,11.864,4.655,0.5" Data="F0 M 1.214273,1.5 C 1.214273,0.67157288 1.6041862,-4.3917364E-14 1.8698079,-4.3917364E-14 4.4805858,-4.3917364E-14 7.9365,0 9.249,0 10.5615,0 10.999,0.91183333 11.214888,1.4181648 L 11.969105,3 22.5,3 C 23.328427,3 24,3.6715729 24,4.5 L 24,18.5 C 24,19.328427 23.328427,20 22.5,20 L 0.65077297,20 C -0.17765413,20 1.214273,19.328427 1.214273,18.5 Z" StrokeThickness="0.5">
+                                <Path.Stroke>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FFAB7B00" Offset="0" />
+                                        <GradientStop Color="#FF885300" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Stroke>
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.439,0.151" StartPoint="0.667,1.113">
+                                        <GradientStop Color="#FF553809" Offset="0" />
+                                        <GradientStop Color="#7FFFAF00" Offset="1" />
+                                        <GradientStop Color="#C3A96C00" Offset="0.564" />
+                                        <GradientStop Color="#BCC48B16" Offset="0.551" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                            <Path Stretch="Fill" HorizontalAlignment="Left" Margin="0.193,8.054,0,0.5" Width="5.914" Data="F0 M 0.39047978,0 C 0.76410171,0 0.90945655,0.44771801 0.90945635,1 0.90945635,7 0.90945635,16.788493 0.90945635,19.428652 0.90945635,22.068811 3.7451346,22.735972 3.7451346,20.683972 3.7451346,18.631971 3.7451346,9.884614 3.7451346,4.8086982 3.7451346,4.256414 3.8904907,3.8941206 4.2641112,3.8941206 4.6377324,3.8941206 4.8115568,4.3418367 4.8115568,4.8941206 L 4.8115568,20.646564 C 4.8115568,22.182032 3.6014166,23.707886 2.4913176,23.326056 0.65463964,22.694312 -0.037621273,21.128232 -0.0074798085,18.147647 0.0078028812,16.636394 0.00037144305,6.8282891 0.00055716457,1 0.00055691475,0.44771791 0.016857464,0 0.39047978,0 Z" Stroke="{x:Null}">
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="-0.718,0.414" StartPoint="0.932,0.679">
+                                        <GradientStop Color="#FF5B3800" Offset="0" />
+                                        <GradientStop Color="#FFB98E4D" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                            <Rectangle StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" Margin="6.106,12.415,0,0" VerticalAlignment="Top" Height="1" Fill="#FFFFF7C7" Width="7.934" HorizontalAlignment="Left" Stroke="{x:Null}" />
+                            <Rectangle Fill="#FFFFF7C7" StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" Margin="15.625,15.338,5.212,15.662" Height="1" Stroke="{x:Null}" />
+                            <Path Name="path1" Stretch="Fill" StrokeThickness="0.5" Margin="4.163,1.679,3.562,12.717" RenderTransformOrigin="0.753568280648686,0.343215935181817" Data="F0 M 27.837174,0.25115117 C 28.303597,-0.29328488 28.506866,0.20206518 28.506866,0.45132509 L 30.700186,14.679675 C 30.700186,14.928934 30.498135,15.131 30.248893,15.131 L 16.020479,12.937679 C 15.771237,12.937679 15.020457,12.618441 15.724836,12.0195 15.724836,12.0195 17.373831,10.122041 19.14325,8.6371255 13.976214,3.6080897 -0.6041045,8.813071 1.8872433,22.042975 0.41222078,18.278224 -0.35694409,13.057209 1.106905,9.5863239 1.472868,8.7186033 1.9312391,7.8746416 2.4844847,7.0676452 6.9104357,0.6116827 16.406896,-1.7084233 22.863199,2.7177673 L 24.11805,3.539974 24.65292,3.0051055 C 26.847793,0.81023995 27.837174,0.25115162 27.837174,0.25115117 Z">
+                                <Path.Stroke>
+                                    <LinearGradientBrush EndPoint="0.568,0.419" StartPoint="0.019,0.583">
+                                        <GradientStop Color="#0000FFF2" Offset="0.16" />
+                                        <GradientStop Color="#FF00411D" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Stroke>
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="25.206" />
+                                        <TranslateTransform X="0.74385576435874157" Y="1.6692321427742254" />
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.895,0.161" StartPoint="0.035,0.617">
+                                        <GradientStop Color="#E5CAFF81" Offset="0.92" />
+                                        <GradientStop Color="#66E1FF97" Offset="0" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                            <Rectangle Fill="#33FFF7C7" StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" Margin="6.044,0,5.593,0.954" Height="1" VerticalAlignment="Bottom" Stroke="{x:Null}" />
+                        </Grid>
+                        <Grid Name="mail" Margin="8,0,0,0" HorizontalAlignment="Right" Grid.Column="2" VerticalAlignment="Top" Width="38" Height="38.542" ToolTip="发送邮件">
+                            <Grid Name="grid1" Margin="6,0,0,6.542" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="0" />
+                                        <TranslateTransform X="0" Y="0" />
+                                    </TransformGroup>
+                                </Grid.RenderTransform>
+                                <Ellipse Name="ellipse1" Fill="#FF000000" StrokeThickness="0.5" Margin="6.607,11.898,7.681,2.391" Stroke="{x:Null}" />
+                                <Rectangle StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" Margin="2,11,2,1">
+                                    <Rectangle.Stroke>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF24506A" Offset="0" />
+                                            <GradientStop Color="#FF091D29" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Stroke>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFEEEEEE" Offset="0.196" />
+                                            <GradientStop Color="#FFBFBFBF" Offset="0.907" />
+                                            <GradientStop Color="#FFC3D7E4" Offset="0.956" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Path Stretch="Fill" StrokeThickness="0.5" Margin="2.677,0,2.675,1.943" Data="F0 M -6.8962598,2.25 C -6.8962598,1.1454305 -6.6704352,-0.0060054351 -5.5658657,-0.0060054351 L 17.555723,-0.0060054351 C 18.660293,-0.0060054351 18.886141,1.1454305 18.886141,2.25 18.886141,2.25 12.775016,6.6604243 10.228488,10.193272 L 1.7432268,10.193272 C -1.5295838,6.3938317 -6.8962598,2.25 -6.8962598,2.25 Z" VerticalAlignment="Bottom" Height="11.116" RenderTransformOrigin="0.5,0.5">
+                                    <Path.Stroke>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0.353">
+                                            <GradientStop Color="#0024506A" Offset="0" />
+                                            <GradientStop Color="#FF091D29" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Path.Stroke>
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF8F8F8F" Offset="0" />
+                                            <GradientStop Color="#FFD8D8D8" Offset="0.12" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="-1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="0" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                </Path>
+                                <Path Name="path4" Stretch="Fill" StrokeThickness="0.5" Margin="3.141,12.722,3.137,9.211" Data="F0 M -7.012019,1.1262071 C -7.012019,0.021637644 -6.6704352,-0.0060054351 -5.5658657,-0.0060054351 L 17.555723,-0.0060054351 C 18.660293,-0.0060054351 19.108165,0.021637644 19.108165,1.1262071 19.108165,1.1262071 11.984768,10.193272 8.5713149,10.193272 L 2.8203888,10.193272 C 0.2231964,10.193272 -7.012019,1.1262071 -7.012019,1.1262071 Z" RenderTransformOrigin="0.5,0.5" Stroke="{x:Null}">
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#33000000" Offset="1" />
+                                            <GradientStop Color="#FF515151" Offset="0.289" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="0" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                </Path>
+                                <Path Name="path2" Stretch="Fill" StrokeThickness="0.5" Margin="2.651,11.582,2.651,10.643" Data="F0 M -6.9188751,2.25 C -6.9529235,0.83726202 -6.6704352,0.22155666 -5.5658657,0.22155666 L 17.555722,0.22155666 C 18.660292,0.22155666 18.908759,1.1454305 18.908759,2.25 18.908759,2.25 9.9581397,10.193272 8.5713149,10.193272 L 2.8203888,10.193272 C 1.462168,10.193272 -6.9188751,2.25 -6.9188751,2.25 Z" RenderTransformOrigin="0.5,0.5">
+                                    <Path.Stroke>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0.353">
+                                            <GradientStop Color="#0024506A" Offset="0" />
+                                            <GradientStop Color="#FF091D29" Offset="0.84" />
+                                        </LinearGradientBrush>
+                                    </Path.Stroke>
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFFFFFFF" Offset="0.191" />
+                                            <GradientStop Color="#FFBFBFBF" Offset="0" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="0" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                </Path>
+                                <Path Name="path3" Stretch="Fill" StrokeThickness="0.5" Margin="4.69,11.898,5.219,12.614" Data="F0 M 4.7096227,10.906922 C 4.7096227,10.906922 7.8259261,17.885926 15.444974,17.885926 23.064021,17.885926 26.280643,11.028766 26.280643,11.028766 Z" RenderTransformOrigin="0.5,0.5" Stroke="{x:Null}">
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#00FFFFFF" Offset="0" />
+                                            <GradientStop Color="#7FBFBFBF" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="0" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                </Path>
+                                <Rectangle Name="rectangle1" StrokeThickness="0.5" RadiusX="1.5" RadiusY="1.5" Margin="2,0,2,-19" VerticalAlignment="Bottom" Height="20" RenderTransformOrigin="0.5,0.5" Stroke="{x:Null}">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#4CEEEEEE" Offset="0" />
+                                            <GradientStop Color="#00BFBFBF" Offset="0.6" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="0" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                </Rectangle>
+                            </Grid>
+                            <Grid Name="grid2" Margin="0,6.542,6,0" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform AngleX="0" AngleY="0" />
+                                        <RotateTransform Angle="0" />
+                                        <TranslateTransform X="0" Y="0" />
+                                    </TransformGroup>
+                                </Grid.RenderTransform>
+                                <Path Stretch="Fill" StrokeThickness="0.5" Margin="0,0,-0.479,6.188" Data="F0 M 0.57212886,0.75 C 0.57212886,0.47385763 0.79598648,0.25 1.0721289,0.25 L 4.1898711,0.25 C 4.4660135,0.25 4.6898711,0.47385763 4.6898711,0.75 L 5.3342252,8.7 C 5.3342252,8.9761424 2.6395452,13.875709 2.6395452,13.875709 2.6395452,13.875709 -0.072153574,8.9761424 -0.072153574,8.7 Z" Width="3.843" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Bottom" Height="9.186">
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="0.1633416664540901" Y="-0.067658333545912441" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                    <Path.Stroke>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF24506A" Offset="0" />
+                                            <GradientStop Color="#FF091D29" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Path.Stroke>
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFEEEEEE" Offset="0.196" />
+                                            <GradientStop Color="#FFBFBFBF" Offset="0.907" />
+                                            <GradientStop Color="#FFE4E0C3" Offset="0.956" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                                <Ellipse StrokeThickness="0.5" HorizontalAlignment="Right" Margin="0,0,2.501,12.107" VerticalAlignment="Bottom" Width="1.222" Height="1.22" Fill="#FF000000" Stroke="{x:Null}" />
+                                <Rectangle StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" Margin="7.88,-1.689,0,0" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" Height="2.695" HorizontalAlignment="Left" Width="2.962" Stroke="{x:Null}">
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush EndPoint="1.252,0.5" StartPoint="-0.116,0.5">
+                                            <GradientStop Color="#FF666666" Offset="0.169" />
+                                            <GradientStop Color="#FF868686" Offset="0.756" />
+                                            <GradientStop Color="#FFFFFFFF" Offset="0.476" />
+                                            <GradientStop Color="#FFF2F2F2" Offset="0.876" />
+                                            <GradientStop Color="#FFA7A7A7" Offset="0" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Path Stretch="Fill" Stroke="#FF5B5B5B" StrokeThickness="0.2" HorizontalAlignment="Right" Margin="0,7.635,6.366,11.849" Width="4.197" RenderTransformOrigin="0.5,0.5" Data="F0 M 0.1,1.1 C 0.1,0.54771525 0.54771525,0.1 1.1,0.1 L 3.097,0.1 C 3.6492847,0.1 4.097,0.54771525 4.097,1.1 L 3.9060794,11.606921 C 3.9060794,12.159205 3.6492847,12.416 3.097,12.416 L 1.1,12.416 C 0.54771525,12.416 0.29092063,12.159205 0.29092063,11.606921 Z">
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="-8.8817841970012523E-16" Y="0" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="1.252,0.5" StartPoint="-0.116,0.5">
+                                            <GradientStop Color="#FF7A7A7A" Offset="0.151" />
+                                            <GradientStop Color="#FF8E8E8E" Offset="0.72" />
+                                            <GradientStop Color="#FFFFFFFF" Offset="0.476" />
+                                            <GradientStop Color="#FFF2F2F2" Offset="0.876" />
+                                            <GradientStop Color="#FFA7A7A7" Offset="0" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                                <Rectangle StrokeThickness="0.5" RadiusX="1" RadiusY="1" Margin="12.178,-2.428,14.864,0" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" Height="14.78" Stroke="{x:Null}">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush EndPoint="1.252,0.5" StartPoint="-0.116,0.5">
+                                            <GradientStop Color="#FF000000" Offset="0" />
+                                            <GradientStop Color="#FF000000" Offset="1" />
+                                            <GradientStop Color="#FF595959" Offset="0.556" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                </Rectangle>
+                                <Rectangle StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" Height="2.817" HorizontalAlignment="Right" Width="5.527" Margin="0,8.659,9.56,0" Stroke="{x:Null}">
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush EndPoint="1.252,0.5" StartPoint="-0.116,0.5">
+                                            <GradientStop Color="#FF686868" Offset="0.169" />
+                                            <GradientStop Color="#FF828282" Offset="0.769" />
+                                            <GradientStop Color="#FFFFFFFF" Offset="0.573" />
+                                            <GradientStop Color="#FFF2F2F2" Offset="0.84" />
+                                            <GradientStop Color="#FFA7A7A7" Offset="0.111" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Path Stretch="Fill" Stroke="#FF000000" StrokeThickness="0" HorizontalAlignment="Right" Margin="0,9.659,6.034,12.874" Width="3.87" RenderTransformOrigin="0.5,0.5" Data="F0 M 0.038184582,0.076370111 L 3.9069991,0.076371218 3.7542635,9.5423708 0.19092063,9.5423694 Z">
+                                    <Path.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="0.0057720779386394305" Y="0.012935028842548935" />
+                                        </TransformGroup>
+                                    </Path.RenderTransform>
+                                    <Path.Fill>
+                                        <LinearGradientBrush EndPoint="1.252,0.5" StartPoint="-0.116,0.5">
+                                            <GradientStop Color="#FF8E8E8E" Offset="0.582" />
+                                            <GradientStop Color="#FF000000" Offset="1" />
+                                            <GradientStop Color="#FF000000" Offset="0" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                                <Path Fill="#FF000000" Stretch="Fill" Stroke="#FF000000" StrokeThickness="0.5" HorizontalAlignment="Right" Margin="0,0,-1.844,7.745" VerticalAlignment="Bottom" Width="5.141" Height="5.156" Data="F0 M 27.974323,18.173459 L 33.275498,23.493722 " StrokeEndLineCap="Round" />
+                                <Rectangle StrokeThickness="0.5" RadiusX="0.5" RadiusY="0.5" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" Height="1.04" Margin="8.982,1.163,0,0" HorizontalAlignment="Left" Width="4.865" Stroke="{x:Null}">
+                                    <Rectangle.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                            <SkewTransform AngleX="0" AngleY="0" />
+                                            <RotateTransform Angle="-45" />
+                                            <TranslateTransform X="0" Y="0" />
+                                        </TransformGroup>
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush EndPoint="1.252,0.5" StartPoint="-0.116,0.5">
+                                            <GradientStop Color="#FF686868" Offset="0.169" />
+                                            <GradientStop Color="#FF828282" Offset="0.769" />
+                                            <GradientStop Color="#FFFFFFFF" Offset="0.573" />
+                                            <GradientStop Color="#FFF2F2F2" Offset="0.84" />
+                                            <GradientStop Color="#FFA7A7A7" Offset="0.111" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid Name="qqshowGrid" Width="48" Height="48" RenderTransformOrigin="0.5,0.5" Grid.Row="0" Grid.Column="0" RowSpan="2" Margin="10,4,0,0">
+                        <Border Name="border" RenderTransformOrigin="0.675,0.425" CornerRadius="2,2,2,2" BorderThickness="1,1,1,1" OpacityMask="#FF000000" Width="48" Height="48">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FF366C82" Offset="0.004" />
+                                    <GradientStop Color="#FF173949" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.495,0" StartPoint="0.505,1">
+                                    <GradientStop Color="#FF173B4B" Offset="0" />
+                                    <GradientStop Color="#FF345A6A" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        <Border Visibility="Visible" Margin="3,3,3,3" Background="#FF000000" BorderBrush="#FF05364F" BorderThickness="1,1,1,1">
+                            <Grid Background="White">
+                                <Image Name="contactImage" Width="40" Height="40" Style="{StaticResource contactImageStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                <Image Width="12" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,2,2" Source="{Binding Path=PresenceInfo, Converter={StaticResource StatusToMaskConverterNoOnlineAndOfflineMask}}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <Grid Height="Auto" HorizontalAlignment="Stretch" SnapsToDevicePixels="true" Grid.Row="1" Grid.Column="1" RowSpan="1" Margin="5,-3,0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0" />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="1" TextTrimming="CharacterEllipsis" FontSize="11" Foreground="#FFF0F0F0" Text="{Binding Path=LongNickName}" />
+                        <StackPanel Orientation="Horizontal" Grid.Row="2">
+                            <Bama_Controls:ImageEx IsCache="true" ForceGifAnim="true" Source="pack://application:,,,/Bama.QQ.Application;Component/res/InputAnimate.gif" Stretch="None" Visibility="{Binding Path=Inputstauts, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" />
+                            <TextBlock Margin="0,0,0,0" FontSize="11" Foreground="#FFEDEDED" Text="{Binding Path=PresenceInfo, Converter={StaticResource StatusConverter}}" />
+                        </StackPanel>
+                    </Grid>
+                    <Bama_Controls:WindowControlBox Name="controlBox" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,7,10,0" Grid.Row="0" Grid.Column="3" Owner="{Binding ElementName=window}" />
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,8,0,0">
+                        <TextBlock FontSize="12" Foreground="White" Text="{Binding Path=CombineName}" />
+                        <Bama_Controls:PixelBitmap Margin="0,2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" SnapsToDevicePixels="true" ToolTip="{Binding Path=QQLevelInfo.QQVipLevel, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}, ConverterParameter=会员成长阶段: VIP{0}}" Source="{Binding Path=QQLevelInfo.QQVipLevel, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}}" Visibility="{Binding FallbackValue=Collapsed, Mode=OneWay, Converter={StaticResource MultiFunctionConverter}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border Name="allinone_body" Background="#FF4F5357" BorderBrush="#FF000000" BorderThickness="1,0,1,1" CornerRadius="0,0,4,4" Grid.Column="0" Grid.Row="1" />
+            <StackPanel Name="expandbar" HorizontalAlignment="Left" ZIndex="100" Grid.RowSpan="1" Grid.Row="2" Margin="4,5,0,3" DataContext="{Binding}" />
+            <DockPanel Grid.Row="2" Grid.RowSpan="1" Margin="3,5,3,3">
+                <Bama_Controls:SingleRowItemsControl Name="sessionsControl" DockPanel.Dock="Bottom" Height="34" VerticalAlignment="Bottom" IsSynchronizedWithCurrentItem="True" HorizontalAlignment="Stretch" TabItemMaxWidth="200" Focusable="false" AllowDelete="true" AllowAddNew="false" AddNewTabToEnd="false" ItemTemplate="{DynamicResource SessionsTemplate}" TabItemMinWidth="20" Style="{DynamicResource sessionscontrol}" ItemContainerStyle="{DynamicResource TabItemStyle1}" BorderThickness="0,1,0,1" />
+                <Grid Name="Grid" Width="Auto" Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="10" />
+                        <RowDefinition Height="30" MinHeight="0" />
+                        <RowDefinition Height="0.1*" MinHeight="95" MaxHeight="300" />
+                    </Grid.RowDefinitions>
+                    <imControls:InputBox Name="OutputBox" Background="#FFFFFFFF" SnapsToDevicePixels="true" ClipToBounds="false" IsDocumentEnabled="true" VerticalScrollBarVisibility="Auto" BorderThickness="0,0,0,0" IsReadOnly="true" Margin="0,0,0,1" Style="{DynamicResource RichTextBoxStyle1}" IsTabStop="false" Focusable="true" BorderBrush="{x:Null}">
+                        <imControls:InputBox.Resources>
+                            <Style x:Key="{x:Type Paragraph}" TargetType="{x:Type Paragraph}">
+                                <Setter Property="Margin" Value="0,2,2,2" />
+                            </Style>
+                            <Style x:Key="{x:Type Hyperlink}" TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource HtmlHyperlinkEx}">
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Style>
+                        </imControls:InputBox.Resources>
+                        <FlowDocument>
+                            <Paragraph />
+                        </FlowDocument>
+                    </imControls:InputBox>
+                    <Rectangle Stroke="#FF000000" Grid.Row="1" StrokeThickness="0">
+                        <Rectangle.OpacityMask>
+                            <LinearGradientBrush EndPoint="0.013,0.5" StartPoint="0.98,0.5">
+                                <GradientStop Color="#FF000000" Offset="0.932" />
+                                <GradientStop Color="#00FFFFFF" Offset="1" />
+                                <GradientStop Color="#00000000" Offset="0" />
+                                <GradientStop Color="#FF000000" Offset="0.072" />
+                            </LinearGradientBrush>
+                        </Rectangle.OpacityMask>
+                        <Rectangle.Fill>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF737373" Offset="0" />
+                                <GradientStop Color="#FF383838" Offset="1" />
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <Grid Name="input_area" VerticalAlignment="Stretch" Height="Auto" Margin="0,0,0,0" Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Name="input" Background="#FFFFFFFF" BorderBrush="#00283C3C" Grid.ColumnSpan="2" />
+                        <imControls:InputBox Name="InputBox"  GlobalFontFamily="Microsoft YaHei" GlobalFontSize="13" SnapsToDevicePixels="true" ClipToBounds="false" Grid.Row="1" VerticalAlignment="Stretch" Height="Auto" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto" Style="{DynamicResource RichTextBoxStyle1}" Background="{x:Null}" BorderBrush="{x:Null}">
+                            <imControls:InputBox.Resources>
+                                <Style x:Key="{x:Type Paragraph}" TargetType="{x:Type Paragraph}">
+                                    <Setter Property="Margin" Value="0,2,2,2" />
+                                </Style>
+                            </imControls:InputBox.Resources>
+                            <FlowDocument>
+                                <Paragraph />
+                            </FlowDocument>
+                        </imControls:InputBox>
+                        <Button Name="send" SnapsToDevicePixels="false" VerticalAlignment="Stretch" Grid.Column="1" HorizontalAlignment="Right" Margin="3,3,3,3" Style="{DynamicResource ConversationSendButtonStyle}" Width="75" />
+                    </Grid>
+                </Grid>
+            </DockPanel>
+        </Grid>
+        <Border Name="MainBorder" CornerRadius="4,4,4,4" BorderBrush="{Binding Path=DropPreviewBorderBrush, ElementName=window, Mode=Default}" BorderThickness="{Binding Path=DropPreviewBorderThickness, ElementName=window, Mode=Default}" />
+    </Grid>
+
+</Window>

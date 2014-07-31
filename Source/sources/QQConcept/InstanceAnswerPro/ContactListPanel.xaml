@@ -1,0 +1,224 @@
+﻿<UserControl x:Class="InstanceAnswerPro.ContactListPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Name="contactListPanel"
+             xmlns:controls ="clr-namespace:InstanceAnswerPro.Controls;assembly=InstanceAnswerPro.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" >
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Style x:Key="contactImageStyle" TargetType="{x:Type Image}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Stretch" Value="Uniform" />
+                <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+                <Setter Property="SnapsToDevicePixels" Value="true" />
+                <Setter Property="Source" Value="{Binding Path=PhotoImageSource, Mode=OneWay}" />
+                <Setter Property="OpacityMask">
+                    <Setter.Value>
+                        <ImageBrush ImageSource="{Binding Path=OnlineImageSource, Mode=OneWay}" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="contactPixelBitmapStyle" TargetType="{x:Type controls:PixelBitmap}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+                <Setter Property="Source" Value="{Binding Path=PhotoImageSource, Mode=OneWay}" />
+                <Setter Property="OpacityMask">
+                    <Setter.Value>
+                        <ImageBrush ImageSource="{Binding Path=OnlineImageSource, Mode=OneWay}" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <ControlTemplate x:Key="BuddyTreeExpanderToggleButtonTemplate" TargetType="{x:Type ToggleButton}">
+
+                <Border Name="Border" Margin="0,2,3,0" Background="Transparent" BorderThickness="1" CornerRadius="2,2,2,2" BorderBrush="{x:Null}">
+                    <Path Name="Arrow" Margin="4,1,4,1" Fill="#ff5fe040" HorizontalAlignment="Left" VerticalAlignment="Center" Data="F0 M 0,0 L 4,4 8,0 Z" RenderTransformOrigin="0.5,0.5"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="true">
+                        <Setter TargetName="Border" Property="Background" Value="#3FFFFFFF" />
+                        <Setter TargetName="Border" Property="BorderBrush" Value="#3FFFFFFF" />
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="true">
+                        <Setter TargetName="Border" Property="Background" Value="#2FFFFFFF" />
+                        <Setter TargetName="Border" Property="BorderBrush" Value="#2FFFFFFF" />
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="true">
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+            <Style x:Key="BuddyTreeGroupStyle" TargetType="{x:Type TreeViewItem}">
+                <Setter Property="Foreground" Value="#FFFAFAFA" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TreeViewItem}">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Rectangle Name="Background" RadiusX="2" RadiusY="2" VerticalAlignment="Stretch" Fill="#3FFFFFFF" Visibility="Hidden" Stroke="{x:Null}" />
+                                <Border Name="Border" SnapsToDevicePixels="true" Grid.Column="0">
+                                    <ContentPresenter Name="PART_Header" ContentSource="Header" RecognizesAccessKey="true" Height="{TemplateBinding Height}" Margin="18,3,0,3" />
+                                </Border>
+                                <ToggleButton Name="Expander" HorizontalAlignment="Stretch" Template="{StaticResource BuddyTreeExpanderToggleButtonTemplate}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" FocusVisualStyle="{x:Null}" />
+                                <ItemsPresenter Name="ItemsHost" Grid.Row="1" Margin="5,0,5,0" Visibility="Collapsed" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsExpanded" Value="true">
+                                    <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <DataTemplate x:Key="ContactTemplateSmall">
+
+                <Border>
+                    <Grid Name="contactGrid" Margin="4,4,4,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top" Width="{Binding Path=ActualHeight, ElementName=contactGrid}" Height="{Binding Path=ActualHeight, ElementName=contactGrid}">
+                            <Border Background="White" Width="40" Height="40" >
+                                <Image Name="contactImage" Style="{StaticResource contactImageStyle}" Width="40" Height="40" />
+                            </Border>
+                        </Viewbox>
+                        <controls:PixelBitmap VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,1,1" Source="{Binding Path=PresenceInfo}" />
+                        <WrapPanel Margin="5,0,0,0" Grid.Column="1">
+                            <TextBlock Name="nickName" TextTrimming="CharacterEllipsis" Foreground="#FFDDDDDD" Margin="0,0,5,0" FontWeight="Bold" Text="{Binding Path=CombineRemarkName, Mode=OneWay}" />
+                            <Grid Name="layout" DataContext="{Binding Path=RichStatusInfo, Mode=OneWay}">
+                                <Grid.Resources>
+                                    <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="TextWrapping" Value="NoWrap" />
+                                        <Setter Property="IsHyphenationEnabled" Value="true" />
+                                        <Setter Property="Foreground" Value="{Binding Path=Foreground, ElementName=userControl}" />
+                                    </Style>
+                                    <Style x:Key="{x:Type Border}" TargetType="{x:Type Border}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter Property="BorderBrush" Value="YellowGreen" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Height" Value="16" />
+                                        <Setter Property="Width" Value="16" />
+                                        <Setter Property="Margin" Value="0, 0, 0, -3" />
+                                        <Setter Property="BorderThickness" Value="1,1,1,1" />
+                                    </Style>
+                                </Grid.Resources>
+                            </Grid>
+                            <TextBlock Name="uin" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource ContactFront}" Margin="0,0,2,0" Text="{Binding Path=Uin, Mode=OneWay}" />
+                        </WrapPanel>
+                    </Grid>
+                </Border>
+                <DataTemplate.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Path=IsQQMember}" Value="true" />
+                            <Condition Binding="{Binding Path=PresenceInfo.IsOnline}" Value="true" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter TargetName="nickName" Property="Foreground" Value="#FFFE7E00" />
+                    </MultiDataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+            <Style x:Key="BuddyTreeBuddyStyle" TargetType="{x:Type TreeViewItem}">
+                <Setter Property="Foreground" Value="#FFFAFAFA" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TreeViewItem}">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Rectangle Name="Background" RadiusX="2" RadiusY="2" VerticalAlignment="Stretch" Fill="#3FFFFFFF" Visibility="Hidden" Stroke="{x:Null}" />
+                                <Border Name="Border" SnapsToDevicePixels="true" Grid.Column="0">
+                                    <ContentPresenter Name="PART_Header" ContentSource="Header" RecognizesAccessKey="true" Height="{TemplateBinding Height}" Margin="0,0,0,0" />
+                                </Border>
+                                <ToggleButton Name="Expander" HorizontalAlignment="Stretch" Template="{StaticResource BuddyTreeExpanderToggleButtonTemplate}" Visibility="Hidden" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" FocusVisualStyle="{x:Null}" />
+                                <ItemsPresenter Name="ItemsHost" Grid.Row="1" Margin="5,0,5,0" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsExpanded" Value="false">
+                                    <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="true" />
+                                        <Condition Property="IsSelected" Value="false" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="Background" Property="Visibility" Value="Visible" />
+                                </MultiTrigger>
+                                <Trigger Property="IsSelected" Value="true">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="#C1FFEE00" />
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="5,1,1,1" />
+                                    <Setter TargetName="Border" Property="CornerRadius" Value="2,2,2,2" />
+                                    <Setter TargetName="Border" Property="Background" Value="#4CFFEE00" />
+                                    <Setter TargetName="Border" Property="Margin" Value="-5,-1,-1,-1" />
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="true" />
+                                        <Condition Property="IsSelected" Value="true" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="Border" Property="Background" Value="#5CFFEE00" />
+                                </MultiTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <ContextMenu x:Key="contactContextMenu" DataContext="{Binding}">
+                <Separator />
+                <MenuItem Header="发送即时消息(_S)" Command="{Binding  controls:UICommands.SendIM}" CommandParameter="{Binding}" />
+                <MenuItem Header="发送电子邮件" Command="{Binding controls:UICommands.SendMail}" CommandParameter="{Binding}" />
+                <Separator />
+                <MenuItem Header="进入QQ空间" Command="{Binding controls:UICommands.ViewQZone}" CommandParameter="{Binding}" />
+                <Separator />
+                <MenuItem Header="修改备注名称" Command="{Binding controls:UICommands.ModifyRemarkName}" CommandParameter="{Binding}" />
+                <MenuItem Header="刷新资料" Command="{Binding controls:UICommands.UpdateProfile}" CommandParameter="{Binding}" />
+                <Separator />
+                <MenuItem Header="删除好友" Command="{Binding controls:UICommands.RemoveContact}" CommandParameter="{Binding}" />
+                <Separator />
+                <MenuItem Header="查看资料(_V)" Command="{Binding controls:UICommands.ViewProfile}" CommandParameter="{Binding}" />
+            </ContextMenu>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <TreeView x:Name="buddyTree" VirtualizingStackPanel.IsVirtualizing ="True" VirtualizingStackPanel.VirtualizationMode ="Recycling" UIElement.ClipToBounds ="True" FrameworkElement.VerticalAlignment ="Stretch" ScrollViewer.HorizontalScrollBarVisibility ="Disabled"  Control.Background ="{x:Null}" Control.BorderBrush ="{x:Null}">
+        <ItemsControl.ItemTemplate >
+            <HierarchicalDataTemplate HierarchicalDataTemplate.ItemTemplate="{StaticResource ContactTemplateSmall}" HierarchicalDataTemplate.ItemsSource ="{Binding Path=Buddies}">
+                <TextBlock TextBlock.Text="{Binding Path=NameWithContactCount}" />
+                <HierarchicalDataTemplate.ItemContainerStyle >
+                    <Style Style.TargetType="{x:Type TreeViewItem}" Style.BasedOn ="{StaticResource BuddyTreeBuddyStyle}">
+                        <Setter Setter.Property="FrameworkElement.Height" Setter.Value ="{Binding Path=ContactItemHeight,ElementName=contactListPanel}" />
+                        <Setter Setter.Property="FrameworkElement.ContextMenu" Setter.Value ="{StaticResource ResourceKey=contactContextMenu}" />
+                        <Setter Setter.Property="UIElement.Visibility" Setter.Value ="{Binding Path=VisibilityInContactPanel}" />
+                        <Setter Setter.Property="ToolTipService.Placement" Setter.Value ="Left" />
+                    </Style>
+                </HierarchicalDataTemplate.ItemContainerStyle>
+            </HierarchicalDataTemplate>
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemContainerStyle >
+            <Style Style.TargetType="{x:Type TreeViewItem}" Style.BasedOn ="{StaticResource BuddyTreeGroupStyle}">
+                <Setter Setter.Property="TreeViewItem.IsExpanded" Setter.Value ="{Binding Path=IsExpanded,Mode=TwoWay}" />
+            </Style>
+        </ItemsControl.ItemContainerStyle>
+    </TreeView>
+</UserControl>

@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="InstanceAnswerPro.IM.Controls.QZoneCtrl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel>
+        <StackPanel.Resources>
+            <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource HyperlinkTextBlock}">
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="ToolTip" Value="{Binding Path=Text, RelativeSource={RelativeSource Self}}" />
+            </Style>
+        </StackPanel.Resources>
+        <TextBlock Name="texttitle" Cursor="Hand" FontSize="12" FontWeight="Normal" Foreground="#FF505050" Text="{Binding Path=QZoneInfo.AbstractTitle}" Visibility="{Binding FallbackValue=Collapsed, Path=QZoneInfo.AbstractTitle, Converter={StaticResource MultiFunctionConverter}}" />
+        <TextBlock Name="textcontent" Cursor="Hand" FontSize="12" FontWeight="Normal" Foreground="#FF505050" MaxHeight="50" Text="{Binding Path=QZoneInfo.AbstractContent}" Visibility="{Binding FallbackValue=Collapsed, Path=QZoneInfo.AbstractContent, Converter={StaticResource MultiFunctionConverter}}" />
+        <Grid>
+            <Rectangle Name="qzonephotobackground" HorizontalAlignment="Left" RadiusX="2" RadiusY="2" Margin="8,16,8,4" VerticalAlignment="Bottom" Height="62" Stroke="{x:Null}" Width="{Binding ElementName=listPhoto, Path=ActualWidth}" Visibility="{Binding FallbackValue=Collapsed, ElementName=listPhoto, Path=Visibility}">
+                <Rectangle.OpacityMask>
+                    <LinearGradientBrush EndPoint="0.011,0.5" StartPoint="0.97,0.5">
+                        <GradientStop Color="#00000000" Offset="0" />
+                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                        <GradientStop Color="#FF7C7C7C" Offset="0.498" />
+                    </LinearGradientBrush>
+                </Rectangle.OpacityMask>
+                <Rectangle.Fill>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#00000000" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="1" />
+                        <GradientStop Color="#3A493416" Offset="0.556" />
+                        <GradientStop Color="#00000000" Offset="0.551" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <ListBox Name="listPhoto" HorizontalAlignment="Left" Background="Transparent" Margin="0,10,-20,0" BorderThickness="0" ItemsSource="{Binding Path=QZoneInfo.PhotoInfoCollection}" Visibility="{Binding FallbackValue=Collapsed, Path=QZoneInfo.PhotoInfoCollection, Converter={StaticResource MultiFunctionConverter}}">
+                <ListBox.Resources>
+                    
+                </ListBox.Resources>
+                <ListBox.Triggers>
+                </ListBox.Triggers>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Border Name="p2" Margin="0,8,12,0" Grid.Row="0" Width="40" Height="40" BorderBrush="#FFFFFFFF" BorderThickness="1,1,1,1" VerticalAlignment="Top">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <Border Name="Reflection2" Margin="0,1,12,0" Grid.Row="1" VerticalAlignment="Top" Width="40" Height="15">
+                                            <Border.Background>
+                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                    <GradientStop Color="#7FFFFFFF" Offset="0" />
+                                                    <GradientStop Color="#00FFFFFF" Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Width="40" Height="40" Stretch="Fill" Cursor="Hand" Source="{Binding Path=PhotoPath}" ToolTip="{Binding Path=PhotoTip}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </StackPanel>
+</UserControl>

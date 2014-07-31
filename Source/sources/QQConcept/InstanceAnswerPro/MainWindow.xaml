@@ -1,0 +1,71 @@
+﻿<Window x:Class="InstanceAnswerPro.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="637" Loaded="MainPanel_Loaded" Unloaded="MainPanel_Unloaded"
+        xmlns:local="clr-namespace:InstanceAnswerPro"
+        >
+    <Grid x:Name="LayoutRoot" Loaded="MainPanel_Loaded" Unloaded="MainPanel_Unloaded">
+       
+        <StackPanel Margin="10">
+            <TextBlock x:Name="userName"/>
+            <TextBox x:Name="longNickName"/>
+            <ComboBox x:Name="status" SourceUpdated="status_SourceUpdated" />
+            <TabControl Height="600">
+                <TabItem Header="联系人">
+                    <local:ContactListPanel x:Name="contactListPanel"/>
+                </TabItem>
+                <TabItem Header="群/讨论组">
+                    <local:CommunityListPanel x:Name="communityListPanel"/>
+                </TabItem>
+                <TabItem Header="最近联系人">
+                    <local:RecentContactsPanel x:Name="messageListPanel"/>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+        <!--<DockPanel>
+            <TabControl>
+                <TabItem Header="联系人" Name="buddyTree">
+                    <StackPanel>
+                        <ListBox>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TreeViewItem  MouseLeftButtonUp="TextBlock_MouseLeftButtonUp" IsExpanded="{Binding IsExpanded}" Header="{Binding NameWithContactCount}" ItemsSource="{Binding Buddies}">
+                                        <TreeViewItem.ItemTemplate>
+                                            <DataTemplate>
+                                                <RadioButton MouseDoubleClick="OnItemDoubleClicked" MouseRightButtonDown="OnItemMouseRightButtonDown">
+                                                    <StackPanel Margin="2"  Orientation="Horizontal" >
+                                                        <Image Source="{Binding Path=PhotoImageSource}"  Width="30" Height="30"  />
+                                                        <StackPanel>
+                                                            <TextBlock FontFamily="Segoe" FontSize="14" Foreground="#282671" Text="{Binding Path=CombineRemarkName}"/>
+                                                            <TextBlock FontFamily="Segoe" FontSize="10" Foreground="#282671" Text="{Binding Path=LongNickName}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </RadioButton>
+                                            </DataTemplate>
+                                        </TreeViewItem.ItemTemplate>
+                                    </TreeViewItem>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="群/讨论组">
+                    <StackPanel>
+                        <ListBox>
+                            <ListBoxItem></ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="最近联系人">
+                    <StackPanel>
+                        <ListBox>
+                            <ListBoxItem></ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+
+        </DockPanel>-->
+    </Grid>
+    
+</Window>

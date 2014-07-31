@@ -1,0 +1,58 @@
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\ResolveAssemblyReference.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.lref
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.g.resources
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.cache
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.lref
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.g.resources
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\IAPro.Conversation\obj\Debug\ResolveAssemblyReference.cache
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.csprojResolveAssemblyReference.cache
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.baml
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.g.cs
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.g.cs
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.cache
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.lref
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.dll
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.pdb
+G:\Users\Shift\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.dll
+G:\Users\Shift\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.pdb
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.baml
+G:\Users\Shift\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.g.resources
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.baml
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.cache
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.lref
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.baml
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.g.resources
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.dll
+E:\7.TINY\Desktop\QQConcept\IAPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.pdb
+E:\7.TINY\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.dll
+E:\7.TINY\Desktop\QQConcept\Application\Bin\InstanceAnswerPro.Conversation.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\Conversation\ContactSessionWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation_MarkupCompile.lref
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\Conversation\CommunitySessionWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.g.resources
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Conversation\obj\Debug\InstanceAnswerPro.Conversation.pdb

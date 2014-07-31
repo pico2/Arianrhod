@@ -1,0 +1,68 @@
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.IM.Controls.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.IM.Controls.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Bama.Controls.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Bama.WPF.Utility.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Controls.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Core.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Interop.TXKernelWrapper.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Bama.Debug.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\System.Windows.Interactivity.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Core.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ResolveAssemblyReference.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\VerifyCodeWindow.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\VerifyCodeWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls_MarkupCompile.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.g.resources
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ReLoginWindow.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ReLoginWindow.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\IAMessageBox.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\IAMessageBox.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.IM.Controls.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.IM.Controls.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Bama.Controls.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Bama.WPF.Utility.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Controls.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Core.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Interop.TXKernelWrapper.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Bama.Debug.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\System.Windows.Interactivity.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Core.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\IAMessageBox.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ReLoginWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\VerifyCodeWindow.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\IAMessageBox.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ReLoginWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\VerifyCodeWindow.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls_MarkupCompile.cache
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.g.resources
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.IM.Controls.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.IM.Controls.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Controls.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Core.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\Interop.TXKernelWrapper.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.API.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Debug.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Core.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.API.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\bin\Debug\InstanceAnswerPro.Debug.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\IAMessageBox.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ReLoginWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\VerifyCodeWindow.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\IAMessageBox.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\ReLoginWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\VerifyCodeWindow.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls_MarkupCompile.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.g.resources
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\InstanceAnswerPro.IM.Controls.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\QZoneCtrl.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.IM.Controls\obj\Debug\QZoneCtrl.g.cs

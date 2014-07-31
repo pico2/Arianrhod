@@ -1,0 +1,17 @@
+﻿<Window x:Class="InstanceAnswerPro.Controls.VerifyCodeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="VerifyCodeWindow" Height="155" Width="300" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <StackPanel>
+            <TextBlock x:Name="textBlockInfo"></TextBlock>
+            <Image x:Name="VCImage"/>
+            <TextBox x:Name="codeTextBox"></TextBox>
+            <UniformGrid Rows="1">
+                <Button Content="OK" x:Name="btnOK" Click="Button_Click" IsDefault="True" />
+                <Button Content="Change" x:Name="btnChange" Click="Button_Click" />
+                <Button Content="Cancel" x:Name="btnCancel" Click="Button_Click" IsCancel="True" />
+            </UniformGrid>
+        </StackPanel>
+    </Grid>
+</Window>

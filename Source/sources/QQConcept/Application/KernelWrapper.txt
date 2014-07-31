@@ -1,0 +1,4264 @@
+// Generated .IDL file (by the OLE/COM Object Viewer)
+// 
+// typelib filename: KernelWrapper.dll
+
+[
+  uuid(8D6EA257-9AAC-40F3-9776-8C2819CE987D),
+  version(1.0),
+  helpstring("KernelWrapper 1.0 Type Library"),
+  custom(DE77BA64-517C-11D1-A2DA-0000F8773CE9, 117441012),
+  custom(DE77BA63-517C-11D1-A2DA-0000F8773CE9, 1279700119),
+  custom(DE77BA65-517C-11D1-A2DA-0000F8773CE9, "Created by MIDL version 7.00.0500 at Wed Jul 21 16:15:15 2010
+")
+
+]
+library KernelWrapper
+{
+    // TLib :     // TLib : OLE Automation : {00020430-0000-0000-C000-000000000046}
+    importlib("stdole2.tlb");
+
+    // Forward declare all types defined in this typelib
+    interface IMessenger;
+    interface ITXDataRead;
+    interface ITXBuffer;
+    interface ITXArrayRead;
+    interface ITXArray;
+    interface ITXData;
+    interface ITXLocation;
+    interface ITXObjectFactory;
+    interface IExportCustomType;
+    interface IMiscHelper;
+    interface ITXMsgPack;
+    interface ITXMsgElem;
+    interface IBamaCmdCodec;
+    interface IHttpDownload;
+    interface IMsgStorage;
+    interface IAsyncCallBackExt;
+    interface ITXC2CImageTransferNotifyExt;
+    interface ITXSessionSendSink;
+    interface ITXSessionEventExt;
+    interface ITXSession;
+    interface ITXCallback;
+    interface ITXCmdCodec;
+    interface ITXNetSendSink;
+    interface ITXGroupEventExt;
+    interface ITXGroup;
+    interface ITXGroupSink;
+    interface ITXGroupUserSink;
+    interface ITXIMContactInfoEvtExt;
+    interface ITXGroupMgr;
+    interface ITXCallbackKey;
+    interface ITXIdleCallback;
+    interface ITXContactIMStatusEvtExt;
+    interface ITXDataRouteFilterExt;
+    interface ITXIMLoginEventExt;
+    interface ITXContactFolderEvtExt;
+    interface ITXOldSysReceiverExt;
+    interface ITXIMConnectionEventExt;
+    interface ITXSYSReceiverExt;
+    interface ITXIntlSysReceiverExt;
+    interface ITXIMConfig;
+    interface ITXSSOAPI;
+    interface ITXSSOData;
+    interface ITXSSODataRead;
+    interface ITXSSOBuffer;
+    interface ITXSSOArrayRead;
+    interface ITXSSOArray;
+    interface ITXSSOEnumData;
+    interface ITXSSOApp;
+    interface ITXSSOConfig;
+    interface ITXMsgRecordList;
+    interface ITXDelMsgCallback;
+    interface ITXValidateCodeMgr;
+    interface ITXAddBuddyNotifyEvt;
+    interface ITXDataRouteCenter;
+    interface ITXDataRouteSink;
+    interface ITXMsgText;
+    interface ITXMsgImage;
+    interface ITXIMContactInfoMgr;
+    interface ITXMsgSysFace;
+    interface ITXMsgFile;
+    interface ITXContactFolderMgr;
+    interface ITXIMContactRelationMgr;
+    interface ITXAddBuddyAuthMgr;
+    interface ITXSessionAuthMgr;
+    interface ITXCallbackFingerKey;
+    interface ITXFingerUserMgr;
+    interface IGroupFinger;
+    interface ITXContactSearcher;
+    interface ITXGroupSessionMgr;
+    interface ITXIMContactPresentationMgr;
+    interface ITXIMContactStatusMgr;
+    interface ITXMsgStorage;
+    interface ITXEncUIGetPass;
+    interface ITXMsgAspect;
+    interface ITXMsgSearchProgress;
+    interface ITXMsgSearchCallback;
+    interface ITXMsgExportCallback;
+    interface ITXMsgImportCallback;
+    interface ITXBuddySessionMgr;
+    interface ITXIM;
+    interface ITXIMLoginUIEventExt;
+    interface ITXShowValidateCodeExt;
+    interface ITXQQLevelMgr;
+    interface ITXQQLevelEvtExt;
+    interface ITXStatusAuthMgr;
+    interface ITXRegistry;
+    interface ITXRegistryKey;
+    interface ITXRegistryArray;
+    interface ITXIMContactAccountMgr;
+    interface ITXAccountCallbackKey;
+    interface ITXIMContactRelationEvtExt;
+    interface ITXGroupHeadMgr;
+    interface ITXContactIMRichStatusEvtExt;
+    interface ITXGrayURLMgr;
+    interface ITXGrayURLMgrExt;
+    interface ICustomFaceMgr;
+    interface ICustomFaceCallback;
+    interface ICustomFaceEvent;
+    interface ITXOfflinePicMgr;
+    interface ITXMsgFileObject;
+    interface ITXOfflinePicSink;
+    interface ITXDataReport;
+    interface IDRStrCodec;
+    interface ITXIMContactPresentationEvtExt;
+    interface ITXDataReportCodecExt;
+    interface IPluginCenter;
+
+    [
+      uuid(BCDC2282-68B6-4A06-932D-494949D98840),
+      helpstring("Tencent Messenger Class")
+    ]
+    coclass Messenger {
+        [default] interface IMessenger;
+        interface ITXLocation;
+        interface ITXObjectFactory;
+        interface IExportCustomType;
+        interface IMiscHelper;
+        interface IBamaCmdCodec;
+        interface IHttpDownload;
+        interface IMsgStorage;
+        interface IAsyncCallBackExt;
+        interface ITXC2CImageTransferNotifyExt;
+        interface ITXSessionSendSink;
+        interface ITXSessionEventExt;
+        interface ITXGroupEventExt;
+        interface ITXGroup;
+        interface ITXIMContactInfoEvtExt;
+        interface ITXGroupMgr;
+        interface ITXIdleCallback;
+        interface ITXContactIMStatusEvtExt;
+        interface ITXDataRouteFilterExt;
+        interface ITXIMLoginEventExt;
+        interface ITXContactFolderEvtExt;
+        interface ITXOldSysReceiverExt;
+        interface ITXIMConnectionEventExt;
+        interface ITXSYSReceiverExt;
+        interface ITXIntlSysReceiverExt;
+        interface ITXIMConfig;
+        interface ITXMsgRecordList;
+        interface ITXValidateCodeMgr;
+        interface ITXAddBuddyNotifyEvt;
+        interface ITXDataRouteCenter;
+        interface ITXMsgText;
+        interface ITXMsgImage;
+        interface ITXIMContactInfoMgr;
+        interface ITXMsgSysFace;
+        interface ITXMsgFile;
+        interface ITXContactFolderMgr;
+        interface ITXIMContactRelationMgr;
+        interface ITXAddBuddyAuthMgr;
+        interface ITXSessionAuthMgr;
+        interface ITXCallbackFingerKey;
+        interface ITXFingerUserMgr;
+        interface IGroupFinger;
+        interface ITXContactSearcher;
+        interface ITXGroupSessionMgr;
+        interface ITXIMContactPresentationMgr;
+        interface ITXIMContactStatusMgr;
+        interface ITXMsgStorage;
+        interface ITXBuddySessionMgr;
+        interface ITXIM;
+        interface ITXIMLoginUIEventExt;
+        interface ITXShowValidateCodeExt;
+        interface ITXQQLevelMgr;
+        interface ITXQQLevelEvtExt;
+        interface ITXStatusAuthMgr;
+        interface ITXRegistry;
+        interface ITXIMContactAccountMgr;
+        interface ITXIMContactRelationEvtExt;
+        interface ITXGroupHeadMgr;
+        interface ITXContactIMRichStatusEvtExt;
+        interface ITXGrayURLMgr;
+        interface ITXGrayURLMgrExt;
+        interface ICustomFaceMgr;
+        interface ICustomFaceEvent;
+        interface ICustomFaceCallback;
+        interface ITXOfflinePicMgr;
+        interface ITXDataReport;
+        interface ITXIMContactPresentationEvtExt;
+    };
+
+    [
+      odl,
+      uuid(6068A433-83FE-4EF7-A25C-7C44115B16E1),
+      helpstring("IMessenger Interface")
+    ]
+    interface IMessenger : IUnknown {
+        HRESULT _stdcall Initialize([in] IUnknown* pUnknown);
+        HRESULT _stdcall Uninitialize();
+        HRESULT _stdcall GetService(
+                        [in] GUID* serviceId, 
+                        [out] void** ppService);
+        HRESULT _stdcall RegisterExtension(
+                        [in] GUID* extensionPointId, 
+                        [in] ITXDataRead* pDataExtensionConfig, 
+                        [in] IUnknown* pExtension, 
+                        [out, retval] VARIANT_BOOL* pbSucceed);
+        HRESULT _stdcall UnregisterExtension(
+                        [in] GUID* extensionPointId, 
+                        [in] IUnknown* pExtension, 
+                        [out, retval] VARIANT_BOOL* pbSucceed);
+        HRESULT _stdcall GetPhysicalFile(
+                        [in] BSTR bstrQNCName, 
+                        [out, retval] BSTR* pbstrPhysicalPath);
+        HRESULT _stdcall GetAppPath(
+                        [in] APP_PATH_TYPE pathType, 
+                        [out, retval] BSTR* pbstrPath);
+        HRESULT _stdcall EventProcessing(
+                        [in] AsyncHandle_Type asynchandletype, 
+                        [in] long lAction, 
+                        [in] ITXData* pData, 
+                        [out, retval] unsigned long* result);
+        HRESULT _stdcall OnIdle();
+        HRESULT _stdcall TXLog(
+                        [in] unsigned char logLevel, 
+                        [in] BSTR filter, 
+                        [in] BSTR log);
+        HRESULT _stdcall SetMainPanelHWnd([in] unsigned long hwnd);
+        HRESULT _stdcall ShowHiddenAppBar([in] VARIANT_BOOL bShow);
+        HRESULT _stdcall SetTopMost([in] VARIANT_BOOL bTopMost);
+        HRESULT _stdcall EnableAutoHide([in] VARIANT_BOOL bAutoHide);
+        HRESULT _stdcall SetBorderRect(
+                        [in] long lLeft, 
+                        [in] long lTop, 
+                        [in] long lRight, 
+                        [in] long lBottom);
+        HRESULT _stdcall Get32ByteValueAddedSign([out, retval] BSTR* pbstrKey);
+        HRESULT _stdcall CameraScreen(
+                        [in] unsigned long hwnd, 
+                        [in] int nMode, 
+                        [in] VARIANT_BOOL bZoom, 
+                        [in] int fZoomScale, 
+                        [in] BSTR szHotKey);
+    };
+
+    [
+      odl,
+      uuid(993196BC-CCB2-440A-9F92-4B39E1F5AF53),
+      helpstring("ITXDataRead Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXDataRead : IDispatch {
+        [id(0x60020000)]
+        HRESULT GetBool(
+                        [in] BSTR bsParamName, 
+                        [out, retval] long* pbValue);
+        [id(0x60020001)]
+        HRESULT GetByte(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned char* pcValue);
+        [id(0x60020002)]
+        HRESULT GetChar(
+                        [in] BSTR bsParamName, 
+                        [out, retval] char* pchValue);
+        [id(0x60020003)]
+        HRESULT GetWord(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned short* pwValue);
+        [id(0x60020004)]
+        HRESULT GetShort(
+                        [in] BSTR bsParamName, 
+                        [out, retval] short* pshValue);
+        [id(0x60020005)]
+        HRESULT GetDWord(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned long* pdwValue);
+        [id(0x60020006)]
+        HRESULT GetInt(
+                        [in] BSTR bsParamName, 
+                        [out, retval] int* pnValue);
+        [id(0x60020007)]
+        HRESULT GetInt64(
+                        [in] BSTR bsParamName, 
+                        [out, retval] int64* pn64Var);
+        [id(0x60020008)]
+        HRESULT GetDouble(
+                        [in] BSTR bsParamName, 
+                        [out, retval] double* pdValue);
+        [id(0x60020009)]
+        HRESULT GetStr(
+                        [in] BSTR bsParamName, 
+                        [out, retval] BSTR* pbsValue);
+        [id(0x6002000a)]
+        HRESULT GetBuf(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXBuffer** ppBufValue);
+        [id(0x6002000b)]
+        HRESULT GetBufTyped(
+                        [in] BSTR bsParamName, 
+                        [out] ITXBuffer** ppBufValue, 
+                        [out] unsigned long* pdwSubType);
+        [id(0x6002000c)]
+        HRESULT GetDataRead(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXDataRead** ppValue);
+        [id(0x6002000d)]
+        HRESULT GetArrayRead(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXArrayRead** ppValue);
+        [id(0x6002000e)]
+        HRESULT GetGuid(
+                        [in] BSTR bsParamName, 
+                        [out, retval] GUID* pGuid);
+        [id(0x6002000f)]
+        HRESULT GetInterface(
+                        [in] BSTR bsParamName, 
+                        [in] GUID* riid, 
+                        [out, retval] void** ppvValue);
+        [id(0x60020010)]
+        HRESULT GetDoc([out, retval] ITXBuffer** ppBufDoc);
+        [id(0x60020011)]
+        HRESULT CopyTo([in] ITXData* pData);
+        [id(0x60020012)]
+        HRESULT IsFieldType(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char cType);
+        [id(0x60020013)]
+        HRESULT GetFieldCount([out, retval] unsigned int* puCount);
+        [id(0x60020014)]
+        HRESULT GetFieldName(
+                        [in] unsigned int uIndex, 
+                        [out, retval] BSTR* pbsFieldName);
+        [id(0x60020015)]
+        HRESULT FieldType(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned char* pcType);
+        [id(0x60020016)]
+        HRESULT Equal([in] ITXDataRead* pData);
+        [id(0x60020017)]
+        HRESULT ZBegReserve();
+        [id(0x60020018)]
+        HRESULT EnterGfMode();
+        [id(0x60020019)]
+        HRESULT LeaveGfMode();
+        [id(0x6002001a)]
+        HRESULT FindStringEntry(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned short** ppv);
+        [id(0x6002001b)]
+        HRESULT CopyToNoOverwrite([in] ITXData* pData);
+        [id(0x6002001c)]
+        HRESULT IsFieldTypeEx(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char chType, 
+                        [out, retval] unsigned char* pcCoincident);
+        [id(0x6002001d)]
+        HRESULT GetUInt64(
+                        [in] BSTR bsParamName, 
+                        [out, retval] uint64* pddwValue);
+        [id(0x6002001e)]
+        HRESULT ZF07Reserve();
+        [id(0x6002001f)]
+        HRESULT ZF08Reserve();
+        [id(0x60020020)]
+        HRESULT ZF09Reserve();
+        [id(0x60020021)]
+        HRESULT ZF10Reserve();
+        [id(0x60020022)]
+        HRESULT ZF11Reserve();
+        [id(0x60020023)]
+        HRESULT ZF12Reserve();
+        [id(0x60020024)]
+        HRESULT ZF13Reserve();
+        [id(0x60020025)]
+        HRESULT ZF14Reserve();
+        [id(0x60020026)]
+        HRESULT ZF15Reserve();
+        [id(0x60020027)]
+        HRESULT ZF16Reserve();
+        [id(0x60020028)]
+        HRESULT ZF17Reserve();
+        [id(0x60020029)]
+        HRESULT ZF18Reserve();
+        [id(0x6002002a)]
+        HRESULT ZF19Reserve();
+        [id(0x6002002b)]
+        HRESULT ZEndReserve();
+    };
+
+    [
+      odl,
+      uuid(04AD9AE4-F179-4A7B-A640-0CB8EA74A071),
+      helpstring("ITXBuffer Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXBuffer : IDispatch {
+        [id(0x60020000)]
+        HRESULT IsEmpty([out, retval] long* pbEmpty);
+        [id(0x60020001)]
+        HRESULT Empty();
+        [id(0x60020002)]
+        HRESULT Resize(
+                        [in] unsigned int uSize, 
+                        [out, retval] unsigned char** ppcBuf);
+        [id(0x60020003)]
+        HRESULT GetAt(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned char* pcValue);
+        [id(0x60020004)]
+        HRESULT SetAt(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned char cValue);
+        [id(0x60020005)]
+        HRESULT GetNativeBuf([out, retval] unsigned char** ppcBuf);
+        [id(0x60020006)]
+        HRESULT GetSize([out, retval] unsigned int* puSize);
+        [id(0x60020007)]
+        HRESULT CopyFrom(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize);
+        [id(0x60020008)]
+        HRESULT CopyFromTXBuffer([in] ITXBuffer* pBuf);
+        [id(0x60020009)]
+        HRESULT Attach(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize);
+        [id(0x6002000a)]
+        HRESULT Detach([out, retval] unsigned char** ppcBuf);
+        [id(0x6002000b)]
+        HRESULT Compare(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize, 
+                        [out, retval] int* pnResult);
+        [id(0x6002000c)]
+        HRESULT CompareTXBuffer(
+                        [in] ITXBuffer* pBuf, 
+                        [out, retval] int* pnResult);
+        [id(0x6002000d)]
+        HRESULT Append(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize, 
+                        [out, retval] unsigned char** ppcBufNew);
+        [id(0x6002000e)]
+        HRESULT AppendTXBuffer(
+                        [in] ITXBuffer* pBuf, 
+                        [out, retval] unsigned char** ppcBufNew);
+        [id(0x6002000f)]
+        HRESULT SetAllocBase([in] unsigned int uSize);
+    };
+
+    [
+      odl,
+      uuid(40CBD107-7733-4280-B059-19ED37D1AA20),
+      helpstring("ITXArrayRead Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXArrayRead : IDispatch {
+        [id(0x60020000)]
+        HRESULT GetBool(
+                        [in] unsigned int uIndex, 
+                        [out, retval] long* pbValue);
+        [id(0x60020001)]
+        HRESULT GetByte(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned char* pcValue);
+        [id(0x60020002)]
+        HRESULT GetChar(
+                        [in] unsigned int uIndex, 
+                        [out, retval] char* pchValue);
+        [id(0x60020003)]
+        HRESULT GetWord(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned short* pwValue);
+        [id(0x60020004)]
+        HRESULT GetShort(
+                        [in] unsigned int uIndex, 
+                        [out, retval] short* pshValue);
+        [id(0x60020005)]
+        HRESULT GetDWord(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned long* pdwValue);
+        [id(0x60020006)]
+        HRESULT GetInt(
+                        [in] unsigned int uIndex, 
+                        [out, retval] int* pnValue);
+        [id(0x60020007)]
+        HRESULT GetStr(
+                        [in] unsigned int uIndex, 
+                        [out, retval] BSTR* pbsValue);
+        [id(0x60020008)]
+        HRESULT GetBuf(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXBuffer** ppBufValue);
+        [id(0x60020009)]
+        HRESULT GetInterface(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* riid, 
+                        [out, retval] void** ppvValue);
+        [id(0x6002000a)]
+        HRESULT GetDataRead(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXDataRead** ppValue);
+        [id(0x6002000b)]
+        HRESULT GetArrayRead(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXArrayRead** ppValue);
+        [id(0x6002000c)]
+        HRESULT GetGuid(
+                        [in] unsigned int uIndex, 
+                        [out, retval] GUID* pGuid);
+        [id(0x6002000d)]
+        HRESULT GetInt64(
+                        [in] unsigned int uIndex, 
+                        [out, retval] int64* pn64Var);
+        [id(0x6002000e)]
+        HRESULT GetDouble(
+                        [in] unsigned int uIndex, 
+                        [out, retval] double* pdValue);
+        [id(0x6002000f)]
+        HRESULT GetBufTyped(
+                        [in] unsigned int uIndex, 
+                        [out] ITXBuffer** ppBufValue, 
+                        [out] unsigned long* pdwSubType);
+        [id(0x60020010)]
+        HRESULT GetType(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned char* pcType);
+        [id(0x60020011)]
+        HRESULT GetSize([out, retval] unsigned int* puSize);
+        [id(0x60020012)]
+        HRESULT GetDoc([out, retval] ITXBuffer** ppBufDoc);
+        [id(0x60020013)]
+        HRESULT Equal([in] ITXArrayRead* pArray);
+        [id(0x60020014)]
+        HRESULT CopyTo([in] ITXArray* pDataArray);
+        [id(0x60020015)]
+        HRESULT GetUInt64(
+                        [in] unsigned int uIndex, 
+                        [out, retval] uint64* pddwValue);
+        [id(0x60020016)]
+        HRESULT ZF01Reserve();
+        [id(0x60020017)]
+        HRESULT ZF02Reserve();
+        [id(0x60020018)]
+        HRESULT ZF03Reserve();
+        [id(0x60020019)]
+        HRESULT ZF04Reserve();
+        [id(0x6002001a)]
+        HRESULT ZF05Reserve();
+        [id(0x6002001b)]
+        HRESULT ZF06Reserve();
+        [id(0x6002001c)]
+        HRESULT ZF07Reserve();
+        [id(0x6002001d)]
+        HRESULT ZF08Reserve();
+        [id(0x6002001e)]
+        HRESULT ZF09Reserve();
+        [id(0x6002001f)]
+        HRESULT ZF10Reserve();
+        [id(0x60020020)]
+        HRESULT ZF11Reserve();
+        [id(0x60020021)]
+        HRESULT ZF12Reserve();
+        [id(0x60020022)]
+        HRESULT ZF13Reserve();
+        [id(0x60020023)]
+        HRESULT ZF14Reserve();
+        [id(0x60020024)]
+        HRESULT ZF15Reserve();
+        [id(0x60020025)]
+        HRESULT ZF16Reserve();
+        [id(0x60020026)]
+        HRESULT ZF17Reserve();
+        [id(0x60020027)]
+        HRESULT ZF18Reserve();
+        [id(0x60020028)]
+        HRESULT ZF19Reserve();
+        [id(0x60020029)]
+        HRESULT ZEndReserve();
+    };
+
+    [
+      odl,
+      uuid(45B22163-C1A9-483D-9657-0B6E8CA607C9),
+      helpstring("ITXArray Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXArray : ITXArrayRead {
+        [id(0x60030000)]
+        HRESULT AddBool([in] long bValue);
+        [id(0x60030001)]
+        HRESULT AddByte([in] unsigned char cValue);
+        [id(0x60030002)]
+        HRESULT AddChar([in] char chValue);
+        [id(0x60030003)]
+        HRESULT AddWord([in] unsigned short wValue);
+        [id(0x60030004)]
+        HRESULT AddShort([in] short shValue);
+        [id(0x60030005)]
+        HRESULT AddDWord([in] unsigned long dwValue);
+        [id(0x60030006)]
+        HRESULT AddInt([in] int iValue);
+        [id(0x60030007)]
+        HRESULT AddStr([in] BSTR bsValue);
+        [id(0x60030008)]
+        HRESULT AddBuf([in] ITXBuffer* pBufValue);
+        [id(0x60030009)]
+        HRESULT AddInterface(
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003000a)]
+        HRESULT AddNewData([out, retval] ITXData** ppValue);
+        [id(0x6003000b)]
+        HRESULT AddData([in] ITXData* pValue);
+        [id(0x6003000c)]
+        HRESULT AddNewArray([out, retval] ITXArray** ppValue);
+        [id(0x6003000d)]
+        HRESULT AddArray([in] ITXArray* pValue);
+        [id(0x6003000e)]
+        HRESULT AddGuid([in] GUID* guid);
+        [id(0x6003000f)]
+        HRESULT AddInt64([in] int64 n64Var);
+        [id(0x60030010)]
+        HRESULT AddDouble([in] double dValue);
+        [id(0x60030011)]
+        HRESULT AddBufTyped(
+                        [in] ITXBuffer* pBufValue, 
+                        [in] unsigned long dwSubType);
+        [id(0x60030012)]
+        HRESULT InsertBool(
+                        [in] unsigned int uIndex, 
+                        [in] long bValue);
+        [id(0x60030013)]
+        HRESULT InsertByte(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned char cValue);
+        [id(0x60030014)]
+        HRESULT InsertChar(
+                        [in] unsigned int uIndex, 
+                        [in] char chValue);
+        [id(0x60030015)]
+        HRESULT InsertWord(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned short wValue);
+        [id(0x60030016)]
+        HRESULT InsertShort(
+                        [in] unsigned int uIndex, 
+                        [in] short shValue);
+        [id(0x60030017)]
+        HRESULT InsertDWord(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned long dwValue);
+        [id(0x60030018)]
+        HRESULT InsertInt(
+                        [in] unsigned int uIndex, 
+                        [in] int iValue);
+        [id(0x60030019)]
+        HRESULT InsertStr(
+                        [in] unsigned int uIndex, 
+                        [in] BSTR bsValue);
+        [id(0x6003001a)]
+        HRESULT InsertBuf(
+                        [in] unsigned int uIndex, 
+                        [in] ITXBuffer* pBufValue);
+        [id(0x6003001b)]
+        HRESULT InsertInterface(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003001c)]
+        HRESULT InsertNewData(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXData** ppValue);
+        [id(0x6003001d)]
+        HRESULT InsertData(
+                        [in] unsigned int uIndex, 
+                        [in] ITXData* pValue);
+        [id(0x6003001e)]
+        HRESULT InsertNewArray(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXArray** ppValue);
+        [id(0x6003001f)]
+        HRESULT InsertArray(
+                        [in] unsigned int uIndex, 
+                        [in] ITXArray* pValue);
+        [id(0x60030020)]
+        HRESULT InsertGuid(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* guid);
+        [id(0x60030021)]
+        HRESULT InsertInt64(
+                        [in] unsigned int uIndex, 
+                        [in] int64 n64Var);
+        [id(0x60030022)]
+        HRESULT InsertDouble(
+                        [in] unsigned int uIndex, 
+                        [in] double dValue);
+        [id(0x60030023)]
+        HRESULT InsertBufTyped(
+                        [in] unsigned int uIndex, 
+                        [in] ITXBuffer* pBufValue, 
+                        [in] unsigned long dwSubType);
+        [id(0x60030024)]
+        HRESULT SetBool(
+                        [in] unsigned int uIndex, 
+                        [in] long bValue);
+        [id(0x60030025)]
+        HRESULT SetByte(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned char cValue);
+        [id(0x60030026)]
+        HRESULT SetChar(
+                        [in] unsigned int uIndex, 
+                        [in] char chValue);
+        [id(0x60030027)]
+        HRESULT SetWord(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned short wValue);
+        [id(0x60030028)]
+        HRESULT SetShort(
+                        [in] unsigned int uIndex, 
+                        [in] short shValue);
+        [id(0x60030029)]
+        HRESULT SetDWord(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned long dwValue);
+        [id(0x6003002a)]
+        HRESULT SetInt(
+                        [in] unsigned int uIndex, 
+                        [in] int iValue);
+        [id(0x6003002b)]
+        HRESULT SetStr(
+                        [in] unsigned int uIndex, 
+                        [in] BSTR bsValue);
+        [id(0x6003002c)]
+        HRESULT SetBuf(
+                        [in] unsigned int uIndex, 
+                        [in] ITXBuffer* pBufValue);
+        [id(0x6003002d)]
+        HRESULT SetInterface(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003002e)]
+        HRESULT SetNewData(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXData** ppValue);
+        [id(0x6003002f)]
+        HRESULT SetData(
+                        [in] unsigned int uIndex, 
+                        [in] ITXData* pValue);
+        [id(0x60030030)]
+        HRESULT SetNewArray(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXArray** ppValue);
+        [id(0x60030031)]
+        HRESULT SetArray(
+                        [in] unsigned int uIndex, 
+                        [in] ITXArray* pValue);
+        [id(0x60030032)]
+        HRESULT SetGuid(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* guid);
+        [id(0x60030033)]
+        HRESULT SetInt64(
+                        [in] unsigned int uIndex, 
+                        [in] int64 n64Var);
+        [id(0x60030034)]
+        HRESULT SetDouble(
+                        [in] unsigned int uIndex, 
+                        [in] double dValue);
+        [id(0x60030035)]
+        HRESULT SetBufTyped(
+                        [in] unsigned int uIndex, 
+                        [in] ITXBuffer* pBufValue, 
+                        [in] unsigned long dwSubType);
+        [id(0x60030036)]
+        HRESULT SetDoc([in] ITXBuffer* pBufDoc);
+        [id(0x60030037)]
+        HRESULT SetDoc2(
+                        [in] unsigned int uSize, 
+                        [in, out] unsigned char* pcDoc);
+        [id(0x60030038)]
+        HRESULT RemoveAt([in] unsigned int uIndex);
+        [id(0x60030039)]
+        HRESULT RemoveAll();
+        [id(0x6003003a)]
+        HRESULT GetData(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXData** ppValue);
+        [id(0x6003003b)]
+        HRESULT GetArray(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXArray** ppValue);
+        [id(0x6003003c)]
+        HRESULT MoveElement(
+                        [in] unsigned int uFrom, 
+                        [in] unsigned int uTo);
+        [id(0x6003003d)]
+        HRESULT Reserve([in] unsigned int uSize);
+        [id(0x6003003e)]
+        HRESULT SetTextDoc(BSTR bstrTextDoc);
+        [id(0x6003003f)]
+        HRESULT SetUInt64(
+                        [in] unsigned int uIndex, 
+                        [in] uint64 ddwValue);
+        [id(0x60030040)]
+        HRESULT AddUInt64([in] uint64 ddwValue);
+        [id(0x60030041)]
+        HRESULT InsertUInt64(
+                        [in] unsigned int uIndex, 
+                        [in] uint64 ddwValue);
+    };
+
+    [
+      odl,
+      uuid(2C3F29CA-F983-4897-A545-2221773BC5A6),
+      helpstring("ITXData Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXData : ITXDataRead {
+        [id(0x60030000)]
+        HRESULT SetBool(
+                        [in] BSTR bsParamName, 
+                        [in] long bValue);
+        [id(0x60030001)]
+        HRESULT SetByte(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char cValue);
+        [id(0x60030002)]
+        HRESULT SetChar(
+                        [in] BSTR bsParamName, 
+                        [in] char chValue);
+        [id(0x60030003)]
+        HRESULT SetWord(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned short wValue);
+        [id(0x60030004)]
+        HRESULT SetShort(
+                        [in] BSTR bsParamName, 
+                        [in] short shValue);
+        [id(0x60030005)]
+        HRESULT SetDWord(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned long dwValue);
+        [id(0x60030006)]
+        HRESULT SetInt(
+                        [in] BSTR bsParamName, 
+                        [in] int iValue);
+        [id(0x60030007)]
+        HRESULT SetStr(
+                        [in] BSTR bsParamName, 
+                        [in] BSTR bsValue);
+        [id(0x60030008)]
+        HRESULT SetBuf(
+                        [in] BSTR bsParamName, 
+                        [in] ITXBuffer* pBufValue);
+        [id(0x60030009)]
+        HRESULT SetInterface(
+                        [in] BSTR bsParamName, 
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003000a)]
+        HRESULT SetNewData(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXData** ppValue);
+        [id(0x6003000b)]
+        HRESULT SetData(
+                        [in] BSTR bsParamName, 
+                        [in] ITXData* pValue);
+        [id(0x6003000c)]
+        HRESULT SetNewArray(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXArray** ppValue);
+        [id(0x6003000d)]
+        HRESULT SetArray(
+                        [in] BSTR bsParamName, 
+                        [in] ITXArray* pValue);
+        [id(0x6003000e)]
+        HRESULT SetGuid(
+                        [in] BSTR bsParamName, 
+                        [in] GUID* guid);
+        [id(0x6003000f)]
+        HRESULT SetInt64(
+                        [in] BSTR bsParamName, 
+                        [in] int64 n64Var);
+        [id(0x60030010)]
+        HRESULT SetDouble(
+                        [in] BSTR bsParamName, 
+                        [in] double dValue);
+        [id(0x60030011)]
+        HRESULT SetBufTyped(
+                        [in] BSTR bsParamName, 
+                        [in] ITXBuffer* pBufValue, 
+                        [in] unsigned long dwSubType);
+        [id(0x60030012)]
+        HRESULT SetDoc([in] ITXBuffer* pBufDoc);
+        [id(0x60030013)]
+        HRESULT SetDoc2(
+                        [in] unsigned int uSize, 
+                        [in, out] unsigned char* pcDoc);
+        [id(0x60030014)]
+        HRESULT GetData(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXData** ppValue);
+        [id(0x60030015)]
+        HRESULT GetArray(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXArray** ppValue);
+        [id(0x60030016)]
+        HRESULT RemoveAField(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char cType);
+        [id(0x60030017)]
+        HRESULT Reserve([in] unsigned int uSize);
+        [id(0x60030018)]
+        HRESULT SetTextDoc(BSTR bstrTextDoc);
+        [id(0x60030019)]
+        HRESULT SetUInt64(
+                        [in] BSTR bsParamName, 
+                        [in] uint64 ddwValue);
+    };
+
+    typedef enum {
+        APP_PATH_ROOT = 0,
+        APP_PATH_DATA = 1,
+        APP_PATH_MISC = 2,
+        APP_PATH_FACE = 3,
+        APP_PATH_HEAD = 4,
+        APP_PATH_APP_MISC = 5,
+        APP_PATH_TEMP = 6,
+        GlobalData_Path_Misc = 7,
+        GlobalSys_Path_Misc = 8,
+        APP_PATH_APP_RES = 9
+    } APP_PATH_TYPE;
+
+    typedef enum {
+        AsyncHandle_NONE = 0,
+        AsyncHandle_HttpDownload = 1,
+        AsyncHandle_FileCome = 2,
+        AsyncHandle_Mail = 3,
+        AsyncHandle_QZone = 4,
+        AsyncHandle_SendFile = 5,
+        AsyncHandle_BlueBar = 6,
+        AsyncHandle_MsgInfo = 7,
+        AsyncHandle_StartUp = 8,
+        AsyncHandle_AutoUpdateMgr = 9
+    } AsyncHandle_Type;
+
+    [
+      odl,
+      uuid(E47494EA-660E-49A0-8FB1-24DF07B38DEE),
+      helpstring("ITXLocation Interface")
+    ]
+    interface ITXLocation : IUnknown {
+        HRESULT _stdcall GetItem(
+                        [in] unsigned long index, 
+                        [in] BSTR bstrCountry, 
+                        [in] BSTR bstrProv, 
+                        [out] BSTR* pbstrNextItem, 
+                        [out] unsigned long* plItemCode, 
+                        [out, retval] unsigned long* plRet);
+        HRESULT _stdcall GetLanguage(
+                        [in] unsigned long lFirst, 
+                        [out] unsigned long* plLang, 
+                        [out] BSTR* pbstrLang, 
+                        [out, retval] unsigned long* plRet);
+        HRESULT _stdcall TranslateToName(
+                        [in] unsigned long dwCountry, 
+                        [in] unsigned long dwProv, 
+                        [in] unsigned long dwCity, 
+                        [out] BSTR* pbstrCountry, 
+                        [out] BSTR* pbstrProv, 
+                        [out] BSTR* pbstrCity, 
+                        [out, retval] unsigned long* plRet);
+    };
+
+    [
+      odl,
+      uuid(B6840A50-1435-4E25-8984-9A088BE95A85),
+      helpstring("ITXObjectFactory Interface")
+    ]
+    interface ITXObjectFactory : IUnknown {
+        HRESULT _stdcall CreateTXBuffer([out, retval] ITXBuffer** ppTXBuffer);
+        HRESULT _stdcall CreateTXData([out, retval] ITXData** ppTXData);
+        HRESULT _stdcall CreateTXArray([out, retval] ITXArray** ppTXArray);
+        HRESULT _stdcall CreateObject(
+                        [in] GUID* objectId, 
+                        [out, retval] IUnknown** ppvObject);
+    };
+
+    [
+      odl,
+      uuid(5DE1A819-28EE-477C-AD62-1C42DE220AA1),
+      helpstring("IExportCustomType Interface")
+    ]
+    interface IExportCustomType : IUnknown {
+        HRESULT _stdcall ExportCustomType(
+                        [in] TXDATA_TYPE __MIDL__IExportCustomType0000, 
+                        [in] Mail_Action __MIDL__IExportCustomType0001, 
+                        [in] QZone_Action __MIDL__IExportCustomType0002, 
+                        [in] SendFile_Action __MIDL__IExportCustomType0003, 
+                        [in] AutoUpdateMgr_Action __MIDL__IExportCustomType0004, 
+                        [in] REG_SCOPE __MIDL__IExportCustomType0005, 
+                        [in] DataReportType __MIDL__IExportCustomType0006);
+    };
+
+    typedef enum {
+        TXDATA_TYPE_NONE = 0,
+        TXDATA_TYPE_BOOL = 1,
+        TXDATA_TYPE_BYTE = 2,
+        TXDATA_TYPE_CHAR = 3,
+        TXDATA_TYPE_WORD = 4,
+        TXDATA_TYPE_SHORT = 5,
+        TXDATA_TYPE_DWORD = 6,
+        TXDATA_TYPE_INT = 7,
+        TXDATA_TYPE_STR = 8,
+        TXDATA_TYPE_BUF = 9,
+        TXDATA_TYPE_INTERFACE = 10,
+        TXDATA_TYPE_TXDATA = 11,
+        TXDATA_TYPE_TXARRAY = 12,
+        TXDATA_TYPE_GUID = 13,
+        TXDATA_TYPE_INT64 = 14,
+        TXDATA_TYPE_DOUBLE = 15,
+        TXDATA_TYPE_BUF_TYPED = 16
+    } TXDATA_TYPE;
+
+    typedef enum {
+        Mail_None = 0,
+        OpenMail = 1,
+        ShowTipWnd = 2,
+        DestroyWndCancel = 4,
+        DestroyWnd = 8,
+        UnReadMailCount = 16,
+        SendMail = 32
+    } Mail_Action;
+
+    typedef enum {
+        QZone_None = 0,
+        FriendQzoneUpdate = 1,
+        FriendQzoneContentUpdate = 2,
+        FriendQzonePhotoUpdate = 4,
+        ShowTips = 16,
+        GetData = 32,
+        Click = 64,
+        FlagData = 128
+    } QZone_Action;
+
+    typedef enum {
+        SendFile_None = 0,
+        SendFile = 1,
+        IsFileSending = 2,
+        Accept = 4,
+        Refuse = 16,
+        Cancel = 32,
+        Control = 64,
+        Close = 128,
+        ActiveReportTransferInfo = 256,
+        TestSendFile = 512,
+        Progress = 1024,
+        Complete = 2048,
+        ReportTransferInfo = 4096,
+        BeRequest = 8192
+    } SendFile_Action;
+
+    typedef enum {
+        AutoUpdateMgr_None = 0,
+        AutoUpdate = 1
+    } AutoUpdateMgr_Action;
+
+    typedef [public]
+    __MIDL___MIDL_itf_KernelWrapper_0001_0182_0003 REG_SCOPE;
+
+    typedef enum {
+        REG_SCOPE_CURRENTUSER = 0,
+        REG_SCOPE_ALLUSER = 1,
+        REG_SCOPE_CURRENTPROCESS = 2,
+        REG_SCOPE_CURRENTUSERSHARE = 64,
+        REG_SCOPE_ALLUSERSHARE = 128,
+        REG_SCOPE_MASK = 455
+    } __MIDL___MIDL_itf_KernelWrapper_0001_0182_0003;
+
+    typedef enum {
+        DataReportType_38003009 = 0x38003009,
+        DataReportType_3800300a = 0x3800300a,
+        DataReportType_3800300b = 0x3800300b,
+        DataReportType_3800300c = 0x3800300c,
+        DataReportType_3800300d = 0x3800300d,
+        DataReportType_3800300e = 0x3800300e,
+        DataReportType_3800300f = 0x3800300f,
+        DataReportType_38003010 = 0x38003010,
+        DataReportType_10001003 = 0x10001003
+    } DataReportType;
+
+    [
+      odl,
+      uuid(51FAFB71-829D-4683-AE0E-FD15BD9D668F),
+      helpstring("IMiscHelper Interface")
+    ]
+    interface IMiscHelper : IUnknown {
+        HRESULT _stdcall IsServerControlBitOn(
+                        [in] int svrctrlbit, 
+                        [out, retval] VARIANT_BOOL* pbEnable);
+        HRESULT _stdcall GetConstellationName(
+                        [in] unsigned char cIndex, 
+                        [out, retval] BSTR* pbstrConstellation);
+        HRESULT _stdcall GetConstellationIndex(
+                        [in] int nMonth, 
+                        [in] int nDay, 
+                        [out, retval] unsigned char* pcIndex);
+        HRESULT _stdcall GetBloodTypeName(
+                        [in] unsigned char cIndex, 
+                        [out, retval] BSTR* pbstrBloodType);
+        HRESULT _stdcall GetMonthName(
+                        [in] unsigned char cIndex, 
+                        [out, retval] BSTR* pbstr);
+        HRESULT _stdcall GetDayName(
+                        [in] unsigned char cIndex, 
+                        [out, retval] BSTR* pbstr);
+        HRESULT _stdcall GetGenderName(
+                        [in] unsigned char cIndex, 
+                        [out, retval] BSTR* pbstr);
+        HRESULT _stdcall GetAnimalsName(
+                        [in] unsigned char cIndex, 
+                        [out, retval] BSTR* pbstr);
+        HRESULT _stdcall GroupClassName(
+                        [in] unsigned long dwGroupClassEx, 
+                        [out, retval] BSTR* pbstrGroupClassName);
+        HRESULT _stdcall TXLoadString(
+                        [in] BSTR bstr, 
+                        [out, retval] BSTR* pbstr);
+        HRESULT _stdcall GetRegulatedTime([out, retval] unsigned long* plTime);
+        HRESULT _stdcall JumpGroupUrl(
+                        [in] VARIANT_BOOL isCampusGroup, 
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned long urlType);
+        HRESULT _stdcall FormatHeadImage(
+                        [in] BSTR bstrSource, 
+                        [out] BSTR* pbstrErrorInfo, 
+                        [out, retval] BSTR* pbstrNewPath);
+        HRESULT _stdcall IsValidAccount(
+                        [in] BSTR bstrAccount, 
+                        [out, retval] VARIANT_BOOL* pbValid);
+        HRESULT _stdcall IsEmailFormat(
+                        [in] BSTR bstrEmail, 
+                        [out, retval] VARIANT_BOOL* pbValid);
+        HRESULT _stdcall CheckUinValid(
+                        [in] BSTR bsAccount, 
+                        [out, retval] long* plRet);
+        HRESULT _stdcall GetVersion(
+                        [out] unsigned char* pcMajorVer, 
+                        [out] unsigned char* pcMinorVer, 
+                        [out] unsigned long* plBuild);
+        HRESULT _stdcall ConvertHtmlToXaml(
+                        [in] BSTR bstrSource, 
+                        [out, retval] BSTR* pbstrXaml);
+        HRESULT _stdcall GetMsgAbstract(
+                        [in] ITXMsgPack* pMsgPack, 
+                        [out, retval] BSTR* pbstr);
+        HRESULT _stdcall GetExeDir([out, retval] BSTR* pbstr);
+    };
+
+    [
+      odl,
+      uuid(A1A62363-EF82-4038-8CAF-2069EAF7C065)
+    ]
+    interface ITXMsgPack : IUnknown {
+        HRESULT _stdcall SetStream([in] ITXBuffer* pBufStream);
+        HRESULT _stdcall GetStream([out] ITXBuffer** ppBufStream);
+        HRESULT _stdcall Clear();
+        HRESULT _stdcall SetHeader([in] ITXDataRead* pDataHeader);
+        HRESULT _stdcall GetHeader([out] ITXDataRead** ppDataHeader);
+        HRESULT _stdcall CreateElem(
+                        [in] unsigned char cElemType, 
+                        [in] GUID* riid, 
+                        [out] void** ppMsgElem);
+        HRESULT _stdcall AddElem([in] ITXMsgElem* pMsgElem);
+        HRESULT _stdcall AddNewElem(
+                        [in] unsigned char cElemType, 
+                        [in] GUID* riid, 
+                        [out] void** ppMsgElem);
+        HRESULT _stdcall InsertNewElem(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned char cElemType, 
+                        [in] GUID* riid, 
+                        [out] void** ppMsgElem);
+        HRESULT _stdcall InsertElem(
+                        [in] unsigned int uIndex, 
+                        [in] ITXMsgElem* pMsgElem);
+        HRESULT _stdcall GetElemCount([out] unsigned int* puElemCount);
+        HRESULT _stdcall GetElemType(
+                        [in] unsigned int uIndex, 
+                        [out] unsigned char* pcElemType);
+        HRESULT _stdcall GetElem(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* riid, 
+                        [out] void** ppMsgElem);
+        HRESULT _stdcall DelElem(unsigned int uIndex);
+    };
+
+    [
+      odl,
+      uuid(991089D9-FECD-4B12-B7D4-434F521A22E7)
+    ]
+    interface ITXMsgElem : IUnknown {
+        HRESULT _stdcall GetType([out] unsigned char* pcElemType);
+        HRESULT _stdcall SetStream([in] ITXBuffer* pBufStream);
+        HRESULT _stdcall GetStreamSize([out] unsigned short* pwStreamSize);
+        HRESULT _stdcall GetStream([in] ITXBuffer* pBufStream);
+        HRESULT _stdcall SetCustomData([in] ITXData* pCustomData);
+        HRESULT _stdcall GetCustomData([out] ITXData** ppCustomData);
+        HRESULT _stdcall Clear();
+    };
+
+    [
+      odl,
+      uuid(D2EE872A-6C07-45E0-9E5B-B4E44B26B6C6),
+      helpstring("BamaCmdCodec Interface")
+    ]
+    interface IBamaCmdCodec : IUnknown {
+        HRESULT _stdcall DecodeBuffer(
+                        [in] ITXBuffer* pBuf, 
+                        [in] BSTR bstrProtocol, 
+                        [in] ITXData* pSendData, 
+                        [out] ITXData** ppCmdData, 
+                        [out, retval] unsigned long* plRet);
+    };
+
+    [
+      odl,
+      uuid(F147F552-B8FB-46F9-A18E-510C77683B6C),
+      helpstring("IHttpDownload Interface")
+    ]
+    interface IHttpDownload : IUnknown {
+        HRESULT _stdcall Download(
+                        [in] BSTR bstrUrl, 
+                        [in] BSTR bstrFilePath, 
+                        [out, retval] unsigned long* plRet);
+    };
+
+    [
+      odl,
+      uuid(FC299D35-EAFD-49F1-985F-E646893B09B4),
+      helpstring("IMsgStorage Interface")
+    ]
+    interface IMsgStorage : IUnknown {
+        HRESULT _stdcall SaveMsg(
+                        [in] BSTR lpCatalog, 
+                        [in] BSTR lpRecver, 
+                        [in] BSTR lpSender, 
+                        [in] BSTR lpKey, 
+                        [in] unsigned long dwToUin, 
+                        [in] unsigned long dwFromUin, 
+                        [in] ITXMsgPack* pPack, 
+                        [in] ITXData* pDataMsg, 
+                        [out, retval] VARIANT_BOOL* pRet);
+        HRESULT _stdcall TransformMsg(
+                        [in] ITXMsgPack* pMsg, 
+                        [out, retval] ITXMsgPack** ppMsgOut);
+    };
+
+    [
+      odl,
+      uuid(6E11E792-09B8-4421-A0E5-4E94EE2B1D80)
+    ]
+    interface IAsyncCallBackExt : IUnknown {
+        HRESULT _stdcall OnAsyncCallBack(
+                        [in] AsyncHandle_Type asynchandletype, 
+                        [in] long lAction, 
+                        [in] ITXData* pDataExtraInfo);
+    };
+
+    [
+      odl,
+      uuid(BF84548B-8860-4A84-95CA-DC5047429B25)
+    ]
+    interface ITXC2CImageTransferNotifyExt : IUnknown {
+        HRESULT _stdcall OnTransferStatusChanged(
+                        [in] unsigned long dwUin, 
+                        [in] ITXArrayRead* pImageInfo);
+    };
+
+    [
+      odl,
+      uuid(C5A78E00-8516-4793-87DE-7D86AF972C02)
+    ]
+    interface ITXSessionSendSink : IUnknown {
+        HRESULT _stdcall OnSendMsgReply(
+                        [in] int nResult, 
+                        [in] ITXMsgPack* pMsgPack, 
+                        [in] ITXDataRead* pDataReply);
+    };
+
+    [
+      odl,
+      uuid(D95C8459-F41A-4820-875F-83637C407D1B)
+    ]
+    interface ITXSessionEventExt : IUnknown {
+        HRESULT _stdcall OnSessionStart(
+                        [in] unsigned long dwUin, 
+                        [in] int neResult, 
+                        [in] ITXSession* pSession);
+        HRESULT _stdcall OnCRMSessionStart(
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsParam);
+        HRESULT _stdcall OnSessionInvalid([in] unsigned long dwUin);
+        HRESULT _stdcall OnSessionInfoUpdate([in] ITXSession* pSession);
+        HRESULT _stdcall OnMsgCome(
+                        [in] int eSessionType, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwTime, 
+                        [in] ITXMsgPack* pMsgPack);
+        HRESULT _stdcall OnCmdCome(
+                        [in] int eSessionType, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned short wCmd, 
+                        [in] ITXData* pCCData, 
+                        [in] ITXBuffer* pCmdData);
+        HRESULT _stdcall OnMsgSent(
+                        [in] int neSessionType, 
+                        [in] unsigned long dwUin);
+    };
+
+    [
+      odl,
+      uuid(9CAF470B-73B4-4B30-B87B-0FFF039ABF6D)
+    ]
+    interface ITXSession : IUnknown {
+        HRESULT _stdcall QuerySessionInfo([out] ITXDataRead** ppInfo);
+        HRESULT _stdcall UpdateSessionInfo([in] ITXCallback* pCB);
+        HRESULT _stdcall QuerySessionRight([out] unsigned long* pdwRight);
+        HRESULT _stdcall SendMsg(
+                        [in] ITXMsgPack* pMsgPack, 
+                        [in] ITXBuffer* pValidateCode, 
+                        [in] ITXSessionSendSink* pSendSink, 
+                        [in] ITXData* pMsgExt);
+        HRESULT _stdcall CancelSendMsgSink([in] ITXSessionSendSink* pSendSink);
+        HRESULT _stdcall SendCmd(
+                        [in] ITXData* pCmdData, 
+                        [in] ITXCmdCodec* pCmdCodec, 
+                        [in] ITXBuffer* pValidateCode, 
+                        [in] ITXNetSendSink* pSink);
+        HRESULT _stdcall UpdateDestVerInfo([in] ITXCallback* pCB);
+        HRESULT _stdcall CheckWAPOwner([out] long* pbOwner);
+        HRESULT _stdcall TerminatePerWAP([in] ITXCallback* pCB);
+        HRESULT _stdcall GetValidateCodeAppType([out] unsigned short* pwAppType);
+        HRESULT _stdcall SetAutoReplyMsgSaveFlag([in] long bSaveFlag);
+    };
+
+    [
+      odl,
+      uuid(D6B6842B-C5CA-4516-A4A2-3C90C5FD4C44)
+    ]
+    interface ITXCallback : IUnknown {
+        HRESULT _stdcall OnCallback(
+                        [in] int nResult, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(580EF47C-7F24-4F2E-9F70-6FC5F3DD1E18)
+    ]
+    interface ITXCmdCodec : IUnknown {
+        HRESULT _stdcall CodeTXData(
+                        [in] ITXData* pCmdData, 
+                        [out] ITXBuffer** ppBufferOut);
+        HRESULT _stdcall DecodeBuffer(
+                        [in] ITXBuffer* pBuf, 
+                        [out] ITXData** ppCmdData, 
+                        [in] ITXData* pSendData);
+    };
+
+    [
+      odl,
+      uuid(FB5B41B8-E2C2-4239-98B6-98ECD5C009D3)
+    ]
+    interface ITXNetSendSink : IUnknown {
+        HRESULT _stdcall OnRecvReply(
+                        [in] ITXData* pReplyData, 
+                        [in] ITXData* pSendData);
+        HRESULT _stdcall OnTimeOut([in] ITXData* pSendData);
+    };
+
+    [
+      odl,
+      uuid(2DE693C5-930E-4BA5-B81A-7CB14496BFD2)
+    ]
+    interface ITXGroupEventExt : IUnknown {
+        HRESULT _stdcall OnGroupEvent(
+                        int nEvent, 
+                        unsigned long dwGroupID, 
+                        ITXDataRead* pExtraData);
+        HRESULT _stdcall OnGroupSysMsgNotifyEvent(
+                        int nEvent, 
+                        unsigned long dwGroupID, 
+                        ITXDataRead* pNotifyData);
+        HRESULT _stdcall OnGroupMsg(
+                        [in] unsigned long dwGroupID, 
+                        [in] ITXArrayRead* pMsg);
+        HRESULT _stdcall OnGroupMsgSent([in] unsigned long dwGroupID);
+    };
+
+    [
+      odl,
+      uuid(DFFF7DDB-0138-4318-9161-49CDF89128A2)
+    ]
+    interface ITXGroup : IUnknown {
+        HRESULT _stdcall UpdateGroupAllRelatedInfo([in] ITXGroupSink* pCB);
+        HRESULT _stdcall GetIds(
+                        [out] unsigned long* pdwGroupId, 
+                        [out] unsigned long* pdwGroupCode);
+        HRESULT _stdcall GetGroupBasicInfo([out] ITXDataRead** ppGroupInfo);
+        HRESULT _stdcall UpdateGroupInfo([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateGroupOrgInfo([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UploadGroupOrg(
+                        [in] unsigned char cOpType, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall UploadGroupMemOrg(
+                        [in] ITXArray* pOrgUinList, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall GetGroupNodeType(
+                        [in] unsigned long dwGroupFolderID, 
+                        [out] unsigned char* pcGroupNodeType);
+        HRESULT _stdcall GetSubGroupFolderList(
+                        [in] unsigned long dwParentFolderID, 
+                        [out] ITXArrayRead** pSubOrgFolderArray);
+        HRESULT _stdcall GetSubUserItemList(
+                        [in] unsigned long dwParentFolderID, 
+                        [out] ITXArrayRead** pSubItemArray);
+        HRESULT _stdcall UpLoadGroupMsgType(
+                        [in] unsigned char cMsgType, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall SetUpdateAllDiscListFlag();
+        HRESULT _stdcall UpdateUserInfo(
+                        [in] unsigned long dwUin, 
+                        [in] ITXGroupUserSink* pCB);
+        HRESULT _stdcall UpdatePartUserInfo(
+                        ITXArray* pUserList, 
+                        ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateAllUserInfo([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateOnlineList([in] ITXGroupSink* pCB);
+        HRESULT _stdcall IsCurrentUserAdmin(
+                        [out] long* pbIsAdmin, 
+                        [out] long* pbIsCreator);
+        HRESULT _stdcall IsGroupMemAdm(
+                        [in] unsigned long dwUin, 
+                        [out] long* pbIsAdmin, 
+                        [out] long* pbIsCreator);
+        HRESULT _stdcall QuitGroup([in] ITXGroupSink* pCB);
+        HRESULT _stdcall GetUserInfo(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppUserInfo);
+        HRESULT _stdcall GetUserInfoList([out] ITXArrayRead** ppUserList);
+        HRESULT _stdcall GetUserList([out] ITXArrayRead** ppUserList);
+        HRESULT _stdcall GetCreatorUin([out] unsigned long* pdwCreatorUin);
+        HRESULT _stdcall UpdateMemberExstat([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateMemCardInfo(
+                        [in] unsigned long dwMemUin, 
+                        [in] ITXGroupUserSink* pCB);
+        HRESULT _stdcall UpdateAllMemberCardInfoName([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UploadAllMemCardInfo(
+                        [in] ITXArray* pArray, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateAllMemFlag([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateAllMemTalkTimeLastDate([in] ITXGroupSink* pCB);
+        HRESULT _stdcall UpdateAllMemAccountList([in] ITXGroupSink* pCB);
+        HRESULT _stdcall GetGroupMemShowName(
+                        [in] unsigned long dwUin, 
+                        [out] BSTR* pbsShowName);
+        HRESULT _stdcall GetGroupMemStatus(
+                        [in] unsigned long dwUin, 
+                        [out] unsigned short* pwStatus);
+        HRESULT _stdcall GetGroupMemImageIndex(
+                        [in] unsigned long dwUin, 
+                        [out] unsigned short* pwHeadIndex);
+        HRESULT _stdcall GetGroupMemGender(
+                        [in] unsigned long dwUin, 
+                        [out] unsigned char* pcGender);
+        HRESULT _stdcall AdmAddUser(
+                        [in] ITXArray* pUinList, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall AdmDelUser(
+                        [in] ITXArray* pUinList, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall AdmSetGroupInfo(
+                        [in] ITXDataRead* pNewInfo, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall AdmDisbandGroup([in] ITXGroupSink* pCB);
+        HRESULT _stdcall AdmProcessJoinRequest(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pData, 
+                        ITXGroupUserSink* pCB);
+        HRESULT _stdcall CreatorTransfer(
+                        [in] unsigned long dwToUin, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall CreatorSetManager(
+                        [in] unsigned long dwManagerUin, 
+                        [in] char bSet, 
+                        [in] ITXGroupSink* pCB);
+        HRESULT _stdcall AdmInviteUser(
+                        [in] ITXDataRead* pData, 
+                        [in] ITXGroupUserSink* pCB);
+        HRESULT _stdcall SetMsgType([in] unsigned char cMsgType);
+        HRESULT _stdcall SetMsgSaveType([in] long bSaveToSever);
+        HRESULT _stdcall SetGroupZoneTimeStamp([in] unsigned long dwTimeStamp);
+        HRESULT _stdcall GetGroupZoneTimeStamp([out] unsigned long* pdwTimeStamp);
+        HRESULT _stdcall StartUpdateMemberStatus();
+        HRESULT _stdcall StopUpdateMemberStatus();
+        HRESULT _stdcall SetGroupMemSheildStatus(
+                        [in] unsigned long dwUin, 
+                        [in] long bSheild);
+        HRESULT _stdcall GetGroupMemSheildStatus(
+                        [in] unsigned long dwUin, 
+                        [out, retval] long* pbSheild);
+        HRESULT _stdcall SetGroupFobidPic([in] long bForbidPic);
+        HRESULT _stdcall UpdateGroupSignature([in] ITXGroupSink* pCB);
+        HRESULT _stdcall GetGroupMemSignature(
+                        [in] unsigned long dwUin, 
+                        [in] ITXGroupUserSink* pCB);
+        HRESULT _stdcall SetAttentionUinListWhenShield([in] ITXArray* parUinList);
+        HRESULT _stdcall SetAttentionContentListWhenShield([in] ITXArray* parContentList);
+        HRESULT _stdcall SetGroupDefindedHeadInfo([in] ITXData* pGroupInfo);
+        HRESULT _stdcall UpdateGroupInfoOnly(ITXGroupSink* pCB);
+        HRESULT _stdcall AdmSetSysGroupHead(
+                        unsigned short wIndex, 
+                        ITXGroupSink* pCB);
+    };
+
+    [
+      odl,
+      uuid(55A66D8C-604F-49C1-AC23-A16872BE93F7)
+    ]
+    interface ITXGroupSink : IUnknown {
+        HRESULT _stdcall OnCallback(
+                        [in] int nResult, 
+                        [in] unsigned long dwGroupID, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(8E3F0AAF-AD39-4FCB-B447-E14A3DFCA68D)
+    ]
+    interface ITXGroupUserSink : IUnknown {
+        HRESULT _stdcall OnCallback(
+                        [in] int nResult, 
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned long dwUin, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(DB17A85C-23F4-462D-9E0D-5BC59C7608B6)
+    ]
+    interface ITXIMContactInfoEvtExt : IUnknown {
+        HRESULT _stdcall OnIMContactInfoEvt(
+                        [in] int nEventType, 
+                        [in] unsigned long dwUin);
+        HRESULT _stdcall OnIMContactInfoListEvt(
+                        [in] int nEventType, 
+                        [in] ITXArrayRead* pList, 
+                        [in] long flag);
+        HRESULT _stdcall OnAllIMContactInfoUpdatedEvt(
+                        [in] int nEventType, 
+                        [in] ITXArrayRead* pList, 
+                        [in] int flag);
+    };
+
+    [
+      odl,
+      uuid(76063A86-D553-44A6-AF7A-12AE87211AA7)
+    ]
+    interface ITXGroupMgr : IUnknown {
+        HRESULT _stdcall CreateGroup(
+                        [in] ITXDataRead* pGroupInfo, 
+                        [in] ITXCallback* pCB);
+        HRESULT _stdcall JoinGroup(
+                        [in] unsigned long dwGroupID, 
+                        [in] ITXCallbackKey* pCB);
+        HRESULT _stdcall AcceptInvite(
+                        [in] unsigned long dwGroupID, 
+                        [in] ITXDataRead* pData, 
+                        [in] ITXCallback* pCB);
+        HRESULT _stdcall DenyInvite(
+                        [in] unsigned long dwGroupID, 
+                        [in] ITXDataRead* pData, 
+                        [in] ITXCallback* pCB);
+        HRESULT _stdcall SendReqJoinGroup(
+                        [in] unsigned long dwGroupID, 
+                        [in] ITXDataRead* pJoinInfo, 
+                        [in] ITXCallbackKey* pCB);
+        HRESULT _stdcall UpdateMyCreatedGroupList([in] ITXCallback* pCB);
+        HRESULT _stdcall QueryGroup(
+                        [in] unsigned long dwGroupID, 
+                        [out] ITXGroup** ppGroup);
+        HRESULT _stdcall GetGroupIdList([out] ITXArrayRead** ppGroupList);
+        HRESULT _stdcall GroupCodeToId(
+                        [in] unsigned long dwGroupCode, 
+                        [out] unsigned long* pdwGroupId);
+        HRESULT _stdcall GroupIdToId(
+                        [in] unsigned long dwGroupID, 
+                        [out] unsigned long* pdwGroupCode);
+        HRESULT _stdcall UpdateGroupSpaceTimeStamp([in] ITXCallback* pCB);
+        HRESULT _stdcall GetGroupSpaceTimeStamp(
+                        [in] unsigned long dwGroupID, 
+                        [out] unsigned long* pdwNewStamp, 
+                        [out] unsigned long* pdwOldStamp);
+        HRESULT _stdcall UpdateGroupListMsgType([in] ITXCallback* pCB);
+        HRESULT _stdcall UnifySetGroupListMsgRevType([in] unsigned char cPriorRevMsgType);
+        HRESULT _stdcall UpdateAllGroupInfo([in] ITXCallback* pCB);
+        HRESULT _stdcall FingerGroup(
+                        [in] unsigned long dwGroupCode, 
+                        [in] ITXCallback* pCB);
+        HRESULT _stdcall UpdateLayerFile([in] ITXCallback* pCB);
+        HRESULT _stdcall AddUinForDenyForever(
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned long dwUin);
+        HRESULT _stdcall RemoveUinForDenyForever(
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned long dwUin);
+        HRESULT _stdcall IsUinInDenyForever(
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned long dwUin, 
+                        [out] long* pbDenyForever);
+        HRESULT _stdcall AddGroupForDenyForever([in] unsigned long dwGroupID);
+        HRESULT _stdcall RemoveGroupForDenyForever([in] unsigned long dwGroupID);
+        HRESULT _stdcall IsGroupInDenyForever(
+                        [in] unsigned long dwGroupID, 
+                        [out] long* pbDenyForever);
+        HRESULT _stdcall GetDenyForeverInfoOfGroup(
+                        [in] unsigned long dwGroupID, 
+                        [out] ITXArray** ppUinList);
+        HRESULT _stdcall GetDenyForeverInfoOfUin([out] ITXArray** ppGroupList);
+    };
+
+    [
+      odl,
+      uuid(44026A74-80D4-4C97-9227-F27EC43D5C0E)
+    ]
+    interface ITXCallbackKey : IUnknown {
+        HRESULT _stdcall OnCallback(
+                        [in] int nResult, 
+                        [in] unsigned long dwKey, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(B1B07711-24AE-4439-A4DB-7544DAE85936)
+    ]
+    interface ITXIdleCallback : IUnknown {
+        HRESULT _stdcall OnIdle([in, optional] unsigned int uID);
+    };
+
+    [
+      odl,
+      uuid(65FDDA98-1AF6-4A28-BBA4-D6C668F0514E)
+    ]
+    interface ITXContactIMStatusEvtExt : IUnknown {
+        HRESULT _stdcall OnContactIMStatusEvt(
+                        [in] int nEventType, 
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pStatusInfo);
+        HRESULT _stdcall OnContactIMStatusListEvt(
+                        [in] int nEventType, 
+                        [in] ITXArrayRead* pList);
+    };
+
+    [
+      odl,
+      uuid(D5362940-C114-4911-8EDF-40884CB33B25)
+    ]
+    interface ITXDataRouteFilterExt : IUnknown {
+        HRESULT _stdcall OnRouteData(
+                        BSTR bsRouteName, 
+                        ITXData* pRouteData, 
+                        ITXData* pCtrlData);
+    };
+
+    [
+      odl,
+      uuid(ADF9825A-970B-43B3-8600-E768B4424B0E)
+    ]
+    interface ITXIMLoginEventExt : IUnknown {
+        HRESULT _stdcall OnLoginStart();
+        HRESULT _stdcall OnLoginEnd();
+        HRESULT _stdcall OnLoginOK(ITXData* pLoginOKInfo);
+        HRESULT _stdcall OnPreLogout();
+    };
+
+    [
+      odl,
+      uuid(3CB1F17D-F7B4-4E20-B59C-A6FA3ED2C877)
+    ]
+    interface ITXContactFolderEvtExt : IUnknown {
+        HRESULT _stdcall OnFolderInfoUpdate([in] unsigned char cFolderId);
+        HRESULT _stdcall OnFolderSeqUpdate([in] ITXArrayRead* pSortedList);
+    };
+
+    [
+      odl,
+      uuid(D92097DD-CF17-40EB-9668-EDF8BA54C1B8)
+    ]
+    interface ITXOldSysReceiverExt : IUnknown {
+        HRESULT _stdcall OnOldSysDataCome(
+                        [in] unsigned short wCmd, 
+                        [in] ITXData* pDataExtraInfo, 
+                        [in] ITXBuffer* pBuf);
+    };
+
+    [
+      odl,
+      uuid(DC652929-20C0-4AC8-B8C7-2C1689DB2CF6)
+    ]
+    interface ITXIMConnectionEventExt : IUnknown {
+        HRESULT _stdcall OnServerKickout([in] ITXData* pKickoutInfo);
+        HRESULT _stdcall OnConnectionBroken(
+                        [out] long* pbAutoConnect, 
+                        [in] ITXData* pConnectionBrokenInfo);
+        HRESULT _stdcall OnConnectionAvailable([out] long* pbAutoConnect);
+    };
+
+    [
+      odl,
+      uuid(533897A7-574E-4EB1-8FD4-1F0DC034E2C5)
+    ]
+    interface ITXSYSReceiverExt : IUnknown {
+        HRESULT _stdcall OnSysDataCome(
+                        [in] unsigned short wCmd, 
+                        [in] ITXData* pDataExtraInfo, 
+                        [in] ITXBuffer* pBuf);
+    };
+
+    [
+      odl,
+      uuid(7E178BC9-1A6F-425F-A60D-08E8C0F1872C)
+    ]
+    interface ITXIntlSysReceiverExt : IUnknown {
+        HRESULT _stdcall OnSysDataCome(
+                        [in] unsigned short wCmd, 
+                        [in] ITXData* pDataExtraInfo, 
+                        [in] ITXBuffer* pBuf);
+    };
+
+    [
+      odl,
+      uuid(78878E81-730D-4717-BF12-A65686FEB706)
+    ]
+    interface ITXIMConfig : IUnknown {
+        HRESULT _stdcall Flush();
+        HRESULT _stdcall GetAccountList([out] ITXArrayRead** pAccountList);
+        HRESULT _stdcall GetAccountInfo(
+                        [in] BSTR bsAccount, 
+                        [out] ITXDataRead** ppAccountData);
+        HRESULT _stdcall SetAccountInfo(
+                        [in] unsigned long dwUin, 
+                        [in] ITXData* pAccountData);
+        HRESULT _stdcall ModifyAccount(
+                        [in] unsigned long dwUin, 
+                        [in] ITXData* pAccountData);
+        HRESULT _stdcall DeleteAccount(
+                        [in] BSTR bsAccount, 
+                        [in] long bDeleteFolder);
+        HRESULT _stdcall GetAutoLoginAccountInfo([out] ITXDataRead** ppAccountData);
+        HRESULT _stdcall CancelAutoLogin();
+        HRESULT _stdcall GetAccountListByAccountType(
+                        [in] unsigned char cAccountType, 
+                        [out] ITXArrayRead** ppAccountList);
+        HRESULT _stdcall SavePassword([in] ITXDataRead* pData);
+        HRESULT _stdcall GetSavedPassword(
+                        [in] BSTR bsAccount, 
+                        [out] ITXData** ppDataPass);
+        HRESULT _stdcall GetAllProxys([out] ITXArrayRead** pProxyList);
+        HRESULT _stdcall AddProxy([in] ITXData* pProxyData);
+        HRESULT _stdcall GetProxyByType(
+                        [in] unsigned char cType, 
+                        [out] ITXDataRead** pProxyData);
+        HRESULT _stdcall DeleteProxyByType([in] unsigned char cType);
+        HRESULT _stdcall SetActiveProxyType([in] unsigned char cType);
+        HRESULT _stdcall GetActiveProxyType([out] unsigned char* pcType);
+        HRESULT _stdcall DisableProxy();
+        HRESULT _stdcall SetSpecifyLoginServer(
+                        [in] BSTR bsIP, 
+                        [in] unsigned short wPort, 
+                        [in] unsigned char cType, 
+                        [in] long bEnable);
+        HRESULT _stdcall GetSpecifyLoginServer(
+                        [out] BSTR* pbsIP, 
+                        [out] unsigned short* pwPort, 
+                        [out] unsigned char* pcType, 
+                        [out] long* pbEnable);
+        HRESULT _stdcall CancelSpecifyLoginServer();
+        HRESULT _stdcall SetLastLoginServer(
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsIP, 
+                        [in] unsigned short wPort, 
+                        [in] unsigned char cType);
+        HRESULT _stdcall GetLastLoginServer(
+                        [in] BSTR bsAccount, 
+                        [out] BSTR* pbsIP, 
+                        [out] unsigned short* pwPort, 
+                        [out] unsigned char* pcType);
+        HRESULT _stdcall ResetAccountInfo();
+        HRESULT _stdcall GetDelFolderOnExit([out] long* pbDel);
+        HRESULT _stdcall SetDelFolderOnExit([in] long bDel);
+        HRESULT _stdcall GetSSOAccountList([out] ITXArrayRead** pAccountList);
+        HRESULT _stdcall GetSSOAPI([out] ITXSSOAPI** pAPI);
+        HRESULT _stdcall ModifySSOListNotifyWindow(
+                        [in] unsigned long hwnd, 
+                        [in] long bAdd);
+        HRESULT _stdcall SetLoginUin([in] unsigned long dwUin);
+        HRESULT _stdcall SetTGTPriority([in] unsigned long dwTGTPriority);
+    };
+
+    [
+      odl,
+      uuid(76A1FC45-70B3-4E01-9F6F-BB538C9D0E07),
+      helpstring("ITXSSOAPI Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOAPI : IDispatch {
+        [id(0x00000001), helpstring("method TestAPI")]
+        HRESULT TestAPI([in] unsigned short wVersion);
+        [id(0x00000002), helpstring("method Initialize")]
+        HRESULT Initialize(
+                        [in] unsigned long dwFlags, 
+                        [in] ITXSSOData* pInitData);
+        [id(0x00000003), helpstring("method Uninitialize")]
+        HRESULT Uninitialize();
+        [id(0x00000004), helpstring("method GetPVAccountList")]
+        HRESULT GetPVAccountList([out, retval] ITXSSOArray** ppPVAccountList);
+        [id(0x00000005), helpstring("method GetPVAccountList")]
+        HRESULT AddPVAccountUpdateNotifyWnd([in] unsigned long uUpdateNotifyWndHandle);
+        [id(0x00000006), helpstring("method CancelPVAccountUpdateNotify")]
+        HRESULT CancelPVAccountUpdateNotify([in] unsigned long uCurUpdateNotifyWndHandle);
+        [id(0x00000007), helpstring("method RegisterApp")]
+        HRESULT RegisterApp(
+                        [in] unsigned long dwAppPID, 
+                        [in] BSTR bsAppName, 
+                        [in] unsigned long hAppCallbackWnd, 
+                        [in] unsigned long dwAppClientVer, 
+                        [in] ITXSSOData* pOtherRegisterInfo, 
+                        [out] ITXSSOData** ppInitResultData);
+        [id(0x00000008), helpstring("method UnregisterApp")]
+        HRESULT UnregisterApp(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey);
+        [id(0x00000009), helpstring("method GetSSOAppInterface")]
+        HRESULT GetSSOAppInterface(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [out, retval] ITXSSOApp** ppOutAppInterface);
+        [id(0x0000000a), helpstring("method GetSSOConfigInterface")]
+        HRESULT GetSSOConfigInterface([out, retval] ITXSSOConfig** ppOutConfigInterface);
+        [id(0x0000000b), helpstring("method GetSSOPlatformInfo")]
+        HRESULT GetSSOPlatformInfo(
+                        [out] unsigned long* pdwSSOPlfVersion, 
+                        [out] unsigned short* pwSSOPlfHeaderMainVer, 
+                        [out] unsigned short* pwSSOPlfHeaderSubVer, 
+                        [out] ITXSSOData** ppOutInfo);
+        [id(0x0000000c), helpstring("method CreateTXData")]
+        HRESULT CreateTXSSOData([out, retval] ITXSSOData** ppOutData);
+        [id(0x0000000d), helpstring("method CreateTXData")]
+        HRESULT CreateTXSSOBuffer([out, retval] ITXSSOBuffer** ppOutBuffer);
+        [id(0x0000000e), helpstring("method CreateTXArray")]
+        HRESULT CreateTXSSOArray([out, retval] ITXSSOArray** ppOutArray);
+    };
+
+    [
+      odl,
+      uuid(DCE82D4D-D85A-473B-8E9A-A93D89EDAD72),
+      helpstring("ITXSSOData Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOData : ITXSSODataRead {
+        [id(0x60030000)]
+        HRESULT SetBool(
+                        [in] BSTR bsParamName, 
+                        [in] long bValue);
+        [id(0x60030001)]
+        HRESULT SetByte(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char cValue);
+        [id(0x60030002)]
+        HRESULT SetChar(
+                        [in] BSTR bsParamName, 
+                        [in] char chValue);
+        [id(0x60030003)]
+        HRESULT SetWord(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned short wValue);
+        [id(0x60030004)]
+        HRESULT SetShort(
+                        [in] BSTR bsParamName, 
+                        [in] short shValue);
+        [id(0x60030005)]
+        HRESULT SetDWord(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned long dwValue);
+        [id(0x60030006)]
+        HRESULT SetInt(
+                        [in] BSTR bsParamName, 
+                        [in] int iValue);
+        [id(0x60030007)]
+        HRESULT SetStr(
+                        [in] BSTR bsParamName, 
+                        [in] BSTR bsValue);
+        [id(0x60030008)]
+        HRESULT SetBuf(
+                        [in] BSTR bsParamName, 
+                        [in] ITXSSOBuffer* pBufValue);
+        [id(0x60030009)]
+        HRESULT SetInterface(
+                        [in] BSTR bsParamName, 
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003000a)]
+        HRESULT SetNewData(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSOData** ppValue);
+        [id(0x6003000b)]
+        HRESULT SetData(
+                        [in] BSTR bsParamName, 
+                        [in] ITXSSOData* pValue);
+        [id(0x6003000c)]
+        HRESULT SetNewArray(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSOArray** ppValue);
+        [id(0x6003000d)]
+        HRESULT SetArray(
+                        [in] BSTR bsParamName, 
+                        [in] ITXSSOArray* pValue);
+        [id(0x6003000e)]
+        HRESULT SetGuid(
+                        [in] BSTR bsParamName, 
+                        [in] GUID* guid);
+        [id(0x6003000f)]
+        HRESULT SetInt64(
+                        [in] BSTR bsParamName, 
+                        [in] int64 n64Var);
+        [id(0x60030010)]
+        HRESULT SetDoc([in] ITXSSOBuffer* pBufDoc);
+        [id(0x60030011)]
+        HRESULT SetDoc2(
+                        [in] unsigned int uSize, 
+                        [in, out] unsigned char* pcDoc);
+        [id(0x60030012)]
+        HRESULT GetData(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSOData** ppValue);
+        [id(0x60030013)]
+        HRESULT GetArray(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSOArray** ppValue);
+        [id(0x60030014)]
+        HRESULT RemoveAField(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char cType);
+    };
+
+    [
+      odl,
+      uuid(F2A89253-E5E7-426E-8D54-22360114ACA3),
+      helpstring("ITXSSODataRead Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSODataRead : IDispatch {
+        [id(0x60020000)]
+        HRESULT GetBool(
+                        [in] BSTR bsParamName, 
+                        [out, retval] long* pbValue);
+        [id(0x60020001)]
+        HRESULT GetByte(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned char* pcValue);
+        [id(0x60020002)]
+        HRESULT GetChar(
+                        [in] BSTR bsParamName, 
+                        [out, retval] char* pchValue);
+        [id(0x60020003)]
+        HRESULT GetWord(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned short* pwValue);
+        [id(0x60020004)]
+        HRESULT GetShort(
+                        [in] BSTR bsParamName, 
+                        [out, retval] short* pshValue);
+        [id(0x60020005)]
+        HRESULT GetDWord(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned long* pdwValue);
+        [id(0x60020006)]
+        HRESULT GetInt(
+                        [in] BSTR bsParamName, 
+                        [out, retval] int* pnValue);
+        [id(0x60020007)]
+        HRESULT GetStr(
+                        [in] BSTR bsParamName, 
+                        [out, retval] BSTR* pbsValue);
+        [id(0x60020008)]
+        HRESULT GetBuf(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSOBuffer** ppBufValue);
+        [id(0x60020009)]
+        HRESULT GetInterface(
+                        [in] BSTR bsParamName, 
+                        [in] GUID* riid, 
+                        [out, retval] void** ppvValue);
+        [id(0x6002000a)]
+        HRESULT GetDataRead(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSODataRead** ppValue);
+        [id(0x6002000b)]
+        HRESULT GetArrayRead(
+                        [in] BSTR bsParamName, 
+                        [out, retval] ITXSSOArrayRead** ppValue);
+        [id(0x6002000c)]
+        HRESULT GetGuid(
+                        [in] BSTR bsParamName, 
+                        [out, retval] GUID* pGuid);
+        [id(0x6002000d)]
+        HRESULT GetInt64(
+                        [in] BSTR bsParamName, 
+                        [out, retval] int64* pn64Var);
+        [id(0x6002000e)]
+        HRESULT GetDoc([out, retval] ITXSSOBuffer** ppBufDoc);
+        [id(0x6002000f)]
+        HRESULT FieldType(
+                        [in] BSTR bsParamName, 
+                        [out, retval] unsigned char* pcType);
+        [id(0x60020010)]
+        HRESULT IsFieldType(
+                        [in] BSTR bsParamName, 
+                        [in] unsigned char cType);
+        [id(0x60020011)]
+        HRESULT Equal([in] ITXSSODataRead* pData);
+        [id(0x60020012)]
+        HRESULT GetFieldCount([out, retval] unsigned int* puCount);
+        [id(0x60020013)]
+        HRESULT GetFieldName(
+                        [in] unsigned int uIndex, 
+                        [out, retval] BSTR* pbsFieldName);
+        [id(0x60020014)]
+        HRESULT CopyTo([in] ITXSSOData* pData);
+        [id(0x60020015)]
+        HRESULT EnumData([out, retval] ITXSSOEnumData** ppEnum);
+    };
+
+    [
+      odl,
+      uuid(9CFE8D35-D272-4979-9E36-EA55D898D340),
+      helpstring("ITXSSOBuffer Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOBuffer : IDispatch {
+        [id(0x60020000)]
+        HRESULT IsEmpty();
+        [id(0x60020001)]
+        HRESULT Empty();
+        [id(0x60020002)]
+        HRESULT Resize(
+                        [in] unsigned int uSize, 
+                        [out, retval] unsigned char** ppcBuf);
+        [id(0x60020003)]
+        HRESULT GetAt(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned char* pcValue);
+        [id(0x60020004)]
+        HRESULT SetAt(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned char cValue);
+        [id(0x60020005)]
+        HRESULT GetNativeBuf([out, retval] unsigned char** ppcBuf);
+        [id(0x60020006)]
+        HRESULT GetSize([out, retval] unsigned int* puSize);
+        [id(0x60020007)]
+        HRESULT CopyFrom(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize);
+        [id(0x60020008)]
+        HRESULT CopyFromTXBuffer([in] ITXSSOBuffer* pBuf);
+        [id(0x60020009)]
+        HRESULT Attach(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize);
+        [id(0x6002000a)]
+        HRESULT Detach([out, retval] unsigned char** ppcBuf);
+        [id(0x6002000b)]
+        HRESULT Compare(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize, 
+                        [out, retval] int* pnResult);
+        [id(0x6002000c)]
+        HRESULT CompareTXBuffer(
+                        [in] ITXSSOBuffer* pBuf, 
+                        [out, retval] int* pnResult);
+        [id(0x6002000d)]
+        HRESULT Append(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize, 
+                        [out, retval] unsigned char** ppcBufNew);
+        [id(0x6002000e)]
+        HRESULT AppendTXBuffer(
+                        [in] ITXSSOBuffer* pBuf, 
+                        [out, retval] unsigned char** ppcBufNew);
+        [id(0x6002000f)]
+        HRESULT SetAllocBase([in] unsigned int uSize);
+        [id(0x60020010)]
+        HRESULT CopyFromSTR([in] BSTR bsValue);
+        [id(0x60020011)]
+        HRESULT AppendSTRToBuffer([in] BSTR bsValue);
+        [id(0x60020012)]
+        HRESULT __Resize([in] unsigned int uSize);
+        [id(0x60020013)]
+        HRESULT __Append(
+                        [in] unsigned char* pcBuf, 
+                        [in] unsigned int uSize);
+        [id(0x60020014)]
+        HRESULT __AppendTXBuffer([in] ITXSSOBuffer* pBuf);
+    };
+
+    [
+      odl,
+      uuid(8182B8C8-3BFC-472B-8409-FE6BBFC889A4),
+      helpstring("ITXSSOArrayRead Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOArrayRead : IDispatch {
+        [id(0x60020000)]
+        HRESULT GetBool(
+                        [in] unsigned int uIndex, 
+                        [out, retval] long* pbValue);
+        [id(0x60020001)]
+        HRESULT GetByte(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned char* pcValue);
+        [id(0x60020002)]
+        HRESULT GetChar(
+                        [in] unsigned int uIndex, 
+                        [out, retval] char* pchValue);
+        [id(0x60020003)]
+        HRESULT GetWord(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned short* pwValue);
+        [id(0x60020004)]
+        HRESULT GetShort(
+                        [in] unsigned int uIndex, 
+                        [out, retval] short* pshValue);
+        [id(0x60020005)]
+        HRESULT GetDWord(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned long* pdwValue);
+        [id(0x60020006)]
+        HRESULT GetInt(
+                        [in] unsigned int uIndex, 
+                        [out, retval] int* pnValue);
+        [id(0x60020007)]
+        HRESULT GetStr(
+                        [in] unsigned int uIndex, 
+                        [out, retval] BSTR* pbsValue);
+        [id(0x60020008)]
+        HRESULT GetBuf(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSOBuffer** ppBufValue);
+        [id(0x60020009)]
+        HRESULT GetInterface(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* riid, 
+                        [out, retval] void** ppvValue);
+        [id(0x6002000a)]
+        HRESULT GetDataRead(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSODataRead** ppValue);
+        [id(0x6002000b)]
+        HRESULT GetArrayRead(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSOArrayRead** ppValue);
+        [id(0x6002000c)]
+        HRESULT GetGuid(
+                        [in] unsigned int uIndex, 
+                        [out, retval] GUID* pGuid);
+        [id(0x6002000d)]
+        HRESULT GetInt64(
+                        [in] unsigned int uIndex, 
+                        [out, retval] int64* pn64Var);
+        [id(0x6002000e)]
+        HRESULT GetType(
+                        [in] unsigned int uIndex, 
+                        [out, retval] unsigned char* pcType);
+        [id(0x6002000f)]
+        HRESULT GetSize([out, retval] unsigned int* puSize);
+        [id(0x60020010)]
+        HRESULT GetDoc([out, retval] ITXSSOBuffer** ppBufDoc);
+        [id(0x60020011)]
+        HRESULT Equal([in] ITXSSOArrayRead* pArray);
+        [id(0x60020012)]
+        HRESULT CopyTo([in] ITXSSOArray* pDataArray);
+    };
+
+    [
+      odl,
+      uuid(C4814377-19D4-48FE-B913-28E24A96AE08),
+      helpstring("ITXSSOArray Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOArray : ITXSSOArrayRead {
+        [id(0x60030000)]
+        HRESULT AddBool([in] long bValue);
+        [id(0x60030001)]
+        HRESULT AddByte([in] unsigned char cValue);
+        [id(0x60030002)]
+        HRESULT AddChar([in] char chValue);
+        [id(0x60030003)]
+        HRESULT AddWord([in] unsigned short wValue);
+        [id(0x60030004)]
+        HRESULT AddShort([in] short shValue);
+        [id(0x60030005)]
+        HRESULT AddDWord([in] unsigned long dwValue);
+        [id(0x60030006)]
+        HRESULT AddInt([in] int iValue);
+        [id(0x60030007)]
+        HRESULT AddStr([in] BSTR bsValue);
+        [id(0x60030008)]
+        HRESULT AddBuf([in] ITXSSOBuffer* pBufValue);
+        [id(0x60030009)]
+        HRESULT AddInterface(
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003000a)]
+        HRESULT AddNewData([out, retval] ITXSSOData** ppValue);
+        [id(0x6003000b)]
+        HRESULT AddData([in] ITXSSOData* pValue);
+        [id(0x6003000c)]
+        HRESULT AddNewArray([out, retval] ITXSSOArray** ppValue);
+        [id(0x6003000d)]
+        HRESULT AddArray([in] ITXSSOArray* pValue);
+        [id(0x6003000e)]
+        HRESULT AddGuid([in] GUID* guid);
+        [id(0x6003000f)]
+        HRESULT AddInt64([in] int64 n64Var);
+        [id(0x60030010)]
+        HRESULT InsertBool(
+                        [in] unsigned int uIndex, 
+                        [in] long bValue);
+        [id(0x60030011)]
+        HRESULT InsertByte(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned char cValue);
+        [id(0x60030012)]
+        HRESULT InsertChar(
+                        [in] unsigned int uIndex, 
+                        [in] char chValue);
+        [id(0x60030013)]
+        HRESULT InsertWord(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned short wValue);
+        [id(0x60030014)]
+        HRESULT InsertShort(
+                        [in] unsigned int uIndex, 
+                        [in] short shValue);
+        [id(0x60030015)]
+        HRESULT InsertDWord(
+                        [in] unsigned int uIndex, 
+                        [in] unsigned long dwValue);
+        [id(0x60030016)]
+        HRESULT InsertInt(
+                        [in] unsigned int uIndex, 
+                        [in] int iValue);
+        [id(0x60030017)]
+        HRESULT InsertStr(
+                        [in] unsigned int uIndex, 
+                        [in] BSTR bsValue);
+        [id(0x60030018)]
+        HRESULT InsertBuf(
+                        [in] unsigned int uIndex, 
+                        [in] ITXSSOBuffer* pBufValue);
+        [id(0x60030019)]
+        HRESULT InsertInterface(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* riid, 
+                        [in] IUnknown* pValue);
+        [id(0x6003001a)]
+        HRESULT InsertNewData(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSOData** ppValue);
+        [id(0x6003001b)]
+        HRESULT InsertData(
+                        [in] unsigned int uIndex, 
+                        [in] ITXSSOData* pValue);
+        [id(0x6003001c)]
+        HRESULT InsertNewArray(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSOArray** ppValue);
+        [id(0x6003001d)]
+        HRESULT InsertArray(
+                        [in] unsigned int uIndex, 
+                        [in] ITXSSOArray* pValue);
+        [id(0x6003001e)]
+        HRESULT InsertGuid(
+                        [in] unsigned int uIndex, 
+                        [in] GUID* guid);
+        [id(0x6003001f)]
+        HRESULT InsertInt64(
+                        [in] unsigned int uIndex, 
+                        [in] int64 n64Var);
+        [id(0x60030020)]
+        HRESULT SetDoc([in] ITXSSOBuffer* pBufDoc);
+        [id(0x60030021)]
+        HRESULT SetDoc2(
+                        [in] unsigned int uSize, 
+                        [in, out] unsigned char* pcDoc);
+        [id(0x60030022)]
+        HRESULT RemoveAt([in] unsigned int uIndex);
+        [id(0x60030023)]
+        HRESULT RemoveAll();
+        [id(0x60030024)]
+        HRESULT GetData(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSOData** ppValue);
+        [id(0x60030025)]
+        HRESULT GetArray(
+                        [in] unsigned int uIndex, 
+                        [out, retval] ITXSSOArray** ppValue);
+        [id(0x60030026)]
+        HRESULT MoveElement(
+                        [in] unsigned int uFrom, 
+                        [in] unsigned int uTo);
+    };
+
+    [
+      odl,
+      uuid(40DBB647-8BFF-49E1-9F4A-F597C24ADA73),
+      helpstring("ITXSSOEnumData Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOEnumData : IDispatch {
+        [id(0x60020000)]
+        HRESULT Next(
+                        [in] unsigned int nCelt, 
+                        [out] ITXSSOData** ppData, 
+                        [in, out] unsigned long* pFetched);
+        [id(0x60020001)]
+        HRESULT Skip([in] unsigned int uCelt);
+        [id(0x60020002)]
+        HRESULT Reset();
+        [id(0x60020003)]
+        HRESULT CopyTo([out, retval] ITXSSOEnumData** pEnum);
+        [id(0x60020004)]
+        HRESULT GetSize([out, retval] unsigned int* puSize);
+    };
+
+    [
+      odl,
+      uuid(EC4A0D43-C7CE-4D2D-868F-6F57075C5320),
+      helpstring("ITXSSOApp Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOApp : IDispatch {
+        [id(0x00000001), helpstring("method AppHello")]
+        HRESULT AppHello(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey);
+        [id(0x00000002), helpstring("method RequestServiceTicket")]
+        HRESULT RequestServiceTicket(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwServiceID, 
+                        [in] BSTR bsAccount, 
+                        [in] unsigned char cCredentialType, 
+                        [in] ITXSSOBuffer* pCredentialData, 
+                        [in] ITXSSOData* pRequestInfo);
+        [id(0x00000003), helpstring("method CancelRequestST")]
+        HRESULT CancelRequestST(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwServiceID, 
+                        [in] BSTR bsAccount);
+        [id(0x00000004), helpstring("method CloseAccount")]
+        HRESULT CloseAccount(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] BSTR bsAccount);
+        [id(0x00000005), helpstring("method EnterVerifyCode")]
+        HRESULT EnterVerifyCode(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsEnterCode, 
+                        [in] long bCancel, 
+                        [in] ITXSSOData* pOtherEnterInfo);
+        [id(0x00000006), helpstring("method EnterCoorCode")]
+        HRESULT EnterCoorCode(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsEnterCode, 
+                        [in] long bCancel, 
+                        [in] ITXSSOData* pOtherEnterInfo);
+        [id(0x00000007), helpstring("method RenewVerifyCodePic")]
+        HRESULT RenewVerifyCodePic(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long hNewPicNotifyWnd);
+        [id(0x00000008), helpstring("method ManualSetTGTInfo")]
+        HRESULT ManualSetTGTInfo(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwUin, 
+                        [in] ITXSSOData* pTGTInfo);
+        [id(0x00000009), helpstring("method DoPasswordGuardChallenge")]
+        HRESULT DoPasswordGuardChallenge(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned char chOpt, 
+                        [in] ITXSSOData* pOptContent);
+        [id(0x0000000a)]
+        HRESULT DoSSOOpt(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [in] unsigned short wOptID, 
+                        [in] ITXSSOData* pOperationData, 
+                        [out, retval] ITXSSOData** ppResultData);
+        [id(0x0000000b), helpstring("method GetSSOConfigInterface")]
+        HRESULT GetSSOConfigInterface(
+                        [in] unsigned long hAppHandle, 
+                        [in] BSTR bsAccessKey, 
+                        [out, retval] ITXSSOConfig** ppOutConfigInterface);
+    };
+
+    [
+      odl,
+      uuid(2D72499C-48D9-4574-911C-85CDD7C08C94),
+      helpstring("ITXSSOConfig Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXSSOConfig : IDispatch {
+        [id(0x00000001)]
+        HRESULT GetAllProxys(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [out] ITXSSOArray** ppProxyList);
+        [id(0x00000002)]
+        HRESULT AddProxy(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] ITXSSOData* pProxyData);
+        [id(0x00000003)]
+        HRESULT GetProxyByType(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned char cType, 
+                        [out] ITXSSOData** ppProxyData);
+        [id(0x00000004)]
+        HRESULT DeleteProxyByType(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned char cType);
+        [id(0x00000005)]
+        HRESULT SetActiveProxyType(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] unsigned char cType);
+        [id(0x00000006)]
+        HRESULT GetActiveProxyType(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [out] unsigned char* pcType);
+        [id(0x00000007)]
+        HRESULT DisableProxy(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin);
+        [id(0x00000008)]
+        HRESULT GetLocalAccountUin(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] BSTR bsAccount, 
+                        [out] unsigned long* pdwUin);
+        [id(0x00000009)]
+        HRESULT GetAccountInfo(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] BSTR bsAccount, 
+                        [out] ITXSSOData** ppAccountData);
+        [id(0x0000000a)]
+        HRESULT SetAccountInfo(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] ITXSSOData* pAccountData);
+        [id(0x0000000b)]
+        HRESULT DeleteAccount(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] BSTR bsAccount);
+        [id(0x0000000c)]
+        HRESULT GetAccountList(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [out] ITXSSOArray** ppAccountList);
+        [id(0x0000000d)]
+        HRESULT GetAccountListByAccountType(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned char cAccountType, 
+                        [out] ITXSSOArray** ppAccountList);
+        [id(0x0000000e)]
+        HRESULT SetAccountList(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] ITXSSOArray* pAccountList);
+        [id(0x0000000f)]
+        HRESULT SetAutoLoginAccount(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin);
+        [id(0x00000010)]
+        HRESULT GetAutoLoginAccount(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long* pdwAutoLoginUin);
+        [id(0x00000011)]
+        HRESULT CancelAutoLoginAccount(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID);
+        [id(0x00000012)]
+        HRESULT SetAppSetting(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] ITXSSOData* pData);
+        [id(0x00000013)]
+        HRESULT GetAppSetting(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [out] ITXSSOData** ppResultData);
+        [id(0x00000014)]
+        HRESULT SetPGSetting(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] ITXSSOData* pData);
+        [id(0x00000015)]
+        HRESULT GetPGSetting(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [out] ITXSSOData** ppResultData);
+        [id(0x00000016)]
+        HRESULT SetCustomSetting(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsSectionName, 
+                        [in] ITXSSOData* pData);
+        [id(0x00000017)]
+        HRESULT GetCustomSetting(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwAccount, 
+                        [in] BSTR bsSectionName, 
+                        [out] ITXSSOData** ppResultData);
+        [id(0x00000018)]
+        HRESULT SetSpecifyLoginServer(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsIP, 
+                        [in] unsigned short wPort, 
+                        [in] unsigned char cType, 
+                        [in] long bEnable);
+        [id(0x00000019)]
+        HRESULT GetSpecifyLoginServer(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [out] BSTR* pbsIP, 
+                        [out] unsigned short* pwPort, 
+                        [out] unsigned char* pcType, 
+                        [out] long* bEnable);
+        [id(0x0000001a)]
+        HRESULT CancelSpecifyLoginServer(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin);
+        [id(0x0000001b)]
+        HRESULT SetLastLoginServer(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [in] BSTR bsIP, 
+                        [in] unsigned short wPort, 
+                        [in] unsigned char cType);
+        [id(0x0000001c)]
+        HRESULT GetLastLoginServer(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin, 
+                        [out] BSTR* pbsIP, 
+                        [out] unsigned short* pwPort, 
+                        [out] unsigned char* pcType, 
+                        [out] unsigned short* pwSvrTypeLoginCount);
+        [id(0x0000001d)]
+        HRESULT ClearSvrTypeLoginCount(
+                        [in] int nSaveOpt, 
+                        [in] unsigned long dwServiceID, 
+                        [in] unsigned long dwUin);
+        [id(0x0000001e)]
+        HRESULT DoSSOConfigOpt(
+                        [in] unsigned short wOptID, 
+                        [in] ITXSSOData* pOperationData, 
+                        [out, retval] ITXSSOData** pResultData);
+    };
+
+    [
+      odl,
+      uuid(9F8921F7-5401-43EB-B0AD-15CFA5BF1A1C)
+    ]
+    interface ITXMsgRecordList : IUnknown {
+        HRESULT _stdcall SetRecordListData(ITXData* pData);
+        HRESULT _stdcall GetRecordListData(ITXData** ppData);
+        HRESULT _stdcall GetIdList([out] ITXArrayRead** ppIdList);
+        HRESULT _stdcall GetRecord(
+                        [in] unsigned long dwId, 
+                        [out] unsigned long* pdwIndex, 
+                        [out] ITXMsgPack** ppMsgPack, 
+                        [out] ITXData** ppDataInfo);
+        HRESULT _stdcall GetRecordFromIndex(
+                        [in] unsigned long dwIndex, 
+                        [out] unsigned long* pdwId, 
+                        [out] ITXMsgPack** ppMsgPack, 
+                        [out] ITXData** ppDataInfo);
+        HRESULT _stdcall BatchGetRecord(
+                        [in] unsigned long dwBeginIndex, 
+                        [in] unsigned long dwMaxCount, 
+                        [out] ITXArrayRead** ppMsgPackList, 
+                        [out] ITXArrayRead** ppDataInfoList);
+        HRESULT _stdcall QueryDateForHaveRecord(
+                        [in] unsigned long dwBeginTime, 
+                        [in] unsigned long dwEndTime, 
+                        [out] ITXArrayRead** ppDateList);
+        HRESULT _stdcall QueryIndexByDate(
+                        [in] unsigned long dwTime, 
+                        [out] unsigned long* pdwIndex);
+        HRESULT _stdcall QueryIndexByTime(
+                        [in] unsigned long dwTime, 
+                        [out] unsigned long* pdwIndex);
+        HRESULT _stdcall GetIndexFromId(
+                        [in] unsigned long dwId, 
+                        [out] unsigned long* pdwIndex);
+        HRESULT _stdcall GetRecordCount(unsigned long* pdwCount);
+        HRESULT _stdcall GetAspectName(BSTR* pbsAspectName);
+        HRESULT _stdcall GetRecordListName(BSTR* pbsRLName);
+        HRESULT _stdcall AddRecord(
+                        [in] ITXMsgPack* pMsgPack, 
+                        [in] ITXDataRead* pDataInfo, 
+                        [out] unsigned long* pdwId);
+        HRESULT _stdcall DeleteRecord([in] unsigned long dwId);
+        HRESULT _stdcall DeleteRecordByIndex([in] unsigned long dwIndex);
+        HRESULT _stdcall DeleteRecordByTime(
+                        unsigned long dwTime, 
+                        ITXDelMsgCallback* pCB);
+        HRESULT _stdcall GetRecordInfoListFromIndex(
+                        [in] unsigned long dwIndex, 
+                        [in] unsigned long dwCount, 
+                        [in] ITXArray** ppInfoList);
+        HRESULT _stdcall InternalSave(
+                        [in] unsigned char* pcA, 
+                        [in] unsigned char* pCB);
+        HRESULT _stdcall InternalGetMsgData([out] ITXBuffer** ppMsgData);
+        HRESULT _stdcall InternalDelAllMsg();
+        HRESULT _stdcall InternalGetMsgContentByDate(
+                        [in] unsigned long dwBeginTime, 
+                        [in] unsigned long dwEndTime, 
+                        [out] ITXBuffer** ppMsg);
+    };
+
+    [
+      odl,
+      uuid(2015139B-EC7B-446C-883B-249DB12D6560)
+    ]
+    interface ITXDelMsgCallback : IUnknown {
+        HRESULT _stdcall NotifyProgress(
+                        [in] unsigned long dwStep, 
+                        [in] unsigned long dwSumStep, 
+                        [out] long* pbStop);
+    };
+
+    [
+      odl,
+      uuid(1CD83340-009D-4148-911A-9C10D9098949)
+    ]
+    interface ITXValidateCodeMgr : IUnknown {
+        HRESULT _stdcall GetDigitalKey(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned short wAppType, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall RefreshValidateCode(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned short wAppType, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall CheckValidateCode(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned short wAppType, 
+                        [in] ITXDataRead* pDataInfo, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall CancelCheckFlow(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned short wAppType);
+    };
+
+    [
+      odl,
+      uuid(6509193D-11F0-4300-B9EE-FEC9A0A6FF82),
+      helpstring("ITXAddBuddyInterface Interface")
+    ]
+    interface ITXAddBuddyNotifyEvt : IUnknown {
+        HRESULT _stdcall OnAddBuddyNotify(
+                        BSTR bsAccount, 
+                        ITXDataRead* pNotifyData);
+    };
+
+    [
+      odl,
+      uuid(ABC5EE50-D991-4EE0-A96B-3512397EDBA1)
+    ]
+    interface ITXDataRouteCenter : IUnknown {
+        HRESULT _stdcall StartRoute(
+                        BSTR bsRouteName, 
+                        ITXData* pRouteData, 
+                        ITXData* pCtrlData, 
+                        ITXDataRouteSink* pSink);
+        HRESULT _stdcall EndRoute(
+                        BSTR bsRouteName, 
+                        ITXData* pRouteData, 
+                        ITXData* pCtrlData);
+        HRESULT _stdcall CallNextRouteFilter(
+                        BSTR bsRouteName, 
+                        ITXData* pRouteData, 
+                        ITXData* pCtrlData);
+    };
+
+    [
+      odl,
+      uuid(E8E41A78-894C-4F09-8875-09FDD1FA1FF3)
+    ]
+    interface ITXDataRouteSink : IUnknown {
+        HRESULT _stdcall OnEndRouteData(
+                        BSTR bsRouteName, 
+                        ITXData* pRouteData, 
+                        ITXData* pCtrlData);
+    };
+
+    [
+      odl,
+      uuid(5F2797E6-BBEF-4497-A90D-765CB24D082A)
+    ]
+    interface ITXMsgText : ITXMsgElem {
+        HRESULT _stdcall GetText([out] BSTR* pbsText);
+        HRESULT _stdcall SetText([in] BSTR bsText);
+        HRESULT _stdcall GetLink(
+                        [out] GUID* pGuidType, 
+                        [out] BSTR* pbsCoreName, 
+                        [out] ITXData** ppDataParam);
+        HRESULT _stdcall SetLink(
+                        [in] GUID* guidType, 
+                        [in] BSTR bsCoreName, 
+                        [in] ITXData* pDataParam);
+        HRESULT _stdcall GetTip([out] BSTR* pbsTip);
+        HRESULT _stdcall SetTip([in] BSTR bsTip);
+    };
+
+    [
+      odl,
+      uuid(377C04A5-AF64-4D37-9858-A49589C1F6AF)
+    ]
+    interface ITXMsgImage : ITXMsgElem {
+        HRESULT _stdcall GetId([out] GUID* pId);
+        HRESULT _stdcall SetId([in] GUID gId);
+        HRESULT _stdcall GetPath([out] BSTR* pbsPath);
+        HRESULT _stdcall SetPath([in] BSTR bsPath);
+        HRESULT _stdcall GetShortcut([out] BSTR* pbsShortcut);
+        HRESULT _stdcall SetShortcut([in] BSTR bsShortcut);
+        HRESULT _stdcall GetLink(
+                        [out] GUID* pGuidType, 
+                        [out] BSTR* pbsCoreName, 
+                        [out] ITXData** ppDataParam);
+        HRESULT _stdcall SetLink(
+                        [in] GUID* guidType, 
+                        [in] BSTR bsCoreName, 
+                        [in] ITXData* pDataParam);
+        HRESULT _stdcall GetTip([out] BSTR* pbsTip);
+        HRESULT _stdcall SetTip([in] BSTR bsTip);
+        HRESULT _stdcall SetType([in] unsigned char cType);
+        HRESULT _stdcall GetFlag([out] ITXBuffer** ppBuffFlag);
+        HRESULT _stdcall SetFlag([in] ITXBuffer* pBuffFlag);
+    };
+
+    [
+      odl,
+      uuid(F81FCE98-6539-4070-B1EE-7B6BE2ADD1BB)
+    ]
+    interface ITXIMContactInfoMgr : IUnknown {
+        HRESULT _stdcall QueryInfo(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwAccessFlag, 
+                        [out] ITXDataRead** ppDataInfo);
+        HRESULT _stdcall UpdateInfo(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwAccessFlag, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall UpdateAllBuddyInfo(
+                        [in] unsigned long dwAccessFlag, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall ForceUpdateAllBuddyInfo(
+                        [in] unsigned long dwAccessFlag, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall LazyUpdateAllBuddyInfo([in] ITXCallback* pCallback);
+        HRESULT _stdcall QueryUpdateAllBuddyInfoStatus(
+                        unsigned long dwType, 
+                        int* status);
+        HRESULT _stdcall UpdateListInfo(
+                        [in] ITXArrayRead* pList, 
+                        [in] unsigned long dwAccessFlag, 
+                        [in] ITXCallbackKey* pCallback, 
+                        [out] unsigned long* pdwCookie);
+        HRESULT _stdcall UploadInfo(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pDataInfo, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUploadInfoSink([in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUpdateInfoSink([in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUpdateListInfoSink([in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUpdateAllInfoSink([in] ITXCallback* pCallback);
+        HRESULT _stdcall QueryUploadCustomHeadAuthorized([out] long* pbAuthorized);
+        HRESULT _stdcall SetPublicNamePrior([in] unsigned char cPriorType);
+        HRESULT _stdcall QueryPublicNamePrior([out] unsigned char* pcPriorType);
+        HRESULT _stdcall UpdateAllLastLoginDays([in] ITXCallback* pCallback);
+        HRESULT _stdcall CancelUpdateAllLastLoginDaysSink([in] ITXCallback* pCallback);
+        HRESULT _stdcall UpdateOneLastLoginDays(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallbackKey);
+        HRESULT _stdcall CancelUpdateOneLastLoginDaysSink(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallbackKey);
+        HRESULT _stdcall GetBigHead(
+                        [in] unsigned long dwUin, 
+                        [in] int type, 
+                        [out] BSTR* pbsPath, 
+                        [in] long bGetFromLocalDirectly);
+        HRESULT _stdcall HasThisTypeHead(
+                        [in] unsigned long dwUin, 
+                        [in] int type, 
+                        [in] long* bHas);
+    };
+
+    [
+      odl,
+      uuid(D8964B2A-CD5B-4535-8EEC-A774E1CD5ADC)
+    ]
+    interface ITXMsgSysFace : ITXMsgElem {
+        HRESULT _stdcall GetIndex([out] unsigned char* pcSysFaceIndex);
+        HRESULT _stdcall SetIndex([in] unsigned char cSysFaceIndex);
+    };
+
+    [
+      odl,
+      uuid(AFECA420-E390-4CC7-A0A8-5DDD74D330F1)
+    ]
+    interface ITXMsgFile : ITXMsgElem {
+        HRESULT _stdcall GetId([out] GUID* pId);
+        HRESULT _stdcall SetId([in] GUID gId);
+        HRESULT _stdcall GetPath([out] BSTR* pbsPath);
+        HRESULT _stdcall SetPath([in] BSTR bsPath);
+        HRESULT _stdcall GetTip([out] BSTR* pbsTip);
+        HRESULT _stdcall SetTip([in] BSTR bsTip);
+    };
+
+    [
+      odl,
+      uuid(4A2E4F63-A211-46ED-839F-DDFF760D27E8),
+      helpstring("ITXContactFolderMgr Interface"),
+      dual,
+      oleautomation
+    ]
+    interface ITXContactFolderMgr : IDispatch {
+        [id(0x60020000)]
+        HRESULT QueryInfo(
+                        [in] unsigned char cFolderId, 
+                        [out] ITXDataRead** ppFolderInfo);
+        [id(0x60020001)]
+        HRESULT UpdateAll([in] ITXCallback* pCallback);
+        [id(0x60020002)]
+        HRESULT UploadSeqs(
+                        [in] ITXArrayRead* pFolderList, 
+                        [in] ITXCallback* pCallback);
+        [id(0x60020003)]
+        HRESULT QuerySeqInfo(
+                        [out] long* pbDefRenamed, 
+                        [out] long* pbSeqUpdated);
+        [id(0x60020004)]
+        HRESULT CancelUploadSeqs([in] ITXCallback* pCallback);
+        [id(0x60020005)]
+        HRESULT GetFolderIdList(
+                        [in] long bSorted, 
+                        [out] ITXArrayRead** pparFolderList);
+        [id(0x60020006)]
+        HRESULT RenameFolder(
+                        [in] unsigned char cFolderId, 
+                        [in] BSTR bsFolderName, 
+                        [in] ITXCallback* pCallback);
+        [id(0x60020007)]
+        HRESULT CancelRenameFolder([in] ITXCallback* pCallback);
+        [id(0x60020008)]
+        HRESULT AddFolder(
+                        [in] BSTR bsFolderName, 
+                        [in] ITXCallback* pCallback);
+        [id(0x60020009)]
+        HRESULT CancelAddFolder([in] ITXCallback* pCallback);
+        [id(0x6002000a)]
+        HRESULT DelFolder(
+                        [in] unsigned char cFolderId, 
+                        [in] ITXCallback* pCallback);
+        [id(0x6002000b)]
+        HRESULT CancelDelFolder([in] ITXCallback* pCallback);
+        [id(0x6002000c)]
+        HRESULT IsFolderListUpdated([in] long* pbUpdated);
+    };
+
+    [
+      odl,
+      uuid(27F36E1E-8321-4A15-916B-D058CAF157B2)
+    ]
+    interface ITXIMContactRelationMgr : IUnknown {
+        HRESULT _stdcall QueryRelation(
+                        [in] unsigned long dwUin, 
+                        [out] unsigned long* pdwRType);
+        HRESULT _stdcall ModifyRelation(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwNewRelationType);
+        HRESULT _stdcall GetIMContactList(
+                        [in] unsigned long dwRType, 
+                        [out] ITXArrayRead** ppIMContactList);
+        HRESULT _stdcall AddBuddy(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall DelBuddy(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall ReverseDel(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall ModifyBuddyToStranger(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall DelStranger([in] unsigned long dwUin);
+        HRESULT _stdcall Accept(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall Refuse(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+    };
+
+    [
+      odl,
+      uuid(74A3F7EE-4F84-413D-9312-55497CA0A081),
+      dual,
+      oleautomation
+    ]
+    interface ITXAddBuddyAuthMgr : IDispatch {
+        [id(0x60020000)]
+        HRESULT QueryInfo(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppAddBuddyAuthInfo);
+        [id(0x60020001)]
+        HRESULT UploadSelfVerificationType(
+                        [in] unsigned char cVerificationType, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallback* pCallback);
+        [id(0x60020002)]
+        HRESULT CancelUploadSelfVerificationType([in] ITXCallback* pCallback);
+        [id(0x60020003)]
+        HRESULT UpdateSelfQA([in] ITXCallback* pCallback);
+        [id(0x60020004)]
+        HRESULT CancelUpdateSelfQA([in] ITXCallback* pCallback);
+        [id(0x60020005)]
+        HRESULT FetchVerificationType(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallback);
+        [id(0x60020006)]
+        HRESULT CancelFetchVerificationType([in] ITXCallbackKey* pCallback);
+        [id(0x60020007)]
+        HRESULT FetchQuestion(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallback);
+        [id(0x60020008)]
+        HRESULT CancelFetchQuestion([in] ITXCallbackKey* pCallback);
+        [id(0x60020009)]
+        HRESULT SubmitAnswer(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pData, 
+                        [in] ITXCallbackKey* pCallback);
+        [id(0x6002000a)]
+        HRESULT CancelSubmitAnswer([in] ITXCallbackKey* pCallback);
+        [id(0x6002000b)]
+        HRESULT GetMultiQuestion(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        [id(0x6002000c)]
+        HRESULT CancelGetMultiQuestion([in] ITXCallbackKey* pCallback);
+    };
+
+    [
+      odl,
+      uuid(B0A66078-FC78-4DD2-A9F4-F703E834A3E2),
+      dual,
+      oleautomation
+    ]
+    interface ITXSessionAuthMgr : IDispatch {
+        [id(0x60020000)]
+        HRESULT QueryInfo(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppSessionAuthInfo);
+        [id(0x60020001)]
+        HRESULT AddToBlackList(
+                        [in] unsigned long dwUin, 
+                        [in] ITXDataRead* pExtraData, 
+                        [in] ITXCallbackKey* pCallback);
+        [id(0x60020002)]
+        HRESULT RemoveFromBlackList([in] unsigned long dwUin);
+        [id(0x60020003)]
+        HRESULT SetPrevented(
+                        [in] unsigned long dwUin, 
+                        [in] long bPrevented);
+        [id(0x60020004)]
+        HRESULT GetBlackList([out] ITXArrayRead** pparBlackList);
+        [id(0x60020005)]
+        HRESULT GetPreventedContactList([out] ITXArrayRead** ppPreventedContactList);
+    };
+
+    [
+      odl,
+      uuid(1675F6EB-07C7-45B9-BE14-043F2C14E390)
+    ]
+    interface ITXCallbackFingerKey : IUnknown {
+        HRESULT _stdcall OnFingerComplete(
+                        [in] int nResult, 
+                        [in] BSTR bsKey, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(7E7275E4-BE65-45E9-9E66-3CFA6F7508CE)
+    ]
+    interface ITXFingerUserMgr : IUnknown {
+        HRESULT _stdcall FingerSingleUserFromServerByAccount(
+                        [in] BSTR bsAccount, 
+                        [in] ITXCallbackFingerKey* pCallback);
+        HRESULT _stdcall FingerUserFromServerByNick(
+                        [in] ITXDataRead* pFingerCondition, 
+                        [in] ITXCallbackFingerKey* pCallback);
+        HRESULT _stdcall FingerClassUserFromServer(
+                        [in] ITXDataRead* pFingerCondition, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall FingerEmailByUin(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallback);
+    };
+
+    [
+      odl,
+      uuid(A81C56FD-A4DD-493E-B3B6-AB67F72C1BED)
+    ]
+    interface IGroupFinger : IUnknown {
+        HRESULT _stdcall FingerFromServer(
+                        [in] unsigned long dwGroupID, 
+                        [in] long bOnlyGroupName, 
+                        [in] ITXCallbackKey* pCallback);
+    };
+
+    [
+      odl,
+      uuid(7B62C6B4-7341-4A5C-822A-3DEB725C5729),
+      dual,
+      oleautomation
+    ]
+    interface ITXContactSearcher : IDispatch {
+        [id(0x60020000)]
+        HRESULT Search(
+                        [in] LPWSTR lpszKey, 
+                        [out] ITXArrayRead** ppResultList);
+        [id(0x60020001)]
+        HRESULT SearchGroup(
+                        [in] LPWSTR lpszKey, 
+                        [out] ITXArrayRead** ppResultList);
+        [id(0x60020002)]
+        HRESULT SearchGroupMember(
+                        [in] unsigned long dwGroupUin, 
+                        [in] LPWSTR lpszKey, 
+                        [out] ITXArrayRead** ppResultList);
+        [id(0x60020003)]
+        HRESULT SearchAddrBookContact(
+                        [in] LPWSTR lpszKey, 
+                        [out] ITXArrayRead** ppResultList);
+        [id(0x60020004)]
+        HRESULT CompareContactInfo(
+                        [in] LPWSTR lpszContactInfo, 
+                        [in] LPWSTR lpszKey, 
+                        [out] long* pbResult);
+        [id(0x60020005)]
+        HRESULT Reset();
+    };
+
+    [
+      odl,
+      uuid(94160931-CBDD-4A1D-BCCA-F99E91C7E328)
+    ]
+    interface ITXGroupSessionMgr : IUnknown {
+        HRESULT _stdcall GetSession(
+                        [in] unsigned long dwGroupID, 
+                        [out] ITXSession** ppSession);
+        HRESULT _stdcall DeleteSession([in] unsigned long dwGroupID);
+        HRESULT _stdcall SetRetryStrategyInfo([in] ITXArray* pInfo);
+    };
+
+    [
+      odl,
+      uuid(CEE82B03-34B7-4CD4-BE95-3B743A49F1F1),
+      dual,
+      oleautomation
+    ]
+    interface ITXIMContactPresentationMgr : IDispatch {
+        [id(0x60020000), helpstring("method QueryInfo")]
+        HRESULT QueryInfo(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppPresentation);
+        [id(0x60020001), helpstring("method GetContactList")]
+        HRESULT GetContactList(
+                        [in] unsigned char cFolderId, 
+                        [out] ITXArrayRead** pparContactList);
+        [id(0x60020002), helpstring("method MoveContacts")]
+        HRESULT MoveContacts(
+                        [in] ITXArrayRead* parIMContactsData, 
+                        [in] ITXCallback* pCallback);
+    };
+
+    [
+      odl,
+      uuid(5E063F81-DBA9-41F0-912F-4B8C626BA1A8)
+    ]
+    interface ITXIMContactStatusMgr : IUnknown {
+        HRESULT _stdcall GetStatus(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppStatusInfo);
+        HRESULT _stdcall QueryLastRSID(
+                        [in] unsigned long dwUin, 
+                        [out] unsigned long* pdwRSID);
+        HRESULT _stdcall QueryRichStatus(
+                        [in] unsigned long dwUin, 
+                        [out] ITXArrayRead** pparRichStatus);
+        HRESULT _stdcall QueryRichStatusItem(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwRSID, 
+                        [out] ITXDataRead** ppDataRead);
+        HRESULT _stdcall UpdateAll([in] ITXCallback* pCallback);
+        HRESULT _stdcall UploadSelfRichStatusInfo(
+                        [in] int nRSTId, 
+                        [in] ITXDataRead* pRichStatusData, 
+                        [in] ITXCallbackKey* pCallback, 
+                        [in] long bUnicode);
+        HRESULT _stdcall RemoveSelfRichStatusInfo(
+                        [in] int nRSTId, 
+                        [in] ITXCallbackKey* pCallbackKey);
+        HRESULT _stdcall CancelUpdateAllSink([in] ITXCallback* pCallback);
+        HRESULT _stdcall CancelUploadSelfRichStatusInfoSink(
+                        [in] int nRSId, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelRemoveSelfRichStatusInfoSink(
+                        [in] int nRSId, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall GetStatusItemList([out] ITXArrayRead** ppStatusItems);
+        HRESULT _stdcall AddStatusItem(
+                        [in] unsigned short wStatus, 
+                        [in] BSTR bsStatusDetail);
+        HRESULT _stdcall RemoveStatusItem(
+                        [in] unsigned short wStatus, 
+                        [in] BSTR bsStatusDetail);
+        HRESULT _stdcall ModifyStatusItem(
+                        [in] unsigned short wStatus, 
+                        [in] BSTR bsStatusDetail, 
+                        [in] BSTR bsNewStatusDetail);
+        HRESULT _stdcall SetAutoChangeStatusConfig([in] ITXDataRead* pConfigInfo);
+        HRESULT _stdcall GetAutoChangeStatusConfig([out] ITXDataRead** ppConfigInfo);
+        HRESULT _stdcall UpdateList(
+                        [in] ITXArrayRead* parIMContactList, 
+                        [in] ITXCallbackKey* pCallback, 
+                        [out] unsigned long* pdwCookie);
+    };
+
+    [
+      odl,
+      uuid(EB53EC98-ED11-49EE-B478-FAA157C60EA3)
+    ]
+    interface ITXMsgStorage : IUnknown {
+        HRESULT _stdcall InitStorage(
+                        [in] long bCanAccessSvr, 
+                        [in] ITXEncUIGetPass* p, 
+                        [in] ITXCallback* pCB);
+        HRESULT _stdcall GetAspect(
+                        [in] BSTR bsMsgAspectName, 
+                        [out] ITXMsgAspect** ppMsgAspect);
+        HRESULT _stdcall GetAspectNameList([out] ITXArray** ppAspectNameList);
+        HRESULT _stdcall QueryAspect(
+                        [in] BSTR bsMsgAspectName, 
+                        [out] ITXMsgAspect** ppMsgAspect);
+        HRESULT _stdcall EraseAspect(
+                        [in] BSTR bsMsgAspectName, 
+                        [in] long bDeleteAllMsg);
+        HRESULT _stdcall SearchMsg(
+                        [in] BSTR bsSearchStr, 
+                        [in] BSTR bsMainKey, 
+                        [in] BSTR bsSubKey, 
+                        [out] ITXArray** pIdArray, 
+                        [in] ITXMsgSearchProgress* prog, 
+                        [in] ITXMsgSearchCallback* pCB);
+        HRESULT _stdcall SearchMsgByTime(
+                        [in] unsigned long dwTime, 
+                        [in] BSTR bsSearchStr, 
+                        [in] BSTR bsMainKey, 
+                        [in] BSTR bsSubKey, 
+                        [out] ITXArray** pIdArray, 
+                        [in] ITXMsgSearchProgress* prog, 
+                        [in] ITXMsgSearchCallback* pCB);
+        HRESULT _stdcall CancelSearch();
+        HRESULT _stdcall QueryMsgRecordDirect(
+                        [in] BSTR bsAspName, 
+                        [in] BSTR bsRecName, 
+                        [in] unsigned long dwId, 
+                        [out] unsigned long* pdwIndex, 
+                        [out] ITXMsgPack** ppMsgPack, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall QueryMsgRecordDirectByIndex(
+                        [in] BSTR bsAspName, 
+                        [in] BSTR bsRecName, 
+                        [in] unsigned long dwIndex, 
+                        [out] ITXMsgPack** ppMsgPack, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall QueryMsgRecordDirectByIndexEx(
+                        [in] BSTR bsAspName, 
+                        [in] BSTR bsRecName, 
+                        [in] unsigned long dwIndex, 
+                        [out] unsigned long* pdwId, 
+                        [out] ITXMsgPack** ppMsgPack, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall ExportMsg(
+                        [in] BSTR bsAspect, 
+                        [in] BSTR bsFileName, 
+                        [in] BSTR bsPassword, 
+                        [in] ITXMsgExportCallback* pCB);
+        HRESULT _stdcall CheckMsg(
+                        [in] BSTR bsFileName, 
+                        [in] unsigned char cLanguageFlag, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall DecryptMsg(
+                        [in] BSTR bsFileName, 
+                        [in] int neKeyType, 
+                        [in] ITXBuffer* pbuffPwdHash);
+        HRESULT _stdcall ImportMsg(
+                        [in] BSTR bsFileName, 
+                        [in] int neKeyType, 
+                        [in] ITXBuffer* pbuffPwdHash, 
+                        [in] unsigned char cLanguageFlag, 
+                        [in] ITXMsgImportCallback* pCB);
+        HRESULT _stdcall SetImageTransferResult(
+                        [in] GUID* rguid, 
+                        [in] unsigned char cResult);
+        HRESULT _stdcall QueryImageTransferResult(
+                        [in] GUID* rguid, 
+                        [out] unsigned char* pcResult);
+        HRESULT _stdcall QueryLastMsgInfo(
+                        [in] BSTR bsMsgAspectName, 
+                        [out] ITXArrayRead** pLastMsgInfoList);
+    };
+
+    [
+      odl,
+      uuid(1DBFA599-A684-4EB1-93F4-F830A54EBBFC)
+    ]
+    interface ITXEncUIGetPass : IUnknown {
+        HRESULT _stdcall GetPassOrAns(
+                        [in] ITXDataRead* pDataInfo, 
+                        [out] ITXData** pOut);
+    };
+
+    [
+      odl,
+      uuid(B1062301-AD54-403A-8693-F59998C70139)
+    ]
+    interface ITXMsgAspect : IUnknown {
+        HRESULT _stdcall SetAspectData(ITXData* pData);
+        HRESULT _stdcall GetAspectData(ITXData** ppData);
+        HRESULT _stdcall GetRecordList(
+                        [in] BSTR bsRecordListName, 
+                        [out] ITXMsgRecordList** ppMsgRecordList);
+        HRESULT _stdcall QueryRecordList(
+                        [in] BSTR bsRecordListName, 
+                        [out] ITXMsgRecordList** ppMsgRecordList);
+        HRESULT _stdcall GetRecordNameList([out] ITXArray** ppRecordListArray);
+        HRESULT _stdcall EraseRecordList(
+                        [in] BSTR bsRecordListName, 
+                        [in] long bDeleteAllMsg);
+    };
+
+    [
+      odl,
+      uuid(B76E8075-6957-4553-BF67-F3F8B7AE39E0)
+    ]
+    interface ITXMsgSearchProgress : IUnknown {
+        HRESULT _stdcall OnStartSearchItem(
+                        BSTR bsAspectName, 
+                        BSTR bsRLName);
+        HRESULT _stdcall NotifyProgress(
+                        [in] unsigned long dwProgress, 
+                        [in] unsigned long dwMaxProgress, 
+                        [in] unsigned long dwId, 
+                        [in] ITXArray* pIdArray);
+        HRESULT _stdcall EndOfSearch([in] long bCancel);
+    };
+
+    [
+      odl,
+      uuid(BD781FF7-2ECB-4EAF-94AA-71F571C58960)
+    ]
+    interface ITXMsgSearchCallback : IUnknown {
+        HRESULT _stdcall CheckMsgSearchContact(
+                        [in] BSTR bsContactName, 
+                        [out] long* pbNeed);
+    };
+
+    [
+      odl,
+      uuid(35E4968B-9BB0-4430-B999-F4B77F06AF4A)
+    ]
+    interface ITXMsgExportCallback : IUnknown {
+        HRESULT _stdcall CheckMsgContact(
+                        [in] BSTR bsContactName, 
+                        [out] long* pbNeed);
+        HRESULT _stdcall NotifyProgress(
+                        [in] unsigned long dwMsgCount, 
+                        [in] unsigned long dwSumMsgCount, 
+                        [in] unsigned long dwStep, 
+                        [in] unsigned long dwSumStep, 
+                        [out] long* pbStop);
+    };
+
+    [
+      odl,
+      uuid(FA7C9B74-2A8A-4CD1-BED6-67F660D83A4A)
+    ]
+    interface ITXMsgImportCallback : IUnknown {
+        HRESULT _stdcall NotifyForAnalyseMsg([out] long* pbStop);
+        HRESULT _stdcall NotifyProgress(
+                        [in] unsigned long dwMsgCount, 
+                        [in] unsigned long dwSumMsgCount, 
+                        [in] unsigned long dwStep, 
+                        [in] unsigned long dwSumStep, 
+                        [in] unsigned long dwImportMsgCount, 
+                        [out] long* pbStop);
+        HRESULT _stdcall NotifyImportResult([in] HRESULT hResult);
+    };
+
+    [
+      odl,
+      uuid(C595A299-5908-432C-8BBD-D6ACBFE03D14)
+    ]
+    interface ITXBuddySessionMgr : IUnknown {
+        HRESULT _stdcall GetSession(
+                        [in] unsigned long dwUin, 
+                        [out] ITXSession** ppSession);
+        HRESULT _stdcall GetSessionEx(
+                        [in] unsigned long dwUin, 
+                        [in] ITXData* pExtInfo, 
+                        [out] ITXSession** ppSession);
+    };
+
+    [
+      odl,
+      uuid(3A990F4E-95BC-4F00-AE52-FDD9FBFF303E)
+    ]
+    interface ITXIM : IUnknown {
+        HRESULT _stdcall Login(
+                        [in] BSTR bsAccount, 
+                        [in] ITXBuffer* pPwd, 
+                        [in] int nPwdType, 
+                        [in] long bSavePwd, 
+                        [in] unsigned short wStatus, 
+                        [in] BSTR bsStatusDetail, 
+                        [in] ITXBuffer* pPwdHashOne, 
+                        [in] ITXEncUIGetPass* pGetPass, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall Relogin(
+                        [in] ITXCallback* pCallback, 
+                        [in] ITXData* pReloginInfo);
+        HRESULT _stdcall IsLogining([out] long* pbOut);
+        HRESULT _stdcall CancelLogin();
+        HRESULT _stdcall GetMBKPic([in] ITXBuffer* pCardSignBuf);
+        HRESULT _stdcall Logout(
+                        ITXCallback* pCallback, 
+                        [in] unsigned char cLogoutFlg);
+        HRESULT _stdcall ChangeStatus(
+                        [in] unsigned short wStatus, 
+                        [in] BSTR bsStatusDetail, 
+                        [in] ITXCallback* pCallback);
+        HRESULT _stdcall GetUin([out] unsigned long* pdwUin);
+        HRESULT _stdcall GetAccountName([out] BSTR* pbsAccount);
+        HRESULT _stdcall GetSessionInfo([out] ITXData** ppData);
+        HRESULT _stdcall GetSignature(
+                        [in] BSTR bsSignName, 
+                        [out] ITXBuffer** ppBuf);
+        HRESULT _stdcall GetKey(
+                        [in] BSTR bsKeyName, 
+                        [out] ITXBuffer** ppBuf);
+        HRESULT _stdcall GetOnlineUserCount([out] unsigned long* pdwCount);
+        HRESULT _stdcall FetchUnusualPrompt([in] ITXCallback* pCB);
+        HRESULT _stdcall QueryServerControlBitInfo(
+                        [in] unsigned long dwSvrCtrlBitIdx, 
+                        [out] long* pbOpenBit);
+        HRESULT _stdcall QuerySelfAbilityBit(
+                        [in] unsigned long dwBitNumber, 
+                        [out] long* pbOpenBit);
+        HRESULT _stdcall GetLoginMiscInfo([out] ITXDataRead** pInfo);
+        HRESULT _stdcall GetHashForOldApp([out] ITXBuffer** pHash);
+        HRESULT _stdcall CleanUserWinTempDir();
+        HRESULT _stdcall IsUseQQLocks(
+                        [out] int* piUse, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall CheckQQLocksPwd(
+                        [in] ITXBuffer* pPwdHashOne, 
+                        [out] long* pbOK);
+        HRESULT _stdcall SetQQLocksStatus([in] unsigned char bStatus);
+    };
+
+    [
+      odl,
+      uuid(B7263862-70F6-4F61-9F23-8E1C322741CA)
+    ]
+    interface ITXIMLoginUIEventExt : IUnknown {
+        HRESULT _stdcall OnServerVerifyCode(
+                        [in] ITXData* pData, 
+                        [out] BSTR* pbsEnterCode, 
+                        [out] long* pbCancel);
+        HRESULT _stdcall OnServerVerifyFailed(
+                        [in] ITXData* pData, 
+                        [out] long* pbRetry);
+        HRESULT _stdcall OnServerPwd2(
+                        [in] ITXData* pData, 
+                        [out] BSTR* pbsEnterCode, 
+                        [out] long* pbCancel);
+        HRESULT _stdcall OnReinputPassword(
+                        [in] BSTR bsReason, 
+                        [out] ITXBuffer** ppbufPwd, 
+                        [out] long* pbCancel);
+        HRESULT _stdcall OnSavePassword([in] ITXBuffer* pNewBuffer);
+        HRESULT _stdcall OnServerPwdGuard(
+                        [in] ITXData* pAskData, 
+                        [in] ITXData* pReplyData, 
+                        [out] unsigned char* pbOptType);
+        HRESULT _stdcall OnEMBKPic([in] ITXBuffer* pPicBuf);
+        HRESULT _stdcall OnGetEMBKPicFailed([out] unsigned char* pbOptType);
+        HRESULT _stdcall OnMBVerifiedExInfo([in] ITXData* pExData);
+    };
+
+    [
+      odl,
+      uuid(1D724CBD-2F8B-485A-A220-B1DE77AAEDFB)
+    ]
+    interface ITXShowValidateCodeExt : IUnknown {
+        HRESULT _stdcall ShowFrame(
+                        [in] ITXDataRead* pDataInfo, 
+                        [in, out] long* pbHandled);
+    };
+
+    [
+      odl,
+      uuid(9375394D-1837-4944-828C-530D24A53B40)
+    ]
+    interface ITXQQLevelMgr : IUnknown {
+        HRESULT _stdcall GetInfo(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppInfo);
+        HRESULT _stdcall UpdateInfo(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUpdateInfoSink([in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall UpdateAll([in] ITXCallback* pCallback);
+        HRESULT _stdcall UpdateNewBuddyInfo(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUpdateNewBuddyInfo([in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelUpdateAllSink([in] ITXCallback* pCallback);
+        HRESULT _stdcall UpdateGroupMemInfo(
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned long dwUin);
+    };
+
+    [
+      odl,
+      uuid(041C0331-26D2-4CFE-93FD-48E3F5690FC5)
+    ]
+    interface ITXQQLevelEvtExt : IUnknown {
+        HRESULT _stdcall OnQQLevelChangeEvt(
+                        unsigned long dwUin, 
+                        ITXData* pData);
+    };
+
+    [
+      odl,
+      uuid(77640FF9-6C27-428A-A7EE-5C28773FE220),
+      dual,
+      oleautomation
+    ]
+    interface ITXStatusAuthMgr : IDispatch {
+        [id(0x60020000)]
+        HRESULT QueryInfo(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** ppStatusAuthInfo);
+        [id(0x60020001)]
+        HRESULT QueryAuthList(
+                        [in] BSTR bsKey, 
+                        [out] ITXArrayRead** ppStatusAuthList);
+        [id(0x60020002)]
+        HRESULT SetCameraFlag(long bCameraFlag);
+        [id(0x60020003)]
+        HRESULT UploadAuthVisibleFlag(
+                        unsigned long dwUin, 
+                        long bVisible, 
+                        ITXCallbackKey* pCallback);
+        [id(0x60020004)]
+        HRESULT CancelUploadAuthVisibleFlag(ITXCallbackKey* pCallback);
+        [id(0x60020005)]
+        HRESULT UploadAuthInVisibleFlag(
+                        unsigned long dwUin, 
+                        long bInVisible, 
+                        ITXCallbackKey* pCallback);
+        [id(0x60020006)]
+        HRESULT CancelUploadAuthInVisibleFlag(ITXCallbackKey* pCallback);
+        [id(0x60020007)]
+        HRESULT UploadExchangeMode(
+                        unsigned char cType, 
+                        long bValue, 
+                        ITXCallbackKey* pCallback);
+        [id(0x60020008)]
+        HRESULT CancelUploadExchangeMode(
+                        unsigned char cType, 
+                        ITXCallbackKey* pCallback);
+    };
+
+    [
+      odl,
+      uuid(36E6FF01-0B47-460C-83F8-D7FE4628D3EE)
+    ]
+    interface ITXRegistry : IUnknown {
+        HRESULT _stdcall LoadModeConfig([in] BSTR bsFilePath);
+        HRESULT _stdcall InitializeModeConfig(
+                        [in] MODE_SCOPE eMode, 
+                        [in] BSTR bsFilePath);
+        HRESULT _stdcall RevertPrimal(
+                        unsigned long dwScope, 
+                        BSTR bsDomain);
+        HRESULT _stdcall QueryDomain(
+                        [in] BSTR bsNameID, 
+                        [in] unsigned long dwScope, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall QueryDomain2(
+                        [in] unsigned long dwNameID, 
+                        [in] unsigned long dwScope, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall GetDomain(
+                        [in] BSTR bsNameID, 
+                        [in] REG_FILE_TYPE nType, 
+                        [in] unsigned long dwScope, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall GetDomain2(
+                        [in] unsigned long dwNameID, 
+                        [in] REG_FILE_TYPE nType, 
+                        [in] unsigned long dwScope, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall GetDomainEx(
+                        [in] BSTR bsNameID, 
+                        [in] REG_FILE_TYPE nType, 
+                        [in] unsigned long dwScope, 
+                        [in] long bReload, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall GetDomainEx2(
+                        [in] unsigned long dwNameID, 
+                        [in] REG_FILE_TYPE nType, 
+                        [in] unsigned long dwScope, 
+                        [in] long bReload, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall FlushDomain(
+                        [in] BSTR bsNameID, 
+                        [in] unsigned long dwScope);
+        HRESULT _stdcall FlushDomain2(
+                        [in] unsigned long dwNameID, 
+                        [in] unsigned long dwScope);
+        HRESULT _stdcall Flush();
+        HRESULT _stdcall SaveDomain(
+                        [in] BSTR bsNameID, 
+                        [in] unsigned long dwScope);
+        HRESULT _stdcall SaveDomain2(
+                        [in] unsigned long dwNameID, 
+                        [in] unsigned long dwScope);
+        HRESULT _stdcall UnregisterDomain(
+                        BSTR bsNameID, 
+                        [in] unsigned long dwScope);
+        HRESULT _stdcall GetDomainByPath(
+                        [in] BSTR bsDomain, 
+                        [in] BSTR bsPath, 
+                        [in] REG_FILE_TYPE nType, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall AquireLock(
+                        [in] unsigned long dwScope, 
+                        [out] IUnknown** ppLock);
+    };
+
+    typedef [public]
+    __MIDL___MIDL_itf_KernelWrapper_0001_0182_0004 MODE_SCOPE;
+
+    typedef enum {
+        MODE_SCOPE_NONE = 0,
+        MODE_SCOPE_CURRENT = 8,
+        MODE_SCOPE_FUN = 16,
+        MODE_SCOPE_WORK = 24,
+        MODE_SCOPE_MASK = 56
+    } __MIDL___MIDL_itf_KernelWrapper_0001_0182_0004;
+
+    [
+      odl,
+      uuid(17E3A891-2150-4F7F-A459-07CAE29F5121)
+    ]
+    interface ITXRegistryKey : IUnknown {
+        HRESULT _stdcall CreateSubKey(
+                        [in] BSTR bsKeyName, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall QuerySubKey(
+                        [in] BSTR bsKeyName, 
+                        [out] ITXRegistryKey** ppKey);
+        HRESULT _stdcall RemoveSubKey([in] BSTR bsKeyName);
+        HRESULT _stdcall RemoveField([in] BSTR bsFieldName);
+        HRESULT _stdcall CreateArray(
+                        [in] BSTR bsFieldName, 
+                        [in] REG_VALUE_TYPE nType, 
+                        [out] ITXRegistryArray** ppValue);
+        HRESULT _stdcall QueryArray(
+                        [in] BSTR bsFieldName, 
+                        [in] REG_VALUE_TYPE nType, 
+                        [out] ITXRegistryArray** ppValue);
+        HRESULT _stdcall CreateTXData(
+                        [in] BSTR bsFieldName, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall QueryTXData(
+                        [in] BSTR bsFieldName, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall CreateTXArray(
+                        [in] BSTR bsFieldName, 
+                        [out] ITXArray** ppArray);
+        HRESULT _stdcall QueryTXArray(
+                        [in] BSTR bsFieldName, 
+                        [out] ITXArray** ppArray);
+        HRESULT _stdcall SetBool(
+                        [in] BSTR bsFieldName, 
+                        [in] long bValue);
+        HRESULT _stdcall QueryBool(
+                        [in] BSTR bsFieldName, 
+                        [out] long* pbValue);
+        HRESULT _stdcall SetDWord(
+                        [in] BSTR bsFieldName, 
+                        [in] unsigned long dwValue);
+        HRESULT _stdcall QueryDWord(
+                        [in] BSTR bsFieldName, 
+                        [out] unsigned long* pdwValue);
+        HRESULT _stdcall SetString(
+                        [in] BSTR bsFieldName, 
+                        [in] BSTR bsValue);
+        HRESULT _stdcall QueryString(
+                        [in] BSTR bsFieldName, 
+                        [out] BSTR* pbsValue);
+        HRESULT _stdcall SetBuffer(
+                        [in] BSTR bsFieldName, 
+                        [in] ITXBuffer* pBuf);
+        HRESULT _stdcall QueryBuffer(
+                        [in] BSTR bsFieldName, 
+                        [out] ITXBuffer** ppBuf);
+    };
+
+    typedef [public]
+    __MIDL___MIDL_itf_KernelWrapper_0001_0182_0001 REG_VALUE_TYPE;
+
+    typedef enum {
+        REG_VALUE_TYPE_NONE = 0,
+        REG_VALUE_TYPE_DWORD_ARRAY = 1,
+        REG_VALUE_TYPE_STRING_ARRAY = 2,
+        REG_VALUE_TYPE_BUFFER_ARRAY = 3
+    } __MIDL___MIDL_itf_KernelWrapper_0001_0182_0001;
+
+    [
+      odl,
+      uuid(8A6C1981-A35A-403F-A045-985A58FEBF8B)
+    ]
+    interface ITXRegistryArray : IUnknown {
+        HRESULT _stdcall GetType([out] REG_VALUE_TYPE* pType);
+        HRESULT _stdcall GetCount([out] unsigned int* puCount);
+    };
+
+    typedef [public]
+    __MIDL___MIDL_itf_KernelWrapper_0001_0182_0002 REG_FILE_TYPE;
+
+    typedef enum {
+        REG_FILE_TYPE_TXDATA = 0,
+        REG_FILE_TYPE_XML = 1
+    } __MIDL___MIDL_itf_KernelWrapper_0001_0182_0002;
+
+    [
+      odl,
+      uuid(E92D8C52-3822-4CE3-8BA9-F0B31FD579DE),
+      dual,
+      oleautomation
+    ]
+    interface ITXIMContactAccountMgr : IDispatch {
+        [id(0x60020000)]
+        HRESULT GetAccount(
+                        [in] unsigned long dwUin, 
+                        [out] ITXDataRead** pReadAccount);
+        [id(0x60020001)]
+        HRESULT GetAccountFromValue(
+                        [in] BSTR bsAccountValue, 
+                        [out] ITXDataRead** pReadAccount);
+        [id(0x60020002)]
+        HRESULT FetchAccountList(
+                        [in] ITXArray* pArray, 
+                        [in] ITXBuffer* pbufSessisonKey, 
+                        [in] ITXCallback* pCB);
+        [id(0x60020003)]
+        HRESULT FetchAccountListFromValueList(
+                        [in] ITXArray* pArray, 
+                        [in] ITXCallback* pCB);
+        [id(0x60020004)]
+        HRESULT UpdateSomeBuddyAccountList(
+                        [in] ITXArray* pArray, 
+                        [in] ITXCallback* pCB);
+        [id(0x60020005)]
+        HRESULT UpdateSelfAccountInfo([in] ITXCallback* pCB);
+        [id(0x60020006)]
+        HRESULT CheckCurrentAccountCloneStatus();
+        [id(0x60020007)]
+        HRESULT UpdateAllBuddyAccountList([in] ITXCallback* pCB);
+        [id(0x60020008)]
+        HRESULT UpdateIMStrangerAccount(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pKeyCB);
+        [id(0x60020009)]
+        HRESULT CheckIMContactAccountExist(
+                        [in] BSTR bsAccount, 
+                        [in] ITXAccountCallbackKey* pKeyCB);
+        [id(0x6002000a)]
+        HRESULT FetchEmailByTempSessionInfo(
+                        [in] unsigned long dwUin, 
+                        [in] ITXBuffer* pbufSessisonKey, 
+                        [in] unsigned char cC2CType, 
+                        [in] unsigned char cServiceType, 
+                        [in] ITXCallback* pCB);
+    };
+
+    [
+      odl,
+      uuid(FCC0E5FA-7935-4DD4-B02F-AAA48A4C23C9)
+    ]
+    interface ITXAccountCallbackKey : IUnknown {
+        HRESULT _stdcall OnCallback(
+                        [in] int nResult, 
+                        [in] BSTR bsKey, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(4E16B5AC-3FC4-4F2B-BCA5-42A190955572)
+    ]
+    interface ITXIMContactRelationEvtExt : IUnknown {
+        HRESULT _stdcall OnIMContactRelationUpdate(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwOldRType, 
+                        [in] unsigned long dwNewRType);
+    };
+
+    [
+      odl,
+      uuid(B766B747-D89F-4F97-B5D3-4ABC78327EC6)
+    ]
+    interface ITXGroupHeadMgr : IUnknown {
+        HRESULT _stdcall UpdateGroupDefinehead(
+                        [in] unsigned long dwUin, 
+                        [in] ITXCallbackKey* pCallback);
+        HRESULT _stdcall UpdateAllGroupDefinehead(ITXCallback* pCallback);
+        HRESULT _stdcall UploadGroupDefinehead(
+                        unsigned long dwUin, 
+                        BSTR bsFileName, 
+                        ITXCallbackKey* pCallback);
+        HRESULT _stdcall CancelGroupDefinehead(
+                        unsigned long dwGroupUin, 
+                        unsigned char cImageId, 
+                        ITXCallbackKey* pCallback);
+    };
+
+    [
+      odl,
+      uuid(3244B366-7707-467A-9B00-C618B5AF2797)
+    ]
+    interface ITXContactIMRichStatusEvtExt : IUnknown {
+        HRESULT _stdcall OnContactIMRichStatusEvt(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned long dwRSID, 
+                        [in] ITXDataRead* pStatusInfo);
+        HRESULT _stdcall OnParseRichStatusContent(
+                        [in] unsigned long dwRSID, 
+                        [in] ITXBuffer* pBuf, 
+                        [in] long bUnicode, 
+                        [in] ITXData* pContentData, 
+                        [out] long* pbRet);
+    };
+
+    [
+      odl,
+      uuid(7F550787-5B23-47C5-84EC-C17DBBD3C67C)
+    ]
+    interface ITXGrayURLMgr : IUnknown {
+        HRESULT _stdcall UpdateURLInfo(
+                        int neMsgType, 
+                        BSTR bsURL);
+        HRESULT _stdcall UpdateURLInfoEx(
+                        int neMsgType, 
+                        BSTR bsURL, 
+                        int neQueryType);
+        HRESULT _stdcall QueryURLInfo(
+                        BSTR bsURL, 
+                        ITXDataRead** ppUrlInfo);
+        HRESULT _stdcall GetURLDefaultTips(
+                        int neURLType, 
+                        BSTR* pbsURLTips);
+        HRESULT _stdcall QueryURLTips(
+                        unsigned short wURLTipsID, 
+                        BSTR* pbsURLTips);
+        HRESULT _stdcall UpdateURLTips(
+                        int neURLType, 
+                        unsigned short wURLTipsID);
+        HRESULT _stdcall QueryBlockURLWarningMsg(
+                        long bReceiver, 
+                        unsigned short wMsgID, 
+                        BSTR* pbsWarningMsg);
+        HRESULT _stdcall UpdateBlockURLWarningMsg(
+                        long bReceiver, 
+                        unsigned short wMsgID);
+    };
+
+    [
+      odl,
+      uuid(C54DD1C9-AD06-4511-A19A-74D6F55FB242)
+    ]
+    interface ITXGrayURLMgrExt : IUnknown {
+        HRESULT _stdcall OnURLInfoUpdate(
+                        BSTR bsURL, 
+                        ITXDataRead* pUrlInfo);
+        HRESULT _stdcall OnURLTipsUpdate(
+                        unsigned short wURLTipsID, 
+                        BSTR bsURLTips);
+        HRESULT _stdcall OnBlockURLWarningMsgUpdate(
+                        long bReceiver, 
+                        unsigned short wMsgID, 
+                        BSTR bsWarningMsg);
+    };
+
+    [
+      odl,
+      uuid(548DD381-C5A6-4F92-BF9F-18CC87B3FB8C)
+    ]
+    interface ICustomFaceMgr : IUnknown {
+        HRESULT _stdcall QueryFaceGroupList([out] ITXArray** ppDataArray);
+        HRESULT _stdcall QueryFaceGroupIdList([out] ITXArrayRead** ppDataArray);
+        HRESULT _stdcall QueryFaceGroupInfoById(
+                        [in] unsigned long dwFaceGroupId, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall QueryFaceGroupInfoByName(
+                        [in] BSTR bstrGroupName, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall QueryFaceListById(
+                        [in] unsigned long dwFaceGroupId, 
+                        [out] ITXArray** pDataArray);
+        HRESULT _stdcall GetFaceInMap(
+                        [in] BSTR bsId, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall GetFaceById(
+                        [in] BSTR bsId, 
+                        [out] int* pnPos, 
+                        [out] ITXData** pData);
+        HRESULT _stdcall GetFaceByPos(
+                        [in] int nGrpId, 
+                        [in] int nPos, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall GetFaceByShortCut(
+                        [in] BSTR bsShortcut, 
+                        [out] int* pnPos, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall AddGroup(
+                        [in] BSTR bsGroupName, 
+                        [out] unsigned long* dwGroupID, 
+                        [in] long bIsCanSameName);
+        HRESULT _stdcall EditGroup(
+                        [in] unsigned long dwGroupID, 
+                        [in] BSTR bsGroupName, 
+                        [in] long bIsCanSameName);
+        HRESULT _stdcall DelGroup([in] unsigned long dwGroupID);
+        HRESULT _stdcall MoveGroup(
+                        [in] unsigned long dwGroupID, 
+                        [in] int nPos);
+        HRESULT _stdcall AddFace(
+                        [out] BSTR* pbsFaceID, 
+                        [out] long* pbDelSameShortCut, 
+                        [in] BSTR bsOrgPicFullName, 
+                        [in] BSTR bsShortcut, 
+                        [in] BSTR bsTip, 
+                        [in] unsigned long dwGroupID, 
+                        [in] unsigned int uFlag);
+        HRESULT _stdcall EditFace(
+                        [out] BSTR* pbsFaceID, 
+                        [out] long* pbDelSameShortCut, 
+                        [in] BSTR bsId, 
+                        [in] BSTR bsOrgPicFullName, 
+                        [in] BSTR bsShortcut, 
+                        [in] BSTR bsTip, 
+                        [in] unsigned int uFlag);
+        HRESULT _stdcall DelFace([in] BSTR bsId);
+        HRESULT _stdcall MoveFace(
+                        [in] BSTR bsId, 
+                        [in] unsigned long dwGroupID, 
+                        [in] int nPos);
+        HRESULT _stdcall SaveToFile();
+        HRESULT _stdcall CommitChange(
+                        long bCommitDBC, 
+                        long bCommitDB);
+        HRESULT _stdcall GetCustomFaceDir([out] BSTR* pbsCustomDir);
+        HRESULT _stdcall GetCustomFaceCount(unsigned long* pdwCount);
+        HRESULT _stdcall SetCurGroupAndPage(
+                        unsigned long dwCurGroupId, 
+                        int nPage);
+        HRESULT _stdcall GetCurGroupAndPage(
+                        unsigned long* pdwGroupId, 
+                        int* pnPage);
+        HRESULT _stdcall ExportFace(
+                        BSTR bsPureExportFile, 
+                        int nGroupId, 
+                        ITXArray* pTXArray, 
+                        ICustomFaceCallback* pSink);
+        HRESULT _stdcall ImportFace(
+                        BSTR bsPureImportFile, 
+                        int* pnCountFace, 
+                        int* pnCountSameFace, 
+                        long bImportGroupInfo, 
+                        ICustomFaceCallback* pSink);
+        HRESULT _stdcall ImportFaceFormFolder(
+                        BSTR bsImportFolder, 
+                        int* pnCountFace, 
+                        int* pnCountSameFace, 
+                        long bImportGroupInfo, 
+                        ICustomFaceCallback* pSink);
+        HRESULT _stdcall AddFaceForRoam(
+                        BSTR strId, 
+                        BSTR strQNCOrg, 
+                        BSTR strQNCFix, 
+                        BSTR strShortCut, 
+                        BSTR strTip, 
+                        unsigned long dwGroupID, 
+                        unsigned int uFlag);
+        HRESULT _stdcall DelFaceForRoam(
+                        unsigned long dwGroupID, 
+                        ITXArrayRead* pFaceIds);
+        HRESULT _stdcall MoveMultiFaceToOtherGroup(
+                        ITXArray* pFaceList, 
+                        unsigned long dwFromId, 
+                        unsigned long dwToId);
+    };
+
+    [
+      odl,
+      uuid(57361468-6E34-420D-AE2B-E5C25EFE4899)
+    ]
+    interface ICustomFaceCallback : IUnknown {
+        HRESULT _stdcall OnCallback(
+                        [in] int nResult, 
+                        [in] unsigned long dwAllCount, 
+                        [in] unsigned long dwDisposeCount, 
+                        [in] unsigned long dwSameCount, 
+                        [out] long* pbStop);
+    };
+
+    [
+      odl,
+      uuid(6372BDA5-80F6-48A1-8A30-B99109842ED8)
+    ]
+    interface ICustomFaceEvent : IUnknown {
+        HRESULT _stdcall OnFaceUpdate(
+                        [in] unsigned char cEventType, 
+                        [in] unsigned long dwGroupSrc, 
+                        [in] unsigned long dwGroupDest, 
+                        [in] ITXArray* pFaceList);
+        HRESULT _stdcall OnShortcutConflict(
+                        [in] BSTR bsId, 
+                        [in] BSTR bsShortcut, 
+                        [out] long* pbReplace);
+        HRESULT _stdcall OnGroupInfoChangeWhenImport([in] unsigned long dwGroupID);
+        HRESULT _stdcall OnGroupInfoBeginImport([in] unsigned long dwGroupID);
+    };
+
+    [
+      odl,
+      uuid(782517D0-3380-410F-B422-029B7D357F89)
+    ]
+    interface ITXOfflinePicMgr : IUnknown {
+        HRESULT _stdcall GetConfig(ITXDataRead** ppDataConfig);
+        HRESULT _stdcall QueryStatus(
+                        unsigned long dwToUin, 
+                        long* pbHaveSendingPic, 
+                        long* pbHaveRecvingPic);
+        HRESULT _stdcall RecvSinglePic(
+                        [in] unsigned long dwToUin, 
+                        [in] ITXMsgImage* pMsgImage);
+        HRESULT _stdcall RecvFileObject(
+                        [in] unsigned long dwToUin, 
+                        [in] ITXMsgFileObject* pMsgFileObject);
+        HRESULT _stdcall CancelPicTransfer([in] unsigned long dwToUin);
+        HRESULT _stdcall SendOfflinePic(
+                        [in] unsigned long dwToUin, 
+                        [in] ITXMsgPack* pMsgPack, 
+                        [in] ITXBuffer* pValidateCode, 
+                        [in] ITXSessionSendSink* pSendSink, 
+                        [in] ITXData* pMsgExt, 
+                        [in] ITXOfflinePicSink* pSink);
+        HRESULT _stdcall RecvOfflinePic(
+                        [in] unsigned long dwToUin, 
+                        [in] ITXMsgPack* pMsgPack, 
+                        [in] ITXOfflinePicSink* pSink);
+        HRESULT _stdcall CheckImageIsExist(
+                        [in] ITXMsgImage* pMsgImage, 
+                        [out] long* pbExist);
+    };
+
+    [
+      odl,
+      uuid(34C5B64E-A9C2-4B8B-B996-B50C3A3C8776)
+    ]
+    interface ITXMsgFileObject : ITXMsgElem {
+        HRESULT _stdcall GetId([out] GUID* pId);
+        HRESULT _stdcall SetId([in] GUID gId);
+        HRESULT _stdcall GetPath([out] BSTR* pbsPath);
+        HRESULT _stdcall SetPath([in] BSTR bsPath);
+        HRESULT _stdcall GetShortcut([out] BSTR* pbsShortcut);
+        HRESULT _stdcall SetShortcut([in] BSTR bsShortcut);
+        HRESULT _stdcall GetLink(
+                        [out] GUID* pGuidType, 
+                        [out] BSTR* pbsCoreName, 
+                        [out] ITXData** ppDataParam);
+        HRESULT _stdcall SetLink(
+                        [in] GUID* guidType, 
+                        [in] BSTR bsCoreName, 
+                        [in] ITXData* pDataParam);
+        HRESULT _stdcall GetTip([out] BSTR* pbsTip);
+        HRESULT _stdcall SetTip([in] BSTR bsTip);
+        HRESULT _stdcall GetIsOnline([out] long* pbIsOnline);
+        HRESULT _stdcall SetIsOnline([in] long bIsOnline);
+        HRESULT _stdcall GetFileType([out] unsigned char* pcFileType);
+        HRESULT _stdcall SetFileType([in] unsigned char cFileType);
+        HRESULT _stdcall GetSessionType([out] unsigned char* pcSessionType);
+        HRESULT _stdcall SetSessionType([in] unsigned char cSessionType);
+        HRESULT _stdcall GetHRTXGroupUin([out] unsigned long* pdwHRTXGroupUin);
+        HRESULT _stdcall SetHRTXGroupUin([in] unsigned long dwHRTXGroupUin);
+        HRESULT _stdcall GetFileStatus(unsigned char* pcStatus);
+        HRESULT _stdcall SetFileStatus(unsigned char cStatus);
+        HRESULT _stdcall GetFileStatusInfo(ITXBuffer** ppBuffer);
+        HRESULT _stdcall SetFileStatusInfo(ITXBuffer* pBuf);
+    };
+
+    [
+      odl,
+      uuid(60497843-4539-4EAA-B4E6-0DAE1ADFE792)
+    ]
+    interface ITXOfflinePicSink : IUnknown {
+        HRESULT _stdcall OnOfflinePicComplete(
+                        [in] long bSend, 
+                        [in] ITXMsgPack* pMsgPack, 
+                        [in] ITXBuffer* pValidateCode, 
+                        [in] ITXSessionSendSink* pSendSink, 
+                        [in] ITXData* pMsgExt, 
+                        [in] ITXData* pDataCallback);
+    };
+
+    [
+      odl,
+      uuid(0212E1B9-1375-43CF-B09F-1BE104F05BE3)
+    ]
+    interface ITXDataReport : IUnknown {
+        HRESULT _stdcall RequestSingletonData(
+                        unsigned long dwRID, 
+                        ITXData** ppData);
+        HRESULT _stdcall RequestData(
+                        [in] BSTR bsLogicalModule, 
+                        [in] BSTR bsHandle, 
+                        [out] ITXData** ppData);
+        HRESULT _stdcall ClearData(
+                        [in] BSTR bsLogicalModule, 
+                        [in] BSTR bsHandle);
+        HRESULT _stdcall DownloadStrategy();
+        HRESULT _stdcall ReportAll(
+                        long bLogout, 
+                        ITXCallback* pCallback);
+        HRESULT _stdcall SaveAll(long bLogout);
+        HRESULT _stdcall HttpRealTimeReportData(
+                        unsigned char cModeID, 
+                        ITXDataRead* pData, 
+                        IDRStrCodec* pCmdCodec);
+        HRESULT _stdcall CsRealTimeReportData(
+                        unsigned char cType, 
+                        ITXDataRead* pData, 
+                        ITXCmdCodec* pCmdCodec);
+        HRESULT _stdcall GetAdReportInterval(unsigned short* pwInterval);
+        HRESULT _stdcall SetTestChannelTimer();
+        HRESULT _stdcall IsLogout(long* bLogout);
+        HRESULT _stdcall AddOneFaildAgreementInfo(
+                        unsigned short wMainCmd, 
+                        unsigned short wSubCmd, 
+                        unsigned short wCnt, 
+                        unsigned char cErrType, 
+                        unsigned char cErrCode);
+        HRESULT _stdcall ReportFaildData();
+    };
+
+    [
+      odl,
+      uuid(92155276-7461-425F-870E-1D4885F8003A)
+    ]
+    interface IDRStrCodec : IUnknown {
+        HRESULT _stdcall DRCodecStr(
+                        [in] unsigned char cType, 
+                        [in] ITXData* pDataIn, 
+                        [out, retval] BSTR* strOut);
+    };
+
+    [
+      odl,
+      uuid(228E082D-564D-47C4-B449-365795E0BCDE)
+    ]
+    interface ITXIMContactPresentationEvtExt : IUnknown {
+        HRESULT _stdcall OnIMContactPresentationUpdate(
+                        [in] unsigned long dwUin, 
+                        [in] unsigned char cOldValue);
+    };
+
+    [
+      uuid(9A9D7CD1-5CB7-463D-9220-CE91E3DDCC2A),
+      helpstring("Tencent ReportCodec Class")
+    ]
+    coclass ReportCodec {
+        [default] interface ITXDataReportCodecExt;
+    };
+
+    [
+      odl,
+      uuid(35469066-112F-4CFC-9B97-87D453DE3067)
+    ]
+    interface ITXDataReportCodecExt : IUnknown {
+        HRESULT _stdcall CodecTLV(
+                        [in] unsigned long dwRID, 
+                        [in] ITXData* pDataIn, 
+                        [out, retval] ITXBuffer** ppBuferOut);
+    };
+
+    [
+      uuid(B9D253C5-CFCE-4AEB-B500-698E4CE0558E),
+      helpstring("Tencent PluginCenter Class")
+    ]
+    coclass PluginCenter {
+        [default] interface IPluginCenter;
+    };
+
+    [
+      odl,
+      uuid(41D26ED5-7680-4631-BCC1-5E523037F70A)
+    ]
+    interface IPluginCenter : IUnknown {
+        HRESULT _stdcall InitPlugin();
+        HRESULT _stdcall EnablePlugin([in] BSTR bsPluginName);
+        HRESULT _stdcall DisablePlugin(
+                        [in] BSTR bsPluginName, 
+                        IUnknown* pParentFrame);
+        HRESULT _stdcall SettingPlugin([in] BSTR bsPluginName);
+        HRESULT _stdcall GetPluginEnable(
+                        [in] MODE_SCOPE_BAMA eMode, 
+                        [in] BSTR bsPluginName, 
+                        [out] long* pbEnable);
+        HRESULT _stdcall SetPluginEnable(
+                        [in] MODE_SCOPE_BAMA eMode, 
+                        [in] BSTR bsPluginName, 
+                        [in] long bEnable);
+        HRESULT _stdcall GetPluginInitFlag([out] long* pbInit);
+    };
+
+    typedef enum {
+        MODE_SCOPE_BAMA_NONE = 0,
+        MODE_SCOPE_BAMA_CURRENT = 8,
+        MODE_SCOPE_BAMA_FUN = 16,
+        MODE_SCOPE_BAMA_WORK = 24,
+        MODE_SCOPE_BAMA_MASK = 56
+    } MODE_SCOPE_BAMA;
+};

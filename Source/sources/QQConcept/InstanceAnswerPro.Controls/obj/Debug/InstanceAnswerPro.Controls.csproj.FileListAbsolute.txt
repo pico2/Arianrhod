@@ -1,0 +1,27 @@
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\bin\Debug\InstanceAnswerPro.Controls.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\bin\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ResolveAssemblyReference.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ClipboardControl.baml
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ClipboardControl.g.cs
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls_MarkupCompile.cache
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.g.resources
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.dll
+E:\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\bin\Debug\InstanceAnswerPro.Controls.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\bin\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ClipboardControl.baml
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ClipboardControl.g.cs
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls_MarkupCompile.cache
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.g.resources
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.dll
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.TINY\7.Documents\Visual Studio 2010\Projects\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\bin\Debug\InstanceAnswerPro.Controls.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\bin\Debug\InstanceAnswerPro.Controls.pdb
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ResolveAssemblyReference.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ClipboardControl.baml
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\ClipboardControl.g.cs
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls_MarkupCompile.cache
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.g.resources
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.dll
+E:\7.TINY\Desktop\QQConcept\InstanceAnswerPro.Controls\obj\Debug\InstanceAnswerPro.Controls.pdb

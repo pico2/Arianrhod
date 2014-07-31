@@ -1,0 +1,43 @@
+﻿<Window x:Class="InstanceAnswerPro.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:Bama_Controls="clr-namespace:Bama.Controls;assembly=Bama.Controls"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Height="300" Width="200" ResizeMode="CanMinimize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
+    <!--<Window.Resources>
+        <ResourceDictionary>
+            <Style Style.TargetType="{x:Type MenuItem}">
+                <Setter Setter.Property="MenuItem.Command" Setter.Value="{x:Static local:LoginWindow.LoginStatusCmd}" />
+                <Setter Setter.Property="MenuItem.CommandParameter" Setter.Value="{Binding Path=Header,RelativeSource={RelativeSource Self}}" />
+            </Style>
+            <ContextMenu x:Key="loginContexMenu">
+                <MenuItem HeaderedItemsControl.Header="{x:Static QQCore:IMContactStatus.Available}" />
+                <MenuItem HeaderedItemsControl.Header="{x:Static QQCore:IMContactStatus.Qme}" />
+                <MenuItem HeaderedItemsControl.Header="{x:Static QQCore:IMContactStatus.Away}" />
+                <MenuItem HeaderedItemsControl.Header="{x:Static QQCore:IMContactStatus.Busy}" />
+                <MenuItem HeaderedItemsControl.Header="{x:Static QQCore:IMContactStatus.NoDisturbance}" />
+                <MenuItem HeaderedItemsControl.Header="{x:Static QQCore:IMContactStatus.Invisible}" />
+            </ContextMenu>
+        </ResourceDictionary>
+    </Window.Resources>-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="1">
+            <StackPanel Margin="10" x:Name="inputFrame" Orientation="Vertical">
+                <ComboBox Margin="5" x:Name="accounts" SelectedIndex="0">
+                    <ComboBoxItem Content="670927388"></ComboBoxItem>
+                </ComboBox>
+                <PasswordBox Margin="5" Password="w348862142"  x:Name="passwordBox"/>
+                <!--<Button x:Name="Status" Height="22" Margin="5" ContextMenu="{StaticResource loginContexMenu}"/>-->
+                <CheckBox Margin="5" x:Name="rememberPasswordCheckBox" Content="Remember my pssword"/>
+                <Button Margin="5" Content="Enter" x:Name="Enter" Click="Enter_Click" IsDefault="True"/>
+                <Button Margin="5" x:Name="Setup" Content="Register new account"/>
+            </StackPanel>
+            <StackPanel Margin="10">
+                <Button Margin="5" Content="Cancel Enter" Visibility="Hidden"  x:Name="btnCancel" Click="Enter_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

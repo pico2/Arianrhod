@@ -1,0 +1,15 @@
+﻿<Window x:Class="InstanceAnswerPro.IAProMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="IAProMessageBox" Height="300" Width="300">
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+        <Image x:Name="iconInfo"></Image>
+        <TextBlock x:Name="paragraph_Info"></TextBlock>
+        <Button x:Name="okButton" Content="OK"/>
+            <Button x:Name="cancelButton" Content="Cancel"/>
+            <Button x:Name="yesButton" Content="Yes"/>
+            <Button x:Name="noButton" Content="No"/>
+        </StackPanel>
+    </Grid>
+</Window>

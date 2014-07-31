@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tpc version="1.0.0">
+  <file-systems>
+    <file-system name="@thisdata:" path="Data"/>
+    <file-system name="@thismisc:" path="Misc" type="windows"/>
+    <file-system name="@thisres:" path="Res"/>
+    <file-system name="@thisxtml:" path="Xtml"/>
+    <file-system name="@thistheme:" path="Themes\NewTheme"/>
+  </file-systems>
+  <core-configs>
+    <core-config file="common.xml"/>
+    <core-config file="kernel.xml"/>
+    <core-config file="App.xml"/>
+  </core-configs>
+  <i18n-config file="I18N\Config.xml"/>
+  <mode-config file="Mode\mode-config.xml"/>
+</tpc>
