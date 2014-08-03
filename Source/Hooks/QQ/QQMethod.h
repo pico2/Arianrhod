@@ -31,22 +31,103 @@ struct CTXStringW
 INIT_STATIC_MEMBER(CTXStringW::StubEmpty);
 INIT_STATIC_MEMBER(CTXStringW::StubIsEmpty);
 
+interface ITXBuffer;
+interface ITXArrayRead;
+interface ITXData;
+interface ITXArray;
 
-typedef struct TX_DATA : public IUnknown
+interface ITXDataRead : IDispatch
 {
+    virtual HRESULT NTAPI GetBool(BSTR bsParamName, PLONG pbValue);
+    virtual HRESULT NTAPI GetByte(BSTR bsParamName, PBYTE pcValue);
+    virtual HRESULT NTAPI GetChar(BSTR bsParamName, PCHAR pchValue);
+    virtual HRESULT NTAPI GetWord(BSTR bsParamName, PUSHORT pwValue);
+    virtual HRESULT NTAPI GetShort(BSTR bsParamName, PSHORT pshValue);
+    virtual HRESULT NTAPI GetDWord(BSTR bsParamName, PULONG pdwValue);
+    virtual HRESULT NTAPI GetInt(BSTR bsParamName, PINT pnValue);
+    virtual HRESULT NTAPI GetInt64(BSTR bsParamName, PINT64 pn64Var);
+    virtual HRESULT NTAPI GetDouble(BSTR bsParamName, DOUBLE* pdValue);
+    virtual HRESULT NTAPI GetStr(BSTR bsParamName, BSTR* pbsValue);
+    virtual HRESULT NTAPI GetBuf(BSTR bsParamName, ITXBuffer** ppBufValue);
+    virtual HRESULT NTAPI GetBufTyped(BSTR bsParamName, ITXBuffer** ppBufValue, PULONG pdwSubType);
+    virtual HRESULT NTAPI GetDataRead(BSTR bsParamName, ITXDataRead** ppValue);
+    virtual HRESULT NTAPI GetArrayRead(BSTR bsParamName, ITXArrayRead** ppValue);
+    virtual HRESULT NTAPI GetGuid(BSTR bsParamName, GUID* pGuid);
+    virtual HRESULT NTAPI GetInterface(BSTR bsParamName, GUID* riid, PVOID* ppvValue);
+    virtual HRESULT NTAPI GetDoc(ITXBuffer** ppBufDoc);
+    virtual HRESULT NTAPI CopyTo(ITXData* pData);
+    virtual HRESULT NTAPI IsFieldType(BSTR bsParamName, UCHAR cType);
+    virtual HRESULT NTAPI GetFieldCount(PUINT puCount);
+    virtual HRESULT NTAPI GetFieldName(UINT uIndex, BSTR* pbsFieldName);
+    virtual HRESULT NTAPI FieldType(BSTR bsParamName, PBYTE pcType);
+    virtual HRESULT NTAPI Equal(ITXDataRead* pData);
+    virtual HRESULT NTAPI ZBegReserve();
+    virtual HRESULT NTAPI EnterGfMode();
+    virtual HRESULT NTAPI LeaveGfMode();
+    virtual HRESULT NTAPI FindStringEntry(BSTR bsParamName, PUSHORT* ppv);
+    virtual HRESULT NTAPI CopyToNoOverwrite(ITXData* pData);
+    virtual HRESULT NTAPI IsFieldTypeEx(BSTR bsParamName, BYTE chType, PBYTE pcCoincident);
+    virtual HRESULT NTAPI GetUInt64(BSTR bsParamName, PUINT64 pddwValue);
+    //virtual HRESULT NTAPI ZF07Reserve();
+    //virtual HRESULT NTAPI ZF08Reserve();
+    //virtual HRESULT NTAPI ZF09Reserve();
+    //virtual HRESULT NTAPI ZF10Reserve();
+    virtual HRESULT NTAPI ZF11Reserve();
+    virtual HRESULT NTAPI ZF12Reserve();
+    virtual HRESULT NTAPI ZF13Reserve();
+    virtual HRESULT NTAPI ZF14Reserve();
+    virtual HRESULT NTAPI ZF15Reserve();
+    virtual HRESULT NTAPI ZF16Reserve();
+    virtual HRESULT NTAPI ZF17Reserve();
+    virtual HRESULT NTAPI ZF18Reserve();
+    virtual HRESULT NTAPI ZF19Reserve();
+    virtual HRESULT NTAPI ZEndReserve();
+};
+
+
+typedef struct ITXData : public ITXDataRead
+{
+/*
     VOID NTAPI SetDword(PCWSTR Name, ULONG Value)
     {
-        API_POINTER(TX_DATA::SetDword) _SetDword;
+        API_POINTER(ITXData::SetDword) _SetDword;
         *(PVOID *)&_SetDword = *(PVOID *)PtrAdd(*(PVOID *)this, 0xD0);
         return (this->*_SetDword)(Name, Value);
     }
+*/
+    virtual HRESULT NTAPI SetBool(BSTR bsParamName, LONG bValue);
+    virtual HRESULT NTAPI SetByte(BSTR bsParamName, BYTE cValue);
+    virtual HRESULT NTAPI SetChar(BSTR bsParamName, CHAR chValue);
+    virtual HRESULT NTAPI SetWord(BSTR bsParamName, USHORT wValue);
+    virtual HRESULT NTAPI SetShort(BSTR bsParamName, SHORT shValue);
+    virtual HRESULT NTAPI SetDWord(BSTR bsParamName, ULONG dwValue);
+    virtual HRESULT NTAPI SetInt(BSTR bsParamName, INT iValue);
+    virtual HRESULT NTAPI SetStr(BSTR bsParamName, BSTR bsValue);
+    virtual HRESULT NTAPI SetBuf(BSTR bsParamName, ITXBuffer* pBufValue);
+    virtual HRESULT NTAPI SetInterface(BSTR bsParamName, GUID* riid, IUnknown* pValue);
+    virtual HRESULT NTAPI SetNewData(BSTR bsParamName, ITXData** ppValue);
+    virtual HRESULT NTAPI SetData(BSTR bsParamName, ITXData* pValue);
+    virtual HRESULT NTAPI SetNewArray(BSTR bsParamName, ITXArray** ppValue);
+    virtual HRESULT NTAPI SetArray(BSTR bsParamName, ITXArray* pValue);
+    virtual HRESULT NTAPI SetGuid(BSTR bsParamName, GUID* guid);
+    virtual HRESULT NTAPI SetInt64(BSTR bsParamName, INT64 n64Var);
+    virtual HRESULT NTAPI SetDouble(BSTR bsParamName, DOUBLE dValue);
+    virtual HRESULT NTAPI SetBufTyped(BSTR bsParamName, ITXBuffer* pBufValue, ULONG dwSubType);
+    virtual HRESULT NTAPI SetDoc(ITXBuffer* pBufDoc);
+    virtual HRESULT NTAPI SetDoc2(UINT uSize, PBYTE pcDoc);
+    virtual HRESULT NTAPI GetData(BSTR bsParamName, ITXData** ppValue);
+    virtual HRESULT NTAPI GetArray(BSTR bsParamName, ITXArray** ppValue);
+    virtual HRESULT NTAPI RemoveAField(BSTR bsParamName, BYTE cType);
+    virtual HRESULT NTAPI Reserve(UINT uSize);
+    virtual HRESULT NTAPI SetTextDoc(BSTR bstrTextDoc);
+    virtual HRESULT NTAPI SetUInt64(BSTR bsParamName, UINT64 ddwValue);
 
-} TX_DATA, *PTX_DATA;
+} ITXData, *PITXData;
 
 struct TXReloginMgr : public IUnknown
 {
-    virtual HRESULT NTAPI Login(PVOID Tray, PTX_DATA Data);
-    virtual HRESULT NTAPI Relogin(PVOID Tray, PTX_DATA Data);
+    virtual HRESULT NTAPI Login(PVOID Tray, PITXData Data);
+    virtual HRESULT NTAPI Relogin(PVOID Tray, PITXData Data);
 };
 
 struct Util
@@ -70,7 +151,7 @@ struct Util
 
     struct Data
     {
-        static BOOL (CDECL *CreateTXData)(PTX_DATA *Data);
+        static BOOL (CDECL *CreateTXData)(PITXData *Data);
     };
 };
 

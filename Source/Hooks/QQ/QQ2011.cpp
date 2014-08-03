@@ -738,6 +738,34 @@ HRESULT NTAPI GroupMgr_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
     return Result;
 }
 
+ULONG NTAPI GroupObject_GetAtAllGroupMemberUseTimes(PVOID)
+{
+    return 1;
+}
+
+HRESULT NTAPI GroupObject_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
+{
+    HRESULT Result;
+
+    Result = StubPlatformCore_QueryInterface(Object, Guid, Output);
+    if (FAILED(Result))
+        return Result;
+
+    PVOID& GetAtAllGroupMemberUseTimes = *(PVOID *)PtrAdd(**(PVOID **)Output, 0x10);
+
+    if (GetAtAllGroupMemberUseTimes == GroupObject_GetAtAllGroupMemberUseTimes)
+        return Result;
+
+    Mp::PATCH_MEMORY_DATA p[] =
+    {
+        Mp::MemoryPatchVa((ULONG_PTR)GroupObject_GetAtAllGroupMemberUseTimes, sizeof(ULONG_PTR), &GetAtAllGroupMemberUseTimes),
+    };
+
+    Mp::PatchMemory(p, countof(p));
+
+    return Result;
+}
+
 // CTXComponentMgr
 
 HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Output)
@@ -748,6 +776,16 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
         { 0x76063A86, 0xD553, 0x44A6, 0xAF, 0x7A, 0x12, 0xAE, 0x87, 0x21, 0x1A, 0xA7 }, // GUID_GroupMgr
         { 0xC8730021, 0xE7DE, 0x4F65, 0x98, 0x8C, 0x7D, 0x69, 0x4C, 0x38, 0x83, 0x6E }, // GUID_DllHashCheckMgr
         { 0x3A990F4E, 0x95BC, 0x4F00, 0xAE, 0x52, 0xFD, 0xD9, 0xFB, 0xFF, 0x30, 0x3E }, // GUID_ReloginMgr
+        { 0xD302C850, 0x939F, 0x4575, 0x85, 0xBE, 0xE0, 0x45, 0x11, 0x42, 0x1A, 0x75 }, // GUID_GroupObject
+    };
+
+    enum
+    {
+        GUID_PluginCenter,
+        GUID_GroupMgr,
+        GUID_DllHashCheckMgr,
+        GUID_ReloginMgr,
+        GUID_GroupObject,
     };
 
     GUID *Filter;
@@ -770,16 +808,16 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
             case countof(GUID_FilterList):
                 continue;
 
-            case 0:
+            case GUID_PluginCenter:
                 AppUtil = FindLdrModuleByHandle(_ReturnAddress());
                 if (AppUtil != nullptr && AppUtil->DllBase == AppUtilBase)
                     continue;
                 break;
 
-            case 1:
+            case GUID_GroupMgr:
                 return GroupMgr_QueryInterface(Object, Guid, Output);
 
-            case 3:
+            case GUID_ReloginMgr:
             {
                 HRESULT hr = StubPlatformCore_QueryInterface(Object, Guid, Output);
 
@@ -791,6 +829,9 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
 
                 return hr;
             }
+
+            case GUID_GroupObject:
+                return GroupObject_QueryInterface(Object, Guid, Output);
         }
 
         return E_NOINTERFACE;
@@ -872,10 +913,10 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
         Io::SetAsyncCall(
             [](PVOID)
             {
-                PTX_DATA Data;
+                PITXData Data;
 
                 Util::Data::CreateTXData(&Data);
-                Data->SetDword(L"cReloginFlag", 2);
+                Data->SetDWord(L"cReloginFlag", 2);
 
                 ReloginMgr->Relogin(nullptr, Data);
                 Data->Release();
