@@ -84,7 +84,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
 /PyLibs/*.pth
 /PyLibs/MyPyLibrary/AMFHelper/PyAmfHelper.pyd
-/Source/Android/.metadata
 /Source/Glorius
 /Library/qt-everywhere-opensource-src-5.3.0
 /Source/sources/x64_dbg
