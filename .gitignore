@@ -87,3 +87,5 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Glorius
 /Library/qt-everywhere-opensource-src-5.3.0
 /Source/sources/x64_dbg
+/Source/Android/*/bin
+/Source/Android/*/gen
