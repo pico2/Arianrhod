@@ -91,3 +91,5 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Android/*/gen
 /Source/Android/.metadata/.log
 /Source/Android/.metadata/*/.log
+/Source/Android/.metadata/.plugins/
+/Source/Android/*/.settings/

@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Delete 2 resources" deleteContents="true" description="Delete 2 resources" element1="/appcompat_v7" element2="/QQNotificationClearable" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="2" stamp="1407420481202"/>&#x0A;<refactoring comment="Delete resource &apos;QQNotificationClearable&apos;" deleteContents="true" description="Delete resource &apos;QQNotificationClearable&apos;" element1="/QQNotificationClearable" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1407513832601"/>
-</session>
