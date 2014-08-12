@@ -5,3 +5,20 @@ EXPORTS
 	ICInfo = MSVFW32.ICInfo
 	ICCompress = MSVFW32.ICCompress
 	ICClose = MSVFW32.ICClose
+
+    timeKillEvent = WINMM.timeKillEvent
+    timeEndPeriod = WINMM.timeEndPeriod
+    timeBeginPeriod = WINMM.timeBeginPeriod
+    timeGetDevCaps = WINMM.timeGetDevCaps
+    timeSetEvent = WINMM.timeSetEvent
+    mixerGetControlDetailsW = WINMM.mixerGetControlDetailsW
+    mixerGetLineControlsW = WINMM.mixerGetLineControlsW
+    mixerGetLineInfoW = WINMM.mixerGetLineInfoW
+    mixerClose = WINMM.mixerClose
+    mixerOpen = WINMM.mixerOpen
+    mixerGetNumDevs = WINMM.mixerGetNumDevs
+    mixerSetControlDetails = WINMM.mixerSetControlDetails
+    timeGetTime = WINMM.timeGetTime
+    PlaySoundW = WINMM.PlaySoundW
+    waveOutSetVolume = WINMM.waveOutSetVolume
+    waveOutGetVolume = WINMM.waveOutGetVolume

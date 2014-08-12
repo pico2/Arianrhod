@@ -2,6 +2,7 @@
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 #pragma comment(lib, "vfw32.lib")
+#pragma comment(lib, "WINMM.lib")
 
 #include "MyLibrary.cpp"
 
@@ -126,20 +127,16 @@ BOOL Initialize(PVOID BaseAddress)
 
     BaseAddress = FindLdrModuleByName(&USTR(L"PotPlayer.dll"))->DllBase;
 
-    MEMORY_PATCH p[] =
+    Mp::PATCH_MEMORY_DATA p[] =
     {
-        PATCH_MEMORY(METHOD_PTR(&PpCmdTarget::OnCmdRange), sizeof(PVOID), PtrOffset(&SearchMessageEntry(BaseAddress)->Function, BaseAddress)),
+        Mp::MemoryPatchVa((ULONG64)METHOD_PTR(&PpCmdTarget::OnCmdRange), sizeof(PVOID), &SearchMessageEntry(BaseAddress)->Function, Mp::BackupData),
+        Mp::FunctionJumpVa(LookupExportTable(GetKernel32Handle(), KERNEL32_GetProcAddress), PpGetProcAddress),
+        Mp::FunctionJumpVa(IsIconic, PpIsIconic, &StubIsIconic),
     };
 
-    MEMORY_FUNCTION_PATCH f[] =
-    {
-        INLINE_HOOK_JUMP_NULL(EATLookupRoutineByHashPNoFix(GetKernel32Handle(), KERNEL32_GetProcAddress), PpGetProcAddress),
-        INLINE_HOOK_JUMP(IsIconic, PpIsIconic, StubIsIconic),
-    };
+    Mp::PatchMemory(p, countof(p), BaseAddress);
 
-    Nt_PatchMemory(p, countof(p), f, countof(f), BaseAddress);
-
-    *(PULONG_PTR)&PpCmdTarget::StubOnCmdRange = p[0].DataBak;
+    *(PULONG_PTR)&PpCmdTarget::StubOnCmdRange = p[0].Memory.Backup;
 
     return TRUE;
 }
