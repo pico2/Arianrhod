@@ -556,7 +556,7 @@ a:WinMainT:#winm:
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 ForceInline UInt WinMain2(HINSTANCE hInstance, HINSTANCE hPrevInstance, PTChar lpCmdLine, Int nCmdShow)
 {
@@ -584,7 +584,7 @@ a:WinMain:#winmA:
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 ForceInline UInt WinMain2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, Int nCmdShow)
 {
@@ -609,7 +609,7 @@ a:WinMainW:#winmw:
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 ForceInline ULONG WinMain2(HINSTANCE Instance, HINSTANCE PrevInstance, PWSTR CmdLine, LONG CmdShow)
 {
@@ -648,7 +648,7 @@ a:DllMain:#dllm:
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 BOOL UnInitialize(PVOID BaseAddress)
 {
@@ -685,7 +685,7 @@ a:Console Main:#conm:
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 ForceInline Void main2(Long_Ptr argc, TChar **argv)
 {
@@ -703,7 +703,7 @@ a:Console MainW:#conmw:
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 ForceInline Void main2(LONG_PTR argc, PWSTR *argv)
 {
@@ -720,7 +720,7 @@ int __cdecl main(LONG_PTR argc, PWSTR *argv)
 a:DriverEntry:#drvm:
 #pragma comment(linker, "/ENTRY:DriverEntry")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 VOID NTAPI DriverUnload(PDRIVER_OBJECT DriverObject)
 {
@@ -739,7 +739,7 @@ a:ifdef Guard in H:#ifdg:
 #ifndef _$FILE_BASE_UPPER$_$FILE_EXT_UPPER$_$GUID_SYMBOL$_
 #define _$FILE_BASE_UPPER$_$FILE_EXT_UPPER$_$GUID_SYMBOL$_
 
-#include "MyLibrary.h"
+#include "ml.h"
 
 $selected$
 
@@ -1007,7 +1007,6 @@ $end$namespace $NamespaceName$
 	};
 }
 
-
 readme:
 VA Snippet used by Surround With Namespace.
 If you have modified this item, you may delete it to restore the default upon next use.
@@ -1018,7 +1017,6 @@ namespace $end$
 	$selected$
 }
 
-
 readme:
 VA Snippet used for Create Implementation refactoring when used on member variables.
 If you have modified this item, you may delete it to restore the default upon next use.
@@ -1027,7 +1025,6 @@ a:Refactor Create Implementation for Member::
 
 $SymbolType$ $SymbolContext$;
 
-
 
 readme:
 VA Snippet used for Create Implementation refactoring when used on member variables and the target is a header file.

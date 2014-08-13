@@ -305,7 +305,6 @@ $end$$SymbolPrivileges$ $SymbolType$ $SymbolContext$($ParameterList$)
 	$MethodBody$
 }
 
-
 readme:
 VA Snippet used by Surround With Namespace.
 If you have modified this item, you may delete it to restore the default upon next use.
