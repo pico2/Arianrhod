@@ -93,3 +93,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Android/.metadata/*/.log
 /Source/Android/.metadata/.plugins/
 /Source/Android/*/.settings/
+/Source/Hooks/Falcom/ZWEI2Plus/zw

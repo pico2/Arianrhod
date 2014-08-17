@@ -14,7 +14,7 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    
+    AllocConsole();
 
     return TRUE;
 }
