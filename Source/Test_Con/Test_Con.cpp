@@ -146,15 +146,10 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-#pragma comment(lib, "XLMiniDownloadKernel2.lib")
-#include "D:\Desktop\src\xlacc_depend\src\XLMiniDownloadKernelSDK\XLMiniDownloadKernelSDK.h"
-#include "XLMiniDownloadKernel/Demo.cpp"
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    main3(argc, argv);
     return;
 
 #if 0

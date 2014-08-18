@@ -911,7 +911,7 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
     if (Type == 0x30 && ReloginMgr != nullptr)
     {
         Io::SetAsyncCall(
-            [](PVOID)
+            []()
             {
                 PITXData Data;
 
