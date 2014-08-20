@@ -149,6 +149,40 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    LONG64 DueTime;
+    BOOL Beep = FALSE;
+
+    ml::MlInitialize();
+
+    SetWindowPos(GetConsoleWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+    DueTime = 5 * 1000;
+
+    Io::SetAsyncCall(
+        [&]()
+        {        
+            if (Beep)
+            {
+                PrintConsole(L"\a");
+                FlashWindow(GetConsoleWindow(), TRUE);
+            }
+            else
+            {
+                PrintConsole(L"%I64d         \r", DueTime / 1000);
+                DueTime -= 1000;
+                Beep = DueTime <= 0;
+            }
+
+            return FALSE;
+        },
+        0,
+        1000
+    );
+
+    LOOP_FOREVER
+    {
+        Ps::Sleep(1, TRUE);
+    }
 
     return;
 

@@ -15,6 +15,16 @@ BOOL Initialize(PVOID BaseAddress)
     ml::MlInitialize();
 
     // AllocConsole();
+    //
+    // 4A12E0
+    // check ascii range
+    //
+    // 4A0DE0
+    // check sjis range
+    //
+    // 4A1300
+    // char outline
+    //
 
     Mp::PATCH_MEMORY_DATA p[] =
     {
