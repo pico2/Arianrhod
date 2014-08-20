@@ -14,7 +14,21 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    AllocConsole();
+    // AllocConsole();
+
+    Mp::PATCH_MEMORY_DATA p[] =
+    {
+        Mp::MemoryPatchVa(
+            (ULONG64)(API_POINTER(::Sleep))[] (ULONG ms) -> VOID
+            {
+                Ps::Sleep(ms == 0 ? 1 : ms);
+            },
+            sizeof(PVOID),
+            LookupImportTable(GetExeModuleHandle(), "KERNEL32.dll", KERNEL32_Sleep)
+        ),
+    };
+
+    Mp::PatchMemory(p, countof(p));
 
     return TRUE;
 }

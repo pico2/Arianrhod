@@ -11,6 +11,15 @@
 #include <Lm.h>
 #include "QQMethod.h"
 
+
+/*++
+
+Req AnonymousInfo %lu
+AnonymousChat
+
+--*/
+
+
 WCHAR GlobalRegistryDb[0x20];
 WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
 
@@ -972,13 +981,15 @@ HRESULT CDECL GetCurrentAtNumber(PVOID Object, PULONG Number)
     return S_OK;
 }
 
+ULONG_PTR BanSpeechObjectOffset;
+
 VOID FASTCALL GetBanSpeechTimeStamp(PVOID This, PVOID Edx, PULONG* TimeStampData, PULONG* What)
 {
     StubGetBanSpeechTimeStamp(This, Edx, TimeStampData, What);
 
     ULONG& TimeStamp = (*TimeStampData)[4];
 
-    if (*TimeStampData == *(PULONG*)PtrAdd(PtrSub(This, 0x58), 0x5C))
+    if (*TimeStampData == *(PULONG*)PtrAdd(PtrSub(This, BanSpeechObjectOffset), BanSpeechObjectOffset + 4))
         return;
 
     if (GetKeyState(VK_CONTROL) < 0)
@@ -1281,10 +1292,12 @@ PVOID SearchGroupApp_GroupBanSpeech(PVOID ImageBase)
         WalkOpCodeM(Buffer, OpLength, Ret)
         {
             if (
-                Buffer[0] == 0x83 && Buffer[1] == 0xC1 && Buffer[2] == 0x58 &&      // add ecx, 58
-                Buffer[3] == 0xE8                                                   // call const
+                OpLength == 3 &&
+                Buffer[0] == 0x83 && Buffer[1] == 0xC1 && // Buffer[2] == 0x58 &&       // add ecx, const
+                Buffer[3] == 0xE8                                                       // call const
                )
             {
+                BanSpeechObjectOffset = (ULONG_PTR)Buffer[2];
                 CallGetBanSpeechTimeStamp = Buffer + 3;
                 return STATUS_SUCCESS;
             }

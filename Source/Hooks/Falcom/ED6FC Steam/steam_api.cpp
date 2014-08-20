@@ -3,6 +3,8 @@
 #define S_API CDECL
 #define S_VIRTUAL THISCALL
 
+#define PrintConsole(...)
+
 enum AccountType
 {
     AccountTypeInvalid = 0,
@@ -60,7 +62,7 @@ typedef ULONG64 SteamLeaderboard;
 typedef ULONG64 SteamLeaderboardEntries;
 typedef ULONG SteamPipeId;
 typedef ULONG SteamUserId;
-typedef ULONG AppId;
+typedef ULONG AppId, AppId_t;
 
 const SteamAPICall SteamAPICallInvalid = 0;
 const AppId AppIdInvalid = 0;
@@ -84,7 +86,7 @@ ISteamApps* S_API SteamApps();
 
 struct CSteamID
 {
-
+    ULONG64 steamid;
 };
 
 struct LeaderboardEntry
@@ -100,50 +102,131 @@ struct ISteamApps
 public:
     virtual bool S_VIRTUAL BIsSubscribed()
     {
-        PrintConsole(L"%s\n", L"BIsSubscribed");
+        PrintConsole(L"BIsSubscribed\n");
         return true;
     }
 
     virtual bool S_VIRTUAL BIsLowViolence()
     {
-        PrintConsole(L"%s\n", L"BIsLowViolence");
+        PrintConsole(L"BIsLowViolence\n");
         return false;
     }
 
     virtual bool S_VIRTUAL BIsCybercafe()
     {
-        PrintConsole(L"%s\n", L"BIsCybercafe");
+        PrintConsole(L"BIsCybercafe\n");
         return false;
     }
 
     virtual bool S_VIRTUAL BIsVACBanned()
     {
-        PrintConsole(L"%s\n", L"BIsVACBanned");
+        PrintConsole(L"BIsVACBanned\n");
         return false;
     }
 
     virtual PCSTR S_VIRTUAL GetCurrentGameLanguage()
     {
-        PrintConsole(L"%s\n", L"GetCurrentGameLanguage");
+        PrintConsole(L"GetCurrentGameLanguage\n");
         return "english";
     }
 
     virtual PCSTR S_VIRTUAL GetAvailableGameLanguages()
     {
-        PrintConsole(L"%s\n", L"GetAvailableGameLanguages");
+        PrintConsole(L"GetAvailableGameLanguages\n");
         return "english";
     }
 
     virtual bool S_VIRTUAL BIsSubscribedApp(ULONG appID)
     {
-        PrintConsole(L"%s\n", L"BIsSubscribedApp");
+        PrintConsole(L"BIsSubscribedApp\n");
         return true;
     }
 
     virtual bool S_VIRTUAL BIsDlcInstalled(ULONG appID)
     {
-        PrintConsole(L"%s\n", L"BIsDlcInstalled");
+        PrintConsole(L"BIsDlcInstalled\n");
         return true;
+    }
+
+    virtual ULONG S_VIRTUAL GetEarliestPurchaseUnixTime(AppId nAppID)
+    {
+        PrintConsole(L"GetEarliestPurchaseUnixTime\n");
+        return 0;
+    }
+
+    virtual bool S_VIRTUAL BIsSubscribedFromFreeWeekend()
+    {
+        PrintConsole(L"BIsSubscribedFromFreeWeekend\n");
+        return true;
+    }
+
+    virtual int S_VIRTUAL GetDLCCount()
+    {
+        PrintConsole(L"GetDLCCount\n");
+        return 0;
+    }
+
+    virtual bool S_VIRTUAL BGetDLCDataByIndex( int iDLC, AppId_t *pAppID, bool *pbAvailable, char *pchName, int cchNameBufferSize )
+    {
+        PrintConsole(L"BGetDLCDataByIndex\n");
+        return false;
+    }
+
+    virtual void S_VIRTUAL InstallDLC( AppId_t nAppID )
+    {
+        PrintConsole(L"InstallDLC\n");
+    }
+
+    virtual void S_VIRTUAL UninstallDLC( AppId_t nAppID )
+    {
+        PrintConsole(L"UninstallDLC\n");
+    }
+
+    virtual void S_VIRTUAL RequestAppProofOfPurchaseKey(AppId_t nAppID)
+    {
+        PrintConsole(L"RequestAppProofOfPurchaseKey\n");
+    }
+
+    virtual bool S_VIRTUAL GetCurrentBetaName( char *pchName, int cchNameBufferSize )
+    {
+        PrintConsole(L"GetCurrentBetaName\n");
+        return false;
+    }
+
+    virtual bool S_VIRTUAL MarkContentCorrupt( bool bMissingFilesOnly )
+    {
+        PrintConsole(L"MarkContentCorrupt\n");
+        return false;
+    }
+
+    virtual ULONG S_VIRTUAL GetInstalledDepots( AppId_t appID, ULONG *pvecDepots, ULONG cMaxDepots )
+    {
+        PrintConsole(L"GetInstalledDepots\n");
+        return false;
+    }
+
+    virtual ULONG S_VIRTUAL GetAppInstallDir( AppId_t appID, char *pchFolder, ULONG cchFolderBufferSize )
+    {
+        PrintConsole(L"GetAppInstallDir\n");
+        return 0;
+    }
+
+    virtual bool S_VIRTUAL BIsAppInstalled(AppId_t appID)
+    {
+        PrintConsole(L"BIsAppInstalled\n");
+        return true;
+    }
+
+    virtual PVOID S_VIRTUAL GetAppOwner()
+    {
+        PrintConsole(L"GetAppOwner\n");
+        return nullptr;
+    }
+
+    virtual PCSTR S_VIRTUAL GetLaunchQueryParam(PCSTR pchKey)
+    {
+        PrintConsole(L"GetLaunchQueryParam\n");
+        return "";
     }
 };
 
@@ -152,130 +235,172 @@ struct ISteamClient
 public:
     virtual SteamPipeId S_VIRTUAL CreateSteamPipe()
     {
-        PrintConsole(L"%s\n", L"CreateSteamPipe");
+        PrintConsole(L"CreateSteamPipe\n");
         return 0;
     }
 
     virtual bool S_VIRTUAL BReleaseSteamPipe(SteamPipeId steamPipe)
     {
-        PrintConsole(L"%s\n", L"BReleaseSteamPipe");
+        PrintConsole(L"BReleaseSteamPipe\n");
         return true;
     }
 
     virtual SteamUserId S_VIRTUAL ConnectToGlobalUser(SteamPipeId steamPipe)
     {
-        PrintConsole(L"%s\n", L"ConnectToGlobalUser");
+        PrintConsole(L"ConnectToGlobalUser\n");
         return 0;
     }
 
     virtual SteamUserId S_VIRTUAL CreateLocalUser(SteamPipeId *steamPipe, AccountType accountType)
     {
-        PrintConsole(L"%s\n", L"CreateLocalUser");
+        PrintConsole(L"CreateLocalUser\n");
         return 0;
     }
 
     virtual void S_VIRTUAL ReleaseUser(SteamPipeId steamPipe, SteamUserId user)
     {
-        PrintConsole(L"%s\n", L"ReleaseUser");
+        PrintConsole(L"ReleaseUser\n");
     }
 
     virtual ISteamUser* S_VIRTUAL GetISteamUser(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamUser");
+        PrintConsole(L"GetISteamUser\n");
         DebugBreakPoint();
     }
 
     virtual ISteamGameServer *S_VIRTUAL GetISteamGameServer(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamGameServer");
+        PrintConsole(L"GetISteamGameServer\n");
         DebugBreakPoint();
     }
 
     virtual void S_VIRTUAL SetLocalIPBinding(ULONG ip, USHORT port)
     {
-        PrintConsole(L"%s\n", L"SetLocalIPBinding");
+        PrintConsole(L"SetLocalIPBinding\n");
     }
 
     virtual ISteamFriends *S_VIRTUAL GetISteamFriends(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamFriends");
+        PrintConsole(L"GetISteamFriends\n");
         DebugBreakPoint();
     }
 
     virtual ISteamUtils *S_VIRTUAL GetISteamUtils(SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamUtils");
+        PrintConsole(L"GetISteamUtils\n");
         DebugBreakPoint();
     }
 
     virtual ISteamMatchmaking *S_VIRTUAL GetISteamMatchmaking(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamMatchmaking");
+        PrintConsole(L"GetISteamMatchmaking\n");
         DebugBreakPoint();
     }
 
     virtual ISteamMasterServerUpdater *S_VIRTUAL GetISteamMasterServerUpdater(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamMasterServerUpdater");
+        PrintConsole(L"GetISteamMasterServerUpdater\n");
         DebugBreakPoint();
     }
 
     virtual ISteamMatchmakingServers *S_VIRTUAL GetISteamMatchmakingServers(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamMatchmakingServers");
+        PrintConsole(L"GetISteamMatchmakingServers\n");
         DebugBreakPoint();
     }
 
     virtual void *S_VIRTUAL GetISteamGenericInterface(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamGenericInterface");
+        PrintConsole(L"GetISteamGenericInterface\n");
         DebugBreakPoint();
     }
 
     virtual ISteamUserStats *S_VIRTUAL GetISteamUserStats(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamUserStats");
+        PrintConsole(L"GetISteamUserStats\n");
         DebugBreakPoint();
     }
 
     virtual ISteamGameServerStats *S_VIRTUAL GetISteamGameServerStats(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamGameServerStats");
+        PrintConsole(L"GetISteamGameServerStats\n");
         DebugBreakPoint();
     }
 
     virtual ISteamApps *S_VIRTUAL GetISteamApps(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamApps");
+        PrintConsole(L"GetISteamApps\n");
         return SteamApps();
     }
 
     virtual ISteamNetworking *S_VIRTUAL GetISteamNetworking(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamNetworking");
+        PrintConsole(L"GetISteamNetworking\n");
         DebugBreakPoint();
     }
 
     virtual ISteamRemoteStorage *S_VIRTUAL GetISteamRemoteStorage(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
-        PrintConsole(L"%s\n", L"GetISteamRemoteStorage");
+        PrintConsole(L"GetISteamRemoteStorage\n");
         DebugBreakPoint();
     }
 
     virtual void S_VIRTUAL RunFrame()
     {
-        PrintConsole(L"%s\n", L"RunFrame");
+        PrintConsole(L"RunFrame\n");
     }
 
     virtual ULONG S_VIRTUAL GetIPCCallCount()
     {
-        PrintConsole(L"%s\n", L"GetIPCCallCount");
+        PrintConsole(L"GetIPCCallCount\n");
         return 0;
     }
 
     virtual void S_VIRTUAL SetWarningMessageHook(SteamAPIWarningMessageHook function)
     {
-        PrintConsole(L"%s\n", L"SetWarningMessageHook");
+        PrintConsole(L"SetWarningMessageHook\n");
+    }
+
+    virtual bool S_VIRTUAL BShutdownIfAllPipesClosed()
+    {
+        PrintConsole(L"BShutdownIfAllPipesClosed\n");
+        return false;
+    }
+
+    virtual class ISteamHTTP * S_VIRTUAL GetISteamHTTP( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    {
+        PrintConsole(L"GetISteamHTTP\n");
+        DebugBreakPoint();
+    }
+
+    virtual class ISteamUnifiedMessages * S_VIRTUAL GetISteamUnifiedMessages( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    {
+        PrintConsole(L"GetISteamUnifiedMessages\n");
+        DebugBreakPoint();
+    }
+
+    virtual class  ISteamController * S_VIRTUAL GetISteamController( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    {
+        PrintConsole(L"GetISteamController\n");
+        DebugBreakPoint();
+    }
+
+    virtual class ISteamUGC * S_VIRTUAL GetISteamUGC( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    {
+        PrintConsole(L"GetISteamUGC\n");
+        DebugBreakPoint();
+    }
+
+    virtual class ISteamAppList * S_VIRTUAL GetISteamAppList( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    {
+        PrintConsole(L"GetISteamAppList\n");
+        DebugBreakPoint();
+    }
+
+    virtual class ISteamMusic * S_VIRTUAL GetISteamMusic( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    {
+        PrintConsole(L"GetISteamMusic\n");
+        DebugBreakPoint();
     }
 };
 
@@ -285,58 +410,58 @@ struct ISteamUserStats
 
     virtual bool S_VIRTUAL RequestCurrentStats()
     {
-        PrintConsole(L"%s\n", L"RequestCurrentStats");
+        PrintConsole(L"RequestCurrentStats\n");
         return true;
     }
 
     virtual bool S_VIRTUAL GetStat(PCSTR name, LONG *data )
     {
-        PrintConsole(L"%s\n", L"GetStat");
+        PrintConsole(L"GetStat\n");
         *data = 0;
         return true;
     };
 
     virtual bool S_VIRTUAL GetStat(PCSTR name, float *data)
     {
-        PrintConsole(L"%s\n", L"GetStat");
+        PrintConsole(L"GetStat\n");
         *data = 0;
         return true;
     }
 
     virtual bool S_VIRTUAL SetStat(PCSTR name, LONG data)
     {
-        PrintConsole(L"%s\n", L"SetStat");
+        PrintConsole(L"SetStat\n");
         return true;
     }
 
     virtual bool S_VIRTUAL SetStat(PCSTR name, float data)
     {
-        PrintConsole(L"%s\n", L"SetStat");
+        PrintConsole(L"SetStat\n");
         return true;
     }
 
     virtual bool S_VIRTUAL UpdateAvgRateStat(PCSTR name, float countThisSession,  double sessionLength)
     {
-        PrintConsole(L"%s\n", L"UpdateAvgRateStat");
+        PrintConsole(L"UpdateAvgRateStat\n");
         return true;
     }
 
     virtual bool S_VIRTUAL GetAchievement(PCSTR name, bool *achieved)
     {
-        PrintConsole(L"%s\n", L"GetAchievement");
+        PrintConsole(L"GetAchievement\n");
         *achieved = true;
         return true;
     }
 
     virtual bool S_VIRTUAL SetAchievement(PCSTR name)
     {
-        PrintConsole(L"%s\n", L"SetAchievement");
+        PrintConsole(L"SetAchievement\n");
         return true;
     }
 
     virtual bool S_VIRTUAL ClearAchievement(PCSTR name)
     {
-        PrintConsole(L"%s\n", L"ClearAchievement");
+        PrintConsole(L"ClearAchievement\n");
         return true;
     }
 
@@ -344,7 +469,7 @@ struct ISteamUserStats
                               bool *achieved,
                               ULONG *unlockTime)
     {
-        PrintConsole(L"%s\n", L"GetAchievementAndUnlockTime");
+        PrintConsole(L"GetAchievementAndUnlockTime\n");
         *achieved = true;
         *unlockTime = 0;
         return true;
@@ -352,70 +477,68 @@ struct ISteamUserStats
 
     virtual bool S_VIRTUAL StoreStats()
     {
-        PrintConsole(L"%s\n", L"StoreStats");
+        PrintConsole(L"StoreStats\n");
         return true;
     }
 
     virtual int S_VIRTUAL GetAchievementIcon(PCSTR name)
     {
-        PrintConsole(L"%s\n", L"GetAchievementIcon");
+        PrintConsole(L"GetAchievementIcon\n");
         return 0;
     }
 
-    virtual PCSTR S_VIRTUAL GetAchievementDisplayAttribute(PCSTR name,
-                                    PCSTR key)
+    virtual PCSTR S_VIRTUAL GetAchievementDisplayAttribute(PCSTR name, PCSTR key)
     {
-        PrintConsole(L"%s\n", L"GetAchievementDisplayAttribute");
+        PrintConsole(L"GetAchievementDisplayAttribute\n");
         return "AchievementDisplayAttribute";
     }
 
-    virtual bool S_VIRTUAL IndicateAchievementProgress(PCSTR name,
-                              ULONG curProgress,
-                              ULONG maxProgress)
+    virtual bool S_VIRTUAL IndicateAchievementProgress(PCSTR name, ULONG curProgress, ULONG maxProgress)
     {
-        PrintConsole(L"%s\n", L"IndicateAchievementProgress");
+        PrintConsole(L"IndicateAchievementProgress\n");
         return true;
+    }
+
+    virtual ULONG S_VIRTUAL GetNumAchievements()
+    {
+        return 0;
+    }
+
+    virtual PCSTR S_VIRTUAL GetAchievementName( ULONG iAchievement )
+    {
+        return 0;
     }
 
     virtual SteamAPICall S_VIRTUAL RequestUserStats(CSteamID steamIDUser)
     {
-        PrintConsole(L"%s\n", L"RequestUserStats");
+        PrintConsole(L"RequestUserStats\n");
         return SteamAPICallInvalid;
     }
 
-    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser,
-                      PCSTR name,
-                      LONG *data)
+    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, LONG *data)
     {
-        PrintConsole(L"%s\n", L"GetUserStat");
+        PrintConsole(L"GetUserStat\n");
         *data = 0;
         return true;
     }
 
-    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser,
-                      PCSTR name,
-                      float *data)
+    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, float *data)
     {
-        PrintConsole(L"%s\n", L"GetUserStat");
+        PrintConsole(L"GetUserStat\n");
         *data = 0;
         return true;
     }
 
-    virtual bool S_VIRTUAL GetUserAchievement(CSteamID steamIDUser,
-                         PCSTR name,
-                         bool *achieved)
+    virtual bool S_VIRTUAL GetUserAchievement(CSteamID steamIDUser, PCSTR name, bool *achieved)
     {
-        PrintConsole(L"%s\n", L"GetUserAchievement");
+        PrintConsole(L"GetUserAchievement\n");
         *achieved = true;
         return true;
     }
 
-    virtual bool S_VIRTUAL GetUserAchievementAndUnlockTime(CSteamID steamIDUser,
-                                  PCSTR name,
-                                  bool *achieved,
-                                  ULONG *unlockTime)
+    virtual bool S_VIRTUAL GetUserAchievementAndUnlockTime(CSteamID steamIDUser, PCSTR name, bool *achieved, ULONG *unlockTime)
     {
-        PrintConsole(L"%s\n", L"GetUserAchievementAndUnlockTime");
+        PrintConsole(L"GetUserAchievementAndUnlockTime\n");
         *achieved = true;
         *unlockTime = 0;
         return true;
@@ -423,7 +546,7 @@ struct ISteamUserStats
 
     virtual bool S_VIRTUAL ResetAllStats(bool achievementsToo)
     {
-        PrintConsole(L"%s\n", L"ResetAllStats");
+        PrintConsole(L"ResetAllStats\n");
         return true;
     }
 
@@ -432,49 +555,49 @@ struct ISteamUserStats
             LeaderboardSortMethod leaderboardSortMethod,
             LeaderboardDisplayType leaderboardDisplayType)
     {
-        PrintConsole(L"%s\n", L"FindOrCreateLeaderboard");
+        PrintConsole(L"FindOrCreateLeaderboard\n");
         return SteamAPICallInvalid;
     }
 
     virtual SteamAPICall S_VIRTUAL FindLeaderboard(PCSTR leaderboardName)
     {
-        PrintConsole(L"%s\n", L"FindLeaderboard");
+        PrintConsole(L"FindLeaderboard\n");
         return SteamAPICallInvalid;
     }
 
     virtual PCSTR S_VIRTUAL GetLeaderboardName(SteamLeaderboard steamLeaderboard)
     {
-        PrintConsole(L"%s\n", L"GetLeaderboardName");
+        PrintConsole(L"GetLeaderboardName\n");
         return "LeaderboardName";
     }
     virtual int S_VIRTUAL GetLeaderboardEntryCount(SteamLeaderboard steamLeaderboard)
     {
-        PrintConsole(L"%s\n", L"GetLeaderboardEntryCount");
+        PrintConsole(L"GetLeaderboardEntryCount\n");
         mLastLeaderboard = steamLeaderboard;
         return 10;
     }
 
-    virtual LeaderboardSortMethod S_VIRTUAL GetLeaderboardSortMethod(
-            SteamLeaderboard steamLeaderboard)
+    virtual LeaderboardSortMethod S_VIRTUAL GetLeaderboardSortMethod(SteamLeaderboard steamLeaderboard)
     {
-        PrintConsole(L"%s\n", L"GetLeaderboardSortMethod");
+        PrintConsole(L"GetLeaderboardSortMethod\n");
         return LeaderboardSortMethodDescending;
     }
 
-    virtual LeaderboardDisplayType S_VIRTUAL GetLeaderboardDisplayType(
-            SteamLeaderboard steamLeaderboard)
+    virtual LeaderboardDisplayType S_VIRTUAL GetLeaderboardDisplayType(SteamLeaderboard steamLeaderboard)
     {
-        PrintConsole(L"%s\n", L"GetLeaderboardDisplayType");
+        PrintConsole(L"GetLeaderboardDisplayType\n");
         return LeaderboardDisplayTypeNumeric;
     }
 
-    virtual SteamAPICall S_VIRTUAL DownloadLeaderboardEntries(
-            SteamLeaderboard steamLeaderboard,
-            LeaderboardDataRequest leaderboardDataRequest,
-            int rangeStart,
-            int rangeEnd)
+    virtual SteamAPICall S_VIRTUAL DownloadLeaderboardEntries(SteamLeaderboard steamLeaderboard, LeaderboardDataRequest leaderboardDataRequest, int rangeStart, int rangeEnd)
     {
-        PrintConsole(L"%s\n", L"DownloadLeaderboardEntries");
+        PrintConsole(L"DownloadLeaderboardEntries\n");
+        return SteamAPICallInvalid;
+    }
+
+    virtual SteamAPICall S_VIRTUAL DownloadLeaderboardEntriesForUsers(SteamLeaderboard hSteamLeaderboard, CSteamID *prgUsers, int cUsers )
+    {
+        PrintConsole(L"DownloadLeaderboardEntriesForUsers\n");
         return SteamAPICallInvalid;
     }
 
@@ -485,7 +608,7 @@ struct ISteamUserStats
             LONG *details,
             int detailsMax)
     {
-        PrintConsole(L"%s\n", L"GetDownloadedLeaderboardEntry");
+        PrintConsole(L"GetDownloadedLeaderboardEntry\n");
         *details = 0;
         return false;
     }
@@ -497,68 +620,249 @@ struct ISteamUserStats
             const LONG *scoreDetails,
             int scoreDetailsCount)
     {
-        PrintConsole(L"%s\n", L"UploadLeaderboardScore");
+        PrintConsole(L"UploadLeaderboardScore\n");
+        return SteamAPICallInvalid;
+    }
+
+    virtual SteamAPICall S_VIRTUAL AttachLeaderboardUGC( SteamLeaderboard hSteamLeaderboard, ULONG64 hUGC )
+    {
+        PrintConsole(L"AttachLeaderboardUGC\n");
         return SteamAPICallInvalid;
     }
 
     virtual SteamAPICall S_VIRTUAL GetNumberOfCurrentPlayers()
     {
-        PrintConsole(L"%s\n", L"GetNumberOfCurrentPlayers");
+        PrintConsole(L"GetNumberOfCurrentPlayers\n");
         return SteamAPICallInvalid;
+    }
+
+    virtual SteamAPICall S_VIRTUAL RequestGlobalAchievementPercentages()
+    {
+        PrintConsole(L"RequestGlobalAchievementPercentages\n");
+        return SteamAPICallInvalid;
+    }
+
+    virtual int S_VIRTUAL GetMostAchievedAchievementInfo( char *pchName, ULONG unNameBufLen, float *pflPercent, bool *pbAchieved )
+    {
+        PrintConsole(L"GetMostAchievedAchievementInfo\n");
+        *pflPercent = 100;
+        *pbAchieved = true;
+        return 0;
+    }
+
+    virtual int S_VIRTUAL GetNextMostAchievedAchievementInfo( int iIteratorPrevious, char *pchName, ULONG unNameBufLen, float *pflPercent, bool *pbAchieved )
+    {
+        PrintConsole(L"GetNextMostAchievedAchievementInfo\n");
+        ZeroMemory(pchName, unNameBufLen);
+        *pflPercent = 100;
+        *pbAchieved = true;
+        return 0;
+    }
+
+    virtual bool S_VIRTUAL GetAchievementAchievedPercent( PCSTR pchName, float *pflPercent )
+    {
+        PrintConsole(L"GetAchievementAchievedPercent\n");
+        *pflPercent = 100;
+        return false;
+    }
+
+    virtual SteamAPICall S_VIRTUAL RequestGlobalStats( int nHistoryDays )
+    {
+        PrintConsole(L"RequestGlobalStats\n");
+        return SteamAPICallInvalid;
+    }
+
+    virtual bool S_VIRTUAL GetGlobalStat( PCSTR pchStatName, LONG64 *pData )
+    {
+        PrintConsole(L"GetGlobalStat\n");
+        return false;
+    }
+
+    virtual bool S_VIRTUAL GetGlobalStat( PCSTR pchStatName, double *pData )
+    {
+        PrintConsole(L"GetGlobalStat\n");
+        return false;
+    }
+
+    virtual LONG S_VIRTUAL GetGlobalStatHistory( PCSTR pchStatName, LONG64 *pData, ULONG cubData )
+    {
+        PrintConsole(L"GetGlobalStatHistory\n");
+        return 0;
+    }
+
+    virtual LONG S_VIRTUAL GetGlobalStatHistory( PCSTR pchStatName, double *pData, ULONG cubData )
+    {
+        PrintConsole(L"GetGlobalStatHistory\n");
+        return 0;
     }
 };
 
 struct ISteamRemoteStorage
 {
-    virtual bool S_VIRTUAL FileWrite(const char *file,
-                        const void *data,
-                        LONG dataSize)
+    virtual bool S_VIRTUAL FileWrite(PCSTR FileName, PVOID Data, LONG Size)
     {
-        PrintConsole(L"%s\n", L"FileWrite");
+        PrintConsole(L"FileWrite: %S\n", FileName);
         return true;
     }
 
-    virtual LONG S_VIRTUAL GetFileSize(const char *file)
+    virtual LONG S_VIRTUAL FileRead(PCSTR FileName, PVOID Data, LONG Size)
     {
-        PrintConsole(L"%s\n", L"GetFileSize");
+        PrintConsole(L"FileRead: %S\n", FileName);
         return 0;
     }
 
-    virtual LONG S_VIRTUAL FileRead(const char *file,
-                        void *data,
-                        LONG dataSize)
+    virtual bool S_VIRTUAL FileForget(PCSTR FileName)
     {
-        PrintConsole(L"%s\n", L"FileRead");
+        PrintConsole(L"FileForget: %S\n", FileName);
+        return true;
+    }
+
+    virtual bool S_VIRTUAL FileDelete( PCSTR FileName )
+    {
+        PrintConsole(L"FileDelete: %S\n", FileName);
+        return true;
+    }
+
+    virtual SteamAPICall S_VIRTUAL FileShare( PCSTR FileName )
+    {
+        PrintConsole(L"FileShare: %S\n", FileName);
+        return SteamAPICallInvalid;
+    }
+
+    virtual bool S_VIRTUAL SetSyncPlatforms( PCSTR FileName, LONG eRemoteStoragePlatform )
+    {
+        PrintConsole(L"SetSyncPlatforms: %S\n", FileName);
+        return true;
+    }
+
+    virtual ULONG64 S_VIRTUAL FileWriteStreamOpen( PCSTR FileName )
+    {
+        PrintConsole(L"FileWriteStreamOpen: %S\n", FileName);
         return 0;
     }
 
-    virtual bool S_VIRTUAL FileExists(const char *file)
+    virtual bool S_VIRTUAL FileWriteStreamWriteChunk( ULONG64 writeHandle, const void *pvData, LONG cubData )
     {
-        PrintConsole(L"%s\n", L"FileExists");
+        PrintConsole(L"FileWriteStreamWriteChunk\n");
         return false;
+    }
+
+    virtual bool S_VIRTUAL FileWriteStreamClose( ULONG64 writeHandle )
+    {
+        PrintConsole(L"FileWriteStreamClose\n");
+        return false;
+    }
+
+    virtual bool S_VIRTUAL FileWriteStreamCancel( ULONG64 writeHandle )
+    {
+        PrintConsole(L"FileWriteStreamCancel\n");
+        return false;
+    }
+
+    virtual bool S_VIRTUAL FileExists( PCSTR FileName )
+    {
+        PrintConsole(L"FileExists: %S\n", FileName);
+        return false;
+    }
+
+    virtual bool S_VIRTUAL FilePersisted( PCSTR FileName )
+    {
+        PrintConsole(L"FilePersisted: %S\n", FileName);
+        return false;
+    }
+
+    virtual LONG S_VIRTUAL GetFileSize( PCSTR FileName )
+    {
+        PrintConsole(L"GetFileSize: %S\n", FileName);
+        return 0;
+    }
+
+    virtual LONG64 S_VIRTUAL GetFileTimestamp( PCSTR FileName )
+    {
+        PrintConsole(L"GetFileTimestamp: %S\n", FileName);
+        return 0;
+    }
+
+    virtual LONG S_VIRTUAL GetSyncPlatforms( PCSTR FileName )
+    {
+        PrintConsole(L"GetSyncPlatforms: %S\n", FileName);
+        return 0;
     }
 
     virtual LONG S_VIRTUAL GetFileCount()
     {
-        PrintConsole(L"%s\n", L"GetFileCount");
+        PrintConsole(L"GetFileCount\n");
         return 0;
     }
 
-    virtual const char *S_VIRTUAL GetFileNameAndSize(int file,
-                                LONG *fileSizeInBytes)
+    virtual PCSTR S_VIRTUAL GetFileNameAndSize( int iFile, LONG *pnFileSizeInBytes )
     {
-        PrintConsole(L"%s\n", L"GetFileNameAndSize");
-        *fileSizeInBytes = 0;
-        return "FileName";
+        PrintConsole(L"GetFileNameAndSize\n");
+        *pnFileSizeInBytes = 0;
+        return "";
     }
 
-    virtual bool S_VIRTUAL GetQuota(LONG *totalBytes, LONG *availableBytes)
+    virtual bool S_VIRTUAL GetQuota( LONG *pnTotalBytes, LONG *puAvailableBytes )
     {
-        PrintConsole(L"%s\n", L"GetQuota");
-        *totalBytes = 1000000000;
-        *availableBytes = 1000000000;
+        PrintConsole(L"GetQuota\n");
+        *pnTotalBytes = 0x10000000;
+        *puAvailableBytes = 0x10000000;
         return true;
     }
+
+    virtual bool S_VIRTUAL IsCloudEnabledForAccount()
+    {
+        PrintConsole(L"IsCloudEnabledForAccount\n");
+        return true;
+    }
+
+    virtual bool S_VIRTUAL IsCloudEnabledForApp()
+    {
+        PrintConsole(L"IsCloudEnabledForApp\n");
+        return true;
+    }
+
+    virtual void S_VIRTUAL SetCloudEnabledForApp( bool bEnabled )
+    {
+        PrintConsole(L"SetCloudEnabledForApp\n");
+    }
+
+    virtual SteamAPICall S_VIRTUAL UGCDownload( ULONG64 hContent, ULONG unPriority )
+    {
+        PrintConsole(L"UGCDownload\n");
+        return SteamAPICallInvalid;
+    }
+
+    virtual bool S_VIRTUAL GetUGCDownloadProgress( ULONG64 hContent, LONG *pnBytesDownloaded, LONG *pnBytesExpected )
+    {
+        PrintConsole(L"GetUGCDownloadProgress\n");
+        return false;
+    }
+
+    virtual bool S_VIRTUAL GetUGCDetails( ULONG64 hContent, AppId_t *pnAppID, char **ppchName, LONG *pnFileSizeInBytes, CSteamID *pSteamIDOwner )
+    {
+        PrintConsole(L"GetUGCDetails\n");
+        return false;
+    }
+
+    virtual LONG S_VIRTUAL UGCRead( ULONG64 hContent, void *pvData, LONG cubDataToRead, ULONG cOffset, LONG eAction )
+    {
+        PrintConsole(L"UGCRead\n");
+        return 0;
+    }
+
+    virtual LONG S_VIRTUAL GetCachedUGCCount()
+    {
+        PrintConsole(L"GetCachedUGCCount\n");
+        return 0;
+    }
+
+    virtual ULONG64 S_VIRTUAL GetCachedUGCHandle( LONG iCachedContent )
+    {
+        PrintConsole(L"GetCachedUGCHandle\n");
+        return 0;
+    }
+
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -567,155 +871,155 @@ struct ISteamRemoteStorage
 
 bool S_API SteamAPI_Init()
 {
-    PrintConsole(L"%s\n", L"SteamAPI_Init");
+    PrintConsole(L"SteamAPI_Init\n");
     return true;
 }
 
 bool S_API SteamAPI_InitSafe()
 {
-    PrintConsole(L"%s\n", L"SteamAPI_InitSafe");
+    PrintConsole(L"SteamAPI_InitSafe\n");
     return false;
 }
 
 bool S_API SteamAPI_IsSteamRunning()
 {
-    PrintConsole(L"%s\n", L"SteamAPI_IsSteamRunning");
+    PrintConsole(L"SteamAPI_IsSteamRunning\n");
     return true;
 }
 
 void S_API SteamAPI_RegisterCallResult(struct CallbackBase *callback, SteamAPICall apiCall)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_RegisterCallResult");
+    PrintConsole(L"SteamAPI_RegisterCallResult\n");
 }
 
 void S_API SteamAPI_RegisterCallback(struct CallbackBase *callback, int iCallback)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_RegisterCallback");
+    PrintConsole(L"SteamAPI_RegisterCallback\n");
 }
 
 bool S_API SteamAPI_RestartAppIfNecessary(ULONG appId)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_RestartAppIfNecessary");
+    PrintConsole(L"SteamAPI_RestartAppIfNecessary\n");
     return false;
 }
 
 void S_API SteamAPI_RunCallbacks()
 {
-    PrintConsole(L"%s\n", L"SteamAPI_RunCallbacks");
+    PrintConsole(L"SteamAPI_RunCallbacks\n");
 }
 
 void S_API SteamAPI_SetMiniDumpComment(PCSTR msg)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_SetMiniDumpComment");
+    PrintConsole(L"SteamAPI_SetMiniDumpComment\n");
 }
 
 void S_API SteamAPI_Shutdown()
 {
-    PrintConsole(L"%s\n", L"SteamAPI_Shutdown");
+    PrintConsole(L"SteamAPI_Shutdown\n");
 }
 
 void S_API SteamAPI_UnregisterCallResult(struct CallbackBase *callback, SteamAPICall apiCall)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_UnregisterCallResult");
+    PrintConsole(L"SteamAPI_UnregisterCallResult\n");
 }
 
 void S_API SteamAPI_UnregisterCallback(struct CallbackBase *callback)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_UnregisterCallback");
+    PrintConsole(L"SteamAPI_UnregisterCallback\n");
 }
 
 void S_API SteamAPI_WriteMiniDump(ULONG exceptionCode, PVOID exceptionInfo, ULONG buildId)
 {
-    PrintConsole(L"%s\n", L"SteamAPI_WriteMiniDump");
+    PrintConsole(L"SteamAPI_WriteMiniDump\n");
 }
 
 ISteamApps* S_API SteamApps()
 {
-    PrintConsole(L"%s\n", L"SteamApps");
+    PrintConsole(L"SteamApps\n");
     static ISteamApps apps;
     return &apps;
 }
 
 ISteamUserStats* S_API SteamUserStats()
 {
-    PrintConsole(L"%s\n", L"SteamUserStats");
+    PrintConsole(L"SteamUserStats\n");
     static ISteamUserStats stat;
     return &stat;
 }
 
 struct ISteamClient* S_API SteamClient()
 {
-    PrintConsole(L"%s\n", L"SteamClient");
+    PrintConsole(L"SteamClient\n");
     static ISteamClient client;
     return &client;
 }
 
 ISteamFriends* S_API SteamFriends()
 {
-    PrintConsole(L"%s\n", L"SteamFriends");
+    PrintConsole(L"SteamFriends\n");
     DebugBreakPoint();
 }
 
 ISteamGameServer* S_API SteamGameServer()
 {
-    PrintConsole(L"%s\n", L"SteamGameServer");
+    PrintConsole(L"SteamGameServer\n");
     DebugBreakPoint();
 }
 
 ISteamNetworking* S_API SteamGameServerNetworking()
 {
-    PrintConsole(L"%s\n", L"SteamGameServerNetworking");
+    PrintConsole(L"SteamGameServerNetworking\n");
     DebugBreakPoint();
 }
 
 ULONG64 S_API SteamGameServer_GetSteamID()
 {
-    PrintConsole(L"%s\n", L"SteamGameServer_GetSteamID");
+    PrintConsole(L"SteamGameServer_GetSteamID\n");
     return 251150;
 }
 
 bool S_API SteamGameServer_Init(ULONG ip, USHORT port, USHORT gamePort, USHORT spectatorPort, USHORT queryPort, ServerMode serverMode, PCSTR gameDir, PCSTR versionString)
 {
-    PrintConsole(L"%s\n", L"SteamGameServer_Init");
+    PrintConsole(L"SteamGameServer_Init\n");
     return true;
 }
 
 void S_API SteamGameServer_RunCallbacks()
 {
-    PrintConsole(L"%s\n", L"SteamGameServer_RunCallbacks");
+    PrintConsole(L"SteamGameServer_RunCallbacks\n");
 }
 
 void S_API SteamGameServer_Shutdown()
 {
-    PrintConsole(L"%s\n", L"SteamGameServer_Shutdown");
+    PrintConsole(L"SteamGameServer_Shutdown\n");
 }
 
 ISteamMatchmaking* S_API SteamMatchmaking()
 {
-    PrintConsole(L"%s\n", L"SteamMatchmaking");
+    PrintConsole(L"SteamMatchmaking\n");
     DebugBreakPoint();
 }
 
 ISteamMatchmakingServers* S_API SteamMatchmakingServers()
 {
-    PrintConsole(L"%s\n", L"SteamMatchmakingServers");
+    PrintConsole(L"SteamMatchmakingServers\n");
     DebugBreakPoint();
 }
 
 ISteamNetworking* S_API SteamNetworking()
 {
-    PrintConsole(L"%s\n", L"SteamNetworking");
+    PrintConsole(L"SteamNetworking\n");
     DebugBreakPoint();
 }
 
 ISteamRemoteStorage* S_API SteamRemoteStorage()
 {
-    PrintConsole(L"%s\n", L"SteamRemoteStorage");
+    PrintConsole(L"SteamRemoteStorage\n");
     static ISteamRemoteStorage storage;
     return &storage;
 }
 
 VOID S_API SteamScreenshots()
 {
-    PrintConsole(L"%s\n", L"SteamScreenshots");
+    PrintConsole(L"SteamScreenshots\n");
 }
