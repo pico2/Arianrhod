@@ -930,6 +930,8 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
                 ReloginMgr->Relogin(nullptr, Data);
                 Data->Release();
 
+                return TRUE;
+
                 //MessageBoxW(0, L"done", 0, 64);
             },
             500

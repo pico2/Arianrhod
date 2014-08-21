@@ -36,6 +36,26 @@ BOOL Initialize(PVOID BaseAddress)
             sizeof(PVOID),
             LookupImportTable(GetExeModuleHandle(), "KERNEL32.dll", KERNEL32_Sleep)
         ),
+
+        Mp::MemoryPatchVa(
+            (ULONG64)(API_POINTER(SetWindowPos))[](HWND Wnd, HWND InsertAfter, int X, int Y, int cx, int cy, UINT Flags) -> BOOL
+            {
+                if (Flags == SWP_NOMOVE)
+                {
+                    RECT WorkArea;
+
+                    SystemParametersInfoW(SPI_GETWORKAREA, 0, &WorkArea, 0);
+                    X = ((WorkArea.right - WorkArea.left) - cx) / 2;
+                    Y = ((WorkArea.bottom - WorkArea.top) - cy) / 2;
+
+                    CLEAR_FLAG(Flags, SWP_NOMOVE);
+                }
+
+                return SetWindowPos(Wnd, InsertAfter, X, Y, cx, cy, Flags);
+            },
+            sizeof(PVOID),
+            LookupImportTable(GetExeModuleHandle(), "USER32.dll", USER32_SetWindowPos)
+        ),
     };
 
     Mp::PatchMemory(p, countof(p));
