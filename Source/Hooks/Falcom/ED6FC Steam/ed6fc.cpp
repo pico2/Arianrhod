@@ -7,7 +7,28 @@
 #include <ft2build.h>
 #include <freetype.h>
 
+using ml::String;
+using ml::GrowableArray;
+
 FT_Library FTLibrary;
+
+PVOID SearchPatternSafe(PCSTR Pattern, PVOID Begin, LONG_PTR Length)
+{
+    GrowableArray<SEARCH_PATTERN_DATA> Patterns;
+
+    for (String &p : String::Decode((PVOID)Pattern, StrLengthA(Pattern), CP_ACP).Split(L" "))
+    {
+        if (!p)
+            continue;
+
+        if (p.GetCount() != 2)
+            return nullptr;
+
+        PrintConsole(L"%s\n", p);
+    }
+
+    return SearchPatternSafe(Patterns.GetData(), Patterns.GetSize(), Begin, Length);
+}
 
 BOOL UnInitialize(PVOID BaseAddress)
 {
@@ -19,7 +40,11 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    // AllocConsole();
+    AllocConsole();
+
+    if (SearchPatternSafe("81  3D  ?? ??   ?? ?? BC 02 00 00", BaseAddress, 0x2000))
+        DebugBreakPoint();
+
     //
     // 4A12E0
     // check ascii range
