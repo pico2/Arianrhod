@@ -24,6 +24,15 @@ PVOID SearchPatternSafe(PCSTR Pattern, PVOID Begin, LONG_PTR Length)
         if (p.GetCount() != 2)
             return nullptr;
 
+        if (p == L"??")
+        {
+            ;
+        }
+        else
+        {
+            ULONG Hex = p.ToHex();
+        }
+
         PrintConsole(L"%s\n", p);
     }
 
