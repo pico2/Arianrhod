@@ -1,8 +1,13 @@
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
+#pragma comment(lib, "freetype.lib")
 
 #include "ml.cpp"
+#include <ft2build.h>
+#include <freetype.h>
+
+FT_Library FTLibrary;
 
 BOOL UnInitialize(PVOID BaseAddress)
 {
@@ -24,6 +29,11 @@ BOOL Initialize(PVOID BaseAddress)
     //
     // 4A1300
     // char outline
+    //
+    // FT_Load_Glyph
+    // FT_Get_Glyph
+    // FT_Render_Glyph
+    // FT_Glyph_To_Bitmap
     //
 
     Mp::PATCH_MEMORY_DATA p[] =
@@ -59,6 +69,8 @@ BOOL Initialize(PVOID BaseAddress)
     };
 
     Mp::PatchMemory(p, countof(p));
+
+    FT_Init_FreeType(&FTLibrary);
 
     return TRUE;
 }
