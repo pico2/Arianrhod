@@ -9,12 +9,15 @@
 #include <ftglyph.h>
 #include <ftimage.h>
 
+ML_OVERLOAD_NEW
+
 using ml::String;
 using ml::GrowableArray;
 
 FT_Library  FTLibrary;
 FT_Face     Face;
 ULONG       SleepFix;
+PVOID       FontRender;
 
 USHORT FontColorTable[] =
 {
@@ -51,50 +54,15 @@ BYTE FontLumaTable[] =
     0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F,
 };
 
-PVOID SearchPatternSafe(const ml::String& Pattern, PVOID Begin, LONG_PTR Length)
-{
-    GrowableArray<SEARCH_PATTERN_DATA> Patterns;
-
-    for (String &p : Pattern.Split(' '))
-    {
-        if (!p)
-            continue;
-
-        if (p.GetCount() != 2)
-            return nullptr;
-
-        if (p == L"??")
-        {
-            ;
-        }
-        else
-        {
-            ULONG Hex = p.ToHex();
-        }
-
-        PrintConsole(L"%s\n", p);
-    }
-
-    return SearchPatternSafe(Patterns.GetData(), Patterns.GetSize(), Begin, Length);
-}
-
-PVOID SearchPatternSafe(PCSTR Pattern, PVOID Begin, LONG_PTR Length)
-{
-    return SearchPatternSafe(String::Decode((PVOID)Pattern, StrLengthA(Pattern), CP_ACP), Begin, Length);
-}
-
-NTSTATUS GetGlyphBitmap(ULONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG ColorIndex, ULONG Stride)
+NTSTATUS GetGlyphBitmap(LONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG ColorIndex, ULONG Stride)
 {
     PBYTE           Outline, Source;
     ULONG_PTR       Color;
     FT_Glyph        glyph;
     FT_BitmapGlyph  bitmap;
 
-    ULONG factor = 56;
-
     Color = FontColorTable[ColorIndex];
 
-    FT_Set_Char_Size(Face, FontSize * factor, FontSize * factor, 0, 0);
     FT_Load_Glyph(Face, FT_Get_Char_Index(Face, Chr), FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER);
     FT_Render_Glyph(Face->glyph, FT_RENDER_MODE_NORMAL);
     FT_Get_Glyph(Face->glyph, &glyph);
@@ -108,7 +76,7 @@ NTSTATUS GetGlyphBitmap(ULONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG Colo
         BYTE LocalOutline[0x2000];
         ZeroMemory(LocalOutline, FontSize * FontSize);
 
-        Outline = LocalOutline + (FontSize - ML_MAX(0, bitmap->top + 3)) * FontSize + bitmap->left;
+        Outline = LocalOutline + bitmap->left + (FontSize - ML_MIN(FontSize, bitmap->top + 3)) * FontSize;
 
         for (ULONG_PTR Height = bitmap->bitmap.rows; Height; --Height)
         {
@@ -169,16 +137,20 @@ NAKED VOID CDECL InvokeOriginalGetGlyphsBitmap(PCSTR Text, PVOID Buffer, ULONG C
 
 NTSTATUS GetGlyphsBitmap(PVOID Render, PCSTR Text, PVOID Buffer, ULONG ColorIndex, ULONG Stride, PVOID OriginalRoutine)
 {
-    ULONG_PTR FontSize = FontSizeTable[*(PULONG_PTR)PtrAdd(Render, 0x24)];
+    LONG_PTR FontSize = FontSizeTable[*(PULONG_PTR)PtrAdd(Render, 0x24)];
+    ULONG_PTR Encoding = CP_GB2312;
+    ULONG_PTR factor = 52;
 
     SleepFix = 1;
 
-    for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_SHIFTJIS))
+    FT_Set_Char_Size(Face, FontSize * factor, FontSize * factor, 0, 0);
+
+    for (auto &chr : String::Decode(Text, StrLengthA(Text), Encoding))
     {
         if (NT_FAILED(GetGlyphBitmap(FontSize, chr, Buffer, ColorIndex, Stride)))
         {
             WCHAR wcs[] = { chr, 0 };
-            auto mbcs = String(wcs).Encode(CP_SHIFTJIS);
+            auto mbcs = String(wcs).Encode(Encoding);
             InvokeOriginalGetGlyphsBitmap((PCSTR)mbcs.GetData(), Buffer, ColorIndex, Stride, OriginalRoutine);
             Buffer = PtrAdd(Buffer, FontSize * 2);
         }
@@ -198,13 +170,38 @@ VOID MP_CALL NakedGetGlyphBitmap(Mp::PTRAMPOLINE_NAKED_CONTEXT Context)
     Text        = (PCSTR)Context->GetArgument(1);
     Buffer      = (PVOID)Context->GetArgument(2);
     Original    = (PVOID)Context->ReturnAddress;
-    Render      = (PVOID)0x16018E0;
+    Render      = FontRender;
 
     if (NT_SUCCESS(GetGlyphsBitmap(Render, Text, Buffer, ColorIndex, Stride, Original)))
     {
         Context->SetArgument(2, Context->GetArgument(0));
         Context->Rsp += sizeof(PVOID) * 3;
     }
+}
+
+/************************************************************************
+  init
+************************************************************************/
+
+PVOID FindGetGlyphsBitmap(PVOID BaseAddress)
+{
+    PVOID p;
+
+     p = SearchPatternSafe(L"81 3D ?? ?? ?? ?? BC 02 00 00", BaseAddress, ImageNtHeaders(BaseAddress)->OptionalHeader.SizeOfImage);
+     if (p == nullptr)
+         return IMAGE_INVALID_VA;
+
+     FontRender = PtrSub(*(PVOID *)PtrAdd(p, 2), 0x28);
+
+     p = ReverseSearchFunctionHeader(p, 0x60);
+     return p == nullptr ? IMAGE_INVALID_VA : p;
+}
+
+template<typename... ARGS>
+PVOID FindAndAdvance(ULONG_PTR Advance, ARGS... args)
+{
+    PVOID p = SearchPatternSafe(args...);
+    return p == nullptr ? IMAGE_INVALID_VA : PtrAdd(p, Advance);
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -214,15 +211,14 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
-    BOOL    Success;
-    PVOID   FaceBuffer;
+    BOOL        Success;
+    ULONG_PTR   SizeOfImage;
+    PVOID       FaceBuffer;
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    //AllocConsole();
-    //if (SearchPatternSafe(L"81  3D  ?? ??   ?? ?? BC 02 00 00", BaseAddress, 0x2000))
-    //    DebugBreakPoint();
+    BaseAddress = GetExeModuleHandle();
 
     //
     // 4A12E0
@@ -252,7 +248,7 @@ BOOL Initialize(PVOID BaseAddress)
         if (FT_Init_FreeType(&FTLibrary) != FT_Err_Ok)
             break;
 
-        if (NT_FAILED(file.Open(L"user.ft")))
+        if (NT_FAILED(file.Open(L"user.ttf")))
             break;
 
         FaceBuffer = AllocateMemoryP(file.GetSize32());
@@ -267,6 +263,8 @@ BOOL Initialize(PVOID BaseAddress)
         FT_Select_Charmap(Face, FT_ENCODING_GB2312);
 
         Success = TRUE;
+        AllocConsole();
+        PrintConsole(L"%p\n", Face->style_flags & FT_STYLE_FLAG_BOLD);
     }
 
     if (Success == FALSE)
@@ -275,8 +273,13 @@ BOOL Initialize(PVOID BaseAddress)
         // return TRUE;
     }
 
+    SizeOfImage = ImageNtHeaders(BaseAddress)->OptionalHeader.SizeOfImage;
+
     Mp::PATCH_MEMORY_DATA p[] =
     {
+        Mp::MemoryPatchVa((ULONG64)0x00, 1, FindAndAdvance(0xA, L"3C 80 73 03 32 C0 C3 3C A0 73 03", BaseAddress, SizeOfImage)),
+        Mp::MemoryPatchVa((ULONG64)0x00, 1, FindAndAdvance(0xA, L"3C 80 73 03 33 C0 C3 3C A0 73 06", BaseAddress, SizeOfImage)),
+
         Mp::MemoryPatchVa(
             (ULONG64)(API_POINTER(::Sleep))[] (ULONG ms) -> VOID
             {
@@ -306,10 +309,10 @@ BOOL Initialize(PVOID BaseAddress)
             LookupImportTable(GetExeModuleHandle(), "USER32.dll", USER32_SetWindowPos)
         ),
 
-        Mp::FunctionJumpRva(Success ? 0xA1300 : IMAGE_INVALID_RVA, NakedGetGlyphBitmap, nullptr, Mp::NakedTrampoline),
+        Mp::FunctionJumpVa(Success ? FindGetGlyphsBitmap(BaseAddress) : IMAGE_INVALID_VA, NakedGetGlyphBitmap, nullptr, Mp::NakedTrampoline),
     };
 
-    Mp::PatchMemory(p, countof(p), GetExeModuleHandle());
+    Mp::PatchMemory(p, countof(p), BaseAddress);
 
     return TRUE;
 }
