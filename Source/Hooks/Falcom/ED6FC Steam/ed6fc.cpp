@@ -8,6 +8,8 @@
 #include <freetype.h>
 #include <ftglyph.h>
 #include <ftimage.h>
+#include <ftbitmap.h>
+#include <ftsynth.h>
 
 ML_OVERLOAD_NEW
 
@@ -61,9 +63,13 @@ NTSTATUS GetGlyphBitmap(LONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG Color
     FT_Glyph        glyph;
     FT_BitmapGlyph  bitmap;
 
+    ULONG strenth = (0 << 6) | (9 << 26);
+
     Color = FontColorTable[ColorIndex];
 
     FT_Load_Glyph(Face, FT_Get_Char_Index(Face, Chr), FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER);
+    FT_Bitmap_Embolden(FTLibrary, &Face->glyph->bitmap, strenth, strenth);
+    //FT_GlyphSlot_Embolden(Face->glyph);
     FT_Render_Glyph(Face->glyph, FT_RENDER_MODE_NORMAL);
     FT_Get_Glyph(Face->glyph, &glyph);
     FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, TRUE);
@@ -139,11 +145,10 @@ NTSTATUS GetGlyphsBitmap(PVOID Render, PCSTR Text, PVOID Buffer, ULONG ColorInde
 {
     LONG_PTR FontSize = FontSizeTable[*(PULONG_PTR)PtrAdd(Render, 0x24)];
     ULONG_PTR Encoding = CP_GB2312;
-    ULONG_PTR factor = 52;
 
     SleepFix = 1;
 
-    FT_Set_Char_Size(Face, FontSize * factor, FontSize * factor, 0, 0);
+    FT_Set_Pixel_Sizes(Face, FontSize, FontSize);
 
     for (auto &chr : String::Decode(Text, StrLengthA(Text), Encoding))
     {
