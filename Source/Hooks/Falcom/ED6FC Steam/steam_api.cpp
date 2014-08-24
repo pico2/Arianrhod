@@ -570,6 +570,7 @@ struct ISteamUserStats
         PrintConsole(L"GetLeaderboardName\n");
         return "LeaderboardName";
     }
+
     virtual int S_VIRTUAL GetLeaderboardEntryCount(SteamLeaderboard steamLeaderboard)
     {
         PrintConsole(L"GetLeaderboardEntryCount\n");
