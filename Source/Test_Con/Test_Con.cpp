@@ -146,97 +146,26 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-namespace xldl
-{
-    #include "xldl.h"
-}
-
-BOOL   (CDECL *XL_Init)();
-BOOL   (CDECL *XL_UnInit)();
-HANDLE (CDECL *XL_CreateTask)(xldl::DownTaskParam &stParam);
-BOOL   (CDECL *XL_DeleteTask)(HANDLE hTask);
-BOOL   (CDECL *XL_StartTask)(HANDLE hTask);
-BOOL   (CDECL *XL_StopTask)(HANDLE hTask);
-BOOL   (CDECL *XL_ForceStopTask)(HANDLE hTask);
-BOOL   (CDECL *XL_QueryTaskInfo)(HANDLE hTask, xldl::DownTaskInfo & stTaskInfo); //旧版接口，使用Ex接口替换
-BOOL   (CDECL *XL_QueryTaskInfoEx)(HANDLE hTask, xldl::DownTaskInfo & stTaskInfo);
-BOOL   (CDECL *XL_DelTempFile)(xldl::DownTaskParam &stParam);
-void   (CDECL *XL_SetSpeedLimit)(INT32 nKBps);
-void   (CDECL *XL_SetUploadSpeedLimit)(INT32 nTcpKBps,INT32 nOtherKBps);
-BOOL   (CDECL *XL_SetProxy)(xldl::DOWN_PROXY_INFO &stProxyInfo);
-void   (CDECL *XL_SetUserAgent)(const wchar_t *pszUserAgent);
-BOOL   (CDECL *XL_ParseThunderPrivateUrl)(const wchar_t *pszThunderUrl, wchar_t *normalUrlBuffer, INT32 bufferLen);
-BOOL   (CDECL *XL_GetFileSizeWithUrl)(const wchar_t * lpURL, INT64& iFileSize);
-BOOL   (CDECL *XL_SetFileIdAndSize)(HANDLE hTask, char szFileId[40], unsigned __int64 nFileSize);
-BOOL   (CDECL *XL_SetAdditionInfo)( HANDLE task_id, WSAPROTOCOL_INFOW *sock_info, CHAR *http_resp_buf, LONG buf_len );
-HANDLE (CDECL *XL_CreateTaskByURL)(const wchar_t *url, const wchar_t *path, const wchar_t *fileName, BOOL IsResume);
-LONG   (CDECL *XL_CreateTaskByThunder)(wchar_t *pszUrl, wchar_t *pszFileName, wchar_t *pszReferUrl, wchar_t *pszCharSet, wchar_t *pszCookie);
-LONG   (CDECL *XL_CreateBTTaskByThunder)(const wchar_t *pszPath);
-
-VOID init()
-{
-    PVOID xldl = Ldr::LoadDll(L"xldl.dll");
-
-    *(PVOID *)&XL_Init                      = GetRoutineAddress(xldl, "XL_Init");
-    *(PVOID *)&XL_UnInit                    = GetRoutineAddress(xldl, "XL_UnInit");
-    *(PVOID *)&XL_CreateTask                = GetRoutineAddress(xldl, "XL_CreateTask");
-    *(PVOID *)&XL_DeleteTask                = GetRoutineAddress(xldl, "XL_DeleteTask");
-    *(PVOID *)&XL_StartTask                 = GetRoutineAddress(xldl, "XL_StartTask");
-    *(PVOID *)&XL_StopTask                  = GetRoutineAddress(xldl, "XL_StopTask");
-    *(PVOID *)&XL_ForceStopTask             = GetRoutineAddress(xldl, "XL_ForceStopTask");
-    *(PVOID *)&XL_QueryTaskInfo             = GetRoutineAddress(xldl, "XL_QueryTaskInfo");
-    *(PVOID *)&XL_QueryTaskInfoEx           = GetRoutineAddress(xldl, "XL_QueryTaskInfoEx");
-    *(PVOID *)&XL_DelTempFile               = GetRoutineAddress(xldl, "XL_DelTempFile");
-    *(PVOID *)&XL_SetSpeedLimit             = GetRoutineAddress(xldl, "XL_SetSpeedLimit");
-    *(PVOID *)&XL_SetUploadSpeedLimit       = GetRoutineAddress(xldl, "XL_SetUploadSpeedLimit");
-    *(PVOID *)&XL_SetProxy                  = GetRoutineAddress(xldl, "XL_SetProxy");
-    *(PVOID *)&XL_SetUserAgent              = GetRoutineAddress(xldl, "XL_SetUserAgent");
-    *(PVOID *)&XL_ParseThunderPrivateUrl    = GetRoutineAddress(xldl, "XL_ParseThunderPrivateUrl");
-    *(PVOID *)&XL_GetFileSizeWithUrl        = GetRoutineAddress(xldl, "XL_GetFileSizeWithUrl");
-    *(PVOID *)&XL_SetFileIdAndSize          = GetRoutineAddress(xldl, "XL_SetFileIdAndSize");
-    *(PVOID *)&XL_SetAdditionInfo           = GetRoutineAddress(xldl, "XL_SetAdditionInfo");
-    *(PVOID *)&XL_CreateTaskByURL           = GetRoutineAddress(xldl, "XL_CreateTaskByURL");
-    *(PVOID *)&XL_CreateTaskByThunder       = GetRoutineAddress(xldl, "XL_CreateTaskByThunder");
-    *(PVOID *)&XL_CreateBTTaskByThunder     = GetRoutineAddress(xldl, "XL_CreateBTTaskByThunder");
-}
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
-    using namespace xldl;
-
     NTSTATUS Status;
 
-    init();
+    PeekMessageW(0, 0, WM_USER, WM_USER, PM_NOREMOVE);
 
-    XL_Init();
-
-    DownTaskParam param;
-
-    wcsncpy(param.szTaskUrl, L"http://dl.client.baidu.com/download.php?source=/ime/BaiduPinyinSetup.exe", countof(param.szTaskUrl));
-    wcsncpy(param.szFilename, L"百度输入法.exe", countof(param.szFilename));
-    wcsncpy(param.szSavePath, L"C:\\arc\\download\\神雕侠侣", countof(param.szSavePath));
-
-    ExceptionBox(L"attach");
-
-    HANDLE task = XL_CreateTask(param);
-
-    XL_StartTask(task);
-
-    LOOP_FOREVER
+    for (ULONG_PTR Count = 100000; Count != 0; --Count)
     {
-        DownTaskInfo info;
-
-        XL_QueryTaskInfoEx(task, info);
-
-        if (info.stat == TSC_COMPLETE || info.stat == TSC_ERROR)
-            break;
-
-        printf("%d KB/s %I64d / %I64d (%f%%)                   \r", info.nSpeed / 1024, info.nTotalDownload, info.nTotalSize, info.fPercent * 100);
-
-        Ps::Sleep(1000);
+    	if (PostThreadMessageW(CurrentTid(), WM_USER, Count, 0) == FALSE)
+        {
+            //PrintConsole(L"count = %d\n", 100000 - Count);
+            //break;
+        }
     }
 
-    XL_UnInit();
+    MSG msg;
+    while (PeekMessageW(&msg, 0, WM_USER, WM_USER + 1, PM_REMOVE))
+    {
+        PrintConsole(L"%d ", msg.wParam);
+    }
 
     return;
 

@@ -11,6 +11,8 @@
 #include <ftbitmap.h>
 #include <ftsynth.h>
 
+#define FT_INT(_int, _float) ((_int << 6) | (_float))
+
 ML_OVERLOAD_NEW
 
 using ml::String;
@@ -63,13 +65,12 @@ NTSTATUS GetGlyphBitmap(LONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG Color
     FT_Glyph        glyph;
     FT_BitmapGlyph  bitmap;
 
-    ULONG strenth = (0 << 6) | (9 << 26);
+    ULONG strenth = FT_INT(1, 0);
 
     Color = FontColorTable[ColorIndex];
 
     FT_Load_Glyph(Face, FT_Get_Char_Index(Face, Chr), FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_RENDER);
-    FT_Bitmap_Embolden(FTLibrary, &Face->glyph->bitmap, strenth, strenth);
-    //FT_GlyphSlot_Embolden(Face->glyph);
+    //FT_Bitmap_Embolden(FTLibrary, &Face->glyph->bitmap, 0, strenth);
     FT_Render_Glyph(Face->glyph, FT_RENDER_MODE_NORMAL);
     FT_Get_Glyph(Face->glyph, &glyph);
     FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, TRUE);
@@ -118,6 +119,7 @@ NTSTATUS GetGlyphBitmap(LONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG Color
     }
     else
     {
+        //Buffer = PtrAdd(Buffer, Face->glyph->metrics.horiAdvance * 2);
         Buffer = PtrAdd(Buffer, Chr == ' ' ? FontSize : FontSize * 2);
     }
 
@@ -268,8 +270,6 @@ BOOL Initialize(PVOID BaseAddress)
         FT_Select_Charmap(Face, FT_ENCODING_GB2312);
 
         Success = TRUE;
-        AllocConsole();
-        PrintConsole(L"%p\n", Face->style_flags & FT_STYLE_FLAG_BOLD);
     }
 
     if (Success == FALSE)
