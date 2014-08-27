@@ -146,26 +146,11 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
+#include <TlHelp32.h>
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-
-    PeekMessageW(0, 0, WM_USER, WM_USER, PM_NOREMOVE);
-
-    for (ULONG_PTR Count = 100000; Count != 0; --Count)
-    {
-    	if (PostThreadMessageW(CurrentTid(), WM_USER, Count, 0) == FALSE)
-        {
-            //PrintConsole(L"count = %d\n", 100000 - Count);
-            //break;
-        }
-    }
-
-    MSG msg;
-    while (PeekMessageW(&msg, 0, WM_USER, WM_USER + 1, PM_REMOVE))
-    {
-        PrintConsole(L"%d ", msg.wParam);
-    }
 
     return;
 
