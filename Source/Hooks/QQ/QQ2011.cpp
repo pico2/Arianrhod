@@ -1029,58 +1029,6 @@ PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBy
     return StringReference;
 }
 
-PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
-{
-    PBYTE Buffer;
-
-    Buffer = (PBYTE)Start;
-
-    for (; Length != 0; --Buffer, --Length)
-    {
-        switch (Buffer[0])
-        {
-            case CALL:
-                // push    local_var_size
-                // mov     eax, exception_handler
-                // call    _SEH_prolog
-
-                if (Buffer[-5] != 0xB8)
-                    continue;
-
-                if (Buffer[-7] == 0x6A)
-                {
-                    Buffer -= 7;
-                }
-                else if (Buffer[-10] == 0x68)
-                {
-                    Buffer -= 10;
-                }
-                else
-                {
-                    continue;
-                }
-
-                break;
-
-            case 0x55:
-                if (Buffer[1] != 0x8B || Buffer[2] != 0xEC)
-                    continue;
-
-                // push ebp
-                // mov ebp, esp
-
-                break;
-
-            default:
-                continue;
-        }
-
-        return Buffer;
-    }
-
-    return nullptr;
-}
-
 PVOID
 SearchStringAndReverseSearchHeader(
     PVOID       ImageBase,
@@ -1241,19 +1189,8 @@ BOOL SearchGroupApp_AtAllGroupMemberMax(PVOID GroupApp, PVOID *ConditionJump)
     360C9916    .  7C 12               jl      short 0x360C992A
     ************************************************************************/
 
-    BYTE CallStub[]      = { CALL };
-    BYTE CmpEbp[]        = { 0x83, 0xBD };
-    BYTE CmpR32_0x14[]   = { 0x14 };
-
-    SEARCH_PATTERN_DATA Pattern[] =
-    {
-        ADD_PATTERN(CallStub,       0, 5),
-        ADD_PATTERN(CmpEbp,         0, 6),
-        ADD_PATTERN(CmpR32_0x14),
-    };
-
     Module = FindLdrModuleByHandle(GroupApp);
-    Buffer = SearchPattern(Pattern, countof(Pattern), Module->DllBase, Module->SizeOfImage);
+    Buffer = SearchPatternSafe(L"E8 ?? ?? ?? ?? 83 BD ?? ?? ?? ?? 14", Module->DllBase, Module->SizeOfImage);
     if (Buffer == nullptr)
         return FALSE;
 
