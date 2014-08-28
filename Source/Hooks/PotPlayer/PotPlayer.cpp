@@ -129,7 +129,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     Mp::PATCH_MEMORY_DATA p[] =
     {
-        Mp::MemoryPatchVa((ULONG64)METHOD_PTR(&PpCmdTarget::OnCmdRange), sizeof(PVOID), &SearchMessageEntry(BaseAddress)->Function, Mp::BackupData),
+        Mp::MemoryPatchVa((ULONG64)METHOD_PTR(&PpCmdTarget::OnCmdRange), sizeof(PVOID), &SearchMessageEntry(BaseAddress)->Function),
         Mp::FunctionJumpVa(LookupExportTable(GetKernel32Handle(), KERNEL32_GetProcAddress), PpGetProcAddress),
         Mp::FunctionJumpVa(IsIconic, PpIsIconic, &StubIsIconic),
     };

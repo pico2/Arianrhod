@@ -280,21 +280,23 @@ BOOL Initialize(PVOID BaseAddress)
 
     SizeOfImage = ImageNtHeaders(BaseAddress)->OptionalHeader.SizeOfImage;
 
-    Mp::PATCH_MEMORY_DATA p[] =
-    {
-        Mp::MemoryPatchVa((ULONG64)0x00, 1, FindAndAdvance(0xA, L"3C 80 73 03 32 C0 C3 3C A0 73 03", BaseAddress, SizeOfImage)),
-        Mp::MemoryPatchVa((ULONG64)0x00, 1, FindAndAdvance(0xA, L"3C 80 73 03 33 C0 C3 3C A0 73 06", BaseAddress, SizeOfImage)),
+    using namespace Mp;
 
-        Mp::MemoryPatchVa(
+    PATCH_MEMORY_DATA p[] =
+    {
+        MemoryPatchVa((ULONG64)0x00, 1, FindAndAdvance(0xA, L"3C 80 73 03 32 C0 C3 3C A0 73 03", BaseAddress, SizeOfImage)),
+        MemoryPatchVa((ULONG64)0x00, 1, FindAndAdvance(0xA, L"3C 80 73 03 33 C0 C3 3C A0 73 06", BaseAddress, SizeOfImage)),
+
+        MemoryPatchVa(
             (ULONG64)(API_POINTER(::Sleep))[] (ULONG ms) -> VOID
             {
                 Ps::Sleep(ms == 0 ? SleepFix : ms);
             },
             sizeof(PVOID),
-            LookupImportTable(GetExeModuleHandle(), "KERNEL32.dll", KERNEL32_Sleep)
+            LookupImportTable(GetExeModuleHandle(), nullptr, KERNEL32_Sleep)
         ),
 
-        Mp::MemoryPatchVa(
+        MemoryPatchVa(
             (ULONG64)(API_POINTER(SetWindowPos))[](HWND Wnd, HWND InsertAfter, int X, int Y, int cx, int cy, UINT Flags) -> BOOL
             {
                 if (Flags == SWP_NOMOVE)
@@ -311,13 +313,13 @@ BOOL Initialize(PVOID BaseAddress)
                 return SetWindowPos(Wnd, InsertAfter, X, Y, cx, cy, Flags);
             },
             sizeof(PVOID),
-            LookupImportTable(GetExeModuleHandle(), "USER32.dll", USER32_SetWindowPos)
+            LookupImportTable(GetExeModuleHandle(), nullptr, USER32_SetWindowPos)
         ),
 
-        Mp::FunctionJumpVa(Success ? FindGetGlyphsBitmap(BaseAddress) : IMAGE_INVALID_VA, NakedGetGlyphBitmap, nullptr, Mp::NakedTrampoline),
+        FunctionJumpVa(Success ? FindGetGlyphsBitmap(BaseAddress) : IMAGE_INVALID_VA, NakedGetGlyphBitmap, nullptr, NakedTrampoline),
     };
 
-    Mp::PatchMemory(p, countof(p), BaseAddress);
+    PatchMemory(p, countof(p), BaseAddress);
 
     return TRUE;
 }
