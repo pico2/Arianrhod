@@ -911,9 +911,9 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
 {
     HRESULT hr;
 
-    WCHAR buf[0x100];
-    swprintf(buf, L"被踢了 %p %p %p", Type, Param1, Packet);
-    MessageBoxW(0, buf, 0, 64);
+    // WCHAR buf[0x100];
+    // swprintf(buf, L"被踢了 %p %p %p", Type, Param1, Packet);
+    // MessageBoxW(0, buf, 0, 64);
 
     hr = StubOnSysDataCome(This, Dummy, Type, Param1, Packet);
 
