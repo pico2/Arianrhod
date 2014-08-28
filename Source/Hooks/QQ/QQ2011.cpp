@@ -57,7 +57,7 @@ BOOL    (CDECL *StubGetPlatformCore)(PVOID *Core);
 BOOL    (CDECL *StubInitPluginFileSystem)(PCWSTR PluginName);
 HRESULT (NTAPI *StubPlatformCore_QueryInterface)(PVOID Object, REFGUID Guid, PVOID Output);
 VOID    (FASTCALL *StubOnConnectionBroken)(PVOID This, PVOID, ULONG Param1, ULONG Param2, ULONG Param3, PVOID MessageString, ULONG Type);
-HRESULT (FASTCALL *StubOnSysDataCome)(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2);
+HRESULT (FASTCALL *StubOnSysDataCome)(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, PVOID Packet);
 VOID (FASTCALL *StubGetBanSpeechTimeStamp)(PVOID This, PVOID Edx, PULONG* TimeStampData, PULONG* What);
 
 /************************************************************************
@@ -907,17 +907,17 @@ VOID FASTCALL OnConnectionBroken(PVOID This, PVOID Dummy, ULONG Param1, ULONG Pa
     StubOnConnectionBroken(This, Dummy, Param1, Param2, Param3, MessageString, RetryTimeOut);
 }
 
-HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, ULONG Param2)
+HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param1, PVOID Packet)
 {
     HRESULT hr;
 
-    //WCHAR buf[0x100];
-    //swprintf(buf, L"掉线了 %p", Type);
-    //MessageBoxW(0, buf, 0, 64);
+    WCHAR buf[0x100];
+    swprintf(buf, L"被踢了 %p %p %p", Type, Param1, Packet);
+    MessageBoxW(0, buf, 0, 64);
 
-    hr = StubOnSysDataCome(This, Dummy, Type, Param1, Param2);
+    hr = StubOnSysDataCome(This, Dummy, Type, Param1, Packet);
 
-    if (Type == 0x30 && ReloginMgr != nullptr)
+    if (Type == 0x30 && ReloginMgr != nullptr && *(PBYTE)PtrAdd(This, 0x18) == 2)   // cType
     {
         Io::SetAsyncCall(
             []()
