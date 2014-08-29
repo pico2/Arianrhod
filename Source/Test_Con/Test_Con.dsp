@@ -38,7 +38,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Gr /MD /W4 /GR- /Z7 /O2 /Ob1 /D "WIN32" /D "UNICODE" /D "_UNICODE" /FD /GS- /MP /GL /arch:SSE /c
+# ADD CPP /nologo /Gr /MD /W4 /GR- /Z7 /O2 /Ob1 /I "D:\Desktop\Python3\include" /D "WIN32" /D "UNICODE" /D "_UNICODE" /FD /GS- /MP /GL /arch:SSE /c
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
 # ADD RSC /l 0x804 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -46,7 +46,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 mylib_nt.lib fms2.lib undoc_ntdll.lib ntdll.lib undoc_k32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Test_Con.exe" /ltcg /LARGEADDRESSAWARE /fixed /OPT:REF /NXCOMPAT:NO
+# ADD LINK32 mylib_nt.lib fms2.lib undoc_ntdll.lib ntdll.lib undoc_k32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Test_Con.exe" /libpath:"D:\Desktop\Python3\libs" /ltcg /LARGEADDRESSAWARE /fixed /OPT:REF /NXCOMPAT:NO
 # SUBTRACT LINK32 /pdb:none
 # Begin Target
 

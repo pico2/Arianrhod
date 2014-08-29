@@ -146,11 +146,15 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-#include <TlHelp32.h>
+#pragma warning(disable:4005)
+
+//#include "D:\Desktop\ffpython-master\ffpython.h"
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    PrintLocaleDefaultAnsiCodePage();
 
     return;
 
