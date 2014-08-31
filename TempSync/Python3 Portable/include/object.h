@@ -162,11 +162,11 @@ NB: the methods for certain type groups are now contained in separate
 method blocks.
 */
 
-typedef PyObject * (*unaryfunc)(PyObject *);
-typedef PyObject * (*binaryfunc)(PyObject *, PyObject *);
-typedef PyObject * (*ternaryfunc)(PyObject *, PyObject *, PyObject *);
-typedef int (*inquiry)(PyObject *);
-typedef Py_ssize_t (*lenfunc)(PyObject *);
+typedef PyObject * (__cdecl *unaryfunc)(PyObject *);
+typedef PyObject * (__cdecl *binaryfunc)(PyObject *, PyObject *);
+typedef PyObject * (__cdecl *ternaryfunc)(PyObject *, PyObject *, PyObject *);
+typedef int (__cdecl *inquiry)(PyObject *);
+typedef Py_ssize_t (__cdecl *lenfunc)(PyObject *);
 typedef PyObject *(*ssizeargfunc)(PyObject *, Py_ssize_t);
 typedef PyObject *(*ssizessizeargfunc)(PyObject *, Py_ssize_t, Py_ssize_t);
 typedef int(*ssizeobjargproc)(PyObject *, Py_ssize_t, PyObject *);
@@ -190,8 +190,8 @@ typedef struct bufferinfo {
     void *internal;
 } Py_buffer;
 
-typedef int (*getbufferproc)(PyObject *, Py_buffer *, int);
-typedef void (*releasebufferproc)(PyObject *, Py_buffer *);
+typedef int (__cdecl *getbufferproc)(PyObject *, Py_buffer *, int);
+typedef void (__cdecl *releasebufferproc)(PyObject *, Py_buffer *);
 
 /* Maximum number of dimensions */
 #define PyBUF_MAX_NDIM 64
@@ -228,9 +228,9 @@ typedef void (*releasebufferproc)(PyObject *, Py_buffer *);
 /* End buffer interface */
 #endif /* Py_LIMITED_API */
 
-typedef int (*objobjproc)(PyObject *, PyObject *);
-typedef int (*visitproc)(PyObject *, void *);
-typedef int (*traverseproc)(PyObject *, visitproc, void *);
+typedef int (__cdecl *objobjproc)(PyObject *, PyObject *);
+typedef int (__cdecl *visitproc)(PyObject *, void *);
+typedef int (__cdecl *traverseproc)(PyObject *, visitproc, void *);
 
 #ifndef Py_LIMITED_API
 typedef struct {
@@ -304,29 +304,29 @@ typedef struct {
 } PyBufferProcs;
 #endif /* Py_LIMITED_API */
 
-typedef void (*freefunc)(void *);
-typedef void (*destructor)(PyObject *);
+typedef void (__cdecl *freefunc)(void *);
+typedef void (__cdecl *destructor)(PyObject *);
 #ifndef Py_LIMITED_API
 /* We can't provide a full compile-time check that limited-API
    users won't implement tp_print. However, not defining printfunc
    and making tp_print of a different function pointer type
    should at least cause a warning in most cases. */
-typedef int (*printfunc)(PyObject *, FILE *, int);
+typedef int (__cdecl *printfunc)(PyObject *, FILE *, int);
 #endif
-typedef PyObject *(*getattrfunc)(PyObject *, char *);
-typedef PyObject *(*getattrofunc)(PyObject *, PyObject *);
-typedef int (*setattrfunc)(PyObject *, char *, PyObject *);
-typedef int (*setattrofunc)(PyObject *, PyObject *, PyObject *);
-typedef PyObject *(*reprfunc)(PyObject *);
-typedef Py_hash_t (*hashfunc)(PyObject *);
-typedef PyObject *(*richcmpfunc) (PyObject *, PyObject *, int);
-typedef PyObject *(*getiterfunc) (PyObject *);
-typedef PyObject *(*iternextfunc) (PyObject *);
-typedef PyObject *(*descrgetfunc) (PyObject *, PyObject *, PyObject *);
-typedef int (*descrsetfunc) (PyObject *, PyObject *, PyObject *);
-typedef int (*initproc)(PyObject *, PyObject *, PyObject *);
-typedef PyObject *(*newfunc)(struct _typeobject *, PyObject *, PyObject *);
-typedef PyObject *(*allocfunc)(struct _typeobject *, Py_ssize_t);
+typedef PyObject *(__cdecl *getattrfunc)(PyObject *, char *);
+typedef PyObject *(__cdecl *getattrofunc)(PyObject *, PyObject *);
+typedef int (__cdecl *setattrfunc)(PyObject *, char *, PyObject *);
+typedef int (__cdecl *setattrofunc)(PyObject *, PyObject *, PyObject *);
+typedef PyObject *(__cdecl *reprfunc)(PyObject *);
+typedef Py_hash_t (__cdecl *hashfunc)(PyObject *);
+typedef PyObject *(__cdecl *richcmpfunc) (PyObject *, PyObject *, int);
+typedef PyObject *(__cdecl *getiterfunc) (PyObject *);
+typedef PyObject *(__cdecl *iternextfunc) (PyObject *);
+typedef PyObject *(__cdecl *descrgetfunc) (PyObject *, PyObject *, PyObject *);
+typedef int (__cdecl *descrsetfunc) (PyObject *, PyObject *, PyObject *);
+typedef int (__cdecl *initproc)(PyObject *, PyObject *, PyObject *);
+typedef PyObject *(__cdecl *newfunc)(struct _typeobject *, PyObject *, PyObject *);
+typedef PyObject *(__cdecl *allocfunc)(struct _typeobject *, Py_ssize_t);
 
 #ifdef Py_LIMITED_API
 typedef struct _typeobject PyTypeObject; /* opaque */

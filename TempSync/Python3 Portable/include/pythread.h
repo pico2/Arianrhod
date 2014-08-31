@@ -18,7 +18,7 @@ typedef enum PyLockStatus {
 } PyLockStatus;
 
 PyAPI_FUNC(void) PyThread_init_thread(void);
-PyAPI_FUNC(long) PyThread_start_new_thread(void (*)(void *), void *);
+PyAPI_FUNC(long) PyThread_start_new_thread(void (__cdecl *)(void *), void *);
 PyAPI_FUNC(void) PyThread_exit_thread(void);
 PyAPI_FUNC(long) PyThread_get_thread_ident(void);
 

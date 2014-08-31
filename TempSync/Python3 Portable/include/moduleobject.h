@@ -32,7 +32,7 @@ PyAPI_FUNC(void*) PyModule_GetState(PyObject*);
 
 typedef struct PyModuleDef_Base {
   PyObject_HEAD
-  PyObject* (*m_init)(void);
+  PyObject* (__cdecl *m_init)(void);
   Py_ssize_t m_index;
   PyObject* m_copy;
 } PyModuleDef_Base;

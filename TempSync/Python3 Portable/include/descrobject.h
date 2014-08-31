@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 typedef PyObject *(*getter)(PyObject *, void *);
-typedef int (*setter)(PyObject *, PyObject *, void *);
+typedef int (__cdecl *setter)(PyObject *, PyObject *, void *);
 
 typedef struct PyGetSetDef {
     char *name;

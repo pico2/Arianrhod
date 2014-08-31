@@ -146,15 +146,64 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-#pragma warning(disable:4005)
+template<typename T>
+struct type_ref_traits_t;
 
-//#include "D:\Desktop\ffpython-master\ffpython.h"
+template<typename T>
+struct type_ref_traits_t
+{
+    typedef T        value_t;
+    typedef T&        ref_t;
+    value_t                value; 
+};
+
+template<typename T>
+struct type_ref_traits_t<T&>
+{
+    typedef T        value_t;
+    typedef T&        ref_t;
+    value_t                value; 
+};
+
+template<typename T>
+struct type_ref_traits_t<const T&>
+{
+    typedef T        value_t;
+    typedef T&        ref_t;
+    value_t                value;
+};
+
+template<class T>
+void print(const T& v)
+{
+    printf("%p\n", v);
+}
+
+template<class T, class... ARGS>
+void print(const T& v, ARGS... args)
+{
+    printf("@%p\n", sizeof...(ARGS));
+    print(v);
+    print(args...);
+}
+
+#include "mlpython.h"
+
+template<typename T>
+ForceInline ULONG_PTR GetArgNum(T)
+{
+    return FunctionTraits<T>::NumberOfArguments;
+}
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintLocaleDefaultAnsiCodePage();
+    PrintConsole(L"%d\n", GetArgNum(main2));
+
+    MlPython py;
+
+    py.RunString("print('fuck')");
 
     return;
 

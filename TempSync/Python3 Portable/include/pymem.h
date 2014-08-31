@@ -130,13 +130,13 @@ typedef struct {
     void *ctx;
 
     /* allocate a memory block */
-    void* (*malloc) (void *ctx, size_t size);
+    void* (__cdecl *malloc) (void *ctx, size_t size);
 
     /* allocate or resize a memory block */
-    void* (*realloc) (void *ctx, void *ptr, size_t new_size);
+    void* (__cdecl *realloc) (void *ctx, void *ptr, size_t new_size);
 
     /* release a memory block */
-    void (*free) (void *ctx, void *ptr);
+    void (__cdecl *free) (void *ctx, void *ptr);
 } PyMemAllocator;
 
 /* Get the memory block allocator of the specified domain. */
