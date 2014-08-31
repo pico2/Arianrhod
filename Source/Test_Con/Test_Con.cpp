@@ -146,33 +146,6 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-template<typename T>
-struct type_ref_traits_t;
-
-template<typename T>
-struct type_ref_traits_t
-{
-    typedef T        value_t;
-    typedef T&        ref_t;
-    value_t                value; 
-};
-
-template<typename T>
-struct type_ref_traits_t<T&>
-{
-    typedef T        value_t;
-    typedef T&        ref_t;
-    value_t                value; 
-};
-
-template<typename T>
-struct type_ref_traits_t<const T&>
-{
-    typedef T        value_t;
-    typedef T&        ref_t;
-    value_t                value;
-};
-
 template<class T>
 void print(const T& v)
 {
@@ -182,7 +155,6 @@ void print(const T& v)
 template<class T, class... ARGS>
 void print(const T& v, ARGS... args)
 {
-    printf("@%p\n", sizeof...(ARGS));
     print(v);
     print(args...);
 }
@@ -192,7 +164,12 @@ void print(const T& v, ARGS... args)
 template<typename T>
 ForceInline ULONG_PTR GetArgNum(T)
 {
-    return FunctionTraits<T>::NumberOfArguments;
+    return PyFunctionTraits<T>::NumberOfArguments;
+}
+
+void test(int a)
+{
+    ;
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
@@ -202,6 +179,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     PrintConsole(L"%d\n", GetArgNum(main2));
 
     MlPython py;
+
+    py.Register(test, L"test")
+      .InitModule(L"mlpy");
 
     py.RunString("print('fuck')");
 

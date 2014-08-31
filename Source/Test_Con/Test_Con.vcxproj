@@ -44,16 +44,17 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Test_Con</TargetName>
     <TargetExt>.exe</TargetExt>
-    <IncludePath>C:\Program Files (x86)\Intel\Composer XE 2013\compiler\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Desktop\Python3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Desktop\Python3\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Test_Con</TargetName>
     <TargetExt>.exe</TargetExt>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <LibraryPath>D:\Desktop\Python3\libs;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <OutDir>$(SolutionDir)</OutDir>
-    <IncludePath>C:\Program Files (x86)\Intel\Composer XE 2013\compiler\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Desktop\Python3\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
