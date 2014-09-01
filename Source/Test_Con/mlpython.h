@@ -68,29 +68,70 @@ struct PyFunctionTraits
     static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
     typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
 
-    //template<typename R, typename... ARGS>
-    //static PyObject* CallRoutine(R(*func)(ARGS...), PyObject *args)
-    //{
-    //    func(sizeof...(ARGS));
-    //    Py_RETURN_NONE;
-    //}
-
-    template<typename R, typename ARG1>
-    static PyObject* CallRoutine(R(*func)(ARG1), PyObject * args)
+    template<typename R, typename... ARGS>
+    static PyObject* CallRoutine(R(*func)(ARGS...), PyObject * args)
     {
-        PyTypeHelper<ARG1> arg1;
-        return PyTypeConverter<RET_TYPE>::FromNative(func(arg1.value));
+        return PyTypeConverter<R>::FromNative(CallRoutineImpl(func, args));
     }
-};
 
-template<>
-struct PyTypeConverter<VOID>
-{
-    PyObject* FromNative(VOID)
+    template<typename... ARGS>
+    static PyObject* CallRoutine(VOID(*func)(ARGS...), PyObject * args)
     {
+        PrintConsole(L"fuck\n");
+        CallRoutineImpl(func, args);
         Py_RETURN_NONE;
     }
+
+    template<typename R, typename... ARGS>
+    static R CallRoutineImpl(R(*func)(ARGS...), PyObject * args)
+    {
+        return func(1);
+    }
 };
+
+#define PY_INTEGER_CONVERTER_32(type) \
+    template<> \
+    struct PyTypeConverter<type> \
+    { \
+        static PyObject* FromNative(type ret) \
+        { \
+            return PyLong_FromLong((LONG)ret); \
+        } \
+ \
+        static type ToNative(PyObject *obj) \
+        { \
+            return (type)PyLong_AsLong(obj); \
+        } \
+    };
+
+PY_INTEGER_CONVERTER_32(CHAR);
+PY_INTEGER_CONVERTER_32(UCHAR);
+PY_INTEGER_CONVERTER_32(SHORT);
+PY_INTEGER_CONVERTER_32(USHORT);
+PY_INTEGER_CONVERTER_32(INT32);
+PY_INTEGER_CONVERTER_32(UINT32);
+PY_INTEGER_CONVERTER_32(LONG);
+PY_INTEGER_CONVERTER_32(ULONG);
+
+
+#define PY_INTEGER_CONVERTER_64(type) \
+    template<> \
+    struct PyTypeConverter<type> \
+    { \
+        static PyObject* FromNative(type ret) \
+        { \
+            return PyLong_FromLongLong((LONG64)ret); \
+        } \
+ \
+        static type ToNative(PyObject *obj) \
+        { \
+            return (type)PyLong_AsUnsignedLongLong(obj); \
+        } \
+    };
+
+PY_INTEGER_CONVERTER_64(LONG64);
+PY_INTEGER_CONVERTER_64(ULONG64);
+
 
 template<typename T>
 struct PyStaticFunctionHelper : public PyObjectBase
@@ -98,7 +139,6 @@ struct PyStaticFunctionHelper : public PyObjectBase
     typedef ml::String String;
     typedef PyStaticFunctionHelper<T> SELF;
 
-    //T *object;
     T func;
 
     PyStaticFunctionHelper()
@@ -106,30 +146,12 @@ struct PyStaticFunctionHelper : public PyObjectBase
         func = nullptr;
     }
 
-    template<typename T>
-    struct CtorHelper;
-
-    template<typename R, typename... ARGS>
-    struct CtorHelper<R (PYCALL*)(ARGS...)>
+    static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
     {
-        static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
-        {
-            new (self) PyStaticFunctionHelper<T>();
-            *(PVOID *)&self->func = (PVOID)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
-            return 0;
-        }
-    };
-
-    template<typename R, typename... ARGS>
-    struct CtorHelper<R PYCALL(ARGS...)>
-    {
-        static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
-        {
-            new (self)PyStaticFunctionHelper<T>();
-            *(PVOID *)&self->func = (PVOID)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
-            return 0;
-        }
-    };
+        new (self)PyStaticFunctionHelper<T>();
+        *(PVOID *)&self->func = (PVOID)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
+        return 0;
+    }
 
     static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
     {
@@ -166,7 +188,7 @@ struct PyStaticFunctionHelper : public PyObjectBase
 
     static VOID PYCALL FreeObject(SELF *self)
     {
-        self->ob_base.ob_type->tp_free((PyObject*)self);
+        Py_TYPE(self)->tp_free((PyObject*)self);
     }
 };
 
@@ -238,7 +260,7 @@ public:
         f.TypeSize  = sizeof(PyStaticFunctionHelper<T>);
         f.Native    = (PyCFunction)PyStaticFunctionHelper<T>::CallMethod;
         f.dtor      = (destructor)PyStaticFunctionHelper<T>::FreeObject;
-        f.ctor      = (initproc)PyStaticFunctionHelper<T>::CtorHelper<PYCTOR(ULONG64)>::InitObject;
+        f.ctor      = (initproc)PyStaticFunctionHelper<T>::InitObject;
         f.alloc      = PyStaticFunctionHelper<T>::AllocObject;
 
         this->RegisteredFunctions.Add(f);
