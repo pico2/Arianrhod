@@ -32,6 +32,32 @@ typedef enum
     PyStatusLast,
 };
 
+template<typename T>
+struct PyTypeHelper
+{
+    typedef T   VALUE_TYPE;
+    typedef T&  REF_TYPE;
+    typedef const T& CONST_REF_TYPE;
+    VALUE_TYPE  value;
+};
+
+template<typename T>
+struct PyTypeHelper<T&>
+{
+    typedef T   VALUE_TYPE;
+    typedef T&  REF_TYPE;
+    typedef const T& CONST_REF_TYPE;
+    VALUE_TYPE  value;
+};
+
+template<typename T>
+struct PyTypeHelper<const T&>
+{
+    typedef T   VALUE_TYPE;
+    typedef T&  REF_TYPE;
+    typedef const T& CONST_REF_TYPE;
+    VALUE_TYPE  value;
+};
 
 template<typename NATIVE_TYPE>
 struct PyTypeConverter;
@@ -42,14 +68,29 @@ struct PyFunctionTraits
     static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
     typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
 
-    template<typename R, typename... ARGS>
-    static PyObject* CallRoutine(R(*func)(ARGS...), PyObject *args)
+    //template<typename R, typename... ARGS>
+    //static PyObject* CallRoutine(R(*func)(ARGS...), PyObject *args)
+    //{
+    //    func(sizeof...(ARGS));
+    //    Py_RETURN_NONE;
+    //}
+
+    template<typename R, typename ARG1>
+    static PyObject* CallRoutine(R(*func)(ARG1), PyObject * args)
     {
-        func(sizeof...(ARGS));
-        Py_RETURN_NONE;
+        PyTypeHelper<ARG1> arg1;
+        return PyTypeConverter<RET_TYPE>::FromNative(func(arg1.value));
     }
 };
 
+template<>
+struct PyTypeConverter<VOID>
+{
+    PyObject* FromNative(VOID)
+    {
+        Py_RETURN_NONE;
+    }
+};
 
 template<typename T>
 struct PyStaticFunctionHelper : public PyObjectBase
