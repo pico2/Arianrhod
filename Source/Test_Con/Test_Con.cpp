@@ -146,44 +146,33 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-template<class T>
-void print(const T& v)
-{
-    printf("%p\n", v);
-}
-
-template<class T, class... ARGS>
-void print(const T& v, ARGS... args)
-{
-    print(v);
-    print(args...);
-}
-
 #include "mlpython.h"
 
-template<typename T>
-ForceInline ULONG_PTR GetArgNum(T)
+void test(ULONG_PTR a)
 {
-    return PyFunctionTraits<T>::NumberOfArguments;
-}
-
-void test(int a)
-{
-    ;
+    PrintConsole(L"%S: %Iu\n", __FUNCTION__, a);
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintConsole(L"%d\n", GetArgNum(main2));
-
+#if 1
     MlPython py;
 
     py.Register(test, L"test")
       .InitModule(L"mlpy");
 
-    py.RunString("print('fuck')");
+    py.RunString(
+        "print(__name__)\r\n"
+        "import mlpy\r\n"
+        "print('fuck2')\r\n"
+        "mlpy.test(1)"
+    );
+
+#endif
+
+    PauseConsole();
 
     return;
 

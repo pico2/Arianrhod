@@ -51,7 +51,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Test_Con</TargetName>
     <TargetExt>.exe</TargetExt>
-    <LibraryPath>D:\Desktop\Python3\libs;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <OutDir>$(SolutionDir)</OutDir>
     <IncludePath>D:\Desktop\Python3\include;$(IncludePath)</IncludePath>
@@ -94,7 +94,8 @@
       <AdditionalOptions> /FIXED  /ltcg</AdditionalOptions>
       <AdditionalDependencies>mylib_nt.lib;ntdll.lib;undoc_k32.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(SolutionDir)$(TargetName)$(TargetExt)</OutputFile>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

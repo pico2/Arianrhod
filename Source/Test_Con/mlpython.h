@@ -33,22 +33,36 @@ typedef enum
 };
 
 
+template<typename NATIVE_TYPE>
+struct PyTypeConverter;
+
 template<typename T>
 struct PyFunctionTraits
 {
     static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
+    typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
+
+    template<typename R, typename... ARGS>
+    static PyObject* CallRoutine(R(*func)(ARGS...), PyObject *args)
+    {
+        func(sizeof...(ARGS));
+        Py_RETURN_NONE;
+    }
 };
+
 
 template<typename T>
 struct PyStaticFunctionHelper : public PyObjectBase
 {
+    typedef ml::String String;
     typedef PyStaticFunctionHelper<T> SELF;
 
-    T *object;
+    //T *object;
+    T func;
 
     PyStaticFunctionHelper()
     {
-        object = nullptr;
+        func = nullptr;
     }
 
     template<typename T>
@@ -59,10 +73,8 @@ struct PyStaticFunctionHelper : public PyObjectBase
     {
         static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
         {
-            if (self->object == nullptr)
-            {
-                self->object = new T();
-            }
+            new (self) PyStaticFunctionHelper<T>();
+            *(PVOID *)&self->func = (PVOID)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
             return 0;
         }
     };
@@ -72,17 +84,38 @@ struct PyStaticFunctionHelper : public PyObjectBase
     {
         static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
         {
-            if (self->object == nullptr)
-            {
-                self->object = new T();
-            }
+            new (self)PyStaticFunctionHelper<T>();
+            *(PVOID *)&self->func = (PVOID)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
             return 0;
         }
     };
 
     static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
     {
-        return 0;
+        return self->CallMethodImpl(args);
+    }
+
+    PyObject* CallMethodImpl(PyObject *args)
+    {
+        if (PyTuple_GET_SIZE(args) != PyFunctionTraits<T>::NumberOfArguments)
+        {
+            PyErr_SetString(
+                PyExc_TypeError,
+                String::Format(
+                    L"function takes %d argument%s, but %d given",
+                    PyFunctionTraits<T>::NumberOfArguments,
+                    PyFunctionTraits<T>::NumberOfArguments > 1 ? L"s" : L"",
+                    PyTuple_GET_SIZE(args)
+                )
+                .Encode(CP_UTF8)
+            );
+
+            return nullptr;
+        }
+
+        PrintConsole(L"%S\n", __FUNCTION__);
+
+        return PyFunctionTraits<T>::CallRoutine(this->func, args);
     }
 
     static PyObject* PYCALL AllocObject(PyTypeObject *type, PyObject *args, PyObject *kwargs)
@@ -109,9 +142,9 @@ protected:
         ULONG_PTR   ArgsCount;
         ULONG_PTR   TypeSize;
         PyCFunction Native;
-        initproc    init;
+        initproc    ctor;
         destructor  dtor;
-        API_POINTER(PyStaticFunctionHelper<VOID>::AllocObject) ctor;
+        newfunc     alloc;
         PVOID       Address;
         String      Name;
         String      Doc;
@@ -136,6 +169,9 @@ public:
         ;
     }
 
+    MlPython(const MlPython&) = delete;
+    MlPython& operator=(const MlPython&) = delete;
+
     PYSTATUS RunString(PCSTR code)
     {
         PyRun_SimpleString(code);
@@ -144,7 +180,7 @@ public:
 
     PYSTATUS RunString(const String& code)
     {
-        PyRun_SimpleString(code.Encode(CP_ACP));
+        PyRun_SimpleString(code.Encode(CP_UTF8));
         return STATUS_SUCCESS;
     }
 
@@ -153,24 +189,27 @@ public:
     {
         PY_STATIC_FUNCTION f;
 
+        *(T *)&f.Address = func;
+
+        f.Name      = FunctionName;
+        f.Doc       = Doc;
         f.ArgsCount = PyFunctionTraits<T>::NumberOfArguments;
         f.TypeSize  = sizeof(PyStaticFunctionHelper<T>);
-        f.Address   = PtrAdd(nullptr, func);
         f.Native    = (PyCFunction)PyStaticFunctionHelper<T>::CallMethod;
         f.dtor      = (destructor)PyStaticFunctionHelper<T>::FreeObject;
-        f.init      = (initproc)PyStaticFunctionHelper<T>::CtorHelper<PYCTOR(VOID)>::InitObject;
-        f.ctor      = PyStaticFunctionHelper<T>::AllocObject;
+        f.ctor      = (initproc)PyStaticFunctionHelper<T>::CtorHelper<PYCTOR(ULONG64)>::InitObject;
+        f.alloc      = PyStaticFunctionHelper<T>::AllocObject;
 
         this->RegisteredFunctions.Add(f);
 
         return *this;
     }
 
-    PYSTATUS InitModule(const String& ModuleName, const String& Doc = L"")
+    NoInline PYSTATUS InitModule(const String& ModuleName, const String& Doc = L"")
     {
         PyObject* Module;
-        auto& ModuleNameAnsi = ModuleName.Encode(CP_ACP);
-        auto& DocAnsi = Doc.Encode(CP_ACP);
+        auto& ModuleNameAnsi = ModuleName.Encode(CP_UTF8);
+        auto& DocAnsi = Doc.Encode(CP_UTF8);
 
         PyModuleDef ModuleDef =
         {
@@ -180,7 +219,8 @@ public:
             -1,
         };
 
-        Module = PyModule_Create(&ModuleDef);
+        //Module = PyModule_Create(&ModuleDef);
+        Module = PyImport_AddModule(ModuleNameAnsi);
         if (Module == nullptr)
             return PYSTATUS_CREATE_MODULE_FAILED;
 
@@ -192,20 +232,32 @@ public:
 protected:
     PYSTATUS InitFunctions(PyObject* Module, const String& ModuleName, const String& Doc = L"")
     {
-        GrowableArray<PyMethodDef> RegisteredMethods;
-
         for (auto &func : this->RegisteredFunctions)
         {
-            auto &name = func.Name.Encode(CP_ACP);
-            auto &type = (func.Name + L"_wrapclass").Encode(CP_ACP);
+            auto &name = func.Name.Encode(CP_UTF8);
+            auto &type = (func.Name + L"_wrapclass").Encode(CP_UTF8);
 
-            PyMethodDef methods[] =
+            BOOL Success;
+            PyObject *args, *obj, *method;
+
+            args    = nullptr;
+            obj     = nullptr;
+            method  = nullptr;
+            Success = FALSE;
+
+            PyMethodDef localmethods[] =
             {
                 PY_ADD_METHOD(name, func.Native, METH_VARARGS | METH_KEYWORDS),
                 PY_ADD_METHOD_END
             };
 
-            PyTypeObject methoswrapclass =
+            PyMethodDef *methods = new PyMethodDef[countof(localmethods)];
+            if (methods != nullptr)
+            {
+                CopyStruct(methods, localmethods, sizeof(localmethods));
+            }
+
+            PyTypeObject *methoswrapclass = new PyTypeObject
             {
                 PyVarObject_HEAD_INIT(&PyType_Type, 0)
                 type,                                               /* tp_name */
@@ -242,12 +294,54 @@ protected:
                 0,                                                  /* tp_descr_get */
                 0,                                                  /* tp_descr_set */
                 0,                                                  /* tp_dictoffset */
-                0,                                                  /* tp_init */
+                func.ctor,                                          /* tp_init */
                 0,                                                  /* tp_alloc */
-                func.ctor,                                          /* tp_new */
+                func.alloc,                                         /* tp_new */
                 nullptr,                                            /* tp_free */
             };
+
+            LOOP_ONCE
+            {
+                if (methods == nullptr || methoswrapclass == nullptr)
+                    break;
+
+                if (PyType_Ready(methoswrapclass) != 0)
+                    break;
+
+                PyAddRef((PyObject *)methoswrapclass);
+                if (PyModule_AddObject(Module, methoswrapclass->tp_name, (PyObject *)methoswrapclass) != 0)
+                    break;
+
+                args = Py_BuildValue("(K)", (ULONG64)func.Address);
+                if (args == nullptr)
+                    break;
+
+                obj = PyObject_CallObject((PyObject *)methoswrapclass, args);
+                if (obj == nullptr)
+                    break;
+
+                method = PyObject_GetAttrString(obj, name);
+                if (method == nullptr)
+                    break;
+
+                if (PyObject_SetAttrString(Module, name, method) != 0)
+                    break;
+
+                Success = TRUE;
+            }
+
+            PyRelease(args);
+            PyRelease(method);
+            PyRelease(obj);
+
+            if (Success == FALSE)
+            {
+                delete[] methods;
+                delete methoswrapclass;
+            }
         }
+
+        this->RegisteredFunctions.RemoveAll();
 
         return STATUS_SUCCESS;
     }
@@ -325,10 +419,6 @@ protected:
 
         return STATUS_SUCCESS;
     }
-
-private:
-    MlPython(const MlPython&);
-    MlPython& operator=(const MlPython&);
 };
 
 #endif // _MLPYTHON_H_13f13917_f5da_49af_b443_052ccfc01ea9_
