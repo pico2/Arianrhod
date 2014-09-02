@@ -148,12 +148,12 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
 
 #include "mlpython.h"
 
-void test_void_void()
+void test_void_void0()
 {
     PrintConsole(L"%S\n", __FUNCTION__);
 }
 
-void test_void_uptr(ULONG_PTR a)
+void test_void_uptr1(ULONG_PTR a)
 {
     PrintConsole(L"%S: %Iu\n", __FUNCTION__, a);
 }
@@ -163,9 +163,9 @@ void test_void_uptr2(ULONG_PTR a, ULONG_PTR b)
     PrintConsole(L"%S: %Iu, %Iu\n", __FUNCTION__, a, b);
 }
 
-void test_void_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
+ULONG test_ulong_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
 {
-    PrintConsole(L"%S: %Iu, %Iu, %Iu\n", __FUNCTION__, a, b, c);
+    return PrintConsole(L"%S: %Iu, %Iu, %Iu\n", __FUNCTION__, a, b, c);
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
@@ -175,14 +175,19 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 #if 1
     MlPython py;
 
-    py.Register(test_void_uptr3, L"test")
+    py.Register(test_void_void0, L"test_void_void0")
+      .Register(test_void_uptr1, L"test_void_uptr1")
+      .Register(test_void_uptr2, L"test_void_uptr2")
+      .Register(test_ulong_uptr3, L"test_void_uptr3")
       .InitModule(L"mlpy");
 
     py.RunString(
         "print(__name__)\r\n"
         "import mlpy\r\n"
-        "print('fuck2')\r\n"
-        "mlpy.test(987, 654, 321)"
+        "print('ret = %s' % mlpy.test_void_void0())\r\n"
+        "print('ret = %s' % mlpy.test_void_uptr1(123))\r\n"
+        "print('ret = %s' % mlpy.test_void_uptr2(456, 789))\r\n"
+        "print('ret = %s' % mlpy.test_void_uptr3(987, 654, 3210))\r\n"
     );
 
 #endif

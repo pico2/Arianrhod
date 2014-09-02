@@ -157,7 +157,6 @@ struct PyCallStaticRoutineHelper
     template<typename R, typename FUNC_TYPE, typename ARG1, typename... FUNC_ARGS, typename... EXTRACTED_ARGS>
     ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
     {
-        //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(FUNC_ARGS));
         return PyCallStaticRoutineHelper<sizeof...(FUNC_ARGS)>::CallStaticRoutine<R, FUNC_TYPE, FUNC_ARGS...>(
                    func,
                    args,
@@ -174,7 +173,6 @@ struct PyCallStaticRoutineHelper<0>
     template<typename R, typename FUNC_TYPE, typename... EXTRACTED_ARGS>
     ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
     {
-        //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(EXTRACTED_ARGS));
         return func(fargs...);
     }
 };
@@ -198,17 +196,9 @@ struct PyFunctionHelper
         Py_RETURN_NONE;
     }
 
-    template<typename R>
-    static R CallStaticRoutineImpl(R(*func)(), PyObject *args)
-    {
-        return func();
-    }
-
     template<typename R, typename... ARGS>
     static R CallStaticRoutineImpl(R(*func)(ARGS...), PyObject *args)
     {
-        //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(ARGS));
-
         return PyCallStaticRoutineHelper<sizeof...(ARGS)>::CallStaticRoutine<R, TYPE_OF(func), ARGS...>(func, args, 0);
     }
 };
@@ -238,7 +228,7 @@ struct PyStaticFunctionHelper : public PyObjectBase
         return self->CallMethodImpl(args);
     }
 
-    PyObject* CallMethodImpl(PyObject *args)
+    ForceInline PyObject* CallMethodImpl(PyObject *args)
     {
         if (PyTuple_GET_SIZE(args) != PyFunctionHelper<T>::NumberOfArguments)
         {
@@ -255,8 +245,6 @@ struct PyStaticFunctionHelper : public PyObjectBase
 
             return nullptr;
         }
-
-        //PrintConsole(L"%S\n", __FUNCTION__);
 
         return PyFunctionHelper<T>::CallRoutine(this->func, args);
     }
