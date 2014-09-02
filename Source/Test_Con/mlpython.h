@@ -155,10 +155,10 @@ template<typename int>
 struct PyCallStaticRoutineHelper
 {
     template<typename R, typename FUNC_TYPE, typename ARG1, typename... FUNC_ARGS, typename... EXTRACTED_ARGS>
-    ForceInline static R CallStaticRoutineImpl3(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
+    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
     {
         //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(FUNC_ARGS));
-        return PyCallStaticRoutineHelper<sizeof...(FUNC_ARGS)>::CallStaticRoutineImpl3<R, FUNC_TYPE, FUNC_ARGS...>(
+        return PyCallStaticRoutineHelper<sizeof...(FUNC_ARGS)>::CallStaticRoutine<R, FUNC_TYPE, FUNC_ARGS...>(
                    func,
                    args,
                    Index + 1,
@@ -172,7 +172,7 @@ template<>
 struct PyCallStaticRoutineHelper<0>
 {
     template<typename R, typename FUNC_TYPE, typename... EXTRACTED_ARGS>
-    ForceInline static R CallStaticRoutineImpl3(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
+    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
     {
         //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(EXTRACTED_ARGS));
         return func(fargs...);
@@ -204,34 +204,12 @@ struct PyFunctionHelper
         return func();
     }
 
-    // template<typename R, typename ARG1>
-    // static R CallStaticRoutineImpl(R(*func)(ARG1), PyObject *args)
-    // {
-    //     PyTypeHelper<ARG1> arg1;
-
-    //     arg1.value = PyTypeConverter<PyTypeHelper<ARG1>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, 0));
-
-    //     return func(arg1.value);
-    // }
-
-    // template<typename R, typename ARG1, typename ARG2>
-    // static R CallStaticRoutineImpl(R(*func)(ARG1, ARG2), PyObject *args)
-    // {
-    //     PyTypeHelper<ARG1> arg1;
-    //     PyTypeHelper<ARG2> arg2;
-
-    //     arg1.value = PyTypeConverter<PyTypeHelper<ARG1>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, 0));
-    //     arg2.value = PyTypeConverter<PyTypeHelper<ARG2>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, 1));
-
-    //     return func(arg1.value, arg2.value);
-    // }
-
     template<typename R, typename... ARGS>
     static R CallStaticRoutineImpl(R(*func)(ARGS...), PyObject *args)
     {
         //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(ARGS));
 
-        return PyCallStaticRoutineHelper<sizeof...(ARGS)>::CallStaticRoutineImpl3<R, TYPE_OF(func), ARGS...>(func, args, 0);
+        return PyCallStaticRoutineHelper<sizeof...(ARGS)>::CallStaticRoutine<R, TYPE_OF(func), ARGS...>(func, args, 0);
     }
 };
 

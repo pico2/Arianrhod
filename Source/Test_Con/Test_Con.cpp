@@ -182,7 +182,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         "print(__name__)\r\n"
         "import mlpy\r\n"
         "print('fuck2')\r\n"
-        "mlpy.test(123, 456, 789)"
+        "mlpy.test(987, 654, 321)"
     );
 
 #endif
