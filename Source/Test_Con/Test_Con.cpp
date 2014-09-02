@@ -148,9 +148,24 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
 
 #include "mlpython.h"
 
-void test(ULONG_PTR a)
+void test_void_void()
+{
+    PrintConsole(L"%S\n", __FUNCTION__);
+}
+
+void test_void_uptr(ULONG_PTR a)
 {
     PrintConsole(L"%S: %Iu\n", __FUNCTION__, a);
+}
+
+void test_void_uptr2(ULONG_PTR a, ULONG_PTR b)
+{
+    PrintConsole(L"%S: %Iu, %Iu\n", __FUNCTION__, a, b);
+}
+
+void test_void_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
+{
+    PrintConsole(L"%S: %Iu, %Iu, %Iu\n", __FUNCTION__, a, b, c);
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
@@ -160,14 +175,14 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 #if 1
     MlPython py;
 
-    py.Register(test, L"test")
+    py.Register(test_void_uptr3, L"test")
       .InitModule(L"mlpy");
 
     py.RunString(
         "print(__name__)\r\n"
         "import mlpy\r\n"
         "print('fuck2')\r\n"
-        "mlpy.test(1)"
+        "mlpy.test(123, 456, 789)"
     );
 
 #endif

@@ -8,6 +8,35 @@
 
 --*/
 
+
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//               ·ð×æ±£ÓÓ         ÓÀÎÞBUG
+//
+//
+//
+
 #include "ml.h"
 #include <PythonHelper/PythonHelper.h>
 
@@ -22,6 +51,8 @@ typedef LONG PYSTATUS;
 
 #define PYCTOR INT (PYCALL*)
 
+#define WRAP_CLASS_SUFFIX L"_WRAP_CLASS"
+
 
 typedef enum
 {
@@ -32,62 +63,45 @@ typedef enum
     PyStatusLast,
 };
 
+
+//////////////////////////////////////////////////////////////////////////
+// type traits
+//////////////////////////////////////////////////////////////////////////
+
 template<typename T>
 struct PyTypeHelper
 {
-    typedef T   VALUE_TYPE;
-    typedef T&  REF_TYPE;
-    typedef const T& CONST_REF_TYPE;
-    VALUE_TYPE  value;
+    typedef T           VALUE_TYPE;
+    typedef T&          REF_TYPE;
+    typedef const T&    CONST_REF_TYPE;
+    VALUE_TYPE          value;
 };
 
 template<typename T>
 struct PyTypeHelper<T&>
 {
-    typedef T   VALUE_TYPE;
-    typedef T&  REF_TYPE;
-    typedef const T& CONST_REF_TYPE;
-    VALUE_TYPE  value;
+    typedef T           VALUE_TYPE;
+    typedef T&          REF_TYPE;
+    typedef const T&    CONST_REF_TYPE;
+    VALUE_TYPE          value;
 };
 
 template<typename T>
 struct PyTypeHelper<const T&>
 {
-    typedef T   VALUE_TYPE;
-    typedef T&  REF_TYPE;
-    typedef const T& CONST_REF_TYPE;
-    VALUE_TYPE  value;
+    typedef T           VALUE_TYPE;
+    typedef T&          REF_TYPE;
+    typedef const T&    CONST_REF_TYPE;
+    VALUE_TYPE          value;
 };
+
+
+//////////////////////////////////////////////////////////////////////////
+// type converter
+//////////////////////////////////////////////////////////////////////////
 
 template<typename NATIVE_TYPE>
 struct PyTypeConverter;
-
-template<typename T>
-struct PyFunctionTraits
-{
-    static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
-    typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
-
-    template<typename R, typename... ARGS>
-    static PyObject* CallRoutine(R(*func)(ARGS...), PyObject * args)
-    {
-        return PyTypeConverter<R>::FromNative(CallRoutineImpl(func, args));
-    }
-
-    template<typename... ARGS>
-    static PyObject* CallRoutine(VOID(*func)(ARGS...), PyObject * args)
-    {
-        PrintConsole(L"fuck\n");
-        CallRoutineImpl(func, args);
-        Py_RETURN_NONE;
-    }
-
-    template<typename R, typename... ARGS>
-    static R CallRoutineImpl(R(*func)(ARGS...), PyObject * args)
-    {
-        return func(1);
-    }
-};
 
 #define PY_INTEGER_CONVERTER_32(type) \
     template<> \
@@ -133,6 +147,94 @@ PY_INTEGER_CONVERTER_64(LONG64);
 PY_INTEGER_CONVERTER_64(ULONG64);
 
 
+//////////////////////////////////////////////////////////////////////////
+// func helper
+//////////////////////////////////////////////////////////////////////////
+
+template<typename int>
+struct PyCallStaticRoutineHelper
+{
+    template<typename R, typename FUNC_TYPE, typename ARG1, typename... FUNC_ARGS, typename... EXTRACTED_ARGS>
+    ForceInline static R CallStaticRoutineImpl3(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
+    {
+        //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(FUNC_ARGS));
+        return PyCallStaticRoutineHelper<sizeof...(FUNC_ARGS)>::CallStaticRoutineImpl3<R, FUNC_TYPE, FUNC_ARGS...>(
+                   func,
+                   args,
+                   Index + 1,
+                   fargs...,
+                   PyTypeConverter<PyTypeHelper<ARG1>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, Index))
+               );
+    }
+};
+
+template<>
+struct PyCallStaticRoutineHelper<0>
+{
+    template<typename R, typename FUNC_TYPE, typename... EXTRACTED_ARGS>
+    ForceInline static R CallStaticRoutineImpl3(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
+    {
+        //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(EXTRACTED_ARGS));
+        return func(fargs...);
+    }
+};
+
+template<typename T>
+struct PyFunctionHelper
+{
+    static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
+    typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
+
+    template<typename R, typename... ARGS>
+    static PyObject* CallRoutine(R(*func)(ARGS...), PyObject * args)
+    {
+        return PyTypeConverter<R>::FromNative(CallStaticRoutineImpl(func, args));
+    }
+
+    template<typename... ARGS>
+    static PyObject* CallRoutine(VOID(*func)(ARGS...), PyObject * args)
+    {
+        CallStaticRoutineImpl(func, args);
+        Py_RETURN_NONE;
+    }
+
+    template<typename R>
+    static R CallStaticRoutineImpl(R(*func)(), PyObject *args)
+    {
+        return func();
+    }
+
+    // template<typename R, typename ARG1>
+    // static R CallStaticRoutineImpl(R(*func)(ARG1), PyObject *args)
+    // {
+    //     PyTypeHelper<ARG1> arg1;
+
+    //     arg1.value = PyTypeConverter<PyTypeHelper<ARG1>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, 0));
+
+    //     return func(arg1.value);
+    // }
+
+    // template<typename R, typename ARG1, typename ARG2>
+    // static R CallStaticRoutineImpl(R(*func)(ARG1, ARG2), PyObject *args)
+    // {
+    //     PyTypeHelper<ARG1> arg1;
+    //     PyTypeHelper<ARG2> arg2;
+
+    //     arg1.value = PyTypeConverter<PyTypeHelper<ARG1>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, 0));
+    //     arg2.value = PyTypeConverter<PyTypeHelper<ARG2>::VALUE_TYPE>::ToNative(PyTuple_GetItem(args, 1));
+
+    //     return func(arg1.value, arg2.value);
+    // }
+
+    template<typename R, typename... ARGS>
+    static R CallStaticRoutineImpl(R(*func)(ARGS...), PyObject *args)
+    {
+        //PrintConsole(L"%S: %Iu\n\n", __FUNCSIG__, sizeof...(ARGS));
+
+        return PyCallStaticRoutineHelper<sizeof...(ARGS)>::CallStaticRoutineImpl3<R, TYPE_OF(func), ARGS...>(func, args, 0);
+    }
+};
+
 template<typename T>
 struct PyStaticFunctionHelper : public PyObjectBase
 {
@@ -160,14 +262,14 @@ struct PyStaticFunctionHelper : public PyObjectBase
 
     PyObject* CallMethodImpl(PyObject *args)
     {
-        if (PyTuple_GET_SIZE(args) != PyFunctionTraits<T>::NumberOfArguments)
+        if (PyTuple_GET_SIZE(args) != PyFunctionHelper<T>::NumberOfArguments)
         {
             PyErr_SetString(
                 PyExc_TypeError,
                 String::Format(
                     L"function takes %d argument%s, but %d given",
-                    PyFunctionTraits<T>::NumberOfArguments,
-                    PyFunctionTraits<T>::NumberOfArguments > 1 ? L"s" : L"",
+                    PyFunctionHelper<T>::NumberOfArguments,
+                    PyFunctionHelper<T>::NumberOfArguments > 1 ? L"s" : L"",
                     PyTuple_GET_SIZE(args)
                 )
                 .Encode(CP_UTF8)
@@ -176,9 +278,9 @@ struct PyStaticFunctionHelper : public PyObjectBase
             return nullptr;
         }
 
-        PrintConsole(L"%S\n", __FUNCTION__);
+        //PrintConsole(L"%S\n", __FUNCTION__);
 
-        return PyFunctionTraits<T>::CallRoutine(this->func, args);
+        return PyFunctionHelper<T>::CallRoutine(this->func, args);
     }
 
     static PyObject* PYCALL AllocObject(PyTypeObject *type, PyObject *args, PyObject *kwargs)
@@ -191,6 +293,11 @@ struct PyStaticFunctionHelper : public PyObjectBase
         Py_TYPE(self)->tp_free((PyObject*)self);
     }
 };
+
+
+//////////////////////////////////////////////////////////////////////////
+// mlpy
+//////////////////////////////////////////////////////////////////////////
 
 class MlPython
 {
@@ -256,7 +363,7 @@ public:
 
         f.Name      = FunctionName;
         f.Doc       = Doc;
-        f.ArgsCount = PyFunctionTraits<T>::NumberOfArguments;
+        f.ArgsCount = PyFunctionHelper<T>::NumberOfArguments;
         f.TypeSize  = sizeof(PyStaticFunctionHelper<T>);
         f.Native    = (PyCFunction)PyStaticFunctionHelper<T>::CallMethod;
         f.dtor      = (destructor)PyStaticFunctionHelper<T>::FreeObject;
@@ -298,7 +405,7 @@ protected:
         for (auto &func : this->RegisteredFunctions)
         {
             auto &name = func.Name.Encode(CP_UTF8);
-            auto &type = (func.Name + L"_wrapclass").Encode(CP_UTF8);
+            auto &type = (func.Name + WRAP_CLASS_SUFFIX).Encode(CP_UTF8);
 
             BOOL Success;
             PyObject *args, *obj, *method;
@@ -327,38 +434,38 @@ protected:
                 func.TypeSize,                                      /* tp_size */
                 0,                                                  /* tp_itemsize */
                 func.dtor,                                          /* tp_dealloc */
-                0,                                                  /* tp_print */
-                0,                                                  /* tp_getattr */
-                0,                                                  /* tp_setattr */
-                0,                                                  /* tp_reserved */
-                0,                                                  /* tp_repr */
-                0,                                                  /* tp_as_number */
-                0,                                                  /* tp_as_sequence */
-                0,                                                  /* tp_as_mapping */
-                0,                                                  /* tp_hash*/
-                0,                                                  /* tp_call*/
-                0,                                                  /* tp_str */
+                nullptr,                                            /* tp_print */
+                nullptr,                                            /* tp_getattr */
+                nullptr,                                            /* tp_setattr */
+                nullptr,                                            /* tp_reserved */
+                nullptr,                                            /* tp_repr */
+                nullptr,                                            /* tp_as_number */
+                nullptr,                                            /* tp_as_sequence */
+                nullptr,                                            /* tp_as_mapping */
+                nullptr,                                            /* tp_hash*/
+                nullptr,                                            /* tp_call*/
+                nullptr,                                            /* tp_str */
                 PyObject_GenericGetAttr,                            /* tp_getattro */
-                0,                                                  /* tp_setattro */
-                0,                                                  /* tp_as_buffer */
+                nullptr,                                            /* tp_setattro */
+                nullptr,                                            /* tp_as_buffer */
                 Py_TPFLAGS_DEFAULT,                                 /* tp_flags */
                 "",                                                 /* tp_doc */
-                0,                                                  /* tp_traverse */
-                0,                                                  /* tp_clear */
-                0,                                                  /* tp_richcompare */
+                nullptr,                                            /* tp_traverse */
+                nullptr,                                            /* tp_clear */
+                nullptr,                                            /* tp_richcompare */
                 0,                                                  /* tp_weaklistoffset */
-                0,                                                  /* tp_iter */
-                0,                                                  /* tp_iternext */
+                nullptr,                                            /* tp_iter */
+                nullptr,                                            /* tp_iternext */
                 methods,                                            /* tp_methods */
-                0,                                                  /* tp_members */
-                0,                                                  /* tp_getset */
+                nullptr,                                            /* tp_members */
+                nullptr,                                            /* tp_getset */
                 &PyBaseObject_Type,                                 /* tp_base */
-                0,                                                  /* tp_dict */
-                0,                                                  /* tp_descr_get */
-                0,                                                  /* tp_descr_set */
+                nullptr,                                            /* tp_dict */
+                nullptr,                                            /* tp_descr_get */
+                nullptr,                                            /* tp_descr_set */
                 0,                                                  /* tp_dictoffset */
                 func.ctor,                                          /* tp_init */
-                0,                                                  /* tp_alloc */
+                nullptr,                                            /* tp_alloc */
                 func.alloc,                                         /* tp_new */
                 nullptr,                                            /* tp_free */
             };
