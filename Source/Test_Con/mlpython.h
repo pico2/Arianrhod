@@ -59,6 +59,11 @@ typedef enum
     PyStatusFirst = DEFINE_NTSTATUS(STATUS_SEVERITY_ERROR, 0x100),
 
     PYSTATUS_CREATE_MODULE_FAILED,
+    PYSTATUS_IMPORT_MODULE_FAILED,
+    PYSTATUS_CREATE_UNICODE_FAILED,
+    PYSTATUS_CREATE_OBJECT_FAILED,
+    PYSTATUS_GET_ATTR_FAILED,
+    PYSTATUS_SET_ATTR_FAILED,
 
     PyStatusLast,
 };
@@ -114,6 +119,8 @@ struct PyTypeConverter;
  \
         static type ToNative(PyObject *obj) \
         { \
+            if (obj == nullptr || PyLong_Check(obj) == 0) \
+                return type(); \
             return (type)PyLong_AsLong(obj); \
         } \
     };
@@ -139,6 +146,8 @@ PY_INTEGER_CONVERTER_32(ULONG);
  \
         static type ToNative(PyObject *obj) \
         { \
+            if (obj == nullptr || PyLong_Check(obj) == 0) \
+                return type(); \
             return (type)PyLong_AsUnsignedLongLong(obj); \
         } \
     };
@@ -155,7 +164,7 @@ template<typename int>
 struct PyCallStaticRoutineHelper
 {
     template<typename R, typename FUNC_TYPE, typename ARG1, typename... FUNC_ARGS, typename... EXTRACTED_ARGS>
-    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
+    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, Py_ssize_t Index, EXTRACTED_ARGS... fargs)
     {
         return PyCallStaticRoutineHelper<sizeof...(FUNC_ARGS)>::CallStaticRoutine<R, FUNC_TYPE, FUNC_ARGS...>(
                    func,
@@ -171,7 +180,7 @@ template<>
 struct PyCallStaticRoutineHelper<0>
 {
     template<typename R, typename FUNC_TYPE, typename... EXTRACTED_ARGS>
-    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, ULONG_PTR Index, EXTRACTED_ARGS... fargs)
+    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, Py_ssize_t Index, EXTRACTED_ARGS... fargs)
     {
         return func(fargs...);
     }
@@ -320,6 +329,89 @@ public:
         return STATUS_SUCCESS;
     }
 
+    template<typename T>
+    PYSTATUS GetGlobalVariable(const String& ModuleName, const String& VariableName, T& Output)
+    {
+        PyObject *module, *name, *value;
+        PYSTATUS status;
+
+        module = Import(ModuleName);
+        if (module == nullptr)
+            return PYSTATUS_IMPORT_MODULE_FAILED;
+
+        status = STATUS_UNSUCCESSFUL;
+
+        name = nullptr;
+        value = nullptr;
+
+        LOOP_ONCE
+        {
+            name = PyUnicode_FromUnicode(VariableName, VariableName.GetCount());
+            if (name == nullptr)
+            {
+                status = PYSTATUS_CREATE_UNICODE_FAILED;
+                break;
+            }
+
+            value = PyObject_GetAttr(module, name);
+            if (value == nullptr)
+            {
+                status = PYSTATUS_GET_ATTR_FAILED;
+                break;
+            }
+
+            Output = PyTypeConverter<PyTypeHelper<T>::VALUE_TYPE>::ToNative(value);
+            status = STATUS_SUCCESS;
+        }
+
+        PyRelease(name);
+        PyRelease(value);
+        PyRelease(module);
+
+        return status;
+    }
+
+    template<typename T>
+    PYSTATUS SetGlobalVariable(const String& ModuleName, const String& VariableName, const T& Value)
+    {
+        PyObject *module, *name, *value;
+        PYSTATUS status;
+
+        module = Import(ModuleName);
+        if (module == nullptr)
+            return PYSTATUS_IMPORT_MODULE_FAILED;
+
+        status = STATUS_UNSUCCESSFUL;
+
+        name = nullptr;
+        value = nullptr;
+
+        LOOP_ONCE
+        {
+            name = PyUnicode_FromUnicode(VariableName, VariableName.GetCount());
+            if (name == nullptr)
+            {
+                status = PYSTATUS_CREATE_UNICODE_FAILED;
+                break;
+            }
+
+            value = PyTypeConverter<PyTypeHelper<T>::VALUE_TYPE>::FromNative(Value);
+            if (value == nullptr)
+            {
+                status = PYSTATUS_CREATE_OBJECT_FAILED;
+                break;
+            }
+
+            status = PyObject_SetAttr(module, name, value) == 0 ? STATUS_SUCCESS : PYSTATUS_SET_ATTR_FAILED;
+        }
+
+        PyRelease(name);
+        PyRelease(value);
+        PyRelease(module);
+
+        return status;
+    }
+
     template<class T>
     NoInline MlPython& Register(T func, const String& FunctionName, const String& Doc = L"")
     {
@@ -341,32 +433,164 @@ public:
         return *this;
     }
 
-    NoInline PYSTATUS InitModule(const String& ModuleName, const String& Doc = L"")
+    NoInline PYSTATUS InitModule(const String& ModuleName/*, const String& Doc = L""*/)
     {
         PyObject* Module;
         auto& ModuleNameAnsi = ModuleName.Encode(CP_UTF8);
-        auto& DocAnsi = Doc.Encode(CP_UTF8);
+        //auto& DocAnsi = Doc.Encode(CP_UTF8);
 
-        PyModuleDef ModuleDef =
-        {
-            PyModuleDef_HEAD_INIT,
-            ModuleNameAnsi,
-            DocAnsi,
-            -1,
-        };
-
-        //Module = PyModule_Create(&ModuleDef);
         Module = PyImport_AddModule(ModuleNameAnsi);
         if (Module == nullptr)
             return PYSTATUS_CREATE_MODULE_FAILED;
 
-        FAIL_RETURN(this->InitFunctions(Module, ModuleName, Doc));
+        FAIL_RETURN(this->InitFunctions(Module, ModuleName));
 
         return STATUS_SUCCESS;
     }
 
+    static PyObject* Import(const String& ModuleName)
+    {
+        PyObject *name, *module;
+
+        name = PyUnicode_FromUnicode(ModuleName, ModuleName.GetCount());
+        if (name == nullptr)
+            return nullptr;
+
+        module = PyImport_Import(name);
+        PyRelease(name);
+
+        return module;
+    }
+
+    template<typename RET_TYPE, typename... ARGS>
+    NoInline RET_TYPE Invoke(const String& ModuleName, const String& FunctionName, ARGS... args)
+    {
+        return PyInvokePyHelper<RET_TYPE>::Invoke(this, ModuleName, FunctionName, args...);
+    }
+
 protected:
-    PYSTATUS InitFunctions(PyObject* Module, const String& ModuleName, const String& Doc = L"")
+
+    template<typename RET_TYPE>
+    struct PyInvokePyHelper
+    {
+        template<typename... ARGS>
+        ForceInline static RET_TYPE Invoke(MlPython* This, const String& ModuleName, const String& FunctionName, ARGS... args)
+        {
+            PyObject* retval = This->InvokeInternal(ModuleName, FunctionName, args...);
+            RET_TYPE ret = PyTypeConverter<PyTypeHelper<RET_TYPE>::VALUE_TYPE>::ToNative(retval);
+            PyRelease(retval);
+            return ret;
+        }
+    };
+
+    template<>
+    struct PyInvokePyHelper<VOID>
+    {
+        template<typename... ARGS>
+        ForceInline static VOID Invoke(MlPython* This, const String& ModuleName, const String& FunctionName, ARGS... args)
+        {
+            PyObject* retval = This->InvokeInternal(ModuleName, FunctionName, args...);
+            PyRelease(retval);
+        }
+    };
+
+    template<typename... ARGS>
+    NoInline PyObject* InvokeInternal(const String& ModuleName, const String& FunctionName, ARGS... args)
+    {
+        PYSTATUS status;
+        PyObject* tuple;
+        PyObject* module;
+        PyObject* func;
+        PyObject* name;
+        PyObject* value;
+        PyCodeObject* code;
+
+        status = STATUS_UNSUCCESSFUL;
+
+        tuple   = nullptr;
+        module  = nullptr;
+        func    = nullptr;
+        name    = nullptr;
+        value   = nullptr;
+
+        SCOPE_EXIT
+        {
+            PyRelease(tuple);
+            PyRelease(module);
+            PyRelease(func);
+            PyRelease(name);
+            PyRelease(value);
+        }
+        SCOPE_EXIT_END;
+
+        module = Import(ModuleName);
+        if (module == nullptr)
+            return value;
+
+        name = PyUnicode_FromUnicode(FunctionName, FunctionName.GetCount());
+        if (name == nullptr)
+            return value;
+
+        func = PyObject_GetAttr(module, name);
+        if (func == nullptr)
+            return value;
+
+        code = (PyCodeObject *)PyFunction_GET_CODE(func);
+        if (code->co_argcount != sizeof...(ARGS))
+        {   
+            PyErr_SetString(
+                PyExc_TypeError,
+                String::Format(
+                    L"function takes %d argument%s, but %d given",
+                    code->co_argcount,
+                    code->co_argcount > 1 ? L"s" : L"",
+                    sizeof...(ARGS)
+                )
+                .Encode(CP_UTF8)
+            );
+
+            return nullptr;
+        }
+
+        tuple = PyTuple_New(sizeof...(ARGS));
+        if (tuple == nullptr)
+            return value;
+
+        status = BuildPyArgs(tuple, 0, args...);
+        if (PY_FAILED(status))
+            return value;
+
+        value = PyObject_CallObject(func, tuple);
+        if (PyErr_Occurred())
+        {
+            PyErr_Clear();
+        }
+
+        if (value != nullptr)
+            PyAddRef(value);
+
+        return value;
+    }
+
+    ForceInline PYSTATUS BuildPyArgs(PyObject *tuple, Py_ssize_t Index)
+    {
+        return STATUS_SUCCESS;
+    }
+
+    template<typename T, typename... REST>
+    ForceInline PYSTATUS BuildPyArgs(PyObject *tuple, Py_ssize_t Index, T arg, REST... rest)
+    {
+        PyObject *obj = PyTypeConverter<PyTypeHelper<T>::VALUE_TYPE>::FromNative(arg);
+        if (obj == nullptr)
+            return PYSTATUS_CREATE_OBJECT_FAILED;
+
+        PyTuple_SetItem(tuple, Index, obj);
+        PyRelease(obj);
+
+        return BuildPyArgs(tuple, Index + 1, rest...);
+    }
+
+    PYSTATUS InitFunctions(PyObject* Module, const String& ModuleName)
     {
         for (auto &func : this->RegisteredFunctions)
         {
@@ -503,12 +727,12 @@ protected:
 
         Py_SetPath(String::Format(
             L"%wZ%s;%wZ%s%s;%wZ%s%s\\site-packages;%wZ%slib;%wZ%sDLLs;%wZ%sUserSite",
-            &SelfPath, PYTHON_PACKAGE_PATH,                      // exe path
-            &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python.zip
-            &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python.zip/site-packages
-            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./lib
-            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./DLLs
-            &SelfPath, PYTHON_PACKAGE_PATH                       // ./UserSite
+            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python
+            &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip
+            &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip/site-packages
+            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python/lib
+            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python/DLLs
+            &SelfPath, PYTHON_PACKAGE_PATH                       // ./python/UserSite
         ));
 
         String          PathEnv, UserSite;

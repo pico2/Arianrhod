@@ -175,19 +175,32 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 #if 1
     MlPython py;
 
-    py.Register(test_void_void0, L"test_void_void0")
-      .Register(test_void_uptr1, L"test_void_uptr1")
-      .Register(test_void_uptr2, L"test_void_uptr2")
-      .Register(test_ulong_uptr3, L"test_void_uptr3")
-      .InitModule(L"mlpy");
+    LONG_PTR& a = argc;
+
+    argc = 123;
+
+    //py.Register(test_void_void0, L"test_void_void0")
+    //  .Register(test_void_uptr1, L"test_void_uptr1")
+    //  .Register(test_void_uptr2, L"test_void_uptr2")
+    //  .Register(test_ulong_uptr3, L"test_void_uptr3")
+    //  .InitModule(L"mlpy");
+
+    //py.SetGlobalVariable(L"mlpy", L"fuck_global_var", a);
+    //py.GetGlobalVariable(L"mlpy", L"fuck_global_var", a);
+
+    auto x = py.Invoke<int>(L"fuck", L"add", 3);
+    PrintConsole(L"%i\n", x);
 
     py.RunString(
         "print(__name__)\r\n"
         "import mlpy\r\n"
+        "print(mlpy.fuck_global_var)\r\n"
         "print('ret = %s' % mlpy.test_void_void0())\r\n"
         "print('ret = %s' % mlpy.test_void_uptr1(123))\r\n"
         "print('ret = %s' % mlpy.test_void_uptr2(456, 789))\r\n"
         "print('ret = %s' % mlpy.test_void_uptr3(987, 654, 3210))\r\n"
+        "def fuck():\r\n"
+        "    print('fuck py')\r\n"
     );
 
 #endif
