@@ -39,6 +39,7 @@
 
 #include "ml.h"
 #include <PythonHelper/PythonHelper.h>
+#include <frameobject.h>
 
 #define PYTHON_DLL              L"python34.dll"
 #define PYTHON_PACKAGE_PATH     L"python\\"
@@ -161,12 +162,12 @@ PY_INTEGER_CONVERTER_64(ULONG64);
 //////////////////////////////////////////////////////////////////////////
 
 template<typename int>
-struct PyCallStaticRoutineHelper
+struct PyCallFuncObjectHelper
 {
     template<typename R, typename FUNC_TYPE, typename ARG1, typename... FUNC_ARGS, typename... EXTRACTED_ARGS>
-    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, Py_ssize_t Index, EXTRACTED_ARGS... fargs)
+    ForceInline static R CallFuncObject(FUNC_TYPE func, PyObject *args, Py_ssize_t Index, EXTRACTED_ARGS... fargs)
     {
-        return PyCallStaticRoutineHelper<sizeof...(FUNC_ARGS)>::CallStaticRoutine<R, FUNC_TYPE, FUNC_ARGS...>(
+        return PyCallFuncObjectHelper<sizeof...(FUNC_ARGS)>::CallFuncObject<R, FUNC_TYPE, FUNC_ARGS...>(
                    func,
                    args,
                    Index + 1,
@@ -177,17 +178,17 @@ struct PyCallStaticRoutineHelper
 };
 
 template<>
-struct PyCallStaticRoutineHelper<0>
+struct PyCallFuncObjectHelper<0>
 {
     template<typename R, typename FUNC_TYPE, typename... EXTRACTED_ARGS>
-    ForceInline static R CallStaticRoutine(FUNC_TYPE func, PyObject *args, Py_ssize_t Index, EXTRACTED_ARGS... fargs)
+    ForceInline static R CallFuncObject(FUNC_TYPE func, PyObject *args, Py_ssize_t Index, EXTRACTED_ARGS... fargs)
     {
-        return func(fargs...);
+        return (*func)(fargs...);
     }
 };
 
 template<typename T>
-struct PyFunctionHelper
+struct PyFunctionTraits
 {
     static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
     typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
@@ -208,17 +209,19 @@ struct PyFunctionHelper
     template<typename R, typename... ARGS>
     static R CallStaticRoutineImpl(R(*func)(ARGS...), PyObject *args)
     {
-        return PyCallStaticRoutineHelper<sizeof...(ARGS)>::CallStaticRoutine<R, TYPE_OF(func), ARGS...>(func, args, 0);
+        return PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<R, TYPE_OF(func), ARGS...>(func, args, 0);
     }
 };
 
-template<typename T>
+template<typename FUNC_OBJECT, typename FUNC_TYPE = VOID>
 struct PyStaticFunctionHelper : public PyObjectBase
 {
     typedef ml::String String;
-    typedef PyStaticFunctionHelper<T> SELF;
+    typedef PyStaticFunctionHelper<FUNC_OBJECT, FUNC_TYPE> SELF;
 
-    T func;
+    static const ULONG_PTR NumberOfArguments = FUNC_OBJECT::NumberOfArguments;
+
+    FUNC_OBJECT* func;
 
     PyStaticFunctionHelper()
     {
@@ -227,35 +230,9 @@ struct PyStaticFunctionHelper : public PyObjectBase
 
     static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
     {
-        new (self)PyStaticFunctionHelper<T>();
-        *(PVOID *)&self->func = (PVOID)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
+        new (self) SELF();
+        *(FUNC_OBJECT **)&self->func = (FUNC_OBJECT *)(ULONG_PTR)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
         return 0;
-    }
-
-    static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
-    {
-        return self->CallMethodImpl(args);
-    }
-
-    ForceInline PyObject* CallMethodImpl(PyObject *args)
-    {
-        if (PyTuple_GET_SIZE(args) != PyFunctionHelper<T>::NumberOfArguments)
-        {
-            PyErr_SetString(
-                PyExc_TypeError,
-                String::Format(
-                    L"function takes %d argument%s, but %d given",
-                    PyFunctionHelper<T>::NumberOfArguments,
-                    PyFunctionHelper<T>::NumberOfArguments > 1 ? L"s" : L"",
-                    PyTuple_GET_SIZE(args)
-                )
-                .Encode(CP_UTF8)
-            );
-
-            return nullptr;
-        }
-
-        return PyFunctionHelper<T>::CallRoutine(this->func, args);
     }
 
     static PyObject* PYCALL AllocObject(PyTypeObject *type, PyObject *args, PyObject *kwargs)
@@ -265,7 +242,56 @@ struct PyStaticFunctionHelper : public PyObjectBase
 
     static VOID PYCALL FreeObject(SELF *self)
     {
+        self->~SELF();
         Py_TYPE(self)->tp_free((PyObject*)self);
+    }
+
+
+    static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
+    {
+        return self->CallMethodImpl(args);
+    }
+
+    ForceInline PyObject* CallMethodImpl(PyObject *args)
+    {
+        if (PyTuple_GET_SIZE(args) != NumberOfArguments)
+        {
+            PyFrameObject* frame = PyThreadState_Get()->frame;
+
+            PyErr_SetString(
+                PyExc_TypeError,
+                String::Format(
+                    L"'%s' takes %d argument%s, but %d given",
+                    PyUnicode_AsUnicode(frame->f_code->co_name), NumberOfArguments, NumberOfArguments > 1 ? L"s" : L"", PyTuple_GET_SIZE(args)
+                )
+                .Encode(CP_UTF8)
+            );
+
+            return nullptr;
+        }
+
+        return CallRoutine<FUNC_OBJECT::RET_TYPE>(args);
+    }
+
+    template<typename RET_TYPE>
+    PyObject* CallRoutine(PyObject * args)
+    {
+        FUNC_TYPE *f = nullptr;
+        return PyTypeConverter<RET_TYPE>::FromNative(CallStaticRoutineImpl<RET_TYPE>(args, f));
+    }
+
+    template<>
+    PyObject* CallRoutine<VOID>(PyObject * args)
+    {
+        FUNC_TYPE *f = nullptr;
+        CallStaticRoutineImpl<VOID>(args, f);
+        Py_RETURN_NONE;
+    }
+
+    template<typename R, typename... ARGS>
+    R CallStaticRoutineImpl(PyObject *args, R(*)(ARGS...))
+    {
+        return PyCallFuncObjectHelper<NumberOfArguments>::CallFuncObject<R, TYPE_OF(this->func), ARGS...>(this->func, args, 0);
     }
 };
 
@@ -273,6 +299,68 @@ struct PyStaticFunctionHelper : public PyObjectBase
 //////////////////////////////////////////////////////////////////////////
 // mlpy
 //////////////////////////////////////////////////////////////////////////
+
+struct MlPythonException
+{
+    MlPythonException() {}
+
+    MlPythonException(const MlPythonException&) = delete;
+    MlPythonException& operator=(const MlPythonException&) = delete;
+
+    VOID Clear()
+    {
+        this->Message = L"";
+    }
+
+    VOID SetMessage(PCWSTR Message)
+    {
+        this->Message = Message;
+    }
+
+    BOOL ErrorOccurred() const
+    {
+        return this->Message.GetCount() != 0;
+    }
+
+    ml::String Message;
+};
+
+class MlPyObject
+{
+protected:
+    PyObject *object;
+
+public:
+    MlPyObject(PyObject* object = nullptr)
+    {
+        this->object = object;
+    }
+
+    NoInline ~MlPyObject()
+    {
+        PyRelease(object);
+    }
+
+    MlPyObject(const MlPyObject&) = delete;
+    MlPyObject& operator=(const MlPyObject&) = delete;
+
+    MlPyObject& operator=(PyObject *object)
+    {
+        this->~MlPyObject();
+        this->object = object;
+        return *this;
+    }
+
+    operator PyObject*()
+    {
+        return object;
+    }
+
+    PyObject** operator&()
+    {
+        return &object;
+    }
+};
 
 class MlPython
 {
@@ -295,13 +383,13 @@ protected:
         String      Doc;
     };
 
+    MlPythonException PyException;
     GrowableArray<PY_STATIC_FUNCTION> RegisteredFunctions;
 
 public:
     MlPython()
     {
         ml::MlInitialize();
-
         if (Py_IsInitialized() == FALSE)
         {
             InitializePackage();
@@ -316,6 +404,56 @@ public:
 
     MlPython(const MlPython&) = delete;
     MlPython& operator=(const MlPython&) = delete;
+
+    const MlPythonException& GetPyException() const
+    {
+        return this->PyException;
+    }
+
+    NoInline const MlPythonException& CapturePyException()
+    {
+        MlPyObject Type, Value, TraceBack, FormatException, StringJoin, ExceptionList, ExceptionInfo;
+
+        this->PyException.Clear();
+
+        PyErr_Fetch(&Type, &Value, &TraceBack);
+        PyErr_NormalizeException(&Type, &Value, &TraceBack);
+
+        LOOP_ONCE
+        {
+            FormatException = GetModuleAttr(L"traceback", L"format_exception");
+            BREAK_IF(FormatException == nullptr);
+
+            if (TraceBack == nullptr)
+            {
+                TraceBack = Py_None;
+                PyAddRef(TraceBack);
+            }
+
+            ExceptionList = PyObject_CallFunction(FormatException, "OOOi", Type, Value, TraceBack, 20);
+            BREAK_IF(ExceptionList == nullptr);
+
+            ExceptionInfo = PyUnicode_Join(MlPyObject(PyUnicode_FromUnicode(L"", 0)), ExceptionList);
+            BREAK_IF(ExceptionInfo == nullptr);
+
+            this->PyException.SetMessage(PyUnicode_AsUnicode(ExceptionInfo));
+        }
+
+        return this->PyException;
+    }
+
+    NoInline const MlPythonException& SetPyException(const String& ErrorMessage, PyObject *ExceptionType = PyExc_TypeError)
+    {
+        PyErr_SetString(ExceptionType, ErrorMessage.Encode(CP_UTF8));
+        return this->CapturePyException();
+    }
+
+    NoInline const MlPythonException& SetPyException(PCSTR Utf8ErrorMessage, PyObject *ExceptionType = PyExc_TypeError)
+    {
+        PyErr_SetString(ExceptionType, Utf8ErrorMessage);
+        return this->CapturePyException();
+    }
+
 
     PYSTATUS RunString(PCSTR code)
     {
@@ -332,59 +470,28 @@ public:
     template<typename T>
     PYSTATUS GetGlobalVariable(const String& ModuleName, const String& VariableName, T& Output)
     {
-        PyObject *module, *name, *value;
-        PYSTATUS status;
+        MlPyObject value;
 
-        module = Import(ModuleName);
-        if (module == nullptr)
-            return PYSTATUS_IMPORT_MODULE_FAILED;
+        value = GetModuleAttr(ModuleName, VariableName);
+        if (value == nullptr)
+            return PYSTATUS_GET_ATTR_FAILED;
 
-        status = STATUS_UNSUCCESSFUL;
+        Output = PyTypeConverter<PyTypeHelper<T>::VALUE_TYPE>::ToNative(value);
 
-        name = nullptr;
-        value = nullptr;
-
-        LOOP_ONCE
-        {
-            name = PyUnicode_FromUnicode(VariableName, VariableName.GetCount());
-            if (name == nullptr)
-            {
-                status = PYSTATUS_CREATE_UNICODE_FAILED;
-                break;
-            }
-
-            value = PyObject_GetAttr(module, name);
-            if (value == nullptr)
-            {
-                status = PYSTATUS_GET_ATTR_FAILED;
-                break;
-            }
-
-            Output = PyTypeConverter<PyTypeHelper<T>::VALUE_TYPE>::ToNative(value);
-            status = STATUS_SUCCESS;
-        }
-
-        PyRelease(name);
-        PyRelease(value);
-        PyRelease(module);
-
-        return status;
+        return STATUS_SUCCESS;
     }
 
     template<typename T>
     PYSTATUS SetGlobalVariable(const String& ModuleName, const String& VariableName, const T& Value)
     {
-        PyObject *module, *name, *value;
-        PYSTATUS status;
+        MlPyObject  module, name, value;
+        PYSTATUS    status;
 
         module = Import(ModuleName);
         if (module == nullptr)
             return PYSTATUS_IMPORT_MODULE_FAILED;
 
         status = STATUS_UNSUCCESSFUL;
-
-        name = nullptr;
-        value = nullptr;
 
         LOOP_ONCE
         {
@@ -405,28 +512,28 @@ public:
             status = PyObject_SetAttr(module, name, value) == 0 ? STATUS_SUCCESS : PYSTATUS_SET_ATTR_FAILED;
         }
 
-        PyRelease(name);
-        PyRelease(value);
-        PyRelease(module);
-
         return status;
     }
 
-    template<class T>
+    template<typename T>
     NoInline MlPython& Register(T func, const String& FunctionName, const String& Doc = L"")
     {
         PY_STATIC_FUNCTION f;
 
-        *(T *)&f.Address = func;
+        typedef ml::Function<T> FUNCTION_INTERNAL;
+        typedef ml::Function<FUNCTION_INTERNAL::FUNCTION_TYPE> FUNCTION;
+        typedef FUNCTION_INTERNAL::FUNCTION_TYPE FUNCTION_TYPE;
+
+        *(FUNCTION **)&f.Address = new FUNCTION(func);
 
         f.Name      = FunctionName;
         f.Doc       = Doc;
-        f.ArgsCount = PyFunctionHelper<T>::NumberOfArguments;
-        f.TypeSize  = sizeof(PyStaticFunctionHelper<T>);
-        f.Native    = (PyCFunction)PyStaticFunctionHelper<T>::CallMethod;
-        f.dtor      = (destructor)PyStaticFunctionHelper<T>::FreeObject;
-        f.ctor      = (initproc)PyStaticFunctionHelper<T>::InitObject;
-        f.alloc      = PyStaticFunctionHelper<T>::AllocObject;
+        f.ArgsCount = FUNCTION::NumberOfArguments;
+        f.TypeSize  = sizeof(PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>);
+        f.Native    = (PyCFunction)PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::CallMethod;
+        f.dtor      = (destructor)PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::FreeObject;
+        f.ctor      = (initproc)PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::InitObject;
+        f.alloc      = PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::AllocObject;
 
         this->RegisteredFunctions.Add(f);
 
@@ -462,6 +569,27 @@ public:
         return module;
     }
 
+    static PyObject* GetModuleAttr(const String& ModuleName, const String& AttrName)
+    {
+        PyObject *module, *name, *attr;
+
+        module = Import(ModuleName);
+        if (module == nullptr)
+            return nullptr;
+
+        attr = nullptr;
+        name = PyUnicode_FromUnicode(AttrName, AttrName.GetCount());
+        if (name != nullptr)
+        {
+            attr = PyObject_GetAttr(module, name);
+        }
+
+        PyRelease(name);
+        PyRelease(module);
+
+        return attr;
+    }
+
     template<typename RET_TYPE, typename... ARGS>
     NoInline RET_TYPE Invoke(const String& ModuleName, const String& FunctionName, ARGS... args)
     {
@@ -476,9 +604,8 @@ protected:
         template<typename... ARGS>
         ForceInline static RET_TYPE Invoke(MlPython* This, const String& ModuleName, const String& FunctionName, ARGS... args)
         {
-            PyObject* retval = This->InvokeInternal(ModuleName, FunctionName, args...);
+            MlPyObject retval = This->InvokeInternal(ModuleName, FunctionName, args...);
             RET_TYPE ret = PyTypeConverter<PyTypeHelper<RET_TYPE>::VALUE_TYPE>::ToNative(retval);
-            PyRelease(retval);
             return ret;
         }
     };
@@ -489,8 +616,7 @@ protected:
         template<typename... ARGS>
         ForceInline static VOID Invoke(MlPython* This, const String& ModuleName, const String& FunctionName, ARGS... args)
         {
-            PyObject* retval = This->InvokeInternal(ModuleName, FunctionName, args...);
-            PyRelease(retval);
+            MlPyObject retval = This->InvokeInternal(ModuleName, FunctionName, args...);
         }
     };
 
@@ -498,55 +624,34 @@ protected:
     NoInline PyObject* InvokeInternal(const String& ModuleName, const String& FunctionName, ARGS... args)
     {
         PYSTATUS status;
-        PyObject* tuple;
-        PyObject* module;
-        PyObject* func;
-        PyObject* name;
-        PyObject* value;
+        MlPyObject module, tuple, func, value;
         PyCodeObject* code;
-
-        status = STATUS_UNSUCCESSFUL;
-
-        tuple   = nullptr;
-        module  = nullptr;
-        func    = nullptr;
-        name    = nullptr;
-        value   = nullptr;
-
-        SCOPE_EXIT
-        {
-            PyRelease(tuple);
-            PyRelease(module);
-            PyRelease(func);
-            PyRelease(name);
-            PyRelease(value);
-        }
-        SCOPE_EXIT_END;
 
         module = Import(ModuleName);
         if (module == nullptr)
-            return value;
+        {
+            this->SetPyException(String::Format(L"No module named '%s'", ModuleName), PyExc_ImportError);
+            return nullptr;
+        }
 
-        name = PyUnicode_FromUnicode(FunctionName, FunctionName.GetCount());
-        if (name == nullptr)
-            return value;
-
-        func = PyObject_GetAttr(module, name);
+        func = PyObject_GetAttr(module, MlPyObject(PyUnicode_FromUnicode(FunctionName, FunctionName.GetCount())));
         if (func == nullptr)
-            return value;
+        {
+            this->SetPyException(String::Format(L"'%s' object has no attribute '%s'", ModuleName, FunctionName), PyExc_AttributeError);
+            return nullptr;
+        }
 
-        code = (PyCodeObject *)PyFunction_GET_CODE(func);
+        code = (PyCodeObject *)PyFunction_GET_CODE((PyObject *)func);
         if (code->co_argcount != sizeof...(ARGS))
-        {   
-            PyErr_SetString(
-                PyExc_TypeError,
+        {
+            this->SetPyException(
                 String::Format(
-                    L"function takes %d argument%s, but %d given",
+                    L"'%s' takes %d argument%s, but %d given",
+                    FunctionName,
                     code->co_argcount,
                     code->co_argcount > 1 ? L"s" : L"",
                     sizeof...(ARGS)
                 )
-                .Encode(CP_UTF8)
             );
 
             return nullptr;
@@ -554,16 +659,26 @@ protected:
 
         tuple = PyTuple_New(sizeof...(ARGS));
         if (tuple == nullptr)
-            return value;
+        {
+            this->SetPyException("Create Tuple failed", PyExc_MemoryError);
+            return nullptr;
+        }
 
         status = BuildPyArgs(tuple, 0, args...);
         if (PY_FAILED(status))
-            return value;
+        {
+            this->SetPyException("Build python args failed", PyExc_MemoryError);
+            return nullptr;
+        }
 
         value = PyObject_CallObject(func, tuple);
         if (PyErr_Occurred())
         {
-            PyErr_Clear();
+            CapturePyException();
+        }
+        else
+        {
+            this->PyException.Clear();
         }
 
         if (value != nullptr)
@@ -597,13 +712,7 @@ protected:
             auto &name = func.Name.Encode(CP_UTF8);
             auto &type = (func.Name + WRAP_CLASS_SUFFIX).Encode(CP_UTF8);
 
-            BOOL Success;
-            PyObject *args, *obj, *method;
-
-            args    = nullptr;
-            obj     = nullptr;
-            method  = nullptr;
-            Success = FALSE;
+            BOOL Success = FALSE;
 
             PyMethodDef localmethods[] =
             {
@@ -662,6 +771,8 @@ protected:
 
             LOOP_ONCE
             {
+                MlPyObject args, obj, method;
+
                 if (methods == nullptr || methoswrapclass == nullptr)
                     break;
 
@@ -689,10 +800,6 @@ protected:
 
                 Success = TRUE;
             }
-
-            PyRelease(args);
-            PyRelease(method);
-            PyRelease(obj);
 
             if (Success == FALSE)
             {
