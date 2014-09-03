@@ -153,26 +153,54 @@ void test_void_void0()
     PrintConsole(L"%S\n", __FUNCTION__);
 }
 
-void test_void_uptr1(ULONG_PTR a)
+void FASTCALL test_void_uptr1(ULONG_PTR a)
 {
     PrintConsole(L"%S: %Iu\n", __FUNCTION__, a);
 }
 
-void test_void_uptr2(ULONG_PTR a, ULONG_PTR b)
+void CDECL test_void_uptr2(ULONG_PTR a, ULONG_PTR b)
 {
     PrintConsole(L"%S: %Iu, %Iu\n", __FUNCTION__, a, b);
 }
 
-ULONG test_ulong_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
+ULONG NTAPI test_ulong_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
 {
     return PrintConsole(L"%S: %Iu, %Iu, %Iu\n", __FUNCTION__, a, b, c);
 }
+
+struct test_class
+{
+    static long static_func()
+    {
+        return 0;
+    }
+
+    long class_method()
+    {
+        return 1;
+    }
+};
+
+template<typename T>
+struct helper1;
+
+template<typename CLASS, typename R, typename... ARGS>
+struct helper1<R(CLASS::*)(ARGS...)>
+{
+    template<typename T>
+    helper1(const T&)
+    {
+        ;
+    }
+};
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
 #if 1
+
+    using namespace ml;
 
     ml::MlInitialize();
     MlPython py;
@@ -181,7 +209,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     argc = 123;
 
-    py.Register(
+    py.Register(test_void_void0, L"test_void_void0")
+      .Register(
         [&](ULONG_PTR a)
         {
             argc = a;
@@ -189,29 +218,17 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         },
         L"test_void_uptr1"
     )
+    .Register(test_void_uptr2, L"test_void_uptr2")
+    .Register(test_ulong_uptr3, L"test_void_uptr3")
+    .Register(&test_class::static_func, L"test_fuck")
     .InitModule(L"mlpy");
 
-    // py.Register(test_void_uptr1, L"test_void_uptr1")
-    //   .Register(test_void_uptr2, L"test_void_uptr2")
-    //   .Register(test_ulong_uptr3, L"test_void_uptr3")
-    //   .InitModule(L"mlpy");
+    py.SetGlobalVariable(L"mlpy", L"fuck_global_var", a);
+    py.GetGlobalVariable(L"mlpy", L"fuck_global_var", a);
 
-    // py.SetGlobalVariable(L"mlpy", L"fuck_global_var", a);
-    // py.GetGlobalVariable(L"mlpy", L"fuck_global_var", a);
-
-    //py.RunString(
-    //    "print(__name__)\r\n"
-    //    "import mlpy\r\n"
-    //    "print(mlpy.fuck_global_var)\r\n"
-    //    "print('ret = %s' % mlpy.test_void_void0())\r\n"
-    //    "print('ret = %s' % mlpy.test_void_uptr1(123))\r\n"
-    //    "print('ret = %s' % mlpy.test_void_uptr2(456, 789))\r\n"
-    //    "print('ret = %s' % mlpy.test_void_uptr3(987, 654, 3210))\r\n"
-    //    "def fuck():\r\n"
-    //    "    print('fuck py')\r\n"
-    //);
-
-    py.Invoke<VOID>(L"fuck", L"main");
+    auto ret = py.Invoke<ULONG>(L"fuck", L"main");
+ 
+    PrintConsole(L"ret = %u argc = %u\n", ret, argc);
 
     if (py.GetPyException().ErrorOccurred())
         PrintConsole(L"%s\n", py.GetPyException().Message);

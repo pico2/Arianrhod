@@ -190,47 +190,52 @@ struct PyCallFuncObjectHelper<0>
 template<typename T>
 struct PyFunctionTraits
 {
-    static const ULONG_PTR NumberOfArguments = ml::Function<T>::NumberOfArguments;
-    typedef typename ml::Function<T>::RET_TYPE RET_TYPE;
+    typedef ml::Function<T> FUNCTION_OBJECT;
 
-    template<typename R, typename... ARGS>
-    static PyObject* CallRoutine(R(*func)(ARGS...), PyObject * args)
+    static const ULONG_PTR NumberOfArguments = FUNCTION_OBJECT::NumberOfArguments;
+
+    typedef typename FUNCTION_OBJECT::RET_TYPE          RET_TYPE;
+    typedef typename FUNCTION_OBJECT::FUNCTION_TYPE     FUNCTION_TYPE;
+};
+
+struct MlPyObjectBase : public PyObjectBase
+{
+    PyMethodDef*    Methods;
+    PyTypeObject*   SelfType;
+
+    MlPyObjectBase()
     {
-        return PyTypeConverter<R>::FromNative(CallStaticRoutineImpl(func, args));
+        this->Methods = nullptr;
+        this->SelfType = nullptr;
     }
 
-    template<typename... ARGS>
-    static PyObject* CallRoutine(VOID(*func)(ARGS...), PyObject * args)
+    ~MlPyObjectBase()
     {
-        CallStaticRoutineImpl(func, args);
-        Py_RETURN_NONE;
-    }
-
-    template<typename R, typename... ARGS>
-    static R CallStaticRoutineImpl(R(*func)(ARGS...), PyObject *args)
-    {
-        return PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<R, TYPE_OF(func), ARGS...>(func, args, 0);
+        SafeDeleteArrayT(this->Methods);
+        SafeDeleteT(this->SelfType);
     }
 };
 
-template<typename FUNC_OBJECT, typename FUNC_TYPE = VOID>
-struct PyStaticFunctionHelper : public PyObjectBase
+template<typename FUNC_OBJECT>
+struct PyStaticFunctionHelper : public MlPyObjectBase
 {
+    typedef typename FUNC_OBJECT::FUNCTION_TYPE FUNC_TYPE;
     typedef ml::String String;
-    typedef PyStaticFunctionHelper<FUNC_OBJECT, FUNC_TYPE> SELF;
+    typedef PyStaticFunctionHelper<FUNC_OBJECT> SELF;
 
     static const ULONG_PTR NumberOfArguments = FUNC_OBJECT::NumberOfArguments;
 
     FUNC_OBJECT* func;
+    String Name;
 
-    PyStaticFunctionHelper()
+    PyStaticFunctionHelper(PCWSTR FunctionName) : Name(FunctionName)
     {
         func = nullptr;
     }
 
     static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
     {
-        new (self) SELF();
+        new (self) SELF(PyUnicode_AsUnicode(PyTuple_GetItem(args, 1)));
         *(FUNC_OBJECT **)&self->func = (FUNC_OBJECT *)(ULONG_PTR)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
         return 0;
     }
@@ -246,7 +251,6 @@ struct PyStaticFunctionHelper : public PyObjectBase
         Py_TYPE(self)->tp_free((PyObject*)self);
     }
 
-
     static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
     {
         return self->CallMethodImpl(args);
@@ -256,13 +260,11 @@ struct PyStaticFunctionHelper : public PyObjectBase
     {
         if (PyTuple_GET_SIZE(args) != NumberOfArguments)
         {
-            PyFrameObject* frame = PyThreadState_Get()->frame;
-
             PyErr_SetString(
                 PyExc_TypeError,
                 String::Format(
                     L"'%s' takes %d argument%s, but %d given",
-                    PyUnicode_AsUnicode(frame->f_code->co_name), NumberOfArguments, NumberOfArguments > 1 ? L"s" : L"", PyTuple_GET_SIZE(args)
+                    this->Name, NumberOfArguments, NumberOfArguments > 1 ? L"s" : L"", PyTuple_GET_SIZE(args)
                 )
                 .Encode(CP_UTF8)
             );
@@ -520,24 +522,35 @@ public:
     {
         PY_STATIC_FUNCTION f;
 
-        typedef ml::Function<T> FUNCTION_INTERNAL;
-        typedef ml::Function<FUNCTION_INTERNAL::FUNCTION_TYPE> FUNCTION;
-        typedef FUNCTION_INTERNAL::FUNCTION_TYPE FUNCTION_TYPE;
+        typedef ml::Function<T>                                     LAMBDA_OR_FUNCTION;
+        typedef ml::Function<LAMBDA_OR_FUNCTION::FUNCTION_TYPE>     FUNCTION;
+        typedef FUNCTION::FUNCTION_TYPE                             FUNCTION_TYPE;
 
         *(FUNCTION **)&f.Address = new FUNCTION(func);
 
         f.Name      = FunctionName;
         f.Doc       = Doc;
         f.ArgsCount = FUNCTION::NumberOfArguments;
-        f.TypeSize  = sizeof(PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>);
-        f.Native    = (PyCFunction)PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::CallMethod;
-        f.dtor      = (destructor)PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::FreeObject;
-        f.ctor      = (initproc)PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::InitObject;
-        f.alloc      = PyStaticFunctionHelper<FUNCTION, FUNCTION_TYPE>::AllocObject;
+        f.TypeSize  = sizeof(PyStaticFunctionHelper<FUNCTION>);
+        f.Native    = (PyCFunction)PyStaticFunctionHelper<FUNCTION>::CallMethod;
+        f.dtor      = (destructor)PyStaticFunctionHelper<FUNCTION>::FreeObject;
+        f.ctor      = (initproc)PyStaticFunctionHelper<FUNCTION>::InitObject;
+        f.alloc      = PyStaticFunctionHelper<FUNCTION>::AllocObject;
 
         this->RegisteredFunctions.Add(f);
 
         return *this;
+    }
+
+    struct REGISTER_CLASS_HELPER
+    {
+        ;
+    };
+
+    template<typename CLASS>
+    REGISTER_CLASS_HELPER& RegisterClass()
+    {
+        ;
     }
 
     NoInline PYSTATUS InitModule(const String& ModuleName/*, const String& Doc = L""*/)
@@ -783,7 +796,7 @@ protected:
                 if (PyModule_AddObject(Module, methoswrapclass->tp_name, (PyObject *)methoswrapclass) != 0)
                     break;
 
-                args = Py_BuildValue("(K)", (ULONG64)func.Address);
+                args = Py_BuildValue("(Ku)", (ULONG64)func.Address, func.Name);
                 if (args == nullptr)
                     break;
 
@@ -797,6 +810,9 @@ protected:
 
                 if (PyObject_SetAttrString(Module, name, method) != 0)
                     break;
+
+                ((MlPyObjectBase *)(PyObject *)obj)->Methods = methods;
+                ((MlPyObjectBase *)(PyObject *)obj)->SelfType = methoswrapclass;
 
                 Success = TRUE;
             }
