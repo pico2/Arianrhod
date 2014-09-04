@@ -32,7 +32,7 @@
 //
 //     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-//               ∑◊Ê±£””         ”¿ŒﬁBUG
+//               ‰ΩõÁ•ñ‰øù‰Ωë         Ê∞∏Êó†BUG
 //
 //
 //
@@ -220,8 +220,8 @@ template<typename FUNC_OBJECT>
 struct PyStaticFunctionHelper : public MlPyObjectBase
 {
     typedef typename FUNC_OBJECT::FUNCTION_TYPE FUNC_TYPE;
-    typedef ml::String String;
     typedef PyStaticFunctionHelper<FUNC_OBJECT> SELF;
+    typedef ml::String String;
 
     static const ULONG_PTR NumberOfArguments = FUNC_OBJECT::NumberOfArguments;
 
@@ -229,6 +229,85 @@ struct PyStaticFunctionHelper : public MlPyObjectBase
     String Name;
 
     PyStaticFunctionHelper(PCWSTR FunctionName) : Name(FunctionName)
+    {
+        func = nullptr;
+    }
+
+    static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
+    {
+        new (self) SELF(PyUnicode_AsUnicode(PyTuple_GetItem(args, 1)));
+        *(FUNC_OBJECT **)&self->func = (FUNC_OBJECT *)(ULONG_PTR)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
+        return 0;
+    }
+
+    static PyObject* PYCALL AllocObject(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+    {
+        return type->tp_alloc(type, 0);
+    }
+
+    static VOID PYCALL FreeObject(SELF *self)
+    {
+        self->~SELF();
+        Py_TYPE(self)->tp_free((PyObject*)self);
+    }
+
+    static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
+    {
+        return self->CallMethodImpl(args);
+    }
+
+    ForceInline PyObject* CallMethodImpl(PyObject *args)
+    {
+        if (PyTuple_GET_SIZE(args) != NumberOfArguments)
+        {
+            PyErr_SetString(
+                PyExc_TypeError,
+                String::Format(
+                    L"'%s' takes %d argument%s, but %d given",
+                    this->Name, NumberOfArguments, NumberOfArguments > 1 ? L"s" : L"", PyTuple_GET_SIZE(args)
+                )
+                .Encode(CP_UTF8)
+            );
+
+            return nullptr;
+        }
+
+        return CallRoutine<FUNC_OBJECT::RET_TYPE>(args);
+    }
+
+    template<typename RET_TYPE>
+    PyObject* CallRoutine(PyObject* args)
+    {
+        FUNC_TYPE *f = nullptr;
+        return PyTypeConverter<RET_TYPE>::FromNative(CallStaticRoutineImpl<RET_TYPE>(args, f));
+    }
+
+    template<>
+    PyObject* CallRoutine<VOID>(PyObject * args)
+    {
+        FUNC_TYPE *f = nullptr;
+        CallStaticRoutineImpl<VOID>(args, f);
+        Py_RETURN_NONE;
+    }
+
+    template<typename R, typename... ARGS>
+    R CallStaticRoutineImpl(PyObject *args, R(*)(ARGS...))
+    {
+        return PyCallFuncObjectHelper<NumberOfArguments>::CallFuncObject<R, TYPE_OF(this->func), ARGS...>(this->func, args, 0);
+    }
+};
+
+
+template<typename BASE_CLASS>
+struct PyClassMethodHelper : public MlPyObjectBase, public BASE_CLASS
+{
+    typedef PyClassMethodHelper<BASE_CLASS> SELF;
+    typedef ml::String String;
+
+    FUNC_OBJECT* func;
+    String Name;
+
+    PyClassMethodHelper(PCWSTR FunctionName) : Name(FunctionName)
     {
         func = nullptr;
     }
@@ -296,7 +375,6 @@ struct PyStaticFunctionHelper : public MlPyObjectBase
         return PyCallFuncObjectHelper<NumberOfArguments>::CallFuncObject<R, TYPE_OF(this->func), ARGS...>(this->func, args, 0);
     }
 };
-
 
 //////////////////////////////////////////////////////////////////////////
 // mlpy
@@ -385,24 +463,8 @@ protected:
         String      Doc;
     };
 
-    struct REGISTER_CLASS_HELPER
-    {
-        ULONG_PTR   ArgsCount;
-        ULONG_PTR   TypeSize;
-        PyCFunction Native;
-        initproc    ctor;
-        destructor  dtor;
-        newfunc     alloc;
-        PVOID       CtorAddress;
-        String      Name;
-        String      Doc;
-
-        GrowableArray<PY_STATIC_FUNCTION> ClassMethods;
-    };
-
     MlPythonException PyException;
     GrowableArray<PY_STATIC_FUNCTION> RegisteredFunctions;
-    GrowableArray<REGISTER_CLASS_HELPER> RegisteredClasses;
 
 public:
     MlPython()
@@ -540,7 +602,6 @@ public:
 
         typedef ml::Function<T>                                     LAMBDA_OR_FUNCTION;
         typedef ml::Function<LAMBDA_OR_FUNCTION::FUNCTION_TYPE>     FUNCTION;
-        typedef FUNCTION::FUNCTION_TYPE                             FUNCTION_TYPE;
 
         *(FUNCTION **)&f.Address = new FUNCTION(func);
 
@@ -558,17 +619,58 @@ public:
         return *this;
     }
 
+    struct REGISTER_CLASS_HELPER
+    {
+        ULONG_PTR   ArgsCount;
+        ULONG_PTR   TypeSize;
+        PyCFunction Native;
+        initproc    ctor;
+        destructor  dtor;
+        newfunc     alloc;
+        PVOID       CtorAddress;
+        String      Name;
+        String      Doc;
+
+        MlPython*   thiz;
+
+        GrowableArray<PY_STATIC_FUNCTION> ClassMethods;
+
+        REGISTER_CLASS_HELPER(MlPython* py = nullptr) : thiz(py)
+        {
+        }
+
+        template<typename CLASS, typename R, typename... ARGS>
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod(R (CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        {
+            auto Invoker = [=](PyObject *self, PyObject *args) -> PyObject*
+            {
+                (((CLASS *)self)->*method)();
+                return 0;
+            };
+
+            return *this;
+        }
+
+        template<typename... ARGS>
+        ForceInline PYSTATUS AddToModule(ARGS... args)
+        {
+            return thiz->AddToModule(args...);
+        }
+    };
+
+    GrowableArray<REGISTER_CLASS_HELPER> RegisteredClasses;
+
     template<typename CLASS, typename CTOR>
     REGISTER_CLASS_HELPER& RegisterClass(const String& ClassName, const String& ClassDoc = L"")
     {
-        this->RegisteredClasses.Add(REGISTER_CLASS_HELPER());
+        this->RegisteredClasses.Add(REGISTER_CLASS_HELPER(this));
 
         REGISTER_CLASS_HELPER& cls = this->RegisteredClasses.GetLast();
 
         return cls;
     }
 
-    NoInline PYSTATUS InitModule(const String& ModuleName/*, const String& Doc = L""*/)
+    NoInline PYSTATUS AddToModule(const String& ModuleName/*, const String& Doc = L""*/)
     {
         PyObject *Module;
 

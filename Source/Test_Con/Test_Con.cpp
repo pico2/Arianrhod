@@ -181,17 +181,10 @@ struct test_class
     }
 };
 
-template<typename T>
-struct helper1;
-
-template<typename CLASS, typename R, typename... ARGS>
-struct helper1<R(CLASS::*)(ARGS...)>
+template<typename BASE>
+class fuck : public BASE
 {
-    template<typename T>
-    helper1(const T&)
-    {
-        ;
-    }
+    ;
 };
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
@@ -199,6 +192,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     NTSTATUS Status;
 
 #if 1
+
+    fuck<test_class> fuck;
 
     using namespace ml;
 
@@ -218,14 +213,16 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         },
         L"test_void_uptr1"
     )
-    .InitModule(L"mlpy");
+    .AddToModule(L"mlpy");
 
-    py.Register(test_void_uptr2, L"test_void_uptr1").InitModule(L"mlpy");
+    py.Register(test_void_uptr2, L"test_void_uptr1").AddToModule(L"mlpy");
 
-    py.RegisterClass<test_class, VOID()>(L"test_class");
+    py.RegisterClass<test_class, VOID()>(L"test_class")
+      .RegisterMethod(&test_class::class_method, L"class_method")
+      .AddToModule(L"mlpy");
 
     auto ret = py.Invoke<ULONG>(L"fuck", L"main");
- 
+
     PrintConsole(L"ret = %u argc = %u\n", ret, argc);
 
     if (py.GetPyException().ErrorOccurred())
