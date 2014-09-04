@@ -109,6 +109,20 @@ struct PyTypeHelper<const T&>
 template<typename NATIVE_TYPE>
 struct PyTypeConverter;
 
+template<>
+struct PyTypeConverter<PyObject *>
+{
+    static PyObject* FromNative(PyObject *object)
+    {
+        return object;
+    }
+
+    static PyObject* ToNative(PyObject *object)
+    {
+        return object;
+    }
+};
+
 #define PY_INTEGER_CONVERTER_32(type) \
     template<> \
     struct PyTypeConverter<type> \
@@ -216,12 +230,12 @@ struct MlPyObjectBase : public PyObjectBase
     }
 };
 
-template<typename FUNC_OBJECT>
+template<typename FUNC_OBJECT, typename FUNC_OBJ_CALLER = PyCallFuncObjectHelper<FUNC_OBJECT::NumberOfArguments>>
 struct PyStaticFunctionHelper : public MlPyObjectBase
 {
-    typedef typename FUNC_OBJECT::FUNCTION_TYPE FUNC_TYPE;
-    typedef PyStaticFunctionHelper<FUNC_OBJECT> SELF;
-    typedef ml::String String;
+    typedef typename FUNC_OBJECT::FUNCTION_TYPE                     FUNC_TYPE;
+    typedef PyStaticFunctionHelper<FUNC_OBJECT, FUNC_OBJ_CALLER>    SELF;
+    typedef ml::String                                              String;
 
     static const ULONG_PTR NumberOfArguments = FUNC_OBJECT::NumberOfArguments;
 
@@ -293,30 +307,28 @@ struct PyStaticFunctionHelper : public MlPyObjectBase
     template<typename R, typename... ARGS>
     R CallStaticRoutineImpl(PyObject *args, R(*)(ARGS...))
     {
-        return PyCallFuncObjectHelper<NumberOfArguments>::CallFuncObject<R, TYPE_OF(this->func), ARGS...>(this->func, args, 0);
+        return FUNC_OBJ_CALLER::CallFuncObject<R, TYPE_OF(this->func), ARGS...>(this->func, args, 0);
     }
 };
 
 
-template<typename BASE_CLASS>
-struct PyClassMethodHelper : public MlPyObjectBase, public BASE_CLASS
+template<typename BASE_CLASS, typename CTOR>
+struct PyNativeClassHelper : public MlPyObjectBase
 {
-    typedef PyClassMethodHelper<BASE_CLASS> SELF;
+    typedef PyNativeClassHelper<BASE_CLASS, CTOR> SELF;
     typedef ml::String String;
 
-    FUNC_OBJECT* func;
+    BASE_CLASS *object;
     String Name;
 
-    PyClassMethodHelper(PCWSTR FunctionName) : Name(FunctionName)
+    PyNativeClassHelper()
     {
-        func = nullptr;
+        this->object = nullptr;
     }
 
-    static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
+    ~PyNativeClassHelper()
     {
-        new (self) SELF(PyUnicode_AsUnicode(PyTuple_GetItem(args, 1)));
-        *(FUNC_OBJECT **)&self->func = (FUNC_OBJECT *)(ULONG_PTR)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
-        return 0;
+        SafeDeleteT(this->object);
     }
 
     static PyObject* PYCALL AllocObject(PyTypeObject *type, PyObject *args, PyObject *kwargs)
@@ -330,49 +342,26 @@ struct PyClassMethodHelper : public MlPyObjectBase, public BASE_CLASS
         Py_TYPE(self)->tp_free((PyObject*)self);
     }
 
-    static PyObject* PYCALL CallMethod(SELF *self, PyObject *args)
+    static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
     {
-        return self->CallMethodImpl(args);
-    }
+        new (self)SELF();
 
-    ForceInline PyObject* CallMethodImpl(PyObject *args)
-    {
-        if (PyTuple_GET_SIZE(args) != NumberOfArguments)
-        {
-            PyErr_SetString(
-                PyExc_TypeError,
-                String::Format(
-                    L"'%s' takes %d argument%s, but %d given",
-                    this->Name, NumberOfArguments, NumberOfArguments > 1 ? L"s" : L"", PyTuple_GET_SIZE(args)
-                )
-                .Encode(CP_UTF8)
-            );
+        CTOR* ctor = nullptr;
 
-            return nullptr;
-        }
+        self->object = self->InitClassObject(args, ctor);
 
-        return CallRoutine<FUNC_OBJECT::RET_TYPE>(args);
-    }
-
-    template<typename RET_TYPE>
-    PyObject* CallRoutine(PyObject * args)
-    {
-        FUNC_TYPE *f = nullptr;
-        return PyTypeConverter<RET_TYPE>::FromNative(CallStaticRoutineImpl<RET_TYPE>(args, f));
-    }
-
-    template<>
-    PyObject* CallRoutine<VOID>(PyObject * args)
-    {
-        FUNC_TYPE *f = nullptr;
-        CallStaticRoutineImpl<VOID>(args, f);
-        Py_RETURN_NONE;
+        return 0;
     }
 
     template<typename R, typename... ARGS>
-    R CallStaticRoutineImpl(PyObject *args, R(*)(ARGS...))
+    BASE_CLASS* InitClassObject(PyObject *args, R(*ctor)(ARGS...))
     {
-        return PyCallFuncObjectHelper<NumberOfArguments>::CallFuncObject<R, TYPE_OF(this->func), ARGS...>(this->func, args, 0);
+        auto lambda = [](ARGS... args)
+        {
+            return new BASE_CLASS(args...);
+        };
+
+        return PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<BASE_CLASS*, TYPE_OF(&lambda), ARGS...>(&lambda, args, 0);
     }
 };
 
@@ -452,7 +441,6 @@ protected:
 
     struct PY_STATIC_FUNCTION
     {
-        ULONG_PTR   ArgsCount;
         ULONG_PTR   TypeSize;
         PyCFunction Native;
         initproc    ctor;
@@ -607,7 +595,6 @@ public:
 
         f.Name      = FunctionName;
         f.Doc       = Doc;
-        f.ArgsCount = FUNCTION::NumberOfArguments;
         f.TypeSize  = sizeof(PyStaticFunctionHelper<FUNCTION>);
         f.Native    = (PyCFunction)PyStaticFunctionHelper<FUNCTION>::CallMethod;
         f.dtor      = (destructor)PyStaticFunctionHelper<FUNCTION>::FreeObject;
@@ -621,13 +608,10 @@ public:
 
     struct REGISTER_CLASS_HELPER
     {
-        ULONG_PTR   ArgsCount;
         ULONG_PTR   TypeSize;
-        PyCFunction Native;
         initproc    ctor;
         destructor  dtor;
         newfunc     alloc;
-        PVOID       CtorAddress;
         String      Name;
         String      Doc;
 
@@ -639,14 +623,70 @@ public:
         {
         }
 
-        template<typename CLASS, typename R, typename... ARGS>
-        NoInline REGISTER_CLASS_HELPER& RegisterMethod(R (CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        template<typename T>
+        NoInline REGISTER_CLASS_HELPER& RegisterMethodHelper(T func, const String& MethodName, const String& Doc = L"")
         {
+            PY_STATIC_FUNCTION f;
+
+            typedef ml::Function<T>                                     LAMBDA_OR_FUNCTION;
+            typedef ml::Function<LAMBDA_OR_FUNCTION::FUNCTION_TYPE>     FUNCTION;
+
+            *(FUNCTION **)&f.Address = new FUNCTION(func);
+
+            f.Name      = MethodName;
+            f.Doc       = Doc;
+            f.TypeSize  = sizeof(PyStaticFunctionHelper<FUNCTION>);
+            f.Native    = (PyCFunction)PyStaticFunctionHelper<FUNCTION>::CallMethod;
+            f.dtor      = (destructor)PyStaticFunctionHelper<FUNCTION>::FreeObject;
+            f.ctor      = (initproc)PyStaticFunctionHelper<FUNCTION>::InitObject;
+            f.alloc     = PyStaticFunctionHelper<FUNCTION>::AllocObject;
+
+            this->ClassMethods.Add(f);
+
+            return *this;
+        }
+
+        template<typename CLASS, typename R, typename... ARGS>
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod(R(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        {
+            typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
+
             auto Invoker = [=](PyObject *self, PyObject *args) -> PyObject*
             {
-                (((CLASS *)self)->*method)();
-                return 0;
+                auto Invoker2 = [=] (ARGS... args)
+                {
+                    FAKE_CLASS *thiz = (FAKE_CLASS *)self;
+                    return (thiz->object->*method)(args...);
+                };
+
+                return PyTypeConverter<R>::FromNative(
+                            PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<R, TYPE_OF(&Invoker2), ARGS...>(&Invoker2, args, 0)
+                        );
             };
+
+            //this->RegisterMethodHelper(Invoker, MethodName, Doc);
+
+            return *this;
+        }
+
+        template<typename CLASS, typename... ARGS>
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod(VOID (CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        {
+            typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
+
+            auto Invoker = [=](PyObject *self, PyObject *args) -> PyObject*
+            {
+                auto Invoker2 = [=](ARGS... args)
+                {
+                    FAKE_CLASS *thiz = (FAKE_CLASS *)self;
+                    return (thiz->object->*method)(args...);
+                };
+
+                PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<R, TYPE_OF(&Invoker2), ARGS...>(&Invoker2, args, 0);
+                Py_RETURN_NONE;
+            };
+
+            //this->RegisterMethodHelper(Invoker, MethodName, Doc);
 
             return *this;
         }
@@ -666,6 +706,13 @@ public:
         this->RegisteredClasses.Add(REGISTER_CLASS_HELPER(this));
 
         REGISTER_CLASS_HELPER& cls = this->RegisteredClasses.GetLast();
+
+        cls.Name        = ClassName;
+        cls.Doc         = ClassDoc;
+        cls.TypeSize    = sizeof       (PyNativeClassHelper<CLASS, CTOR>);
+        cls.dtor        = (destructor)  PyNativeClassHelper<CLASS, CTOR>::FreeObject;
+        cls.ctor        = (initproc)    PyNativeClassHelper<CLASS, CTOR>::InitObject;
+        cls.alloc       =               PyNativeClassHelper<CLASS, CTOR>::AllocObject;
 
         return cls;
     }

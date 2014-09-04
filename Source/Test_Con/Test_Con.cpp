@@ -170,6 +170,10 @@ ULONG NTAPI test_ulong_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
 
 struct test_class
 {
+    test_class()
+    {
+    }
+
     static long static_func()
     {
         return 0;
@@ -181,19 +185,11 @@ struct test_class
     }
 };
 
-template<typename BASE>
-class fuck : public BASE
-{
-    ;
-};
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
 #if 1
-
-    fuck<test_class> fuck;
 
     using namespace ml;
 
@@ -204,18 +200,18 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     argc = 123;
 
-    py.Register(test_void_void0, L"test_void_void0")
-      .Register(
-        [&](ULONG_PTR a)
-        {
-            argc = a;
-            return PrintConsole(L"%S: %d\n", __FUNCTION__, a);
-        },
-        L"test_void_uptr1"
-    )
-    .AddToModule(L"mlpy");
+    //py.Register(test_void_void0, L"test_void_void0")
+    //  .Register(
+    //    [&](ULONG_PTR a)
+    //    {
+    //        argc = a;
+    //        return PrintConsole(L"%S: %d\n", __FUNCTION__, a);
+    //    },
+    //    L"test_void_uptr1"
+    //)
+    //.AddToModule(L"mlpy");
 
-    py.Register(test_void_uptr2, L"test_void_uptr1").AddToModule(L"mlpy");
+    //py.Register(test_void_uptr2, L"test_void_uptr1").AddToModule(L"mlpy");
 
     py.RegisterClass<test_class, VOID()>(L"test_class")
       .RegisterMethod(&test_class::class_method, L"class_method")
