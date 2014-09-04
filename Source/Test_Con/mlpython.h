@@ -385,8 +385,24 @@ protected:
         String      Doc;
     };
 
+    struct REGISTER_CLASS_HELPER
+    {
+        ULONG_PTR   ArgsCount;
+        ULONG_PTR   TypeSize;
+        PyCFunction Native;
+        initproc    ctor;
+        destructor  dtor;
+        newfunc     alloc;
+        PVOID       CtorAddress;
+        String      Name;
+        String      Doc;
+
+        GrowableArray<PY_STATIC_FUNCTION> ClassMethods;
+    };
+
     MlPythonException PyException;
     GrowableArray<PY_STATIC_FUNCTION> RegisteredFunctions;
+    GrowableArray<REGISTER_CLASS_HELPER> RegisteredClasses;
 
 public:
     MlPython()
@@ -542,24 +558,21 @@ public:
         return *this;
     }
 
-    struct REGISTER_CLASS_HELPER
+    template<typename CLASS, typename CTOR>
+    REGISTER_CLASS_HELPER& RegisterClass(const String& ClassName, const String& ClassDoc = L"")
     {
-        ;
-    };
+        this->RegisteredClasses.Add(REGISTER_CLASS_HELPER());
 
-    template<typename CLASS>
-    REGISTER_CLASS_HELPER& RegisterClass()
-    {
-        ;
+        REGISTER_CLASS_HELPER& cls = this->RegisteredClasses.GetLast();
+
+        return cls;
     }
 
     NoInline PYSTATUS InitModule(const String& ModuleName/*, const String& Doc = L""*/)
     {
-        PyObject* Module;
-        auto& ModuleNameAnsi = ModuleName.Encode(CP_UTF8);
-        //auto& DocAnsi = Doc.Encode(CP_UTF8);
+        PyObject *Module;
 
-        Module = PyImport_AddModule(ModuleNameAnsi);
+        Module = PyImport_AddModuleObject(MlPyObject(PyUnicode_FromUnicode(ModuleName, ModuleName.GetCount())));
         if (Module == nullptr)
             return PYSTATUS_CREATE_MODULE_FAILED;
 

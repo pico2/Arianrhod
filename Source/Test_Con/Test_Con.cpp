@@ -218,13 +218,11 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
         },
         L"test_void_uptr1"
     )
-    .Register(test_void_uptr2, L"test_void_uptr2")
-    .Register(test_ulong_uptr3, L"test_void_uptr3")
-    .Register(&test_class::static_func, L"test_fuck")
     .InitModule(L"mlpy");
 
-    py.SetGlobalVariable(L"mlpy", L"fuck_global_var", a);
-    py.GetGlobalVariable(L"mlpy", L"fuck_global_var", a);
+    py.Register(test_void_uptr2, L"test_void_uptr1").InitModule(L"mlpy");
+
+    py.RegisterClass<test_class, VOID()>(L"test_class");
 
     auto ret = py.Invoke<ULONG>(L"fuck", L"main");
  
