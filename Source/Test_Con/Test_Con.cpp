@@ -179,10 +179,21 @@ struct test_class
         return 0;
     }
 
-    long class_method()
+    long long_void()
     {
         return 1;
     }
+
+    VOID void_void()
+    {
+        return;
+    }
+};
+
+template<typename wchar_t*>
+struct fuck
+{
+    ;
 };
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
@@ -214,7 +225,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     //py.Register(test_void_uptr2, L"test_void_uptr1").AddToModule(L"mlpy");
 
     py.RegisterClass<test_class, VOID()>(L"test_class")
-      .RegisterMethod(&test_class::class_method, L"class_method")
+      .RegisterMethod(&test_class::long_void, L"long_void")
+      .RegisterMethod(&test_class::void_void, L"void_void")
       .AddToModule(L"mlpy");
 
     auto ret = py.Invoke<ULONG>(L"fuck", L"main");

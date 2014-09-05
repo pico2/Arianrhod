@@ -453,6 +453,7 @@ protected:
 
     MlPythonException PyException;
     GrowableArray<PY_STATIC_FUNCTION> RegisteredFunctions;
+    GrowableArray<PyTypeObject> RegisteredTypes;
 
 public:
     MlPython()
@@ -617,7 +618,7 @@ public:
 
         MlPython*   thiz;
 
-        GrowableArray<PY_STATIC_FUNCTION> ClassMethods;
+        GrowableArray<PY_STATIC_FUNCTION> Methods;
 
         REGISTER_CLASS_HELPER(MlPython* py = nullptr) : thiz(py)
         {
@@ -631,23 +632,23 @@ public:
             typedef ml::Function<T>                                     LAMBDA_OR_FUNCTION;
             typedef ml::Function<LAMBDA_OR_FUNCTION::FUNCTION_TYPE>     FUNCTION;
 
-            *(FUNCTION **)&f.Address = new FUNCTION(func);
+            typedef ml::Function<PyObject* (PyObject*, PyObject*)> FUNC;
+
+            *(FUNC **)&f.Address = new FUNC(func);
 
             f.Name      = MethodName;
             f.Doc       = Doc;
-            f.TypeSize  = sizeof(PyStaticFunctionHelper<FUNCTION>);
-            f.Native    = (PyCFunction)PyStaticFunctionHelper<FUNCTION>::CallMethod;
-            f.dtor      = (destructor)PyStaticFunctionHelper<FUNCTION>::FreeObject;
-            f.ctor      = (initproc)PyStaticFunctionHelper<FUNCTION>::InitObject;
-            f.alloc     = PyStaticFunctionHelper<FUNCTION>::AllocObject;
 
-            this->ClassMethods.Add(f);
+            this->Methods.Add(f);
 
             return *this;
         }
 
+#define RegisterMethod(method, name, ...) \
+            RegisterMethod_(method, name, __VA_ARGS__)
+
         template<typename CLASS, typename R, typename... ARGS>
-        NoInline REGISTER_CLASS_HELPER& RegisterMethod(R(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod_(R(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
         {
             typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
 
@@ -664,13 +665,11 @@ public:
                         );
             };
 
-            //this->RegisterMethodHelper(Invoker, MethodName, Doc);
-
-            return *this;
+            return this->RegisterMethodHelper(Invoker, MethodName, Doc);
         }
 
         template<typename CLASS, typename... ARGS>
-        NoInline REGISTER_CLASS_HELPER& RegisterMethod(VOID (CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod_(VOID(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
         {
             typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
 
@@ -682,13 +681,11 @@ public:
                     return (thiz->object->*method)(args...);
                 };
 
-                PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<R, TYPE_OF(&Invoker2), ARGS...>(&Invoker2, args, 0);
+                PyCallFuncObjectHelper<sizeof...(ARGS)>::CallFuncObject<VOID, TYPE_OF(&Invoker2), ARGS...>(&Invoker2, args, 0);
                 Py_RETURN_NONE;
             };
 
-            //this->RegisterMethodHelper(Invoker, MethodName, Doc);
-
-            return *this;
+            return this->RegisterMethodHelper(Invoker, MethodName, Doc);
         }
 
         template<typename... ARGS>
@@ -719,15 +716,20 @@ public:
 
     NoInline PYSTATUS AddToModule(const String& ModuleName/*, const String& Doc = L""*/)
     {
-        PyObject *Module;
+        PYSTATUS    status;
+        PyObject*   Module;
 
         Module = PyImport_AddModuleObject(MlPyObject(PyUnicode_FromUnicode(ModuleName, ModuleName.GetCount())));
         if (Module == nullptr)
             return PYSTATUS_CREATE_MODULE_FAILED;
 
-        FAIL_RETURN(this->InitFunctions(Module, ModuleName));
+        status = this->InitFunctions(Module, ModuleName);
+        status = PY_SUCCESS(status) ? this->InitClass(Module, ModuleName) : status;
 
-        return STATUS_SUCCESS;
+        this->RegisteredFunctions.RemoveAll();
+        this->RegisteredClasses.RemoveAll();
+
+        return status;
     }
 
     static PyObject* Import(const String& ModuleName)
@@ -891,7 +893,7 @@ protected:
 
             PyMethodDef localmethods[] =
             {
-                PY_ADD_METHOD(name, func.Native, METH_VARARGS | METH_KEYWORDS),
+                PY_ADD_METHOD(name, func.Native, METH_VARARGS),
                 PY_ADD_METHOD_END
             };
 
@@ -987,6 +989,94 @@ protected:
         }
 
         this->RegisteredFunctions.RemoveAll();
+
+        return STATUS_SUCCESS;
+    }
+
+    PYSTATUS InitClass(PyObject* Module, const String& ModuleName)
+    {
+        for (auto &cls : this->RegisteredClasses)
+        {
+            auto &name = cls.Name.Encode(CP_UTF8);
+
+            BOOL Success = FALSE;
+
+            PyTypeObject classtype =
+            {
+                PyVarObject_HEAD_INIT(&PyType_Type, 0)
+                name,                                               /* tp_name */
+                cls.TypeSize,                                       /* tp_size */
+                0,                                                  /* tp_itemsize */
+                cls.dtor,                                           /* tp_dealloc */
+                nullptr,                                            /* tp_print */
+                nullptr,                                            /* tp_getattr */
+                nullptr,                                            /* tp_setattr */
+                nullptr,                                            /* tp_reserved */
+                nullptr,                                            /* tp_repr */
+                nullptr,                                            /* tp_as_number */
+                nullptr,                                            /* tp_as_sequence */
+                nullptr,                                            /* tp_as_mapping */
+                nullptr,                                            /* tp_hash*/
+                nullptr,                                            /* tp_call*/
+                nullptr,                                            /* tp_str */
+                PyObject_GenericGetAttr,                            /* tp_getattro */
+                nullptr,                                            /* tp_setattro */
+                nullptr,                                            /* tp_as_buffer */
+                Py_TPFLAGS_DEFAULT,                                 /* tp_flags */
+                "",                                                 /* tp_doc */
+                nullptr,                                            /* tp_traverse */
+                nullptr,                                            /* tp_clear */
+                nullptr,                                            /* tp_richcompare */
+                0,                                                  /* tp_weaklistoffset */
+                nullptr,                                            /* tp_iter */
+                nullptr,                                            /* tp_iternext */
+                nullptr,                                            /* tp_methods */
+                nullptr,                                            /* tp_members */
+                nullptr,                                            /* tp_getset */
+                &PyBaseObject_Type,                                 /* tp_base */
+                nullptr,                                            /* tp_dict */
+                nullptr,                                            /* tp_descr_get */
+                nullptr,                                            /* tp_descr_set */
+                0,                                                  /* tp_dictoffset */
+                cls.ctor,                                           /* tp_init */
+                nullptr,                                            /* tp_alloc */
+                cls.alloc,                                          /* tp_new */
+                nullptr,                                            /* tp_free */
+            };
+
+            this->RegisteredTypes.Add(classtype);
+
+            auto type = this->RegisteredTypes.GetLast();
+
+            PyAddRef((PyObject *)&type);
+            if (PyType_Ready(&type) != 0)
+                continue;
+
+            PyObject *dict = type.tp_dict;
+
+            Success = TRUE;
+
+            for (auto &method : cls.Methods)
+            {
+                PyMethodDef meth = PY_ADD_METHOD(method.Name.Encode(CP_UTF8), method.Address, METH_VARARGS);
+                MlPyObject descr = PyDescr_NewMethod(&type, &meth);
+                if (descr == nullptr)
+                {
+                    Success = FALSE;
+                    break;
+                }
+
+                PyDict_SetItem(dict, MlPyObject(PyUnicode_FromUnicode(method.Name, method.Name.GetCount())), descr);
+            }
+
+            if (Success == FALSE)
+                continue;
+
+            if (PyModule_AddObject(Module, name, (PyObject *)&type) != 0)
+                ;
+        }
+
+        this->RegisteredClasses.RemoveAll();
 
         return STATUS_SUCCESS;
     }
