@@ -831,7 +831,7 @@ public:
             this->Properties.Add(CLASS_PROPERTY_HELPER());
 
             auto &last = this->Properties.GetLast();
-            
+
             last.Name = PropertyName;
             last.Doc = Doc;
             last.get = getter;
@@ -935,7 +935,7 @@ protected:
         template<typename... ARGS>
         ForceInline static RET_TYPE Invoke(MlPython* This, const String& ModuleName, const String& FunctionName, ARGS... args)
         {
-            MlPyObject retval = This->InvokeInternal(ModuleName, FunctionName, args...);
+            MlPyObject retval = This->InvokeModuleMethod(ModuleName, FunctionName, args...);
             RET_TYPE ret = PyTypeConverter<PyTypeHelper<RET_TYPE>::VALUE_TYPE>::ToNative(retval);
             return ret;
         }
@@ -947,14 +947,13 @@ protected:
         template<typename... ARGS>
         ForceInline static VOID Invoke(MlPython* This, const String& ModuleName, const String& FunctionName, ARGS... args)
         {
-            MlPyObject retval = This->InvokeInternal(ModuleName, FunctionName, args...);
+            MlPyObject retval = This->InvokeModuleMethod(ModuleName, FunctionName, args...);
         }
     };
 
     template<typename... ARGS>
-    NoInline PyObject* InvokeInternal(const String& ModuleName, const String& FunctionName, ARGS... args)
+    NoInline PyObject* InvokeModuleMethod(const String& ModuleName, const String& FunctionName, ARGS... args)
     {
-        PYSTATUS status;
         MlPyObject module, tuple, func, value;
         PyCodeObject* code;
 
@@ -965,20 +964,33 @@ protected:
             return nullptr;
         }
 
-        func = PyObject_GetAttr(module, MlPyObject(PyUnicode_FromUnicode(FunctionName, FunctionName.GetCount())));
+        func = PyObject_GetAttr(module, MlPyObject(FunctionName));
         if (func == nullptr)
         {
             this->SetPyException(String::Format(L"'%s' object has no attribute '%s'", ModuleName, FunctionName), PyExc_AttributeError);
             return nullptr;
         }
 
-        code = (PyCodeObject *)PyFunction_GET_CODE((PyObject *)func);
-        if (code->co_argcount != sizeof...(ARGS))
+        return InvokeInternal(func, FunctionName, args...);
+    }
+
+    template<typename... ARGS>
+    NoInline PyObject* InvokeInternal(PyObject *f, const String& FunctionName, ARGS... args)
+    {
+        PYSTATUS status;
+        MlPyObject tuple, value;
+        PyCodeObject* code;
+        PyFunctionObject* func;
+        
+        func = (PyFunctionObject *)f;
+        code = (PyCodeObject *)PyFunction_GET_CODE(func);
+
+        if (FLAG_OFF(code->co_flags, CO_VARARGS | CO_VARKEYWORDS) && code->co_argcount != sizeof...(ARGS))
         {
             this->SetPyException(
                 String::Format(
                     L"'%s' takes %d argument%s, but %d given",
-                    FunctionName,
+                    PyUnicode_AsUnicode(func->func_name),
                     code->co_argcount,
                     code->co_argcount > 1 ? L"s" : L"",
                     sizeof...(ARGS)
@@ -1002,7 +1014,7 @@ protected:
             return nullptr;
         }
 
-        value = PyObject_CallObject(func, tuple);
+        value = PyObject_CallObject(f, tuple);
         if (PyErr_Occurred())
         {
             CapturePyException();
