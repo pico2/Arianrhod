@@ -170,8 +170,12 @@ ULONG NTAPI test_ulong_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
 
 struct test_class
 {
-    test_class()
+    int dummy;
+    int member;
+
+    test_class(int m)
     {
+        member = m;
     }
 
     static long static_func()
@@ -179,14 +183,19 @@ struct test_class
         return 0;
     }
 
+    void set_member(int m)
+    {
+        member = m;
+    }
+
     long long_void()
     {
-        return 1;
+        return PrintConsole(L"%S, %u\n", __FUNCTION__, this->member);
     }
 
     VOID void_void()
     {
-        return;
+        PrintConsole(L"%S, %u\n", __FUNCTION__, this->member);
     }
 };
 
@@ -211,22 +220,26 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     argc = 123;
 
-    //py.Register(test_void_void0, L"test_void_void0")
-    //  .Register(
-    //    [&](ULONG_PTR a)
-    //    {
-    //        argc = a;
-    //        return PrintConsole(L"%S: %d\n", __FUNCTION__, a);
-    //    },
-    //    L"test_void_uptr1"
-    //)
-    //.AddToModule(L"mlpy");
+    py.Register(test_void_void0, L"test_void_void0")
+      .Register(
+        [&](ULONG_PTR a)
+        {
+            argc = a;
+            return PrintConsole(L"%S: %d\n", __FUNCTION__, a);
+        },
+        L"test_void_uptr1"
+    )
+    .AddToModule(L"mlpy");
 
-    //py.Register(test_void_uptr2, L"test_void_uptr1").AddToModule(L"mlpy");
+    py.Register(test_void_uptr2, L"test_void_uptr2")
+      .Register(test_ulong_uptr3, L"test_void_uptr3")
+      .AddToModule(L"mlpy");
 
-    py.RegisterClass<test_class, VOID()>(L"test_class")
+    py.RegisterClass<test_class, VOID(int)>(L"test_class")
+      .RegisterMethod(&test_class::set_member, L"set_member")
       .RegisterMethod(&test_class::long_void, L"long_void")
       .RegisterMethod(&test_class::void_void, L"void_void")
+      .RegisterProperty(&test_class::member, L"member")
       .AddToModule(L"mlpy");
 
     auto ret = py.Invoke<ULONG>(L"fuck", L"main");

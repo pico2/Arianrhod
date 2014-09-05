@@ -57,6 +57,8 @@ typedef LONG PYSTATUS;
 
 typedef enum
 {
+    PYSTATUS_SUCCESS = 0,
+
     PyStatusFirst = DEFINE_NTSTATUS(STATUS_SEVERITY_ERROR, 0x100),
 
     PYSTATUS_CREATE_MODULE_FAILED,
@@ -65,6 +67,7 @@ typedef enum
     PYSTATUS_CREATE_OBJECT_FAILED,
     PYSTATUS_GET_ATTR_FAILED,
     PYSTATUS_SET_ATTR_FAILED,
+    PYSTATUS_NO_MEMORY,
 
     PyStatusLast,
 };
@@ -319,7 +322,6 @@ struct PyNativeClassHelper : public MlPyObjectBase
     typedef ml::String String;
 
     BASE_CLASS *object;
-    String Name;
 
     PyNativeClassHelper()
     {
@@ -350,12 +352,27 @@ struct PyNativeClassHelper : public MlPyObjectBase
 
         self->object = self->InitClassObject(args, ctor);
 
-        return 0;
+        return self->object == nullptr ? -1 : 0;
     }
 
     template<typename R, typename... ARGS>
     BASE_CLASS* InitClassObject(PyObject *args, R(*ctor)(ARGS...))
     {
+        static const ULONG_PTR NumberOfArguments = sizeof...(ARGS);
+        if (PyTuple_GET_SIZE(args) != NumberOfArguments)
+        {
+            PyErr_SetString(
+                PyExc_TypeError,
+                String::Format(
+                    L"'%S' takes %d argument%s, but %d given",
+                    Py_TYPE(this)->tp_name, NumberOfArguments, NumberOfArguments > 1 ? L"s" : L"", PyTuple_GET_SIZE(args)
+                )
+                .Encode(CP_UTF8)
+            );
+
+            return nullptr;
+        }
+
         auto lambda = [](ARGS... args)
         {
             return new BASE_CLASS(args...);
@@ -405,6 +422,11 @@ public:
         this->object = object;
     }
 
+    MlPyObject(const ml::String& str)
+    {
+        this->object = PyUnicode_FromUnicode(str, str.GetCount());
+    }
+
     NoInline ~MlPyObject()
     {
         PyRelease(object);
@@ -431,6 +453,92 @@ public:
     }
 };
 
+struct MlPyTypeObject : public PyTypeObject
+{
+    MlPyTypeObject()
+    {
+        this->tp_name = nullptr;
+    }
+
+    MlPyTypeObject(PyTypeObject *that)
+    {
+        CopyStruct((PyTypeObject *)this, that, sizeof(*that));
+        this->tp_name = nullptr;
+    }
+
+    ~MlPyTypeObject()
+    {
+        SafeDeleteT(this->tp_name);
+    }
+};
+
+struct MlPyMethodDef : public PyMethodDef
+{
+    MlPyMethodDef()
+    {
+        this->ml_name = nullptr;
+    }
+
+    MlPyMethodDef(PyMethodDef *that)
+    {
+        CopyStruct((PyMethodDef *)this, that, sizeof(*that));
+        this->ml_name = nullptr;
+    }
+
+    ~MlPyMethodDef()
+    {
+        SafeDeleteT(this->ml_name);
+    }
+};
+
+struct MlPyGetSetDef : public PyGetSetDef
+{
+    MlPyGetSetDef()
+    {
+        this->name = nullptr;
+        this->doc = nullptr;
+    }
+
+    MlPyGetSetDef(PyGetSetDef *that)
+    {
+        CopyStruct((PyGetSetDef *)this, that, sizeof(*that));
+        this->name = nullptr;
+        this->doc = nullptr;
+    }
+
+    ~MlPyGetSetDef()
+    {
+        SafeDeleteT(this->name);
+        SafeDeleteT(this->doc);
+    }
+};
+
+struct MlWrapperBase : public wrapperbase
+{
+    PyCFunction method;
+
+    MlWrapperBase()
+    {
+        this->name = nullptr;
+        this->doc = nullptr;
+        this->method = nullptr;
+    }
+
+    MlWrapperBase(wrapperbase *that)
+    {
+        CopyStruct((PyMethodDef *)this, that, sizeof(*that));
+        this->name = nullptr;
+        this->doc = nullptr;
+        this->method = nullptr;
+    }
+
+    ~MlWrapperBase()
+    {
+        SafeDeleteT(this->name);
+        SafeDeleteT(this->doc);
+    }
+};
+
 class MlPython
 {
 protected:
@@ -451,9 +559,11 @@ protected:
         String      Doc;
     };
 
-    MlPythonException PyException;
-    GrowableArray<PY_STATIC_FUNCTION> RegisteredFunctions;
-    GrowableArray<PyTypeObject> RegisteredTypes;
+    MlPythonException                   PyException;
+    GrowableArray<PY_STATIC_FUNCTION>   RegisteredFunctions;
+    GrowableArray<MlPyTypeObject>       RegisteredTypeObjects;
+    GrowableArray<MlWrapperBase>        RegisteredWrappers;
+    GrowableArray<MlPyGetSetDef>        RegisteredGetSets;
 
 public:
     MlPython()
@@ -527,13 +637,13 @@ public:
     PYSTATUS RunString(PCSTR code)
     {
         PyRun_SimpleString(code);
-        return STATUS_SUCCESS;
+        return PYSTATUS_SUCCESS;
     }
 
     PYSTATUS RunString(const String& code)
     {
         PyRun_SimpleString(code.Encode(CP_UTF8));
-        return STATUS_SUCCESS;
+        return PYSTATUS_SUCCESS;
     }
 
     template<typename T>
@@ -547,7 +657,7 @@ public:
 
         Output = PyTypeConverter<PyTypeHelper<T>::VALUE_TYPE>::ToNative(value);
 
-        return STATUS_SUCCESS;
+        return PYSTATUS_SUCCESS;
     }
 
     template<typename T>
@@ -578,7 +688,7 @@ public:
                 break;
             }
 
-            status = PyObject_SetAttr(module, name, value) == 0 ? STATUS_SUCCESS : PYSTATUS_SET_ATTR_FAILED;
+            status = PyObject_SetAttr(module, name, value) == 0 ? PYSTATUS_SUCCESS : PYSTATUS_SET_ATTR_FAILED;
         }
 
         return status;
@@ -609,6 +719,15 @@ public:
 
     struct REGISTER_CLASS_HELPER
     {
+        struct CLASS_PROPERTY_HELPER
+        {
+            getter      get;
+            setter      set;
+            ULONG_PTR   offset;
+            String      Name;
+            String      Doc;
+        };
+
         ULONG_PTR   TypeSize;
         initproc    ctor;
         destructor  dtor;
@@ -619,6 +738,7 @@ public:
         MlPython*   thiz;
 
         GrowableArray<PY_STATIC_FUNCTION> Methods;
+        GrowableArray<CLASS_PROPERTY_HELPER> Properties;
 
         REGISTER_CLASS_HELPER(MlPython* py = nullptr) : thiz(py)
         {
@@ -629,10 +749,7 @@ public:
         {
             PY_STATIC_FUNCTION f;
 
-            typedef ml::Function<T>                                     LAMBDA_OR_FUNCTION;
-            typedef ml::Function<LAMBDA_OR_FUNCTION::FUNCTION_TYPE>     FUNCTION;
-
-            typedef ml::Function<PyObject* (PyObject*, PyObject*)> FUNC;
+            typedef ml::Function<PyCFunction> FUNC;
 
             *(FUNC **)&f.Address = new FUNC(func);
 
@@ -644,11 +761,8 @@ public:
             return *this;
         }
 
-#define RegisterMethod(method, name, ...) \
-            RegisterMethod_(method, name, __VA_ARGS__)
-
         template<typename CLASS, typename R, typename... ARGS>
-        NoInline REGISTER_CLASS_HELPER& RegisterMethod_(R(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod(R(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
         {
             typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
 
@@ -669,7 +783,7 @@ public:
         }
 
         template<typename CLASS, typename... ARGS>
-        NoInline REGISTER_CLASS_HELPER& RegisterMethod_(VOID(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
+        NoInline REGISTER_CLASS_HELPER& RegisterMethod(VOID(CLASS::*method)(ARGS...), const String& MethodName, const String& Doc = L"")
         {
             typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
 
@@ -686,6 +800,46 @@ public:
             };
 
             return this->RegisterMethodHelper(Invoker, MethodName, Doc);
+        }
+
+        template<typename CLASS, typename R>
+        NoInline REGISTER_CLASS_HELPER& RegisterProperty(R CLASS::*member, const String& PropertyName, const String& Doc = L"", BOOL ReadOnly = FALSE)
+        {
+            typedef PyNativeClassHelper<CLASS, VOID()> FAKE_CLASS;
+
+            auto getter = [](PyObject *self, PVOID Closure) -> PyObject*
+            {
+                R CLASS::*member;
+                FAKE_CLASS *thiz = (FAKE_CLASS *)self;
+
+                *(PVOID *)&member = Closure;
+
+                return PyTypeConverter<R>::FromNative(thiz->object->*member);
+            };
+
+            auto setter = [](PyObject *self, PyObject *value, PVOID Closure) -> int
+            {
+                R CLASS::*member;
+                FAKE_CLASS *thiz = (FAKE_CLASS *)self;
+
+                *(PVOID *)&member = Closure;
+                thiz->object->*member = PyTypeConverter<R>::ToNative(value);
+
+                return 0;
+            };
+
+            this->Properties.Add(CLASS_PROPERTY_HELPER());
+
+            auto &last = this->Properties.GetLast();
+            
+            last.Name = PropertyName;
+            last.Doc = Doc;
+            last.get = getter;
+            last.set = setter;
+
+            *(TYPE_OF(&member))&last.offset = member;
+
+            return *this;
         }
 
         template<typename... ARGS>
@@ -866,7 +1020,7 @@ protected:
 
     ForceInline PYSTATUS BuildPyArgs(PyObject *tuple, Py_ssize_t Index)
     {
-        return STATUS_SUCCESS;
+        return PYSTATUS_SUCCESS;
     }
 
     template<typename T, typename... REST>
@@ -882,132 +1036,19 @@ protected:
         return BuildPyArgs(tuple, Index + 1, rest...);
     }
 
-    PYSTATUS InitFunctions(PyObject* Module, const String& ModuleName)
+    NoInline PYSTATUS InitFunctions(PyObject* Module, const String& ModuleName)
     {
         for (auto &func : this->RegisteredFunctions)
         {
-            auto &name = func.Name.Encode(CP_UTF8);
-            auto &type = (func.Name + WRAP_CLASS_SUFFIX).Encode(CP_UTF8);
-
             BOOL Success = FALSE;
 
-            PyMethodDef localmethods[] =
-            {
-                PY_ADD_METHOD(name, func.Native, METH_VARARGS),
-                PY_ADD_METHOD_END
-            };
-
-            PyMethodDef *methods = new PyMethodDef[countof(localmethods)];
-            if (methods != nullptr)
-            {
-                CopyStruct(methods, localmethods, sizeof(localmethods));
-            }
-
-            PyTypeObject *methoswrapclass = new PyTypeObject
+            PyTypeObject wraptype =
             {
                 PyVarObject_HEAD_INIT(&PyType_Type, 0)
-                type,                                               /* tp_name */
+                nullptr,                                            /* tp_name */
                 func.TypeSize,                                      /* tp_size */
                 0,                                                  /* tp_itemsize */
                 func.dtor,                                          /* tp_dealloc */
-                nullptr,                                            /* tp_print */
-                nullptr,                                            /* tp_getattr */
-                nullptr,                                            /* tp_setattr */
-                nullptr,                                            /* tp_reserved */
-                nullptr,                                            /* tp_repr */
-                nullptr,                                            /* tp_as_number */
-                nullptr,                                            /* tp_as_sequence */
-                nullptr,                                            /* tp_as_mapping */
-                nullptr,                                            /* tp_hash*/
-                nullptr,                                            /* tp_call*/
-                nullptr,                                            /* tp_str */
-                PyObject_GenericGetAttr,                            /* tp_getattro */
-                nullptr,                                            /* tp_setattro */
-                nullptr,                                            /* tp_as_buffer */
-                Py_TPFLAGS_DEFAULT,                                 /* tp_flags */
-                "",                                                 /* tp_doc */
-                nullptr,                                            /* tp_traverse */
-                nullptr,                                            /* tp_clear */
-                nullptr,                                            /* tp_richcompare */
-                0,                                                  /* tp_weaklistoffset */
-                nullptr,                                            /* tp_iter */
-                nullptr,                                            /* tp_iternext */
-                methods,                                            /* tp_methods */
-                nullptr,                                            /* tp_members */
-                nullptr,                                            /* tp_getset */
-                &PyBaseObject_Type,                                 /* tp_base */
-                nullptr,                                            /* tp_dict */
-                nullptr,                                            /* tp_descr_get */
-                nullptr,                                            /* tp_descr_set */
-                0,                                                  /* tp_dictoffset */
-                func.ctor,                                          /* tp_init */
-                nullptr,                                            /* tp_alloc */
-                func.alloc,                                         /* tp_new */
-                nullptr,                                            /* tp_free */
-            };
-
-            LOOP_ONCE
-            {
-                MlPyObject args, obj, method;
-
-                if (methods == nullptr || methoswrapclass == nullptr)
-                    break;
-
-                if (PyType_Ready(methoswrapclass) != 0)
-                    break;
-
-                PyAddRef((PyObject *)methoswrapclass);
-                if (PyModule_AddObject(Module, methoswrapclass->tp_name, (PyObject *)methoswrapclass) != 0)
-                    break;
-
-                args = Py_BuildValue("(Ku)", (ULONG64)func.Address, func.Name);
-                if (args == nullptr)
-                    break;
-
-                obj = PyObject_CallObject((PyObject *)methoswrapclass, args);
-                if (obj == nullptr)
-                    break;
-
-                method = PyObject_GetAttrString(obj, name);
-                if (method == nullptr)
-                    break;
-
-                if (PyObject_SetAttrString(Module, name, method) != 0)
-                    break;
-
-                ((MlPyObjectBase *)(PyObject *)obj)->Methods = methods;
-                ((MlPyObjectBase *)(PyObject *)obj)->SelfType = methoswrapclass;
-
-                Success = TRUE;
-            }
-
-            if (Success == FALSE)
-            {
-                delete[] methods;
-                delete methoswrapclass;
-            }
-        }
-
-        this->RegisteredFunctions.RemoveAll();
-
-        return STATUS_SUCCESS;
-    }
-
-    PYSTATUS InitClass(PyObject* Module, const String& ModuleName)
-    {
-        for (auto &cls : this->RegisteredClasses)
-        {
-            auto &name = cls.Name.Encode(CP_UTF8);
-
-            BOOL Success = FALSE;
-
-            PyTypeObject classtype =
-            {
-                PyVarObject_HEAD_INIT(&PyType_Type, 0)
-                name,                                               /* tp_name */
-                cls.TypeSize,                                       /* tp_size */
-                0,                                                  /* tp_itemsize */
-                cls.dtor,                                           /* tp_dealloc */
                 nullptr,                                            /* tp_print */
                 nullptr,                                            /* tp_getattr */
                 nullptr,                                            /* tp_setattr */
@@ -1038,15 +1079,109 @@ protected:
                 nullptr,                                            /* tp_descr_get */
                 nullptr,                                            /* tp_descr_set */
                 0,                                                  /* tp_dictoffset */
+                func.ctor,                                          /* tp_init */
+                nullptr,                                            /* tp_alloc */
+                func.alloc,                                         /* tp_new */
+                nullptr,                                            /* tp_free */
+            };
+
+            auto& type = this->AddType(&wraptype, func.Name + WRAP_CLASS_SUFFIX);
+
+            LOOP_ONCE
+            {
+                MlPyObject args, obj, method;
+
+                if (PyType_Ready(&type) != 0)
+                    break;
+
+                PyMethodDef methoddef = PY_ADD_METHOD(nullptr, func.Native, METH_VARARGS);
+
+                PyAddRef((PyObject *)&type);
+
+                AddMethod(&type, &methoddef, func.Name, func.Doc);
+                //MlPyObject wrapper = CreateWrapper(Py_TYPE(Module), &methoddef, func.Name, func.Doc);
+                //PyObject_SetAttr(Module, MlPyObject(func.Name), wrapper);
+                //break;
+
+                //if (PyModule_AddObject(Module, type.tp_name, (PyObject *)&type) != 0)
+                //    break;
+
+                args = Py_BuildValue("(Ku)", (ULONG64)func.Address, func.Name);
+                if (args == nullptr)
+                    break;
+
+                obj = PyObject_CallObject((PyObject *)&type, args);
+                if (obj == nullptr)
+                    break;
+
+                MlPyObject name = PyUnicode_FromUnicode(func.Name, func.Name.GetCount());
+
+                method = PyObject_GetAttr(obj, name);
+                if (method == nullptr)
+                    break;
+
+                if (PyObject_SetAttr(Module, name, method) != 0)
+                    break;
+
+                Success = TRUE;
+            }
+        }
+
+        this->RegisteredFunctions.RemoveAll();
+
+        return PYSTATUS_SUCCESS;
+    }
+
+    NoInline PYSTATUS InitClass(PyObject* Module, const String& ModuleName)
+    {
+        for (auto &cls : this->RegisteredClasses)
+        {
+            BOOL Success = FALSE;
+
+            PyTypeObject classtype =
+            {
+                PyVarObject_HEAD_INIT(&PyType_Type, 0)
+                nullptr,                                            /* tp_name */
+                cls.TypeSize,                                       /* tp_size */
+                0,                                                  /* tp_itemsize */
+                cls.dtor,                                           /* tp_dealloc */
+                nullptr,                                            /* tp_print */
+                nullptr,                                            /* tp_getattr */
+                nullptr,                                            /* tp_setattr */
+                nullptr,                                            /* tp_reserved */
+                nullptr,                                            /* tp_repr */
+                nullptr,                                            /* tp_as_number */
+                nullptr,                                            /* tp_as_sequence */
+                nullptr,                                            /* tp_as_mapping */
+                nullptr,                                            /* tp_hash*/
+                nullptr,                                            /* tp_call*/
+                nullptr,                                            /* tp_str */
+                PyObject_GenericGetAttr,                            /* tp_getattro */
+                nullptr,                                            /* tp_setattro */
+                nullptr,                                            /* tp_as_buffer */
+                Py_TPFLAGS_DEFAULT,                                 /* tp_flags */
+                nullptr,                                            /* tp_doc */
+                nullptr,                                            /* tp_traverse */
+                nullptr,                                            /* tp_clear */
+                nullptr,                                            /* tp_richcompare */
+                0,                                                  /* tp_weaklistoffset */
+                nullptr,                                            /* tp_iter */
+                nullptr,                                            /* tp_iternext */
+                nullptr,                                            /* tp_methods */
+                nullptr,                                            /* tp_members */
+                nullptr,                                            /* tp_getset */
+                &PyBaseObject_Type,                                 /* tp_base */
+                nullptr,                                            /* tp_dict */
+                nullptr,                                            /* tp_descr_get */
+                nullptr,                                            /* tp_descr_set */
+                0,                                                  /* tp_dictoffset */
                 cls.ctor,                                           /* tp_init */
                 nullptr,                                            /* tp_alloc */
                 cls.alloc,                                          /* tp_new */
                 nullptr,                                            /* tp_free */
             };
 
-            this->RegisteredTypes.Add(classtype);
-
-            auto type = this->RegisteredTypes.GetLast();
+            auto& type = this->AddType(&classtype, cls.Name, cls.Doc);
 
             PyAddRef((PyObject *)&type);
             if (PyType_Ready(&type) != 0)
@@ -1058,27 +1193,132 @@ protected:
 
             for (auto &method : cls.Methods)
             {
-                PyMethodDef meth = PY_ADD_METHOD(method.Name.Encode(CP_UTF8), method.Address, METH_VARARGS);
-                MlPyObject descr = PyDescr_NewMethod(&type, &meth);
-                if (descr == nullptr)
+                auto caller = [](PyObject *self, PyObject *args, PVOID wrapped) -> PyObject*
                 {
-                    Success = FALSE;
-                    break;
-                }
+                    typedef ml::Function<PyCFunction> FUNC;
+                    return (*(FUNC *)((MlWrapperBase *)wrapped)->method)(self, args);
+                };
 
-                PyDict_SetItem(dict, MlPyObject(PyUnicode_FromUnicode(method.Name, method.Name.GetCount())), descr);
+                PyMethodDef meth = PY_ADD_METHOD(nullptr, method.Address, METH_VARARGS);
+                AddMethod(&type, &meth, method.Name, method.Doc, caller);
+            }
+
+            for (auto &prop : cls.Properties)
+            {
+                PyGetSetDef getset = { nullptr, prop.get, prop.set, nullptr, (PVOID)prop.offset };
+                AddGetSet(&type, &getset, prop.Name, prop.Doc);
             }
 
             if (Success == FALSE)
                 continue;
 
-            if (PyModule_AddObject(Module, name, (PyObject *)&type) != 0)
-                ;
+            if (PyModule_AddObject(Module, cls.Name.Encode(CP_UTF8), (PyObject *)&type) != 0)
+                break;
         }
 
         this->RegisteredClasses.RemoveAll();
 
-        return STATUS_SUCCESS;
+        return PYSTATUS_SUCCESS;
+    }
+
+    NoInline MlPyTypeObject& AddType(PyTypeObject *Type, const String& TypeName, const String& TypeDoc = L"")
+    {
+        this->RegisteredTypeObjects.Add(Type);
+
+        auto &last = this->RegisteredTypeObjects.GetLast();
+
+        StringToAnsi(*(PSTR*)&last.tp_name, TypeName);
+        StringToAnsi(*(PSTR*)&last.tp_doc, TypeDoc);
+
+        return last;
+    }
+
+    NoInline PYSTATUS AddMethod(PyTypeObject *Type, PyMethodDef *Method, const String& MethodName, const String& Doc, wrapperfunc WrapperCaller = nullptr)
+    {
+        MlPyObject wrapper = CreateWrapper(Type, Method->ml_meth, MethodName, Doc, WrapperCaller);
+
+        if (wrapper == nullptr)
+            return PYSTATUS_CREATE_OBJECT_FAILED;
+
+        PyDict_SetItem(Type->tp_dict, MlPyObject(MethodName), wrapper);
+
+        return PYSTATUS_SUCCESS;
+    }
+
+    NoInline PYSTATUS AddGetSet(PyTypeObject *Type, PyGetSetDef *GetSet, const String& PropertyName, const String& Doc)
+    {
+        MlPyObject name = PropertyName;
+
+        if (PyDict_GetItem(Type->tp_dict, name))
+            return PYSTATUS_SUCCESS;
+
+        this->RegisteredGetSets.Add(GetSet);
+
+        auto& gsp = this->RegisteredGetSets.GetLast();
+
+        StringToAnsi(gsp.name, PropertyName);
+        StringToAnsi(gsp.doc, Doc);
+
+        MlPyObject descr = PyDescr_NewGetSet(Type, &gsp);
+
+        PyDict_SetItem(Type->tp_dict, MlPyObject(PropertyName), descr);
+
+        return PYSTATUS_SUCCESS;
+    }
+
+    PyObject* CreateWrapper(PyTypeObject *Type, PyCFunction Method, const String& MethodName, const String& Doc, wrapperfunc WrapperCaller = nullptr)
+    {
+        auto caller = [](PyObject *self, PyObject *args, PVOID wrapped) -> PyObject*
+        {
+            return ((MlWrapperBase *)wrapped)->method(self, args);
+        };
+
+        wrapperbase wrapper =
+        {
+            nullptr,
+            0,
+            nullptr,
+            WrapperCaller == nullptr ? caller : WrapperCaller,
+            nullptr,
+            0,
+            nullptr,
+        };
+
+        this->RegisteredWrappers.Add(&wrapper);
+
+        auto &last = this->RegisteredWrappers.GetLast();
+        last.method = Method;
+
+        StringToAnsi(last.name, MethodName);
+        StringToAnsi(last.doc, Doc);
+
+        return PyDescr_NewWrapper(Type, &last, &last);
+    }
+
+    NoInline static VOID StringToAnsi(PSTR &ansi, const String& str)
+    {
+        if (!str)
+        {
+            ansi = "";
+            return;
+        }
+
+        auto &doc = str.Encode(CP_UTF8);
+
+        ansi = new CHAR[doc.GetSize()];
+        if (ansi != nullptr)
+        {
+            CopyMemory(ansi, doc.GetData(), doc.GetSize());
+        }
+        else
+        {
+            ansi = "ansi out of memory";
+        }
+    }
+
+    NoInline static VOID DestroyAnsi(PSTR &ansi)
+    {
+        SafeDeleteT(ansi);
     }
 
     PYSTATUS InitializePackage()
@@ -1152,7 +1392,7 @@ protected:
 
         RtlSetEnvironmentVariable(nullptr, &USTR(L"Path"), PathEnv);
 
-        return STATUS_SUCCESS;
+        return PYSTATUS_SUCCESS;
     }
 };
 

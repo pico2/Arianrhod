@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-typedef PyObject *(*getter)(PyObject *, void *);
+typedef PyObject *(__cdecl *getter)(PyObject *, void *);
 typedef int (__cdecl *setter)(PyObject *, PyObject *, void *);
 
 typedef struct PyGetSetDef {
@@ -17,10 +17,10 @@ typedef struct PyGetSetDef {
 } PyGetSetDef;
 
 #ifndef Py_LIMITED_API
-typedef PyObject *(*wrapperfunc)(PyObject *self, PyObject *args,
+typedef PyObject *(__cdecl *wrapperfunc)(PyObject *self, PyObject *args,
                                  void *wrapped);
 
-typedef PyObject *(*wrapperfunc_kwds)(PyObject *self, PyObject *args,
+typedef PyObject *(__cdecl *wrapperfunc_kwds)(PyObject *self, PyObject *args,
                                       void *wrapped, PyObject *kwds);
 
 struct wrapperbase {
