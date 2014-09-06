@@ -117,11 +117,13 @@ struct PyTypeConverter<PyObject *>
 {
     static PyObject* FromNative(PyObject *object)
     {
+        PyAddRef(object);
         return object;
     }
 
     static PyObject* ToNative(PyObject *object)
     {
+        PyAddRef(object);
         return object;
     }
 };
@@ -927,6 +929,13 @@ public:
         return PyInvokePyHelper<RET_TYPE>::Invoke(this, ModuleName, FunctionName, args...);
     }
 
+    template<typename RET_TYPE, typename... ARGS>
+    NoInline RET_TYPE Invoke(PyObject *object, ARGS... args)
+    {
+        MlPyObject retval = InvokeInternal(object, L"", args...);
+        return PyTypeConverter<PyTypeHelper<RET_TYPE>::VALUE_TYPE>::ToNative(retval);
+    }
+
 protected:
 
     template<typename RET_TYPE>
@@ -975,22 +984,41 @@ protected:
     }
 
     template<typename... ARGS>
-    NoInline PyObject* InvokeInternal(PyObject *f, const String& FunctionName, ARGS... args)
+    NoInline PyObject* InvokeInternal(PyObject *callable, const String& FunctionName, ARGS... args)
     {
-        PYSTATUS status;
-        MlPyObject tuple, value;
-        PyCodeObject* code;
-        PyFunctionObject* func;
-        
-        func = (PyFunctionObject *)f;
-        code = (PyCodeObject *)PyFunction_GET_CODE(func);
+        BOOL                InvalidNumberOfArguments;
+        PYSTATUS            status;
+        MlPyObject          tuple, value;
+        PyCodeObject*       code;
 
-        if (FLAG_OFF(code->co_flags, CO_VARARGS | CO_VARKEYWORDS) && code->co_argcount != sizeof...(ARGS))
+        if (PyCallable_Check(callable) == FALSE)
+        {
+            this->SetPyException(String::Format(L"'%S' object is not callable", Py_TYPE(callable)->tp_name));
+            return nullptr;
+        }
+
+        code = nullptr;
+        InvalidNumberOfArguments = FALSE;
+        if (PyFunction_Check(callable))
+        {
+            code = (PyCodeObject *)PyFunction_GET_CODE(callable);
+        }
+        else if (PyMethod_Check(callable))
+        {
+            code = (PyCodeObject *)PyFunction_GET_CODE(PyMethod_GET_FUNCTION(callable));
+        }
+
+        if (code != nullptr)
+        {
+            InvalidNumberOfArguments = FLAG_OFF(code->co_flags, CO_VARARGS | CO_VARKEYWORDS) && code->co_argcount != sizeof...(ARGS);
+        }
+
+        if (InvalidNumberOfArguments)
         {
             this->SetPyException(
                 String::Format(
-                    L"'%s' takes %d argument%s, but %d given",
-                    PyUnicode_AsUnicode(func->func_name),
+                    L"'%S' takes %d argument%s, but %d given",
+                    PyEval_GetFuncName(callable),
                     code->co_argcount,
                     code->co_argcount > 1 ? L"s" : L"",
                     sizeof...(ARGS)
@@ -1014,7 +1042,7 @@ protected:
             return nullptr;
         }
 
-        value = PyObject_CallObject(f, tuple);
+        value = PyObject_CallObject(callable, tuple);
         if (PyErr_Occurred())
         {
             CapturePyException();

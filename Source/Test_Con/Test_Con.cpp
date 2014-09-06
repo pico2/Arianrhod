@@ -242,6 +242,10 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
       .RegisterProperty(&test_class::member, L"member")
       .AddToModule(L"mlpy");
 
+    MlPyObject func = py.Invoke<PyObject *>(L"fuck", L"getfunc");
+
+    PrintConsole(L"%u\n", py.Invoke<ULONG>(func));
+
     auto ret = py.Invoke<ULONG>(L"fuck", L"main", 1, 2, 3, 4, 5);
 
     PrintConsole(L"ret = %u argc = %u\n", ret, argc);
