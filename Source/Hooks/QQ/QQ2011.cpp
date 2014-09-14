@@ -4,12 +4,15 @@
 #pragma comment(linker, "/EXPORT:Netbios=_QqNetbios@4")
 #pragma comment(linker, "/EXPORT:NetApiBufferFree=_QqNetApiBufferFree@4")
 #pragma comment(linker, "/EXPORT:NetWkstaTransportEnum=_QqNetWkstaTransportEnum@28")
+#pragma comment(linker, "/EXPORT:NetWkstaUserGetInfo=_QqNetWkstaUserGetInfo@12")
 
 #include "QQ2011.h"
 #include "MyLibrary.cpp"
 #include <Psapi.h>
 #include <Lm.h>
 #include "QQMethod.h"
+
+ML_OVERLOAD_NEW
 
 
 /*++
@@ -41,6 +44,7 @@ API_POINTER(NtQueryAttributesFile)      StubNtQueryAttributesFile;
 API_POINTER(Netbios)                    StubNetbios;
 API_POINTER(NetApiBufferFree)           StubNetApiBufferFree;
 API_POINTER(NetWkstaTransportEnum)      StubNetWkstaTransportEnum;
+API_POINTER(NetWkstaUserGetInfo)        StubNetWkstaUserGetInfo;
 
 
 HRESULT
@@ -96,6 +100,7 @@ BOOL InitializeNetapi32()
     *(PVOID *)&StubNetbios                  = GetRoutineAddress(module, "Netbios");
     *(PVOID *)&StubNetApiBufferFree         = GetRoutineAddress(module, "NetApiBufferFree");
     *(PVOID *)&StubNetWkstaTransportEnum    = GetRoutineAddress(module, "NetWkstaTransportEnum");
+    *(PVOID *)&StubNetWkstaUserGetInfo      = GetRoutineAddress(module, "NetWkstaUserGetInfo");
 
     Self = FindLdrModuleByHandle(&__ImageBase);
     Netapi32 = FindLdrModuleByHandle(module);
@@ -141,6 +146,13 @@ EXTC UCHAR NTAPI QqNetbios(PNCB pcnb)
     InitializeNetapi32();
     return StubNetbios(pcnb);
 }
+
+EXTC NET_API_STATUS NET_API_FUNCTION QqNetWkstaUserGetInfo(LMSTR reserved, DWORD level, LPBYTE *bufptr)
+{
+    InitializeNetapi32();
+    return StubNetWkstaUserGetInfo(reserved, level, bufptr);
+}
+
 
 BOOL InitializeUin()
 {
@@ -542,6 +554,7 @@ QqSetWindowPos(
         GroupWindow,
         DiscussWindow,
         MessageBox,
+        Qq64,
     };
 
     auto GetWindowType = [] (HWND hWnd, INT cx, INT cy)
@@ -597,11 +610,55 @@ QqSetWindowPos(
 
     ULONG WindowType = GetWindowType(hWnd, cx, cy);
 
+    static HWND LastChatFrame;
+
+    if (WindowType == UnknownWindow)
+    {
+        if (Flags == 0x15 &&
+            cx == -1 &&
+            cy == -1 &&
+            X != -1 &&
+            Y != -1 &&
+            hWndInsertAfter == HWND_TOP
+           )
+        {
+            LastChatFrame = hWnd;
+        }
+        else if (Flags == 0x214 &&
+                 hWndInsertAfter == HWND_TOP &&
+                 X != -1 &&
+                 Y != -1 &&
+                 cx != -1 &&
+                 cy != -1
+                )
+        {
+            if (LastChatFrame != nullptr && LastChatFrame == hWnd)
+            {
+                WindowType = Qq64;
+            }
+        }
+        else if (Flags == 0x214 &&
+                 hWndInsertAfter == HWND_TOP &&
+                 X == -1 &&
+                 Y == -1 &&
+                 cx != -1 &&
+                 cy != -1
+                )
+        {
+            LastChatFrame = hWnd;
+        }
+
+        if (hWnd != LastChatFrame)
+            LastChatFrame = nullptr;
+    }
+
     if (WindowType != UnknownWindow)
     {
         RECT WorkArea;
 
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &WorkArea, 0);
+
+        int width, height;
 
         switch (WindowType)
         {
@@ -622,10 +679,15 @@ QqSetWindowPos(
                 break;
         }
 
-        X = ((WorkArea.right - WorkArea.left) - cx) / 2;
-        Y = ((WorkArea.bottom - WorkArea.top) - cy) / 2;
+        width = cx;
+        height = cy;
 
-        CLEAR_FLAG(Flags, SWP_NOSIZE | SWP_NOMOVE);
+        X = ((WorkArea.right - WorkArea.left) - width) / 2;
+        Y = ((WorkArea.bottom - WorkArea.top) - height) / 2;
+
+        //X = Y = 0;
+
+        //CLEAR_FLAG(Flags, SWP_NOSIZE | SWP_NOMOVE);
     }
 
     return StubSetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, Flags);
@@ -840,6 +902,7 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
             }
 
             case GUID_GroupObject:
+                break;
                 return GroupObject_QueryInterface(Object, Guid, Output);
         }
 
