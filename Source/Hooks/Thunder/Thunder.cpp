@@ -13,12 +13,25 @@ ML_OVERLOAD_NEW
 
 #define SELF_THUNK_MAGIC    TAG4('TDAP')
 
-TYPE_OF(NtDeviceIoControlFile)* StubNtDeviceIoControlFile;
+struct lua_State;
+
+typedef struct
+{
+    PCSTR name;
+    PVOID func;
+    ULONG permission;
+
+} XLLRTGlobalAPI, *PXLLRTGlobalAPI;
+
+API_POINTER(NtDeviceIoControlFile)  StubNtDeviceIoControlFile;
+int (CDECL *StubCreateAccelerateTaskMap)(lua_State *L);
+
+PCSTR (CDECL *luaL_checklstring)(lua_State *L, int narg, size_t *l);
 
 static union
 {
-    TYPE_OF(SetTimer)*              StubSetTimer;
-    TYPE_OF(SetCoalescableTimer)*   StubSetCoalescableTimer;
+    API_POINTER(SetTimer)               StubSetTimer;
+    API_POINTER(SetCoalescableTimer)    StubSetCoalescableTimer;
 };
 
 #pragma pack(push, 1)
@@ -150,6 +163,73 @@ TdSetTimer(
     return StubSetTimer(hWnd, IDEvent, Elapse, TimerFunction);
 }
 
+int CDECL CreateAccelerateTaskMap(lua_State *L)
+{
+    size_t Length;
+    PCSTR UserData;
+    PSTR Result;
+
+    UserData = luaL_checklstring(L, 5, &Length);
+
+    LOOP_ONCE
+    {
+        if (UserData == nullptr || Length == 0)
+            break;
+
+        // {"CommitGcid":"","Message":"stupid","Result":0,"SubId":10}
+
+        if (strstr(UserData, "CommitGcid") == nullptr)
+            break;
+
+        if (strstr(UserData, "Message") == nullptr)
+            break;
+
+        if (strstr(UserData, "SubId") == nullptr)
+            break;
+
+        Result = strstr(UserData, "\"Result\":");
+        if (Result == nullptr)
+            break;
+
+        CopyMemory(Result, "\"Result\":0,", 11);
+        Result += 11;
+
+        while (*Result != '"' && *Result != '}')
+        {
+            *Result++ = ' ';
+        }
+    }
+
+    return StubCreateAccelerateTaskMap(L);
+}
+
+PXLLRTGlobalAPI LookupLRTApiEntry(PLDR_MODULE Module, PCSTR ApiName)
+{
+    PVOID name;
+
+    name = SearchStringReference(Module, (PVOID)ApiName, StrLengthA(ApiName) + 1);
+
+    return name == nullptr ? nullptr : FIELD_BASE(name, XLLRTGlobalAPI, name);
+}
+
+PVOID LookupCreateAccelerateTaskMap()
+{
+    PLDR_MODULE     DownloadKernel;
+    PXLLRTGlobalAPI Entry;
+
+    static CHAR FunctionName[] = "CreateAccelerateTaskMap";
+
+    DownloadKernel = FindLdrModuleByName(&USTR(L"DownloadKernel.dll"));
+    if (DownloadKernel == nullptr)
+        return IMAGE_INVALID_VA;
+
+    Entry = LookupLRTApiEntry(DownloadKernel, "CreateAccelerateTaskMap");
+    if (Entry == nullptr)
+        return IMAGE_INVALID_VA;
+
+    return Entry->func;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     Exiting = TRUE;
@@ -158,6 +238,8 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    using namespace Mp;
+
     ml::MlInitialize();
 
     PLDR_MODULE ExeModule;
@@ -170,13 +252,13 @@ BOOL Initialize(PVOID BaseAddress)
     {
         PLDR_MODULE User32 = FindLdrModuleByName(&WCS2US(L"USER32.dll"));
 
-        MEMORY_FUNCTION_PATCH f[] =
+        PATCH_MEMORY_DATA f[] =
         {
-            EAT_HOOK_JUMP_HASH(User32->DllBase, USER32_SetTimer, TdSetTimer, StubSetTimer),
-            INLINE_HOOK_JUMP(NtDeviceIoControlFile, TdDeviceIoControlFile, StubNtDeviceIoControlFile),
+            FunctionJumpVa(LookupExportTable(User32->DllBase, USER32_SetTimer), TdSetTimer, &StubSetTimer),
+            FunctionJumpVa(NtDeviceIoControlFile, TdDeviceIoControlFile, &StubNtDeviceIoControlFile),
         };
 
-        Nt_PatchMemory(NULL, 0, f, countof(f));
+        PatchMemory(f, countof(f));
 
         Ps::CreateThread(
             (PTHREAD_START_ROUTINE)([](PVOID) -> ULONG
@@ -229,16 +311,21 @@ BOOL Initialize(PVOID BaseAddress)
     }
     else if (RtlEqualUnicodeString(&ExeModule->BaseDllName, &WCS2US(L"Thunder.exe"), TRUE))
     {
+        PVOID luart;
         PLDR_MODULE User32;
 
         User32 = FindLdrModuleByName(&WCS2US(L"USER32.dll"));
 
-        MEMORY_FUNCTION_PATCH f[] =
+        PATCH_MEMORY_DATA f[] =
         {
-            EAT_HOOK_JUMP_HASH(User32->DllBase, USER32_SetTimer, TdSetTimer, StubSetTimer),
+            FunctionJumpVa(LookupCreateAccelerateTaskMap(), CreateAccelerateTaskMap, &StubCreateAccelerateTaskMap),
+            FunctionJumpVa(LookupExportTable(User32->DllBase, USER32_SetTimer), TdSetTimer, &StubSetTimer),
         };
 
-        Nt_PatchMemory(NULL, 0, f, countof(f));
+        PatchMemory(f, countof(f));
+
+        luart = LoadDll(L"XLLuaRuntime.dll");
+        *(PVOID *)&luaL_checklstring = GetRoutineAddress(luart, "luaL_checklstring");
     }
 
     return TRUE;
