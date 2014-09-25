@@ -847,7 +847,7 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
         { 0x76063A86, 0xD553, 0x44A6, 0xAF, 0x7A, 0x12, 0xAE, 0x87, 0x21, 0x1A, 0xA7 }, // GUID_GroupMgr
         { 0xC8730021, 0xE7DE, 0x4F65, 0x98, 0x8C, 0x7D, 0x69, 0x4C, 0x38, 0x83, 0x6E }, // GUID_DllHashCheckMgr
         { 0x3A990F4E, 0x95BC, 0x4F00, 0xAE, 0x52, 0xFD, 0xD9, 0xFB, 0xFF, 0x30, 0x3E }, // GUID_ReloginMgr
-        { 0xD302C850, 0x939F, 0x4575, 0x85, 0xBE, 0xE0, 0x45, 0x11, 0x42, 0x1A, 0x75 }, // GUID_GroupObject
+        //{ 0xD302C850, 0x939F, 0x4575, 0x85, 0xBE, 0xE0, 0x45, 0x11, 0x42, 0x1A, 0x75 }, // GUID_GroupObject
     };
 
     enum
@@ -901,9 +901,9 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
                 return hr;
             }
 
-            case GUID_GroupObject:
-                break;
-                return GroupObject_QueryInterface(Object, Guid, Output);
+            //case GUID_GroupObject:
+                //continue;
+                //return GroupObject_QueryInterface(Object, Guid, Output);
         }
 
         return E_NOINTERFACE;
@@ -945,18 +945,24 @@ BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
     PLDR_MODULE Module;
 
     static WCHAR PluginPath[] = L"..\\Plugin\\";
+    static WCHAR Disabled[] = L"\\Disabled";
 
     Module = FindLdrModuleByHandle(nullptr);
     Length = (StrLengthW(PluginName) + 1) * sizeof(WCHAR);
     BufferSize = Module->FullDllName.Length + Length + sizeof(PluginPath);
-    Buffer = (PWSTR)AllocStack(BufferSize);
+    Buffer = (PWSTR)AllocStack(BufferSize + sizeof(Disabled));
     CopyMemory(Buffer, Module->FullDllName.Buffer, Module->FullDllName.Length);
 
     Name = findnamew(Buffer);
     CopyMemory(Name, PluginPath, sizeof(PluginPath));
     CopyMemory(Name + CONST_STRLEN(PluginPath), PluginName, Length);
 
-    if (!Io::IsPathExists(Buffer))
+    if (Io::IsPathExists(Buffer) == FALSE)
+        return FALSE;
+
+    CopyMemory(Name + CONST_STRLEN(PluginPath) + Length / 2 - 1, Disabled, sizeof(Disabled));
+
+    if (Io::IsPathExists(Buffer))
         return FALSE;
 
     return StubInitPluginFileSystem(PluginName);
@@ -979,6 +985,7 @@ HRESULT FASTCALL OnSysDataCome(PVOID This, PVOID Dummy, USHORT Type, ULONG Param
     // MessageBoxW(0, buf, 0, 64);
 
     hr = StubOnSysDataCome(This, Dummy, Type, Param1, Packet);
+    return hr;
 
     if (Type == 0x30 && ReloginMgr != nullptr && *(PBYTE)PtrAdd(This, 0x18) == 2)   // cType
     {
@@ -1066,31 +1073,6 @@ VOID FASTCALL GetBanSpeechTimeStamp(PVOID This, PVOID Edx, PULONG* TimeStampData
 /************************************************************************
   init functions
 ************************************************************************/
-
-PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
-{
-    PVOID StringValue, StringReference;
-
-    SEARCH_PATTERN_DATA Str[] =
-    {
-        ADD_PATTERN_(String, SizeInBytes),
-    };
-
-    StringValue = SearchPattern(Str, countof(Str), Module->DllBase, Module->SizeOfImage);
-    if (StringValue == nullptr)
-        return nullptr;
-
-    SEARCH_PATTERN_DATA Stub[] =
-    {
-        ADD_PATTERN(&StringValue),
-    };
-
-    StringReference = SearchPattern(Stub, countof(Stub), PtrAdd(Module->DllBase, BeginOffset), PtrSub(Module->SizeOfImage, BeginOffset));
-    if (StringReference == nullptr)
-        return nullptr;
-
-    return StringReference;
-}
 
 PVOID
 SearchStringAndReverseSearchHeader(
@@ -1388,7 +1370,7 @@ BOOL Initialize2(PVOID BaseAddress)
         Mp::FunctionJumpVa(QQUINSpecified ? NtOpenFile            : IMAGE_INVALID_VA, QqNtOpenFile,               &StubNtOpenFile),
         Mp::FunctionJumpVa(QQUINSpecified ? NtCreateFile          : IMAGE_INVALID_VA, QqNtCreateFile,             &StubNtCreateFile),
         Mp::FunctionJumpVa(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    &StubNtQueryAttributesFile),
-        Mp::FunctionJumpVa(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,&StubNtQueryInformationProcess),
+        //Mp::FunctionJumpVa(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,&StubNtQueryInformationProcess),
         //Mp::FunctionJumpVa(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      &StubNtFreeVirtualMemory),
     };
 
@@ -1489,8 +1471,8 @@ BOOL Initialize2(PVOID BaseAddress)
 
     Mp::PATCH_MEMORY_DATA Function_GroupApp[] =
     {
-        Mp::FunctionJumpVa(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
-        Mp::FunctionCallVa(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, GetCurrentAtNumber),
+        //Mp::FunctionJumpVa(AtAllGroupMemberFound ? GetUseTimes : IMAGE_INVALID_VA, GetAtAllGroupMemberUseTimes),
+        //Mp::FunctionCallVa(AtGroupMemberMaxFound ? AtGroupMemberMax : IMAGE_INVALID_VA, GetCurrentAtNumber),
         Mp::FunctionCallVa(SearchGroupApp_GroupBanSpeech(module), GetBanSpeechTimeStamp, &StubGetBanSpeechTimeStamp),
     };
 
@@ -1562,16 +1544,16 @@ BOOL Initialize2(PVOID BaseAddress)
 
     PATCH_ARRAY *Entry, Array[] =
     {
-        { nullptr,  Patch_HummerEngine,     countof(Patch_HummerEngine)  },
+        //{ nullptr,  Patch_HummerEngine,     countof(Patch_HummerEngine)  },
         { nullptr,  Function_KernelUtil,    countof(Function_KernelUtil) },
         { nullptr,  Function_GroupApp,      countof(Function_GroupApp)   },
         { nullptr,  Function_AppUtil,       countof(Function_AppUtil)    },
         { nullptr,  Function_AppMisc,       countof(Function_AppMisc)    },
         { nullptr,  Function_MainFrame,     countof(Function_MainFrame)  },
-        { nullptr,  Function_PreLogin,      countof(Function_PreLogin)   },
+        //{ nullptr,  Function_PreLogin,      countof(Function_PreLogin)   },
         { nullptr,  Function_Common,        countof(Function_Common)     },
         { nullptr,  Function_ntdll,         countof(Function_ntdll)      },
-        { nullptr,  Function_psapi,         countof(Function_psapi)      },
+        //{ nullptr,  Function_psapi,         countof(Function_psapi)      },
         { nullptr,  Function_user32,        countof(Function_user32)     },
     };
 
