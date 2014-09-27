@@ -46,23 +46,25 @@ class AMFSerializer(AMFWriter):
             self.Position = BodyBegin - 4
             self.WriteLong(BodyEnd - BodyBegin)
 
-def main():
-    from AMFDeserializer import AMFDeserializer
-
-    infile = 'Members.onlineReward.send.bin'
-
-    amf = AMFDeserializer(open(infile, 'rb').read())
-    msg = amf.ReadAMFMessage()
-    info = FormatObject(msg, itergen = iter)
-    print(''.join(info))
-
-    amf = AMFSerializer()
-    bin = amf.WriteMessage(msg)
-    open('amf.bin', 'wb').write(bin)
-
-    os.system('fc/b amf.bin %s' % infile)
-    PauseConsole()
-
 
 if __name__ == '__main__':
+    from ml import *
+
+    def main():
+        from AMFDeserializer import AMFDeserializer
+
+        infile = 'Members.onlineReward.send.bin'
+
+        amf = AMFDeserializer(open(infile, 'rb').read())
+        msg = amf.ReadAMFMessage()
+        info = FormatObject(msg, itergen = iter)
+        print(''.join(info))
+
+        amf = AMFSerializer()
+        bin = amf.WriteMessage(msg)
+        open('amf.bin', 'wb').write(bin)
+
+        os.system('fc/b amf.bin %s' % infile)
+        PauseConsole()
+
     TryInvoke(main)

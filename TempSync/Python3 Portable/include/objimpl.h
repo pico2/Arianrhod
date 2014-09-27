@@ -204,10 +204,10 @@ typedef struct {
     void *ctx;
 
     /* allocate an arena of size bytes */
-    void* (__cdecl *alloc) (void *ctx, size_t size);
+    void* (*alloc) (void *ctx, size_t size);
 
     /* free an arena */
-    void (__cdecl *free) (void *ctx, void *ptr, size_t size);
+    void (*free) (void *ctx, void *ptr, size_t size);
 } PyObjectArenaAllocator;
 
 /* Get the arena allocator. */

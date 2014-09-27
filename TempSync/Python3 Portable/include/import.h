@@ -98,7 +98,7 @@ PyAPI_FUNC(int) _PyImport_FixupExtensionObject(PyObject*, PyObject *, PyObject *
 
 struct _inittab {
     const char *name;           /* ASCII encoded string */
-    PyObject* (__cdecl *initfunc)(void);
+    PyObject* (*initfunc)(void);
 };
 PyAPI_DATA(struct _inittab *) PyImport_Inittab;
 PyAPI_FUNC(int) PyImport_ExtendInittab(struct _inittab *newtab);
@@ -108,7 +108,7 @@ PyAPI_DATA(PyTypeObject) PyNullImporter_Type;
 
 PyAPI_FUNC(int) PyImport_AppendInittab(
     const char *name,           /* ASCII encoded string */
-    PyObject* (__cdecl *initfunc)(void)
+    PyObject* (*initfunc)(void)
     );
 
 #ifndef Py_LIMITED_API

@@ -87,7 +87,7 @@ PyAPI_DATA(int) _Py_HashSecret_Initialized;
 /* hash function definition */
 #ifndef Py_LIMITED_API
 typedef struct {
-    Py_hash_t (__cdecl *const hash)(const void *, Py_ssize_t);
+    Py_hash_t (*const hash)(const void *, Py_ssize_t);
     const char *name;
     const int hash_bits;
     const int seed_bits;

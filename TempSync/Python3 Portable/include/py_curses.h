@@ -92,10 +92,10 @@ typedef struct {
 
 static void **PyCurses_API;
 
-#define PyCursesWindow_Type (__cdecl *(PyTypeObject *) PyCurses_API[0])
-#define PyCursesSetupTermCalled  {if (! ((int (__cdecl *)(void))PyCurses_API[1]) () ) return NULL;}
-#define PyCursesInitialised      {if (! ((int (__cdecl *)(void))PyCurses_API[2]) () ) return NULL;}
-#define PyCursesInitialisedColor {if (! ((int (__cdecl *)(void))PyCurses_API[3]) () ) return NULL;}
+#define PyCursesWindow_Type (*(PyTypeObject *) PyCurses_API[0])
+#define PyCursesSetupTermCalled  {if (! ((int (*)(void))PyCurses_API[1]) () ) return NULL;}
+#define PyCursesInitialised      {if (! ((int (*)(void))PyCurses_API[2]) () ) return NULL;}
+#define PyCursesInitialisedColor {if (! ((int (*)(void))PyCurses_API[3]) () ) return NULL;}
 
 #define import_curses() \
     PyCurses_API = (void **)PyCapsule_Import(PyCurses_CAPSULE_NAME, 1);

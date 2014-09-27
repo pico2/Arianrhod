@@ -38,12 +38,14 @@ class AMFDeserializer(AMFReader):
 
         return AMFBody(Target, Response, Content)
 
-def main():
-    amf = AMFDeserializer(open('Tables.getGameZoneTables.send.bin', 'rb').read())
-    msg = amf.ReadMessage()
-    info = FormatObject(msg, itergen = iter)
-    print(''.join(info))
-    PauseConsole()
-
 if __name__ == '__main__':
+    from ml import *
+
+    def main():
+        amf = AMFDeserializer(open('Tables.getGameZoneTables.send.bin', 'rb').read())
+        msg = amf.ReadMessage()
+        info = FormatObject(msg, itergen = iter)
+        print(''.join(info))
+        PauseConsole()
+
     TryInvoke(main)

@@ -20,7 +20,7 @@ extern "C" {
 
 PyAPI_DATA(PyTypeObject) PyCapsule_Type;
 
-typedef void (__cdecl *PyCapsule_Destructor)(PyObject *);
+typedef void (*PyCapsule_Destructor)(PyObject *);
 
 #define PyCapsule_CheckExact(op) (Py_TYPE(op) == &PyCapsule_Type)
 

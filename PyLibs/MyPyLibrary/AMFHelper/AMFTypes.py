@@ -195,10 +195,12 @@ class AMFTimeStamp:
     def Date(self):
         return self._Date
 
-def main():
-    import time
-    print(AMFTimeStamp(time.time()))
-    PauseConsole()
-
 if __name__ == '__main__':
+    from ml import *
+
+    def main():
+        import time
+        print(AMFTimeStamp(time.time()))
+        PauseConsole()
+
     TryInvoke(main)

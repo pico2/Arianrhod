@@ -39,6 +39,7 @@ EXPORTS
 	swprintf
 	sprintf
 	wcsstr
+	strstr
 	_ftol
 	_stricmp
 	_wcsicmp

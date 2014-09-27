@@ -161,9 +161,3 @@ class AsyncHttpRequest(object):
             thread.start()
 
             return thread
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    TryInvoke(main)

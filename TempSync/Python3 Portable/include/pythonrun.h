@@ -170,9 +170,9 @@ PyAPI_FUNC(void) PyErr_Display(PyObject *, PyObject *, PyObject *);
  * exit functions.
  */
 #ifndef Py_LIMITED_API
-PyAPI_FUNC(void) _Py_PyAtExit(void (__cdecl *func)(void));
+PyAPI_FUNC(void) _Py_PyAtExit(void (*func)(void));
 #endif
-PyAPI_FUNC(int) Py_AtExit(void (__cdecl *func)(void));
+PyAPI_FUNC(int) Py_AtExit(void (*func)(void));
 
 PyAPI_FUNC(void) Py_Exit(int);
 
@@ -269,7 +269,7 @@ PyAPI_DATA(PyThreadState *) _Py_Finalizing;
 #ifndef Py_LIMITED_API
 PyAPI_FUNC(char *) PyOS_Readline(FILE *, FILE *, const char *);
 #endif
-PyAPI_DATA(int) (__cdecl *PyOS_InputHook)(void);
+PyAPI_DATA(int) (*PyOS_InputHook)(void);
 PyAPI_DATA(char) *(*PyOS_ReadlineFunctionPointer)(FILE *, FILE *, const char *);
 #ifndef Py_LIMITED_API
 PyAPI_DATA(PyThreadState*) _PyOS_ReadlineTState;
@@ -291,7 +291,7 @@ PyAPI_FUNC(int) PyOS_CheckStack(void);
 #endif
 
 /* Signals */
-typedef void (__cdecl *PyOS_sighandler_t)(int);
+typedef void (*PyOS_sighandler_t)(int);
 PyAPI_FUNC(PyOS_sighandler_t) PyOS_getsig(int);
 PyAPI_FUNC(PyOS_sighandler_t) PyOS_setsig(int, PyOS_sighandler_t);
 

@@ -20,6 +20,11 @@ int __cdecl _wcsicmp(_In_z_ const wchar_t * _Str1, _In_z_ const wchar_t * _Str2)
     return 0;
 }
 
+char *  __cdecl strstr(__in_z const char * _Str, __in_z const char * _SubStr)
+{
+    return 0;
+}
+
 wchar_t* __cdecl wcsstr(const wchar_t *_Str, const wchar_t *_SubStr)
 {
     return 0;

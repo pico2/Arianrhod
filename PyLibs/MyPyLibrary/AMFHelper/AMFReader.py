@@ -196,11 +196,3 @@ class AMFReader(FileStream):
 
     def AMF3ReadByteArray(self):
         raise NotImplementedError('not implemented type at offset %08X' % self.Position)
-
-
-
-def main():
-    AMFReader(b'')
-
-if __name__ == '__main__':
-    TryInvoke(main)
