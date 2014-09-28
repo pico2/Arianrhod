@@ -15,6 +15,15 @@ class AsyncHttp(object):
         def __str__(self):
             return self.response.__str__()
 
+        def json(self, encoding = None):
+            return json.loads(self.decode(encoding))
+
+        def text(self, encoding = None):
+            return self.decode(encoding)
+
+        def decode(self, encoding = None):
+            return self.content.decode(self.response._get_encoding(encoding))
+
     def __init__(self, *, loop = None, cookie_class = http.cookies.BaseCookie):
         self.loop = loop or asyncio.get_event_loop()
         self.TCPConnector = aiohttp.connector.TCPConnector(share_cookies = True, loop = self.loop)
