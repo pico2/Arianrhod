@@ -11,7 +11,6 @@ __all__ = ['__import__', 'import_module', 'invalidate_caches', 'reload']
 # initialised below if the frozen one is not available).
 import _imp  # Just the builtin component, NOT the full Python module
 import sys
-import types
 
 try:
     import _frozen_importlib as _bootstrap
@@ -23,7 +22,12 @@ else:
     # a second copy of the module.
     _bootstrap.__name__ = 'importlib._bootstrap'
     _bootstrap.__package__ = 'importlib'
-    _bootstrap.__file__ = __file__.replace('__init__.py', '_bootstrap.py')
+    try:
+        _bootstrap.__file__ = __file__.replace('__init__.py', '_bootstrap.py')
+    except NameError:
+        # __file__ is not guaranteed to be defined, e.g. if this code gets
+        # frozen by a tool like cx_Freeze.
+        pass
     sys.modules['importlib._bootstrap'] = _bootstrap
 
 # To simplify imports in test code
@@ -32,6 +36,10 @@ _r_long = _bootstrap._r_long
 
 # Fully bootstrapped at this point, import whatever you like, circular
 # dependencies and startup overhead minimisation permitting :)
+
+import types
+import warnings
+
 
 # Public API #########################################################
 
@@ -47,20 +55,15 @@ def invalidate_caches():
 
 
 def find_loader(name, path=None):
-    """Find the loader for the specified module.
+    """Return the loader for the specified module.
 
-    First, sys.modules is checked to see if the module was already imported. If
-    so, then sys.modules[name].__loader__ is returned. If that happens to be
-    set to None, then ValueError is raised. If the module is not in
-    sys.modules, then sys.meta_path is searched for a suitable loader with the
-    value of 'path' given to the finders. None is returned if no loader could
-    be found.
+    This is a backward-compatible wrapper around find_spec().
 
-    Dotted names do not have their parent packages implicitly imported. You will
-    most likely need to explicitly import all parent packages in the proper
-    order for a submodule to get the correct loader.
+    This function is deprecated in favor of importlib.util.find_spec().
 
     """
+    warnings.warn('Use importlib.util.find_spec() instead.',
+                  DeprecationWarning, stacklevel=2)
     try:
         loader = sys.modules[name].__loader__
         if loader is None:
@@ -71,7 +74,18 @@ def find_loader(name, path=None):
         pass
     except AttributeError:
         raise ValueError('{}.__loader__ is not set'.format(name))
-    return _bootstrap._find_module(name, path)
+
+    spec = _bootstrap._find_spec(name, path)
+    # We won't worry about malformed specs (missing attributes).
+    if spec is None:
+        return None
+    if spec.loader is None:
+        if spec.submodule_search_locations is None:
+            raise ImportError('spec for {} missing loader'.format(name),
+                              name=name)
+        raise ImportError('namespace packages do not have loaders',
+                          name=name)
+    return spec.loader
 
 
 def import_module(name, package=None):
@@ -106,8 +120,12 @@ def reload(module):
     """
     if not module or not isinstance(module, types.ModuleType):
         raise TypeError("reload() argument must be module")
-    name = module.__name__
-    if name not in sys.modules:
+    try:
+        name = module.__spec__.name
+    except AttributeError:
+        name = module.__name__
+
+    if sys.modules.get(name) is not module:
         msg = "module {} not in sys.modules"
         raise ImportError(msg.format(name), name=name)
     if name in _RELOADING:
@@ -115,12 +133,22 @@ def reload(module):
     _RELOADING[name] = module
     try:
         parent_name = name.rpartition('.')[0]
-        if parent_name and parent_name not in sys.modules:
-            msg = "parent {!r} not in sys.modules"
-            raise ImportError(msg.format(parent_name), name=parent_name)
-        module.__loader__.load_module(name)
+        if parent_name:
+            try:
+                parent = sys.modules[parent_name]
+            except KeyError:
+                msg = "parent {!r} not in sys.modules"
+                raise ImportError(msg.format(parent_name), name=parent_name)
+            else:
+                pkgpath = parent.__path__
+        else:
+            pkgpath = None
+        target = module
+        spec = module.__spec__ = _bootstrap._find_spec(name, pkgpath, target)
+        methods = _bootstrap._SpecMethods(spec)
+        methods.exec(module)
         # The module may have replaced itself in sys.modules!
-        return sys.modules[module.__name__]
+        return sys.modules[name]
     finally:
         try:
             del _RELOADING[name]

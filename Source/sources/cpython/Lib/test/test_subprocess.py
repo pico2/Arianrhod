@@ -11,6 +11,7 @@ import errno
 import tempfile
 import time
 import re
+import selectors
 import sysconfig
 import warnings
 import select
@@ -785,6 +786,7 @@ class ProcessTestCase(BaseTestCase):
                              stdout=subprocess.PIPE,
                              universal_newlines=1)
         p.stdin.write("line1\n")
+        p.stdin.flush()
         self.assertEqual(p.stdout.readline(), "line1\n")
         p.stdin.write("line3\n")
         p.stdin.close()
@@ -883,8 +885,9 @@ class ProcessTestCase(BaseTestCase):
         #
         # UTF-16 and UTF-32-BE are sufficient to check both with BOM and
         # without, and UTF-16 and UTF-32.
+        import _bootlocale
         for encoding in ['utf-16', 'utf-32-be']:
-            old_getpreferredencoding = locale.getpreferredencoding
+            old_getpreferredencoding = _bootlocale.getpreferredencoding
             # Indirectly via io.TextIOWrapper, Popen() defaults to
             # locale.getpreferredencoding(False) and earlier in Python 3.2 to
             # locale.getpreferredencoding().
@@ -895,7 +898,7 @@ class ProcessTestCase(BaseTestCase):
                     encoding)
             args = [sys.executable, '-c', code]
             try:
-                locale.getpreferredencoding = getpreferredencoding
+                _bootlocale.getpreferredencoding = getpreferredencoding
                 # We set stdin to be non-None because, as of this writing,
                 # a different code path is used when the number of pipes is
                 # zero or one.
@@ -904,7 +907,7 @@ class ProcessTestCase(BaseTestCase):
                                          stdout=subprocess.PIPE)
                 stdout, stderr = popen.communicate(input='')
             finally:
-                locale.getpreferredencoding = old_getpreferredencoding
+                _bootlocale.getpreferredencoding = old_getpreferredencoding
             self.assertEqual(stdout, '1\n2\n3\n4')
 
     def test_no_leaking(self):
@@ -1049,6 +1052,59 @@ class ProcessTestCase(BaseTestCase):
                     exc = e
             if exc is not None:
                 raise exc
+
+    @unittest.skipIf(threading is None, "threading required")
+    def test_threadsafe_wait(self):
+        """Issue21291: Popen.wait() needs to be threadsafe for returncode."""
+        proc = subprocess.Popen([sys.executable, '-c',
+                                 'import time; time.sleep(12)'])
+        self.assertEqual(proc.returncode, None)
+        results = []
+
+        def kill_proc_timer_thread():
+            results.append(('thread-start-poll-result', proc.poll()))
+            # terminate it from the thread and wait for the result.
+            proc.kill()
+            proc.wait()
+            results.append(('thread-after-kill-and-wait', proc.returncode))
+            # this wait should be a no-op given the above.
+            proc.wait()
+            results.append(('thread-after-second-wait', proc.returncode))
+
+        # This is a timing sensitive test, the failure mode is
+        # triggered when both the main thread and this thread are in
+        # the wait() call at once.  The delay here is to allow the
+        # main thread to most likely be blocked in its wait() call.
+        t = threading.Timer(0.2, kill_proc_timer_thread)
+        t.start()
+
+        if mswindows:
+            expected_errorcode = 1
+        else:
+            # Should be -9 because of the proc.kill() from the thread.
+            expected_errorcode = -9
+
+        # Wait for the process to finish; the thread should kill it
+        # long before it finishes on its own.  Supplying a timeout
+        # triggers a different code path for better coverage.
+        proc.wait(timeout=20)
+        self.assertEqual(proc.returncode, expected_errorcode,
+                         msg="unexpected result in wait from main thread")
+
+        # This should be a no-op with no change in returncode.
+        proc.wait()
+        self.assertEqual(proc.returncode, expected_errorcode,
+                         msg="unexpected result in second main wait.")
+
+        t.join()
+        # Ensure that all of the thread results are as expected.
+        # When a race condition occurs in wait(), the returncode could
+        # be set by the wrong thread that doesn't actually have it
+        # leading to an incorrect value.
+        self.assertEqual([('thread-start-poll-result', None),
+                          ('thread-after-kill-and-wait', expected_errorcode),
+                          ('thread-after-second-wait', expected_errorcode)],
+                         results)
 
     def test_issue8780(self):
         # Ensure that stdout is inherited from the parent
@@ -1231,7 +1287,7 @@ class POSIXProcessTestCase(BaseTestCase):
 
     def test_run_abort(self):
         # returncode handles signal termination
-        with support.SuppressCoreFiles():
+        with support.SuppressCrashReport():
             p = subprocess.Popen([sys.executable, "-c",
                                   'import os; os.abort()'])
             p.wait()
@@ -1557,6 +1613,27 @@ class POSIXProcessTestCase(BaseTestCase):
         # all standard fds closed.
         self.check_close_std_fds([0, 1, 2])
 
+    def test_small_errpipe_write_fd(self):
+        """Issue #15798: Popen should work when stdio fds are available."""
+        new_stdin = os.dup(0)
+        new_stdout = os.dup(1)
+        try:
+            os.close(0)
+            os.close(1)
+
+            # Side test: if errpipe_write fails to have its CLOEXEC
+            # flag set this should cause the parent to think the exec
+            # failed.  Extremely unlikely: everyone supports CLOEXEC.
+            subprocess.Popen([
+                    sys.executable, "-c",
+                    "print('AssertionError:0:CLOEXEC failure.')"]).wait()
+        finally:
+            # Restore original stdin and stdout
+            os.dup2(new_stdin, 0)
+            os.dup2(new_stdout, 1)
+            os.close(new_stdin)
+            os.close(new_stdout)
+
     def test_remapping_std_fds(self):
         # open up some temporary files
         temps = [mkstemp() for i in range(3)]
@@ -1679,31 +1756,38 @@ class POSIXProcessTestCase(BaseTestCase):
 
     def test_undecodable_env(self):
         for key, value in (('test', 'abc\uDCFF'), ('test\uDCFF', '42')):
+            encoded_value = value.encode("ascii", "surrogateescape")
+
             # test str with surrogates
             script = "import os; print(ascii(os.getenv(%s)))" % repr(key)
             env = os.environ.copy()
             env[key] = value
-            # Use C locale to get ascii for the locale encoding to force
+            # Use C locale to get ASCII for the locale encoding to force
             # surrogate-escaping of \xFF in the child process; otherwise it can
             # be decoded as-is if the default locale is latin-1.
             env['LC_ALL'] = 'C'
+            if sys.platform.startswith("aix"):
+                # On AIX, the C locale uses the Latin1 encoding
+                decoded_value = encoded_value.decode("latin1", "surrogateescape")
+            else:
+                # On other UNIXes, the C locale uses the ASCII encoding
+                decoded_value = value
             stdout = subprocess.check_output(
                 [sys.executable, "-c", script],
                 env=env)
             stdout = stdout.rstrip(b'\n\r')
-            self.assertEqual(stdout.decode('ascii'), ascii(value))
+            self.assertEqual(stdout.decode('ascii'), ascii(decoded_value))
 
             # test bytes
             key = key.encode("ascii", "surrogateescape")
-            value = value.encode("ascii", "surrogateescape")
             script = "import os; print(ascii(os.getenvb(%s)))" % repr(key)
             env = os.environ.copy()
-            env[key] = value
+            env[key] = encoded_value
             stdout = subprocess.check_output(
                 [sys.executable, "-c", script],
                 env=env)
             stdout = stdout.rstrip(b'\n\r')
-            self.assertEqual(stdout.decode('ascii'), ascii(value))
+            self.assertEqual(stdout.decode('ascii'), ascii(encoded_value))
 
     def test_bytes_program(self):
         abs_program = os.fsencode(sys.executable)
@@ -1841,6 +1925,86 @@ class POSIXProcessTestCase(BaseTestCase):
         self.assertFalse(remaining_fds & fds_to_keep & open_fds,
                          "Some fds not in pass_fds were left open")
         self.assertIn(1, remaining_fds, "Subprocess failed")
+
+
+    @unittest.skipIf(sys.platform.startswith("freebsd") and
+                     os.stat("/dev").st_dev == os.stat("/dev/fd").st_dev,
+                     "Requires fdescfs mounted on /dev/fd on FreeBSD.")
+    def test_close_fds_when_max_fd_is_lowered(self):
+        """Confirm that issue21618 is fixed (may fail under valgrind)."""
+        fd_status = support.findfile("fd_status.py", subdir="subprocessdata")
+
+        # This launches the meat of the test in a child process to
+        # avoid messing with the larger unittest processes maximum
+        # number of file descriptors.
+        #  This process launches:
+        #  +--> Process that lowers its RLIMIT_NOFILE aftr setting up
+        #    a bunch of high open fds above the new lower rlimit.
+        #    Those are reported via stdout before launching a new
+        #    process with close_fds=False to run the actual test:
+        #    +--> The TEST: This one launches a fd_status.py
+        #      subprocess with close_fds=True so we can find out if
+        #      any of the fds above the lowered rlimit are still open.
+        p = subprocess.Popen([sys.executable, '-c', textwrap.dedent(
+        '''
+        import os, resource, subprocess, sys, textwrap
+        open_fds = set()
+        # Add a bunch more fds to pass down.
+        for _ in range(40):
+            fd = os.open("/dev/null", os.O_RDONLY)
+            open_fds.add(fd)
+
+        # Leave a two pairs of low ones available for use by the
+        # internal child error pipe and the stdout pipe.
+        # We also leave 10 more open as some Python buildbots run into
+        # "too many open files" errors during the test if we do not.
+        for fd in sorted(open_fds)[:14]:
+            os.close(fd)
+            open_fds.remove(fd)
+
+        for fd in open_fds:
+            #self.addCleanup(os.close, fd)
+            os.set_inheritable(fd, True)
+
+        max_fd_open = max(open_fds)
+
+        # Communicate the open_fds to the parent unittest.TestCase process.
+        print(','.join(map(str, sorted(open_fds))))
+        sys.stdout.flush()
+
+        rlim_cur, rlim_max = resource.getrlimit(resource.RLIMIT_NOFILE)
+        try:
+            # 29 is lower than the highest fds we are leaving open.
+            resource.setrlimit(resource.RLIMIT_NOFILE, (29, rlim_max))
+            # Launch a new Python interpreter with our low fd rlim_cur that
+            # inherits open fds above that limit.  It then uses subprocess
+            # with close_fds=True to get a report of open fds in the child.
+            # An explicit list of fds to check is passed to fd_status.py as
+            # letting fd_status rely on its default logic would miss the
+            # fds above rlim_cur as it normally only checks up to that limit.
+            subprocess.Popen(
+                [sys.executable, '-c',
+                 textwrap.dedent("""
+                     import subprocess, sys
+                     subprocess.Popen([sys.executable, %r] +
+                                      [str(x) for x in range({max_fd})],
+                                      close_fds=True).wait()
+                     """.format(max_fd=max_fd_open+1))],
+                close_fds=False).wait()
+        finally:
+            resource.setrlimit(resource.RLIMIT_NOFILE, (rlim_cur, rlim_max))
+        ''' % fd_status)], stdout=subprocess.PIPE)
+
+        output, unused_stderr = p.communicate()
+        output_lines = output.splitlines()
+        self.assertEqual(len(output_lines), 2,
+                         msg="expected exactly two lines of output:\n%r" % output)
+        opened_fds = set(map(int, output_lines[0].strip().split(b',')))
+        remaining_fds = set(map(int, output_lines[1].strip().split(b',')))
+
+        self.assertFalse(remaining_fds & opened_fds,
+                         msg="Some fds were left open.")
+
 
     # Mac OS X Tiger (10.4) has a kernel bug: sometimes, the file
     # descriptor of a pipe closed in the parent process is valid in the
@@ -2157,13 +2321,6 @@ class Win32ProcessTestCase(BaseTestCase):
     def test_terminate_dead(self):
         self._kill_dead_process('terminate')
 
-
-# The module says:
-#   "NB This only works (and is only relevant) for UNIX."
-#
-# Actually, getoutput should work on any platform with an os.popen, but
-# I'll take the comment as given, and skip this suite.
-@unittest.skipUnless(os.name == 'posix', "only relevant for UNIX")
 class CommandTests(unittest.TestCase):
     def test_getoutput(self):
         self.assertEqual(subprocess.getoutput('echo xyzzy'), 'xyzzy')
@@ -2177,23 +2334,24 @@ class CommandTests(unittest.TestCase):
         try:
             dir = tempfile.mkdtemp()
             name = os.path.join(dir, "foo")
-
-            status, output = subprocess.getstatusoutput('cat ' + name)
+            status, output = subprocess.getstatusoutput(
+                ("type " if mswindows else "cat ") + name)
             self.assertNotEqual(status, 0)
         finally:
             if dir is not None:
                 os.rmdir(dir)
 
 
-@unittest.skipUnless(getattr(subprocess, '_has_poll', False),
-                     "poll system call not supported")
+@unittest.skipUnless(hasattr(selectors, 'PollSelector'),
+                     "Test needs selectors.PollSelector")
 class ProcessTestCaseNoPoll(ProcessTestCase):
     def setUp(self):
-        subprocess._has_poll = False
+        self.orig_selector = subprocess._PopenSelector
+        subprocess._PopenSelector = selectors.SelectSelector
         ProcessTestCase.setUp(self)
 
     def tearDown(self):
-        subprocess._has_poll = True
+        subprocess._PopenSelector = self.orig_selector
         ProcessTestCase.tearDown(self)
 
 

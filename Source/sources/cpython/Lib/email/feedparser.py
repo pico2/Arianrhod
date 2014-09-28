@@ -50,8 +50,8 @@ class BufferedSubFile(object):
     simple abstraction -- it parses until EOF closes the current message.
     """
     def __init__(self):
-        # The last partial line pushed into this object.
-        self._partial = ''
+        # Chunks of the last partial line pushed into this object.
+        self._partial = []
         # The list of full, pushed lines, in reverse order
         self._lines = []
         # The stack of false-EOF checking predicates.
@@ -67,8 +67,8 @@ class BufferedSubFile(object):
 
     def close(self):
         # Don't forget any trailing partial line.
-        self._lines.append(self._partial)
-        self._partial = ''
+        self.pushlines(''.join(self._partial).splitlines(True))
+        self._partial = []
         self._closed = True
 
     def readline(self):
@@ -96,16 +96,26 @@ class BufferedSubFile(object):
 
     def push(self, data):
         """Push some new data into this object."""
-        # Handle any previous leftovers
-        data, self._partial = self._partial + data, ''
         # Crack into lines, but preserve the linesep characters on the end of each
         parts = data.splitlines(True)
+
+        if not parts or not parts[0].endswith(('\n', '\r')):
+            # No new complete lines, so just accumulate partials
+            self._partial += parts
+            return
+
+        if self._partial:
+            # If there are previous leftovers, complete them now
+            self._partial.append(parts[0])
+            parts[0:1] = ''.join(self._partial).splitlines(True)
+            del self._partial[:]
+
         # If the last element of the list does not end in a newline, then treat
         # it as a partial line.  We only check for '\n' here because a line
         # ending with '\r' might be a line that was split in the middle of a
         # '\r\n' sequence (see bugs 1555570 and 1721862).
-        if parts and not parts[-1].endswith('\n'):
-            self._partial = parts.pop()
+        if not parts[-1].endswith('\n'):
+            self._partial = [parts.pop()]
         self.pushlines(parts)
 
     def pushlines(self, lines):
@@ -126,7 +136,7 @@ class BufferedSubFile(object):
 class FeedParser:
     """A feed-style parser of email."""
 
-    def __init__(self, _factory=message.Message, *, policy=compat32):
+    def __init__(self, _factory=None, *, policy=compat32):
         """_factory is called with no arguments to create a new message obj
 
         The policy keyword specifies a policy object that controls a number of
@@ -134,14 +144,23 @@ class FeedParser:
         backward compatibility.
 
         """
-        self._factory = _factory
         self.policy = policy
-        try:
-            _factory(policy=self.policy)
-            self._factory_kwds = lambda: {'policy': self.policy}
-        except TypeError:
-            # Assume this is an old-style factory
-            self._factory_kwds = lambda: {}
+        self._factory_kwds = lambda: {'policy': self.policy}
+        if _factory is None:
+            # What this should be:
+            #self._factory = policy.default_message_factory
+            # but, because we are post 3.4 feature freeze, fix with temp hack:
+            if self.policy is compat32:
+                self._factory = message.Message
+            else:
+                self._factory = message.EmailMessage
+        else:
+            self._factory = _factory
+            try:
+                _factory(policy=self.policy)
+            except TypeError:
+                # Assume this is an old-style factory
+                self._factory_kwds = lambda: {}
         self._input = BufferedSubFile()
         self._msgstack = []
         self._parse = self._parsegen().__next__

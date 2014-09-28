@@ -3,7 +3,7 @@ Tests for the threading module.
 """
 
 import test.support
-from test.support import verbose, strip_python_stderr, import_module
+from test.support import verbose, strip_python_stderr, import_module, cpython_only
 from test.script_helper import assert_python_ok
 
 import random
@@ -11,7 +11,6 @@ import re
 import sys
 _thread = import_module('_thread')
 threading = import_module('threading')
-import _testcapi
 import time
 import unittest
 import weakref
@@ -599,6 +598,65 @@ class ThreadTests(BaseTestCase):
             time.sleep(0.01)
         self.assertIn(LOOKING_FOR, repr(t)) # we waited at least 5 seconds
 
+    def test_BoundedSemaphore_limit(self):
+        # BoundedSemaphore should raise ValueError if released too often.
+        for limit in range(1, 10):
+            bs = threading.BoundedSemaphore(limit)
+            threads = [threading.Thread(target=bs.acquire)
+                       for _ in range(limit)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            threads = [threading.Thread(target=bs.release)
+                       for _ in range(limit)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            self.assertRaises(ValueError, bs.release)
+
+    @cpython_only
+    def test_frame_tstate_tracing(self):
+        # Issue #14432: Crash when a generator is created in a C thread that is
+        # destroyed while the generator is still used. The issue was that a
+        # generator contains a frame, and the frame kept a reference to the
+        # Python state of the destroyed C thread. The crash occurs when a trace
+        # function is setup.
+
+        def noop_trace(frame, event, arg):
+            # no operation
+            return noop_trace
+
+        def generator():
+            while 1:
+                yield "genereator"
+
+        def callback():
+            if callback.gen is None:
+                callback.gen = generator()
+            return next(callback.gen)
+        callback.gen = None
+
+        old_trace = sys.gettrace()
+        sys.settrace(noop_trace)
+        try:
+            # Install a trace function
+            threading.settrace(noop_trace)
+
+            # Create a generator in a C thread which exits after the call
+            import _testcapi
+            _testcapi.call_in_temporary_c_thread(callback)
+
+            # Call the generator in a different Python thread, check that the
+            # generator didn't keep a reference to the destroyed thread state
+            for test in range(3):
+                # The trace function is still called here
+                callback()
+        finally:
+            sys.settrace(old_trace)
+
+
 class ThreadJoinOnShutdown(BaseTestCase):
 
     def _run_and_join(self, script):
@@ -785,7 +843,7 @@ class SubinterpThreadingTests(BaseTestCase):
                 os.write(%d, b"x")
             threading.Thread(target=f).start()
             """ % (w,)
-        ret = _testcapi.run_in_subinterp(code)
+        ret = test.support.run_in_subinterp(code)
         self.assertEqual(ret, 0)
         # The thread was joined properly.
         self.assertEqual(os.read(r, 1), b"x")
@@ -817,11 +875,12 @@ class SubinterpThreadingTests(BaseTestCase):
                 os.write(%d, b"x")
             threading.Thread(target=f).start()
             """ % (w,)
-        ret = _testcapi.run_in_subinterp(code)
+        ret = test.support.run_in_subinterp(code)
         self.assertEqual(ret, 0)
         # The thread was joined properly.
         self.assertEqual(os.read(r, 1), b"x")
 
+    @cpython_only
     def test_daemon_threads_fatal_error(self):
         subinterp_code = r"""if 1:
             import os
@@ -839,7 +898,8 @@ class SubinterpThreadingTests(BaseTestCase):
 
             _testcapi.run_in_subinterp(%r)
             """ % (subinterp_code,)
-        rc, out, err = assert_python_failure("-c", script)
+        with test.support.SuppressCrashReport():
+            rc, out, err = assert_python_failure("-c", script)
         self.assertIn("Fatal Python error: Py_EndInterpreter: "
                       "not the last thread", err.decode())
 

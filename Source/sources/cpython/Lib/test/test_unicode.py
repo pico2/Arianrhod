@@ -845,6 +845,27 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertEqual('{0:10000}'.format(''), ' ' * 10000)
         self.assertEqual('{0:10000000}'.format(''), ' ' * 10000000)
 
+        # issue 12546: use \x00 as a fill character
+        self.assertEqual('{0:\x00<6s}'.format('foo'), 'foo\x00\x00\x00')
+        self.assertEqual('{0:\x01<6s}'.format('foo'), 'foo\x01\x01\x01')
+        self.assertEqual('{0:\x00^6s}'.format('foo'), '\x00foo\x00\x00')
+        self.assertEqual('{0:^6s}'.format('foo'), ' foo  ')
+
+        self.assertEqual('{0:\x00<6}'.format(3), '3\x00\x00\x00\x00\x00')
+        self.assertEqual('{0:\x01<6}'.format(3), '3\x01\x01\x01\x01\x01')
+        self.assertEqual('{0:\x00^6}'.format(3), '\x00\x003\x00\x00\x00')
+        self.assertEqual('{0:<6}'.format(3), '3     ')
+
+        self.assertEqual('{0:\x00<6}'.format(3.14), '3.14\x00\x00')
+        self.assertEqual('{0:\x01<6}'.format(3.14), '3.14\x01\x01')
+        self.assertEqual('{0:\x00^6}'.format(3.14), '\x003.14\x00')
+        self.assertEqual('{0:^6}'.format(3.14), ' 3.14 ')
+
+        self.assertEqual('{0:\x00<12}'.format(3+2.0j), '(3+2j)\x00\x00\x00\x00\x00\x00')
+        self.assertEqual('{0:\x01<12}'.format(3+2.0j), '(3+2j)\x01\x01\x01\x01\x01\x01')
+        self.assertEqual('{0:\x00^12}'.format(3+2.0j), '\x00\x00\x00(3+2j)\x00\x00\x00')
+        self.assertEqual('{0:^12}'.format(3+2.0j), '   (3+2j)   ')
+
         # format specifiers for user defined type
         self.assertEqual('{0:abc}'.format(C()), 'abc')
 
@@ -972,6 +993,8 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertRaises(ValueError, "{a{}b}".format, 42)
         self.assertRaises(ValueError, "{a{b}".format, 42)
         self.assertRaises(ValueError, "{[}".format, 42)
+
+        self.assertEqual("0x{:0{:d}X}".format(0x0,16), "0x0000000000000000")
 
     def test_format_map(self):
         self.assertEqual(''.format_map({}), '')
@@ -1124,6 +1147,35 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertEqual('%.1s' % "a\xe9\u20ac", 'a')
         self.assertEqual('%.2s' % "a\xe9\u20ac", 'a\xe9')
 
+        #issue 19995
+        class PsuedoInt:
+            def __init__(self, value):
+                self.value = int(value)
+            def __int__(self):
+                return self.value
+            def __index__(self):
+                return self.value
+        class PsuedoFloat:
+            def __init__(self, value):
+                self.value = float(value)
+            def __int__(self):
+                return int(self.value)
+        pi = PsuedoFloat(3.1415)
+        letter_m = PsuedoInt(109)
+        self.assertEqual('%x' % 42, '2a')
+        self.assertEqual('%X' % 15, 'F')
+        self.assertEqual('%o' % 9, '11')
+        self.assertEqual('%c' % 109, 'm')
+        self.assertEqual('%x' % letter_m, '6d')
+        self.assertEqual('%X' % letter_m, '6D')
+        self.assertEqual('%o' % letter_m, '155')
+        self.assertEqual('%c' % letter_m, 'm')
+        self.assertWarns(DeprecationWarning, '%x'.__mod__, pi),
+        self.assertWarns(DeprecationWarning, '%x'.__mod__, 3.14),
+        self.assertWarns(DeprecationWarning, '%X'.__mod__, 2.11),
+        self.assertWarns(DeprecationWarning, '%o'.__mod__, 1.79),
+        self.assertWarns(DeprecationWarning, '%c'.__mod__, pi),
+
     def test_formatting_with_enum(self):
         # issue18780
         import enum
@@ -1156,8 +1208,13 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertEqual('...%(foo)f...' % {'foo':Float.PI,'def':123},
                          '...3.141593...')
 
-    @support.cpython_only
     def test_formatting_huge_precision(self):
+        format_string = "%.{}f".format(sys.maxsize + 1)
+        with self.assertRaises(ValueError):
+            result = format_string % 2.34
+
+    @support.cpython_only
+    def test_formatting_huge_precision_c_limits(self):
         from _testcapi import INT_MAX
         format_string = "%.{}f".format(INT_MAX + 1)
         with self.assertRaises(ValueError):
@@ -1831,10 +1888,10 @@ class UnicodeTest(string_tests.CommonTest,
         # 0-127
         s = bytes(range(128))
         for encoding in (
-            'cp037', 'cp1026',
+            'cp037', 'cp1026', 'cp273',
             'cp437', 'cp500', 'cp720', 'cp737', 'cp775', 'cp850',
             'cp852', 'cp855', 'cp858', 'cp860', 'cp861', 'cp862',
-            'cp863', 'cp865', 'cp866',
+            'cp863', 'cp865', 'cp866', 'cp1125',
             'iso8859_10', 'iso8859_13', 'iso8859_14', 'iso8859_15',
             'iso8859_2', 'iso8859_3', 'iso8859_4', 'iso8859_5', 'iso8859_6',
             'iso8859_7', 'iso8859_9', 'koi8_r', 'latin_1',
@@ -1859,10 +1916,10 @@ class UnicodeTest(string_tests.CommonTest,
         # 128-255
         s = bytes(range(128, 256))
         for encoding in (
-            'cp037', 'cp1026',
+            'cp037', 'cp1026', 'cp273',
             'cp437', 'cp500', 'cp720', 'cp737', 'cp775', 'cp850',
             'cp852', 'cp855', 'cp858', 'cp860', 'cp861', 'cp862',
-            'cp863', 'cp865', 'cp866',
+            'cp863', 'cp865', 'cp866', 'cp1125',
             'iso8859_10', 'iso8859_13', 'iso8859_14', 'iso8859_15',
             'iso8859_2', 'iso8859_4', 'iso8859_5',
             'iso8859_9', 'koi8_r', 'latin_1',
@@ -2000,12 +2057,12 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertEqual(repr('\U00010000'), "'%c'" % (0x10000,)) # printable
         self.assertEqual(repr('\U00014000'), "'\\U00014000'")     # nonprintable
 
+    # This test only affects 32-bit platforms because expandtabs can only take
+    # an int as the max value, not a 64-bit C long.  If expandtabs is changed
+    # to take a 64-bit long, this test should apply to all platforms.
+    @unittest.skipIf(sys.maxsize > (1 << 32) or struct.calcsize('P') != 4,
+                     'only applies to 32-bit platforms')
     def test_expandtabs_overflows_gracefully(self):
-        # This test only affects 32-bit platforms because expandtabs can only take
-        # an int as the max value, not a 64-bit C long.  If expandtabs is changed
-        # to take a 64-bit long, this test should apply to all platforms.
-        if sys.maxsize > (1 << 32) or struct.calcsize('P') != 4:
-            return
         self.assertRaises(OverflowError, 't\tt\t'.expandtabs, sys.maxsize)
 
     @support.cpython_only
@@ -2284,6 +2341,7 @@ class UnicodeTest(string_tests.CommonTest,
                      b'%.%s', b'abc')
 
     # Test PyUnicode_AsWideChar()
+    @support.cpython_only
     def test_aswidechar(self):
         from _testcapi import unicode_aswidechar
         support.import_module('ctypes')
@@ -2321,6 +2379,7 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertEqual(wchar, nonbmp + '\0')
 
     # Test PyUnicode_AsWideCharString()
+    @support.cpython_only
     def test_aswidecharstring(self):
         from _testcapi import unicode_aswidecharstring
         support.import_module('ctypes')
@@ -2355,6 +2414,7 @@ class UnicodeTest(string_tests.CommonTest,
         s += "4"
         self.assertEqual(s, "3")
 
+    @support.cpython_only
     def test_encode_decimal(self):
         from _testcapi import unicode_encodedecimal
         self.assertEqual(unicode_encodedecimal('123'),
@@ -2370,6 +2430,7 @@ class UnicodeTest(string_tests.CommonTest,
             "^'decimal' codec can't encode character",
             unicode_encodedecimal, "123\u20ac", "replace")
 
+    @support.cpython_only
     def test_transform_decimal(self):
         from _testcapi import unicode_transformdecimaltoascii as transform_decimal
         self.assertEqual(transform_decimal('123'),

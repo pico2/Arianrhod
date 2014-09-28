@@ -89,7 +89,7 @@ def print_tb(tb, limit=None, file=None):
     print_list(extract_tb(tb, limit=limit), file=file)
 
 def format_tb(tb, limit=None):
-    """A shorthand for 'format_list(extract_tb(tb, limit))."""
+    """A shorthand for 'format_list(extract_tb(tb, limit))'."""
     return format_list(extract_tb(tb, limit=limit))
 
 def extract_tb(tb, limit=None):
@@ -224,11 +224,12 @@ def _format_exception_only_iter(etype, value):
     if badline is not None:
         yield '    {}\n'.format(badline.strip())
         if offset is not None:
-            caretspace = badline.rstrip('\n')[:offset].lstrip()
+            caretspace = badline.rstrip('\n')
+            offset = min(len(caretspace), offset) - 1
+            caretspace = caretspace[:offset].lstrip()
             # non-space whitespace (likes tabs) must be kept for alignment
             caretspace = ((c.isspace() and c or ' ') for c in caretspace)
-            # only three spaces to account for offset1 == pos 0
-            yield '   {}^\n'.format(''.join(caretspace))
+            yield '    {}^\n'.format(''.join(caretspace))
     msg = value.msg or "<no detail available>"
     yield "{}: {}\n".format(stype, msg)
 

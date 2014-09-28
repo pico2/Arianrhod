@@ -426,7 +426,7 @@ mock using the "as" form of the with statement:
 
 As an alternative `patch`, `patch.object` and `patch.dict` can be used as
 class decorators. When used in this way it is the same as applying the
-decorator indvidually to every method whose name starts with "test".
+decorator individually to every method whose name starts with "test".
 
 
 .. _further-examples:
@@ -476,7 +476,7 @@ the `backend` attribute on a `Something` instance. In this particular case
 we are only interested in the return value from the final call to
 `start_call` so we don't have much configuration to do. Let's assume the
 object it returns is 'file-like', so we'll ensure that our response object
-uses the builtin `file` as its `spec`.
+uses the builtin `open` as its `spec`.
 
 To do this we create a mock instance as our mock backend and create a mock
 response object for it. To set the response as the return value for that final
@@ -488,7 +488,7 @@ We can do that in a slightly nicer way using the :meth:`~Mock.configure_mock`
 method to directly set the return value for us:
 
     >>> something = Something()
-    >>> mock_response = Mock(spec=file)
+    >>> mock_response = Mock(spec=open)
     >>> mock_backend = Mock()
     >>> config = {'get_endpoint.return_value.create_call.return_value.start_call.return_value': mock_response}
     >>> mock_backend.configure_mock(**config)
@@ -934,8 +934,8 @@ After the `MagicMock` has been used we can use attributes like
     the magic methods you specifically want:
 
         >>> mock = Mock()
-        >>> mock.__setitem__ = Mock(side_effect=getitem)
-        >>> mock.__getitem__ = Mock(side_effect=setitem)
+        >>> mock.__getitem__ = Mock(side_effect=getitem)
+        >>> mock.__setitem__ = Mock(side_effect=setitem)
 
     A *third* option is to use `MagicMock` but passing in `dict` as the `spec`
     (or `spec_set`) argument so that the `MagicMock` created only has

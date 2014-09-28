@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 """
 Module difflib -- helpers for computing deltas between objects.
 
@@ -32,7 +30,6 @@ __all__ = ['get_close_matches', 'ndiff', 'restore', 'SequenceMatcher',
            'Differ','IS_CHARACTER_JUNK', 'IS_LINE_JUNK', 'context_diff',
            'unified_diff', 'HtmlDiff', 'Match']
 
-import warnings
 import heapq
 from collections import namedtuple as _namedtuple
 
@@ -514,8 +511,8 @@ class SequenceMatcher:
             non_adjacent.append((i1, j1, k1))
 
         non_adjacent.append( (la, lb, 0) )
-        self.matching_blocks = non_adjacent
-        return map(Match._make, self.matching_blocks)
+        self.matching_blocks = list(map(Match._make, non_adjacent))
+        return self.matching_blocks
 
     def get_opcodes(self):
         """Return list of 5-tuples describing how to turn a into b.

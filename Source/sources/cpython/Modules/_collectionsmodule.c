@@ -1699,11 +1699,13 @@ defdict_init(PyObject *self, PyObject *args, PyObject *kwds)
 }
 
 PyDoc_STRVAR(defdict_doc,
-"defaultdict(default_factory) --> dict with default factory\n\
+"defaultdict(default_factory[, ...]) --> dict with default factory\n\
 \n\
 The default factory is called without arguments to produce\n\
 a new value when a key is not present, in __getitem__ only.\n\
 A defaultdict compares equal to a dict with the same items.\n\
+All remaining arguments are treated the same as if they were\n\
+passed to the dict constructor, including keyword arguments.\n\
 ");
 
 /* See comment in xxsubtype.c */
@@ -1816,7 +1818,7 @@ _count_elements(PyObject *self, PyObject *args)
             Py_DECREF(key);
         }
     } else {
-        bound_get = PyObject_GetAttrString(mapping, "get");
+        bound_get = _PyObject_GetAttrId(mapping, &PyId_get);
         if (bound_get == NULL)
             goto done;
 

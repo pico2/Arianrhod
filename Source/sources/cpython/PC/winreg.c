@@ -871,8 +871,10 @@ Py2Reg(PyObject *value, DWORD typ, BYTE **retDataBuf, DWORD *retDataSize)
         /* ALSO handle ALL unknown data types here.  Even if we can't
            support it natively, we should handle the bits. */
         default:
-            if (value == Py_None)
+            if (value == Py_None) {
                 *retDataSize = 0;
+                *retDataBuf = NULL;
+            }
             else {
                 Py_buffer view;
 
@@ -943,8 +945,10 @@ Reg2Py(BYTE *retDataBuf, DWORD retDataSize, DWORD typ)
 
                 fixupMultiSZ(str, data, len);
                 obData = PyList_New(s);
-                if (obData == NULL)
+                if (obData == NULL) {
+                    PyMem_Free(str);
                     return NULL;
+                }
                 for (index = 0; index < s; index++)
                 {
                     size_t len = wcslen(str[index]);
@@ -952,6 +956,7 @@ Reg2Py(BYTE *retDataBuf, DWORD retDataSize, DWORD typ)
                         PyErr_SetString(PyExc_OverflowError,
                             "registry string is too long for a Python string");
                         Py_DECREF(obData);
+                        PyMem_Free(str);
                         return NULL;
                     }
                     PyList_SetItem(obData,

@@ -8,7 +8,9 @@ OS X 10.5 and the 10.5 SDK.
 Please ensure that this script keeps working with Python 2.5, to avoid
 bootstrap issues (/usr/bin/python is Python 2.5 on OSX 10.5).  Sphinx,
 which is used to build the documentation, currently requires at least
-Python 2.4.
+Python 2.4.  However, as of Python 3.4.1, Doc builds require an external
+sphinx-build and the current versions of Sphinx now require at least
+Python 2.6.
 
 In addition to what is supplied with OS X 10.5+ and Xcode 3+, the script
 requires an installed version of hg and a third-party version of
@@ -21,8 +23,8 @@ installing the most recent ActiveTcl 8.4 or 8.5 version.
 
 32-bit-only installer builds are still possible on OS X 10.4 with Xcode 2.5
 and the installation of additional components, such as a newer Python
-(2.5 is needed for Python parser updates), hg, and svn (for the documentation
-build).
+(2.5 is needed for Python parser updates), hg, and for the documentation
+build either svn (pre-3.4.1) or sphinx-build (3.4.1 and later).
 
 Usage: see USAGE variable in the script.
 """
@@ -148,16 +150,19 @@ SRCDIR = os.path.dirname(
 # $MACOSX_DEPLOYMENT_TARGET -> minimum OS X level
 DEPTARGET = '10.3'
 
-target_cc_map = {
+def getDeptargetTuple():
+    return tuple([int(n) for n in DEPTARGET.split('.')[0:2]])
+
+def getTargetCompilers():
+    target_cc_map = {
         '10.3': ('gcc-4.0', 'g++-4.0'),
         '10.4': ('gcc-4.0', 'g++-4.0'),
         '10.5': ('gcc-4.2', 'g++-4.2'),
         '10.6': ('gcc-4.2', 'g++-4.2'),
-        '10.7': ('clang', 'clang++'),
-        '10.8': ('clang', 'clang++'),
-}
+    }
+    return target_cc_map.get(DEPTARGET, ('clang', 'clang++') )
 
-CC, CXX = target_cc_map[DEPTARGET]
+CC, CXX = getTargetCompilers()
 
 PYTHON_3 = getVersionTuple() >= (3, 0)
 
@@ -190,14 +195,15 @@ EXPECTED_SHARED_LIBS = {}
 def library_recipes():
     result = []
 
-    LT_10_5 = bool(DEPTARGET < '10.5')
+    LT_10_5 = bool(getDeptargetTuple() < (10, 5))
 
-    if DEPTARGET > '10.5':
+#   Disable for now
+    if False:   # if (getDeptargetTuple() > (10, 5)) and (getVersionTuple() >= (3, 5)):
         result.extend([
           dict(
-              name="Tcl 8.5.14",
-              url="ftp://ftp.tcl.tk/pub/tcl//tcl8_5/tcl8.5.14-src.tar.gz",
-              checksum='44b50e58ab45dd272f6714dce2129123',
+              name="Tcl 8.5.15",
+              url="ftp://ftp.tcl.tk/pub/tcl//tcl8_5/tcl8.5.15-src.tar.gz",
+              checksum='f3df162f92c69b254079c4d0af7a690f',
               buildDir="unix",
               configure_pre=[
                     '--enable-shared',
@@ -211,9 +217,12 @@ def library_recipes():
                   },
               ),
           dict(
-              name="Tk 8.5.14",
-              url="ftp://ftp.tcl.tk/pub/tcl//tcl8_5/tk8.5.14-src.tar.gz",
-              checksum='a9c48921b3688020470cd3a6dd4e867d',
+              name="Tk 8.5.15",
+              url="ftp://ftp.tcl.tk/pub/tcl//tcl8_5/tk8.5.15-src.tar.gz",
+              checksum='55b8e33f903210a4e1c8bce0f820657f',
+              patches=[
+                  "issue19373_tk_8_5_15_source.patch",
+                   ],
               buildDir="unix",
               configure_pre=[
                     '--enable-aqua',
@@ -233,9 +242,9 @@ def library_recipes():
     if getVersionTuple() >= (3, 3):
         result.extend([
           dict(
-              name="XZ 5.0.3",
-              url="http://tukaani.org/xz/xz-5.0.3.tar.gz",
-              checksum='fefe52f9ecd521de2a8ce38c21a27574',
+              name="XZ 5.0.5",
+              url="http://tukaani.org/xz/xz-5.0.5.tar.gz",
+              checksum='19d924e066b6fff0bc9d1981b4e53196',
               configure_pre=[
                     '--disable-dependency-tracking',
               ]
@@ -278,9 +287,9 @@ def library_recipes():
                   ),
           ),
           dict(
-              name="SQLite 3.7.13",
-              url="http://www.sqlite.org/sqlite-autoconf-3071300.tar.gz",
-              checksum='c97df403e8a3d5b67bb408fcd6aabd8e',
+              name="SQLite 3.8.3.1",
+              url="http://www.sqlite.org/2014/sqlite-autoconf-3080301.tar.gz",
+              checksum='509ff98d8dc9729b618b7e96612079c6',
               extra_cflags=('-Os '
                             '-DSQLITE_ENABLE_FTS4 '
                             '-DSQLITE_ENABLE_FTS3_PARENTHESIS '
@@ -297,7 +306,7 @@ def library_recipes():
           ),
         ])
 
-    if DEPTARGET < '10.5':
+    if getDeptargetTuple() < (10, 5):
         result.extend([
           dict(
               name="Bzip2 1.0.6",
@@ -360,6 +369,8 @@ def library_recipes():
 # Instructions for building packages inside the .mpkg.
 def pkg_recipes():
     unselected_for_python3 = ('selected', 'unselected')[PYTHON_3]
+    # unselected if 3.0 through 3.3, selected otherwise (2.x or >= 3.4)
+    unselected_for_lt_python34 = ('selected', 'unselected')[(3, 0) <= getVersionTuple() < (3, 4)]
     result = [
         dict(
             name="PythonFramework",
@@ -428,11 +439,28 @@ def pkg_recipes():
             topdir="/Library/Frameworks/Python.framework",
             source="/empty-dir",
             required=False,
-            selected=unselected_for_python3,
+            selected=unselected_for_lt_python34,
         ),
     ]
 
-    if DEPTARGET < '10.4' and not PYTHON_3:
+    if getVersionTuple() >= (3, 4):
+        result.append(
+            dict(
+                name="PythonInstallPip",
+                long_name="Install or upgrade pip",
+                readme="""\
+                    This package installs (or upgrades from an earlier version)
+                    pip, a tool for installing and managing Python packages.
+                    """,
+                postflight="scripts/postflight.ensurepip",
+                topdir="/Library/Frameworks/Python.framework",
+                source="/empty-dir",
+                required=False,
+                selected='selected',
+            )
+        )
+
+    if getDeptargetTuple() < (10, 4) and not PYTHON_3:
         result.append(
             dict(
                 name="PythonSystemFixes",
@@ -449,6 +477,7 @@ def pkg_recipes():
                 selected=unselected_for_python3,
             )
         )
+
     return result
 
 def fatal(msg):
@@ -563,20 +592,6 @@ def checkEnvironment():
                 % frameworks['Tk'],
             ]
 
-    # For 10.6+ builds, we build two versions of _tkinter:
-    #    - the traditional version (renamed to _tkinter.so.framework) linked
-    #       with /Library/Frameworks/{Tcl,Tk}.framework
-    #    - the default version linked with our private copies of Tcl and Tk
-    if DEPTARGET > '10.5':
-        EXPECTED_SHARED_LIBS['_tkinter.so.framework'] = \
-            EXPECTED_SHARED_LIBS['_tkinter.so']
-        EXPECTED_SHARED_LIBS['_tkinter.so'] = [
-                "/Library/Frameworks/Python.framework/Versions/%s/lib/libtcl%s.dylib"
-                    % (getVersion(), frameworks['Tcl']),
-                "/Library/Frameworks/Python.framework/Versions/%s/lib/libtk%s.dylib"
-                    % (getVersion(), frameworks['Tk']),
-                ]
-
     # Remove inherited environment variables which might influence build
     environ_var_prefixes = ['CPATH', 'C_INCLUDE_', 'DYLD_', 'LANG', 'LC_',
                             'LD_', 'LIBRARY_', 'PATH', 'PYTHON']
@@ -597,7 +612,10 @@ def checkEnvironment():
         base_path = base_path + ':' + OLD_DEVELOPER_TOOLS
     os.environ['PATH'] = base_path
     print("Setting default PATH: %s"%(os.environ['PATH']))
-
+    # Ensure ws have access to hg and to sphinx-build.
+    # You may have to create links in /usr/bin for them.
+    runCommand('hg --version')
+    runCommand('sphinx-build --version')
 
 def parseOptions(args=None):
     """
@@ -662,7 +680,7 @@ def parseOptions(args=None):
     SDKPATH=os.path.abspath(SDKPATH)
     DEPSRC=os.path.abspath(DEPSRC)
 
-    CC, CXX=target_cc_map[DEPTARGET]
+    CC, CXX = getTargetCompilers()
 
     print("Settings:")
     print(" * Source directory:", SRCDIR)
@@ -796,8 +814,6 @@ def buildRecipe(recipe, basedir, archList):
 
     workDir = extractArchive(buildDir, sourceArchive)
     os.chdir(workDir)
-    if 'buildDir' in recipe:
-        os.chdir(recipe['buildDir'])
 
     for patch in recipe.get('patches', ()):
         if isinstance(patch, tuple):
@@ -824,6 +840,9 @@ def buildRecipe(recipe, basedir, archList):
         runCommand('sh %s' % shellQuote(fn))
         os.unlink(fn)
 
+    if 'buildDir' in recipe:
+        os.chdir(recipe['buildDir'])
+
     if configure is not None:
         configure_args = [
             "--prefix=/usr/local",
@@ -849,7 +868,7 @@ def buildRecipe(recipe, basedir, archList):
                         ' -arch '.join(archList),
                         shellQuote(SDKPATH)[1:-1],
                         shellQuote(basedir)[1:-1],),
-                "LDFLAGS=-mmacosx-version-min=%s -syslibroot,%s -L%s/usr/local/lib -arch %s"%(
+                "LDFLAGS=-mmacosx-version-min=%s -isysroot %s -L%s/usr/local/lib -arch %s"%(
                     DEPTARGET,
                     shellQuote(SDKPATH)[1:-1],
                     shellQuote(basedir)[1:-1],
@@ -909,8 +928,10 @@ def buildPythonDocs():
     docdir = os.path.join(rootDir, 'pydocs')
     curDir = os.getcwd()
     os.chdir(buildDir)
-    runCommand('make update')
-    runCommand("make html PYTHON='%s'" % os.path.abspath(sys.executable))
+    # The Doc build changed for 3.4 (technically, for 3.4.1) and for 2.7.9
+    runCommand('make clean')
+    # Assume sphinx-build is on our PATH, checked in checkEnvironment
+    runCommand('make html')
     os.chdir(curDir)
     if not os.path.exists(docdir):
         os.mkdir(docdir)
@@ -950,33 +971,21 @@ def buildPython():
     runCommand("%s -C --enable-framework --enable-universalsdk=%s "
                "--with-universal-archs=%s "
                "%s "
+               "%s "
                "LDFLAGS='-g -L%s/libraries/usr/local/lib' "
-               "OPT='-g -O3 -I%s/libraries/usr/local/include' 2>&1"%(
+               "CFLAGS='-g -I%s/libraries/usr/local/include' 2>&1"%(
         shellQuote(os.path.join(SRCDIR, 'configure')), shellQuote(SDKPATH),
         UNIVERSALARCHS,
         (' ', '--with-computed-gotos ')[PYTHON_3],
+        (' ', '--without-ensurepip ')[getVersionTuple() >= (3, 4)],
         shellQuote(WORKDIR)[1:-1],
         shellQuote(WORKDIR)[1:-1]))
 
+    print("Running make touch")
+    runCommand("make touch")
+
     print("Running make")
     runCommand("make")
-
-    # For deployment targets of 10.6 and higher, we build our own version
-    # of Tcl and Cocoa Aqua Tk libs because the Apple-supplied Tk 8.5 is
-    # out-of-date and has critical bugs.  Save the _tkinter.so that was
-    # linked with /Library/Frameworks/{Tck,Tk}.framework and build
-    # another _tkinter.so linked with our private Tcl and Tk libs.
-    if DEPTARGET > '10.5':
-        runCommand("find build -name '_tkinter.so' "
-                        " -execdir mv '{}' '{}'.framework \;")
-        print("Running make to rebuild _tkinter")
-        runCommand("make TCLTK_INCLUDES='-I%s/libraries/usr/local/include' "
-                "TCLTK_LIBS='-L%s/libraries/usr/local/lib -ltcl8.5 -ltk8.5'"%(
-            shellQuote(WORKDIR)[1:-1],
-            shellQuote(WORKDIR)[1:-1]))
-        # make a backup copy, just in case
-        runCommand("find build -name '_tkinter.so' "
-                        " -execdir cp -p '{}' '{}'.private \;")
 
     print("Running make install")
     runCommand("make install DESTDIR=%s"%(
@@ -997,6 +1006,10 @@ def buildPython():
             shellQuote(os.path.join(WORKDIR, '_root', 'Library', 'Frameworks',
                 'Python.framework', 'Versions', getVersion(),
                 'lib'))))
+
+    path_to_lib = os.path.join(rootDir, 'Library', 'Frameworks',
+                                'Python.framework', 'Versions',
+                                version, 'lib', 'python%s'%(version,))
 
     print("Fix file modes")
     frmDir = os.path.join(rootDir, 'Library', 'Frameworks', 'Python.framework')
@@ -1059,10 +1072,6 @@ def buildPython():
 
     include_path = '-I%s/libraries/usr/local/include' % (WORKDIR,)
     lib_path = '-L%s/libraries/usr/local/lib' % (WORKDIR,)
-
-    path_to_lib = os.path.join(rootDir, 'Library', 'Frameworks',
-                                'Python.framework', 'Versions',
-                                version, 'lib', 'python%s'%(version,))
 
     # fix Makefile
     path = os.path.join(path_to_lib, 'config' + config_suffix, 'Makefile')

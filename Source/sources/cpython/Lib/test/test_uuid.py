@@ -1,6 +1,9 @@
 import unittest
+from test import support
 import builtins
+import io
 import os
+import shutil
 import uuid
 
 def importable(name):
@@ -355,6 +358,31 @@ class TestUUID(unittest.TestCase):
         self.check_node(node2, "getnode2")
 
         self.assertEqual(node1, node2)
+
+    @unittest.skipUnless(os.name == 'posix', 'requires Posix')
+    def test_find_mac(self):
+        data = '''\
+
+fake hwaddr
+cscotun0  Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+eth0      Link encap:Ethernet  HWaddr 12:34:56:78:90:ab
+'''
+        def mock_popen(cmd):
+            return io.StringIO(data)
+
+        if shutil.which('ifconfig') is None:
+            path = os.pathsep.join(('/sbin', '/usr/sbin'))
+            if shutil.which('ifconfig', path=path) is None:
+                self.skipTest('requires ifconfig')
+
+        with support.swap_attr(os, 'popen', mock_popen):
+            mac = uuid._find_mac(
+                command='ifconfig',
+                args='',
+                hw_identifiers=['hwaddr'],
+                get_index=lambda x: x + 1,
+            )
+            self.assertEqual(mac, 0x1234567890ab)
 
     @unittest.skipUnless(importable('ctypes'), 'requires ctypes')
     def test_uuid1(self):

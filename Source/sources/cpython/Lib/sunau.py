@@ -352,7 +352,7 @@ class Au_write:
     def setsampwidth(self, sampwidth):
         if self._nframeswritten:
             raise Error('cannot change parameters after starting to write')
-        if sampwidth not in (1, 2, 4):
+        if sampwidth not in (1, 2, 3, 4):
             raise Error('bad sample width')
         self._sampwidth = sampwidth
 
@@ -415,6 +415,8 @@ class Au_write:
         return self._nframeswritten
 
     def writeframesraw(self, data):
+        if not isinstance(data, (bytes, bytearray)):
+            data = memoryview(data).cast('B')
         self._ensure_header_written()
         if self._comptype == 'ULAW':
             import audioop
@@ -465,6 +467,9 @@ class Au_write:
             elif self._sampwidth == 2:
                 encoding = AUDIO_FILE_ENCODING_LINEAR_16
                 self._framesize = 2
+            elif self._sampwidth == 3:
+                encoding = AUDIO_FILE_ENCODING_LINEAR_24
+                self._framesize = 3
             elif self._sampwidth == 4:
                 encoding = AUDIO_FILE_ENCODING_LINEAR_32
                 self._framesize = 4

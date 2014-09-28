@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -42,43 +42,35 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PGUpdate|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PGInstrument|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PGUpdate|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PGInstrument|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -167,16 +159,12 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='PGUpdate|x64'">$(PyDllName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(PyDllName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/Zm200  %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>..\Python;..\Modules\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_ENABLE_SHARED;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -185,15 +173,24 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Generate build information...</Message>
-      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)"</Command>
+      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)\"</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>msvcrt.lib;$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(PyDllName).dll</OutputFile>
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <BaseAddress>0x1e000000</BaseAddress>
-      <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -212,13 +209,23 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Generate build information...</Message>
-      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)"</Command>
+      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)\"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <BaseAddress>0x1e000000</BaseAddress>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -244,6 +251,16 @@
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <BaseAddress>0x1e000000</BaseAddress>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -272,6 +289,16 @@
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <BaseAddress>0x1e000000</BaseAddress>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='PGInstrument|Win32'">
     <ClCompile>
@@ -287,7 +314,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Generate build information...</Message>
-      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)"</Command>
+      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)\"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
@@ -295,6 +322,16 @@
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <BaseAddress>0x1e000000</BaseAddress>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='PGInstrument|x64'">
     <Midl>
@@ -313,7 +350,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Generate build information...</Message>
-      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)"</Command>
+      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)\"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
@@ -321,6 +358,16 @@
       <BaseAddress>0x1e000000</BaseAddress>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='PGUpdate|Win32'">
     <ClCompile>
@@ -336,7 +383,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Generate build information...</Message>
-      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)"</Command>
+      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)\"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
@@ -344,6 +391,16 @@
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <BaseAddress>0x1e000000</BaseAddress>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='PGUpdate|x64'">
     <Midl>
@@ -362,7 +419,7 @@
     </ResourceCompile>
     <PreLinkEvent>
       <Message>Generate build information...</Message>
-      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)"</Command>
+      <Command>"$(SolutionDir)make_buildinfo.exe" Release "$(IntDir)\"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>$(IntDir)getbuildinfo.o;%(AdditionalDependencies)</AdditionalDependencies>
@@ -370,6 +427,16 @@
       <BaseAddress>0x1e000000</BaseAddress>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>$(KillPythonExe)
+IF %ERRORLEVEL% NEQ 0 (
+    echo kill_python: war^ning: could not kill running Pythons, exit code %ERRORLEVEL%
+    exit /b 0
+)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Killing any running $(PythonExe) instances...</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\abstract.h" />
@@ -425,6 +492,7 @@
     <ClInclude Include="..\Include\patchlevel.h" />
     <ClInclude Include="..\Include\pgen.h" />
     <ClInclude Include="..\Include\pgenheaders.h" />
+    <ClInclude Include="..\Include\pyhash.h" />
     <ClInclude Include="..\Include\py_curses.h" />
     <ClInclude Include="..\Include\pyarena.h" />
     <ClInclude Include="..\Include\pycapsule.h" />
@@ -461,7 +529,11 @@
     <ClInclude Include="..\Include\unicodeobject.h" />
     <ClInclude Include="..\Include\weakrefobject.h" />
     <ClInclude Include="..\Modules\_math.h" />
+    <ClInclude Include="..\Modules\hashtable.h" />
     <ClInclude Include="..\Modules\rotatingtree.h" />
+    <ClInclude Include="..\Modules\sre.h" />
+    <ClInclude Include="..\Modules\sre_constants.h" />
+    <ClInclude Include="..\Modules\sre_lib.h" />
     <ClInclude Include="..\Modules\_io\_iomodule.h" />
     <ClInclude Include="..\Modules\zlib\crc32.h" />
     <ClInclude Include="..\Modules\zlib\deflate.h" />
@@ -526,11 +598,13 @@
     <ClCompile Include="..\Modules\errnomodule.c" />
     <ClCompile Include="..\Modules\faulthandler.c" />
     <ClCompile Include="..\Modules\gcmodule.c" />
+    <ClCompile Include="..\Modules\hashtable.c" />
     <ClCompile Include="..\Modules\itertoolsmodule.c" />
     <ClCompile Include="..\Modules\main.c" />
     <ClCompile Include="..\Modules\mathmodule.c" />
     <ClCompile Include="..\Modules\md5module.c" />
     <ClCompile Include="..\Modules\mmapmodule.c" />
+    <ClCompile Include="..\Modules\_opcode.c" />
     <ClCompile Include="..\Modules\_operator.c" />
     <ClCompile Include="..\Modules\parsermodule.c" />
     <ClCompile Include="..\Modules\posixmodule.c" />
@@ -541,6 +615,7 @@
     <ClCompile Include="..\Modules\signalmodule.c" />
     <ClCompile Include="..\Modules\symtablemodule.c" />
     <ClCompile Include="..\Modules\_threadmodule.c" />
+    <ClCompile Include="..\Modules\_tracemalloc.c" />
     <ClCompile Include="..\Modules\timemodule.c" />
     <ClCompile Include="..\Modules\xxsubtype.c" />
     <ClCompile Include="..\Modules\zipimport.c" />
@@ -626,6 +701,7 @@
     <ClCompile Include="..\PC\dl_nt.c" />
     <ClCompile Include="..\PC\getpathp.c" />
     <ClCompile Include="..\PC\msvcrtmodule.c" />
+    <ClCompile Include="..\Python\pyhash.c" />
     <ClCompile Include="..\Python\random.c" />
     <ClCompile Include="..\Python\_warnings.c" />
     <ClCompile Include="..\Python\asdl.c" />

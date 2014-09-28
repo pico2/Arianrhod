@@ -40,11 +40,11 @@ Creating virtual environments
    A venv is a directory tree which contains Python executable files and
    other files which indicate that it is a venv.
 
-   Common installation tools such as ``Distribute`` and ``pip`` work as
+   Common installation tools such as ``Setuptools`` and ``pip`` work as
    expected with venvs - i.e. when a venv is active, they install Python
    packages into the venv without needing to be told to do so explicitly.
    Of course, you need to install them into the venv first: this could be
-   done by running ``distribute_setup.py`` with the venv activated,
+   done by running ``ez_setup.py`` with the venv activated,
    followed by running ``easy_install pip``. Alternatively, you could download
    the source tarballs and run ``python setup.py install`` after unpacking,
    with the venv activated.
@@ -76,6 +76,8 @@ Creating virtual environments
    without there needing to be any reference to its venv in ``PATH``.
 
 
+.. _venv-api:
+
 API
 ---
 
@@ -85,7 +87,8 @@ The high-level method described above makes use of a simple API which provides
 mechanisms for third-party virtual environment creators to customize environment
 creation according to their needs, the :class:`EnvBuilder` class.
 
-.. class:: EnvBuilder(system_site_packages=False, clear=False, symlinks=False, upgrade=False)
+.. class:: EnvBuilder(system_site_packages=False, clear=False, \
+                      symlinks=False, upgrade=False, with_pip=False)
 
     The :class:`EnvBuilder` class accepts the following keyword arguments on
     instantiation:
@@ -93,7 +96,7 @@ creation according to their needs, the :class:`EnvBuilder` class.
     * ``system_site_packages`` -- a Boolean value indicating that the system Python
       site-packages should be available to the environment (defaults to ``False``).
 
-    * ``clear`` -- a Boolean value which, if True, will delete the contents of
+    * ``clear`` -- a Boolean value which, if true, will delete the contents of
       any existing target directory, before creating the environment.
 
     * ``symlinks`` -- a Boolean value indicating whether to attempt to symlink the
@@ -101,9 +104,16 @@ creation according to their needs, the :class:`EnvBuilder` class.
       e.g. ``pythonw.exe``), rather than copying. Defaults to ``True`` on Linux and
       Unix systems, but ``False`` on Windows.
 
-    * ``upgrade`` -- a Boolean value which, if True, will upgrade an existing
+    * ``upgrade`` -- a Boolean value which, if true, will upgrade an existing
       environment with the running Python - for use when that Python has been
       upgraded in-place (defaults to ``False``).
+
+    * ``with_pip`` -- a Boolean value which, if true, ensures pip is
+      installed in the virtual environment. This uses :mod:`ensurepip` with
+      the ``--default-pip`` option.
+
+    .. versionchanged:: 3.4
+       Added the ``with_pip`` parameter
 
 
     Creators of third-party virtual environment tools will be free to use the
@@ -201,10 +211,14 @@ creation according to their needs, the :class:`EnvBuilder` class.
 
 There is also a module-level convenience function:
 
-.. function:: create(env_dir, system_site_packages=False, clear=False, symlinks=False)
+.. function:: create(env_dir, system_site_packages=False, clear=False, \
+                     symlinks=False, with_pip=False)
 
     Create an :class:`EnvBuilder` with the given keyword arguments, and call its
     :meth:`~EnvBuilder.create` method with the *env_dir* argument.
+
+    .. versionchanged:: 3.4
+       Added the ``with_pip`` parameter
 
 An example of extending ``EnvBuilder``
 --------------------------------------

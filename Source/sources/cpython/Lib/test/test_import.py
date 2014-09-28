@@ -3,7 +3,6 @@ import importlib
 import importlib.util
 from importlib._bootstrap import _get_sourcefile
 import builtins
-from test.test_importlib.import_ import util as importlib_util
 import marshal
 import os
 import platform
@@ -149,15 +148,23 @@ class ImportTests(unittest.TestCase):
         sys.path.append('')
         importlib.invalidate_caches()
 
+        namespace = {}
         try:
             make_legacy_pyc(filename)
             # This used to crash.
-            exec('import ' + module)
+            exec('import ' + module, None, namespace)
         finally:
             # Cleanup.
             del sys.path[-1]
             unlink(filename + 'c')
             unlink(filename + 'o')
+
+            # Remove references to the module (unload the module)
+            namespace.clear()
+            try:
+                del sys.modules[module]
+            except KeyError:
+                pass
 
     def test_failing_import_sticks(self):
         source = TESTFN + ".py"
@@ -183,12 +190,12 @@ class ImportTests(unittest.TestCase):
         # import x.y.z binds x in the current namespace
         import test as x
         import test.support
-        self.assertTrue(x is test, x.__name__)
+        self.assertIs(x, test, x.__name__)
         self.assertTrue(hasattr(test.support, "__file__"))
 
         # import x.y.z as w binds z as w
         import test.support as y
-        self.assertTrue(y is test.support, y.__name__)
+        self.assertIs(y, test.support, y.__name__)
 
     def test_failing_reload(self):
         # A failing reload should leave the module object in sys.modules.
@@ -216,7 +223,7 @@ class ImportTests(unittest.TestCase):
             self.assertRaises(ZeroDivisionError, importlib.reload, mod)
             # But we still expect the module to be in sys.modules.
             mod = sys.modules.get(TESTFN)
-            self.assertIsNot(mod, None, "expected module to be in sys.modules")
+            self.assertIsNotNone(mod, "expected module to be in sys.modules")
 
             # We should have replaced a w/ 10, but the old b value should
             # stick.
@@ -1029,11 +1036,14 @@ class ImportTracebackTests(unittest.TestCase):
         # away from the traceback.
         self.create_module("foo", "")
         importlib = sys.modules['_frozen_importlib']
-        old_load_module = importlib.SourceLoader.load_module
+        if 'load_module' in vars(importlib.SourceLoader):
+            old_exec_module = importlib.SourceLoader.exec_module
+        else:
+            old_exec_module = None
         try:
-            def load_module(*args):
+            def exec_module(*args):
                 1/0
-            importlib.SourceLoader.load_module = load_module
+            importlib.SourceLoader.exec_module = exec_module
             try:
                 import foo
             except ZeroDivisionError as e:
@@ -1042,7 +1052,10 @@ class ImportTracebackTests(unittest.TestCase):
                 self.fail("ZeroDivisionError should have been raised")
             self.assert_traceback(tb, [__file__, '<frozen importlib', __file__])
         finally:
-            importlib.SourceLoader.load_module = old_load_module
+            if old_exec_module is None:
+                del importlib.SourceLoader.exec_module
+            else:
+                importlib.SourceLoader.exec_module = old_exec_module
 
     @unittest.skipUnless(TESTFN_UNENCODABLE, 'need TESTFN_UNENCODABLE')
     def test_unencodable_filename(self):
@@ -1050,7 +1063,8 @@ class ImportTracebackTests(unittest.TestCase):
         # encode filenames, especially on Windows
         pyname = script_helper.make_script('', TESTFN_UNENCODABLE, 'pass')
         name = pyname[:-3]
-        script_helper.assert_python_ok("-c", "mod = __import__(%a)" % name)
+        script_helper.assert_python_ok("-c", "mod = __import__(%a)" % name,
+                                       __isolated=False)
 
 
 if __name__ == '__main__':

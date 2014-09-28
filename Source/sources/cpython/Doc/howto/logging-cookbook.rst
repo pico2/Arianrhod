@@ -416,7 +416,7 @@ module. Here is a basic working example::
        Simple TCP socket-based logging receiver suitable for testing.
        """
 
-       allow_reuse_address = 1
+       allow_reuse_address = True
 
        def __init__(self, host='localhost',
                     port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
@@ -839,7 +839,7 @@ separate thread::
             },
             'loggers': {
                 'foo': {
-                    'handlers' : ['foofile']
+                    'handlers': ['foofile']
                 }
             },
             'root': {
@@ -1096,7 +1096,7 @@ Python 3.2 or later.
 
 .. _custom-logrecord:
 
-Customising ``LogRecord``
+Customizing ``LogRecord``
 -------------------------
 
 Every logging event is represented by a :class:`LogRecord` instance.
@@ -1308,12 +1308,12 @@ This dictionary is passed to :func:`~config.dictConfig` to put the configuration
     }
 
 For more information about this configuration, you can see the `relevant
-section <https://docs.djangoproject.com/en/1.3/topics/logging/#configuring-logging>`_
+section <https://docs.djangoproject.com/en/1.6/topics/logging/#configuring-logging>`_
 of the Django documentation.
 
 .. _cookbook-rotator-namer:
 
-Using a rotator and namer to customise log rotation processing
+Using a rotator and namer to customize log rotation processing
 --------------------------------------------------------------
 
 An example of how you can define a namer and rotator is given in the following
@@ -1527,7 +1527,7 @@ works::
             },
             'loggers': {
                 'foo': {
-                    'handlers' : ['foofile']
+                    'handlers': ['foofile']
                 }
             },
             'root': {
@@ -1691,4 +1691,345 @@ When the above script is run, it prints::
 
 Note that the order of items might be different according to the version of
 Python used.
+
+
+.. _custom-handlers:
+
+.. currentmodule:: logging.config
+
+Customizing handlers with :func:`dictConfig`
+--------------------------------------------
+
+There are times when you want to customize logging handlers in particular ways,
+and if you use :func:`dictConfig` you may be able to do this without
+subclassing. As an example, consider that you may want to set the ownership of a
+log file. On POSIX, this is easily done using :func:`shutil.chown`, but the file
+handlers in the stdlib don't offer built-in support. You can customize handler
+creation using a plain function such as::
+
+    def owned_file_handler(filename, mode='a', encoding=None, owner=None):
+        if owner:
+            if not os.path.exists(filename):
+                open(filename, 'a').close()
+            shutil.chown(filename, *owner)
+        return logging.FileHandler(filename, mode, encoding)
+
+You can then specify, in a logging configuration passed to :func:`dictConfig`,
+that a logging handler be created by calling this function::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'default': {
+                'format': '%(asctime)s %(levelname)s %(name)s %(message)s'
+            },
+        },
+        'handlers': {
+            'file':{
+                # The values below are popped from this dictionary and
+                # used to create the handler, set the handler's level and
+                # its formatter.
+                '()': owned_file_handler,
+                'level':'DEBUG',
+                'formatter': 'default',
+                # The values below are passed to the handler creator callable
+                # as keyword arguments.
+                'owner': ['pulse', 'pulse'],
+                'filename': 'chowntest.log',
+                'mode': 'w',
+                'encoding': 'utf-8',
+            },
+        },
+        'root': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+    }
+
+In this example I am setting the ownership using the ``pulse`` user and group,
+just for the purposes of illustration. Putting it together into a working
+script, ``chowntest.py``::
+
+    import logging, logging.config, os, shutil
+
+    def owned_file_handler(filename, mode='a', encoding=None, owner=None):
+        if owner:
+            if not os.path.exists(filename):
+                open(filename, 'a').close()
+            shutil.chown(filename, *owner)
+        return logging.FileHandler(filename, mode, encoding)
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'default': {
+                'format': '%(asctime)s %(levelname)s %(name)s %(message)s'
+            },
+        },
+        'handlers': {
+            'file':{
+                # The values below are popped from this dictionary and
+                # used to create the handler, set the handler's level and
+                # its formatter.
+                '()': owned_file_handler,
+                'level':'DEBUG',
+                'formatter': 'default',
+                # The values below are passed to the handler creator callable
+                # as keyword arguments.
+                'owner': ['pulse', 'pulse'],
+                'filename': 'chowntest.log',
+                'mode': 'w',
+                'encoding': 'utf-8',
+            },
+        },
+        'root': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+    }
+
+    logging.config.dictConfig(LOGGING)
+    logger = logging.getLogger('mylogger')
+    logger.debug('A debug message')
+
+To run this, you will probably need to run as ``root``::
+
+    $ sudo python3.3 chowntest.py
+    $ cat chowntest.log
+    2013-11-05 09:34:51,128 DEBUG mylogger A debug message
+    $ ls -l chowntest.log
+    -rw-r--r-- 1 pulse pulse 55 2013-11-05 09:34 chowntest.log
+
+Note that this example uses Python 3.3 because that's where :func:`shutil.chown`
+makes an appearance. This approach should work with any Python version that
+supports :func:`dictConfig` - namely, Python 2.7, 3.2 or later. With pre-3.3
+versions, you would need to implement the actual ownership change using e.g.
+:func:`os.chown`.
+
+In practice, the handler-creating function may be in a utility module somewhere
+in your project. Instead of the line in the configuration::
+
+    '()': owned_file_handler,
+
+you could use e.g.::
+
+    '()': 'ext://project.util.owned_file_handler',
+
+where ``project.util`` can be replaced with the actual name of the package
+where the function resides. In the above working script, using
+``'ext://__main__.owned_file_handler'`` should work. Here, the actual callable
+is resolved by :func:`dictConfig` from the ``ext://`` specification.
+
+This example hopefully also points the way to how you could implement other
+types of file change - e.g. setting specific POSIX permission bits - in the
+same way, using :func:`os.chmod`.
+
+Of course, the approach could also be extended to types of handler other than a
+:class:`~logging.FileHandler` - for example, one of the rotating file handlers,
+or a different type of handler altogether.
+
+
+.. currentmodule:: logging
+
+.. _formatting-styles:
+
+Using particular formatting styles throughout your application
+--------------------------------------------------------------
+
+In Python 3.2, the :class:`~logging.Formatter` gained a ``style`` keyword
+parameter which, while defaulting to ``%`` for backward compatibility, allowed
+the specification of ``{`` or ``$`` to support the formatting approaches
+supported by :meth:`str.format` and :class:`string.Template`. Note that this
+governs the formatting of logging messages for final output to logs, and is
+completely orthogonal to how an individual logging message is constructed.
+
+Logging calls (:meth:`~Logger.debug`, :meth:`~Logger.info` etc.) only take
+positional parameters for the actual logging message itself, with keyword
+parameters used only for determining options for how to handle the logging call
+(e.g. the ``exc_info`` keyword parameter to indicate that traceback information
+should be logged, or the ``extra`` keyword parameter to indicate additional
+contextual information to be added to the log). So you cannot directly make
+logging calls using :meth:`str.format` or :class:`string.Template` syntax,
+because internally the logging package uses %-formatting to merge the format
+string and the variable arguments. There would no changing this while preserving
+backward compatibility, since all logging calls which are out there in existing
+code will be using %-format strings.
+
+There have been suggestions to associate format styles with specific loggers,
+but that approach also runs into backward compatibility problems because any
+existing code could be using a given logger name and using %-formatting.
+
+For logging to work interoperably between any third-party libraries and your
+code, decisions about formatting need to be made at the level of the
+individual logging call. This opens up a couple of ways in which alternative
+formatting styles can be accommodated.
+
+
+Using LogRecord factories
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In Python 3.2, along with the :class:`~logging.Formatter` changes mentioned
+above, the logging package gained the ability to allow users to set their own
+:class:`LogRecord` subclasses, using the :func:`setLogRecordFactory` function.
+You can use this to set your own subclass of :class:`LogRecord`, which does the
+Right Thing by overriding the :meth:`~LogRecord.getMessage` method. The base
+class implementation of this method is where the ``msg % args`` formatting
+happens, and where you can substitute your alternate formatting; however, you
+should be careful to support all formatting styles and allow %-formatting as
+the default, to ensure interoperability with other code. Care should also be
+taken to call ``str(self.msg)``, just as the base implementation does.
+
+Refer to the reference documentation on :func:`setLogRecordFactory` and
+:class:`LogRecord` for more information.
+
+
+Using custom message objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There is another, perhaps simpler way that you can use {}- and $- formatting to
+construct your individual log messages. You may recall (from
+:ref:`arbitrary-object-messages`) that when logging you can use an arbitrary
+object as a message format string, and that the logging package will call
+:func:`str` on that object to get the actual format string. Consider the
+following two classes::
+
+    class BraceMessage(object):
+        def __init__(self, fmt, *args, **kwargs):
+            self.fmt = fmt
+            self.args = args
+            self.kwargs = kwargs
+
+        def __str__(self):
+            return self.fmt.format(*self.args, **self.kwargs)
+
+    class DollarMessage(object):
+        def __init__(self, fmt, **kwargs):
+            self.fmt = fmt
+            self.kwargs = kwargs
+
+        def __str__(self):
+            from string import Template
+            return Template(self.fmt).substitute(**self.kwargs)
+
+Either of these can be used in place of a format string, to allow {}- or
+$-formatting to be used to build the actual "message" part which appears in the
+formatted log output in place of “%(message)s” or “{message}” or “$message”.
+If you find it a little unwieldy to use the class names whenever you want to log
+something, you can make it more palatable if you use an alias such as ``M`` or
+``_`` for the message (or perhaps ``__``, if you are using ``_`` for
+localization).
+
+Examples of this approach are given below. Firstly, formatting with
+:meth:`str.format`::
+
+    >>> __ = BraceMessage
+    >>> print(__('Message with {0} {1}', 2, 'placeholders'))
+    Message with 2 placeholders
+    >>> class Point: pass
+    ...
+    >>> p = Point()
+    >>> p.x = 0.5
+    >>> p.y = 0.5
+    >>> print(__('Message with coordinates: ({point.x:.2f}, {point.y:.2f})', point=p))
+    Message with coordinates: (0.50, 0.50)
+
+Secondly, formatting with :class:`string.Template`::
+
+    >>> __ = DollarMessage
+    >>> print(__('Message with $num $what', num=2, what='placeholders'))
+    Message with 2 placeholders
+    >>>
+
+One thing to note is that you pay no significant performance penalty with this
+approach: the actual formatting happens not when you make the logging call, but
+when (and if) the logged message is actually about to be output to a log by a
+handler. So the only slightly unusual thing which might trip you up is that the
+parentheses go around the format string and the arguments, not just the format
+string. That’s because the __ notation is just syntax sugar for a constructor
+call to one of the ``XXXMessage`` classes shown above.
+
+
+.. _filters-dictconfig:
+
+.. currentmodule:: logging.config
+
+Configuring filters with :func:`dictConfig`
+-------------------------------------------
+
+You *can* configure filters using :func:`~logging.config.dictConfig`, though it
+might not be obvious at first glance how to do it (hence this recipe). Since
+:class:`~logging.Filter` is the only filter class included in the standard
+library, and it is unlikely to cater to many requirements (it's only there as a
+base class), you will typically need to define your own :class:`~logging.Filter`
+subclass with an overridden :meth:`~logging.Filter.filter` method. To do this,
+specify the ``()`` key in the configuration dictionary for the filter,
+specifying a callable which will be used to create the filter (a class is the
+most obvious, but you can provide any callable which returns a
+:class:`~logging.Filter` instance). Here is a complete example::
+
+    import logging
+    import logging.config
+    import sys
+
+    class MyFilter(logging.Filter):
+        def __init__(self, param=None):
+            self.param = param
+
+        def filter(self, record):
+            if self.param is None:
+                allow = True
+            else:
+                allow = self.param not in record.msg
+            if allow:
+                record.msg = 'changed: ' + record.msg
+            return allow
+
+    LOGGING = {
+        'version': 1,
+        'filters': {
+            'myfilter': {
+                '()': MyFilter,
+                'param': 'noshow',
+            }
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'filters': ['myfilter']
+            }
+        },
+        'root': {
+            'level': 'DEBUG',
+            'handlers': ['console']
+        },
+    }
+
+    if __name__ == '__main__':
+        logging.config.dictConfig(LOGGING)
+        logging.debug('hello')
+        logging.debug('hello - noshow')
+
+This example shows how you can pass configuration data to the callable which
+constructs the instance, in the form of keyword parameters. When run, the above
+script will print::
+
+    changed: hello
+
+which shows that the filter is working as configured.
+
+A couple of extra points to note:
+
+* If you can't refer to the callable directly in the configuration (e.g. if it
+  lives in a different module, and you can't import it directly where the
+  configuration dictionary is), you can use the form ``ext://...`` as described
+  in :ref:`logging-config-dict-externalobj`. For example, you could have used
+  the text ``'ext://__main__.MyFilter'`` instead of ``MyFilter`` in the above
+  example.
+
+* As well as for filters, this technique can also be used to configure custom
+  handlers and formatters. See :ref:`logging-config-dict-userdef` for more
+  information on how logging supports using user-defined objects in its
+  configuration, and see the other cookbook recipe :ref:`custom-handlers` above.
 

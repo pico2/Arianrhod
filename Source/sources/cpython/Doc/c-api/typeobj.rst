@@ -205,9 +205,8 @@ type objects) *must* have the :attr:`ob_size` field.
    bit currently defined is :const:`Py_PRINT_RAW`. When the :const:`Py_PRINT_RAW`
    flag bit is set, the instance should be printed the same way as :c:member:`~PyTypeObject.tp_str`
    would format it; when the :const:`Py_PRINT_RAW` flag bit is clear, the instance
-   should be printed the same was as :c:member:`~PyTypeObject.tp_repr` would format it. It should
-   return ``-1`` and set an exception condition when an error occurred during the
-   comparison.
+   should be printed the same way as :c:member:`~PyTypeObject.tp_repr` would format it. It should
+   return ``-1`` and set an exception condition when an error occurs.
 
    It is possible that the :c:member:`~PyTypeObject.tp_print` field will be deprecated. In any case,
    it is recommended not to define :c:member:`~PyTypeObject.tp_print`, but instead to rely on
@@ -465,6 +464,24 @@ type objects) *must* have the :attr:`ob_size` field.
       :const:`Py_TPFLAGS_HAVE_VERSION_TAG`.
 
 
+   .. data:: Py_TPFLAGS_LONG_SUBCLASS
+   .. data:: Py_TPFLAGS_LIST_SUBCLASS
+   .. data:: Py_TPFLAGS_TUPLE_SUBCLASS
+   .. data:: Py_TPFLAGS_BYTES_SUBCLASS
+   .. data:: Py_TPFLAGS_UNICODE_SUBCLASS
+   .. data:: Py_TPFLAGS_DICT_SUBCLASS
+   .. data:: Py_TPFLAGS_BASE_EXC_SUBCLASS
+   .. data:: Py_TPFLAGS_TYPE_SUBCLASS
+
+      These flags are used by functions such as
+      :c:func:`PyLong_Check` to quickly determine if a type is a subclass
+      of a built-in type; such specific checks are faster than a generic
+      check, like :c:func:`PyObject_IsInstance`. Custom types that inherit
+      from built-ins should have their :c:member:`~PyTypeObject.tp_flags`
+      set appropriately, or the code that interacts with such types
+      will behave differently depending on what kind of check is used.
+
+
    .. data:: Py_TPFLAGS_HAVE_FINALIZE
 
       This bit is set when the :c:member:`~PyTypeObject.tp_finalize` slot is present in the
@@ -510,7 +527,7 @@ type objects) *must* have the :attr:`ob_size` field.
 
    On the other hand, even if you know a member can never be part of a cycle, as a
    debugging aid you may want to visit it anyway just so the :mod:`gc` module's
-   :func:`get_referents` function will include it.
+   :func:`~gc.get_referents` function will include it.
 
    Note that :c:func:`Py_VISIT` requires the *visit* and *arg* parameters to
    :c:func:`local_traverse` to have these specific names; don't name them just
@@ -580,7 +597,9 @@ type objects) *must* have the :attr:`ob_size` field.
 .. c:member:: richcmpfunc PyTypeObject.tp_richcompare
 
    An optional pointer to the rich comparison function, whose signature is
-   ``PyObject *tp_richcompare(PyObject *a, PyObject *b, int op)``.
+   ``PyObject *tp_richcompare(PyObject *a, PyObject *b, int op)``. The first
+   parameter is guaranteed to be an instance of the type that is defined
+   by :c:type:`PyTypeObject`.
 
    The function should return the result of the comparison (usually ``Py_True``
    or ``Py_False``).  If the comparison is undefined, it must return
@@ -635,7 +654,7 @@ type objects) *must* have the :attr:`ob_size` field.
    reference list head than the base type.  Since the list head is always found via
    :c:member:`~PyTypeObject.tp_weaklistoffset`, this should not be a problem.
 
-   When a type defined by a class statement has no :attr:`__slots__` declaration,
+   When a type defined by a class statement has no :attr:`~object.__slots__` declaration,
    and none of its base types are weakly referenceable, the type is made weakly
    referenceable by adding a weak reference list head slot to the instance layout
    and setting the :c:member:`~PyTypeObject.tp_weaklistoffset` of that slot's offset.
@@ -825,7 +844,7 @@ type objects) *must* have the :attr:`ob_size` field.
    dictionary at a difference offset than the base type.  Since the dictionary is
    always found via :c:member:`~PyTypeObject.tp_dictoffset`, this should not be a problem.
 
-   When a type defined by a class statement has no :attr:`__slots__` declaration,
+   When a type defined by a class statement has no :attr:`~object.__slots__` declaration,
    and none of its base types has an instance variable dictionary, a dictionary
    slot is added to the instance layout and the :c:member:`~PyTypeObject.tp_dictoffset` is set to
    that slot's offset.
@@ -833,7 +852,7 @@ type objects) *must* have the :attr:`ob_size` field.
    When a type defined by a class statement has a :attr:`__slots__` declaration,
    the type inherits its :c:member:`~PyTypeObject.tp_dictoffset` from its base type.
 
-   (Adding a slot named :attr:`__dict__` to the :attr:`__slots__` declaration does
+   (Adding a slot named :attr:`~object.__dict__` to the :attr:`__slots__` declaration does
    not have the expected effect, it just causes confusion.  Maybe this should be
    added as a feature just like :attr:`__weakref__` though.)
 
@@ -1200,7 +1219,8 @@ Sequence Object Structures
 
    This function is used by :c:func:`PySequence_Repeat` and has the same
    signature.  It is also used by the ``*`` operator, after trying numeric
-   multiplication via the :c:member:`~PyTypeObject.tp_as_number.nb_mul` slot.
+   multiplication via the :c:member:`~PyTypeObject.tp_as_number.nb_multiply`
+   slot.
 
 .. c:member:: ssizeargfunc PySequenceMethods.sq_item
 

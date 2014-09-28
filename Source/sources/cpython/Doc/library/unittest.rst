@@ -239,9 +239,10 @@ Test Discovery
 
 Unittest supports simple test discovery. In order to be compatible with test
 discovery, all of the test files must be :ref:`modules <tut-modules>` or
-:ref:`packages <tut-packages>` importable from the top-level directory of
-the project (this means that their filenames must be valid
-:ref:`identifiers <identifiers>`).
+:ref:`packages <tut-packages>` (including :term:`namespace packages
+<namespace package>`) importable from the top-level directory of
+the project (this means that their filenames must be valid :ref:`identifiers
+<identifiers>`).
 
 Test discovery is implemented in :meth:`TestLoader.discover`, but can also be
 used from the command line. The basic command-line usage is::
@@ -305,6 +306,9 @@ as the start directory.
 
 Test modules and packages can customize test loading and discovery by through
 the `load_tests protocol`_.
+
+.. versionchanged:: 3.4
+   Test discovery supports :term:`namespace packages <namespace package>`.
 
 
 .. _organizing-tests:
@@ -559,8 +563,9 @@ The following decorators implement test skipping and expected failures:
    Usually you can use :meth:`TestCase.skipTest` or one of the skipping
    decorators instead of raising this directly.
 
-Skipped tests will not have :meth:`setUp` or :meth:`tearDown` run around them.
-Skipped classes will not have :meth:`setUpClass` or :meth:`tearDownClass` run.
+Skipped tests will not have :meth:`~TestCase.setUp` or :meth:`~TestCase.tearDown` run around them.
+Skipped classes will not have :meth:`~TestCase.setUpClass` or :meth:`~TestCase.tearDownClass` run.
+Skipped modules will not have :func:`setUpModule` or :func:`tearDownModule` run.
 
 
 .. _subtests:
@@ -669,9 +674,9 @@ Test cases
    .. method:: setUp()
 
       Method called to prepare the test fixture.  This is called immediately
-      before calling the test method; any exception raised by this method will
-      be considered an error rather than a test failure. The default
-      implementation does nothing.
+      before calling the test method; other than :exc:`AssertionError` or :exc:`SkipTest`,
+      any exception raised by this method will be considered an error rather than
+      a test failure. The default implementation does nothing.
 
 
    .. method:: tearDown()
@@ -679,10 +684,10 @@ Test cases
       Method called immediately after the test method has been called and the
       result recorded.  This is called even if the test method raised an
       exception, so the implementation in subclasses may need to be particularly
-      careful about checking internal state.  Any exception raised by this
-      method will be considered an error rather than a test failure.  This
-      method will only be called if the :meth:`setUp` succeeds, regardless of
-      the outcome of the test method. The default implementation does nothing.
+      careful about checking internal state.  Any exception, other than :exc:`AssertionError`
+      or :exc:`SkipTest`, raised by this method will be considered an error rather than a
+      test failure.  This method will only be called if the :meth:`setUp` succeeds,
+      regardless of the outcome of the test method. The default implementation does nothing.
 
 
    .. method:: setUpClass()
@@ -901,8 +906,8 @@ Test cases
    | :meth:`assertWarnsRegex(warn, r, fun, *args, **kwds)    | ``fun(*args, **kwds)`` raises *warn* | 3.2        |
    | <TestCase.assertWarnsRegex>`                            | and the message matches regex *r*    |            |
    +---------------------------------------------------------+--------------------------------------+------------+
-   | :meth:`assertLogs(logger, level)`                       | The ``with`` block logs on *logger*  | 3.4        |
-   | <TestCase.assertWarns>`                                 | with minimum *level*                 |            |
+   | :meth:`assertLogs(logger, level)                        | The ``with`` block logs on *logger*  | 3.4        |
+   | <TestCase.assertLogs>`                                  | with minimum *level*                 |            |
    +---------------------------------------------------------+--------------------------------------+------------+
 
    .. method:: assertRaises(exception, callable, *args, **kwds)
@@ -1619,11 +1624,11 @@ Loading and running tests
 
    .. method:: discover(start_dir, pattern='test*.py', top_level_dir=None)
 
-      Find and return all test modules from the specified start directory,
-      recursing into subdirectories to find them. Only test files that match
-      *pattern* will be loaded. (Using shell style pattern matching.) Only
-      module names that are importable (i.e. are valid Python identifiers) will
-      be loaded.
+      Find all the test modules by recursing into subdirectories from the
+      specified start directory, and return a TestSuite object containing them.
+      Only test files that match *pattern* will be loaded. (Using shell style
+      pattern matching.) Only module names that are importable (i.e. are valid
+      Python identifiers) will be loaded.
 
       All test modules must be importable from the top level of the project. If
       the start directory is not the top level directory then the top level
@@ -1653,12 +1658,11 @@ Loading and running tests
 
       .. versionchanged:: 3.4
          Modules that raise :exc:`SkipTest` on import are recorded as skips,
-         not errors.
-
-      .. versionchanged:: 3.4
-         Paths are sorted before being imported to ensure execution order for a
-         given test suite is the same even if the underlying file system's ordering
-         is not dependent on file name like in ext3/4.
+           not errors.
+         Discovery works for :term:`namespace packages <namespace package>`.
+         Paths are sorted before being imported so that execution order is
+           the same even if the underlying file system's ordering is not
+           dependent on file name.
 
 
    The following attributes of a :class:`TestLoader` can be configured either by
@@ -1771,6 +1775,10 @@ Loading and running tests
       Return ``True`` if all tests run so far have passed, otherwise returns
       ``False``.
 
+      .. versionchanged:: 3.4
+         Returns ``False`` if there were any :attr:`unexpectedSuccesses`
+         from tests marked with the :func:`expectedFailure` decorator.
+
 
    .. method:: stop()
 
@@ -1799,14 +1807,14 @@ Loading and running tests
       Called after the test case *test* has been executed, regardless of the
       outcome.
 
-   .. method:: startTestRun(test)
+   .. method:: startTestRun()
 
       Called once before any tests are executed.
 
       .. versionadded:: 3.1
 
 
-   .. method:: stopTestRun(test)
+   .. method:: stopTestRun()
 
       Called once after all tests are executed.
 
@@ -1911,13 +1919,14 @@ Loading and running tests
    applications which run test suites should provide alternate implementations.
 
    By default this runner shows :exc:`DeprecationWarning`,
-   :exc:`PendingDeprecationWarning`, and :exc:`ImportWarning` even if they are
-   :ref:`ignored by default <warning-ignored>`. Deprecation warnings caused by
-   :ref:`deprecated unittest methods <deprecated-aliases>` are also
-   special-cased and, when the warning filters are ``'default'`` or ``'always'``,
-   they will appear only once per-module, in order to avoid too many warning
-   messages.  This behavior can be overridden using the :option:`-Wd` or
-   :option:`-Wa` options and leaving *warnings* to ``None``.
+   :exc:`PendingDeprecationWarning`, :exc:`ResourceWarning` and
+   :exc:`ImportWarning` even if they are :ref:`ignored by default
+   <warning-ignored>`. Deprecation warnings caused by :ref:`deprecated unittest
+   methods <deprecated-aliases>` are also special-cased and, when the warning
+   filters are ``'default'`` or ``'always'``, they will appear only once
+   per-module, in order to avoid too many warning messages.  This behavior can
+   be overridden using the :option:`-Wd` or :option:`-Wa` options and leaving
+   *warnings* to ``None``.
 
    .. versionchanged:: 3.2
       Added the ``warnings`` argument.
@@ -1939,6 +1948,14 @@ Loading and running tests
 
         stream, descriptions, verbosity
 
+   .. method:: run(test)
+
+      This method is the main public interface to the `TextTestRunner`. This
+      method takes a :class:`TestSuite` or :class:`TestCase` instance. A
+      :class:`TestResult` is created by calling
+      :func:`_makeResult` and the test(s) are run and the
+      results printed to stdout.
+
 
 .. function:: main(module='__main__', defaultTest=None, argv=None, testRunner=None, \
                    testLoader=unittest.defaultTestLoader, exit=True, verbosity=1, \
@@ -1957,6 +1974,11 @@ Loading and running tests
 
       if __name__ == '__main__':
           unittest.main(verbosity=2)
+
+   The *defaultTest* argument is either the name of a single test or an
+   iterable of test names to run if no test names are specified via *argv*.  If
+   not specified or ``None`` and no test names are provided via *argv*, all
+   tests found in *module* are run.
 
    The *argv* argument can be a list of options passed to the program, with the
    first element being the program name.  If not specified or ``None``,

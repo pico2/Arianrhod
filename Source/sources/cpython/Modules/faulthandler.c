@@ -26,6 +26,11 @@
    (anyway, the length is smaller than 30 characters) */
 #define PUTS(fd, str) write(fd, str, (int)strlen(str))
 
+_Py_IDENTIFIER(enable);
+_Py_IDENTIFIER(fileno);
+_Py_IDENTIFIER(flush);
+_Py_IDENTIFIER(stderr);
+
 #ifdef HAVE_SIGACTION
 typedef struct sigaction _Py_sighandler_t;
 #else
@@ -130,15 +135,17 @@ static PyObject*
 faulthandler_get_fileno(PyObject *file, int *p_fd)
 {
     PyObject *result;
-    _Py_IDENTIFIER(fileno);
-    _Py_IDENTIFIER(flush);
     long fd_long;
     int fd;
 
     if (file == NULL || file == Py_None) {
-        file = PySys_GetObject("stderr");
+        file = _PySys_GetObjectId(&PyId_stderr);
         if (file == NULL) {
             PyErr_SetString(PyExc_RuntimeError, "unable to get sys.stderr");
+            return NULL;
+        }
+        if (file == Py_None) {
+            PyErr_SetString(PyExc_RuntimeError, "sys.stderr is None");
             return NULL;
         }
     }
@@ -300,7 +307,7 @@ faulthandler_fatal_error(int signum)
         return;
     }
 #endif
-    /* call the previous signal handler: it is called immediatly if we use
+    /* call the previous signal handler: it is called immediately if we use
        sigaction() thanks to SA_NODEFER flag, otherwise it is deferred */
     raise(signum);
 }
@@ -858,18 +865,12 @@ faulthandler_sigfpe(PyObject *self, PyObject *args)
 static PyObject *
 faulthandler_sigabrt(PyObject *self, PyObject *args)
 {
-#if !ML_PYTHON
-
 #ifdef _MSC_VER
     /* Visual Studio: configure abort() to not display an error message nor
        open a popup asking to report the fault. */
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 #endif
-
-#endif
-
     abort();
-
     Py_RETURN_NONE;
 }
 
@@ -1053,7 +1054,6 @@ static int
 faulthandler_env_options(void)
 {
     PyObject *xoptions, *key, *module, *res;
-    _Py_IDENTIFIER(enable);
     char *p;
 
     if (!((p = Py_GETENV("PYTHONFAULTHANDLER")) && *p != '\0')) {

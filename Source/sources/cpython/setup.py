@@ -3,6 +3,8 @@
 
 import sys, os, importlib.machinery, re, optparse
 from glob import glob
+import importlib._bootstrap
+import importlib.util
 import sysconfig
 
 from distutils import log
@@ -16,6 +18,12 @@ from distutils.command.build_scripts import build_scripts
 from distutils.spawn import find_executable
 
 cross_compiling = "_PYTHON_HOST_PLATFORM" in os.environ
+
+# Add special CFLAGS reserved for building the interpreter and the stdlib
+# modules (Issue #21121).
+cflags = sysconfig.get_config_var('CFLAGS')
+py_cflags_nodist = sysconfig.get_config_var('PY_CFLAGS_NODIST')
+sysconfig.get_config_vars()['CFLAGS'] = cflags + ' ' + py_cflags_nodist
 
 def get_platform():
     # cross build
@@ -327,8 +335,10 @@ class PyBuildExt(build_ext):
             return
 
         loader = importlib.machinery.ExtensionFileLoader(ext.name, ext_filename)
+        spec = importlib.util.spec_from_file_location(ext.name, ext_filename,
+                                                      loader=loader)
         try:
-            loader.load_module()
+            importlib._bootstrap._SpecMethods(spec).load()
         except ImportError as why:
             self.failed.append(ext.name)
             self.announce('*** WARNING: renaming "%s" since importing it'
@@ -596,6 +606,8 @@ class PyBuildExt(build_ext):
         exts.append( Extension('_lsprof', ['_lsprof.c', 'rotatingtree.c']) )
         # static Unicode character database
         exts.append( Extension('unicodedata', ['unicodedata.c']) )
+        # _opcode module
+        exts.append( Extension('_opcode', ['_opcode.c']) )
 
         # Modules with some UNIX dependencies -- on by default:
         # (If you have a really backward UNIX, select and socket may not be
@@ -691,7 +703,9 @@ class PyBuildExt(build_ext):
         if host_platform == 'darwin':
             os_release = int(os.uname()[2].split('.')[0])
             dep_target = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET')
-            if dep_target and dep_target.split('.') < ['10', '5']:
+            if (dep_target and
+                    (tuple(int(n) for n in dep_target.split('.')[0:2])
+                        < (10, 5) ) ):
                 os_release = 8
             if os_release < 9:
                 # MacOSX 10.4 has a broken readline. Don't try to build
@@ -824,15 +838,6 @@ class PyBuildExt(build_ext):
                                depends=['hashlib.h']) )
         exts.append( Extension('_sha1', ['sha1module.c'],
                                depends=['hashlib.h']) )
-
-        # SHA-3 (Keccak) module
-        sha3_depends = ['hashlib.h']
-        keccak = os.path.join(os.getcwd(), srcdir, 'Modules', '_sha3',
-                              'keccak')
-        for pattern in ('*.c', '*.h', '*.macros'):
-            sha3_depends.extend(glob(os.path.join(keccak, pattern)))
-        exts.append(Extension("_sha3", ["_sha3/sha3module.c"],
-                              depends=sha3_depends))
 
         # Modules that provide persistent dictionary-like semantics.  You will
         # probably want to arrange for at least one of them to be available on
@@ -1025,8 +1030,16 @@ class PyBuildExt(build_ext):
             if db_setup_debug:
                 print("bsddb using BerkeleyDB lib:", db_ver, dblib)
                 print("bsddb lib dir:", dblib_dir, " inc dir:", db_incdir)
-            db_incs = [db_incdir]
             dblibs = [dblib]
+            # Only add the found library and include directories if they aren't
+            # already being searched. This avoids an explicit runtime library
+            # dependency.
+            if db_incdir in inc_dirs:
+                db_incs = None
+            else:
+                db_incs = [db_incdir]
+            if dblib_dir[0] in lib_dirs:
+                dblib_dir = None
         else:
             if db_setup_debug: print("db: no appropriate library found")
             db_incs = None
@@ -1137,11 +1150,13 @@ class PyBuildExt(build_ext):
             # can end up with a bad search path order.
             if sqlite_incdir not in self.compiler.include_dirs:
                 include_dirs.append(sqlite_incdir)
+            # avoid a runtime library path for a system library dir
+            if sqlite_libdir and sqlite_libdir[0] in lib_dirs:
+                sqlite_libdir = None
             exts.append(Extension('_sqlite3', sqlite_srcs,
                                   define_macros=sqlite_defines,
                                   include_dirs=include_dirs,
                                   library_dirs=sqlite_libdir,
-                                  runtime_library_dirs=sqlite_libdir,
                                   extra_link_args=sqlite_extra_link_args,
                                   libraries=["sqlite3",]))
         else:
@@ -1206,7 +1221,7 @@ class PyBuildExt(build_ext):
                                 libraries = gdbm_libs)
                             break
                 elif cand == "bdb":
-                    if db_incs is not None:
+                    if dblibs:
                         if dbm_setup_debug: print("building dbm using bdb")
                         dbmext = Extension('_dbm', ['_dbmmodule.c'],
                                            library_dirs=dblib_dir,
@@ -1326,6 +1341,8 @@ class PyBuildExt(build_ext):
             zlib_h = zlib_inc[0] + '/zlib.h'
             version = '"0.0.0"'
             version_req = '"1.1.3"'
+            if host_platform == 'darwin' and is_macosx_sdk_path(zlib_h):
+                zlib_h = os.path.join(macosx_sdk_root(), zlib_h[1:])
             with open(zlib_h) as fp:
                 while 1:
                     line = fp.readline()
@@ -1540,7 +1557,7 @@ class PyBuildExt(build_ext):
 
         if 'd' not in sys.abiflags:
             ext = Extension('xxlimited', ['xxlimited.c'],
-                            define_macros=[('Py_LIMITED_API', 1)])
+                            define_macros=[('Py_LIMITED_API', '0x03040000')])
             self.extensions.append(ext)
 
         return missing
@@ -1952,7 +1969,7 @@ class PyBuildExt(build_ext):
         undef_macros = []
         if '--with-system-libmpdec' in sysconfig.get_config_var("CONFIG_ARGS"):
             include_dirs = []
-            libraries = ['mpdec']
+            libraries = [':libmpdec.so.2']
             sources = ['_decimal/_decimal.c']
             depends = ['_decimal/docstrings.h']
         else:

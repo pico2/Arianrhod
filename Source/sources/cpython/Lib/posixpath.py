@@ -48,7 +48,6 @@ def _get_sep(path):
 
 def normcase(s):
     """Normalize case of pathname.  Has no effect under Posix"""
-    # TODO: on Mac OS X, this should really return s.lower().
     if not isinstance(s, (bytes, str)):
         raise TypeError("normcase() argument must be str or bytes, "
                         "not '{}'".format(s.__class__.__name__))
@@ -84,12 +83,10 @@ def join(a, *p):
             else:
                 path += sep + b
     except TypeError:
-        valid_types = all(isinstance(s, (str, bytes, bytearray))
-                          for s in (a, ) + p)
-        if valid_types:
+        if all(isinstance(s, (str, bytes)) for s in (a,) + p):
             # Must have a mixture of text and binary data
             raise TypeError("Can't mix strings and bytes in path "
-                            "components.") from None
+                            "components") from None
         raise
     return path
 
@@ -279,6 +276,7 @@ def expandvars(path):
         search = _varprogb.search
         start = b'{'
         end = b'}'
+        environ = getattr(os, 'environb', None)
     else:
         if '$' not in path:
             return path
@@ -288,6 +286,7 @@ def expandvars(path):
         search = _varprog.search
         start = '{'
         end = '}'
+        environ = os.environ
     i = 0
     while True:
         m = search(path, i)
@@ -297,18 +296,18 @@ def expandvars(path):
         name = m.group(1)
         if name.startswith(start) and name.endswith(end):
             name = name[1:-1]
-        if isinstance(name, bytes):
-            name = str(name, 'ASCII')
-        if name in os.environ:
+        try:
+            if environ is None:
+                value = os.fsencode(os.environ[os.fsdecode(name)])
+            else:
+                value = environ[name]
+        except KeyError:
+            i = j
+        else:
             tail = path[j:]
-            value = os.environ[name]
-            if isinstance(path, bytes):
-                value = value.encode('ASCII')
             path = path[:i] + value
             i = len(path)
             path += tail
-        else:
-            i = j
     return path
 
 

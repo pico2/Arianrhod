@@ -65,8 +65,6 @@ except NameError:
 # from tarfile import *
 __all__ = ["TarFile", "TarInfo", "is_tarfile", "TarError"]
 
-from builtins import open as _open # Since 'open' is TarFile.open
-
 #---------------------------------------------------------
 # tar constants
 #---------------------------------------------------------
@@ -140,30 +138,6 @@ PAX_NUMBER_FIELDS = {
 }
 
 #---------------------------------------------------------
-# Bits used in the mode field, values in octal.
-#---------------------------------------------------------
-S_IFLNK = 0o120000        # symbolic link
-S_IFREG = 0o100000        # regular file
-S_IFBLK = 0o060000        # block device
-S_IFDIR = 0o040000        # directory
-S_IFCHR = 0o020000        # character device
-S_IFIFO = 0o010000        # fifo
-
-TSUID   = 0o4000          # set UID on execution
-TSGID   = 0o2000          # set GID on execution
-TSVTX   = 0o1000          # reserved
-
-TUREAD  = 0o400           # read by owner
-TUWRITE = 0o200           # write by owner
-TUEXEC  = 0o100           # execute/search by owner
-TGREAD  = 0o040           # read by group
-TGWRITE = 0o020           # write by group
-TGEXEC  = 0o010           # execute/search by group
-TOREAD  = 0o004           # read by other
-TOWRITE = 0o002           # write by other
-TOEXEC  = 0o001           # execute/search by other
-
-#---------------------------------------------------------
 # initialization
 #---------------------------------------------------------
 if os.name in ("nt", "ce"):
@@ -220,7 +194,7 @@ def itn(n, digits=8, format=DEFAULT_FORMAT):
     # A 0o200 byte indicates a positive number, a 0o377 byte a negative
     # number.
     if 0 <= n < 8 ** (digits - 1):
-        s = bytes("%0*o" % (digits - 1, n), "ascii") + NUL
+        s = bytes("%0*o" % (digits - 1, int(n)), "ascii") + NUL
     elif format == GNU_FORMAT and -256 ** (digits - 1) <= n < 256 ** (digits - 1):
         if n >= 0:
             s = bytearray([0o200])
@@ -280,6 +254,12 @@ def filemode(mode):
     warnings.warn("deprecated in favor of stat.filemode",
                   DeprecationWarning, 2)
     return stat.filemode(mode)
+
+def _safe_print(s):
+    encoding = getattr(sys.stdout, 'encoding', None)
+    if encoding is not None:
+        s = s.encode(encoding, 'backslashreplace').decode(encoding)
+    print(s, end=' ')
 
 
 class TarError(Exception):
@@ -1429,10 +1409,11 @@ class TarFile(object):
            can be determined, `mode' is overridden by `fileobj's mode.
            `fileobj' is not closed, when TarFile is closed.
         """
-        if len(mode) > 1 or mode not in "raw":
+        modes = {"r": "rb", "a": "r+b", "w": "wb"}
+        if mode not in modes:
             raise ValueError("mode must be 'r', 'a' or 'w'")
         self.mode = mode
-        self._mode = {"r": "rb", "a": "r+b", "w": "wb"}[mode]
+        self._mode = modes[mode]
 
         if not fileobj:
             if self.mode == "a" and not os.path.exists(name):
@@ -1442,7 +1423,8 @@ class TarFile(object):
             fileobj = bltn_open(name, self._mode)
             self._extfileobj = False
         else:
-            if name is None and hasattr(fileobj, "name"):
+            if (name is None and hasattr(fileobj, "name") and
+                isinstance(fileobj.name, (str, bytes))):
                 name = fileobj.name
             if hasattr(fileobj, "mode"):
                 self._mode = fileobj.mode
@@ -1588,7 +1570,7 @@ class TarFile(object):
             filemode = filemode or "r"
             comptype = comptype or "tar"
 
-            if filemode not in "rw":
+            if filemode not in ("r", "w"):
                 raise ValueError("mode must be 'r' or 'w'")
 
             stream = _Stream(name, filemode, comptype, fileobj, bufsize)
@@ -1600,7 +1582,7 @@ class TarFile(object):
             t._extfileobj = False
             return t
 
-        elif mode in "aw":
+        elif mode in ("a", "w"):
             return cls.taropen(name, mode, fileobj, **kwargs)
 
         raise ValueError("undiscernible mode")
@@ -1609,7 +1591,7 @@ class TarFile(object):
     def taropen(cls, name, mode="r", fileobj=None, **kwargs):
         """Open uncompressed tar archive name for reading or writing.
         """
-        if len(mode) > 1 or mode not in "raw":
+        if mode not in ("r", "a", "w"):
             raise ValueError("mode must be 'r', 'a' or 'w'")
         return cls(name, mode, fileobj, **kwargs)
 
@@ -1618,7 +1600,7 @@ class TarFile(object):
         """Open gzip compressed tar archive name for reading or writing.
            Appending is not allowed.
         """
-        if len(mode) > 1 or mode not in "rw":
+        if mode not in ("r", "w"):
             raise ValueError("mode must be 'r' or 'w'")
 
         try:
@@ -1627,21 +1609,24 @@ class TarFile(object):
         except (ImportError, AttributeError):
             raise CompressionError("gzip module is not available")
 
-        extfileobj = fileobj is not None
         try:
             fileobj = gzip.GzipFile(name, mode + "b", compresslevel, fileobj)
+        except OSError:
+            if fileobj is not None and mode == 'r':
+                raise ReadError("not a gzip file")
+            raise
+
+        try:
             t = cls.taropen(name, mode, fileobj, **kwargs)
         except OSError:
-            if not extfileobj and fileobj is not None:
-                fileobj.close()
-            if fileobj is None:
-                raise
-            raise ReadError("not a gzip file")
-        except:
-            if not extfileobj and fileobj is not None:
-                fileobj.close()
+            fileobj.close()
+            if mode == 'r':
+                raise ReadError("not a gzip file")
             raise
-        t._extfileobj = extfileobj
+        except:
+            fileobj.close()
+            raise
+        t._extfileobj = False
         return t
 
     @classmethod
@@ -1649,7 +1634,7 @@ class TarFile(object):
         """Open bzip2 compressed tar archive name for reading or writing.
            Appending is not allowed.
         """
-        if len(mode) > 1 or mode not in "rw":
+        if mode not in ("r", "w"):
             raise ValueError("mode must be 'r' or 'w'.")
 
         try:
@@ -1664,7 +1649,12 @@ class TarFile(object):
             t = cls.taropen(name, mode, fileobj, **kwargs)
         except (OSError, EOFError):
             fileobj.close()
-            raise ReadError("not a bzip2 file")
+            if mode == 'r':
+                raise ReadError("not a bzip2 file")
+            raise
+        except:
+            fileobj.close()
+            raise
         t._extfileobj = False
         return t
 
@@ -1687,7 +1677,12 @@ class TarFile(object):
             t = cls.taropen(name, mode, fileobj, **kwargs)
         except (lzma.LZMAError, EOFError):
             fileobj.close()
-            raise ReadError("not an lzma file")
+            if mode == 'r':
+                raise ReadError("not an lzma file")
+            raise
+        except:
+            fileobj.close()
+            raise
         t._extfileobj = False
         return t
 
@@ -1856,24 +1851,24 @@ class TarFile(object):
 
         for tarinfo in self:
             if verbose:
-                print(stat.filemode(tarinfo.mode), end=' ')
-                print("%s/%s" % (tarinfo.uname or tarinfo.uid,
-                                 tarinfo.gname or tarinfo.gid), end=' ')
+                _safe_print(stat.filemode(tarinfo.mode))
+                _safe_print("%s/%s" % (tarinfo.uname or tarinfo.uid,
+                                       tarinfo.gname or tarinfo.gid))
                 if tarinfo.ischr() or tarinfo.isblk():
-                    print("%10s" % ("%d,%d" \
-                                    % (tarinfo.devmajor, tarinfo.devminor)), end=' ')
+                    _safe_print("%10s" %
+                            ("%d,%d" % (tarinfo.devmajor, tarinfo.devminor)))
                 else:
-                    print("%10d" % tarinfo.size, end=' ')
-                print("%d-%02d-%02d %02d:%02d:%02d" \
-                      % time.localtime(tarinfo.mtime)[:6], end=' ')
+                    _safe_print("%10d" % tarinfo.size)
+                _safe_print("%d-%02d-%02d %02d:%02d:%02d" \
+                            % time.localtime(tarinfo.mtime)[:6])
 
-            print(tarinfo.name + ("/" if tarinfo.isdir() else ""), end=' ')
+            _safe_print(tarinfo.name + ("/" if tarinfo.isdir() else ""))
 
             if verbose:
                 if tarinfo.issym():
-                    print("->", tarinfo.linkname, end=' ')
+                    _safe_print("-> " + tarinfo.linkname)
                 if tarinfo.islnk():
-                    print("link to", tarinfo.linkname, end=' ')
+                    _safe_print("link to " + tarinfo.linkname)
             print()
 
     def add(self, name, arcname=None, recursive=True, exclude=None, *, filter=None):
@@ -2428,3 +2423,97 @@ def is_tarfile(name):
 
 bltn_open = open
 open = TarFile.open
+
+
+def main():
+    import argparse
+
+    description = 'A simple command line interface for tarfile module.'
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='Verbose output')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-l', '--list', metavar='<tarfile>',
+                       help='Show listing of a tarfile')
+    group.add_argument('-e', '--extract', nargs='+',
+                       metavar=('<tarfile>', '<output_dir>'),
+                       help='Extract tarfile into target dir')
+    group.add_argument('-c', '--create', nargs='+',
+                       metavar=('<name>', '<file>'),
+                       help='Create tarfile from sources')
+    group.add_argument('-t', '--test', metavar='<tarfile>',
+                       help='Test if a tarfile is valid')
+    args = parser.parse_args()
+
+    if args.test:
+        src = args.test
+        if is_tarfile(src):
+            with open(src, 'r') as tar:
+                tar.getmembers()
+                print(tar.getmembers(), file=sys.stderr)
+            if args.verbose:
+                print('{!r} is a tar archive.'.format(src))
+        else:
+            parser.exit(1, '{!r} is not a tar archive.\n'.format(src))
+
+    elif args.list:
+        src = args.list
+        if is_tarfile(src):
+            with TarFile.open(src, 'r:*') as tf:
+                tf.list(verbose=args.verbose)
+        else:
+            parser.exit(1, '{!r} is not a tar archive.\n'.format(src))
+
+    elif args.extract:
+        if len(args.extract) == 1:
+            src = args.extract[0]
+            curdir = os.curdir
+        elif len(args.extract) == 2:
+            src, curdir = args.extract
+        else:
+            parser.exit(1, parser.format_help())
+
+        if is_tarfile(src):
+            with TarFile.open(src, 'r:*') as tf:
+                tf.extractall(path=curdir)
+            if args.verbose:
+                if curdir == '.':
+                    msg = '{!r} file is extracted.'.format(src)
+                else:
+                    msg = ('{!r} file is extracted '
+                           'into {!r} directory.').format(src, curdir)
+                print(msg)
+        else:
+            parser.exit(1, '{!r} is not a tar archive.\n'.format(src))
+
+    elif args.create:
+        tar_name = args.create.pop(0)
+        _, ext = os.path.splitext(tar_name)
+        compressions = {
+            # gz
+            'gz': 'gz',
+            'tgz': 'gz',
+            # xz
+            'xz': 'xz',
+            'txz': 'xz',
+            # bz2
+            'bz2': 'bz2',
+            'tbz': 'bz2',
+            'tbz2': 'bz2',
+            'tb2': 'bz2',
+        }
+        tar_mode = 'w:' + compressions[ext] if ext in compressions else 'w'
+        tar_files = args.create
+
+        with TarFile.open(tar_name, tar_mode) as tf:
+            for file_name in tar_files:
+                tf.add(file_name)
+
+        if args.verbose:
+            print('{!r} file created.'.format(tar_name))
+
+    else:
+        parser.exit(1, parser.format_help())
+
+if __name__ == '__main__':
+    main()

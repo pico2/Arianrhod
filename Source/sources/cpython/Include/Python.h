@@ -68,6 +68,7 @@
 #include "object.h"
 #include "objimpl.h"
 #include "typeslots.h"
+#include "pyhash.h"
 
 #include "pydebug.h"
 
@@ -128,8 +129,5 @@
 #include "dtoa.h"
 #include "fileutils.h"
 #include "pyfpe.h"
-
-
-#include "crtwrap.h"
 
 #endif /* !Py_PYTHON_H */

@@ -15,7 +15,7 @@
    import itertools
    __name__ = '<doctest>'
 
-**Source code:** :source:`Lib/collections/abc.py`
+**Source code:** :source:`Lib/_collections_abc.py`
 
 --------------
 
@@ -98,8 +98,9 @@ ABC                        Inherits from          Abstract Methods        Mixin 
 
 .. class:: Iterator
 
-   ABC for classes that provide the :meth:`__iter__` and :meth:`__next__` methods.
-   See also the definition of :term:`iterator`.
+   ABC for classes that provide the :meth:`~iterator.__iter__` and
+   :meth:`~iterator.__next__` methods.  See also the definition of
+   :term:`iterator`.
 
 .. class:: Sequence
            MutableSequence
@@ -172,7 +173,7 @@ Notes on using :class:`Set` and :class:`MutableSet` as a mixin:
 
 (2)
    To override the comparisons (presumably for speed, as the
-   semantics are fixed), redefine :meth:`__le__` and
+   semantics are fixed), redefine :meth:`__le__` and :meth:`__ge__`,
    then the other operations will automatically follow suit.
 
 (3)

@@ -65,6 +65,69 @@ test_config(PyObject *self)
 }
 
 static PyObject*
+test_sizeof_c_types(PyObject *self)
+{
+#define CHECK_SIZEOF(TYPE, EXPECTED)         \
+    if (EXPECTED != sizeof(TYPE))  {         \
+        PyErr_Format(TestError,              \
+            "sizeof(%s) = %u instead of %u", \
+            #TYPE, sizeof(TYPE), EXPECTED);  \
+        return (PyObject*)NULL;              \
+    }
+#define IS_SIGNED(TYPE) (((TYPE)-1) < (TYPE)0)
+#define CHECK_SIGNNESS(TYPE, SIGNED)         \
+    if (IS_SIGNED(TYPE) != SIGNED) {         \
+        PyErr_Format(TestError,              \
+            "%s signness is, instead of %i",  \
+            #TYPE, IS_SIGNED(TYPE), SIGNED); \
+        return (PyObject*)NULL;              \
+    }
+
+    /* integer types */
+    CHECK_SIZEOF(Py_UCS1, 1);
+    CHECK_SIZEOF(Py_UCS2, 2);
+    CHECK_SIZEOF(Py_UCS4, 4);
+    CHECK_SIGNNESS(Py_UCS1, 0);
+    CHECK_SIGNNESS(Py_UCS2, 0);
+    CHECK_SIGNNESS(Py_UCS4, 0);
+#ifdef HAVE_INT32_T
+    CHECK_SIZEOF(PY_INT32_T, 4);
+    CHECK_SIGNNESS(PY_INT32_T, 1);
+#endif
+#ifdef HAVE_UINT32_T
+    CHECK_SIZEOF(PY_UINT32_T, 4);
+    CHECK_SIGNNESS(PY_UINT32_T, 0);
+#endif
+#ifdef HAVE_INT64_T
+    CHECK_SIZEOF(PY_INT64_T, 8);
+    CHECK_SIGNNESS(PY_INT64_T, 1);
+#endif
+#ifdef HAVE_UINT64_T
+    CHECK_SIZEOF(PY_UINT64_T, 8);
+    CHECK_SIGNNESS(PY_UINT64_T, 0);
+#endif
+
+    /* pointer/size types */
+    CHECK_SIZEOF(size_t, sizeof(void *));
+    CHECK_SIGNNESS(size_t, 0);
+    CHECK_SIZEOF(Py_ssize_t, sizeof(void *));
+    CHECK_SIGNNESS(Py_ssize_t, 1);
+
+    CHECK_SIZEOF(Py_uintptr_t, sizeof(void *));
+    CHECK_SIGNNESS(Py_uintptr_t, 0);
+    CHECK_SIZEOF(Py_intptr_t, sizeof(void *));
+    CHECK_SIGNNESS(Py_intptr_t, 1);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+
+#undef IS_SIGNED
+#undef CHECK_SIGNESS
+#undef CHECK_SIZEOF
+}
+
+
+static PyObject*
 test_list_api(PyObject *self)
 {
     PyObject* list;
@@ -2453,14 +2516,27 @@ run_in_subinterp(PyObject *self, PyObject *args)
     return PyLong_FromLong(r);
 }
 
+static int
+check_time_rounding(int round)
+{
+    if (round != _PyTime_ROUND_DOWN && round != _PyTime_ROUND_UP) {
+        PyErr_SetString(PyExc_ValueError, "invalid rounding");
+        return -1;
+    }
+    return 0;
+}
+
 static PyObject *
 test_pytime_object_to_time_t(PyObject *self, PyObject *args)
 {
     PyObject *obj;
     time_t sec;
-    if (!PyArg_ParseTuple(args, "O:pytime_object_to_time_t", &obj))
+    int round;
+    if (!PyArg_ParseTuple(args, "Oi:pytime_object_to_time_t", &obj, &round))
         return NULL;
-    if (_PyTime_ObjectToTime_t(obj, &sec) == -1)
+    if (check_time_rounding(round) < 0)
+        return NULL;
+    if (_PyTime_ObjectToTime_t(obj, &sec, round) == -1)
         return NULL;
     return _PyLong_FromTime_t(sec);
 }
@@ -2471,9 +2547,12 @@ test_pytime_object_to_timeval(PyObject *self, PyObject *args)
     PyObject *obj;
     time_t sec;
     long usec;
-    if (!PyArg_ParseTuple(args, "O:pytime_object_to_timeval", &obj))
+    int round;
+    if (!PyArg_ParseTuple(args, "Oi:pytime_object_to_timeval", &obj, &round))
         return NULL;
-    if (_PyTime_ObjectToTimeval(obj, &sec, &usec) == -1)
+    if (check_time_rounding(round) < 0)
+        return NULL;
+    if (_PyTime_ObjectToTimeval(obj, &sec, &usec, round) == -1)
         return NULL;
     return Py_BuildValue("Nl", _PyLong_FromTime_t(sec), usec);
 }
@@ -2484,9 +2563,12 @@ test_pytime_object_to_timespec(PyObject *self, PyObject *args)
     PyObject *obj;
     time_t sec;
     long nsec;
-    if (!PyArg_ParseTuple(args, "O:pytime_object_to_timespec", &obj))
+    int round;
+    if (!PyArg_ParseTuple(args, "Oi:pytime_object_to_timespec", &obj, &round))
         return NULL;
-    if (_PyTime_ObjectToTimespec(obj, &sec, &nsec) == -1)
+    if (check_time_rounding(round) < 0)
+        return NULL;
+    if (_PyTime_ObjectToTimespec(obj, &sec, &nsec, round) == -1)
         return NULL;
     return Py_BuildValue("Nl", _PyLong_FromTime_t(sec), nsec);
 }
@@ -2779,10 +2861,151 @@ test_pyobject_setallocators(PyObject *self)
     return test_setallocators(PYMEM_DOMAIN_OBJ);
 }
 
+PyDoc_STRVAR(docstring_empty,
+""
+);
+
+PyDoc_STRVAR(docstring_no_signature,
+"This docstring has no signature."
+);
+
+PyDoc_STRVAR(docstring_with_invalid_signature,
+"docstring_with_invalid_signature($module, /, boo)\n"
+"\n"
+"This docstring has an invalid signature."
+);
+
+PyDoc_STRVAR(docstring_with_invalid_signature2,
+"docstring_with_invalid_signature2($module, /, boo)\n"
+"\n"
+"--\n"
+"\n"
+"This docstring also has an invalid signature."
+);
+
+PyDoc_STRVAR(docstring_with_signature,
+"docstring_with_signature($module, /, sig)\n"
+"--\n"
+"\n"
+"This docstring has a valid signature."
+);
+
+PyDoc_STRVAR(docstring_with_signature_and_extra_newlines,
+"docstring_with_signature_and_extra_newlines($module, /, parameter)\n"
+"--\n"
+"\n"
+"\n"
+"This docstring has a valid signature and some extra newlines."
+);
+
+PyDoc_STRVAR(docstring_with_signature_with_defaults,
+"docstring_with_signature_with_defaults(module, s='avocado',\n"
+"        b=b'bytes', d=3.14, i=35, n=None, t=True, f=False,\n"
+"        local=the_number_three, sys=sys.maxsize,\n"
+"        exp=sys.maxsize - 1)\n"
+"--\n"
+"\n"
+"\n"
+"\n"
+"This docstring has a valid signature with parameters,\n"
+"and the parameters take defaults of varying types."
+);
+
+#ifdef WITH_THREAD
+typedef struct {
+    PyThread_type_lock start_event;
+    PyThread_type_lock exit_event;
+    PyObject *callback;
+} test_c_thread_t;
+
+static void
+temporary_c_thread(void *data)
+{
+    test_c_thread_t *test_c_thread = data;
+    PyGILState_STATE state;
+    PyObject *res;
+
+    PyThread_release_lock(test_c_thread->start_event);
+
+    /* Allocate a Python thread state for this thread */
+    state = PyGILState_Ensure();
+
+    res = PyObject_CallFunction(test_c_thread->callback, "", NULL);
+    Py_CLEAR(test_c_thread->callback);
+
+    if (res == NULL) {
+        PyErr_Print();
+    }
+    else {
+        Py_DECREF(res);
+    }
+
+    /* Destroy the Python thread state for this thread */
+    PyGILState_Release(state);
+
+    PyThread_release_lock(test_c_thread->exit_event);
+
+    PyThread_exit_thread();
+}
+
+static PyObject *
+call_in_temporary_c_thread(PyObject *self, PyObject *callback)
+{
+    PyObject *res = NULL;
+    test_c_thread_t test_c_thread;
+    long thread;
+
+    PyEval_InitThreads();
+
+    test_c_thread.start_event = PyThread_allocate_lock();
+    test_c_thread.exit_event = PyThread_allocate_lock();
+    test_c_thread.callback = NULL;
+    if (!test_c_thread.start_event || !test_c_thread.exit_event) {
+        PyErr_SetString(PyExc_RuntimeError, "could not allocate lock");
+        goto exit;
+    }
+
+    Py_INCREF(callback);
+    test_c_thread.callback = callback;
+
+    PyThread_acquire_lock(test_c_thread.start_event, 1);
+    PyThread_acquire_lock(test_c_thread.exit_event, 1);
+
+    thread = PyThread_start_new_thread(temporary_c_thread, &test_c_thread);
+    if (thread == -1) {
+        PyErr_SetString(PyExc_RuntimeError, "unable to start the thread");
+        PyThread_release_lock(test_c_thread.start_event);
+        PyThread_release_lock(test_c_thread.exit_event);
+        goto exit;
+    }
+
+    PyThread_acquire_lock(test_c_thread.start_event, 1);
+    PyThread_release_lock(test_c_thread.start_event);
+
+    Py_BEGIN_ALLOW_THREADS
+        PyThread_acquire_lock(test_c_thread.exit_event, 1);
+        PyThread_release_lock(test_c_thread.exit_event);
+    Py_END_ALLOW_THREADS
+
+    Py_INCREF(Py_None);
+    res = Py_None;
+
+exit:
+    Py_CLEAR(test_c_thread.callback);
+    if (test_c_thread.start_event)
+        PyThread_free_lock(test_c_thread.start_event);
+    if (test_c_thread.exit_event)
+        PyThread_free_lock(test_c_thread.exit_event);
+    return res;
+}
+#endif   /* WITH_THREAD */
+
+
 static PyMethodDef TestMethods[] = {
     {"raise_exception",         raise_exception,                 METH_VARARGS},
     {"raise_memoryerror",   (PyCFunction)raise_memoryerror,  METH_NOARGS},
     {"test_config",             (PyCFunction)test_config,        METH_NOARGS},
+    {"test_sizeof_c_types",     (PyCFunction)test_sizeof_c_types, METH_NOARGS},
     {"test_datetime_capi",  test_datetime_capi,              METH_NOARGS},
     {"test_list_api",           (PyCFunction)test_list_api,      METH_NOARGS},
     {"test_dict_iteration",     (PyCFunction)test_dict_iteration,METH_NOARGS},
@@ -2881,14 +3104,41 @@ static PyMethodDef TestMethods[] = {
     {"pytime_object_to_timeval", test_pytime_object_to_timeval,  METH_VARARGS},
     {"pytime_object_to_timespec", test_pytime_object_to_timespec,  METH_VARARGS},
     {"with_tp_del",             with_tp_del,                     METH_VARARGS},
-    {"test_pymem",
-     (PyCFunction)test_pymem_alloc0, METH_NOARGS},
     {"test_pymem_alloc0",
+     (PyCFunction)test_pymem_alloc0, METH_NOARGS},
+    {"test_pymem_setrawallocators",
      (PyCFunction)test_pymem_setrawallocators, METH_NOARGS},
     {"test_pymem_setallocators",
      (PyCFunction)test_pymem_setallocators, METH_NOARGS},
     {"test_pyobject_setallocators",
      (PyCFunction)test_pyobject_setallocators, METH_NOARGS},
+    {"no_docstring",
+        (PyCFunction)test_with_docstring, METH_NOARGS},
+    {"docstring_empty",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_empty},
+    {"docstring_no_signature",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_no_signature},
+    {"docstring_with_invalid_signature",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_with_invalid_signature},
+    {"docstring_with_invalid_signature2",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_with_invalid_signature2},
+    {"docstring_with_signature",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_with_signature},
+    {"docstring_with_signature_and_extra_newlines",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_with_signature_and_extra_newlines},
+    {"docstring_with_signature_with_defaults",
+        (PyCFunction)test_with_docstring, METH_NOARGS,
+        docstring_with_signature_with_defaults},
+#ifdef WITH_THREAD
+    {"call_in_temporary_c_thread", call_in_temporary_c_thread, METH_O,
+     PyDoc_STR("set_error_class(error_class) -> None")},
+#endif
     {NULL, NULL} /* sentinel */
 };
 
@@ -3102,6 +3352,8 @@ PyInit__testcapi(void)
     PyModule_AddObject(m, "SIZEOF_PYGC_HEAD", PyLong_FromSsize_t(sizeof(PyGC_Head)));
     Py_INCREF(&PyInstanceMethod_Type);
     PyModule_AddObject(m, "instancemethod", (PyObject *)&PyInstanceMethod_Type);
+
+    PyModule_AddIntConstant(m, "the_number_three", 3);
 
     TestError = PyErr_NewException("_testcapi.error", NULL, NULL);
     Py_INCREF(TestError);

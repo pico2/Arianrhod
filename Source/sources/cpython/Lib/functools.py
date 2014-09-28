@@ -11,7 +11,7 @@
 
 __all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES',
            'total_ordering', 'cmp_to_key', 'lru_cache', 'reduce', 'partial',
-           'singledispatch']
+           'partialmethod', 'singledispatch']
 
 try:
     from _functools import reduce
@@ -223,8 +223,9 @@ except ImportError:
 ### partial() argument application
 ################################################################################
 
+# Purely functional, no descriptor behaviour
 def partial(func, *args, **keywords):
-    """new function with partial application of the given arguments
+    """New function with partial application of the given arguments
     and keywords.
     """
     def newfunc(*fargs, **fkeywords):
@@ -240,6 +241,80 @@ try:
     from _functools import partial
 except ImportError:
     pass
+
+# Descriptor version
+class partialmethod(object):
+    """Method descriptor with partial application of the given arguments
+    and keywords.
+
+    Supports wrapping existing descriptors and handles non-descriptor
+    callables as instance methods.
+    """
+
+    def __init__(self, func, *args, **keywords):
+        if not callable(func) and not hasattr(func, "__get__"):
+            raise TypeError("{!r} is not callable or a descriptor"
+                                 .format(func))
+
+        # func could be a descriptor like classmethod which isn't callable,
+        # so we can't inherit from partial (it verifies func is callable)
+        if isinstance(func, partialmethod):
+            # flattening is mandatory in order to place cls/self before all
+            # other arguments
+            # it's also more efficient since only one function will be called
+            self.func = func.func
+            self.args = func.args + args
+            self.keywords = func.keywords.copy()
+            self.keywords.update(keywords)
+        else:
+            self.func = func
+            self.args = args
+            self.keywords = keywords
+
+    def __repr__(self):
+        args = ", ".join(map(repr, self.args))
+        keywords = ", ".join("{}={!r}".format(k, v)
+                                 for k, v in self.keywords.items())
+        format_string = "{module}.{cls}({func}, {args}, {keywords})"
+        return format_string.format(module=self.__class__.__module__,
+                                    cls=self.__class__.__name__,
+                                    func=self.func,
+                                    args=args,
+                                    keywords=keywords)
+
+    def _make_unbound_method(self):
+        def _method(*args, **keywords):
+            call_keywords = self.keywords.copy()
+            call_keywords.update(keywords)
+            cls_or_self, *rest = args
+            call_args = (cls_or_self,) + self.args + tuple(rest)
+            return self.func(*call_args, **call_keywords)
+        _method.__isabstractmethod__ = self.__isabstractmethod__
+        _method._partialmethod = self
+        return _method
+
+    def __get__(self, obj, cls):
+        get = getattr(self.func, "__get__", None)
+        result = None
+        if get is not None:
+            new_func = get(obj, cls)
+            if new_func is not self.func:
+                # Assume __get__ returning something new indicates the
+                # creation of an appropriate callable
+                result = partial(new_func, *self.args, **self.keywords)
+                try:
+                    result.__self__ = new_func.__self__
+                except AttributeError:
+                    pass
+        if result is None:
+            # If the underlying descriptor didn't do anything, treat this
+            # like an instance method
+            result = self._make_unbound_method().__get__(obj, cls)
+        return result
+
+    @property
+    def __isabstractmethod__(self):
+        return getattr(self.func, "__isabstractmethod__", False)
 
 
 ################################################################################
@@ -316,6 +391,12 @@ def lru_cache(maxsize=128, typed=False):
     #       cache_info, cache_clear, and f.__wrapped__
     # The internals of the lru_cache are encapsulated for thread safety and
     # to allow the implementation to change (including a possible C version).
+
+    # Early detection of an erroneous call to @lru_cache without any arguments
+    # resulting in the inner function being passed to maxsize instead of an
+    # integer or None.
+    if maxsize is not None and not isinstance(maxsize, int):
+        raise TypeError('Expected maxsize to be an integer or None')
 
     # Constants shared by all lru cache instances:
     sentinel = object()          # unique object used to signal cache misses

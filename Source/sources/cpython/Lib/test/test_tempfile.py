@@ -8,9 +8,11 @@ import sys
 import re
 import warnings
 import contextlib
+import weakref
+from unittest import mock
 
 import unittest
-from test import support
+from test import support, script_helper
 
 
 if hasattr(os, 'stat'):
@@ -324,10 +326,9 @@ class TestMkstempInner(BaseTestCase):
         finally:
             os.rmdir(dir)
 
+    @unittest.skipUnless(has_stat, 'os.stat not available')
     def test_file_mode(self):
         # _mkstemp_inner creates files with the proper mode
-        if not has_stat:
-            return            # ugh, can't use SkipTest.
 
         file = self.do_create()
         mode = stat.S_IMODE(os.stat(file.name).st_mode)
@@ -339,10 +340,9 @@ class TestMkstempInner(BaseTestCase):
             expected = user * (1 + 8 + 64)
         self.assertEqual(mode, expected)
 
+    @unittest.skipUnless(has_spawnl, 'os.spawnl not available')
     def test_noinherit(self):
         # _mkstemp_inner file handles are not inherited by child processes
-        if not has_spawnl:
-            return            # ugh, can't use SkipTest.
 
         if support.verbose:
             v="v"
@@ -378,10 +378,9 @@ class TestMkstempInner(BaseTestCase):
                     "child process caught fatal signal %d" % -retval)
         self.assertFalse(retval > 0, "child process reports failure %d"%retval)
 
+    @unittest.skipUnless(has_textmode, "text mode not available")
     def test_textmode(self):
         # _mkstemp_inner can create files in text mode
-        if not has_textmode:
-            return            # ugh, can't use SkipTest.
 
         # A text file is truncated at the first Ctrl+Z byte
         f = self.do_create(bin=0)
@@ -478,6 +477,20 @@ class TestGetTempDir(BaseTestCase):
 
         self.assertTrue(a is b)
 
+    def test_case_sensitive(self):
+        # gettempdir should not flatten its case
+        # even on a case-insensitive file system
+        case_sensitive_tempdir = tempfile.mkdtemp("-Temp")
+        _tempdir, tempfile.tempdir = tempfile.tempdir, None
+        try:
+            with support.EnvironmentVarGuard() as env:
+                # Fake the first env var which is checked as a candidate
+                env["TMPDIR"] = case_sensitive_tempdir
+                self.assertEqual(tempfile.gettempdir(), case_sensitive_tempdir)
+        finally:
+            tempfile.tempdir = _tempdir
+            support.rmdir(case_sensitive_tempdir)
+
 
 class TestMkstemp(BaseTestCase):
     """Test mkstemp()."""
@@ -557,10 +570,9 @@ class TestMkdtemp(BaseTestCase):
         finally:
             os.rmdir(dir)
 
+    @unittest.skipUnless(has_stat, 'os.stat not available')
     def test_mode(self):
         # mkdtemp creates directories with the proper mode
-        if not has_stat:
-            return            # ugh, can't use SkipTest.
 
         dir = self.do_create()
         try:
@@ -679,6 +691,22 @@ class TestNamedTemporaryFile(BaseTestCase):
         self.do_create(pre="a", suf="b")
         self.do_create(pre="aa", suf=".txt")
 
+    def test_method_lookup(self):
+        # Issue #18879: Looking up a temporary file method should keep it
+        # alive long enough.
+        f = self.do_create()
+        wr = weakref.ref(f)
+        write = f.write
+        write2 = f.write
+        del f
+        write(b'foo')
+        del write
+        write2(b'bar')
+        del write2
+        if support.check_impl_detail(cpython=True):
+            # No reference cycle was created.
+            self.assertIsNone(wr())
+
     def test_creates_named(self):
         # NamedTemporaryFile creates files with names
         f = tempfile.NamedTemporaryFile()
@@ -730,6 +758,19 @@ class TestNamedTemporaryFile(BaseTestCase):
             with f:
                 pass
         self.assertRaises(ValueError, use_closed)
+
+    def test_no_leak_fd(self):
+        # Issue #21058: don't leak file descriptor when io.open() fails
+        closed = []
+        os_close = os.close
+        def close(fd):
+            closed.append(fd)
+            os_close(fd)
+
+        with mock.patch('os.close', side_effect=close):
+            with mock.patch('io.open', side_effect=ValueError):
+                self.assertRaises(ValueError, tempfile.NamedTemporaryFile)
+                self.assertEqual(len(closed), 1)
 
     # How to test the mode and bufsize parameters?
 
@@ -1034,6 +1075,20 @@ if tempfile.NamedTemporaryFile is not tempfile.TemporaryFile:
             roundtrip("\u039B", "w+", encoding="utf-16")
             roundtrip("foo\r\n", "w+", newline="")
 
+        def test_no_leak_fd(self):
+            # Issue #21058: don't leak file descriptor when io.open() fails
+            closed = []
+            os_close = os.close
+            def close(fd):
+                closed.append(fd)
+                os_close(fd)
+
+            with mock.patch('os.close', side_effect=close):
+                with mock.patch('io.open', side_effect=ValueError):
+                    self.assertRaises(ValueError, tempfile.TemporaryFile)
+                    self.assertEqual(len(closed), 1)
+
+
 
 # Helper for test_del_on_shutdown
 class NulledModules:
@@ -1061,7 +1116,8 @@ class TestTemporaryDirectory(BaseTestCase):
         self.nameCheck(tmp.name, dir, pre, suf)
         # Create a subdirectory and some files
         if recurse:
-            self.do_create(tmp.name, pre, suf, recurse-1)
+            d1 = self.do_create(tmp.name, pre, suf, recurse-1)
+            d1.name = None
         with open(os.path.join(tmp.name, "test.txt"), "wb") as f:
             f.write(b"Hello world!")
         return tmp
@@ -1093,7 +1149,7 @@ class TestTemporaryDirectory(BaseTestCase):
     def test_cleanup_with_symlink_to_a_directory(self):
         # cleanup() should not follow symlinks to directories (issue #12464)
         d1 = self.do_create()
-        d2 = self.do_create()
+        d2 = self.do_create(recurse=0)
 
         # Symlink d1/foo -> d2
         os.symlink(d2.name, os.path.join(d1.name, "foo"))
@@ -1123,60 +1179,51 @@ class TestTemporaryDirectory(BaseTestCase):
         finally:
             os.rmdir(dir)
 
-    @unittest.expectedFailure # See issue #10188
     def test_del_on_shutdown(self):
         # A TemporaryDirectory may be cleaned up during shutdown
-        # Make sure it works with the relevant modules nulled out
         with self.do_create() as dir:
-            d = self.do_create(dir=dir)
-            # Mimic the nulling out of modules that
-            # occurs during system shutdown
-            modules = [os, os.path]
-            if has_stat:
-                modules.append(stat)
-            # Currently broken, so suppress the warning
-            # that is otherwise emitted on stdout
-            with support.captured_stderr() as err:
-                with NulledModules(*modules):
-                    d.cleanup()
-            # Currently broken, so stop spurious exception by
-            # indicating the object has already been closed
-            d._closed = True
-            # And this assert will fail, as expected by the
-            # unittest decorator...
-            self.assertFalse(os.path.exists(d.name),
-                        "TemporaryDirectory %s exists after cleanup" % d.name)
+            for mod in ('builtins', 'os', 'shutil', 'sys', 'tempfile', 'warnings'):
+                code = """if True:
+                    import builtins
+                    import os
+                    import shutil
+                    import sys
+                    import tempfile
+                    import warnings
+
+                    tmp = tempfile.TemporaryDirectory(dir={dir!r})
+                    sys.stdout.buffer.write(tmp.name.encode())
+
+                    tmp2 = os.path.join(tmp.name, 'test_dir')
+                    os.mkdir(tmp2)
+                    with open(os.path.join(tmp2, "test.txt"), "w") as f:
+                        f.write("Hello world!")
+
+                    {mod}.tmp = tmp
+
+                    warnings.filterwarnings("always", category=ResourceWarning)
+                    """.format(dir=dir, mod=mod)
+                rc, out, err = script_helper.assert_python_ok("-c", code)
+                tmp_name = out.decode().strip()
+                self.assertFalse(os.path.exists(tmp_name),
+                            "TemporaryDirectory %s exists after cleanup" % tmp_name)
+                err = err.decode('utf-8', 'backslashreplace')
+                self.assertNotIn("Exception ", err)
+                self.assertIn("ResourceWarning: Implicitly cleaning up", err)
 
     def test_warnings_on_cleanup(self):
-        # Two kinds of warning on shutdown
-        #   Issue 10888: may write to stderr if modules are nulled out
-        #   ResourceWarning will be triggered by __del__
+        # ResourceWarning will be triggered by __del__
         with self.do_create() as dir:
-            if os.sep != '\\':
-                # Embed a backslash in order to make sure string escaping
-                # in the displayed error message is dealt with correctly
-                suffix = '\\check_backslash_handling'
-            else:
-                suffix = ''
-            d = self.do_create(dir=dir, suf=suffix)
-
-            #Check for the Issue 10888 message
-            modules = [os, os.path]
-            if has_stat:
-                modules.append(stat)
-            with support.captured_stderr() as err:
-                with NulledModules(*modules):
-                    d.cleanup()
-            message = err.getvalue().replace('\\\\', '\\')
-            self.assertIn("while cleaning up",  message)
-            self.assertIn(d.name,  message)
+            d = self.do_create(dir=dir, recurse=3)
+            name = d.name
 
             # Check for the resource warning
             with support.check_warnings(('Implicitly', ResourceWarning), quiet=False):
                 warnings.filterwarnings("always", category=ResourceWarning)
-                d.__del__()
-            self.assertFalse(os.path.exists(d.name),
-                        "TemporaryDirectory %s exists after __del__" % d.name)
+                del d
+                support.gc_collect()
+            self.assertFalse(os.path.exists(name),
+                        "TemporaryDirectory %s exists after __del__" % name)
 
     def test_multiple_close(self):
         # Can be cleaned-up many times without error

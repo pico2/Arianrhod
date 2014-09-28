@@ -753,7 +753,7 @@ extern pid_t forkpty(int *, char *, struct termios *, struct winsize *);
         /* failures similar to those described at the bottom of 4.1: */
         /* http://docs.python.org/extending/windows.html#a-cookbook-approach */
 #                       if !defined(__CYGWIN__)
-#                               define PyAPI_FUNC(RTYPE) __declspec(dllimport) RTYPE
+#                               define PyAPI_FUNC(RTYPE) __declspec(dllimport) RTYPE __cdecl
 #                       endif /* !__CYGWIN__ */
 #                       define PyAPI_DATA(RTYPE) extern __declspec(dllimport) RTYPE
         /* module init functions outside the core must be exported */
@@ -768,7 +768,7 @@ extern pid_t forkpty(int *, char *, struct termios *, struct winsize *);
 
 /* If no external linkage macros defined by now, create defaults */
 #ifndef PyAPI_FUNC
-#       define PyAPI_FUNC(RTYPE) RTYPE
+#       define PyAPI_FUNC(RTYPE) RTYPE __cdecl
 #endif
 #ifndef PyAPI_DATA
 #       define PyAPI_DATA(RTYPE) extern RTYPE

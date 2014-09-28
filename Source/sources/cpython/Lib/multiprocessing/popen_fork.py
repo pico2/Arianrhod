@@ -47,7 +47,7 @@ class Popen(object):
     def wait(self, timeout=None):
         if self.returncode is None:
             if timeout is not None:
-                from .connection import wait
+                from multiprocessing.connection import wait
                 if not wait([self.sentinel], timeout):
                     return None
             # This shouldn't block if wait() returned successfully.
@@ -81,7 +81,3 @@ class Popen(object):
             os.close(child_w)
             util.Finalize(self, os.close, (parent_r,))
             self.sentinel = parent_r
-
-    @staticmethod
-    def ensure_helpers_running():
-        pass

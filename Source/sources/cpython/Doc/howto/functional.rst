@@ -583,7 +583,7 @@ And here's an example of changing the counter:
 
 Because ``yield`` will often be returning ``None``, you should always check for
 this case.  Don't just use its value in expressions unless you're sure that the
-:meth:`~generator.send` method will be the only method used resume your
+:meth:`~generator.send` method will be the only method used to resume your
 generator function.
 
 In addition to :meth:`~generator.send`, there are two other methods on
@@ -689,8 +689,8 @@ constructed list's :meth:`~list.sort` method. ::
 
 
 The :func:`any(iter) <any>` and :func:`all(iter) <all>` built-ins look at the
-truth values of an iterable's contents.  :func:`any` returns True if any element
-in the iterable is a true value, and :func:`all` returns True if all of the
+truth values of an iterable's contents.  :func:`any` returns ``True`` if any element
+in the iterable is a true value, and :func:`all` returns ``True`` if all of the
 elements are true values:
 
     >>> any([0,1,0])

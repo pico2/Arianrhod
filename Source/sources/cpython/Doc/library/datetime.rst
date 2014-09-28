@@ -1687,11 +1687,11 @@ only EST (fixed offset -5 hours), or only EDT (fixed offset -4 hours)).
 .. seealso::
 
    `pytz <http://pypi.python.org/pypi/pytz/>`_
-      The standard library has no :class:`tzinfo` instances except for UTC, but
-      there exists a third-party library which brings the *IANA timezone
-      database* (also known as the Olson database) to Python: *pytz*.
+      The standard library has :class:`timezone` class for handling arbitrary
+      fixed offsets from UTC and :attr:`timezone.utc` as UTC timezone instance.
 
-      *pytz* contains up-to-date information and its usage is recommended.
+      *pytz* library brings the *IANA timezone database* (also known as the
+      Olson database) to Python and its usage is recommended.
 
    `IANA timezone database <http://www.iana.org/time-zones>`_
       The Time Zone Database (often called tz or zoneinfo) contains code and
@@ -1727,6 +1727,8 @@ made to civil time.
   ``tzname(dt)`` returns a string 'UTCsHH:MM', where s is the sign of
   *offset*, HH and MM are two digits of ``offset.hours`` and
   ``offset.minutes`` respectively.
+
+  .. versionadded:: 3.2
 
 .. method:: timezone.utcoffset(dt)
 
@@ -1784,7 +1786,8 @@ values.  If they're used anyway, ``0`` is substituted for them.
 
 The full set of format codes supported varies across platforms, because Python
 calls the platform C library's :func:`strftime` function, and platform
-variations are common.
+variations are common.  To see the full set of format codes supported on your
+platform, consult the :manpage:`strftime(3)` documentation.
 
 The following is a list of all the format codes that the C standard (1989
 version) requires, and these work on all platforms with a standard C
@@ -1897,7 +1900,7 @@ Notes:
    making assumptions about the output value. Field orderings will vary (for
    example, "month/day/year" versus "day/month/year"), and the output may
    contain Unicode characters encoded using the locale's default encoding (for
-   example, if the current locale is ``js_JP``, the default encoding could be
+   example, if the current locale is ``ja_JP``, the default encoding could be
    any one of ``eucJP``, ``SJIS``, or ``utf-8``; use :meth:`locale.getlocale`
    to determine the current locale's encoding).
 

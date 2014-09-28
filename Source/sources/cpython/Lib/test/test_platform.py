@@ -1,7 +1,9 @@
+from unittest import mock
 import os
 import platform
 import subprocess
 import sys
+import tempfile
 import unittest
 import warnings
 
@@ -91,15 +93,28 @@ class PlatformTest(unittest.TestCase):
                 ("CPython", "2.6.1", "tags/r261", "67515",
                  ('r261:67515', 'Dec  6 2008 15:26:00'),
                  'GCC 4.0.1 (Apple Computer, Inc. build 5370)'),
+
             ("IronPython 2.0 (2.0.0.0) on .NET 2.0.50727.3053", None, "cli")
             :
                 ("IronPython", "2.0.0", "", "", ("", ""),
                  ".NET 2.0.50727.3053"),
+
+            ("2.6.1 (IronPython 2.6.1 (2.6.10920.0) on .NET 2.0.50727.1433)", None, "cli")
+            :
+                ("IronPython", "2.6.1", "", "", ("", ""),
+                 ".NET 2.0.50727.1433"),
+
+            ("2.7.4 (IronPython 2.7.4 (2.7.0.40) on Mono 4.0.30319.1 (32-bit))", None, "cli")
+            :
+                ("IronPython", "2.7.4", "", "", ("", ""),
+                 "Mono 4.0.30319.1 (32-bit)"),
+
             ("2.5 (trunk:6107, Mar 26 2009, 13:02:18) \n[Java HotSpot(TM) Client VM (\"Apple Computer, Inc.\")]",
             ('Jython', 'trunk', '6107'), "java1.5.0_16")
             :
                 ("Jython", "2.5.0", "trunk", "6107",
                  ('trunk:6107', 'Mar 26 2009'), "java1.5.0_16"),
+
             ("2.5.2 (63378, Mar 26 2009, 18:03:29)\n[PyPy 1.0.0]",
              ('PyPy', 'trunk', '63378'), self.save_platform)
             :
@@ -282,6 +297,19 @@ class PlatformTest(unittest.TestCase):
                     returncode = ret >> 8
                 self.assertEqual(returncode, len(data))
 
+    def test_linux_distribution_encoding(self):
+        # Issue #17429
+        with tempfile.TemporaryDirectory() as tempdir:
+            filename = os.path.join(tempdir, 'fedora-release')
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write('Fedora release 19 (Schr\xf6dinger\u2019s Cat)\n')
+
+            with mock.patch('platform._UNIXCONFDIR', tempdir):
+                distname, version, distid = platform.linux_distribution()
+
+            self.assertEqual(distname, 'Fedora')
+            self.assertEqual(version, '19')
+            self.assertEqual(distid, 'Schr\xf6dinger\u2019s Cat')
 
 def test_main():
     support.run_unittest(

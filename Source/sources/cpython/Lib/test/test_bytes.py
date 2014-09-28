@@ -700,7 +700,7 @@ class BytesTest(BaseBytesTest, unittest.TestCase):
     type2test = bytes
 
     def test_buffer_is_readonly(self):
-        fd = os.dup(sys.stdin.fileno())
+        fd = os.open(__file__, os.O_RDONLY)
         with open(fd, "rb", buffering=0) as f:
             self.assertRaises(TypeError, f.readinto, b"")
 
@@ -742,6 +742,12 @@ class BytesTest(BaseBytesTest, unittest.TestCase):
                          b'c:\xff')
         self.assertEqual(PyBytes_FromFormat(b's:%s', c_char_p(b'cstr')),
                          b's:cstr')
+
+        # Issue #19969
+        self.assertRaises(OverflowError,
+                          PyBytes_FromFormat, b'%c', c_int(-1))
+        self.assertRaises(OverflowError,
+                          PyBytes_FromFormat, b'%c', c_int(256))
 
 
 class ByteArrayTest(BaseBytesTest, unittest.TestCase):

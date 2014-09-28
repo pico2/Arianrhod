@@ -28,10 +28,10 @@ handler or to report an error condition "just like" the situation in which the
 interpreter raises the same exception; but beware that there is nothing to
 prevent user code from raising an inappropriate error.
 
-The built-in exception classes can be sub-classed to define new exceptions;
-programmers are encouraged to at least derive new exceptions from the
-:exc:`Exception` class and not :exc:`BaseException`.  More information on
-defining exceptions is available in the Python Tutorial under
+The built-in exception classes can be subclassed to define new exceptions;
+programmers are encouraged to derive new exceptions from the :exc:`Exception`
+class or one of its subclasses, and not from :exc:`BaseException`.  More
+information on defining exceptions is available in the Python Tutorial under
 :ref:`tut-userexceptions`.
 
 When raising (or re-raising) an exception in an :keyword:`except` clause
@@ -82,7 +82,7 @@ The following exceptions are used mostly as base classes for other exceptions.
    .. attribute:: args
 
       The tuple of arguments given to the exception constructor.  Some built-in
-      exceptions (like :exc:`IOError`) expect a certain number of arguments and
+      exceptions (like :exc:`OSError`) expect a certain number of arguments and
       assign a special meaning to the elements of this tuple, while others are
       usually called only with a single string giving an error message.
 
@@ -146,10 +146,9 @@ The following exceptions are the exceptions that are usually raised.
 
 .. exception:: EOFError
 
-   Raised when one of the built-in functions (:func:`input` or :func:`raw_input`)
-   hits an end-of-file condition (EOF) without reading any data. (N.B.: the
-   :meth:`file.read` and :meth:`file.readline` methods return an empty string
-   when they hit EOF.)
+   Raised when the :func:`input` function hits an end-of-file condition (EOF)
+   without reading any data. (N.B.: the :meth:`io.IOBase.read` and
+   :meth:`io.IOBase.readline` methods return an empty string when they hit EOF.)
 
 
 .. exception:: FloatingPointError
@@ -162,7 +161,7 @@ The following exceptions are the exceptions that are usually raised.
 
 .. exception:: GeneratorExit
 
-   Raise when a :term:`generator`\'s :meth:`close` method is called.  It
+   Raised when a :term:`generator`\'s :meth:`close` method is called.  It
    directly inherits from :exc:`BaseException` instead of :exc:`Exception` since
    it is technically not an error.
 
@@ -254,6 +253,11 @@ The following exceptions are the exceptions that are usually raised.
    For exceptions that involve a file system path (such as :func:`open` or
    :func:`os.unlink`), the exception instance will contain an additional
    attribute, :attr:`filename`, which is the file name passed to the function.
+   For functions that involve two file system paths (such as
+   :func:`os.rename`), the exception instance will contain a second
+   :attr:`filename2` attribute corresponding to the second file name passed
+   to the function.
+
 
    .. versionchanged:: 3.3
       :exc:`EnvironmentError`, :exc:`IOError`, :exc:`WindowsError`,
@@ -261,19 +265,19 @@ The following exceptions are the exceptions that are usually raised.
       :exc:`mmap.error` have been merged into :exc:`OSError`.
 
    .. versionchanged:: 3.4
-
       The :attr:`filename` attribute is now the original file name passed to
       the function, instead of the name encoded to or decoded from the
-      filesystem encoding.
+      filesystem encoding.  Also, the :attr:`filename2` attribute was added.
 
 
 .. exception:: OverflowError
 
    Raised when the result of an arithmetic operation is too large to be
    represented.  This cannot occur for integers (which would rather raise
-   :exc:`MemoryError` than give up).  Because of the lack of standardization of
-   floating point exception handling in C, most floating point operations also
-   aren't checked.
+   :exc:`MemoryError` than give up).  However, for historical reasons,
+   OverflowError is sometimes raised for integers that are outside a required
+   range.   Because of the lack of standardization of floating point exception
+   handling in C, most floating point operations are not checked.
 
 
 .. exception:: ReferenceError
@@ -288,8 +292,7 @@ The following exceptions are the exceptions that are usually raised.
 
    Raised when an error is detected that doesn't fall in any of the other
    categories.  The associated value is a string indicating what precisely went
-   wrong.  (This exception is mostly a relic from a previous version of the
-   interpreter; it is not used very much any more.)
+   wrong.
 
 
 .. exception:: StopIteration
@@ -356,7 +359,7 @@ The following exceptions are the exceptions that are usually raised.
    if it has another type (such as a string), the object's value is printed and
    the exit status is one.
 
-   Instances have an attribute :attr:`code` which is set to the proposed exit
+   Instances have an attribute :attr:`!code` which is set to the proposed exit
    status or error message (defaulting to ``None``). Also, this exception derives
    directly from :exc:`BaseException` and not :exc:`Exception`, since it is not
    technically an error.
@@ -366,7 +369,7 @@ The following exceptions are the exceptions that are usually raised.
    executed, and so that a debugger can execute a script without running the risk
    of losing control.  The :func:`os._exit` function can be used if it is
    absolutely positively necessary to exit immediately (for example, in the child
-   process after a call to :func:`fork`).
+   process after a call to :func:`os.fork`).
 
    The exception inherits from :exc:`BaseException` instead of :exc:`Exception` so
    that it is not accidentally caught by code that catches :exc:`Exception`.  This
@@ -454,10 +457,6 @@ starting from Python 3.3, they are aliases of :exc:`OSError`.
 .. exception:: EnvironmentError
 
 .. exception:: IOError
-
-.. exception:: VMSError
-
-   Only available on VMS.
 
 .. exception:: WindowsError
 
@@ -629,7 +628,7 @@ module for more information.
 
 .. exception:: BytesWarning
 
-   Base class for warnings related to :class:`bytes` and :class:`buffer`.
+   Base class for warnings related to :class:`bytes` and :class:`bytearray`.
 
 
 .. exception:: ResourceWarning

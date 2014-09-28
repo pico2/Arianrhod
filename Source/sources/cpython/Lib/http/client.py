@@ -73,7 +73,6 @@ import os
 import socket
 import collections
 from urllib.parse import urlsplit
-import warnings
 
 __all__ = ["HTTPResponse", "HTTPConnection",
            "HTTPException", "NotConnected", "UnknownProtocol",
@@ -214,6 +213,8 @@ MAXAMOUNT = 1048576
 
 # maximal line length when calling readline().
 _MAXLINE = 65536
+_MAXHEADERS = 100
+
 
 class HTTPMessage(email.message.Message):
     # XXX The only usage of this method is in
@@ -261,6 +262,8 @@ def parse_headers(fp, _class=HTTPMessage):
         if len(line) > _MAXLINE:
             raise LineTooLong("header line")
         headers.append(line)
+        if len(headers) > _MAXHEADERS:
+            raise HTTPException("got more than %d headers" % _MAXHEADERS)
         if line in (b'\r\n', b'\n', b''):
             break
     hstring = b''.join(headers).decode('iso-8859-1')
@@ -534,7 +537,7 @@ class HTTPResponse(io.RawIOBase):
         # connection, and the user is reading more bytes than will be provided
         # (for example, reading in 1k chunks)
         n = self.fp.readinto(b)
-        if not n:
+        if not n and b:
             # Ideally, we would raise IncompleteRead if the content-length
             # wasn't satisfied, but it might break compatibility.
             self._close_conn()
@@ -744,14 +747,30 @@ class HTTPConnection:
         self._tunnel_port = None
         self._tunnel_headers = {}
 
-        self._set_hostport(host, port)
+        (self.host, self.port) = self._get_hostport(host, port)
+
+        # This is stored as an instance variable to allow unit
+        # tests to replace it with a suitable mockup
+        self._create_connection = socket.create_connection
 
     def set_tunnel(self, host, port=None, headers=None):
-        """ Sets up the host and the port for the HTTP CONNECT Tunnelling.
+        """Set up host and port for HTTP CONNECT tunnelling.
 
-        The headers argument should be a mapping of extra HTTP headers
-        to send with the CONNECT request.
+        In a connection that uses HTTP CONNECT tunneling, the host passed to the
+        constructor is used as a proxy server that relays all communication to
+        the endpoint passed to `set_tunnel`. This done by sending an HTTP
+        CONNECT request to the proxy server when the connection is established.
+
+        This method must be called before the HTML connection has been
+        established.
+
+        The headers argument should be a mapping of extra HTTP headers to send
+        with the CONNECT request.
         """
+
+        if self.sock:
+            raise RuntimeError("Can't set up tunnel for established connection")
+
         self._tunnel_host = host
         self._tunnel_port = port
         if headers:
@@ -759,7 +778,7 @@ class HTTPConnection:
         else:
             self._tunnel_headers.clear()
 
-    def _set_hostport(self, host, port):
+    def _get_hostport(self, host, port):
         if port is None:
             i = host.rfind(':')
             j = host.rfind(']')         # ipv6 addresses have [...]
@@ -776,15 +795,16 @@ class HTTPConnection:
                 port = self.default_port
             if host and host[0] == '[' and host[-1] == ']':
                 host = host[1:-1]
-        self.host = host
-        self.port = port
+
+        return (host, port)
 
     def set_debuglevel(self, level):
         self.debuglevel = level
 
     def _tunnel(self):
-        self._set_hostport(self._tunnel_host, self._tunnel_port)
-        connect_str = "CONNECT %s:%d HTTP/1.0\r\n" % (self.host, self.port)
+        (host, port) = self._get_hostport(self._tunnel_host,
+                                          self._tunnel_port)
+        connect_str = "CONNECT %s:%d HTTP/1.0\r\n" % (host, port)
         connect_bytes = connect_str.encode("ascii")
         self.send(connect_bytes)
         for header, value in self._tunnel_headers.items():
@@ -812,8 +832,9 @@ class HTTPConnection:
 
     def connect(self):
         """Connect to the host and port specified in __init__."""
-        self.sock = socket.create_connection((self.host,self.port),
-                                             self.timeout, self.source_address)
+        self.sock = self._create_connection((self.host,self.port),
+                                            self.timeout, self.source_address)
+
         if self._tunnel_host:
             self._tunnel()
 
@@ -982,22 +1003,29 @@ class HTTPConnection:
                         netloc_enc = netloc.encode("idna")
                     self.putheader('Host', netloc_enc)
                 else:
+                    if self._tunnel_host:
+                        host = self._tunnel_host
+                        port = self._tunnel_port
+                    else:
+                        host = self.host
+                        port = self.port
+
                     try:
-                        host_enc = self.host.encode("ascii")
+                        host_enc = host.encode("ascii")
                     except UnicodeEncodeError:
-                        host_enc = self.host.encode("idna")
+                        host_enc = host.encode("idna")
 
                     # As per RFC 273, IPv6 address should be wrapped with []
                     # when used as Host header
 
-                    if self.host.find(':') >= 0:
+                    if host.find(':') >= 0:
                         host_enc = b'[' + host_enc + b']'
 
-                    if self.port == self.default_port:
+                    if port == self.default_port:
                         self.putheader('Host', host_enc)
                     else:
                         host_enc = host_enc.decode("ascii")
-                        self.putheader('Host', "%s:%s" % (host_enc, self.port))
+                        self.putheader('Host', "%s:%s" % (host_enc, port))
 
             # note: we are assuming that clients will not attempt to set these
             #       headers since *this* library must deal with the
@@ -1175,9 +1203,7 @@ else:
             self.key_file = key_file
             self.cert_file = cert_file
             if context is None:
-                # Some reasonable defaults
-                context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-                context.options |= ssl.OP_NO_SSLv2
+                context = ssl._create_stdlib_context()
             will_verify = context.verify_mode != ssl.CERT_NONE
             if check_hostname is None:
                 check_hostname = will_verify
@@ -1192,23 +1218,23 @@ else:
         def connect(self):
             "Connect to a host on a given (SSL) port."
 
-            sock = socket.create_connection((self.host, self.port),
-                                            self.timeout, self.source_address)
+            super().connect()
 
             if self._tunnel_host:
-                self.sock = sock
-                self._tunnel()
+                server_hostname = self._tunnel_host
+            else:
+                server_hostname = self.host
+            sni_hostname = server_hostname if ssl.HAS_SNI else None
 
-            server_hostname = self.host if ssl.HAS_SNI else None
-            self.sock = self._context.wrap_socket(sock,
-                                                  server_hostname=server_hostname)
-            try:
-                if self._check_hostname:
-                    ssl.match_hostname(self.sock.getpeercert(), self.host)
-            except Exception:
-                self.sock.shutdown(socket.SHUT_RDWR)
-                self.sock.close()
-                raise
+            self.sock = self._context.wrap_socket(self.sock,
+                                                  server_hostname=sni_hostname)
+            if not self._context.check_hostname and self._check_hostname:
+                try:
+                    ssl.match_hostname(self.sock.getpeercert(), server_hostname)
+                except Exception:
+                    self.sock.shutdown(socket.SHUT_RDWR)
+                    self.sock.close()
+                    raise
 
     __all__.append("HTTPSConnection")
 

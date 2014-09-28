@@ -13,9 +13,17 @@
 
    ------------------------------------------------------------------------ */
 
+#define PY_SSIZE_T_CLEAN
+
 #include "Python.h"
 #include "ucnhash.h"
 #include "structmember.h"
+
+/*[clinic input]
+module unicodedata
+class unicodedata.UCD 'PreviousDBVersion *' '&UCD_Type'
+[clinic start generated code]*/
+/*[clinic end generated code: output=da39a3ee5e6b4b0d input=6dac153082d150bc]*/
 
 /* character properties */
 
@@ -107,25 +115,63 @@ static Py_UCS4 getuchar(PyUnicodeObject *obj)
 
 /* --- Module API --------------------------------------------------------- */
 
-PyDoc_STRVAR(unicodedata_decimal__doc__,
-"decimal(unichr[, default])\n\
-\n\
-Returns the decimal value assigned to the Unicode character unichr\n\
-as integer. If no such value is defined, default is returned, or, if\n\
-not given, ValueError is raised.");
+/*[clinic input]
+
+unicodedata.UCD.decimal
+
+    unichr: object(type='PyUnicodeObject *', subclass_of='&PyUnicode_Type')
+    default: object=NULL
+    /
+
+Converts a Unicode character into its equivalent decimal value.
+
+Returns the decimal value assigned to the Unicode character unichr
+as integer. If no such value is defined, default is returned, or, if
+not given, ValueError is raised.
+[clinic start generated code]*/
+
+PyDoc_STRVAR(unicodedata_UCD_decimal__doc__,
+"decimal($self, unichr, default=None, /)\n"
+"--\n"
+"\n"
+"Converts a Unicode character into its equivalent decimal value.\n"
+"\n"
+"Returns the decimal value assigned to the Unicode character unichr\n"
+"as integer. If no such value is defined, default is returned, or, if\n"
+"not given, ValueError is raised.");
+
+#define UNICODEDATA_UCD_DECIMAL_METHODDEF    \
+    {"decimal", (PyCFunction)unicodedata_UCD_decimal, METH_VARARGS, unicodedata_UCD_decimal__doc__},
 
 static PyObject *
-unicodedata_decimal(PyObject *self, PyObject *args)
+unicodedata_UCD_decimal_impl(PreviousDBVersion *self, PyUnicodeObject *unichr, PyObject *default_value);
+
+static PyObject *
+unicodedata_UCD_decimal(PreviousDBVersion *self, PyObject *args)
 {
-    PyUnicodeObject *v;
-    PyObject *defobj = NULL;
+    PyObject *return_value = NULL;
+    PyUnicodeObject *unichr;
+    PyObject *default_value = NULL;
+
+    if (!PyArg_ParseTuple(args,
+        "O!|O:decimal",
+        &PyUnicode_Type, &unichr, &default_value))
+        goto exit;
+    return_value = unicodedata_UCD_decimal_impl(self, unichr, default_value);
+
+exit:
+    return return_value;
+}
+
+static PyObject *
+unicodedata_UCD_decimal_impl(PreviousDBVersion *self, PyUnicodeObject *unichr, PyObject *default_value)
+/*[clinic end generated code: output=8689669896d293df input=c25c9d2b4de076b1]*/
+{
     int have_old = 0;
     long rc;
     Py_UCS4 c;
 
-    if (!PyArg_ParseTuple(args, "O!|O:decimal", &PyUnicode_Type, &v, &defobj))
-        return NULL;
-    c = getuchar(v);
+    c = getuchar(unichr);
     if (c == (Py_UCS4)-1)
         return NULL;
 
@@ -145,14 +191,14 @@ unicodedata_decimal(PyObject *self, PyObject *args)
     if (!have_old)
         rc = Py_UNICODE_TODECIMAL(c);
     if (rc < 0) {
-        if (defobj == NULL) {
+        if (default_value == NULL) {
             PyErr_SetString(PyExc_ValueError,
                             "not a decimal");
             return NULL;
         }
         else {
-            Py_INCREF(defobj);
-            return defobj;
+            Py_INCREF(default_value);
+            return default_value;
         }
     }
     return PyLong_FromLong(rc);
@@ -1227,12 +1273,16 @@ unicodedata_lookup(PyObject* self, PyObject* args)
     Py_UCS4 code;
 
     char* name;
-    int namelen;
+    Py_ssize_t namelen;
     unsigned int index;
     if (!PyArg_ParseTuple(args, "s#:lookup", &name, &namelen))
         return NULL;
+    if (namelen > INT_MAX) {
+        PyErr_SetString(PyExc_KeyError, "name too long");
+        return NULL;
+    }
 
-    if (!_getcode(self, name, namelen, &code, 1)) {
+    if (!_getcode(self, name, (int)namelen, &code, 1)) {
         PyErr_Format(PyExc_KeyError, "undefined character name '%s'", name);
         return NULL;
     }
@@ -1250,7 +1300,7 @@ unicodedata_lookup(PyObject* self, PyObject* args)
 /* XXX Add doc strings. */
 
 static PyMethodDef unicodedata_functions[] = {
-    {"decimal", unicodedata_decimal, METH_VARARGS, unicodedata_decimal__doc__},
+    UNICODEDATA_UCD_DECIMAL_METHODDEF
     {"digit", unicodedata_digit, METH_VARARGS, unicodedata_digit__doc__},
     {"numeric", unicodedata_numeric, METH_VARARGS, unicodedata_numeric__doc__},
     {"category", unicodedata_category, METH_VARARGS,
@@ -1322,12 +1372,10 @@ PyDoc_STRVAR(unicodedata_docstring,
 "This module provides access to the Unicode Character Database which\n\
 defines character properties for all Unicode characters. The data in\n\
 this database is based on the UnicodeData.txt file version\n\
-6.0.0 which is publically available from ftp://ftp.unicode.org/.\n\
+" UNIDATA_VERSION " which is publically available from ftp://ftp.unicode.org/.\n\
 \n\
 The module uses the same names and symbols as defined by the\n\
-UnicodeData File Format 6.0.0 (see\n\
-http://www.unicode.org/reports/tr44/tr44-6.html).");
-
+UnicodeData File Format " UNIDATA_VERSION ".");
 
 static struct PyModuleDef unicodedatamodule = {
         PyModuleDef_HEAD_INIT,

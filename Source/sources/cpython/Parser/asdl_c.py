@@ -519,9 +519,9 @@ class Obj2ModVisitor(PickleVisitor):
             self.emit("}", depth+1)
             self.emit("len = PyList_GET_SIZE(tmp);", depth+1)
             if self.isSimpleType(field):
-                self.emit("%s = asdl_int_seq_new(len, arena);" % field.name, depth+1)
+                self.emit("%s = _Py_asdl_int_seq_new(len, arena);" % field.name, depth+1)
             else:
-                self.emit("%s = asdl_seq_new(len, arena);" % field.name, depth+1)
+                self.emit("%s = _Py_asdl_seq_new(len, arena);" % field.name, depth+1)
             self.emit("if (%s == NULL) goto failed;" % field.name, depth+1)
             self.emit("for (i = 0; i < len; i++) {", depth+1)
             self.emit("%s value;" % ctype, depth+2)
@@ -1203,10 +1203,14 @@ PyObject* PyAST_mod2obj(mod_ty t)
 mod_ty PyAST_obj2mod(PyObject* ast, PyArena* arena, int mode)
 {
     mod_ty res;
-    PyObject *req_type[] = {(PyObject*)Module_type, (PyObject*)Expression_type,
-                            (PyObject*)Interactive_type};
+    PyObject *req_type[3];
     char *req_name[] = {"Module", "Expression", "Interactive"};
     int isinstance;
+
+    req_type[0] = (PyObject*)Module_type;
+    req_type[1] = (PyObject*)Expression_type;
+    req_type[2] = (PyObject*)Interactive_type;
+
     assert(0 <= mode && mode <= 2);
 
     if (!init_types())

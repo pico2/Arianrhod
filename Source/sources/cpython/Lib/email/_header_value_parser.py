@@ -70,7 +70,7 @@ XXX: provide complete list of token types.
 import re
 import urllib   # For urllib.parse.unquote
 from string import hexdigits
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict
 from email import _encoded_words as _ew
 from email import errors
 from email import utils
@@ -1556,6 +1556,13 @@ def get_bare_quoted_string(value):
     while value and value[0] != '"':
         if value[0] in WSP:
             token, value = get_fws(value)
+        elif value[:2] == '=?':
+            try:
+                token, value = get_encoded_word(value)
+                bare_quoted_string.defects.append(errors.InvalidHeaderDefect(
+                    "encoded word inside quoted string"))
+            except errors.HeaderParseError:
+                token, value = get_qcontent(value)
         else:
             token, value = get_qcontent(value)
         bare_quoted_string.append(token)
@@ -2890,7 +2897,7 @@ def parse_content_disposition_header(value):
     try:
         token, value = get_token(value)
     except errors.HeaderParseError:
-        ctype.defects.append(errors.InvalidHeaderDefect(
+        disp_header.defects.append(errors.InvalidHeaderDefect(
             "Expected content disposition but found {!r}".format(value)))
         _find_mime_parameters(disp_header, value)
         return disp_header
@@ -2921,8 +2928,8 @@ def parse_content_transfer_encoding_header(value):
     try:
         token, value = get_token(value)
     except errors.HeaderParseError:
-        ctype.defects.append(errors.InvalidHeaderDefect(
-            "Expected content trnasfer encoding but found {!r}".format(value)))
+        cte_header.defects.append(errors.InvalidHeaderDefect(
+            "Expected content transfer encoding but found {!r}".format(value)))
     else:
         cte_header.append(token)
         cte_header.cte = token.value.strip().lower()

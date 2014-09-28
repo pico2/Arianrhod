@@ -1,7 +1,7 @@
 import unittest
 from test import support
 from itertools import *
-from weakref import proxy
+import weakref
 from decimal import Decimal
 from fractions import Fraction
 import sys
@@ -10,6 +10,8 @@ import random
 import copy
 import pickle
 from functools import reduce
+import sys
+import struct
 maxsize = support.MAX_Py_ssize_t
 minsize = -maxsize-1
 
@@ -409,7 +411,7 @@ class TestBasicOps(unittest.TestCase):
 
                 self.pickletest(permutations(values, r))                # test pickling
 
-    @support.impl_detail("tuple resuse is CPython specific")
+    @support.impl_detail("tuple reuse is specific to CPython")
     def test_permutations_tuple_reuse(self):
         self.assertEqual(len(set(map(id, permutations('abcde', 3)))), 1)
         self.assertNotEqual(len(set(map(id, list(permutations('abcde', 3))))), 1)
@@ -965,6 +967,12 @@ class TestBasicOps(unittest.TestCase):
         self.assertEqual(take(2, copy.deepcopy(c)), list('a' * 2))
         self.pickletest(repeat(object='a', times=10))
 
+    def test_repeat_with_negative_times(self):
+        self.assertEqual(repr(repeat('a', -1)), "repeat('a', 0)")
+        self.assertEqual(repr(repeat('a', -2)), "repeat('a', 0)")
+        self.assertEqual(repr(repeat('a', times=-1)), "repeat('a', 0)")
+        self.assertEqual(repr(repeat('a', times=-2)), "repeat('a', 0)")
+
     def test_map(self):
         self.assertEqual(list(map(operator.pow, range(3), range(1,7))),
                          [0**1, 1**2, 2**3])
@@ -1085,6 +1093,16 @@ class TestBasicOps(unittest.TestCase):
                              list(range(*args)))
             self.pickletest(islice(range(100), *args))
 
+        # Issue #21321: check source iterator is not referenced
+        # from islice() after the latter has been exhausted
+        it = (x for x in (1, 2))
+        wr = weakref.ref(it)
+        it = islice(it, 1)
+        self.assertIsNotNone(wr())
+        list(it) # exhaust the iterator
+        support.gc_collect()
+        self.assertIsNone(wr())
+
     def test_takewhile(self):
         data = [1, 3, 5, 20, 2, 4, 6, 8]
         self.assertEqual(list(takewhile(underten, data)), [1, 3, 5])
@@ -1201,7 +1219,7 @@ class TestBasicOps(unittest.TestCase):
 
         # test that tee objects are weak referencable
         a, b = tee(range(10))
-        p = proxy(a)
+        p = weakref.proxy(a)
         self.assertEqual(getattr(p, '__class__'), type(b))
         del a
         self.assertRaises(ReferenceError, getattr, p, '__class__')
@@ -1730,7 +1748,14 @@ class LengthTransparency(unittest.TestCase):
 
     def test_repeat(self):
         self.assertEqual(operator.length_hint(repeat(None, 50)), 50)
+        self.assertEqual(operator.length_hint(repeat(None, 0)), 0)
         self.assertEqual(operator.length_hint(repeat(None), 12), 12)
+
+    def test_repeat_with_negative_times(self):
+        self.assertEqual(operator.length_hint(repeat(None, -1)), 0)
+        self.assertEqual(operator.length_hint(repeat(None, -2)), 0)
+        self.assertEqual(operator.length_hint(repeat(None, times=-1)), 0)
+        self.assertEqual(operator.length_hint(repeat(None, times=-2)), 0)
 
 class RegressionTests(unittest.TestCase):
 
@@ -1806,6 +1831,44 @@ class SubclassWithKwargsTest(unittest.TestCase):
             except TypeError as err:
                 # we expect type errors because of wrong argument count
                 self.assertNotIn("does not take keyword arguments", err.args[0])
+
+@support.cpython_only
+class SizeofTest(unittest.TestCase):
+    def setUp(self):
+        self.ssize_t = struct.calcsize('n')
+
+    check_sizeof = support.check_sizeof
+
+    def test_product_sizeof(self):
+        basesize = support.calcobjsize('3Pi')
+        check = self.check_sizeof
+        check(product('ab', '12'), basesize + 2 * self.ssize_t)
+        check(product(*(('abc',) * 10)), basesize + 10 * self.ssize_t)
+
+    def test_combinations_sizeof(self):
+        basesize = support.calcobjsize('3Pni')
+        check = self.check_sizeof
+        check(combinations('abcd', 3), basesize + 3 * self.ssize_t)
+        check(combinations(range(10), 4), basesize + 4 * self.ssize_t)
+
+    def test_combinations_with_replacement_sizeof(self):
+        cwr = combinations_with_replacement
+        basesize = support.calcobjsize('3Pni')
+        check = self.check_sizeof
+        check(cwr('abcd', 3), basesize + 3 * self.ssize_t)
+        check(cwr(range(10), 4), basesize + 4 * self.ssize_t)
+
+    def test_permutations_sizeof(self):
+        basesize = support.calcobjsize('4Pni')
+        check = self.check_sizeof
+        check(permutations('abcd'),
+              basesize + 4 * self.ssize_t + 4 * self.ssize_t)
+        check(permutations('abcd', 3),
+              basesize + 4 * self.ssize_t + 3 * self.ssize_t)
+        check(permutations('abcde', 3),
+              basesize + 5 * self.ssize_t + 3 * self.ssize_t)
+        check(permutations(range(10), 4),
+              basesize + 10 * self.ssize_t + 4 * self.ssize_t)
 
 
 libreftest = """ Doctest for examples in the library reference: libitertools.tex
@@ -1958,6 +2021,19 @@ Samuele
 ...     # unique_justseen('ABBCcAD', str.lower) --> A B C A D
 ...     return map(next, map(itemgetter(1), groupby(iterable, key)))
 
+>>> def first_true(iterable, default=False, pred=None):
+...     '''Returns the first true value in the iterable.
+...
+...     If no true value is found, returns *default*
+...
+...     If *pred* is not None, returns the first item
+...     for which pred(item) is true.
+...
+...     '''
+...     # first_true([a,b,c], x) --> a or b or c or x
+...     # first_true([a,b], x, f) --> a if f(a) else b if f(b) else x
+...     return next(filter(pred, iterable), default)
+
 This is not part of the examples but it tests to make sure the definitions
 perform as purported.
 
@@ -2035,6 +2111,9 @@ True
 >>> list(unique_justseen('ABBCcAD', str.lower))
 ['A', 'B', 'C', 'A', 'D']
 
+>>> first_true('ABC0DEF1', '9', str.isdigit)
+'0'
+
 """
 
 __test__ = {'libreftest' : libreftest}
@@ -2042,7 +2121,8 @@ __test__ = {'libreftest' : libreftest}
 def test_main(verbose=None):
     test_classes = (TestBasicOps, TestVariousIteratorArgs, TestGC,
                     RegressionTests, LengthTransparency,
-                    SubclassWithKwargsTest, TestExamples)
+                    SubclassWithKwargsTest, TestExamples,
+                    SizeofTest)
     support.run_unittest(*test_classes)
 
     # verify reference counting

@@ -222,6 +222,10 @@ class FileInput:
         if mode not in ('r', 'rU', 'U', 'rb'):
             raise ValueError("FileInput opening mode must be one of "
                              "'r', 'rU', 'U' and 'rb'")
+        if 'U' in mode:
+            import warnings
+            warnings.warn("'U' mode is deprecated",
+                          DeprecationWarning, 2)
         self._mode = mode
         if openhook:
             if inplace:
@@ -316,7 +320,10 @@ class FileInput:
             self._backupfilename = 0
             if self._filename == '-':
                 self._filename = '<stdin>'
-                self._file = sys.stdin
+                if 'b' in self._mode:
+                    self._file = sys.stdin.buffer
+                else:
+                    self._file = sys.stdin
                 self._isstdin = True
             else:
                 if self._inplace:

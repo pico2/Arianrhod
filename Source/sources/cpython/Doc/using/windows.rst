@@ -11,6 +11,10 @@
 This document aims to give an overview of Windows-specific behaviour you should
 know about when using Python on Microsoft Windows.
 
+.. XXX (ncoghlan)
+
+   This looks rather stale to me...
+
 
 Installing Python
 =================
@@ -24,10 +28,6 @@ With ongoing development of Python, some platforms that used to be supported
 earlier are no longer supported (due to the lack of users or developers).
 Check :pep:`11` for details on all unsupported platforms.
 
-* Up to 2.5, Python was still compatible with Windows 95, 98 and ME (but already
-  raised a deprecation warning on installation).  For Python 2.6 (and all
-  following releases), this support was dropped and new releases are just
-  expected to work on the Windows NT family.
 * `Windows CE <http://pythonce.sourceforge.net/>`_ is still supported.
 * The `Cygwin <http://cygwin.com/>`_ installer offers to install the `Python
   interpreter <http://cygwin.com/packages/python>`_ as well; it is located under
@@ -36,8 +36,8 @@ Check :pep:`11` for details on all unsupported platforms.
   release/python>`_, `Maintainer releases
   <http://www.tishler.net/jason/software/python/>`_)
 
-See `Python for Windows (and DOS) <http://www.python.org/download/windows/>`_
-for detailed information about platforms with precompiled installers.
+See `Python for Windows <http://www.python.org/download/windows/>`_
+for detailed information about platforms with pre-compiled installers.
 
 .. seealso::
 
@@ -64,7 +64,7 @@ Besides the standard CPython distribution, there are modified packages including
 additional functionality.  The following is a list of popular versions and their
 key features:
 
-`ActivePython <http://www.activestate.com/Products/activepython/>`_
+`ActivePython <http://www.activestate.com/activepython/>`_
     Installer with multi-platform compatibility, documentation, PyWin32
 
 `Enthought Python Distribution <http://www.enthought.com/products/epd.php>`_
@@ -527,13 +527,14 @@ shipped with PyWin32.  It is an embeddable IDE with a built-in debugger.
       by David and Paul Boddie
 
 
-Py2exe
-------
+cx_Freeze
+---------
 
-`Py2exe <http://www.py2exe.org/>`_ is a :mod:`distutils` extension (see
-:ref:`extending-distutils`) which wraps Python scripts into executable Windows
-programs (:file:`{*}.exe` files).  When you have done this, you can distribute
-your application without requiring your users to install Python.
+`cx_Freeze <http://cx-freeze.sourceforge.net/>`_ is a :mod:`distutils`
+extension (see :ref:`extending-distutils`) which wraps Python scripts into
+executable Windows programs (:file:`{*}.exe` files).  When you have done this,
+you can distribute your application without requiring your users to install
+Python.
 
 
 WConio
@@ -556,27 +557,23 @@ If you want to compile CPython yourself, first thing you should do is get the
 latest release's source or just grab a fresh `checkout
 <http://docs.python.org/devguide/setup#checking-out-the-code>`_.
 
-For Microsoft Visual C++, which is the compiler with which official Python
-releases are built, the source tree contains solutions/project files.  View the
-:file:`readme.txt` in their respective directories:
+The source tree contains a build solution and project files for Microsoft
+Visual C++, which is the compiler used to build the official Python releases.
+View the :file:`readme.txt` in their respective directories:
 
 +--------------------+--------------+-----------------------+
 | Directory          | MSVC version | Visual Studio version |
 +====================+==============+=======================+
-| :file:`PC/VC6/`    | 6.0          | 97                    |
+| :file:`PC/VS9.0/`  | 9.0          | 2008                  |
 +--------------------+--------------+-----------------------+
-| :file:`PC/VS7.1/`  | 7.1          | 2003                  |
-+--------------------+--------------+-----------------------+
-| :file:`PC/VS8.0/`  | 8.0          | 2005                  |
-+--------------------+--------------+-----------------------+
-| :file:`PCbuild/`   | 9.0          | 2008                  |
+| :file:`PCbuild/`   | 10.0         | 2010                  |
 +--------------------+--------------+-----------------------+
 
-Note that not all of these build directories are fully supported.  Read the
-release notes to see which compiler version the official releases for your
-version are built with.
+Note that any build directories within the :file:`PC` directory are not
+necessarily fully supported.  The :file:`PCbuild` directory contains the files
+for the compiler used to build the official release.
 
-Check :file:`PC/readme.txt` for general information on the build process.
+Check :file:`PCbuild/readme.txt` for general information on the build process.
 
 
 For extension modules, consult :ref:`building-on-windows`.

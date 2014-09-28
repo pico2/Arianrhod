@@ -52,9 +52,6 @@ extern void bzero(void *, int);
 #  include <winsock.h>
 #else
 #  define SOCKET int
-#  if defined(__VMS)
-#    include <socket.h>
-#  endif
 #endif
 
 /* list of Python objects and their file descriptor */
@@ -69,8 +66,7 @@ reap_obj(pylist fd2obj[FD_SETSIZE + 1])
 {
     int i;
     for (i = 0; i < FD_SETSIZE + 1 && fd2obj[i].sentinel >= 0; i++) {
-        Py_XDECREF(fd2obj[i].obj);
-        fd2obj[i].obj = NULL;
+        Py_CLEAR(fd2obj[i].obj);
     }
     fd2obj[0].sentinel = -1;
 }
@@ -216,10 +212,18 @@ select_select(PyObject *self, PyObject *args)
         return NULL;
     }
     else {
-#ifdef MS_WINDOWS
+        /* On OpenBSD 5.4, timeval.tv_sec is a long.
+         * Example: long is 64-bit, whereas time_t is 32-bit. */
         time_t sec;
-        if (_PyTime_ObjectToTimeval(tout, &sec, &tv.tv_usec) == -1)
+        /* On OS X 64-bit, timeval.tv_usec is an int (and thus still 4
+           bytes as required), but no longer defined by a long. */
+        long usec;
+        if (_PyTime_ObjectToTimeval(tout, &sec, &usec,
+                                    _PyTime_ROUND_UP) == -1)
             return NULL;
+#ifdef MS_WINDOWS
+        /* On Windows, timeval.tv_sec is a long (32 bit),
+         * whereas time_t can be 64-bit. */
         assert(sizeof(tv.tv_sec) == sizeof(long));
 #if SIZEOF_TIME_T > SIZEOF_LONG
         if (sec > LONG_MAX) {
@@ -230,13 +234,10 @@ select_select(PyObject *self, PyObject *args)
 #endif
         tv.tv_sec = (long)sec;
 #else
-        /* 64-bit OS X has struct timeval.tv_usec as an int (and thus still 4
-           bytes as required), but no longer defined by a long. */
-        long tv_usec;
-        if (_PyTime_ObjectToTimeval(tout, &tv.tv_sec, &tv_usec) == -1)
-            return NULL;
-        tv.tv_usec = tv_usec;
+        assert(sizeof(tv.tv_sec) >= sizeof(sec));
+        tv.tv_sec = sec;
 #endif
+        tv.tv_usec = usec;
         if (tv.tv_sec < 0) {
             PyErr_SetString(PyExc_ValueError, "timeout must be non-negative");
             return NULL;
@@ -356,11 +357,29 @@ update_ufd_array(pollObject *self)
         assert(i < self->ufd_len);
         /* Never overflow */
         self->ufds[i].fd = (int)PyLong_AsLong(key);
-        self->ufds[i].events = (short)PyLong_AsLong(value);
+        self->ufds[i].events = (short)(unsigned short)PyLong_AsLong(value);
         i++;
     }
     assert(i == self->ufd_len);
     self->ufd_uptodate = 1;
+    return 1;
+}
+
+static int
+ushort_converter(PyObject *obj, void *ptr)
+{
+    unsigned long uval;
+
+    uval = PyLong_AsUnsignedLong(obj);
+    if (uval == (unsigned long)-1 && PyErr_Occurred())
+        return 0;
+    if (uval > USHRT_MAX) {
+        PyErr_SetString(PyExc_OverflowError,
+                        "Python int too large for C unsigned short");
+        return 0;
+    }
+
+    *(unsigned short *)ptr = Py_SAFE_DOWNCAST(uval, unsigned long, unsigned short);
     return 1;
 }
 
@@ -376,12 +395,11 @@ poll_register(pollObject *self, PyObject *args)
 {
     PyObject *o, *key, *value;
     int fd;
-    short events = POLLIN | POLLPRI | POLLOUT;
+    unsigned short events = POLLIN | POLLPRI | POLLOUT;
     int err;
 
-    if (!PyArg_ParseTuple(args, "O|h:register", &o, &events)) {
+    if (!PyArg_ParseTuple(args, "O|O&:register", &o, ushort_converter, &events))
         return NULL;
-    }
 
     fd = PyObject_AsFileDescriptor(o);
     if (fd == -1) return NULL;
@@ -419,12 +437,12 @@ static PyObject *
 poll_modify(pollObject *self, PyObject *args)
 {
     PyObject *o, *key, *value;
-    int fd, events;
+    int fd;
+    unsigned short events;
     int err;
 
-    if (!PyArg_ParseTuple(args, "Oi:modify", &o, &events)) {
+    if (!PyArg_ParseTuple(args, "OO&:modify", &o, ushort_converter, &events))
         return NULL;
-    }
 
     fd = PyObject_AsFileDescriptor(o);
     if (fd == -1) return NULL;
@@ -729,14 +747,14 @@ static PyObject *
 internal_devpoll_register(devpollObject *self, PyObject *args, int remove)
 {
     PyObject *o;
-    int fd, events = POLLIN | POLLPRI | POLLOUT;
+    int fd;
+    unsigned short events = POLLIN | POLLPRI | POLLOUT;
 
     if (self->fd_devpoll < 0)
         return devpoll_err_closed();
 
-    if (!PyArg_ParseTuple(args, "O|i:register", &o, &events)) {
+    if (!PyArg_ParseTuple(args, "O|O&:register", &o, ushort_converter, &events))
         return NULL;
-    }
 
     fd = PyObject_AsFileDescriptor(o);
     if (fd == -1) return NULL;
@@ -752,7 +770,7 @@ internal_devpoll_register(devpollObject *self, PyObject *args, int remove)
     }
 
     self->fds[self->n_fds].fd = fd;
-    self->fds[self->n_fds].events = events;
+    self->fds[self->n_fds].events = (signed short)events;
 
     if (++self->n_fds == self->max_n_fds) {
         if (devpoll_flush(self))
@@ -1317,16 +1335,16 @@ pyepoll_internal_ctl(int epfd, int op, PyObject *pfd, unsigned int events)
         return NULL;
     }
 
-    switch(op) {
-        case EPOLL_CTL_ADD:
-        case EPOLL_CTL_MOD:
+    switch (op) {
+    case EPOLL_CTL_ADD:
+    case EPOLL_CTL_MOD:
         ev.events = events;
         ev.data.fd = fd;
         Py_BEGIN_ALLOW_THREADS
         result = epoll_ctl(epfd, op, fd, &ev);
         Py_END_ALLOW_THREADS
         break;
-        case EPOLL_CTL_DEL:
+    case EPOLL_CTL_DEL:
         /* In kernel versions before 2.6.9, the EPOLL_CTL_DEL
          * operation required a non-NULL pointer in event, even
          * though this argument is ignored. */
@@ -1339,7 +1357,7 @@ pyepoll_internal_ctl(int epfd, int op, PyObject *pfd, unsigned int events)
         }
         Py_END_ALLOW_THREADS
         break;
-        default:
+    default:
         result = -1;
         errno = EINVAL;
     }
@@ -1444,7 +1462,9 @@ pyepoll_poll(pyEpoll_Object *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
     else {
-        timeout = (int)(dtimeout * 1000.0);
+        /* epoll_wait() has a resolution of 1 millisecond, round away from zero
+           to wait *at least* dtimeout seconds. */
+        timeout = (int)ceil(dtimeout * 1000.0);
     }
 
     if (maxevents == -1) {
@@ -1459,7 +1479,6 @@ pyepoll_poll(pyEpoll_Object *self, PyObject *args, PyObject *kwds)
 
     evs = PyMem_New(struct epoll_event, maxevents);
     if (evs == NULL) {
-        Py_DECREF(self);
         PyErr_NoMemory();
         return NULL;
     }
@@ -1692,17 +1711,17 @@ static PyTypeObject kqueue_queue_Type;
  * kevent is not standard and its members vary across BSDs.
  */
 #if !defined(__OpenBSD__)
-#   define IDENT_TYPE	T_UINTPTRT
-#   define IDENT_CAST	Py_intptr_t
-#   define DATA_TYPE	T_INTPTRT
+#   define IDENT_TYPE  T_UINTPTRT
+#   define IDENT_CAST  Py_intptr_t
+#   define DATA_TYPE   T_INTPTRT
 #   define DATA_FMT_UNIT INTPTRT_FMT_UNIT
-#   define IDENT_AsType	PyLong_AsUintptr_t
+#   define IDENT_AsType PyLong_AsUintptr_t
 #else
-#   define IDENT_TYPE	T_UINT
-#   define IDENT_CAST	int
-#   define DATA_TYPE	T_INT
+#   define IDENT_TYPE  T_UINT
+#   define IDENT_CAST  int
+#   define DATA_TYPE   T_INT
 #   define DATA_FMT_UNIT "i"
-#   define IDENT_AsType	PyLong_AsUnsignedLong
+#   define IDENT_AsType PyLong_AsUnsignedLong
 #endif
 
 /* Unfortunately, we can't store python objects in udata, because
@@ -1754,7 +1773,7 @@ kqueue_event_init(kqueue_event_Object *self, PyObject *args, PyObject *kwds)
 
     if (PyLong_Check(pfd)
 #if IDENT_TYPE == T_UINT
-	&& PyLong_AsUnsignedLong(pfd) <= UINT_MAX
+        && PyLong_AsUnsignedLong(pfd) <= UINT_MAX
 #endif
     ) {
         self->e.ident = IDENT_AsType(pfd);
@@ -1796,22 +1815,22 @@ kqueue_event_richcompare(kqueue_event_Object *s, kqueue_event_Object *o,
     }
 
     switch (op) {
-        case Py_EQ:
+    case Py_EQ:
         result = (result == 0);
         break;
-        case Py_NE:
+    case Py_NE:
         result = (result != 0);
         break;
-        case Py_LE:
+    case Py_LE:
         result = (result <= 0);
         break;
-        case Py_GE:
+    case Py_GE:
         result = (result >= 0);
         break;
-        case Py_LT:
+    case Py_LT:
         result = (result < 0);
         break;
-        case Py_GT:
+    case Py_GT:
         result = (result > 0);
         break;
     }
@@ -2023,8 +2042,8 @@ kqueue_queue_control(kqueue_queue_Object *self, PyObject *args)
         ptimeoutspec = NULL;
     }
     else if (PyNumber_Check(otimeout)) {
-        if (_PyTime_ObjectToTimespec(otimeout,
-                                     &timeout.tv_sec, &timeout.tv_nsec) == -1)
+        if (_PyTime_ObjectToTimespec(otimeout, &timeout.tv_sec,
+                                     &timeout.tv_nsec, _PyTime_ROUND_UP) == -1)
             return NULL;
 
         if (timeout.tv_sec < 0) {
@@ -2237,7 +2256,7 @@ arguments; each contains the subset of the corresponding file descriptors\n\
 that are ready.\n\
 \n\
 *** IMPORTANT NOTICE ***\n\
-On Windows and OpenVMS, only sockets are supported; on Unix, all file\n\
+On Windows only sockets are supported; on Unix, all file\n\
 descriptors can be used.");
 
 static PyMethodDef select_methods[] = {
@@ -2255,7 +2274,7 @@ PyDoc_STRVAR(module_doc,
 "This module supports asynchronous I/O on multiple file descriptors.\n\
 \n\
 *** IMPORTANT NOTICE ***\n\
-On Windows and OpenVMS, only sockets are supported; on Unix, all file descriptors.");
+On Windows only sockets are supported; on Unix, all file descriptors.");
 
 
 static struct PyModuleDef selectmodule = {

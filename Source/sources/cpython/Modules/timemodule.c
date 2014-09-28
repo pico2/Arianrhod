@@ -193,7 +193,7 @@ time_clock_settime(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iO:clock_settime", &clk_id, &obj))
         return NULL;
 
-    if (_PyTime_ObjectToTimespec(obj, &tv_sec, &tv_nsec) == -1)
+    if (_PyTime_ObjectToTimespec(obj, &tv_sec, &tv_nsec, _PyTime_ROUND_DOWN) == -1)
         return NULL;
     tp.tv_sec = tv_sec;
     tp.tv_nsec = tv_nsec;
@@ -341,7 +341,7 @@ parse_time_t_args(PyObject *args, char *format, time_t *pwhen)
         whent = time(NULL);
     }
     else {
-        if (_PyTime_ObjectToTime_t(ot, &whent) == -1)
+        if (_PyTime_ObjectToTime_t(ot, &whent, _PyTime_ROUND_DOWN) == -1)
             return 0;
     }
     *pwhen = whent;
@@ -642,6 +642,26 @@ time_strftime(PyObject *self, PyObject *args)
             Py_DECREF(format);
             return NULL;
         }
+        if ((outbuf[1] == 'y') && buf.tm_year < 0)
+        {
+            PyErr_SetString(PyExc_ValueError,
+                        "format %y requires year >= 1900 on Windows");
+            Py_DECREF(format);
+            return NULL;
+        }
+    }
+#elif (defined(_AIX) || defined(sun)) && defined(HAVE_WCSFTIME)
+    for(outbuf = wcschr(fmt, '%');
+        outbuf != NULL;
+        outbuf = wcschr(outbuf+2, '%'))
+    {
+        /* Issue #19634: On AIX, wcsftime("y", (1899, 1, 1, 0, 0, 0, 0, 0, 0))
+           returns "0/" instead of "99" */
+        if (outbuf[1] == L'y' && buf.tm_year < 0) {
+            PyErr_SetString(PyExc_ValueError,
+                            "format %y requires year >= 1900 on AIX");
+            return NULL;
+        }
     }
 #endif
 
@@ -803,7 +823,18 @@ time_mktime(PyObject *self, PyObject *tup)
     time_t tt;
     if (!gettmarg(tup, &buf))
         return NULL;
+#ifdef _AIX
+    /* year < 1902 or year > 2037 */
+    if (buf.tm_year < 2 || buf.tm_year > 137) {
+        /* Issue #19748: On AIX, mktime() doesn't report overflow error for
+         * timestamp < -2^31 or timestamp > 2**31-1. */
+        PyErr_SetString(PyExc_OverflowError,
+                        "mktime argument out of range");
+        return NULL;
+    }
+#else
     buf.tm_wday = -1;  /* sentinel; original value ignored */
+#endif
     tt = mktime(&buf);
     /* Return value of -1 does not necessarily mean an error, but tm_wday
      * cannot remain set to -1 if mktime succeeded. */

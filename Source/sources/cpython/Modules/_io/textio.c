@@ -45,7 +45,9 @@ PyDoc_STRVAR(textiobase_doc,
 static PyObject *
 _unsupported(const char *message)
 {
-    PyErr_SetString(IO_STATE->unsupported_operation, message);
+    _PyIO_State *state = IO_STATE();
+    if (state != NULL)
+        PyErr_SetString(state->unsupported_operation, message);
     return NULL;
 }
 
@@ -293,12 +295,12 @@ check_decoded(PyObject *decoded)
 #define SEEN_ALL (SEEN_CR | SEEN_LF | SEEN_CRLF)
 
 PyObject *
-_PyIncrementalNewlineDecoder_decode(PyObject *_self,
+_PyIncrementalNewlineDecoder_decode(PyObject *myself,
                                     PyObject *input, int final)
 {
     PyObject *output;
     Py_ssize_t output_len;
-    nldecoder_object *self = (nldecoder_object *) _self;
+    nldecoder_object *self = (nldecoder_object *) myself;
 
     if (self->decoder == NULL) {
         PyErr_SetString(PyExc_ValueError,
@@ -847,12 +849,12 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     char *kwlist[] = {"buffer", "encoding", "errors",
                       "newline", "line_buffering", "write_through",
                       NULL};
-    PyObject *buffer, *raw;
+    PyObject *buffer, *raw, *codec_info = NULL;
     char *encoding = NULL;
     char *errors = NULL;
     char *newline = NULL;
     int line_buffering = 0, write_through = 0;
-    _PyIO_State *state = IO_STATE;
+    _PyIO_State *state = NULL;
 
     PyObject *res;
     int r;
@@ -891,6 +893,9 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     if (encoding == NULL) {
         /* Try os.device_encoding(fileno) */
         PyObject *fileno;
+        state = IO_STATE();
+        if (state == NULL)
+            goto error;
         fileno = _PyObject_CallMethodId(buffer, &PyId_fileno, NULL);
         /* Ignore only AttributeError and UnsupportedOperation */
         if (fileno == NULL) {
@@ -956,6 +961,17 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
                         "could not determine default encoding");
     }
 
+    /* Check we have been asked for a real text encoding */
+    codec_info = _PyCodec_LookupTextEncoding(encoding, "codecs.open()");
+    if (codec_info == NULL) {
+        Py_CLEAR(self->encoding);
+        goto error;
+    }
+
+    /* XXX: Failures beyond this point have the potential to leak elements
+     * of the partially constructed object (like self->encoding)
+     */
+
     if (errors == NULL)
         errors = "strict";
     self->errors = PyBytes_FromString(errors);
@@ -970,7 +986,7 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     if (newline) {
         self->readnl = PyUnicode_FromString(newline);
         if (self->readnl == NULL)
-            return -1;
+            goto error;
     }
     self->writetranslate = (newline == NULL || newline[0] != '\0');
     if (!self->readuniversal && self->readnl) {
@@ -994,8 +1010,8 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     if (r == -1)
         goto error;
     if (r == 1) {
-        self->decoder = PyCodec_IncrementalDecoder(
-            encoding, errors);
+        self->decoder = _PyCodecInfo_GetIncrementalDecoder(codec_info,
+                                                           errors);
         if (self->decoder == NULL)
             goto error;
 
@@ -1019,17 +1035,12 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     if (r == -1)
         goto error;
     if (r == 1) {
-        PyObject *ci;
-        self->encoder = PyCodec_IncrementalEncoder(
-            encoding, errors);
+        self->encoder = _PyCodecInfo_GetIncrementalEncoder(codec_info,
+                                                           errors);
         if (self->encoder == NULL)
             goto error;
         /* Get the normalized named of the codec */
-        ci = _PyCodec_Lookup(encoding);
-        if (ci == NULL)
-            goto error;
-        res = _PyObject_GetAttrId(ci, &PyId_name);
-        Py_DECREF(ci);
+        res = _PyObject_GetAttrId(codec_info, &PyId_name);
         if (res == NULL) {
             if (PyErr_ExceptionMatches(PyExc_AttributeError))
                 PyErr_Clear();
@@ -1048,6 +1059,9 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
         }
         Py_XDECREF(res);
     }
+
+    /* Finished sorting out the codec details */
+    Py_DECREF(codec_info);
 
     self->buffer = buffer;
     Py_INCREF(buffer);
@@ -1111,6 +1125,7 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     return 0;
 
   error:
+    Py_XDECREF(codec_info);
     return -1;
 }
 
@@ -1282,7 +1297,7 @@ textiowrapper_write(textio *self, PyObject *args)
     PyObject *b;
     Py_ssize_t textlen;
     int haslf = 0;
-    int needflush = 0;
+    int needflush = 0, text_needflush = 0;
 
     CHECK_INITIALIZED(self);
 
@@ -1316,8 +1331,8 @@ textiowrapper_write(textio *self, PyObject *args)
     }
 
     if (self->write_through)
-        needflush = 1;
-    else if (self->line_buffering &&
+        text_needflush = 1;
+    if (self->line_buffering &&
         (haslf ||
          PyUnicode_FindChar(text, '\r', 0, PyUnicode_GET_LENGTH(text), 1) != -1))
         needflush = 1;
@@ -1348,7 +1363,8 @@ textiowrapper_write(textio *self, PyObject *args)
     }
     self->pending_bytes_count += PyBytes_GET_SIZE(b);
     Py_DECREF(b);
-    if (self->pending_bytes_count > self->chunk_size || needflush) {
+    if (self->pending_bytes_count > self->chunk_size || needflush ||
+        text_needflush) {
         if (_textiowrapper_writeflush(self) < 0)
             return NULL;
     }
@@ -2597,13 +2613,14 @@ textiowrapper_close(textio *self, PyObject *args)
                 PyErr_Restore(exc, val, tb);
             }
             else {
-                PyObject *val2;
+                PyObject *exc2, *val2, *tb2;
+                PyErr_Fetch(&exc2, &val2, &tb2);
+                PyErr_NormalizeException(&exc, &val, &tb);
                 Py_DECREF(exc);
                 Py_XDECREF(tb);
-                PyErr_Fetch(&exc, &val2, &tb);
-                PyErr_NormalizeException(&exc, &val2, &tb);
+                PyErr_NormalizeException(&exc2, &val2, &tb2);
                 PyException_SetContext(val2, val);
-                PyErr_Restore(exc, val2, tb);
+                PyErr_Restore(exc2, val2, tb2);
             }
         }
         return res;

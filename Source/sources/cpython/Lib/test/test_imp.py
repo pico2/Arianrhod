@@ -165,7 +165,7 @@ class ImportTests(unittest.TestCase):
                 self.assertIsNotNone(file)
                 self.assertTrue(filename[:-3].endswith(temp_mod_name))
                 self.assertEqual(info[0], '.py')
-                self.assertEqual(info[1], 'U')
+                self.assertEqual(info[1], 'r')
                 self.assertEqual(info[2], imp.PY_SOURCE)
 
                 mod = imp.load_module(temp_mod_name, file, filename, info)
@@ -272,7 +272,7 @@ class ImportTests(unittest.TestCase):
         if found[0] is not None:
             found[0].close()
         if found[2][2] != imp.C_EXTENSION:
-            return
+            self.skipTest("found module doesn't appear to be a C extension")
         imp.load_module(name, None, *found[1:])
 
     @unittest.skipIf(sys.dont_write_bytecode,

@@ -312,26 +312,36 @@ class UUID(object):
             return int((self.int >> 76) & 0xf)
 
 def _find_mac(command, args, hw_identifiers, get_index):
-    import os
-    for dir in ['', '/sbin/', '/usr/sbin']:
-        executable = os.path.join(dir, command)
-        if not os.path.exists(executable):
-            continue
+    import os, shutil
+    executable = shutil.which(command)
+    if executable is None:
+        path = os.pathsep.join(('/sbin', '/usr/sbin'))
+        executable = shutil.which(command, path=path)
+        if executable is None:
+            return None
 
-        try:
-            # LC_ALL to get English output, 2>/dev/null to
-            # prevent output on stderr
-            cmd = 'LC_ALL=C %s %s 2>/dev/null' % (executable, args)
-            with os.popen(cmd) as pipe:
-                for line in pipe:
-                    words = line.lower().split()
-                    for i in range(len(words)):
-                        if words[i] in hw_identifiers:
+    try:
+        # LC_ALL to ensure English output, 2>/dev/null to prevent output on
+        # stderr (Note: we don't have an example where the words we search for
+        # are actually localized, but in theory some system could do so.)
+        cmd = 'LC_ALL=C %s %s 2>/dev/null' % (executable, args)
+        with os.popen(cmd) as pipe:
+            for line in pipe:
+                words = line.lower().split()
+                for i in range(len(words)):
+                    if words[i] in hw_identifiers:
+                        try:
                             return int(
                                 words[get_index(i)].replace(':', ''), 16)
-        except OSError:
-            continue
-    return None
+                        except (ValueError, IndexError):
+                            # Virtual interfaces, such as those provided by
+                            # VPNs, do not have a colon-delimited MAC address
+                            # as expected, but a 16-byte HWAddr separated by
+                            # dashes. These should be ignored in favor of a
+                            # real MAC address
+                            pass
+    except OSError:
+        pass
 
 def _ifconfig_getnode():
     """Get the hardware address on Unix by running ifconfig."""
@@ -373,13 +383,11 @@ def _ipconfig_getnode():
             pipe = os.popen(os.path.join(dir, 'ipconfig') + ' /all')
         except OSError:
             continue
-        else:
+        with pipe:
             for line in pipe:
                 value = line.split(':')[-1].strip().lower()
                 if re.match('([0-9a-f][0-9a-f]-){5}[0-9a-f][0-9a-f]', value):
                     return int(value.replace('-', ''), 16)
-        finally:
-            pipe.close()
 
 def _netbios_getnode():
     """Get the hardware address on Windows using NetBIOS calls.

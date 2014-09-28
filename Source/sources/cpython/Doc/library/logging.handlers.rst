@@ -843,17 +843,34 @@ supports sending logging messages to a Web server, using either ``GET`` or
 
    Returns a new instance of the :class:`HTTPHandler` class. The *host* can be
    of the form ``host:port``, should you need to use a specific port number.
-   If no *method* is specified, ``GET`` is used. If *secure* is True, an HTTPS
+   If no *method* is specified, ``GET`` is used. If *secure* is true, an HTTPS
    connection will be used. If *credentials* is specified, it should be a
    2-tuple consisting of userid and password, which will be placed in an HTTP
    'Authorization' header using Basic authentication. If you specify
    credentials, you should also specify secure=True so that your userid and
    password are not passed in cleartext across the wire.
 
+   .. method:: mapLogRecord(record)
+
+      Provides a dictionary, based on ``record``, which is to be URL-encoded
+      and sent to the web server. The default implementation just returns
+      ``record.__dict__``. This method can be overridden if e.g. only a
+      subset of :class:`~logging.LogRecord` is to be sent to the web server, or
+      if more specific customization of what's sent to the server is required.
 
    .. method:: emit(record)
 
-      Sends the record to the Web server as a percent-encoded dictionary.
+      Sends the record to the Web server as an URL-encoded dictionary. The
+      :meth:`mapLogRecord` method is used to convert the record to the
+      dictionary to be sent.
+
+   .. note:: Since preparing a record for sending it to a Web server is not
+      the same as a generic formatting operation, using
+      :meth:`~logging.Handler.setFormatter` to specify a
+      :class:`~logging.Formatter` for a :class:`HTTPHandler` has no effect.
+      Instead of calling :meth:`~logging.Handler.format`, this handler calls
+      :meth:`mapLogRecord` and then :func:`urllib.parse.urlencode` to encode the
+      dictionary in a form suitable for sending to a Web server.
 
 
 .. _queue-handler:
@@ -904,7 +921,7 @@ possible, while any potentially slow operations (such as sending an email via
 
       Enqueues the record on the queue using ``put_nowait()``; you may
       want to override this if you want to use blocking behaviour, or a
-      timeout, or a customised queue implementation.
+      timeout, or a customized queue implementation.
 
 
 

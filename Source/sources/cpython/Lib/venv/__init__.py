@@ -1,7 +1,7 @@
 """
 Virtual environment (venv) package for Python. Based on PEP 405.
 
-Copyright (C) 2011-2012 Vinay Sajip.
+Copyright (C) 2011-2014 Vinay Sajip.
 Licensed to the PSF under a contributor agreement.
 
 usage: python -m venv [-h] [--system-site-packages] [--symlinks] [--clear]
@@ -24,12 +24,14 @@ optional arguments:
                         raised.
   --upgrade             Upgrade the environment directory to use this version
                         of Python, assuming Python has been upgraded in-place.
+  --without-pip         Skips installing or upgrading pip in the virtual
+                        environment (pip is bootstrapped by default)
 """
 import logging
 import os
 import shutil
+import subprocess
 import sys
-import sysconfig
 import types
 
 logger = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ logger = logging.getLogger(__name__)
 class EnvBuilder:
     """
     This class exists to allow virtual environment creation to be
-    customised. The constructor parameters determine the builder's
+    customized. The constructor parameters determine the builder's
     behaviour when called upon to create a virtual environment.
 
     By default, the builder makes the system (global) site-packages dir
@@ -56,14 +58,17 @@ class EnvBuilder:
     :param symlinks: If True, attempt to symlink rather than copy files into
                      virtual environment.
     :param upgrade: If True, upgrade an existing virtual environment.
+    :param with_pip: If True, ensure pip is installed in the virtual
+                     environment
     """
 
     def __init__(self, system_site_packages=False, clear=False,
-                 symlinks=False, upgrade=False):
+                 symlinks=False, upgrade=False, with_pip=False):
         self.system_site_packages = system_site_packages
         self.clear = clear
         self.symlinks = symlinks
         self.upgrade = upgrade
+        self.with_pip = with_pip
 
     def create(self, env_dir):
         """
@@ -76,6 +81,8 @@ class EnvBuilder:
         context = self.ensure_directories(env_dir)
         self.create_configuration(context)
         self.setup_python(context)
+        if self.with_pip:
+            self._setup_pip(context)
         if not self.upgrade:
             self.setup_scripts(context)
             self.post_setup(context)
@@ -125,10 +132,19 @@ class EnvBuilder:
         else:
             binname = 'bin'
             incpath = 'include'
-            libpath = os.path.join(env_dir, 'lib', 'python%d.%d' % sys.version_info[:2], 'site-packages')
+            libpath = os.path.join(env_dir, 'lib',
+                                   'python%d.%d' % sys.version_info[:2],
+                                   'site-packages')
         context.inc_path = path = os.path.join(env_dir, incpath)
         create_if_needed(path)
         create_if_needed(libpath)
+        # Issue 21197: create lib64 as a symlink to lib on 64-bit non-OS X POSIX
+        if ((sys.maxsize > 2**32) and (os.name == 'posix') and
+            (sys.platform != 'darwin')):
+            p = os.path.join(env_dir, 'lib')
+            link_path = os.path.join(env_dir, 'lib64')
+            if not os.path.exists(link_path):   # Issue #21643
+                os.symlink(p, link_path)
         context.bin_path = binpath = os.path.join(env_dir, binname)
         context.bin_name = binname
         context.env_exe = os.path.join(binpath, exename)
@@ -196,7 +212,11 @@ class EnvBuilder:
             for suffix in ('python', 'python3'):
                 path = os.path.join(binpath, suffix)
                 if not os.path.exists(path):
-                    os.symlink(exename, path)
+                    # Issue 18807: make copies if
+                    # symlinks are not wanted
+                    copier(context.env_exe, path)
+                    if not os.path.islink(path):
+                        os.chmod(path, 0o755)
         else:
             subdir = 'DLLs'
             include = self.include_binary
@@ -218,11 +238,21 @@ class EnvBuilder:
                 if 'init.tcl' in files:
                     tcldir = os.path.basename(root)
                     tcldir = os.path.join(context.env_dir, 'Lib', tcldir)
-                    os.makedirs(tcldir)
+                    if not os.path.exists(tcldir):
+                        os.makedirs(tcldir)
                     src = os.path.join(root, 'init.tcl')
                     dst = os.path.join(tcldir, 'init.tcl')
                     shutil.copyfile(src, dst)
                     break
+
+    def _setup_pip(self, context):
+        """Installs or upgrades pip in a virtual environment"""
+        # We run ensurepip in isolated mode to avoid side effects from
+        # environment vars, the current directory and anything else
+        # intended for the global Python environment
+        cmd = [context.env_exe, '-Im', 'ensurepip', '--upgrade',
+                                                    '--default-pip']
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
 
     def setup_scripts(self, context):
         """
@@ -317,7 +347,8 @@ class EnvBuilder:
                     shutil.copymode(srcfile, dstfile)
 
 
-def create(env_dir, system_site_packages=False, clear=False, symlinks=False):
+def create(env_dir, system_site_packages=False, clear=False,
+                    symlinks=False, with_pip=False):
     """
     Create a virtual environment in a directory.
 
@@ -333,9 +364,11 @@ def create(env_dir, system_site_packages=False, clear=False, symlinks=False):
                   raised.
     :param symlinks: If True, attempt to symlink rather than copy files into
                      virtual environment.
+    :param with_pip: If True, ensure pip is installed in the virtual
+                     environment
     """
     builder = EnvBuilder(system_site_packages=system_site_packages,
-                                   clear=clear, symlinks=symlinks)
+                         clear=clear, symlinks=symlinks, with_pip=with_pip)
     builder.create(env_dir)
 
 def main(args=None):
@@ -345,7 +378,7 @@ def main(args=None):
     elif not hasattr(sys, 'base_prefix'):
         compatible = False
     if not compatible:
-        raise ValueError('This script is only for use with Python 3.3')
+        raise ValueError('This script is only for use with Python >= 3.3')
     else:
         import argparse
 
@@ -390,12 +423,19 @@ def main(args=None):
                                                'directory to use this version '
                                                'of Python, assuming Python '
                                                'has been upgraded in-place.')
+        parser.add_argument('--without-pip', dest='with_pip',
+                            default=True, action='store_false',
+                            help='Skips installing or upgrading pip in the '
+                                 'virtual environment (pip is bootstrapped '
+                                 'by default)')
         options = parser.parse_args(args)
         if options.upgrade and options.clear:
             raise ValueError('you cannot supply --upgrade and --clear together.')
         builder = EnvBuilder(system_site_packages=options.system_site,
-                             clear=options.clear, symlinks=options.symlinks,
-                             upgrade=options.upgrade)
+                             clear=options.clear,
+                             symlinks=options.symlinks,
+                             upgrade=options.upgrade,
+                             with_pip=options.with_pip)
         for d in options.dirs:
             builder.create(d)
 

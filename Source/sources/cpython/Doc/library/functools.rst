@@ -194,6 +194,50 @@ The :mod:`functools` module defines the following functions:
       18
 
 
+.. class:: partialmethod(func, *args, **keywords)
+
+   Return a new :class:`partialmethod` descriptor which behaves
+   like :class:`partial` except that it is designed to be used as a method
+   definition rather than being directly callable.
+
+   *func* must be a :term:`descriptor` or a callable (objects which are both,
+   like normal functions, are handled as descriptors).
+
+   When *func* is a descriptor (such as a normal Python function,
+   :func:`classmethod`, :func:`staticmethod`, :func:`abstractmethod` or
+   another instance of :class:`partialmethod`), calls to ``__get__`` are
+   delegated to the underlying descriptor, and an appropriate
+   :class:`partial` object returned as the result.
+
+   When *func* is a non-descriptor callable, an appropriate bound method is
+   created dynamically. This behaves like a normal Python function when
+   used as a method: the *self* argument will be inserted as the first
+   positional argument, even before the *args* and *keywords* supplied to
+   the :class:`partialmethod` constructor.
+
+   Example::
+
+      >>> class Cell(object):
+      ...     def __init__(self):
+      ...         self._alive = False
+      ...     @property
+      ...     def alive(self):
+      ...         return self._alive
+      ...     def set_state(self, state):
+      ...         self._alive = bool(state)
+      ...     set_alive = partialmethod(set_state, True)
+      ...     set_dead = partialmethod(set_state, False)
+      ...
+      >>> c = Cell()
+      >>> c.alive
+      False
+      >>> c.set_alive()
+      >>> c.alive
+      True
+
+   .. versionadded:: 3.4
+
+
 .. function:: reduce(function, iterable[, initializer])
 
    Apply *function* of two arguments cumulatively to the items of *sequence*, from
@@ -204,6 +248,18 @@ The :mod:`functools` module defines the following functions:
    it is placed before the items of the sequence in the calculation, and serves as
    a default when the sequence is empty.  If *initializer* is not given and
    *sequence* contains only one item, the first item is returned.
+
+   Equivalent to::
+
+      def reduce(function, iterable, initializer=None):
+          it = iter(iterable)
+          if initializer is None:
+              value = next(it)
+          else:
+              value = initializer
+          for element in it:
+              value = function(value, element)
+          return value
 
 
 .. decorator:: singledispatch(default)
@@ -357,9 +413,10 @@ The :mod:`functools` module defines the following functions:
 
 .. decorator:: wraps(wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)
 
-   This is a convenience function for invoking ``partial(update_wrapper,
-   wrapped=wrapped, assigned=assigned, updated=updated)`` as a function decorator
-   when defining a wrapper function. For example:
+   This is a convenience function for invoking :func:`update_wrapper` as a
+   function decorator when defining a wrapper function.  It is equivalent to
+   ``partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)``.
+   For example::
 
       >>> from functools import wraps
       >>> def my_decorator(f):
@@ -419,4 +476,3 @@ differences.  For instance, the :attr:`__name__` and :attr:`__doc__` attributes
 are not created automatically.  Also, :class:`partial` objects defined in
 classes behave like static methods and do not transform into bound methods
 during instance attribute look-up.
-

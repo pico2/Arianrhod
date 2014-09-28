@@ -317,8 +317,7 @@ call_with_frame(PyCodeObject *c, PyObject* func, PyObject* args,
     }
     else {
         if (trace_frame(tstate, f, PyTrace_RETURN, res) < 0) {
-            Py_XDECREF(res);
-            res = NULL;
+            Py_CLEAR(res);
         }
     }
 #else
@@ -835,7 +834,8 @@ xmlparse_Parse(xmlparseobject *self, PyObject *args)
         s += MAX_CHUNK_SIZE;
         slen -= MAX_CHUNK_SIZE;
     }
-    rc = XML_Parse(self->itself, s, slen, isFinal);
+    assert(MAX_CHUNK_SIZE < INT_MAX && slen < INT_MAX);
+    rc = XML_Parse(self->itself, s, (int)slen, isFinal);
 
 done:
     if (view.buf != NULL)
@@ -908,7 +908,7 @@ xmlparse_ParseFile(xmlparseobject *self, PyObject *f)
         void *buf = XML_GetBuffer(self->itself, BUF_SIZE);
         if (buf == NULL) {
             Py_XDECREF(readmethod);
-            return PyErr_NoMemory();
+            return get_parse_result(self, 0);
         }
 
         bytes_read = readinst(buf, BUF_SIZE, readmethod);
@@ -1218,7 +1218,7 @@ newxmlparseobject(char *encoding, char *namespace_separator, PyObject *intern)
      * has a backport of this feature where we also define XML_HAS_SET_HASH_SALT
      * to indicate that we can still use it. */
     XML_SetHashSalt(self->itself,
-                    (unsigned long)_Py_HashSecret.prefix);
+                    (unsigned long)_Py_HashSecret.expat.hashsalt);
 #endif
     XML_SetUserData(self->itself, (void *)self);
     XML_SetUnknownEncodingHandler(self->itself,

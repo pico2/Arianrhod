@@ -1518,6 +1518,10 @@ class MinidomTest(unittest.TestCase):
         doc2 = parseString(doc.toxml())
         self.confirm(doc2.namespaceURI == xml.dom.EMPTY_NAMESPACE)
 
+    def testExceptionOnSpacesInXMLNSValue(self):
+        with self.assertRaisesRegex(ValueError, 'Unsupported syntax'):
+            parseString('<element xmlns:abc="http:abc.com/de f g/hi/j k"><abc:foo /></element>')
+
     def testDocRemoveChild(self):
         doc = parse(tstfile)
         title_tag = doc.documentElement.getElementsByTagName("TITLE")[0]
@@ -1526,6 +1530,13 @@ class MinidomTest(unittest.TestCase):
         doc.removeChild(doc.childNodes[0])
         num_children_after = len(doc.childNodes)
         self.assertTrue(num_children_after == num_children_before - 1)
+
+    def testProcessingInstructionNameError(self):
+        # wrong variable in .nodeValue property will
+        # lead to "NameError: name 'data' is not defined"
+        doc = parse(tstfile)
+        pi = doc.createProcessingInstruction("y", "z")
+        pi.nodeValue = "crash"
 
 def test_main():
     run_unittest(MinidomTest)

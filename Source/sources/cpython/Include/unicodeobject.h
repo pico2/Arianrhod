@@ -343,6 +343,9 @@ typedef struct {
            the data pointer is filled out. The bit is redundant, and helps
            to minimize the test in PyUnicode_IS_READY(). */
         unsigned int ready:1;
+        /* Padding to ensure that PyUnicode_DATA() is always aligned to
+           4 bytes (see issue #19537 on m68k). */
+        unsigned int :24;
     } state;
     wchar_t *wstr;              /* wchar_t representation (null-terminated) */
 } PyASCIIObject;
@@ -962,12 +965,20 @@ _PyUnicodeWriter_WriteSubstring(_PyUnicodeWriter *writer,
     Py_ssize_t end
     );
 
+/* Append a ASCII-encoded byte string.
+   Return 0 on success, raise an exception and return -1 on error. */
+PyAPI_FUNC(int)
+_PyUnicodeWriter_WriteASCIIString(_PyUnicodeWriter *writer,
+    const char *str,           /* ASCII-encoded byte string */
+    Py_ssize_t len             /* number of bytes, or -1 if unknown */
+    );
+
 /* Append a latin1-encoded byte string.
    Return 0 on success, raise an exception and return -1 on error. */
 PyAPI_FUNC(int)
-_PyUnicodeWriter_WriteCstr(_PyUnicodeWriter *writer,
-    const char *str,            /* latin1-encoded byte string */
-    Py_ssize_t len              /* length in bytes */
+_PyUnicodeWriter_WriteLatin1String(_PyUnicodeWriter *writer,
+    const char *str,           /* latin1-encoded byte string */
+    Py_ssize_t len             /* length in bytes */
     );
 
 /* Get the value of the writer as an Unicode string. Clear the
@@ -1995,6 +2006,13 @@ PyAPI_FUNC(int) PyUnicode_Compare(
     PyObject *left,             /* Left string */
     PyObject *right             /* Right string */
     );
+
+#ifndef Py_LIMITED_API
+PyAPI_FUNC(int) _PyUnicode_CompareWithId(
+    PyObject *left,             /* Left string */
+    _Py_Identifier *right       /* Right identifier */
+    );
+#endif
 
 PyAPI_FUNC(int) PyUnicode_CompareWithASCIIString(
     PyObject *left,

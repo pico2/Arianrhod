@@ -709,6 +709,19 @@ mmap__exit__method(PyObject *self, PyObject *args)
     return _PyObject_CallMethodId(self, &PyId_close, NULL);
 }
 
+#ifdef MS_WINDOWS
+static PyObject *
+mmap__sizeof__method(mmap_object *self, void *unused)
+{
+    Py_ssize_t res;
+
+    res = sizeof(mmap_object);
+    if (self->tagname)
+        res += strlen(self->tagname) + 1;
+    return PyLong_FromSsize_t(res);
+}
+#endif
+
 static struct PyMethodDef mmap_object_methods[] = {
     {"close",           (PyCFunction) mmap_close_method,        METH_NOARGS},
     {"find",            (PyCFunction) mmap_find_method,         METH_VARARGS},
@@ -726,6 +739,9 @@ static struct PyMethodDef mmap_object_methods[] = {
     {"write_byte",      (PyCFunction) mmap_write_byte_method,   METH_VARARGS},
     {"__enter__",       (PyCFunction) mmap__enter__method,      METH_NOARGS},
     {"__exit__",        (PyCFunction) mmap__exit__method,       METH_VARARGS},
+#ifdef MS_WINDOWS
+    {"__sizeof__",      (PyCFunction) mmap__sizeof__method,     METH_NOARGS},
+#endif
     {NULL,         NULL}       /* sentinel */
 };
 
@@ -1158,12 +1174,6 @@ new_mmap_object(PyTypeObject *type, PyObject *args, PyObject *kwdict)
         (void)fcntl(fd, F_FULLFSYNC);
 #endif
 #ifdef HAVE_FSTAT
-#  ifdef __VMS
-    /* on OpenVMS we must ensure that all bytes are written to the file */
-    if (fd != -1) {
-        fsync(fd);
-    }
-#  endif
     if (fd != -1 && fstat(fd, &st) == 0 && S_ISREG(st.st_mode)) {
         if (map_size == 0) {
             if (st.st_size == 0) {

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #
 # Unit tests for the multiprocessing package
 #
@@ -198,7 +196,7 @@ class _TestProcess(BaseTestCase):
 
     def test_current(self):
         if self.TYPE == 'threads':
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         current = self.current_process()
         authkey = current.authkey
@@ -212,7 +210,7 @@ class _TestProcess(BaseTestCase):
 
     def test_daemon_argument(self):
         if self.TYPE == "threads":
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         # By default uses the current process's daemon flag.
         proc0 = self.Process(target=self._test)
@@ -273,11 +271,11 @@ class _TestProcess(BaseTestCase):
 
     @classmethod
     def _test_terminate(cls):
-        time.sleep(1000)
+        time.sleep(100)
 
     def test_terminate(self):
         if self.TYPE == 'threads':
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         p = self.Process(target=self._test_terminate)
         p.daemon = True
@@ -297,9 +295,26 @@ class _TestProcess(BaseTestCase):
         self.assertTimingAlmostEqual(join.elapsed, 0.0)
         self.assertEqual(p.is_alive(), True)
 
+        # XXX maybe terminating too soon causes the problems on Gentoo...
+        time.sleep(1)
+
         p.terminate()
 
-        self.assertEqual(join(), None)
+        if hasattr(signal, 'alarm'):
+            # On the Gentoo buildbot waitpid() often seems to block forever.
+            # We use alarm() to interrupt it if it blocks for too long.
+            def handler(*args):
+                raise RuntimeError('join took too long: %s' % p)
+            old_handler = signal.signal(signal.SIGALRM, handler)
+            try:
+                signal.alarm(10)
+                self.assertEqual(join(), None)
+            finally:
+                signal.alarm(0)
+                signal.signal(signal.SIGALRM, old_handler)
+        else:
+            self.assertEqual(join(), None)
+
         self.assertTimingAlmostEqual(join.elapsed, 0.0)
 
         self.assertEqual(p.is_alive(), False)
@@ -368,7 +383,7 @@ class _TestProcess(BaseTestCase):
 
     def test_sentinel(self):
         if self.TYPE == "threads":
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
         event = self.Event()
         p = self.Process(target=self._test_sentinel, args=(event,))
         with self.assertRaises(ValueError):
@@ -424,7 +439,7 @@ class _TestSubclassingProcess(BaseTestCase):
     def test_stderr_flush(self):
         # sys.stderr is flushed at process shutdown (issue #13812)
         if self.TYPE == "threads":
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         testfn = test.support.TESTFN
         self.addCleanup(test.support.unlink, testfn)
@@ -452,12 +467,12 @@ class _TestSubclassingProcess(BaseTestCase):
     def test_sys_exit(self):
         # See Issue 13854
         if self.TYPE == 'threads':
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         testfn = test.support.TESTFN
         self.addCleanup(test.support.unlink, testfn)
 
-        for reason, code in (([1, 2, 3], 1), ('ignore this', 0)):
+        for reason, code in (([1, 2, 3], 1), ('ignore this', 1)):
             p = self.Process(target=self._test_sys_exit, args=(reason, testfn))
             p.daemon = True
             p.start()
@@ -661,7 +676,7 @@ class _TestQueue(BaseTestCase):
         try:
             self.assertEqual(q.qsize(), 0)
         except NotImplementedError:
-            return
+            self.skipTest('qsize method not implemented')
         q.put(1)
         self.assertEqual(q.qsize(), 1)
         q.put(5)
@@ -679,9 +694,6 @@ class _TestQueue(BaseTestCase):
 
     def test_task_done(self):
         queue = self.JoinableQueue()
-
-        if sys.version_info < (2, 5) and not hasattr(queue, 'task_done'):
-            self.skipTest("requires 'queue.task_done()' method")
 
         workers = [self.Process(target=self._test_task_done, args=(queue,))
                    for i in range(4)]
@@ -706,7 +718,7 @@ class _TestQueue(BaseTestCase):
         start = time.time()
         self.assertRaises(pyqueue.Empty, q.get, True, 0.2)
         delta = time.time() - start
-        self.assertGreaterEqual(delta, 0.19)
+        self.assertGreaterEqual(delta, 0.18)
 
 #
 #
@@ -769,7 +781,7 @@ class _TestSemaphore(BaseTestCase):
 
     def test_timeout(self):
         if self.TYPE != 'processes':
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         sem = self.Semaphore(0)
         acquire = TimingWrapper(sem.acquire)
@@ -1389,7 +1401,7 @@ class _TestBarrier(BaseTestCase):
 
     def test_thousand(self):
         if self.TYPE == 'manager':
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
         passes = 1000
         lock = self.Lock()
         conn, child_conn = self.Pipe(False)
@@ -1681,6 +1693,16 @@ class _TestPool(BaseTestCase):
         self.assertEqual(2, len(call_args))
         self.assertIsInstance(call_args[1], ValueError)
 
+    def test_map_unplicklable(self):
+        # Issue #19425 -- failure to pickle should not cause a hang
+        if self.TYPE == 'threads':
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
+        class A(object):
+            def __reduce__(self):
+                raise RuntimeError('cannot pickle')
+        with self.assertRaises(RuntimeError):
+            self.pool.map(sqr, [A()]*10)
+
     def test_map_chunksize(self):
         try:
             self.pool.map_async(sqr, [], chunksize=1).get(timeout=TIMEOUT1)
@@ -1694,7 +1716,7 @@ class _TestPool(BaseTestCase):
         self.assertTimingAlmostEqual(get.elapsed, TIMEOUT1)
 
     def test_async_timeout(self):
-        res = self.pool.apply_async(sqr, (6, TIMEOUT2 + 0.2))
+        res = self.pool.apply_async(sqr, (6, TIMEOUT2 + 1.0))
         get = TimingWrapper(res.get)
         self.assertRaises(multiprocessing.TimeoutError, get, timeout=TIMEOUT2)
         self.assertTimingAlmostEqual(get.elapsed, TIMEOUT2)
@@ -1787,6 +1809,17 @@ class _TestPool(BaseTestCase):
                     sys.excepthook(*sys.exc_info())
             self.assertIn('raise RuntimeError(123) # some comment',
                           f1.getvalue())
+
+    @classmethod
+    def _test_wrapped_exception(cls):
+        raise RuntimeError('foo')
+
+    def test_wrapped_exception(self):
+        # Issue #20980: Should not wrap exception when using thread pool
+        with self.Pool(1) as p:
+            with self.assertRaises(RuntimeError):
+                p.apply(self._test_wrapped_exception)
+
 
 def raising():
     raise KeyError("key")
@@ -2197,7 +2230,7 @@ class _TestConnection(BaseTestCase):
 
     def test_sendbytes(self):
         if self.TYPE != 'processes':
-            return
+            self.skipTest('test not appropriate for {}'.format(self.TYPE))
 
         msg = latin('abcdefghijklmnopqrstuvwxyz')
         a, b = self.Pipe()
@@ -3543,6 +3576,32 @@ class TestIgnoreEINTR(unittest.TestCase):
             conn.close()
 
 class TestStartMethod(unittest.TestCase):
+    @classmethod
+    def _check_context(cls, conn):
+        conn.send(multiprocessing.get_start_method())
+
+    def check_context(self, ctx):
+        r, w = ctx.Pipe(duplex=False)
+        p = ctx.Process(target=self._check_context, args=(w,))
+        p.start()
+        w.close()
+        child_method = r.recv()
+        r.close()
+        p.join()
+        self.assertEqual(child_method, ctx.get_start_method())
+
+    def test_context(self):
+        for method in ('fork', 'spawn', 'forkserver'):
+            try:
+                ctx = multiprocessing.get_context(method)
+            except ValueError:
+                continue
+            self.assertEqual(ctx.get_start_method(), method)
+            self.assertIs(ctx.get_context(), ctx)
+            self.assertRaises(ValueError, ctx.set_start_method, 'spawn')
+            self.assertRaises(ValueError, ctx.set_start_method, None)
+            self.check_context(ctx)
+
     def test_set_get(self):
         multiprocessing.set_forkserver_preload(PRELOAD)
         count = 0
@@ -3550,13 +3609,19 @@ class TestStartMethod(unittest.TestCase):
         try:
             for method in ('fork', 'spawn', 'forkserver'):
                 try:
-                    multiprocessing.set_start_method(method)
+                    multiprocessing.set_start_method(method, force=True)
                 except ValueError:
                     continue
                 self.assertEqual(multiprocessing.get_start_method(), method)
+                ctx = multiprocessing.get_context()
+                self.assertEqual(ctx.get_start_method(), method)
+                self.assertTrue(type(ctx).__name__.lower().startswith(method))
+                self.assertTrue(
+                    ctx.Process.__name__.lower().startswith(method))
+                self.check_context(multiprocessing)
                 count += 1
         finally:
-            multiprocessing.set_start_method(old_method)
+            multiprocessing.set_start_method(old_method, force=True)
         self.assertGreaterEqual(count, 1)
 
     def test_get_all(self):
@@ -3597,7 +3662,7 @@ class TestSemaphoreTracker(unittest.TestCase):
         _multiprocessing.sem_unlink(name1)
         p.terminate()
         p.wait()
-        time.sleep(1.0)
+        time.sleep(2.0)
         with self.assertRaises(OSError) as ctx:
             _multiprocessing.sem_unlink(name2)
         # docs say it should be ENOENT, but OSX seems to give EINVAL
@@ -3741,9 +3806,9 @@ def install_tests_in_module_dict(remote_globs, start_method):
         multiprocessing.process._cleanup()
         dangling[0] = multiprocessing.process._dangling.copy()
         dangling[1] = threading._dangling.copy()
-        old_start_method[0] = multiprocessing.get_start_method()
+        old_start_method[0] = multiprocessing.get_start_method(allow_none=True)
         try:
-            multiprocessing.set_start_method(start_method)
+            multiprocessing.set_start_method(start_method, force=True)
         except ValueError:
             raise unittest.SkipTest(start_method +
                                     ' start method not supported')
@@ -3759,7 +3824,7 @@ def install_tests_in_module_dict(remote_globs, start_method):
         multiprocessing.get_logger().setLevel(LOG_LEVEL)
 
     def tearDownModule():
-        multiprocessing.set_start_method(old_start_method[0])
+        multiprocessing.set_start_method(old_start_method[0], force=True)
         # pause a bit so we don't get warning about dangling threads/processes
         time.sleep(0.5)
         multiprocessing.process._cleanup()

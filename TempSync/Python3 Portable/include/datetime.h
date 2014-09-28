@@ -152,15 +152,15 @@ typedef struct {
     PyTypeObject *TZInfoType;
 
     /* constructors */
-    PyObject *(*Date_FromDate)(int, int, int, PyTypeObject*);
-    PyObject *(*DateTime_FromDateAndTime)(int, int, int, int, int, int, int,
+    PyObject *(__cdecl *Date_FromDate)(int, int, int, PyTypeObject*);
+    PyObject *(__cdecl *DateTime_FromDateAndTime)(int, int, int, int, int, int, int,
         PyObject*, PyTypeObject*);
-    PyObject *(*Time_FromTime)(int, int, int, int, PyObject*, PyTypeObject*);
-    PyObject *(*Delta_FromDelta)(int, int, int, int, PyTypeObject*);
+    PyObject *(__cdecl *Time_FromTime)(int, int, int, int, PyObject*, PyTypeObject*);
+    PyObject *(__cdecl *Delta_FromDelta)(int, int, int, int, PyTypeObject*);
 
     /* constructors for the DB API */
-    PyObject *(*DateTime_FromTimestamp)(PyObject*, PyObject*, PyObject*);
-    PyObject *(*Date_FromTimestamp)(PyObject*, PyObject*);
+    PyObject *(__cdecl *DateTime_FromTimestamp)(PyObject*, PyObject*, PyObject*);
+    PyObject *(__cdecl *Date_FromTimestamp)(PyObject*, PyObject*);
 
 } PyDateTime_CAPI;
 

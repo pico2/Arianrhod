@@ -143,26 +143,24 @@ typedef struct {
 } DictRemoverObject;
 
 static void
-_DictRemover_dealloc(PyObject *_self)
+_DictRemover_dealloc(PyObject *myself)
 {
-    DictRemoverObject *self = (DictRemoverObject *)_self;
+    DictRemoverObject *self = (DictRemoverObject *)myself;
     Py_XDECREF(self->key);
     Py_XDECREF(self->dict);
-    Py_TYPE(self)->tp_free(_self);
+    Py_TYPE(self)->tp_free(myself);
 }
 
 static PyObject *
-_DictRemover_call(PyObject *_self, PyObject *args, PyObject *kw)
+_DictRemover_call(PyObject *myself, PyObject *args, PyObject *kw)
 {
-    DictRemoverObject *self = (DictRemoverObject *)_self;
+    DictRemoverObject *self = (DictRemoverObject *)myself;
     if (self->key && self->dict) {
         if (-1 == PyDict_DelItem(self->dict, self->key))
             /* XXX Error context */
             PyErr_WriteUnraisable(Py_None);
-        Py_DECREF(self->key);
-        self->key = NULL;
-        Py_DECREF(self->dict);
-        self->dict = NULL;
+        Py_CLEAR(self->key);
+        Py_CLEAR(self->dict);
     }
     Py_INCREF(Py_None);
     return Py_None;
@@ -278,13 +276,57 @@ _ctypes_alloc_format_string(const char *prefix, const char *suffix)
     if (prefix)
         len += strlen(prefix);
     result = PyMem_Malloc(len + 1);
-    if (result == NULL)
+    if (result == NULL) {
+        PyErr_NoMemory();
         return NULL;
+    }
     if (prefix)
         strcpy(result, prefix);
     else
         result[0] = '\0';
     strcat(result, suffix);
+    return result;
+}
+
+/*
+  Allocate a memory block for a pep3118 format string, adding
+  the given prefix (if non-null), an additional shape prefix, and a suffix.
+  Returns NULL on failure, with the error indicator set.  If called with
+  a suffix of NULL the error indicator must already be set.
+ */
+char *
+_ctypes_alloc_format_string_with_shape(int ndim, const Py_ssize_t *shape,
+                                       const char *prefix, const char *suffix)
+{
+    char *new_prefix;
+    char *result;
+    char buf[32];
+    int prefix_len;
+    int k;
+
+    prefix_len = 32 * ndim + 3;
+    if (prefix)
+        prefix_len += strlen(prefix);
+    new_prefix = PyMem_Malloc(prefix_len);
+    if (new_prefix == NULL)
+        return NULL;
+    new_prefix[0] = '\0';
+    if (prefix)
+        strcpy(new_prefix, prefix);
+    if (ndim > 0) {
+        /* Add the prefix "(shape[0],shape[1],...,shape[ndim-1])" */
+        strcat(new_prefix, "(");
+        for (k = 0; k < ndim; ++k) {
+            if (k < ndim-1) {
+                sprintf(buf, "%"PY_FORMAT_SIZE_T"d,", shape[k]);
+            } else {
+                sprintf(buf, "%"PY_FORMAT_SIZE_T"d)", shape[k]);
+            }
+            strcat(new_prefix, buf);
+        }
+    }
+    result = _ctypes_alloc_format_string(new_prefix, suffix);
+    PyMem_Free(new_prefix);
     return result;
 }
 
@@ -452,7 +494,6 @@ CDataType_from_buffer(PyObject *type, PyObject *args)
 
     Py_INCREF(obj);
     if (-1 == KeepRef((CDataObject *)result, -1, obj)) {
-        Py_DECREF(result);
         return NULL;
     }
     return result;
@@ -861,14 +902,21 @@ PyCPointerType_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     if (proto) {
         StgDictObject *itemdict = PyType_stgdict(proto);
+        const char *current_format;
         assert(itemdict);
         /* If itemdict->format is NULL, then this is a pointer to an
            incomplete type.  We create a generic format string
            'pointer to bytes' in this case.  XXX Better would be to
            fix the format string later...
         */
-        stgdict->format = _ctypes_alloc_format_string("&",
-                      itemdict->format ? itemdict->format : "B");
+        current_format = itemdict->format ? itemdict->format : "B";
+        if (itemdict->shape != NULL) {
+            /* pointer to an array: the shape needs to be prefixed */
+            stgdict->format = _ctypes_alloc_format_string_with_shape(
+                itemdict->ndim, itemdict->shape, "&", current_format);
+        } else {
+            stgdict->format = _ctypes_alloc_format_string("&", current_format);
+        }
         if (stgdict->format == NULL) {
             Py_DECREF((PyObject *)stgdict);
             return NULL;
@@ -1032,7 +1080,7 @@ CharArray_set_raw(CDataObject *self, PyObject *value)
     ptr = view.buf;
     if (size > self->b_size) {
         PyErr_SetString(PyExc_ValueError,
-                        "string too long");
+                        "byte string too long");
         goto fail;
     }
 
@@ -1084,7 +1132,7 @@ CharArray_set_value(CDataObject *self, PyObject *value)
     size = PyBytes_GET_SIZE(value);
     if (size > self->b_size) {
         PyErr_SetString(PyExc_ValueError,
-                        "string too long");
+                        "byte string too long");
         Py_DECREF(value);
         return -1;
     }
@@ -1246,7 +1294,6 @@ PyCArrayType_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     long length;
     int overflow;
     Py_ssize_t itemsize, itemalign;
-    char buf[32];
 
     /* create the new instance (which is a class,
        since we are a metatype!) */
@@ -1296,19 +1343,15 @@ PyCArrayType_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     }
 
     assert(itemdict->format);
-    if (itemdict->format[0] == '(') {
-        sprintf(buf, "(%ld,", length);
-        stgdict->format = _ctypes_alloc_format_string(buf, itemdict->format+1);
-    } else {
-        sprintf(buf, "(%ld)", length);
-        stgdict->format = _ctypes_alloc_format_string(buf, itemdict->format);
-    }
+    stgdict->format = _ctypes_alloc_format_string(NULL, itemdict->format);
     if (stgdict->format == NULL)
         goto error;
     stgdict->ndim = itemdict->ndim + 1;
     stgdict->shape = PyMem_Malloc(sizeof(Py_ssize_t) * stgdict->ndim);
-    if (stgdict->shape == NULL)
+    if (stgdict->shape == NULL) {
+        PyErr_NoMemory();
         goto error;
+    }
     stgdict->shape[0] = length;
     memmove(&stgdict->shape[1], itemdict->shape,
         sizeof(Py_ssize_t) * (stgdict->ndim - 1));
@@ -1339,7 +1382,8 @@ PyCArrayType_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (-1 == PyDict_Update((PyObject *)stgdict, result->tp_dict))
         goto error;
     Py_DECREF(result->tp_dict);
-    result->tp_dict = (PyObject *)stgdict;
+    result->tp_dict = (PyObject *)stgdict;  /* steal the reference */
+    stgdict = NULL;
 
     /* Special case for character arrays.
        A permanent annoyance: char arrays are also strings!
@@ -1427,7 +1471,7 @@ c_wchar_p_from_param(PyObject *type, PyObject *value)
         Py_INCREF(Py_None);
         return Py_None;
     }
-    if (PyUnicode_Check(value) || PyBytes_Check(value)) {
+    if (PyUnicode_Check(value)) {
         PyCArgObject *parg;
         struct fielddesc *fd = _ctypes_get_fielddesc("Z");
 
@@ -1579,25 +1623,8 @@ c_void_p_from_param(PyObject *type, PyObject *value)
         return (PyObject *)parg;
     }
     /* XXX struni: remove later */
-/* string */
-    if (PyBytes_Check(value)) {
-        PyCArgObject *parg;
-        struct fielddesc *fd = _ctypes_get_fielddesc("z");
-
-        parg = PyCArgObject_new();
-        if (parg == NULL)
-            return NULL;
-        parg->pffi_type = &ffi_type_pointer;
-        parg->tag = 'z';
-        parg->obj = fd->setfunc(&parg->value, value, 0);
-        if (parg->obj == NULL) {
-            Py_DECREF(parg);
-            return NULL;
-        }
-        return (PyObject *)parg;
-    }
 /* bytes */
-    if (PyByteArray_Check(value)) {
+    if (PyBytes_Check(value)) {
         PyCArgObject *parg;
         struct fielddesc *fd = _ctypes_get_fielddesc("z");
 
@@ -2241,6 +2268,10 @@ PyCFuncPtrType_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
        argtypes would be a ctypes type).
     */
     stgdict->format = _ctypes_alloc_format_string(NULL, "X{}");
+    if (stgdict->format == NULL) {
+        Py_DECREF((PyObject *)stgdict);
+        return NULL;
+    }
     stgdict->flags |= TYPEFLAG_ISPOINTER;
 
     /* create the new instance (which is a class,
@@ -2323,6 +2354,8 @@ PyCData_GetContainer(CDataObject *self)
     if (self->b_objects == NULL) {
         if (self->b_length) {
             self->b_objects = PyDict_New();
+            if (self->b_objects == NULL)
+                return NULL;
         } else {
             Py_INCREF(Py_None);
             self->b_objects = Py_None;
@@ -2334,7 +2367,11 @@ PyCData_GetContainer(CDataObject *self)
 static PyObject *
 GetKeepedObjects(CDataObject *target)
 {
-    return PyCData_GetContainer(target)->b_objects;
+    CDataObject *container;
+    container = PyCData_GetContainer(target);
+    if (container == NULL)
+        return NULL;
+    return container->b_objects;
 }
 
 static PyObject *
@@ -2391,6 +2428,10 @@ KeepRef(CDataObject *target, Py_ssize_t index, PyObject *keep)
         return 0;
     }
     ob = PyCData_GetContainer(target);
+    if (ob == NULL) {
+        Py_DECREF(keep);
+        return -1;
+    }
     if (ob->b_objects == NULL || !PyDict_CheckExact(ob->b_objects)) {
         Py_XDECREF(ob->b_objects);
         ob->b_objects = keep; /* refcount consumed */
@@ -2451,17 +2492,17 @@ static PyMemberDef PyCData_members[] = {
     { NULL },
 };
 
-static int PyCData_NewGetBuffer(PyObject *_self, Py_buffer *view, int flags)
+static int PyCData_NewGetBuffer(PyObject *myself, Py_buffer *view, int flags)
 {
-    CDataObject *self = (CDataObject *)_self;
-    StgDictObject *dict = PyObject_stgdict(_self);
+    CDataObject *self = (CDataObject *)myself;
+    StgDictObject *dict = PyObject_stgdict(myself);
     Py_ssize_t i;
 
     if (view == NULL) return 0;
 
     view->buf = self->b_ptr;
-    view->obj = _self;
-    Py_INCREF(_self);
+    view->obj = myself;
+    Py_INCREF(myself);
     view->len = self->b_size;
     view->readonly = 0;
     /* use default format character if not set */
@@ -2496,36 +2537,36 @@ PyCData_nohash(PyObject *self)
 }
 
 static PyObject *
-PyCData_reduce(PyObject *_self, PyObject *args)
+PyCData_reduce(PyObject *myself, PyObject *args)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
 
-    if (PyObject_stgdict(_self)->flags & (TYPEFLAG_ISPOINTER|TYPEFLAG_HASPOINTER)) {
+    if (PyObject_stgdict(myself)->flags & (TYPEFLAG_ISPOINTER|TYPEFLAG_HASPOINTER)) {
         PyErr_SetString(PyExc_ValueError,
                         "ctypes objects containing pointers cannot be pickled");
         return NULL;
     }
     return Py_BuildValue("O(O(NN))",
                          _unpickle,
-                         Py_TYPE(_self),
-                         PyObject_GetAttrString(_self, "__dict__"),
+                         Py_TYPE(myself),
+                         PyObject_GetAttrString(myself, "__dict__"),
                          PyBytes_FromStringAndSize(self->b_ptr, self->b_size));
 }
 
 static PyObject *
-PyCData_setstate(PyObject *_self, PyObject *args)
+PyCData_setstate(PyObject *myself, PyObject *args)
 {
     void *data;
     Py_ssize_t len;
     int res;
     PyObject *dict, *mydict;
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     if (!PyArg_ParseTuple(args, "Os#", &dict, &data, &len))
         return NULL;
     if (len > self->b_size)
         len = self->b_size;
     memmove(self->b_ptr, data, len);
-    mydict = PyObject_GetAttrString(_self, "__dict__");
+    mydict = PyObject_GetAttrString(myself, "__dict__");
     res = PyDict_Update(mydict, dict);
     Py_DECREF(mydict);
     if (res == -1)
@@ -2777,6 +2818,9 @@ _PyCData_set(CDataObject *dst, PyObject *type, SETFUNC setfunc, PyObject *value,
             /* XXX */;
 
         value = GetKeepedObjects(src);
+        if (value == NULL)
+            return NULL;
+
         Py_INCREF(value);
         return value;
     }
@@ -2800,6 +2844,9 @@ _PyCData_set(CDataObject *dst, PyObject *type, SETFUNC setfunc, PyObject *value,
         *(void **)ptr = src->b_ptr;
 
         keep = GetKeepedObjects(src);
+        if (keep == NULL)
+            return NULL;
+
         /*
           We are assigning an array object to a field which represents
           a pointer. This has the same effect as converting an array
@@ -2910,10 +2957,8 @@ static int
 PyCFuncPtr_set_restype(PyCFuncPtrObject *self, PyObject *ob)
 {
     if (ob == NULL) {
-        Py_XDECREF(self->restype);
-        self->restype = NULL;
-        Py_XDECREF(self->checker);
-        self->checker = NULL;
+        Py_CLEAR(self->restype);
+        Py_CLEAR(self->checker);
         return 0;
     }
     if (ob != Py_None && !PyType_stgdict(ob) && !PyCallable_Check(ob)) {
@@ -2956,10 +3001,8 @@ PyCFuncPtr_set_argtypes(PyCFuncPtrObject *self, PyObject *ob)
     PyObject *converters;
 
     if (ob == NULL || ob == Py_None) {
-        Py_XDECREF(self->converters);
-        self->converters = NULL;
-        Py_XDECREF(self->argtypes);
-        self->argtypes = NULL;
+        Py_CLEAR(self->converters);
+        Py_CLEAR(self->argtypes);
     } else {
         converters = converters_from_argtypes(ob);
         if (!converters)
@@ -3158,7 +3201,7 @@ _get_name(PyObject *obj, char **pname)
         return *pname ? 1 : 0;
     }
     PyErr_SetString(PyExc_TypeError,
-                    "function name must be string or integer");
+                    "function name must be string, bytes object or integer");
     return 0;
 }
 
@@ -4030,8 +4073,8 @@ Struct_init(PyObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
     if (PyTuple_GET_SIZE(args)) {
-        int res = _init_pos_args(self, Py_TYPE(self),
-                                 args, kwds, 0);
+        Py_ssize_t res = _init_pos_args(self, Py_TYPE(self),
+                                        args, kwds, 0);
         if (res == -1)
             return -1;
         if (res < PyTuple_GET_SIZE(args)) {
@@ -4163,9 +4206,9 @@ Array_init(CDataObject *self, PyObject *args, PyObject *kw)
 }
 
 static PyObject *
-Array_item(PyObject *_self, Py_ssize_t index)
+Array_item(PyObject *myself, Py_ssize_t index)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     Py_ssize_t offset, size;
     StgDictObject *stgdict;
 
@@ -4189,9 +4232,9 @@ Array_item(PyObject *_self, Py_ssize_t index)
 }
 
 static PyObject *
-Array_subscript(PyObject *_self, PyObject *item)
+Array_subscript(PyObject *myself, PyObject *item)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
 
     if (PyIndex_Check(item)) {
         Py_ssize_t i = PyNumber_AsSsize_t(item, PyExc_IndexError);
@@ -4200,9 +4243,9 @@ Array_subscript(PyObject *_self, PyObject *item)
             return NULL;
         if (i < 0)
             i += self->b_length;
-        return Array_item(_self, i);
+        return Array_item(myself, i);
     }
-    else if PySlice_Check(item) {
+    else if (PySlice_Check(item)) {
         StgDictObject *stgdict, *itemdict;
         PyObject *proto;
         PyObject *np;
@@ -4277,7 +4320,11 @@ Array_subscript(PyObject *_self, PyObject *item)
 
         for (cur = start, i = 0; i < slicelen;
              cur += step, i++) {
-            PyObject *v = Array_item(_self, cur);
+            PyObject *v = Array_item(myself, cur);
+            if (v == NULL) {
+                Py_DECREF(np);
+                return NULL;
+            }
             PyList_SET_ITEM(np, i, v);
         }
         return np;
@@ -4291,9 +4338,9 @@ Array_subscript(PyObject *_self, PyObject *item)
 }
 
 static int
-Array_ass_item(PyObject *_self, Py_ssize_t index, PyObject *value)
+Array_ass_item(PyObject *myself, Py_ssize_t index, PyObject *value)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     Py_ssize_t size, offset;
     StgDictObject *stgdict;
     char *ptr;
@@ -4320,9 +4367,9 @@ Array_ass_item(PyObject *_self, Py_ssize_t index, PyObject *value)
 }
 
 static int
-Array_ass_subscript(PyObject *_self, PyObject *item, PyObject *value)
+Array_ass_subscript(PyObject *myself, PyObject *item, PyObject *value)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
 
     if (value == NULL) {
         PyErr_SetString(PyExc_TypeError,
@@ -4337,7 +4384,7 @@ Array_ass_subscript(PyObject *_self, PyObject *item, PyObject *value)
             return -1;
         if (i < 0)
             i += self->b_length;
-        return Array_ass_item(_self, i, value);
+        return Array_ass_item(myself, i, value);
     }
     else if (PySlice_Check(item)) {
         Py_ssize_t start, stop, step, slicelen, otherlen, i, cur;
@@ -4362,7 +4409,7 @@ Array_ass_subscript(PyObject *_self, PyObject *item, PyObject *value)
             int result;
             if (item == NULL)
                 return -1;
-            result = Array_ass_item(_self, cur, item);
+            result = Array_ass_item(myself, cur, item);
             Py_DECREF(item);
             if (result == -1)
                 return -1;
@@ -4377,9 +4424,9 @@ Array_ass_subscript(PyObject *_self, PyObject *item, PyObject *value)
 }
 
 static Py_ssize_t
-Array_length(PyObject *_self)
+Array_length(PyObject *myself)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     return self->b_length;
 }
 
@@ -4665,9 +4712,9 @@ static PyTypeObject Simple_Type = {
   PyCPointer_Type
 */
 static PyObject *
-Pointer_item(PyObject *_self, Py_ssize_t index)
+Pointer_item(PyObject *myself, Py_ssize_t index)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     Py_ssize_t size;
     Py_ssize_t offset;
     StgDictObject *stgdict, *itemdict;
@@ -4696,9 +4743,9 @@ Pointer_item(PyObject *_self, Py_ssize_t index)
 }
 
 static int
-Pointer_ass_item(PyObject *_self, Py_ssize_t index, PyObject *value)
+Pointer_ass_item(PyObject *myself, Py_ssize_t index, PyObject *value)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     Py_ssize_t size;
     Py_ssize_t offset;
     StgDictObject *stgdict, *itemdict;
@@ -4792,6 +4839,9 @@ Pointer_set_contents(CDataObject *self, PyObject *value, void *closure)
         return -1;
 
     keep = GetKeepedObjects(dst);
+    if (keep == NULL)
+        return -1;
+
     Py_INCREF(keep);
     return KeepRef(self, 0, keep);
 }
@@ -4828,14 +4878,14 @@ Pointer_new(PyTypeObject *type, PyObject *args, PyObject *kw)
 }
 
 static PyObject *
-Pointer_subscript(PyObject *_self, PyObject *item)
+Pointer_subscript(PyObject *myself, PyObject *item)
 {
-    CDataObject *self = (CDataObject *)_self;
+    CDataObject *self = (CDataObject *)myself;
     if (PyIndex_Check(item)) {
         Py_ssize_t i = PyNumber_AsSsize_t(item, PyExc_IndexError);
         if (i == -1 && PyErr_Occurred())
             return NULL;
-        return Pointer_item(_self, i);
+        return Pointer_item(myself, i);
     }
     else if (PySlice_Check(item)) {
         PySliceObject *slice = (PySliceObject *)item;
@@ -4948,7 +4998,7 @@ Pointer_subscript(PyObject *_self, PyObject *item)
             return NULL;
 
         for (cur = start, i = 0; i < len; cur += step, i++) {
-            PyObject *v = Pointer_item(_self, cur);
+            PyObject *v = Pointer_item(myself, cur);
             PyList_SET_ITEM(np, i, v);
         }
         return np;
@@ -5198,9 +5248,14 @@ cast(void *ptr, PyObject *src, PyObject *ctype)
      */
     if (CDataObject_Check(src)) {
         CDataObject *obj = (CDataObject *)src;
+        CDataObject *container;
+
         /* PyCData_GetContainer will initialize src.b_objects, we need
            this so it can be shared */
-        PyCData_GetContainer(obj);
+        container = PyCData_GetContainer(obj);
+        if (container == NULL)
+            goto failed;
+
         /* But we need a dictionary! */
         if (obj->b_objects == Py_None) {
             Py_DECREF(Py_None);

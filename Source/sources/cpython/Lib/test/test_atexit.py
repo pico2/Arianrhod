@@ -2,7 +2,6 @@ import sys
 import unittest
 import io
 import atexit
-import _testcapi
 from test import support
 
 ### helpers
@@ -77,6 +76,25 @@ class GeneralTest(unittest.TestCase):
         self.assertRaises(ZeroDivisionError, atexit._run_exitfuncs)
         self.assertIn("ZeroDivisionError", self.stream.getvalue())
 
+    def test_print_tracebacks(self):
+        # Issue #18776: the tracebacks should be printed when errors occur.
+        def f():
+            1/0  # one
+        def g():
+            1/0  # two
+        def h():
+            1/0  # three
+        atexit.register(f)
+        atexit.register(g)
+        atexit.register(h)
+
+        self.assertRaises(ZeroDivisionError, atexit._run_exitfuncs)
+        stderr = self.stream.getvalue()
+        self.assertEqual(stderr.count("ZeroDivisionError"), 3)
+        self.assertIn("# one", stderr)
+        self.assertIn("# two", stderr)
+        self.assertIn("# three", stderr)
+
     def test_stress(self):
         a = [0]
         def inc():
@@ -139,7 +157,7 @@ class SubinterpreterTest(unittest.TestCase):
             atexit.register(f)
             del atexit
             """
-        ret = _testcapi.run_in_subinterp(code)
+        ret = support.run_in_subinterp(code)
         self.assertEqual(ret, 0)
         self.assertEqual(atexit._ncallbacks(), n)
 
@@ -154,7 +172,7 @@ class SubinterpreterTest(unittest.TestCase):
             atexit.register(f)
             atexit.__atexit = atexit
             """
-        ret = _testcapi.run_in_subinterp(code)
+        ret = support.run_in_subinterp(code)
         self.assertEqual(ret, 0)
         self.assertEqual(atexit._ncallbacks(), n)
 

@@ -19,14 +19,14 @@ example::
    >>> x = int(input("Please enter an integer: "))
    Please enter an integer: 42
    >>> if x < 0:
-   ...      x = 0
-   ...      print('Negative changed to zero')
+   ...     x = 0
+   ...     print('Negative changed to zero')
    ... elif x == 0:
-   ...      print('Zero')
+   ...     print('Zero')
    ... elif x == 1:
-   ...      print('Single')
+   ...     print('Single')
    ... else:
-   ...      print('More')
+   ...     print('More')
    ...
    More
 
@@ -370,7 +370,7 @@ defined to allow.  For example::
                return False
            retries = retries - 1
            if retries < 0:
-               raise IOError('refusenik user')
+               raise OSError('uncooperative user')
            print(complaint)
 
 This function can be called in several ways:
@@ -756,4 +756,3 @@ extracted for you:
 .. [#] Actually, *call by object reference* would be a better description,
    since if a mutable object is passed, the caller will see any changes the
    callee makes to it (items inserted into a list).
-

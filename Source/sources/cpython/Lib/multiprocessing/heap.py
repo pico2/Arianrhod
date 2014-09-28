@@ -8,15 +8,13 @@
 #
 
 import bisect
-import itertools
 import mmap
 import os
 import sys
 import tempfile
 import threading
-import _multiprocessing
 
-from . import popen
+from . import context
 from . import reduction
 from . import util
 
@@ -50,7 +48,7 @@ if sys.platform == 'win32':
             self._state = (self.size, self.name)
 
         def __getstate__(self):
-            popen.assert_spawning(self)
+            context.assert_spawning(self)
             return self._state
 
         def __setstate__(self, state):

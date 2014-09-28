@@ -14,7 +14,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\PC\WinMain.cpp">
+    <ClCompile Include="..\PC\WinMain.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

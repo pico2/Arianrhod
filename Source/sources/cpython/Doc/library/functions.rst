@@ -48,7 +48,7 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: all(iterable)
 
-   Return True if all elements of the *iterable* are true (or if the iterable
+   Return ``True`` if all elements of the *iterable* are true (or if the iterable
    is empty).  Equivalent to::
 
       def all(iterable):
@@ -60,8 +60,8 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: any(iterable)
 
-   Return True if any element of the *iterable* is true.  If the iterable
-   is empty, return False.  Equivalent to::
+   Return ``True`` if any element of the *iterable* is true.  If the iterable
+   is empty, return ``False``.  Equivalent to::
 
       def any(iterable):
           for element in iterable:
@@ -193,9 +193,9 @@ are always available.  They are listed here in alphabetical order.
 .. function:: compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
 
    Compile the *source* into a code or AST object.  Code objects can be executed
-   by :func:`exec` or :func:`eval`.  *source* can either be a string or an AST
-   object.  Refer to the :mod:`ast` module documentation for information on how
-   to work with AST objects.
+   by :func:`exec` or :func:`eval`.  *source* can either be a normal string, a
+   byte string, or an AST object.  Refer to the :mod:`ast` module documentation
+   for information on how to work with AST objects.
 
    The *filename* argument should give the file from which the code was read;
    pass some recognizable value if it wasn't read from a file (``'<string>'`` is
@@ -219,8 +219,8 @@ are always available.  They are listed here in alphabetical order.
 
    Future statements are specified by bits which can be bitwise ORed together to
    specify multiple statements.  The bitfield required to specify a given feature
-   can be found as the :attr:`compiler_flag` attribute on the :class:`_Feature`
-   instance in the :mod:`__future__` module.
+   can be found as the :attr:`~__future__._Feature.compiler_flag` attribute on
+   the :class:`~__future__._Feature` instance in the :mod:`__future__` module.
 
    The argument *optimize* specifies the optimization level of the compiler; the
    default value of ``-1`` selects the optimization level of the interpreter as
@@ -410,6 +410,7 @@ are always available.  They are listed here in alphabetical order.
    See :func:`ast.literal_eval` for a function that can safely evaluate strings
    with expressions containing only literals.
 
+.. index:: builtin: exec
 
 .. function:: exec(object[, globals[, locals]])
 
@@ -540,12 +541,13 @@ are always available.  They are listed here in alphabetical order.
    A call to ``format(value, format_spec)`` is translated to
    ``type(value).__format__(format_spec)`` which bypasses the instance
    dictionary when searching for the value's :meth:`__format__` method.  A
-   :exc:`TypeError` exception is raised if the method is not found or if either
-   the *format_spec* or the return value are not strings.
+   :exc:`TypeError` exception is raised if the method search reaches
+   :mod:`object` and the *format_spec* is non-empty, or if either the
+   *format_spec* or the return value are not strings.
 
-   .. versionadded:: 3.4
+   .. versionchanged:: 3.4
       ``object().__format__(format_spec)`` raises :exc:`TypeError`
-      if *format_spec* is not empty string.
+      if *format_spec* is not an empty string.
 
 
 .. _func-frozenset:
@@ -609,12 +611,26 @@ are always available.  They are listed here in alphabetical order.
 
    This function is added to the built-in namespace by the :mod:`site` module.
 
+   .. versionchanged:: 3.4
+      Changes to :mod:`pydoc` and :mod:`inspect` mean that the reported
+      signatures for callables are now more comprehensive and consistent.
+
 
 .. function:: hex(x)
 
-   Convert an integer number to a hexadecimal string. The result is a valid Python
-   expression.  If *x* is not a Python :class:`int` object, it has to define an
-   :meth:`__index__` method that returns an integer.
+   Convert an integer number to a lowercase hexadecimal string
+   prefixed with "0x", for example:
+
+      >>> hex(255)
+      '0xff'
+      >>> hex(-42)
+      '-0x2a'
+
+   If x is not a Python :class:`int` object, it has to define an __index__()
+   method that returns an integer.
+
+   See also :func:`int` for converting a hexadecimal string to an
+   integer using a base of 16.
 
    .. note::
 
@@ -717,7 +733,7 @@ are always available.  They are listed here in alphabetical order.
 
    One useful application of the second form of :func:`iter` is to read lines of
    a file until a certain line is reached.  The following example reads a file
-   until the :meth:`readline` method returns an empty string::
+   until the :meth:`~io.TextIOBase.readline` method returns an empty string::
 
       with open('mydata.txt') as fp:
           for line in iter(fp.readline, ''):
@@ -727,7 +743,8 @@ are always available.  They are listed here in alphabetical order.
 .. function:: len(s)
 
    Return the length (the number of items) of an object.  The argument may be a
-   sequence (string, tuple or list) or a mapping (dictionary).
+   sequence (such as a string, bytes, tuple, list, or range) or a collection
+   (such as a dictionary, set, or frozen set).
 
 
 .. _func-list:
@@ -758,7 +775,7 @@ are always available.  They are listed here in alphabetical order.
    already arranged into argument tuples, see :func:`itertools.starmap`\.
 
 
-.. function:: max(iterable, *[, default, key])
+.. function:: max(iterable, *[, key, default])
               max(arg1, arg2, *args[, key])
 
    Return the largest item in an iterable or the largest of two or more
@@ -766,7 +783,7 @@ are always available.  They are listed here in alphabetical order.
 
    If one positional argument is provided, it should be an :term:`iterable`.
    The largest item in the iterable is returned.  If two or more positional
-   arguments are provided, the smallest of the positional arguments is
+   arguments are provided, the largest of the positional arguments is
    returned.
 
    There are two optional keyword-only arguments. The *key* argument specifies
@@ -780,6 +797,9 @@ are always available.  They are listed here in alphabetical order.
    such as ``sorted(iterable, key=keyfunc, reverse=True)[0]`` and
    ``heapq.nlargest(1, iterable, key=keyfunc)``.
 
+   .. versionadded:: 3.4
+      The *default* keyword-only argument.
+
 
 .. _func-memoryview:
 .. function:: memoryview(obj)
@@ -789,7 +809,7 @@ are always available.  They are listed here in alphabetical order.
    :ref:`typememoryview` for more information.
 
 
-.. function:: min(iterable, *[, default, key])
+.. function:: min(iterable, *[, key, default])
               min(arg1, arg2, *args[, key])
 
    Return the smallest item in an iterable or the smallest of two or more
@@ -811,6 +831,10 @@ are always available.  They are listed here in alphabetical order.
    such as ``sorted(iterable, key=keyfunc)[0]`` and ``heapq.nsmallest(1,
    iterable, key=keyfunc)``.
 
+   .. versionadded:: 3.4
+      The *default* keyword-only argument.
+
+
 .. function:: next(iterator[, default])
 
    Retrieve the next item from the *iterator* by calling its
@@ -826,8 +850,8 @@ are always available.  They are listed here in alphabetical order.
 
    .. note::
 
-      :class:`object` does *not* have a :attr:`__dict__`, so you can't assign
-      arbitrary attributes to an instance of the :class:`object` class.
+      :class:`object` does *not* have a :attr:`~object.__dict__`, so you can't
+      assign arbitrary attributes to an instance of the :class:`object` class.
 
 
 .. function:: oct(x)
@@ -872,8 +896,7 @@ are always available.  They are listed here in alphabetical order.
    ``'b'``   binary mode
    ``'t'``   text mode (default)
    ``'+'``   open a disk file for updating (reading and writing)
-   ``'U'``   universal newlines mode (for backwards compatibility; should
-             not be used in new code)
+   ``'U'``   :term:`universal newlines` mode (deprecated)
    ========= ===============================================================
 
    The default mode is ``'r'`` (open for reading text, synonym of ``'rt'``).
@@ -905,9 +928,9 @@ are always available.  They are listed here in alphabetical order.
      size" and falling back on :attr:`io.DEFAULT_BUFFER_SIZE`.  On many systems,
      the buffer will typically be 4096 or 8192 bytes long.
 
-   * "Interactive" text files (files for which :meth:`isatty` returns True) use
-     line buffering.  Other text files use the policy described above for binary
-     files.
+   * "Interactive" text files (files for which :meth:`~io.IOBase.isatty`
+     returns ``True``) use line buffering.  Other text files use the policy
+     described above for binary files.
 
    *encoding* is the name of the encoding used to decode or encode the file.
    This should only be used in text mode.  The default encoding is platform
@@ -1029,6 +1052,9 @@ are always available.  They are listed here in alphabetical order.
    .. versionchanged:: 3.4
       The file is now non-inheritable.
 
+   .. deprecated-removed:: 3.4 4.0
+      The ``'U'`` mode.
+
 
 .. XXX works for bytes too, but should it?
 .. function:: ord(c)
@@ -1080,9 +1106,11 @@ are always available.  They are listed here in alphabetical order.
 
    Return a property attribute.
 
-   *fget* is a function for getting an attribute value, likewise *fset* is a
-   function for setting, and *fdel* a function for del'ing, an attribute.  Typical
-   use is to define a managed attribute ``x``::
+   *fget* is a function for getting an attribute value.  *fset* is a function
+   for setting an attribute value. *fdel* is a function for deleting an attribute
+   value.  And *doc* creates a docstring for the attribute.
+
+   A typical use is to define a managed attribute ``x``::
 
       class C:
           def __init__(self):
@@ -1090,13 +1118,16 @@ are always available.  They are listed here in alphabetical order.
 
           def getx(self):
               return self._x
+
           def setx(self, value):
               self._x = value
+
           def delx(self):
               del self._x
+
           x = property(getx, setx, delx, "I'm the 'x' property.")
 
-   If then *c* is an instance of *C*, ``c.x`` will invoke the getter,
+   If *c* is an instance of *C*, ``c.x`` will invoke the getter,
    ``c.x = value`` will invoke the setter and ``del c.x`` the deleter.
 
    If given, *doc* will be the docstring of the property attribute. Otherwise, the
@@ -1112,13 +1143,14 @@ are always available.  They are listed here in alphabetical order.
               """Get the current voltage."""
               return self._voltage
 
-   turns the :meth:`voltage` method into a "getter" for a read-only attribute
-   with the same name.
+   The ``@property`` decorator turns the :meth:`voltage` method into a "getter"
+   for a read-only attribute with the same name, and it sets the docstring for
+   *voltage* to "Get the current voltage."
 
-   A property object has :attr:`getter`, :attr:`setter`, and :attr:`deleter`
-   methods usable as decorators that create a copy of the property with the
-   corresponding accessor function set to the decorated function.  This is
-   best explained with an example::
+   A property object has :attr:`~property.getter`, :attr:`~property.setter`,
+   and :attr:`~property.deleter` methods usable as decorators that create a
+   copy of the property with the corresponding accessor function set to the
+   decorated function.  This is best explained with an example::
 
       class C:
           def __init__(self):
@@ -1141,7 +1173,7 @@ are always available.  They are listed here in alphabetical order.
    additional functions the same name as the original property (``x`` in this
    case.)
 
-   The returned property also has the attributes ``fget``, ``fset``, and
+   The returned property object also has the attributes ``fget``, ``fset``, and
    ``fdel`` corresponding to the constructor arguments.
 
 
@@ -1224,13 +1256,13 @@ are always available.  They are listed here in alphabetical order.
 
    Return a :term:`slice` object representing the set of indices specified by
    ``range(start, stop, step)``.  The *start* and *step* arguments default to
-   ``None``.  Slice objects have read-only data attributes :attr:`start`,
-   :attr:`stop` and :attr:`step` which merely return the argument values (or their
-   default).  They have no other explicit functionality; however they are used by
-   Numerical Python and other third party extensions.  Slice objects are also
-   generated when extended indexing syntax is used.  For example:
-   ``a[start:stop:step]`` or ``a[start:stop, i]``.  See :func:`itertools.islice`
-   for an alternate version that returns an iterator.
+   ``None``.  Slice objects have read-only data attributes :attr:`~slice.start`,
+   :attr:`~slice.stop` and :attr:`~slice.step` which merely return the argument
+   values (or their default).  They have no other explicit functionality;
+   however they are used by Numerical Python and other third party extensions.
+   Slice objects are also generated when extended indexing syntax is used.  For
+   example: ``a[start:stop:step]`` or ``a[start:stop, i]``.  See
+   :func:`itertools.islice` for an alternate version that returns an iterator.
 
 
 .. function:: sorted(iterable[, key][, reverse])
@@ -1310,9 +1342,10 @@ are always available.  They are listed here in alphabetical order.
    been overridden in a class. The search order is same as that used by
    :func:`getattr` except that the *type* itself is skipped.
 
-   The :attr:`__mro__` attribute of the *type* lists the method resolution
-   search order used by both :func:`getattr` and :func:`super`.  The attribute
-   is dynamic and can change whenever the inheritance hierarchy is updated.
+   The :attr:`~class.__mro__` attribute of the *type* lists the method
+   resolution search order used by both :func:`getattr` and :func:`super`.  The
+   attribute is dynamic and can change whenever the inheritance hierarchy is
+   updated.
 
    If the second argument is omitted, the super object returned is unbound.  If
    the second argument is an object, ``isinstance(obj, type)`` must be true.  If
@@ -1375,7 +1408,8 @@ are always available.  They are listed here in alphabetical order.
 
 
    With one argument, return the type of an *object*.  The return value is a
-   type object and generally the same object as returned by ``object.__class__``.
+   type object and generally the same object as returned by
+   :attr:`object.__class__ <instance.__class__>`.
 
    The :func:`isinstance` built-in function is recommended for testing the type
    of an object, because it takes subclasses into account.
@@ -1383,11 +1417,11 @@ are always available.  They are listed here in alphabetical order.
 
    With three arguments, return a new type object.  This is essentially a
    dynamic form of the :keyword:`class` statement. The *name* string is the
-   class name and becomes the :attr:`__name__` attribute; the *bases* tuple
-   itemizes the base classes and becomes the :attr:`__bases__` attribute;
-   and the *dict* dictionary is the namespace containing definitions for class
-   body and becomes the :attr:`__dict__` attribute.  For example, the
-   following two statements create identical :class:`type` objects:
+   class name and becomes the :attr:`~class.__name__` attribute; the *bases*
+   tuple itemizes the base classes and becomes the :attr:`~class.__bases__`
+   attribute; and the *dict* dictionary is the namespace containing definitions
+   for class body and becomes the :attr:`~object.__dict__` attribute.  For
+   example, the following two statements create identical :class:`type` objects:
 
       >>> class X:
       ...     a = 1
@@ -1399,7 +1433,7 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: vars([object])
 
-   Return the :attr:`__dict__` attribute for a module, class, instance,
+   Return the :attr:`~object.__dict__` attribute for a module, class, instance,
    or any other object with a :attr:`__dict__` attribute.
 
    Objects such as modules and instances have an updateable :attr:`__dict__`

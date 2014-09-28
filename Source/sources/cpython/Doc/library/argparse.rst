@@ -683,7 +683,7 @@ action
 actions can do just about anything with the command-line arguments associated with
 them, though most actions simply add an attribute to the object returned by
 :meth:`~ArgumentParser.parse_args`.  The ``action`` keyword argument specifies
-how the command-line arguments should be handled. The supported actions are:
+how the command-line arguments should be handled. The supplied actions are:
 
 * ``'store'`` - This just stores the argument's value.  This is the default
   action. For example::
@@ -757,28 +757,18 @@ how the command-line arguments should be handled. The supported actions are:
     >>> parser.parse_args(['--version'])
     PROG 2.0
 
-You can also specify an arbitrary action by passing an object that implements
-the Action API.  The easiest way to do this is to extend
-:class:`argparse.Action`, supplying an appropriate ``__call__`` method.  The
-``__call__`` method should accept four parameters:
-
-* ``parser`` - The ArgumentParser object which contains this action.
-
-* ``namespace`` - The :class:`Namespace` object that will be returned by
-  :meth:`~ArgumentParser.parse_args`.  Most actions add an attribute to this
-  object.
-
-* ``values`` - The associated command-line arguments, with any type conversions
-  applied.  (Type conversions are specified with the type_ keyword argument to
-  :meth:`~ArgumentParser.add_argument`.)
-
-* ``option_string`` - The option string that was used to invoke this action.
-  The ``option_string`` argument is optional, and will be absent if the action
-  is associated with a positional argument.
+You may also specify an arbitrary action by passing an Action subclass or
+other object that implements the same interface.  The recommended way to do
+this is to extend :class:`Action`, overriding the ``__call__`` method
+and optionally the ``__init__`` method.
 
 An example of a custom action::
 
    >>> class FooAction(argparse.Action):
+   ...     def __init__(self, option_strings, dest, nargs=None, **kwargs):
+   ...         if nargs is not None:
+   ...             raise ValueError("nargs not allowed")
+   ...         super(FooAction, self).__init__(option_strings, dest, **kwargs)
    ...     def __call__(self, parser, namespace, values, option_string=None):
    ...         print('%r %r %r' % (namespace, values, option_string))
    ...         setattr(namespace, self.dest, values)
@@ -792,6 +782,7 @@ An example of a custom action::
    >>> args
    Namespace(bar='1', foo='2')
 
+For more details, see :class:`Action`.
 
 nargs
 ^^^^^
@@ -1238,6 +1229,49 @@ behavior::
    >>> parser.parse_args('--foo XXX'.split())
    Namespace(bar='XXX')
 
+Action classes
+^^^^^^^^^^^^^^
+
+Action classes implement the Action API, a callable which returns a callable
+which processes arguments from the command-line. Any object which follows
+this API may be passed as the ``action`` parameter to
+:meth:`add_argument`.
+
+.. class:: Action(option_strings, dest, nargs=None, const=None, default=None, \
+                  type=None, choices=None, required=False, help=None, \
+                  metavar=None)
+
+Action objects are used by an ArgumentParser to represent the information
+needed to parse a single argument from one or more strings from the
+command line. The Action class must accept the two positional arguments
+plus any keyword arguments passed to :meth:`ArgumentParser.add_argument`
+except for the ``action`` itself.
+
+Instances of Action (or return value of any callable to the ``action``
+parameter) should have attributes "dest", "option_strings", "default", "type",
+"required", "help", etc. defined. The easiest way to ensure these attributes
+are defined is to call ``Action.__init__``.
+
+Action instances should be callable, so subclasses must override the
+``__call__`` method, which should accept four parameters:
+
+* ``parser`` - The ArgumentParser object which contains this action.
+
+* ``namespace`` - The :class:`Namespace` object that will be returned by
+  :meth:`~ArgumentParser.parse_args`.  Most actions add an attribute to this
+  object using :func:`setattr`.
+
+* ``values`` - The associated command-line arguments, with any type conversions
+  applied.  Type conversions are specified with the type_ keyword argument to
+  :meth:`~ArgumentParser.add_argument`.
+
+* ``option_string`` - The option string that was used to invoke this action.
+  The ``option_string`` argument is optional, and will be absent if the action
+  is associated with a positional argument.
+
+The ``__call__`` method may perform arbitrary actions, but will typically set
+attributes on the ``namespace`` based on ``dest`` and ``values``.
+
 
 The parse_args() method
 -----------------------
@@ -1371,12 +1405,14 @@ argument::
    >>> parser.parse_args(['--', '-f'])
    Namespace(foo='-f', one=None)
 
+.. _prefix-matching:
 
-Argument abbreviations
-^^^^^^^^^^^^^^^^^^^^^^
+Argument abbreviations (prefix matching)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :meth:`~ArgumentParser.parse_args` method allows long options to be
-abbreviated if the abbreviation is unambiguous::
+abbreviated to a prefix, if the abbreviation is unambiguous (the prefix matches
+a unique option)::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-bacon')
@@ -1669,6 +1705,9 @@ FileType objects
       >>> parser.parse_args(['-'])
       Namespace(infile=<_io.TextIOWrapper name='<stdin>' encoding='UTF-8'>)
 
+   .. versionadded:: 3.4
+      The *encodings* and *errors* keyword arguments.
+
 
 Argument groups
 ^^^^^^^^^^^^^^^
@@ -1853,6 +1892,12 @@ the populated namespace and the list of remaining argument strings.
    >>> parser.add_argument('bar')
    >>> parser.parse_known_args(['--foo', '--badger', 'BAR', 'spam'])
    (Namespace(bar='BAR', foo=True), ['--badger', 'spam'])
+
+.. warning::
+   :ref:`Prefix matching <prefix-matching>` rules apply to
+   :meth:`parse_known_args`. The parser may consume an option even if it's just
+   a prefix of one of its known options, instead of leaving it in the remaining
+   arguments list.
 
 
 Customizing file parsing

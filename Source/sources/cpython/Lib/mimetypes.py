@@ -243,25 +243,27 @@ class MimeTypes:
             while True:
                 try:
                     ctype = _winreg.EnumKey(mimedb, i)
-                except OSError:
+                except EnvironmentError:
                     break
                 else:
                     yield ctype
                 i += 1
 
-        with _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                             r'MIME\Database\Content Type') as mimedb:
-            for ctype in enum_types(mimedb):
+        with _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, '') as hkcr:
+            for subkeyname in enum_types(hkcr):
                 try:
-                    with _winreg.OpenKey(mimedb, ctype) as key:
-                        suffix, datatype = _winreg.QueryValueEx(key,
-                                                                'Extension')
-                except OSError:
+                    with _winreg.OpenKey(hkcr, subkeyname) as subkey:
+                        # Only check file extensions
+                        if not subkeyname.startswith("."):
+                            continue
+                        # raises EnvironmentError if no 'Content Type' value
+                        mimetype, datatype = _winreg.QueryValueEx(
+                            subkey, 'Content Type')
+                        if datatype != _winreg.REG_SZ:
+                            continue
+                        self.add_type(mimetype, subkeyname, strict)
+                except EnvironmentError:
                     continue
-                if datatype != _winreg.REG_SZ:
-                    continue
-                self.add_type(ctype, suffix, strict)
-
 
 def guess_type(url, strict=True):
     """Guess the type of a file based on its URL.
@@ -361,9 +363,10 @@ def read_mime_types(file):
         f = open(file)
     except OSError:
         return None
-    db = MimeTypes()
-    db.readfp(f, True)
-    return db.types_map[True]
+    with f:
+        db = MimeTypes()
+        db.readfp(f, True)
+        return db.types_map[True]
 
 
 def _default_mime_types():

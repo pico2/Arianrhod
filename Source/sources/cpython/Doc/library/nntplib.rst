@@ -82,7 +82,7 @@ The module itself defines the following classes:
 
 
    .. versionchanged:: 3.2
-      *usenetrc* is now False by default.
+      *usenetrc* is now ``False`` by default.
 
    .. versionchanged:: 3.3
       Support for the :keyword:`with` statement was added.
@@ -94,6 +94,7 @@ The module itself defines the following classes:
    port *port*.  :class:`NNTP_SSL` objects have the same methods as
    :class:`NNTP` objects.  If *port* is omitted, port 563 (NNTPS) is used.
    *ssl_context* is also optional, and is a :class:`~ssl.SSLContext` object.
+   Please read :ref:`ssl-security` for best practices.
    All other parameters behave the same as for :class:`NNTP`.
 
    Note that SSL-on-563 is discouraged per :rfc:`4642`, in favor of
@@ -102,6 +103,10 @@ The module itself defines the following classes:
 
    .. versionadded:: 3.2
 
+   .. versionchanged:: 3.4
+      The class now supports hostname check with
+      :attr:`ssl.SSLContext.check_hostname` and *Server Name Indication* (see
+      :data:`ssl.HAS_SNI`).
 
 .. exception:: NNTPError
 
@@ -216,7 +221,7 @@ tuples or objects that the method normally returns will be empty.
 .. method:: NNTP.login(user=None, password=None, usenetrc=True)
 
    Send ``AUTHINFO`` commands with the user name and password.  If *user*
-   and *password* are None and *usenetrc* is True, credentials from
+   and *password* are None and *usenetrc* is true, credentials from
    ``~/.netrc`` will be used if possible.
 
    Unless intentionally delayed, login is normally performed during the
@@ -230,9 +235,10 @@ tuples or objects that the method normally returns will be empty.
 
 .. method:: NNTP.starttls(ssl_context=None)
 
-   Send a ``STARTTLS`` command.  The *ssl_context* argument is optional
-   and should be a :class:`ssl.SSLContext` object.  This will enable
-   encryption on the NNTP connection.
+   Send a ``STARTTLS`` command.  This will enable encryption on the NNTP
+   connection.  The *ssl_context* argument is optional and should be a
+   :class:`ssl.SSLContext` object.  Please read :ref:`ssl-security` for best
+   practices.
 
    Note that this may not be done after authentication information has
    been transmitted, and authentication occurs by default if possible during a
@@ -241,6 +247,10 @@ tuples or objects that the method normally returns will be empty.
 
    .. versionadded:: 3.2
 
+   .. versionchanged:: 3.4
+      The method now supports hostname check with
+      :attr:`ssl.SSLContext.check_hostname` and *Server Name Indication* (see
+      :data:`ssl.HAS_SNI`).
 
 .. method:: NNTP.newgroups(date, *, file=None)
 
@@ -394,18 +404,18 @@ tuples or objects that the method normally returns will be empty.
 
 .. method:: NNTP.next()
 
-   Send a ``NEXT`` command.  Return as for :meth:`stat`.
+   Send a ``NEXT`` command.  Return as for :meth:`.stat`.
 
 
 .. method:: NNTP.last()
 
-   Send a ``LAST`` command.  Return as for :meth:`stat`.
+   Send a ``LAST`` command.  Return as for :meth:`.stat`.
 
 
 .. method:: NNTP.article(message_spec=None, *, file=None)
 
    Send an ``ARTICLE`` command, where *message_spec* has the same meaning as
-   for :meth:`stat`.  Return a tuple ``(response, info)`` where *info*
+   for :meth:`.stat`.  Return a tuple ``(response, info)`` where *info*
    is a :class:`~collections.namedtuple` with three attributes *number*,
    *message_id* and *lines* (in that order).  *number* is the article number
    in the group (or 0 if the information is not available), *message_id* the

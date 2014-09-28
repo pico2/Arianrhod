@@ -33,7 +33,6 @@ typedef struct _is {
     int codecs_initialized;
     int fscodec_initialized;
 
-
 #ifdef HAVE_DLOPEN
     int dlopenflags;
 #endif
@@ -41,6 +40,7 @@ typedef struct _is {
     int tscdump;
 #endif
 
+    PyObject *builtins_copy;
 } PyInterpreterState;
 #endif
 
@@ -99,16 +99,6 @@ typedef struct _ts {
     PyObject *exc_traceback;
 
     PyObject *dict;  /* Stores per-thread state */
-
-    /* XXX doesn't mean anything anymore (the comment below is obsolete)
-       => deprecate or remove? */
-    /* tick_counter is incremented whenever the check_interval ticker
-     * reaches zero. The purpose is to give a useful measure of the number
-     * of interpreted bytecode instructions in a given thread.  This
-     * extremely lightweight statistic collector may be of interest to
-     * profilers (like psyco.jit()), although nothing in the core uses it.
-     */
-    int tick_counter;
 
     int gilstate_counter;
 
@@ -246,7 +236,9 @@ PyAPI_FUNC(PyThreadState *) PyGILState_GetThisThreadState(void);
 /* Helper/diagnostic function - return 1 if the current thread
  * currently holds the GIL, 0 otherwise
  */
+#ifndef Py_LIMITED_API
 PyAPI_FUNC(int) PyGILState_Check(void);
+#endif
 
 #endif   /* #ifdef WITH_THREAD */
 

@@ -105,12 +105,28 @@ Children are nested, and we can access specific child nodes by index::
    >>> root[0][1].text
    '2008'
 
+
+.. note::
+
+   Not all elements of the XML input will end up as elements of the
+   parsed tree. Currently, this module skips over any XML comments,
+   processing instructions, and document type declarations in the
+   input. Nevertheless, trees built using this module's API rather
+   than parsing from XML text can have comments and processing
+   instructions in them; they will be included when generating XML
+   output. A document type declaration may be accessed by passing a
+   custom :class:`TreeBuilder` instance to the :class:`XMLParser`
+   constructor.
+
+
+.. _elementtree-pull-parsing:
+
 Pull API for non-blocking parsing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Most parsing functions provided by this module require to read the whole
-document at once before returning any result.  It is possible to use a
-:class:`XMLParser` and feed data into it incrementally, but it's a push API that
+Most parsing functions provided by this module require the whole document
+to be read at once before returning any result.  It is possible to use an
+:class:`XMLParser` and feed data into it incrementally, but it is a push API that
 calls methods on a callback target, which is too low-level and inconvenient for
 most needs.  Sometimes what the user really wants is to be able to parse XML
 incrementally, without blocking operations, while enjoying the convenience of
@@ -119,7 +135,7 @@ fully constructed :class:`Element` objects.
 The most powerful tool for doing this is :class:`XMLPullParser`.  It does not
 require a blocking read to obtain the XML data, and is instead fed with data
 incrementally with :meth:`XMLPullParser.feed` calls.  To get the parsed XML
-elements, call :meth:`XMLPullParser.read_events`.  Here's an example::
+elements, call :meth:`XMLPullParser.read_events`.  Here is an example::
 
    >>> parser = ET.XMLPullParser(['start', 'end'])
    >>> parser.feed('<mytag>sometext')
@@ -322,7 +338,7 @@ Supported XPath syntax
 +=======================+======================================================+
 | ``tag``               | Selects all child elements with the given tag.       |
 |                       | For example, ``spam`` selects all child elements     |
-|                       | named ``spam``, ``spam/egg`` selects all             |
+|                       | named ``spam``, and ``spam/egg`` selects all         |
 |                       | grandchildren named ``egg`` in all children named    |
 |                       | ``spam``.                                            |
 +-----------------------+------------------------------------------------------+
@@ -378,6 +394,10 @@ Functions
    string containing the comment string.  Returns an element instance
    representing a comment.
 
+   Note that :class:`XMLParser` skips over comments in the input
+   instead of creating comment objects for them. An :class:`ElementTree` will
+   only contain comment nodes if they have been inserted into to
+   the tree using one of the :class:`Element` methods.
 
 .. function:: dump(elem)
 
@@ -458,6 +478,11 @@ Functions
    containing the PI target.  *text* is a string containing the PI contents, if
    given.  Returns an element instance, representing a processing instruction.
 
+   Note that :class:`XMLParser` skips over processing instructions
+   in the input instead of creating comment objects for them. An
+   :class:`ElementTree` will only contain processing instruction nodes if
+   they have been inserted into to the tree using one of the
+   :class:`Element` methods.
 
 .. function:: register_namespace(prefix, uri)
 
@@ -508,7 +533,7 @@ Functions
    *short_empty_elements* has the same meaning as in :meth:`ElementTree.write`.
    Returns a list of (optionally) encoded strings containing the XML data.
    It does not guarantee any specific sequence, except that
-   ``"".join(tostringlist(element)) == tostring(element)``.
+   ``b"".join(tostringlist(element)) == tostring(element)``.
 
    .. versionadded:: 3.2
 
@@ -831,8 +856,8 @@ ElementTree Objects
       :term:`file object`; make sure you do not try to write a string to a
       binary stream and vice versa.
 
-   .. versionadded:: 3.4
-      The *short_empty_elements* parameter.
+      .. versionadded:: 3.4
+         The *short_empty_elements* parameter.
 
 
 This is the XML file that is going to be manipulated::
@@ -949,7 +974,8 @@ XMLParser Objects
    specified in the XML file.
 
    .. deprecated:: 3.4
-      The *html* argument.
+      The *html* argument.  The remaining arguments should be passed via
+      keywword to prepare for the removal of the *html* argument.
 
    .. method:: close()
 
@@ -1038,15 +1064,17 @@ XMLPullParser Objects
 
    .. method:: read_events()
 
-      Iterate over the events which have been encountered in the data fed to the
-      parser.  This method yields ``(event, elem)`` pairs, where *event* is a
+      Return an iterator over the events which have been encountered in the
+      data fed to the
+      parser.  The iterator yields ``(event, elem)`` pairs, where *event* is a
       string representing the type of event (e.g. ``"end"``) and *elem* is the
       encountered :class:`Element` object.
 
       Events provided in a previous call to :meth:`read_events` will not be
-      yielded again. As events are consumed from the internal queue only as
-      they are retrieved from the iterator, multiple readers calling
-      :meth:`read_events` in parallel will have unpredictable results.
+      yielded again.  Events are consumed from the internal queue only when
+      they are retrieved from the iterator, so multiple readers iterating in
+      parallel over iterators obtained from :meth:`read_events` will have
+      unpredictable results.
 
    .. note::
 

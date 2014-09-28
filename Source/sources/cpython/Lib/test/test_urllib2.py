@@ -1,5 +1,6 @@
 import unittest
 from test import support
+from test import test_urllib
 
 import os
 import io
@@ -10,9 +11,10 @@ import sys
 import urllib.request
 # The proxy bypass method imported below has logic specific to the OSX
 # proxy config data structure but is testable on all platforms.
-from urllib.request import Request, OpenerDirector, _proxy_bypass_macosx_sysconf
+from urllib.request import Request, OpenerDirector, _parse_proxy, _proxy_bypass_macosx_sysconf
 from urllib.parse import urlparse
 import urllib.error
+import http.client
 
 # XXX
 # Request
@@ -603,8 +605,8 @@ class OpenerDirectorTests(unittest.TestCase):
                 self.assertIsInstance(args[0], Request)
                 # response from opener.open is None, because there's no
                 # handler that defines http_open to handle it
-                self.assertTrue(args[1] is None or
-                             isinstance(args[1], MockResponse))
+                if args[1] is not None:
+                    self.assertIsInstance(args[1], MockResponse)
 
 def sanepathname2url(path):
     try:
@@ -678,7 +680,7 @@ class HandlerTests(unittest.TestCase):
             self.assertEqual(int(headers["Content-length"]), len(data))
 
     def test_file(self):
-        import email.utils, socket
+        import email.utils
         h = urllib.request.FileHandler()
         o = h.parent = MockOpener()
 
@@ -725,6 +727,7 @@ class HandlerTests(unittest.TestCase):
         for url in [
             "file://localhost:80%s" % urlpath,
             "file:///file_does_not_exist.txt",
+            "file://not-a-local-host.com//dir/file.txt",
             "file://%s:80%s/%s" % (socket.gethostbyname('localhost'),
                                    os.getcwd(), TESTFN),
             "file://somerandomhost.ontheinternet.com%s/%s" %
@@ -1018,7 +1021,8 @@ class HandlerTests(unittest.TestCase):
                            MockHeaders({"location": to_url}))
                 except urllib.error.HTTPError:
                     # 307 in response to POST requires user OK
-                    self.assertTrue(code == 307 and data is not None)
+                    self.assertEqual(code, 307)
+                    self.assertIsNotNone(data)
                 self.assertEqual(o.req.get_full_url(), to_url)
                 try:
                     self.assertEqual(o.req.get_method(), "GET")
@@ -1226,7 +1230,8 @@ class HandlerTests(unittest.TestCase):
             self.assertTrue(_proxy_bypass_macosx_sysconf(host, bypass),
                             'expected bypass of %s to be True' % host)
         # Check hosts that should not trigger the proxy bypass
-        for host in ('abc.foo.bar', 'bar.com', '127.0.0.2', '10.11.0.1', 'test'):
+        for host in ('abc.foo.bar', 'bar.com', '127.0.0.2', '10.11.0.1',
+                'notinbypass'):
             self.assertFalse(_proxy_bypass_macosx_sysconf(host, bypass),
                              'expected bypass of %s to be False' % host)
 
@@ -1390,6 +1395,33 @@ class HandlerTests(unittest.TestCase):
         self.assertEqual(len(http_handler.requests), 1)
         self.assertFalse(http_handler.requests[0].has_header(auth_header))
 
+    def test_http_closed(self):
+        """Test the connection is cleaned up when the response is closed"""
+        for (transfer, data) in (
+            ("Connection: close", b"data"),
+            ("Transfer-Encoding: chunked", b"4\r\ndata\r\n0\r\n\r\n"),
+            ("Content-Length: 4", b"data"),
+        ):
+            header = "HTTP/1.1 200 OK\r\n{}\r\n\r\n".format(transfer)
+            conn = test_urllib.fakehttp(header.encode() + data)
+            handler = urllib.request.AbstractHTTPHandler()
+            req = Request("http://dummy/")
+            req.timeout = None
+            with handler.do_open(conn, req) as resp:
+                resp.read()
+            self.assertTrue(conn.fakesock.closed,
+                "Connection not closed with {!r}".format(transfer))
+
+    def test_invalid_closed(self):
+        """Test the connection is cleaned up after an invalid response"""
+        conn = test_urllib.fakehttp(b"")
+        handler = urllib.request.AbstractHTTPHandler()
+        req = Request("http://dummy/")
+        req.timeout = None
+        with self.assertRaises(http.client.BadStatusLine):
+            handler.do_open(conn, req)
+        self.assertTrue(conn.fakesock.closed, "Connection not closed")
+
 
 class MiscTests(unittest.TestCase):
 
@@ -1438,7 +1470,7 @@ class MiscTests(unittest.TestCase):
                          'test requires network access')
     def test_issue16464(self):
         opener = urllib.request.build_opener()
-        request = urllib.request.Request("http://www.python.org/~jeremy/")
+        request = urllib.request.Request("http://www.example.com/")
         self.assertEqual(None, request.data)
 
         opener.open(request, "1".encode("us-ascii"))
@@ -1464,6 +1496,43 @@ class MiscTests(unittest.TestCase):
         self.assertEqual(err.headers, 'Content-Length: 42')
         expected_errmsg = 'HTTP Error %s: %s' % (err.code, err.msg)
         self.assertEqual(str(err), expected_errmsg)
+
+    def test_parse_proxy(self):
+        parse_proxy_test_cases = [
+            ('proxy.example.com',
+             (None, None, None, 'proxy.example.com')),
+            ('proxy.example.com:3128',
+             (None, None, None, 'proxy.example.com:3128')),
+            ('proxy.example.com', (None, None, None, 'proxy.example.com')),
+            ('proxy.example.com:3128',
+             (None, None, None, 'proxy.example.com:3128')),
+            # The authority component may optionally include userinfo
+            # (assumed to be # username:password):
+            ('joe:password@proxy.example.com',
+             (None, 'joe', 'password', 'proxy.example.com')),
+            ('joe:password@proxy.example.com:3128',
+             (None, 'joe', 'password', 'proxy.example.com:3128')),
+            #Examples with URLS
+            ('http://proxy.example.com/',
+             ('http', None, None, 'proxy.example.com')),
+            ('http://proxy.example.com:3128/',
+             ('http', None, None, 'proxy.example.com:3128')),
+            ('http://joe:password@proxy.example.com/',
+             ('http', 'joe', 'password', 'proxy.example.com')),
+            ('http://joe:password@proxy.example.com:3128',
+             ('http', 'joe', 'password', 'proxy.example.com:3128')),
+            # Everything after the authority is ignored
+            ('ftp://joe:password@proxy.example.com/rubbish:3128',
+             ('ftp', 'joe', 'password', 'proxy.example.com')),
+            # Test for no trailing '/' case
+            ('http://joe:password@proxy.example.com',
+             ('http', 'joe', 'password', 'proxy.example.com'))
+        ]
+
+        for tc, expected in parse_proxy_test_cases:
+            self.assertEqual(_parse_proxy(tc), expected)
+
+        self.assertRaises(ValueError, _parse_proxy, 'file:/ftp.example.com'),
 
 class RequestTests(unittest.TestCase):
     class PutRequest(Request):

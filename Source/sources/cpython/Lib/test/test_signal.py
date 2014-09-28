@@ -454,7 +454,7 @@ class SiginterruptTest(unittest.TestCase):
                 stdout = first_line + stdout
                 exitcode = process.wait()
                 if exitcode not in (2, 3):
-                    raise Exception("Child error (exit code %s): %s"
+                    raise Exception("Child error (exit code %s): %r"
                                     % (exitcode, stdout))
                 return (exitcode == 3)
 
@@ -873,7 +873,7 @@ class PendingSignalsTests(unittest.TestCase):
 
         # Unblock SIGUSR1
         try:
-            # unblock the pending signal calls immediatly the signal handler
+            # unblock the pending signal calls immediately the signal handler
             signal.pthread_sigmask(signal.SIG_UNBLOCK, [signum])
         except ZeroDivisionError:
             pass

@@ -29,7 +29,7 @@ PyCFunction_NewEx(PyMethodDef *ml, PyObject *self, PyObject *module)
     op = free_list;
     if (op != NULL) {
         free_list = (PyCFunctionObject *)(op->m_self);
-        PyObject_INIT(op, &PyCFunction_Type);
+        (void)PyObject_INIT(op, &PyCFunction_Type);
         numfree--;
     }
     else {
@@ -160,14 +160,35 @@ meth_dealloc(PyCFunctionObject *m)
 }
 
 static PyObject *
+meth_reduce(PyCFunctionObject *m)
+{
+    PyObject *builtins;
+    PyObject *getattr;
+    _Py_IDENTIFIER(getattr);
+
+    if (m->m_self == NULL || PyModule_Check(m->m_self))
+        return PyUnicode_FromString(m->m_ml->ml_name);
+
+    builtins = PyEval_GetBuiltins();
+    getattr = _PyDict_GetItemId(builtins, &PyId_getattr);
+    return Py_BuildValue("O(Os)", getattr, m->m_self, m->m_ml->ml_name);
+}
+
+static PyMethodDef meth_methods[] = {
+    {"__reduce__", (PyCFunction)meth_reduce, METH_NOARGS, NULL},
+    {NULL, NULL}
+};
+
+static PyObject *
+meth_get__text_signature__(PyCFunctionObject *m, void *closure)
+{
+    return _PyType_GetTextSignatureFromInternalDoc(m->m_ml->ml_name, m->m_ml->ml_doc);
+}
+
+static PyObject *
 meth_get__doc__(PyCFunctionObject *m, void *closure)
 {
-    const char *doc = m->m_ml->ml_doc;
-
-    if (doc != NULL)
-        return PyUnicode_FromString(doc);
-    Py_INCREF(Py_None);
-    return Py_None;
+    return _PyType_GetDocFromInternalDoc(m->m_ml->ml_name, m->m_ml->ml_doc);
 }
 
 static PyObject *
@@ -236,6 +257,7 @@ static PyGetSetDef meth_getsets [] = {
     {"__name__", (getter)meth_get__name__, NULL, NULL},
     {"__qualname__", (getter)meth_get__qualname__, NULL, NULL},
     {"__self__", (getter)meth_get__self__, NULL, NULL},
+    {"__text_signature__", (getter)meth_get__text_signature__, NULL, NULL},
     {0}
 };
 
@@ -333,7 +355,7 @@ PyTypeObject PyCFunction_Type = {
     0,                                          /* tp_weaklistoffset */
     0,                                          /* tp_iter */
     0,                                          /* tp_iternext */
-    0,                                          /* tp_methods */
+    meth_methods,                               /* tp_methods */
     meth_members,                               /* tp_members */
     meth_getsets,                               /* tp_getset */
     0,                                          /* tp_base */

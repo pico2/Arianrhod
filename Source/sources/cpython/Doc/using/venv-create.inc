@@ -11,6 +11,11 @@ containing a copy of the ``python`` binary (or binaries, in the case of
 Windows).  It also creates an (initially empty) ``lib/pythonX.Y/site-packages``
 subdirectory (on Windows, this is ``Lib\site-packages``).
 
+.. seealso::
+
+   `Python Packaging User Guide: Creating and using virtual environments
+   <http://packaging.python.org/en/latest/tutorial.html#creating-and-using-virtual-environments>`__
+
 .. highlight:: none
 
 On Windows, you may have to invoke the ``pyvenv`` script as follows, if you
@@ -25,7 +30,7 @@ or equivalently::
 The command, if run with ``-h``, will show the available options::
 
     usage: pyvenv [-h] [--system-site-packages] [--symlinks] [--clear]
-                  [--upgrade] ENV_DIR [ENV_DIR ...]
+                  [--upgrade] [--without-pip] ENV_DIR [ENV_DIR ...]
 
     Creates virtual Python environments in one or more target directories.
 
@@ -38,11 +43,19 @@ The command, if run with ``-h``, will show the available options::
                              virtual environment.
       --symlinks             Try to use symlinks rather than copies, when symlinks
                              are not the default for the platform.
+      --copies               Try to use copies rather than symlinks, even when
+                             symlinks are the default for the platform.
       --clear                Delete the environment directory if it already exists.
                              If not specified and the directory exists, an error is
                              raised.
       --upgrade              Upgrade the environment directory to use this version
                              of Python, assuming Python has been upgraded in-place.
+      --without-pip          Skips installing or upgrading pip in the virtual
+                             environment (pip is bootstrapped by default)
+
+.. versionchanged:: 3.4
+   Installs pip by default, added the ``--without-pip``  and ``--copies``
+   options
 
 If the target directory already exists an error will be raised, unless
 the ``--clear`` or ``--upgrade`` option was provided.
@@ -50,6 +63,9 @@ the ``--clear`` or ``--upgrade`` option was provided.
 The created ``pyvenv.cfg`` file also includes the
 ``include-system-site-packages`` key, set to ``true`` if ``venv`` is
 run with the ``--system-site-packages`` option, ``false`` otherwise.
+
+Unless the ``--without-pip`` option is given, :mod:`ensurepip` will be
+invoked to bootstrap ``pip`` into the virtual environment.
 
 Multiple paths can be given to ``pyvenv``, in which case an identical
 virtualenv will be created, according to the given options, at each
@@ -84,3 +100,5 @@ a "deactivate" function, whereas on Windows there are separate scripts called
 ``deactivate.bat`` and ``Deactivate.ps1`` which are installed when the venv is
 created.
 
+.. versionadded:: 3.4
+   ``fish`` and ``csh`` activation scripts.

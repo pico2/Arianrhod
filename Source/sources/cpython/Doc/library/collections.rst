@@ -193,7 +193,7 @@ updates keys found deeper in the chain::
                     return
             raise KeyError(key)
 
-    >>> d = DeepChainMap({'zebra': 'black'}, {'elephant' : 'blue'}, {'lion' : 'yellow'})
+    >>> d = DeepChainMap({'zebra': 'black'}, {'elephant': 'blue'}, {'lion': 'yellow'})
     >>> d['lion'] = 'orange'         # update an existing key two levels down
     >>> d['snake'] = 'red'           # new keys get added to the topmost dict
     >>> del d['elephant']            # remove an existing key one level down
@@ -373,10 +373,6 @@ or subtracting from an empty counter.
       negative counts.
 
 .. seealso::
-
-    * `Counter class <http://code.activestate.com/recipes/576611/>`_
-      adapted for Python 2.5 and an early `Bag recipe
-      <http://code.activestate.com/recipes/259174/>`_ for Python 2.4.
 
     * `Bag class <http://www.gnu.org/software/smalltalk/manual-base/html_node/Bag.html>`_
       in Smalltalk.
@@ -920,11 +916,6 @@ and more efficient to use a simple class declaration:
     >>> class Status:
         open, pending, closed = range(3)
 
-.. seealso::
-
-    * `Named tuple recipe <http://code.activestate.com/recipes/500261/>`_
-      adapted for Python 2.4.
-
     * `Recipe for named tuple abstract base class with a metaclass mix-in
       <http://code.activestate.com/recipes/577629-namedtupleabc-abstract-base-class-mix-in-for-named/>`_
       by Jan Kaliszewski.  Besides providing an :term:`abstract base class` for
@@ -979,18 +970,14 @@ reverse iteration using :func:`reversed`.
 Equality tests between :class:`OrderedDict` objects are order-sensitive
 and are implemented as ``list(od1.items())==list(od2.items())``.
 Equality tests between :class:`OrderedDict` objects and other
-:class:`Mapping` objects are order-insensitive like regular dictionaries.
-This allows :class:`OrderedDict` objects to be substituted anywhere a
-regular dictionary is used.
+:class:`~collections.abc.Mapping` objects are order-insensitive like regular
+dictionaries.  This allows :class:`OrderedDict` objects to be substituted
+anywhere a regular dictionary is used.
 
 The :class:`OrderedDict` constructor and :meth:`update` method both accept
 keyword arguments, but their order is lost because Python's function call
 semantics pass-in keyword arguments using a regular unordered dictionary.
 
-.. seealso::
-
-    `Equivalent OrderedDict recipe <http://code.activestate.com/recipes/576693/>`_
-    that runs on Python 2.4 or later.
 
 :class:`OrderedDict` Examples and Recipes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1098,7 +1085,7 @@ to work with because the underlying list is accessible as an attribute.
         A real :class:`list` object used to store the contents of the
         :class:`UserList` class.
 
-**Subclassing requirements:** Subclasses of :class:`UserList` are expect to
+**Subclassing requirements:** Subclasses of :class:`UserList` are expected to
 offer a constructor which can be called with either no arguments or one
 argument.  List operations which return a new sequence attempt to create an
 instance of the actual implementation class.  To do so, it assumes that the

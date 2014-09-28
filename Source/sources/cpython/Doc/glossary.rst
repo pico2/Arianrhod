@@ -41,7 +41,7 @@ Glossary
 
    argument
       A value passed to a :term:`function` (or :term:`method`) when calling the
-      function.  There are two types of arguments:
+      function.  There are two kinds of argument:
 
       * :dfn:`keyword argument`: an argument preceded by an identifier (e.g.
         ``name=``) in a function call or passed as a value in a dictionary
@@ -77,6 +77,13 @@ Glossary
    BDFL
       Benevolent Dictator For Life, a.k.a. `Guido van Rossum
       <http://www.python.org/~guido/>`_, Python's creator.
+
+   binary file
+      A :term:`file object` able to read and write
+      :term:`bytes-like objects <bytes-like object>`.
+
+      .. seealso::
+         A :term:`text file` reads and writes :class:`str` objects.
 
    bytes-like object
       An object that supports the :ref:`bufferobjects`, like :class:`bytes`,
@@ -225,10 +232,11 @@ Glossary
       etc.).  File objects are also called :dfn:`file-like objects` or
       :dfn:`streams`.
 
-      There are actually three categories of file objects: raw binary files,
-      buffered binary files and text files.  Their interfaces are defined in the
-      :mod:`io` module.  The canonical way to create a file object is by using
-      the :func:`open` function.
+      There are actually three categories of file objects: raw
+      :term:`binary files <binary file>`, buffered
+      :term:`binary files <binary file>` and :term:`text files <text file>`.
+      Their interfaces are defined in the :mod:`io` module.  The canonical
+      way to create a file object is by using the :func:`open` function.
 
    file-like object
       A synonym for :term:`file object`.
@@ -529,6 +537,12 @@ Glossary
       have a namespace containing arbitrary Python objects.  Modules are loaded
       into Python by the process of :term:`importing`.
 
+      See also :term:`package`.
+
+   module spec
+      A namespace containing the import-related information used to load a
+      module.
+
    MRO
       See :term:`method resolution order`.
 
@@ -554,9 +568,9 @@ Glossary
       dictionaries.  There are the local, global and built-in namespaces as well
       as nested namespaces in objects (in methods).  Namespaces support
       modularity by preventing naming conflicts.  For instance, the functions
-      :func:`builtins.open` and :func:`os.open` are distinguished by their
-      namespaces.  Namespaces also aid readability and maintainability by making
-      it clear which module implements a function.  For instance, writing
+      :func:`builtins.open <.open>` and :func:`os.open` are distinguished by
+      their namespaces.  Namespaces also aid readability and maintainability by
+      making it clear which module implements a function.  For instance, writing
       :func:`random.seed` or :func:`itertools.islice` makes it clear that those
       functions are implemented by the :mod:`random` and :mod:`itertools`
       modules, respectively.
@@ -566,6 +580,8 @@ Glossary
       subpackages.  Namespace packages may have no physical representation,
       and specifically are not like a :term:`regular package` because they
       have no ``__init__.py`` file.
+
+      See also :term:`module`.
 
    nested scope
       The ability to refer to a variable in an enclosing definition.  For
@@ -579,8 +595,8 @@ Glossary
    new-style class
       Old name for the flavor of classes now used for all class objects.  In
       earlier Python versions, only new-style classes could use Python's newer,
-      versatile features like :attr:`__slots__`, descriptors, properties,
-      :meth:`__getattribute__`, class methods, and static methods.
+      versatile features like :attr:`~object.__slots__`, descriptors,
+      properties, :meth:`__getattribute__`, class methods, and static methods.
 
    object
       Any data with state (attributes or value) and defined behavior
@@ -588,14 +604,16 @@ Glossary
       class`.
 
    package
-      A Python module which can contain submodules or recursively,
+      A Python :term:`module` which can contain submodules or recursively,
       subpackages.  Technically, a package is a Python module with an
       ``__path__`` attribute.
+
+      See also :term:`regular package` and :term:`namespace package`.
 
    parameter
       A named entity in a :term:`function` (or method) definition that
       specifies an :term:`argument` (or in some cases, arguments) that the
-      function can accept.  There are five types of parameters:
+      function can accept.  There are five kinds of parameter:
 
       * :dfn:`positional-or-keyword`: specifies an argument that can be passed
         either :term:`positionally <argument>` or as a :term:`keyword argument
@@ -608,6 +626,8 @@ Glossary
         by position.  Python has no syntax for defining positional-only
         parameters.  However, some built-in functions have positional-only
         parameters (e.g. :func:`abs`).
+
+      .. _keyword-only_parameter:
 
       * :dfn:`keyword-only`: specifies an argument that can be supplied only
         by keyword.  Keyword-only parameters can be defined by including a
@@ -664,19 +684,26 @@ Glossary
    positional argument
       See :term:`argument`.
 
-   provisional package
-      A provisional package is one which has been deliberately excluded from
+   provisional API
+      A provisional API is one which has been deliberately excluded from
       the standard library's backwards compatibility guarantees.  While major
-      changes to such packages are not expected, as long as they are marked
+      changes to such interfaces are not expected, as long as they are marked
       provisional, backwards incompatible changes (up to and including removal
-      of the package) may occur if deemed necessary by core developers.  Such
+      of the interface) may occur if deemed necessary by core developers.  Such
       changes will not be made gratuitously -- they will occur only if serious
-      flaws are uncovered that were missed prior to the inclusion of the
-      package.
+      fundamental flaws are uncovered that were missed prior to the inclusion
+      of the API.
+
+      Even for provisional APIs, backwards incompatible changes are seen as
+      a "solution of last resort" - every attempt will still be made to find
+      a backwards compatible resolution to any identified problems.
 
       This process allows the standard library to continue to evolve over
       time, without locking in problematic design errors for extended periods
       of time.  See :pep:`411` for more details.
+
+   provisional package
+      See :term:`provisional API`.
 
    Python 3000
       Nickname for the Python 3.x release line (coined long ago when the
@@ -737,6 +764,8 @@ Glossary
       A traditional :term:`package`, such as a directory containing an
       ``__init__.py`` file.
 
+      See also :term:`namespace package`.
+
    __slots__
       A declaration inside a class that saves memory by pre-declaring space for
       instance attributes and eliminating instance dictionaries.  Though
@@ -753,6 +782,14 @@ Glossary
       supports :meth:`__getitem__` and :meth:`__len__`, but is considered a
       mapping rather than a sequence because the lookups use arbitrary
       :term:`immutable` keys rather than integers.
+
+      The :class:`collections.abc.Sequence` abstract base class
+      defines a much richer interface that goes beyond just
+      :meth:`__getitem__` and :meth:`__len__`, adding :meth:`count`,
+      :meth:`index`, :meth:`__contains__`, and
+      :meth:`__reversed__`. Types that implement this expanded
+      interface can be registered explicitly using
+      :func:`~abc.register`.
 
    single dispatch
       A form of :term:`generic function` dispatch where the implementation is
@@ -783,6 +820,14 @@ Glossary
       :meth:`~collections.somenamedtuple._asdict`. Examples of struct sequences
       include :data:`sys.float_info` and the return value of :func:`os.stat`.
 
+   text file
+      A :term:`file object` able to read and write :class:`str` objects.
+      Often, a text file actually accesses a byte-oriented datastream
+      and handles the text encoding automatically.
+
+      .. seealso::
+         A :term:`binary file` reads and write :class:`bytes` objects.
+
    triple-quoted string
       A string which is bound by three instances of either a quotation mark
       (") or an apostrophe (').  While they don't provide any functionality
@@ -795,14 +840,15 @@ Glossary
    type
       The type of a Python object determines what kind of object it is; every
       object has a type.  An object's type is accessible as its
-      :attr:`__class__` attribute or can be retrieved with ``type(obj)``.
+      :attr:`~instance.__class__` attribute or can be retrieved with
+      ``type(obj)``.
 
    universal newlines
       A manner of interpreting text streams in which all of the following are
       recognized as ending a line: the Unix end-of-line convention ``'\n'``,
       the Windows convention ``'\r\n'``, and the old Macintosh convention
       ``'\r'``.  See :pep:`278` and :pep:`3116`, as well as
-      :func:`str.splitlines` for an additional use.
+      :func:`bytes.splitlines` for an additional use.
 
    view
       The objects returned from :meth:`dict.keys`, :meth:`dict.values`, and
@@ -810,6 +856,14 @@ Glossary
       that will see changes in the underlying dictionary.  To force the
       dictionary view to become a full list use ``list(dictview)``.  See
       :ref:`dict-views`.
+
+   virtual environment
+      A cooperatively isolated runtime environment that allows Python users
+      and applications to install and upgrade Python distribution packages
+      without interfering with the behaviour of other Python applications
+      running on the same system.
+
+      See also :ref:`scripts-pyvenv`
 
    virtual machine
       A computer defined entirely in software.  Python's virtual machine

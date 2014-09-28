@@ -14,7 +14,6 @@ import os
 import sys
 import socket
 import struct
-import errno
 import time
 import tempfile
 import itertools
@@ -29,7 +28,7 @@ from .reduction import ForkingPickler
 
 try:
     import _winapi
-    from _winapi import WAIT_OBJECT_0, WAIT_TIMEOUT, INFINITE
+    from _winapi import WAIT_OBJECT_0, WAIT_ABANDONED_0, WAIT_TIMEOUT, INFINITE
 except ImportError:
     if sys.platform == 'win32':
         raise
@@ -77,7 +76,7 @@ def arbitrary_address(family):
         return tempfile.mktemp(prefix='listener-', dir=util.get_temp_dir())
     elif family == 'AF_PIPE':
         return tempfile.mktemp(prefix=r'\\.\pipe\pyc-%d-%d-' %
-                               (os.getpid(), next(_mmap_counter)))
+                               (os.getpid(), next(_mmap_counter)), dir="")
     else:
         raise ValueError('unrecognized family')
 
@@ -395,13 +394,23 @@ class Connection(_ConnectionBase):
         return buf
 
     def _send_bytes(self, buf):
-        # For wire compatibility with 3.2 and lower
         n = len(buf)
-        self._send(struct.pack("!i", n))
-        # The condition is necessary to avoid "broken pipe" errors
-        # when sending a 0-length buffer if the other end closed the pipe.
-        if n > 0:
-            self._send(buf)
+        # For wire compatibility with 3.2 and lower
+        header = struct.pack("!i", n)
+        if n > 16384:
+            # The payload is large so Nagle's algorithm won't be triggered
+            # and we'd better avoid the cost of concatenation.
+            chunks = [header, buf]
+        elif n > 0:
+            # Issue # 20540: concatenate before sending, to avoid delays due
+            # to Nagle's algorithm on a TCP socket.
+            chunks = [header + buf]
+        else:
+            # This code path is necessary to avoid "broken pipe" errors
+            # when sending a 0-length buffer if the other end closed the pipe.
+            chunks = [header]
+        for chunk in chunks:
+            self._send(chunk)
 
     def _recv_bytes(self, maxsize=None):
         buf = self._recv(4)
@@ -719,7 +728,7 @@ def deliver_challenge(connection, authkey):
     assert isinstance(authkey, bytes)
     message = os.urandom(MESSAGE_LENGTH)
     connection.send_bytes(CHALLENGE + message)
-    digest = hmac.new(authkey, message).digest()
+    digest = hmac.new(authkey, message, 'md5').digest()
     response = connection.recv_bytes(256)        # reject large message
     if response == digest:
         connection.send_bytes(WELCOME)
@@ -733,7 +742,7 @@ def answer_challenge(connection, authkey):
     message = connection.recv_bytes(256)         # reject large message
     assert message[:len(CHALLENGE)] == CHALLENGE, 'message = %r' % message
     message = message[len(CHALLENGE):]
-    digest = hmac.new(authkey, message).digest()
+    digest = hmac.new(authkey, message, 'md5').digest()
     connection.send_bytes(digest)
     response = connection.recv_bytes(256)        # reject large message
     if response != WELCOME:

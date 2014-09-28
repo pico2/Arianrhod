@@ -8,8 +8,8 @@ __all__ = ['Message']
 
 import re
 import uu
-import base64
-import binascii
+import quopri
+import warnings
 from io import BytesIO, StringIO
 
 # Intrapackage imports
@@ -205,7 +205,11 @@ class Message:
         if self._payload is None:
             self._payload = [payload]
         else:
-            self._payload.append(payload)
+            try:
+                self._payload.append(payload)
+            except AttributeError:
+                raise TypeError("Attach is not valid on a message with a"
+                                " non-multipart payload")
 
     def get_payload(self, i=None, decode=False):
         """Return a reference to the payload.
@@ -276,7 +280,7 @@ class Message:
         if not decode:
             return payload
         if cte == 'quoted-printable':
-            return utils._qdecode(bpayload)
+            return quopri.decodestring(bpayload)
         elif cte == 'base64':
             # XXX: this is a bit of a hack; decode_b should probably be factored
             # out somewhere, but I haven't figured out where yet.
@@ -303,9 +307,17 @@ class Message:
         Optional charset sets the message's default character set.  See
         set_charset() for details.
         """
-        if isinstance(payload, bytes):
-            payload = payload.decode('ascii', 'surrogateescape')
-        self._payload = payload
+        if hasattr(payload, 'encode'):
+            if charset is None:
+                self._payload = payload
+                return
+            if not isinstance(charset, Charset):
+                charset = Charset(charset)
+            payload = payload.encode(charset.output_charset)
+        if hasattr(payload, 'decode'):
+            self._payload = payload.decode('ascii', 'surrogateescape')
+        else:
+            self._payload = payload
         if charset is not None:
             self.set_charset(charset)
 
@@ -344,7 +356,16 @@ class Message:
             try:
                 cte(self)
             except TypeError:
-                self._payload = charset.body_encode(self._payload)
+                # This 'if' is for backward compatibility, it allows unicode
+                # through even though that won't work correctly if the
+                # message is serialized.
+                payload = self._payload
+                if payload:
+                    try:
+                        payload = payload.encode('ascii', 'surrogateescape')
+                    except UnicodeError:
+                        payload = payload.encode(charset.output_charset)
+                self._payload = charset.body_encode(payload)
                 self.add_header('Content-Transfer-Encoding', cte)
 
     def get_charset(self):
@@ -664,7 +685,7 @@ class Message:
         If your application doesn't care whether the parameter was RFC 2231
         encoded, it can turn the return value into a string as follows:
 
-            param = msg.get_param('foo')
+            rawparam = msg.get_param('foo')
             param = email.utils.collapse_rfc2231_value(rawparam)
 
         """
@@ -679,7 +700,7 @@ class Message:
         return failobj
 
     def set_param(self, param, value, header='Content-Type', requote=True,
-                  charset=None, language=''):
+                  charset=None, language='', replace=False):
         """Set a parameter in the Content-Type header.
 
         If the parameter already exists in the header, its value will be
@@ -723,8 +744,11 @@ class Message:
                 else:
                     ctype = SEMISPACE.join([ctype, append_param])
         if ctype != self.get(header):
-            del self[header]
-            self[header] = ctype
+            if replace:
+                self.replace_header(header, ctype)
+            else:
+                del self[header]
+                self[header] = ctype
 
     def del_param(self, param, header='content-type', requote=True):
         """Remove the given parameter completely from the Content-Type header.
@@ -905,3 +929,219 @@ class Message:
 
     # I.e. def walk(self): ...
     from email.iterators import walk
+
+# XXX Support for temporary deprecation hack for is_attachment property.
+class _IsAttachment:
+    def __init__(self, value):
+        self.value = value
+    def __call__(self):
+        return self.value
+    def __bool__(self):
+        warnings.warn("is_attachment will be a method, not a property, in 3.5",
+                      DeprecationWarning,
+                      stacklevel=3)
+        return self.value
+
+class MIMEPart(Message):
+
+    def __init__(self, policy=None):
+        if policy is None:
+            from email.policy import default
+            policy = default
+        Message.__init__(self, policy)
+
+    @property
+    def is_attachment(self):
+        c_d = self.get('content-disposition')
+        result = False if c_d is None else c_d.content_disposition == 'attachment'
+        # XXX transitional hack to raise deprecation if not called.
+        return _IsAttachment(result)
+
+    def _find_body(self, part, preferencelist):
+        if part.is_attachment():
+            return
+        maintype, subtype = part.get_content_type().split('/')
+        if maintype == 'text':
+            if subtype in preferencelist:
+                yield (preferencelist.index(subtype), part)
+            return
+        if maintype != 'multipart':
+            return
+        if subtype != 'related':
+            for subpart in part.iter_parts():
+                yield from self._find_body(subpart, preferencelist)
+            return
+        if 'related' in preferencelist:
+            yield (preferencelist.index('related'), part)
+        candidate = None
+        start = part.get_param('start')
+        if start:
+            for subpart in part.iter_parts():
+                if subpart['content-id'] == start:
+                    candidate = subpart
+                    break
+        if candidate is None:
+            subparts = part.get_payload()
+            candidate = subparts[0] if subparts else None
+        if candidate is not None:
+            yield from self._find_body(candidate, preferencelist)
+
+    def get_body(self, preferencelist=('related', 'html', 'plain')):
+        """Return best candidate mime part for display as 'body' of message.
+
+        Do a depth first search, starting with self, looking for the first part
+        matching each of the items in preferencelist, and return the part
+        corresponding to the first item that has a match, or None if no items
+        have a match.  If 'related' is not included in preferencelist, consider
+        the root part of any multipart/related encountered as a candidate
+        match.  Ignore parts with 'Content-Disposition: attachment'.
+        """
+        best_prio = len(preferencelist)
+        body = None
+        for prio, part in self._find_body(self, preferencelist):
+            if prio < best_prio:
+                best_prio = prio
+                body = part
+                if prio == 0:
+                    break
+        return body
+
+    _body_types = {('text', 'plain'),
+                   ('text', 'html'),
+                   ('multipart', 'related'),
+                   ('multipart', 'alternative')}
+    def iter_attachments(self):
+        """Return an iterator over the non-main parts of a multipart.
+
+        Skip the first of each occurrence of text/plain, text/html,
+        multipart/related, or multipart/alternative in the multipart (unless
+        they have a 'Content-Disposition: attachment' header) and include all
+        remaining subparts in the returned iterator.  When applied to a
+        multipart/related, return all parts except the root part.  Return an
+        empty iterator when applied to a multipart/alternative or a
+        non-multipart.
+        """
+        maintype, subtype = self.get_content_type().split('/')
+        if maintype != 'multipart' or subtype == 'alternative':
+            return
+        parts = self.get_payload()
+        if maintype == 'multipart' and subtype == 'related':
+            # For related, we treat everything but the root as an attachment.
+            # The root may be indicated by 'start'; if there's no start or we
+            # can't find the named start, treat the first subpart as the root.
+            start = self.get_param('start')
+            if start:
+                found = False
+                attachments = []
+                for part in parts:
+                    if part.get('content-id') == start:
+                        found = True
+                    else:
+                        attachments.append(part)
+                if found:
+                    yield from attachments
+                    return
+            parts.pop(0)
+            yield from parts
+            return
+        # Otherwise we more or less invert the remaining logic in get_body.
+        # This only really works in edge cases (ex: non-text relateds or
+        # alternatives) if the sending agent sets content-disposition.
+        seen = []   # Only skip the first example of each candidate type.
+        for part in parts:
+            maintype, subtype = part.get_content_type().split('/')
+            if ((maintype, subtype) in self._body_types and
+                    not part.is_attachment() and subtype not in seen):
+                seen.append(subtype)
+                continue
+            yield part
+
+    def iter_parts(self):
+        """Return an iterator over all immediate subparts of a multipart.
+
+        Return an empty iterator for a non-multipart.
+        """
+        if self.get_content_maintype() == 'multipart':
+            yield from self.get_payload()
+
+    def get_content(self, *args, content_manager=None, **kw):
+        if content_manager is None:
+            content_manager = self.policy.content_manager
+        return content_manager.get_content(self, *args, **kw)
+
+    def set_content(self, *args, content_manager=None, **kw):
+        if content_manager is None:
+            content_manager = self.policy.content_manager
+        content_manager.set_content(self, *args, **kw)
+
+    def _make_multipart(self, subtype, disallowed_subtypes, boundary):
+        if self.get_content_maintype() == 'multipart':
+            existing_subtype = self.get_content_subtype()
+            disallowed_subtypes = disallowed_subtypes + (subtype,)
+            if existing_subtype in disallowed_subtypes:
+                raise ValueError("Cannot convert {} to {}".format(
+                    existing_subtype, subtype))
+        keep_headers = []
+        part_headers = []
+        for name, value in self._headers:
+            if name.lower().startswith('content-'):
+                part_headers.append((name, value))
+            else:
+                keep_headers.append((name, value))
+        if part_headers:
+            # There is existing content, move it to the first subpart.
+            part = type(self)(policy=self.policy)
+            part._headers = part_headers
+            part._payload = self._payload
+            self._payload = [part]
+        else:
+            self._payload = []
+        self._headers = keep_headers
+        self['Content-Type'] = 'multipart/' + subtype
+        if boundary is not None:
+            self.set_param('boundary', boundary)
+
+    def make_related(self, boundary=None):
+        self._make_multipart('related', ('alternative', 'mixed'), boundary)
+
+    def make_alternative(self, boundary=None):
+        self._make_multipart('alternative', ('mixed',), boundary)
+
+    def make_mixed(self, boundary=None):
+        self._make_multipart('mixed', (), boundary)
+
+    def _add_multipart(self, _subtype, *args, _disp=None, **kw):
+        if (self.get_content_maintype() != 'multipart' or
+                self.get_content_subtype() != _subtype):
+            getattr(self, 'make_' + _subtype)()
+        part = type(self)(policy=self.policy)
+        part.set_content(*args, **kw)
+        if _disp and 'content-disposition' not in part:
+            part['Content-Disposition'] = _disp
+        self.attach(part)
+
+    def add_related(self, *args, **kw):
+        self._add_multipart('related', *args, _disp='inline', **kw)
+
+    def add_alternative(self, *args, **kw):
+        self._add_multipart('alternative', *args, **kw)
+
+    def add_attachment(self, *args, **kw):
+        self._add_multipart('mixed', *args, _disp='attachment', **kw)
+
+    def clear(self):
+        self._headers = []
+        self._payload = None
+
+    def clear_content(self):
+        self._headers = [(n, v) for n, v in self._headers
+                         if not n.lower().startswith('content-')]
+        self._payload = None
+
+
+class EmailMessage(MIMEPart):
+
+    def set_content(self, *args, **kw):
+        super().set_content(*args, **kw)
+        if 'MIME-Version' not in self:
+            self['MIME-Version'] = '1.0'

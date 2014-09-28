@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # test_codecmaps_jp.py
 #   Codec mapping tests for Japanese encodings
@@ -60,8 +59,5 @@ class TestSJISX0213Map(multibytecodec_support.TestBase_Mapping,
     mapfileurl = 'http://people.freebsd.org/~perky/i18n/SHIFT_JISX0213.TXT'
 
 
-def test_main():
-    support.run_unittest(__name__)
-
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

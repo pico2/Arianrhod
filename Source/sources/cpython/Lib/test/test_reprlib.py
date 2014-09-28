@@ -167,8 +167,15 @@ class ReprTests(unittest.TestCase):
         eq(r([[[[[[[{}]]]]]]]), "[[[[[[[...]]]]]]]")
 
     def test_cell(self):
-        # XXX Hmm? How to get at a cell object?
-        pass
+        def get_cell():
+            x = 42
+            def inner():
+                return x
+            return inner
+        x = get_cell().__closure__[0]
+        self.assertRegex(repr(x), r'<cell at 0x[0-9A-Fa-f]+: '
+                                  r'int object at 0x[0-9A-Fa-f]+>')
+        self.assertRegex(r(x), r'<cell at 0x.*\.\.\..*>')
 
     def test_descriptors(self):
         eq = self.assertEqual
@@ -253,6 +260,7 @@ class LongReprTest(unittest.TestCase):
             print("cached_path_len =", cached_path_len)
 
     def test_module(self):
+        self.maxDiff = None
         self._check_path_limitations(self.pkgname)
         create_empty_file(os.path.join(self.subpkgname, self.pkgname + '.py'))
         importlib.invalidate_caches()
@@ -273,6 +281,7 @@ class foo(object):
         eq(repr(foo.foo),
                "<class '%s.foo'>" % foo.__name__)
 
+    @unittest.skip('need a suitable object')
     def test_object(self):
         # XXX Test the repr of a type with a really long tp_name but with no
         # tp_repr.  WIBNI we had ::Inline? :)
@@ -320,6 +329,7 @@ class aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
             '<bound method aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.amethod of <%s.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa object at 0x' \
             % (qux.__name__,) ), r)
 
+    @unittest.skip('needs a built-in function with a really long name')
     def test_builtin_function(self):
         # XXX test built-in functions and methods with really long names
         pass

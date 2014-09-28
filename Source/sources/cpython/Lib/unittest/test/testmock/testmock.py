@@ -64,7 +64,7 @@ class MockTest(unittest.TestCase):
                           "method_calls not initialised correctly")
 
         # Can't use hasattr for this test as it always returns True on a mock
-        self.assertFalse('_items' in mock.__dict__,
+        self.assertNotIn('_items', mock.__dict__,
                          "default mock should not have '_items' attribute")
 
         self.assertIsNone(mock._mock_parent,
@@ -154,6 +154,24 @@ class MockTest(unittest.TestCase):
         mock = Mock(side_effect=side_effect, return_value=sentinel.RETURN)
         self.assertEqual(mock(), sentinel.RETURN)
 
+    def test_autospec_side_effect(self):
+        # Test for issue17826
+        results = [1, 2, 3]
+        def effect():
+            return results.pop()
+        def f():
+            pass
+
+        mock = create_autospec(f)
+        mock.side_effect = [1, 2, 3]
+        self.assertEqual([mock(), mock(), mock()], [1, 2, 3],
+                          "side effect not used correctly in create_autospec")
+        # Test where side effect is a callable
+        results = [1, 2, 3]
+        mock = create_autospec(f)
+        mock.side_effect = effect
+        self.assertEqual([mock(), mock(), mock()], [3, 2, 1],
+                          "callable side effect not used correctly")
 
     @unittest.skipUnless('java' in sys.platform,
                           'This test only applies to Jython')
@@ -565,19 +583,19 @@ class MockTest(unittest.TestCase):
             pass
 
         mock = Mock(spec=X)
-        self.assertTrue(isinstance(mock, X))
+        self.assertIsInstance(mock, X)
 
         mock = Mock(spec=X())
-        self.assertTrue(isinstance(mock, X))
+        self.assertIsInstance(mock, X)
 
         self.assertIs(mock.__class__, X)
         self.assertEqual(Mock().__class__.__name__, 'Mock')
 
         mock = Mock(spec_set=X)
-        self.assertTrue(isinstance(mock, X))
+        self.assertIsInstance(mock, X)
 
         mock = Mock(spec_set=X())
-        self.assertTrue(isinstance(mock, X))
+        self.assertIsInstance(mock, X)
 
 
     def test_setting_attribute_with_spec_set(self):
@@ -1164,6 +1182,10 @@ class MockTest(unittest.TestCase):
                 func.mock_calls, [call(1, 2), call(3, 4)]
             )
 
+    #Issue21222
+    def test_create_autospec_with_name(self):
+        m = mock.create_autospec(object(), name='sweet_func')
+        self.assertIn('sweet_func', repr(m))
 
     def test_mock_add_spec(self):
         class _One(object):
@@ -1302,20 +1324,6 @@ class MockTest(unittest.TestCase):
             self.assertEqual(m.method_calls, [])
 
 
-    def test_attribute_deletion(self):
-        # this behaviour isn't *useful*, but at least it's now tested...
-        for Klass in Mock, MagicMock, NonCallableMagicMock, NonCallableMock:
-            m = Klass()
-            original = m.foo
-            m.foo = 3
-            del m.foo
-            self.assertEqual(m.foo, original)
-
-            new = m.foo = Mock()
-            del m.foo
-            self.assertEqual(m.foo, new)
-
-
     def test_mock_parents(self):
         for Klass in Mock, MagicMock:
             m = Klass()
@@ -1379,7 +1387,8 @@ class MockTest(unittest.TestCase):
 
 
     def test_attribute_deletion(self):
-        for mock in Mock(), MagicMock():
+        for mock in (Mock(), MagicMock(), NonCallableMagicMock(),
+                     NonCallableMock()):
             self.assertTrue(hasattr(mock, 'm'))
 
             del mock.m

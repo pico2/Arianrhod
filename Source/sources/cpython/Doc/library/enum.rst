@@ -9,18 +9,37 @@
 .. :sectionauthor:: Eli Bendersky <eliben@gmail.com>,
 .. :sectionauthor:: Ethan Furman <ethan@stoneleaf.us>
 
+.. versionadded:: 3.4
+
 **Source code:** :source:`Lib/enum.py`
 
 ----------------
 
-An enumeration is a set of symbolic names (members) bound to unique, constant
-values.  Within an enumeration, the members can be compared by identity, and
-the enumeration itself can be iterated over.
+An enumeration is a set of symbolic names (members) bound to unique,
+constant values.  Within an enumeration, the members can be compared
+by identity, and the enumeration itself can be iterated over.
+
+
+Module Contents
+---------------
 
 This module defines two enumeration classes that can be used to define unique
 sets of names and values: :class:`Enum` and :class:`IntEnum`.  It also defines
-one decorator, :func:`unique`, that ensures only unique member values are
-present in an enumeration.
+one decorator, :func:`unique`.
+
+.. class:: Enum
+
+    Base class for creating enumerated constants.  See section
+    `Functional API`_ for an alternate construction syntax.
+
+.. class:: IntEnum
+
+    Base class for creating enumerated constants that are also
+    subclasses of :class:`int`.
+
+.. function:: unique
+
+    Enum class decorator that ensures only one name is bound to any one value.
 
 
 Creating an Enum
@@ -120,7 +139,7 @@ If you want to access enum members by *name*, use item access::
     >>> Color['green']
     <Color.green: 2>
 
-If have an enum member and need its :attr:`name` or :attr:`value`::
+If you have an enum member and need its :attr:`name` or :attr:`value`::
 
     >>> member = Color.red
     >>> member.name
@@ -350,10 +369,13 @@ The usual restrictions for pickling apply: picklable enums must be defined in
 the top level of a module, since unpickling requires them to be importable
 from that module.
 
-.. warning::
+.. note::
 
-    In order to support the singleton nature of enumeration members, pickle
-    protocol version 2 or higher must be used.
+    With pickle protocol version 4 it is possible to easily pickle enums
+    nested in other classes.
+
+It is possible to modify how Enum members are pickled/unpickled by defining
+:meth:`__reduce_ex__` in the enumeration class.
 
 
 Functional API
@@ -371,8 +393,8 @@ The :class:`Enum` class is callable, providing the following functional API::
     >>> list(Animal)
     [<Animal.ant: 1>, <Animal.bee: 2>, <Animal.cat: 3>, <Animal.dog: 4>]
 
-The semantics of this API resemble :class:`namedtuple`. The first argument
-of the call to :class:`Enum` is the name of the enumeration.
+The semantics of this API resemble :class:`~collections.namedtuple`. The first
+argument of the call to :class:`Enum` is the name of the enumeration.
 
 The second argument is the *source* of enumeration member names.  It can be a
 whitespace-separated string of names, a sequence of names, a sequence of
@@ -400,6 +422,45 @@ function in separate module, and also may not work on IronPython or Jython).
 The solution is to specify the module name explicitly as follows::
 
     >>> Animals = Enum('Animals', 'ant bee cat dog', module=__name__)
+
+.. warning::
+
+    If ``module`` is not supplied, and Enum cannot determine what it is,
+    the new Enum members will not be unpicklable; to keep errors closer to
+    the source, pickling will be disabled.
+
+The new pickle protocol 4 also, in some circumstances, relies on
+:attr:`__qualname__` being set to the location where pickle will be able
+to find the class.  For example, if the class was made available in class
+SomeData in the global scope::
+
+    >>> Animals = Enum('Animals', 'ant bee cat dog', qualname='SomeData.Animals')
+
+The complete signature is::
+
+    Enum(value='NewEnumName', names=<...>, *, module='...', qualname='...', type=<mixed-in class>)
+
+:value: What the new Enum class will record as its name.
+
+:names: The Enum members.  This can be a whitespace or comma separated string
+  (values will start at 1)::
+
+    'red green blue' | 'red,green,blue' | 'red, green, blue'
+
+  or an iterator of (name, value) pairs::
+
+    [('cyan', 4), ('magenta', 5), ('yellow', 6)]
+
+  or a mapping::
+
+    {'chartreuse': 7, 'sea_green': 11, 'rosemary': 42}
+
+:module: name of module where new Enum class can be found.
+
+:qualname: where in module new Enum class can be found.
+
+:type: type to mix in to new Enum class.
+
 
 Derived Enumerations
 --------------------
@@ -482,7 +543,7 @@ Some rules:
    add methods and don't specify another data type such as :class:`int` or
    :class:`str`.
 3. When another data type is mixed in, the :attr:`value` attribute is *not the
-   same* as the enum member itself, although it is equivalant and will compare
+   same* as the enum member itself, although it is equivalent and will compare
    equal.
 4. %-style formatting:  `%s` and `%r` call :class:`Enum`'s :meth:`__str__` and
    :meth:`__repr__` respectively; other codes (such as `%i` or `%h` for
@@ -525,8 +586,7 @@ Avoids having to specify the value for each enumeration member::
 
     The :meth:`__new__` method, if defined, is used during creation of the Enum
     members; it is then replaced by Enum's :meth:`__new__` which is used after
-    class creation for lookup of existing members.  Due to the way Enums are
-    supposed to behave, there is no way to customize Enum's :meth:`__new__`.
+    class creation for lookup of existing members.
 
 
 OrderedEnum
@@ -682,7 +742,11 @@ but not of the class::
     >>> dir(Planet.EARTH)
     ['__class__', '__doc__', '__module__', 'name', 'surface_gravity', 'value']
 
-A :meth:`__new__` method will only be used for the creation of the
-:class:`Enum` members -- after that it is replaced.  This means if you wish to
-change how :class:`Enum` members are looked up you either have to write a
-helper function or a :func:`classmethod`.
+The :meth:`__new__` method will only be used for the creation of the
+:class:`Enum` members -- after that it is replaced.  Any custom :meth:`__new__`
+method must create the object and set the :attr:`_value_` attribute
+appropriately.
+
+If you wish to change how :class:`Enum` members are looked up you should either
+write a helper function or a :func:`classmethod` for the :class:`Enum`
+subclass.

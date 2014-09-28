@@ -14,7 +14,7 @@ from test import support
 
 import unittest
 
-from .support import (
+from unittest.test.support import (
     TestEquality, TestHashing, LoggingResult, LegacyLoggingResult,
     ResultWithNoStartTestRunStopTestRun
 )
@@ -407,7 +407,7 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
             def test(self):
                 pass
 
-        self.assertTrue(Foo('test').failureException is AssertionError)
+        self.assertIs(Foo('test').failureException, AssertionError)
 
     # "This class attribute gives the exception raised by the test() method.
     # If a test framework needs to use a specialized exception, possibly to
@@ -425,7 +425,7 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
 
             failureException = RuntimeError
 
-        self.assertTrue(Foo('test').failureException is RuntimeError)
+        self.assertIs(Foo('test').failureException, RuntimeError)
 
 
         Foo('test').run(result)
@@ -448,7 +448,7 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
 
             failureException = RuntimeError
 
-        self.assertTrue(Foo('test').failureException is RuntimeError)
+        self.assertIs(Foo('test').failureException, RuntimeError)
 
 
         Foo('test').run(result)
@@ -760,7 +760,7 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
             msg = e.args[0]
         else:
             self.fail('assertSequenceEqual did not fail.')
-        self.assertTrue(len(msg) < len(diff))
+        self.assertLess(len(msg), len(diff))
         self.assertIn(omitted, msg)
 
         self.maxDiff = len(diff) * 2
@@ -770,7 +770,7 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
             msg = e.args[0]
         else:
             self.fail('assertSequenceEqual did not fail.')
-        self.assertTrue(len(msg) > len(diff))
+        self.assertGreater(len(msg), len(diff))
         self.assertNotIn(omitted, msg)
 
         self.maxDiff = None
@@ -780,7 +780,7 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
             msg = e.args[0]
         else:
             self.fail('assertSequenceEqual did not fail.')
-        self.assertTrue(len(msg) > len(diff))
+        self.assertGreater(len(msg), len(diff))
         self.assertNotIn(omitted, msg)
 
     def testTruncateMessage(self):
@@ -876,8 +876,6 @@ class Test_TestCase(unittest.TestCase, TestEquality, TestHashing):
         with self.assertRaises(self.failureException) as cm:
             self.assertEqual(s1, s2)
         c = 'xxxx[85 chars]xxxxxxxxxxx'
-        #print()
-        #print(str(cm.exception))
         self.assertEqual(str(cm.exception), "'%sa%s' != '%sb%s'" % (c, p, c, p))
 
         p = 'y' * 100
@@ -1127,6 +1125,18 @@ test case
                 self.failureException, '^Exception not raised by <lambda>$',
                 self.assertRaisesRegex, Exception, 'x',
                 lambda: None)
+
+    def testAssertRaisesRegexInvalidRegex(self):
+        # Issue 20145.
+        class MyExc(Exception):
+            pass
+        self.assertRaises(TypeError, self.assertRaisesRegex, MyExc, lambda: True)
+
+    def testAssertWarnsRegexInvalidRegex(self):
+        # Issue 20145.
+        class MyWarn(Warning):
+            pass
+        self.assertRaises(TypeError, self.assertWarnsRegex, MyWarn, lambda: True)
 
     def testAssertRaisesRegexMismatch(self):
         def Stub():
@@ -1532,6 +1542,32 @@ test case
         with support.disable_gc():
             del case
             self.assertFalse(wr())
+
+    def test_no_exception_leak(self):
+        # Issue #19880: TestCase.run() should not keep a reference
+        # to the exception
+        class MyException(Exception):
+            ninstance = 0
+
+            def __init__(self):
+                MyException.ninstance += 1
+                Exception.__init__(self)
+
+            def __del__(self):
+                MyException.ninstance -= 1
+
+        class TestCase(unittest.TestCase):
+            def test1(self):
+                raise MyException()
+
+            @unittest.expectedFailure
+            def test2(self):
+                raise MyException()
+
+        for method_name in ('test1', 'test2'):
+            testcase = TestCase(method_name)
+            testcase.run()
+            self.assertEqual(MyException.ninstance, 0)
 
 
 if __name__ == "__main__":

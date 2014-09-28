@@ -37,12 +37,12 @@ class TestMockingMagicMethods(unittest.TestCase):
             return self, 'fish'
 
         mock.__getitem__ = f
-        self.assertFalse(mock.__getitem__ is f)
+        self.assertIsNot(mock.__getitem__, f)
         self.assertEqual(mock['foo'], (mock, 'fish'))
         self.assertEqual(mock.__getitem__('foo'), (mock, 'fish'))
 
         mock.__getitem__ = mock
-        self.assertTrue(mock.__getitem__ is mock)
+        self.assertIs(mock.__getitem__, mock)
 
 
     def test_magic_methods_isolated_between_mocks(self):
@@ -126,6 +126,31 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(7 + mock, mock)
         self.assertEqual(mock.value, 16)
 
+    def test_division(self):
+        original = mock = Mock()
+        mock.value = 32
+        self.assertRaises(TypeError, lambda: mock / 2)
+
+        def truediv(self, other):
+            mock.value /= other
+            return self
+        mock.__truediv__ = truediv
+        self.assertEqual(mock / 2, mock)
+        self.assertEqual(mock.value, 16)
+
+        del mock.__truediv__
+        def itruediv(mock):
+            mock /= 4
+        self.assertRaises(TypeError, itruediv, mock)
+        mock.__itruediv__ = truediv
+        mock /= 8
+        self.assertEqual(mock, original)
+        self.assertEqual(mock.value, 2)
+
+        self.assertRaises(TypeError, lambda: 8 / mock)
+        mock.__rtruediv__ = truediv
+        self.assertEqual(0.5 / mock, mock)
+        self.assertEqual(mock.value, 4)
 
     def test_hash(self):
         mock = Mock()
@@ -212,8 +237,8 @@ class TestMockingMagicMethods(unittest.TestCase):
         self.assertEqual(len(mock), 6)
 
         mock.__contains__ = lambda s, o: o == 3
-        self.assertTrue(3 in mock)
-        self.assertFalse(6 in mock)
+        self.assertIn(3, mock)
+        self.assertNotIn(6, mock)
 
         mock.__iter__ = lambda s: iter('foobarbaz')
         self.assertEqual(list(mock), list('foobarbaz'))

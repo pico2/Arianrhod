@@ -96,7 +96,7 @@ class GeneralTests(unittest.TestCase):
 
     def testTimeoutDefault(self):
         mock_socket.reply_with(b"220 Hola mundo")
-        self.assertTrue(mock_socket.getdefaulttimeout() is None)
+        self.assertIsNone(mock_socket.getdefaulttimeout())
         mock_socket.setdefaulttimeout(30)
         self.assertEqual(mock_socket.getdefaulttimeout(), 30)
         try:
@@ -108,13 +108,13 @@ class GeneralTests(unittest.TestCase):
 
     def testTimeoutNone(self):
         mock_socket.reply_with(b"220 Hola mundo")
-        self.assertTrue(socket.getdefaulttimeout() is None)
+        self.assertIsNone(socket.getdefaulttimeout())
         socket.setdefaulttimeout(30)
         try:
             smtp = smtplib.SMTP(HOST, self.port, timeout=None)
         finally:
             socket.setdefaulttimeout(None)
-        self.assertTrue(smtp.sock.gettimeout() is None)
+        self.assertIsNone(smtp.sock.gettimeout())
         smtp.close()
 
     def testTimeoutValue(self):
@@ -563,6 +563,33 @@ class BadHELOServerTests(unittest.TestCase):
                             HOST, self.port, 'localhost', 3)
 
 
+@unittest.skipUnless(threading, 'Threading required for this test.')
+class TooLongLineTests(unittest.TestCase):
+    respdata = b'250 OK' + (b'.' * smtplib._MAXLINE * 2) + b'\n'
+
+    def setUp(self):
+        self.old_stdout = sys.stdout
+        self.output = io.StringIO()
+        sys.stdout = self.output
+
+        self.evt = threading.Event()
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(15)
+        self.port = support.bind_port(self.sock)
+        servargs = (self.evt, self.respdata, self.sock)
+        threading.Thread(target=server, args=servargs).start()
+        self.evt.wait()
+        self.evt.clear()
+
+    def tearDown(self):
+        self.evt.wait()
+        sys.stdout = self.old_stdout
+
+    def testLineTooLong(self):
+        self.assertRaises(smtplib.SMTPResponseException, smtplib.SMTP,
+                          HOST, self.port, 'localhost', 3)
+
+
 sim_users = {'Mr.A@somewhere.com':'John A',
              'Ms.B@xn--fo-fka.com':'Sally B',
              'Mrs.C@somewhereesle.com':'Ruth C',
@@ -592,6 +619,7 @@ class SimSMTPChannel(smtpd.SMTPChannel):
     data_response = None
     rcpt_count = 0
     rset_count = 0
+    disconnect = 0
 
     def __init__(self, extra_features, *args, **kw):
         self._extrafeatures = ''.join(
@@ -657,6 +685,8 @@ class SimSMTPChannel(smtpd.SMTPChannel):
             super().smtp_MAIL(arg)
         else:
             self.push(self.mail_response)
+            if self.disconnect:
+                self.close_when_done()
 
     def smtp_RCPT(self, arg):
         if self.rcpt_response is None:
@@ -819,6 +849,30 @@ class SMTPSimTests(unittest.TestCase):
             self.assertIn(sim_auth_credentials['cram-md5'], str(err))
         smtp.close()
 
+    def testAUTH_multiple(self):
+        # Test that multiple authentication methods are tried.
+        self.serv.add_feature("AUTH BOGUS PLAIN LOGIN CRAM-MD5")
+        smtp = smtplib.SMTP(HOST, self.port, local_hostname='localhost', timeout=15)
+        try: smtp.login(sim_auth[0], sim_auth[1])
+        except smtplib.SMTPAuthenticationError as err:
+            self.assertIn(sim_auth_login_password, str(err))
+        smtp.close()
+
+    def test_quit_resets_greeting(self):
+        smtp = smtplib.SMTP(HOST, self.port,
+                            local_hostname='localhost',
+                            timeout=15)
+        code, message = smtp.ehlo()
+        self.assertEqual(code, 250)
+        self.assertIn('size', smtp.esmtp_features)
+        smtp.quit()
+        self.assertNotIn('size', smtp.esmtp_features)
+        smtp.connect(HOST, self.port)
+        self.assertNotIn('size', smtp.esmtp_features)
+        smtp.ehlo_or_helo_if_needed()
+        self.assertIn('size', smtp.esmtp_features)
+        smtp.quit()
+
     def test_with_statement(self):
         with smtplib.SMTP(HOST, self.port) as smtp:
             code, message = smtp.noop()
@@ -838,6 +892,16 @@ class SMTPSimTests(unittest.TestCase):
 
     #TODO: add tests for correct AUTH method fallback now that the
     #test infrastructure can support it.
+
+    # Issue 17498: make sure _rset does not raise SMTPServerDisconnected exception
+    def test__rest_from_mail_cmd(self):
+        smtp = smtplib.SMTP(HOST, self.port, local_hostname='localhost', timeout=15)
+        smtp.noop()
+        self.serv._SMTPchannel.mail_response = '451 Requested action aborted'
+        self.serv._SMTPchannel.disconnect = True
+        with self.assertRaises(smtplib.SMTPSenderRefused):
+            smtp.sendmail('John', 'Sally', 'test message')
+        self.assertIsNone(smtp.sock)
 
     # Issue 5713: make sure close, not rset, is called if we get a 421 error
     def test_421_from_mail_cmd(self):
@@ -879,7 +943,8 @@ class SMTPSimTests(unittest.TestCase):
 def test_main(verbose=None):
     support.run_unittest(GeneralTests, DebuggingServerTests,
                               NonConnectingTests,
-                              BadHELOServerTests, SMTPSimTests)
+                              BadHELOServerTests, SMTPSimTests,
+                              TooLongLineTests)
 
 if __name__ == '__main__':
     test_main()

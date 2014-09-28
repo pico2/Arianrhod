@@ -1,10 +1,12 @@
-from importlib import machinery
 from . import util as ext_util
 from .. import abc
 from .. import util
 
+machinery = util.import_importlib('importlib.machinery')
+
 import os.path
 import sys
+import types
 import unittest
 
 
@@ -13,8 +15,8 @@ class LoaderTests(abc.LoaderTests):
     """Test load_module() for extension modules."""
 
     def setUp(self):
-        self.loader = machinery.ExtensionFileLoader(ext_util.NAME,
-                                                     ext_util.FILEPATH)
+        self.loader = self.machinery.ExtensionFileLoader(ext_util.NAME,
+                                                         ext_util.FILEPATH)
 
     def load_module(self, fullname):
         return self.loader.load_module(fullname)
@@ -26,6 +28,15 @@ class LoaderTests(abc.LoaderTests):
         with self.assertRaises(ImportError):
             self.load_module('XXX')
 
+    def test_equality(self):
+        other = self.machinery.ExtensionFileLoader(ext_util.NAME,
+                                                   ext_util.FILEPATH)
+        self.assertEqual(self.loader, other)
+
+    def test_inequality(self):
+        other = self.machinery.ExtensionFileLoader('_' + ext_util.NAME,
+                                                   ext_util.FILEPATH)
+        self.assertNotEqual(self.loader, other)
 
     def test_module(self):
         with util.uncache(ext_util.NAME):
@@ -36,15 +47,13 @@ class LoaderTests(abc.LoaderTests):
                 self.assertEqual(getattr(module, attr), value)
             self.assertIn(ext_util.NAME, sys.modules)
             self.assertIsInstance(module.__loader__,
-                                  machinery.ExtensionFileLoader)
+                                  self.machinery.ExtensionFileLoader)
 
-    def test_package(self):
-        # No extension module as __init__ available for testing.
-        pass
+    # No extension module as __init__ available for testing.
+    test_package = None
 
-    def test_lacking_parent(self):
-        # No extension module in a package available for testing.
-        pass
+    # No extension module in a package available for testing.
+    test_lacking_parent = None
 
     def test_module_reuse(self):
         with util.uncache(ext_util.NAME):
@@ -52,9 +61,8 @@ class LoaderTests(abc.LoaderTests):
             module2 = self.load_module(ext_util.NAME)
             self.assertIs(module1, module2)
 
-    def test_state_after_failure(self):
-        # No easy way to trigger a failure after a successful import.
-        pass
+    # No easy way to trigger a failure after a successful import.
+    test_state_after_failure = None
 
     def test_unloadable(self):
         name = 'asdfjkl;'
@@ -64,16 +72,15 @@ class LoaderTests(abc.LoaderTests):
 
     def test_is_package(self):
         self.assertFalse(self.loader.is_package(ext_util.NAME))
-        for suffix in machinery.EXTENSION_SUFFIXES:
+        for suffix in self.machinery.EXTENSION_SUFFIXES:
             path = os.path.join('some', 'path', 'pkg', '__init__' + suffix)
-            loader = machinery.ExtensionFileLoader('pkg', path)
+            loader = self.machinery.ExtensionFileLoader('pkg', path)
             self.assertTrue(loader.is_package('pkg'))
 
+Frozen_LoaderTests, Source_LoaderTests = util.test_both(
+        LoaderTests, machinery=machinery)
 
-def test_main():
-    from test.support import run_unittest
-    run_unittest(LoaderTests)
 
 
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

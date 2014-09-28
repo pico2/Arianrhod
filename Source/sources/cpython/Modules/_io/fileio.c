@@ -59,6 +59,8 @@ typedef struct {
 
 PyTypeObject PyFileIO_Type;
 
+_Py_IDENTIFIER(name);
+
 #define PyFileIO_Check(op) (PyObject_TypeCheck((op), &PyFileIO_Type))
 
 int
@@ -427,7 +429,7 @@ fileio_init(PyObject *oself, PyObject *args, PyObject *kwds)
     _setmode(self->fd, O_BINARY);
 #endif
 
-    if (PyObject_SetAttrString((PyObject *)self, "name", nameobj) < 0)
+    if (_PyObject_SetAttrId((PyObject *)self, &PyId_name, nameobj) < 0)
         goto error;
 
     if (self->appending) {
@@ -491,8 +493,10 @@ err_closed(void)
 static PyObject *
 err_mode(char *action)
 {
-    PyErr_Format(IO_STATE->unsupported_operation,
-                 "File not open for %s", action);
+    _PyIO_State *state = IO_STATE();
+    if (state != NULL)
+        PyErr_Format(state->unsupported_operation,
+                     "File not open for %s", action);
     return NULL;
 }
 
@@ -687,9 +691,9 @@ fileio_readall(fileio *self)
                 }
                 continue;
             }
-            if (bytes_read > 0)
-                break;
             if (errno == EAGAIN) {
+                if (bytes_read > 0)
+                    break;
                 Py_DECREF(result);
                 Py_RETURN_NONE;
             }
@@ -1036,7 +1040,6 @@ mode_string(fileio *self)
 static PyObject *
 fileio_repr(fileio *self)
 {
-    _Py_IDENTIFIER(name);
     PyObject *nameobj, *res;
 
     if (self->fd < 0)

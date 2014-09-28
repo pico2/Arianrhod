@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright 2001-2013 by Vinay Sajip. All Rights Reserved.
 #
 # Permission to use, copy, modify, and distribute this software and its
@@ -41,6 +39,7 @@ import socket
 import struct
 import sys
 import tempfile
+from test.script_helper import assert_python_ok
 from test.support import (captured_stdout, run_with_locale, run_unittest,
                           patch, requires_zlib, TestHandler, Matcher)
 import textwrap
@@ -314,6 +313,10 @@ class BuiltinLevelsTest(BaseTest):
             ('INF.BADPARENT', 'INFO', '4'),
         ])
 
+    def test_regression_22386(self):
+        """See issue #22386 for more information."""
+        self.assertEqual(logging.getLevelName('INFO'), logging.INFO)
+        self.assertEqual(logging.getLevelName(logging.INFO), 'INFO')
 
 class BasicFilterTest(BaseTest):
 
@@ -590,12 +593,16 @@ class HandlerTest(BaseTest):
             for _ in range(tries):
                 try:
                     os.unlink(fname)
+                    self.deletion_time = time.time()
                 except OSError:
                     pass
                 time.sleep(0.004 * random.randint(0, 4))
 
         del_count = 500
         log_count = 500
+
+        self.handle_time = None
+        self.deletion_time = None
 
         for delay in (False, True):
             fd, fn = tempfile.mkstemp('.log', 'test_logging-3-')
@@ -610,7 +617,14 @@ class HandlerTest(BaseTest):
                 for _ in range(log_count):
                     time.sleep(0.005)
                     r = logging.makeLogRecord({'msg': 'testing' })
-                    h.handle(r)
+                    try:
+                        self.handle_time = time.time()
+                        h.handle(r)
+                    except Exception:
+                        print('Deleted at %s, '
+                              'opened at %s' % (self.deletion_time,
+                                                self.handle_time))
+                        raise
             finally:
                 remover.join()
                 h.close()
@@ -855,9 +869,6 @@ if threading:
             super(TestTCPServer, self).server_bind()
             self.port = self.socket.getsockname()[1]
 
-    class TestUnixStreamServer(TestTCPServer):
-        address_family = socket.AF_UNIX
-
     class TestUDPServer(ControlMixin, ThreadingUDPServer):
         """
         A UDP server which is controllable using :class:`ControlMixin`.
@@ -905,26 +916,32 @@ if threading:
             super(TestUDPServer, self).server_close()
             self._closed = True
 
-    class TestUnixDatagramServer(TestUDPServer):
-        address_family = socket.AF_UNIX
+    if hasattr(socket, "AF_UNIX"):
+        class TestUnixStreamServer(TestTCPServer):
+            address_family = socket.AF_UNIX
+
+        class TestUnixDatagramServer(TestUDPServer):
+            address_family = socket.AF_UNIX
 
 # - end of server_helper section
 
 @unittest.skipUnless(threading, 'Threading required for this test.')
 class SMTPHandlerTest(BaseTest):
+    TIMEOUT = 8.0
     def test_basic(self):
         sockmap = {}
         server = TestSMTPServer(('localhost', 0), self.process_message, 0.001,
                                 sockmap)
         server.start()
         addr = ('localhost', server.port)
-        h = logging.handlers.SMTPHandler(addr, 'me', 'you', 'Log', timeout=5.0)
+        h = logging.handlers.SMTPHandler(addr, 'me', 'you', 'Log',
+                                         timeout=self.TIMEOUT)
         self.assertEqual(h.toaddrs, ['you'])
         self.messages = []
         r = logging.makeLogRecord({'msg': 'Hello'})
         self.handled = threading.Event()
         h.handle(r)
-        self.handled.wait(5.0)  # 14314: don't wait forever
+        self.handled.wait(self.TIMEOUT)  # 14314: don't wait forever
         server.stop()
         self.assertTrue(self.handled.is_set())
         self.assertEqual(len(self.messages), 1)
@@ -1445,12 +1462,13 @@ def _get_temp_domain_socket():
     os.remove(fn)
     return fn
 
+@unittest.skipUnless(hasattr(socket, "AF_UNIX"), "Unix sockets required")
 @unittest.skipUnless(threading, 'Threading required for this test.')
 class UnixSocketHandlerTest(SocketHandlerTest):
 
     """Test for SocketHandler with unix sockets."""
 
-    if threading:
+    if threading and hasattr(socket, "AF_UNIX"):
         server_class = TestUnixStreamServer
 
     def setUp(self):
@@ -1516,13 +1534,13 @@ class DatagramHandlerTest(BaseTest):
         self.handled.wait()
         self.assertEqual(self.log_output, "spam\neggs\n")
 
-
+@unittest.skipUnless(hasattr(socket, "AF_UNIX"), "Unix sockets required")
 @unittest.skipUnless(threading, 'Threading required for this test.')
 class UnixDatagramHandlerTest(DatagramHandlerTest):
 
     """Test for DatagramHandler using Unix sockets."""
 
-    if threading:
+    if threading and hasattr(socket, "AF_UNIX"):
         server_class = TestUnixDatagramServer
 
     def setUp(self):
@@ -1591,13 +1609,13 @@ class SysLogHandlerTest(BaseTest):
         self.handled.wait()
         self.assertEqual(self.log_output, b'<11>h\xc3\xa4m-sp\xc3\xa4m')
 
-
+@unittest.skipUnless(hasattr(socket, "AF_UNIX"), "Unix sockets required")
 @unittest.skipUnless(threading, 'Threading required for this test.')
 class UnixSysLogHandlerTest(SysLogHandlerTest):
 
     """Test for SysLogHandler with Unix sockets."""
 
-    if threading:
+    if threading and hasattr(socket, "AF_UNIX"):
         server_class = TestUnixDatagramServer
 
     def setUp(self):
@@ -3384,6 +3402,25 @@ class ModuleLevelMiscTest(BaseTest):
         logging.setLoggerClass(logging.Logger)
         self.assertEqual(logging.getLoggerClass(), logging.Logger)
 
+    def test_logging_at_shutdown(self):
+        # Issue #20037
+        code = """if 1:
+            import logging
+
+            class A:
+                def __del__(self):
+                    try:
+                        raise ValueError("some error")
+                    except Exception:
+                        logging.exception("exception in __del__")
+
+            a = A()"""
+        rc, out, err = assert_python_ok("-c", code)
+        err = err.decode()
+        self.assertIn("exception in __del__", err)
+        self.assertIn("ValueError: some error", err)
+
+
 class LogRecordTest(BaseTest):
     def test_str_rep(self):
         r = logging.makeLogRecord({})
@@ -3483,6 +3520,22 @@ class BasicConfigTest(unittest.TestCase):
 
         # level is not explicitly set
         self.assertEqual(logging.root.level, self.original_logging_level)
+
+    def test_strformatstyle(self):
+        with captured_stdout() as output:
+            logging.basicConfig(stream=sys.stdout, style="{")
+            logging.error("Log an error")
+            sys.stdout.seek(0)
+            self.assertEqual(output.getvalue().strip(),
+                "ERROR:root:Log an error")
+
+    def test_stringtemplatestyle(self):
+        with captured_stdout() as output:
+            logging.basicConfig(stream=sys.stdout, style="$")
+            logging.error("Log an error")
+            sys.stdout.seek(0)
+            self.assertEqual(output.getvalue().strip(),
+                "ERROR:root:Log an error")
 
     def test_filename(self):
 

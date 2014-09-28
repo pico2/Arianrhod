@@ -15,16 +15,16 @@ struct PyExpat_CAPI
     int MICRO_VERSION;
     /* pointers to selected expat functions.  add new functions at
        the end, if needed */
-    const XML_LChar * (*ErrorString)(enum XML_Error code);
-    enum XML_Error (*GetErrorCode)(XML_Parser parser);
-    XML_Size (*GetErrorColumnNumber)(XML_Parser parser);
-    XML_Size (*GetErrorLineNumber)(XML_Parser parser);
+    const XML_LChar * (__cdecl *ErrorString)(enum XML_Error code);
+    enum XML_Error (__cdecl *GetErrorCode)(XML_Parser parser);
+    XML_Size (__cdecl *GetErrorColumnNumber)(XML_Parser parser);
+    XML_Size (__cdecl *GetErrorLineNumber)(XML_Parser parser);
     enum XML_Status (*Parse)(
         XML_Parser parser, const char *s, int len, int isFinal);
     XML_Parser (*ParserCreate_MM)(
         const XML_Char *encoding, const XML_Memory_Handling_Suite *memsuite,
         const XML_Char *namespaceSeparator);
-    void (*ParserFree)(XML_Parser parser);
+    void (__cdecl *ParserFree)(XML_Parser parser);
     void (*SetCharacterDataHandler)(
         XML_Parser parser, XML_CharacterDataHandler handler);
     void (*SetCommentHandler)(
@@ -42,10 +42,10 @@ struct PyExpat_CAPI
     void (*SetUnknownEncodingHandler)(
         XML_Parser parser, XML_UnknownEncodingHandler handler,
         void *encodingHandlerData);
-    void (*SetUserData)(XML_Parser parser, void *userData);
-    void (*SetStartDoctypeDeclHandler)(XML_Parser parser,
+    void (__cdecl *SetUserData)(XML_Parser parser, void *userData);
+    void (__cdecl *SetStartDoctypeDeclHandler)(XML_Parser parser,
                                        XML_StartDoctypeDeclHandler start);
-    enum XML_Status (*SetEncoding)(XML_Parser parser, const XML_Char *encoding);
+    enum XML_Status (__cdecl *SetEncoding)(XML_Parser parser, const XML_Char *encoding);
     int (*DefaultUnknownEncodingHandler)(
         void *encodingHandlerData, const XML_Char *name, XML_Encoding *info);
     /* always add new stuff to the end! */

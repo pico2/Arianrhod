@@ -60,8 +60,8 @@ Object Protocol
    Generic attribute getter function that is meant to be put into a type
    object's ``tp_getattro`` slot.  It looks for a descriptor in the dictionary
    of classes in the object's MRO as well as an attribute in the object's
-   :attr:`__dict__` (if present).  As outlined in :ref:`descriptors`, data
-   descriptors take preference over instance attributes, while non-data
+   :attr:`~object.__dict__` (if present).  As outlined in :ref:`descriptors`,
+   data descriptors take preference over instance attributes, while non-data
    descriptors don't.  Otherwise, an :exc:`AttributeError` is raised.
 
 
@@ -85,8 +85,8 @@ Object Protocol
    object's ``tp_setattro`` slot.  It looks for a data descriptor in the
    dictionary of classes in the object's MRO, and if found it takes preference
    over setting the attribute in the instance dictionary. Otherwise, the
-   attribute is set in the object's :attr:`__dict__` (if present).  Otherwise,
-   an :exc:`AttributeError` is raised and ``-1`` is returned.
+   attribute is set in the object's :attr:`~object.__dict__` (if present).
+   Otherwise, an :exc:`AttributeError` is raised and ``-1`` is returned.
 
 
 .. c:function:: int PyObject_DelAttr(PyObject *o, PyObject *attr_name)
@@ -149,6 +149,9 @@ Object Protocol
    representation on success, *NULL* on failure.  This is the equivalent of the
    Python expression ``repr(o)``.  Called by the :func:`repr` built-in function.
 
+   .. versionchanged:: 3.4
+      This function now includes a debug assertion to help ensure that it
+      does not silently discard an active exception.
 
 .. c:function:: PyObject* PyObject_ASCII(PyObject *o)
 
@@ -170,6 +173,10 @@ Object Protocol
    Python expression ``str(o)``.  Called by the :func:`str` built-in function
    and, therefore, by the :func:`print` function.
 
+   .. versionchanged:: 3.4
+      This function now includes a debug assertion to help ensure that it
+      does not silently discard an active exception.
+
 .. c:function:: PyObject* PyObject_Bytes(PyObject *o)
 
    .. index:: builtin: bytes
@@ -189,9 +196,9 @@ Object Protocol
    be done against every entry in *cls*. The result will be ``1`` when at least one
    of the checks returns ``1``, otherwise it will be ``0``. If *inst* is not a
    class instance and *cls* is neither a type object, nor a class object, nor a
-   tuple, *inst* must have a :attr:`__class__` attribute --- the class relationship
-   of the value of that attribute with *cls* will be used to determine the result
-   of this function.
+   tuple, *inst* must have a :attr:`~instance.__class__` attribute --- the
+   class relationship of the value of that attribute with *cls* will be used
+   to determine the result of this function.
 
 
 Subclass determination is done in a fairly straightforward way, but includes a
@@ -201,9 +208,9 @@ of.  If :class:`A` and :class:`B` are class objects, :class:`B` is a subclass of
 either is not a class object, a more general mechanism is used to determine the
 class relationship of the two objects.  When testing if *B* is a subclass of
 *A*, if *A* is *B*, :c:func:`PyObject_IsSubclass` returns true.  If *A* and *B*
-are different objects, *B*'s :attr:`__bases__` attribute is searched in a
-depth-first fashion for *A* --- the presence of the :attr:`__bases__` attribute
-is considered sufficient for this determination.
+are different objects, *B*'s :attr:`~class.__bases__` attribute is searched in
+a depth-first fashion for *A* --- the presence of the :attr:`~class.__bases__`
+attribute is considered sufficient for this determination.
 
 
 .. c:function:: int PyObject_IsSubclass(PyObject *derived, PyObject *cls)
@@ -350,12 +357,13 @@ is considered sufficient for this determination.
 
 .. c:function:: Py_ssize_t PyObject_LengthHint(PyObject *o, Py_ssize_t default)
 
-   Return an estimated length for the object *o*. First trying to return its
-   actual length, then an estimate using ``__length_hint__``, and finally
-   returning the default value. On error ``-1`` is returned. This is the
+   Return an estimated length for the object *o*. First try to return its
+   actual length, then an estimate using :meth:`~object.__length_hint__`, and
+   finally return the default value. On error return ``-1``. This is the
    equivalent to the Python expression ``operator.length_hint(o, default)``.
 
    .. versionadded:: 3.4
+
 
 .. c:function:: PyObject* PyObject_GetItem(PyObject *o, PyObject *key)
 

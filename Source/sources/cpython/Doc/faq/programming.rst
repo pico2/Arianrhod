@@ -352,6 +352,62 @@ the import inside the class but outside of any method still causes the import to
 occur when the module is initialized.
 
 
+Why are default values shared between objects?
+----------------------------------------------
+
+This type of bug commonly bites neophyte programmers.  Consider this function::
+
+   def foo(mydict={}):  # Danger: shared reference to one dict for all calls
+       ... compute something ...
+       mydict[key] = value
+       return mydict
+
+The first time you call this function, ``mydict`` contains a single item.  The
+second time, ``mydict`` contains two items because when ``foo()`` begins
+executing, ``mydict`` starts out with an item already in it.
+
+It is often expected that a function call creates new objects for default
+values. This is not what happens. Default values are created exactly once, when
+the function is defined.  If that object is changed, like the dictionary in this
+example, subsequent calls to the function will refer to this changed object.
+
+By definition, immutable objects such as numbers, strings, tuples, and ``None``,
+are safe from change. Changes to mutable objects such as dictionaries, lists,
+and class instances can lead to confusion.
+
+Because of this feature, it is good programming practice to not use mutable
+objects as default values.  Instead, use ``None`` as the default value and
+inside the function, check if the parameter is ``None`` and create a new
+list/dictionary/whatever if it is.  For example, don't write::
+
+   def foo(mydict={}):
+       ...
+
+but::
+
+   def foo(mydict=None):
+       if mydict is None:
+           mydict = {}  # create a new dict for local namespace
+
+This feature can be useful.  When you have a function that's time-consuming to
+compute, a common technique is to cache the parameters and the resulting value
+of each call to the function, and return the cached value if the same value is
+requested again.  This is called "memoizing", and can be implemented like this::
+
+   # Callers will never provide a third parameter for this function.
+   def expensive(arg1, arg2, _cache={}):
+       if (arg1, arg2) in _cache:
+           return _cache[(arg1, arg2)]
+
+       # Calculate the value
+       result = ... expensive computation ...
+       _cache[(arg1, arg2)] = result  # Store result in the cache
+       return result
+
+You could use a global variable containing a dictionary instead of the default
+value; it's a matter of taste.
+
+
 How can I pass optional or keyword parameters from one function to another?
 ---------------------------------------------------------------------------
 
@@ -711,7 +767,7 @@ By default, these interpret the number as decimal, so that ``int('0144') ==
 144`` and ``int('0x144')`` raises :exc:`ValueError`. ``int(string, base)`` takes
 the base to convert from as a second optional argument, so ``int('0x144', 16) ==
 324``.  If the base is specified as 0, the number is interpreted using Python's
-rules: a leading '0' indicates octal, and '0x' indicates a hex number.
+rules: a leading '0o' indicates octal, and '0x' indicates a hex number.
 
 Do not use the built-in function :func:`eval` if all you need is to convert
 strings to numbers.  :func:`eval` will be significantly slower and it presents a
@@ -732,7 +788,7 @@ To convert, e.g., the number 144 to the string '144', use the built-in type
 constructor :func:`str`.  If you want a hexadecimal or octal representation, use
 the built-in functions :func:`hex` or :func:`oct`.  For fancy formatting, see
 the :ref:`string-formatting` section, e.g. ``"{:04d}".format(144)`` yields
-``'0144'`` and ``"{:.3f}".format(1/3)`` yields ``'0.333'``.
+``'0144'`` and ``"{:.3f}".format(1.0/3.0)`` yields ``'0.333'``.
 
 
 How do I modify a string in place?
@@ -1103,6 +1159,7 @@ Use a list comprehension::
 
    result = [obj.method() for obj in mylist]
 
+.. _faq-augmented-assignment-tuple-error:
 
 Why does a_tuple[i] += ['item'] raise an exception when the addition works?
 ---------------------------------------------------------------------------
@@ -1193,34 +1250,10 @@ that final assignment still results in an error, because tuples are immutable.
 Dictionaries
 ============
 
-How can I get a dictionary to display its keys in a consistent order?
----------------------------------------------------------------------
+How can I get a dictionary to store and display its keys in a consistent order?
+-------------------------------------------------------------------------------
 
-You can't.  Dictionaries store their keys in an unpredictable order, so the
-display order of a dictionary's elements will be similarly unpredictable.
-
-This can be frustrating if you want to save a printable version to a file, make
-some changes and then compare it with some other printed dictionary.  In this
-case, use the ``pprint`` module to pretty-print the dictionary; the items will
-be presented in order sorted by the key.
-
-A more complicated solution is to subclass ``dict`` to create a
-``SortedDict`` class that prints itself in a predictable order.  Here's one
-simpleminded implementation of such a class::
-
-   class SortedDict(dict):
-       def __repr__(self):
-           keys = sorted(self.keys())
-           result = ("{!r}: {!r}".format(k, self[k]) for k in keys)
-           return "{{{}}}".format(", ".join(result))
-
-       __str__ = __repr__
-
-This will work for many common situations you might encounter, though it's far
-from a perfect solution. The largest flaw is that if some values in the
-dictionary are also dictionaries, their values won't be presented in any
-particular order.
-
+Use :class:`collections.OrderedDict`.
 
 I want to do a complicated sort: can you do a Schwartzian Transform in Python?
 ------------------------------------------------------------------------------
@@ -1599,32 +1632,66 @@ You can program the class's constructor to keep track of all instances by
 keeping a list of weak references to each instance.
 
 
+Why does the result of ``id()`` appear to be not unique?
+--------------------------------------------------------
+
+The :func:`id` builtin returns an integer that is guaranteed to be unique during
+the lifetime of the object.  Since in CPython, this is the object's memory
+address, it happens frequently that after an object is deleted from memory, the
+next freshly created object is allocated at the same position in memory.  This
+is illustrated by this example:
+
+>>> id(1000)
+13901272
+>>> id(2000)
+13901272
+
+The two ids belong to different integer objects that are created before, and
+deleted immediately after execution of the ``id()`` call.  To be sure that
+objects whose id you want to examine are still alive, create another reference
+to the object:
+
+>>> a = 1000; b = 2000
+>>> id(a)
+13901272
+>>> id(b)
+13891296
+
+
 Modules
 =======
 
 How do I create a .pyc file?
 ----------------------------
 
-When a module is imported for the first time (or when the source is more recent
-than the current compiled file) a ``.pyc`` file containing the compiled code
-should be created in the same directory as the ``.py`` file.
+When a module is imported for the first time (or when the source file has
+changed since the current compiled file was created) a ``.pyc`` file containing
+the compiled code should be created in a ``__pycache__`` subdirectory of the
+directory containing the ``.py`` file.  The ``.pyc`` file will have a
+filename that starts with the same name as the ``.py`` file, and ends with
+``.pyc``, with a middle component that depends on the particular ``python``
+binary that created it.  (See :pep:`3147` for details.)
 
-One reason that a ``.pyc`` file may not be created is permissions problems with
-the directory. This can happen, for example, if you develop as one user but run
-as another, such as if you are testing with a web server.  Creation of a .pyc
-file is automatic if you're importing a module and Python has the ability
-(permissions, free space, etc...) to write the compiled module back to the
-directory.
+One reason that a ``.pyc`` file may not be created is a permissions problem
+with the directory containing the source file, meaning that the ``__pycache__``
+subdirectory cannot be created. This can happen, for example, if you develop as
+one user but run as another, such as if you are testing with a web server.
+
+Unless the :envvar:`PYTHONDONTWRITEBYTECODE` environment variable is set,
+creation of a .pyc file is automatic if you're importing a module and Python
+has the ability (permissions, free space, etc...) to create a ``__pycache__``
+subdirectory and write the compiled module to that subdirectory.
 
 Running Python on a top level script is not considered an import and no
 ``.pyc`` will be created.  For example, if you have a top-level module
-``foo.py`` that imports another module ``xyz.py``, when you run ``foo``,
-``xyz.pyc`` will be created since ``xyz`` is imported, but no ``foo.pyc`` file
-will be created since ``foo.py`` isn't being imported.
+``foo.py`` that imports another module ``xyz.py``, when you run ``foo`` (by
+typing ``python foo.py`` as a shell command), a ``.pyc`` will be created for
+``xyz`` because ``xyz`` is imported, but no ``.pyc`` file will be created for
+``foo`` since ``foo.py`` isn't being imported.
 
-If you need to create ``foo.pyc`` -- that is, to create a ``.pyc`` file for a module
-that is not imported -- you can, using the :mod:`py_compile` and
-:mod:`compileall` modules.
+If you need to create a ``.pyc`` file for ``foo`` -- that is, to create a
+``.pyc`` file for a module that is not imported -- you can, using the
+:mod:`py_compile` and :mod:`compileall` modules.
 
 The :mod:`py_compile` module can manually compile any module.  One way is to use
 the ``compile()`` function in that module interactively::
@@ -1632,8 +1699,9 @@ the ``compile()`` function in that module interactively::
    >>> import py_compile
    >>> py_compile.compile('foo.py')                 # doctest: +SKIP
 
-This will write the ``.pyc`` to the same location as ``foo.py`` (or you can
-override that with the optional parameter ``cfile``).
+This will write the ``.pyc`` to a ``__pycache__`` subdirectory in the same
+location as ``foo.py`` (or you can override that with the optional parameter
+``cfile``).
 
 You can also automatically compile all files in a directory or directories using
 the :mod:`compileall` module.  You can do it from the shell prompt by running
@@ -1718,19 +1786,10 @@ These solutions are not mutually exclusive.
 __import__('x.y.z') returns <module 'x'>; how do I get z?
 ---------------------------------------------------------
 
-Try::
+Consider using the convenience function :func:`~importlib.import_module` from
+:mod:`importlib` instead::
 
-   __import__('x.y.z').y.z
-
-For more realistic situations, you may have to do something like ::
-
-   m = __import__(s)
-   for i in s.split(".")[1:]:
-       m = getattr(m, i)
-
-See :mod:`importlib` for a convenience function called
-:func:`~importlib.import_module`.
-
+   z = importlib.import_module('x.y.z')
 
 
 When I edit an imported module and reimport it, the changes don't show up.  Why does this happen?

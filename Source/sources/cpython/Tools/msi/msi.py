@@ -100,8 +100,8 @@ extensions = [
     '_lzma.pyd',
     '_decimal.pyd',
     '_testbuffer.pyd',
-    '_sha3.pyd',
     '_testimportmultiple.pyd',
+    '_overlapped.pyd',
 ]
 
 # Well-known component UUIDs
@@ -420,6 +420,8 @@ def add_ui(db):
 
     compileargs = r'-Wi "[TARGETDIR]Lib\compileall.py" -f -x "bad_coding|badsyntax|site-packages|py2_|lib2to3\\tests|venv\\scripts" "[TARGETDIR]Lib"'
     lib2to3args = r'-c "import lib2to3.pygram, lib2to3.patcomp;lib2to3.patcomp.PatternCompiler()"'
+    updatepipargs = r'-m ensurepip -U --default-pip'
+    removepipargs = r'-B -m ensurepip._uninstall'
     # See "CustomAction Table"
     add_data(db, "CustomAction", [
         # msidbCustomActionTypeFirstSequence + msidbCustomActionTypeTextData + msidbCustomActionTypeProperty
@@ -433,9 +435,13 @@ def add_ui(db):
         ("SetLauncherDirToWindows", 307, "LAUNCHERDIR", "[WindowsFolder]"),
         # msidbCustomActionTypeExe + msidbCustomActionTypeSourceFile
         # See "Custom Action Type 18"
-        ("CompilePyc", 18, "python.exe", compileargs),
-        ("CompilePyo", 18, "python.exe", "-O "+compileargs),
-        ("CompileGrammar", 18, "python.exe", lib2to3args),
+        # msidbCustomActionTypeInScript (1024); run during actual installation
+        # msidbCustomActionTypeNoImpersonate (2048); run action in system account, not user account
+        ("CompilePyc", 18+1024+2048, "python.exe", compileargs),
+        ("CompilePyo", 18+1024+2048, "python.exe", "-O "+compileargs),
+        ("CompileGrammar", 18+1024+2048, "python.exe", lib2to3args),
+        ("UpdatePip", 18+1024+2048, "python.exe", updatepipargs),
+        ("RemovePip", 18+1024+2048, "python.exe", removepipargs),
         ])
 
     # UI Sequences, see "InstallUISequence Table", "Using a Sequence Table"
@@ -462,7 +468,7 @@ def add_ui(db):
 
     # Prepend TARGETDIR to the system path, and remove it on uninstall.
     add_data(db, "Environment",
-             [("PathAddition", "=-*Path", "[TARGETDIR];[~]", "REGISTRY.path")])
+             [("PathAddition", "=-*Path", "[TARGETDIR];[TARGETDIR]Scripts;[~]", "REGISTRY.path")])
 
     # Execute Sequences
     add_data(db, "InstallExecuteSequence",
@@ -472,17 +478,20 @@ def add_ui(db):
              ("SetLauncherDirToWindows", 'LAUNCHERDIR="" and ' + sys32cond, 753),
              ("SetLauncherDirToTarget", 'LAUNCHERDIR="" and not ' + sys32cond, 754),
              ("UpdateEditIDLE", None, 1050),
-             ("CompilePyc", "COMPILEALL", 6800),
-             ("CompilePyo", "COMPILEALL", 6801),
-             ("CompileGrammar", "COMPILEALL", 6802),
+             # run command if install state of pip changes to INSTALLSTATE_LOCAL
+             # run after InstallFiles
+             ("UpdatePip", "&pip_feature=3", 4001),
+             # remove pip when state changes to INSTALLSTATE_ABSENT
+             # run before RemoveFiles
+             ("RemovePip", "&pip_feature=2", 3499),
+             ("CompilePyc", "COMPILEALL", 4002),
+             ("CompilePyo", "COMPILEALL", 4003),
+             ("CompileGrammar", "COMPILEALL", 4004),
             ])
     add_data(db, "AdminExecuteSequence",
             [("InitialTargetDir", 'TARGETDIR=""', 750),
              ("SetDLLDirToTarget", 'DLLDIR=""', 751),
              ("SetLauncherDirToTarget", 'LAUNCHERDIR=""', 752),
-             ("CompilePyc", "COMPILEALL", 6800),
-             ("CompilePyo", "COMPILEALL", 6801),
-             ("CompileGrammar", "COMPILEALL", 6802),
             ])
 
     #####################################################################
@@ -751,7 +760,8 @@ def add_ui(db):
     advanced = PyDialog(db, "AdvancedDlg", x, y, w, h, modal, title,
                         "CompilePyc", "Ok", "Ok")
     advanced.title("Advanced Options for [ProductName]")
-    # A radio group with two options: allusers, justme
+
+    # A checkbox whether to build pyc files
     advanced.checkbox("CompilePyc", 135, 60, 230, 50, 3,
                       "COMPILEALL", "Compile .py files to byte code after installation", "Ok")
 
@@ -848,7 +858,8 @@ def add_features(db):
     # (i.e. additional Python libraries) need to follow the parent feature.
     # Features that have no advertisement trigger (e.g. the test suite)
     # must not support advertisement
-    global default_feature, tcltk, htmlfiles, tools, testsuite, ext_feature, private_crt, prepend_path
+    global default_feature, tcltk, htmlfiles, tools, testsuite
+    global ext_feature, private_crt, prepend_path, pip_feature
     default_feature = Feature(db, "DefaultFeature", "Python",
                               "Python Interpreter and Libraries",
                               1, directory = "TARGETDIR")
@@ -870,8 +881,14 @@ def add_features(db):
     tools = Feature(db, "Tools", "Utility Scripts",
                     "Python utility scripts (Tools/)", 9,
                     parent = default_feature, attributes=2)
+    # pip installation isn't enabled by default until a clean uninstall procedure
+    # becomes possible
+    pip_feature = Feature(db, "pip_feature", "pip",
+                    "Install (or upgrade from an earlier version) pip, "
+                    "a tool for installing and managing Python packages.", 11,
+                    parent = default_feature, attributes=2|8)
     testsuite = Feature(db, "Testsuite", "Test suite",
-                        "Python test suite (Lib/test/)", 11,
+                        "Python test suite (Lib/test/)", 13,
                         parent = default_feature, attributes=2|8)
     # prepend_path is an additional feature which is to be off by default.
     # Since the default level for the above features is 1, this needs to be
@@ -879,7 +896,7 @@ def add_features(db):
     prepend_path = Feature(db, "PrependPath", "Add python.exe to Path",
                         "Prepend [TARGETDIR] to the system Path variable. "
                         "This allows you to type 'python' into a command "
-                        "prompt without needing the full path.", 13,
+                        "prompt without needing the full path.", 15,
                         parent = default_feature, attributes=2|8,
                         level=2)
 
@@ -1186,6 +1203,8 @@ def add_registry(db):
                "Documentation"),
               ("REGISTRY.path", msilib.gen_uuid(), "TARGETDIR", registry_component, None,
               None),
+              ("REGISTRY.ensurepip", msilib.gen_uuid(), "TARGETDIR", registry_component, "EnsurePipRun",
+              None),
               ("REGISTRY.def", msilib.gen_uuid(), "TARGETDIR", registry_component,
                None, None)] + tcldata)
     # See "FeatureComponents Table".
@@ -1203,6 +1222,7 @@ def add_registry(db):
              [(default_feature.id, "REGISTRY"),
               (htmlfiles.id, "REGISTRY.doc"),
               (prepend_path.id, "REGISTRY.path"),
+              (pip_feature.id, "REGISTRY.ensurepip"),
               (ext_feature.id, "REGISTRY.def")] +
               tcldata
               )
@@ -1289,7 +1309,9 @@ def add_registry(db):
                "", r"[TARGETDIR]Python.exe", "REGISTRY.def"),
               ("DisplayIcon", -1,
                r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" % product_code,
-               "DisplayIcon", "[TARGETDIR]python.exe", "REGISTRY")
+               "DisplayIcon", "[TARGETDIR]python.exe", "REGISTRY"),
+              # Fake registry entry to allow installer to track whether ensurepip has been run
+              ("EnsurePipRun", -1, prefix+r"\EnsurePipRun", "", "#1", "REGISTRY.ensurepip"),
               ])
     # Shortcuts, see "Shortcut Table"
     add_data(db, "Directory",
@@ -1298,27 +1320,38 @@ def add_registry(db):
     add_data(db, "RemoveFile",
              [("MenuDir", "TARGETDIR", None, "MenuDir", 2)])
     tcltkshortcuts = []
+    if msilib.Win64:
+        bitted = "64 bit"
+    else:
+        bitted = "32 bit"
     if have_tcl:
         tcltkshortcuts = [
-              ("IDLE", "MenuDir", "IDLE|IDLE (Python GUI)", "pythonw.exe",
-               tcltk.id, r'"[TARGETDIR]Lib\idlelib\idle.pyw"', None, None, "python_icon.exe", 0, None, "TARGETDIR"),
-              ("PyDoc", "MenuDir", "MODDOCS|Module Docs", "pythonw.exe",
-               tcltk.id, r'"[TARGETDIR]Tools\scripts\pydocgui.pyw"', None, None, "python_icon.exe", 0, None, "TARGETDIR"),
+              ("IDLE", "MenuDir",
+               "IDLE|IDLE (Python "+short_version+" GUI - "+bitted+")",
+               "pythonw.exe", tcltk.id, r'"[TARGETDIR]Lib\idlelib\idle.pyw"',
+               None, None, "python_icon.exe", 0, None, "TARGETDIR"),
               ]
     add_data(db, "Shortcut",
              tcltkshortcuts +
              [# Advertised shortcuts: targets are features, not files
-              ("Python", "MenuDir", "PYTHON|Python (command line)", "python.exe",
-               default_feature.id, None, None, None, "python_icon.exe", 2, None, "TARGETDIR"),
+              ("Python", "MenuDir",
+               "PYTHON|Python "+short_version+" (command line - "+bitted+")",
+               "python.exe", default_feature.id, None, None, None,
+               "python_icon.exe", 2, None, "TARGETDIR"),
               # Advertising the Manual breaks on (some?) Win98, and the shortcut lacks an
               # icon first.
               #("Manual", "MenuDir", "MANUAL|Python Manuals", "documentation",
               # htmlfiles.id, None, None, None, None, None, None, None),
               ## Non-advertised shortcuts: must be associated with a registry component
-              ("Manual", "MenuDir", "MANUAL|Python Manuals", "REGISTRY.doc",
-               "[#%s]" % docfile, None,
-               None, None, None, None, None, None),
-              ("Uninstall", "MenuDir", "UNINST|Uninstall Python", "REGISTRY",
+              ("Manual", "MenuDir", "MANUAL|Python "+short_version+" Manuals",
+               "REGISTRY.doc", "[#%s]" % docfile,
+               None, None, None, None, None, None, None),
+              ("PyDoc", "MenuDir",
+               "MODDOCS|Python "+short_version+" Docs Server (pydoc - "+
+               bitted+")", "python.exe", default_feature.id, r'-m pydoc -b',
+               None, None, "python_icon.exe", 0, None, "TARGETDIR"),
+              ("Uninstall", "MenuDir", "UNINST|Uninstall Python "+
+               short_version+" ("+bitted+")", "REGISTRY",
                SystemFolderName+"msiexec",  "/x%s" % product_code,
                None, None, None, None, None, None),
               ])

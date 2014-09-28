@@ -209,9 +209,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintLocaleDefaultAnsiCodePage();
-    return;
-
 #if 1
 
     using namespace ml;

@@ -49,7 +49,7 @@ the standard audio interface for Linux and recent versions of FreeBSD.
       the official documentation for the OSS C API
 
    The module defines a large number of constants supplied by the OSS device
-   driver; see ``<sys/soundcard.h>`` on either Linux or FreeBSD for a listing .
+   driver; see ``<sys/soundcard.h>`` on either Linux or FreeBSD for a listing.
 
 :mod:`ossaudiodev` defines the following variables and functions:
 
@@ -165,15 +165,15 @@ and (read-only) attributes:
    data written is always equal to the amount of data supplied.
 
 .. versionchanged:: 3.2
-   Audio device objects also support the context manager protocol, i.e. they can
+   Audio device objects also support the context management protocol, i.e. they can
    be used in a :keyword:`with` statement.
 
 
-The following methods each map to exactly one :func:`ioctl` system call.  The
+The following methods each map to exactly one :c:func:`ioctl` system call.  The
 correspondence is obvious: for example, :meth:`setfmt` corresponds to the
 ``SNDCTL_DSP_SETFMT`` ioctl, and :meth:`sync` to ``SNDCTL_DSP_SYNC`` (this can
 be useful when consulting the OSS documentation).  If the underlying
-:func:`ioctl` fails, they all raise :exc:`OSError`.
+:c:func:`ioctl` fails, they all raise :exc:`OSError`.
 
 
 .. method:: oss_audio_device.nonblock()
@@ -357,7 +357,7 @@ The mixer object provides two file-like methods:
    Returns the file handle number of the open mixer device file.
 
 .. versionchanged:: 3.2
-   Mixer objects also support the context manager protocol.
+   Mixer objects also support the context management protocol.
 
 
 The remaining methods are specific to audio mixing:
@@ -407,7 +407,7 @@ The remaining methods are specific to audio mixing:
    (silent) to 100 (full volume).  If the control is monophonic, a 2-tuple is still
    returned, but both volumes are the same.
 
-   Raises :exc:`OSSAudioError` if an invalid control was is specified, or
+   Raises :exc:`OSSAudioError` if an invalid control is specified, or
    :exc:`OSError` if an unsupported control is specified.
 
 

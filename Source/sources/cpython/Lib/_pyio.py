@@ -62,8 +62,7 @@ def open(file, mode="r", buffering=-1, encoding=None, errors=None,
     'b'       binary mode
     't'       text mode (default)
     '+'       open a disk file for updating (reading and writing)
-    'U'       universal newline mode (for backwards compatibility; unneeded
-              for new code)
+    'U'       universal newline mode (deprecated)
     ========= ===============================================================
 
     The default mode is 'rt' (open for reading text). For binary random
@@ -78,6 +77,10 @@ def open(file, mode="r", buffering=-1, encoding=None, errors=None,
     't' is appended to the mode argument), the contents of the file are
     returned as strings, the bytes having been first decoded using a
     platform-dependent encoding or using the specified encoding if given.
+
+    'U' mode is deprecated and will raise an exception in future versions
+    of Python.  It has no effect in Python 3.  Use newline to control
+    universal newlines mode.
 
     buffering is an optional integer used to set the buffering policy.
     Pass 0 to switch buffering off (only allowed in binary mode), 1 to select
@@ -174,6 +177,9 @@ def open(file, mode="r", buffering=-1, encoding=None, errors=None,
     if "U" in modes:
         if creating or writing or appending:
             raise ValueError("can't use U and writing mode at once")
+        import warnings
+        warnings.warn("'U' mode is deprecated",
+                      DeprecationWarning, 2)
         reading = True
     if text and binary:
         raise ValueError("can't have text and binary mode at once")
@@ -194,38 +200,45 @@ def open(file, mode="r", buffering=-1, encoding=None, errors=None,
                  (appending and "a" or "") +
                  (updating and "+" or ""),
                  closefd, opener=opener)
-    line_buffering = False
-    if buffering == 1 or buffering < 0 and raw.isatty():
-        buffering = -1
-        line_buffering = True
-    if buffering < 0:
-        buffering = DEFAULT_BUFFER_SIZE
-        try:
-            bs = os.fstat(raw.fileno()).st_blksize
-        except (OSError, AttributeError):
-            pass
+    result = raw
+    try:
+        line_buffering = False
+        if buffering == 1 or buffering < 0 and raw.isatty():
+            buffering = -1
+            line_buffering = True
+        if buffering < 0:
+            buffering = DEFAULT_BUFFER_SIZE
+            try:
+                bs = os.fstat(raw.fileno()).st_blksize
+            except (OSError, AttributeError):
+                pass
+            else:
+                if bs > 1:
+                    buffering = bs
+        if buffering < 0:
+            raise ValueError("invalid buffering size")
+        if buffering == 0:
+            if binary:
+                return result
+            raise ValueError("can't have unbuffered text I/O")
+        if updating:
+            buffer = BufferedRandom(raw, buffering)
+        elif creating or writing or appending:
+            buffer = BufferedWriter(raw, buffering)
+        elif reading:
+            buffer = BufferedReader(raw, buffering)
         else:
-            if bs > 1:
-                buffering = bs
-    if buffering < 0:
-        raise ValueError("invalid buffering size")
-    if buffering == 0:
+            raise ValueError("unknown mode: %r" % mode)
+        result = buffer
         if binary:
-            return raw
-        raise ValueError("can't have unbuffered text I/O")
-    if updating:
-        buffer = BufferedRandom(raw, buffering)
-    elif creating or writing or appending:
-        buffer = BufferedWriter(raw, buffering)
-    elif reading:
-        buffer = BufferedReader(raw, buffering)
-    else:
-        raise ValueError("unknown mode: %r" % mode)
-    if binary:
-        return buffer
-    text = TextIOWrapper(buffer, encoding, errors, newline, line_buffering)
-    text.mode = mode
-    return text
+            return result
+        text = TextIOWrapper(buffer, encoding, errors, newline, line_buffering)
+        result = text
+        text.mode = mode
+        return result
+    except:
+        result.close()
+        raise
 
 
 class DocDescriptor:
@@ -1497,6 +1510,11 @@ class TextIOWrapper(TextIOBase):
         if not isinstance(encoding, str):
             raise ValueError("invalid encoding: %r" % encoding)
 
+        if not codecs.lookup(encoding)._is_text_encoding:
+            msg = ("%r is not a text encoding; "
+                   "use codecs.open() to handle arbitrary codecs")
+            raise LookupError(msg % encoding)
+
         if errors is None:
             errors = "strict"
         else:
@@ -2046,7 +2064,7 @@ class StringIO(TextIOWrapper):
     def __init__(self, initial_value="", newline="\n"):
         super(StringIO, self).__init__(BytesIO(),
                                        encoding="utf-8",
-                                       errors="strict",
+                                       errors="surrogatepass",
                                        newline=newline)
         # Issue #5645: make universal newlines semantics the same as in the
         # C version, even under Windows.
@@ -2061,7 +2079,13 @@ class StringIO(TextIOWrapper):
 
     def getvalue(self):
         self.flush()
-        return self.buffer.getvalue().decode(self._encoding, self._errors)
+        decoder = self._decoder or self._get_decoder()
+        old_state = decoder.getstate()
+        decoder.reset()
+        try:
+            return decoder.decode(self.buffer.getvalue(), final=True)
+        finally:
+            decoder.setstate(old_state)
 
     def __repr__(self):
         # TextIOWrapper tells the encoding in its repr. In StringIO,

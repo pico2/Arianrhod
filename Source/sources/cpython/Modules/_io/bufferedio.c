@@ -52,7 +52,6 @@ bufferediobase_readinto(PyObject *self, PyObject *args)
     Py_buffer buf;
     Py_ssize_t len;
     PyObject *data;
-    _Py_IDENTIFIER(read);
 
     if (!PyArg_ParseTuple(args, "w*:readinto", &buf)) {
         return NULL;
@@ -92,7 +91,9 @@ bufferediobase_readinto(PyObject *self, PyObject *args)
 static PyObject *
 bufferediobase_unsupported(const char *message)
 {
-    PyErr_SetString(IO_STATE->unsupported_operation, message);
+    _PyIO_State *state = IO_STATE();
+    if (state != NULL)
+        PyErr_SetString(state->unsupported_operation, message);
     return NULL;
 }
 
@@ -547,13 +548,14 @@ buffered_close(buffered *self, PyObject *args)
             PyErr_Restore(exc, val, tb);
         }
         else {
-            PyObject *val2;
+            PyObject *exc2, *val2, *tb2;
+            PyErr_Fetch(&exc2, &val2, &tb2);
+            PyErr_NormalizeException(&exc, &val, &tb);
             Py_DECREF(exc);
             Py_XDECREF(tb);
-            PyErr_Fetch(&exc, &val2, &tb);
-            PyErr_NormalizeException(&exc, &val2, &tb);
+            PyErr_NormalizeException(&exc2, &val2, &tb2);
             PyException_SetContext(val2, val);
-            PyErr_Restore(exc, val2, tb);
+            PyErr_Restore(exc2, val2, tb2);
         }
     }
 
@@ -2304,9 +2306,14 @@ bufferedrwpair_dealloc(rwpair *self)
 static PyObject *
 _forward_call(buffered *self, _Py_Identifier *name, PyObject *args)
 {
-    PyObject *func = _PyObject_GetAttrId((PyObject *)self, name);
-    PyObject *ret;
+    PyObject *func, *ret;
+    if (self == NULL) {
+        PyErr_SetString(PyExc_ValueError,
+                        "I/O operation on uninitialized object");
+        return NULL;
+    }
 
+    func = _PyObject_GetAttrId((PyObject *)self, name);
     if (func == NULL) {
         PyErr_SetString(PyExc_AttributeError, name->string);
         return NULL;

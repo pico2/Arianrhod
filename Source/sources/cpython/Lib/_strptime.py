@@ -14,7 +14,7 @@ import time
 import locale
 import calendar
 from re import compile as re_compile
-from re import IGNORECASE, ASCII
+from re import IGNORECASE
 from re import escape as re_escape
 from datetime import (date as datetime_date,
                       timedelta as datetime_timedelta,
@@ -329,7 +329,7 @@ def _strptime(data_string, format="%a %b %d %H:%M:%S %Y"):
                                     (bad_directive, format)) from None
             # IndexError only occurs when the format string is "%"
             except IndexError:
-                raise ValueError("stray %% in format '%s'" % format)
+                raise ValueError("stray %% in format '%s'" % format) from None
             _regex_cache[format] = format_regex
     found = format_regex.match(data_string)
     if not found:

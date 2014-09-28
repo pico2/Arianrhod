@@ -8,7 +8,6 @@
 #include <wchar.h>
 #include <tlhelp32.h>
 #include <stdio.h>
-#include "crtwrap.h"
 
 #pragma comment(lib, "psapi")
 

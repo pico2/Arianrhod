@@ -143,7 +143,8 @@ typedef struct _Py_Identifier {
     PyObject *object;
 } _Py_Identifier;
 
-#define _Py_static_string(varname, value)  static _Py_Identifier varname = { 0, value, 0 }
+#define _Py_static_string_init(value) { 0, value, 0 }
+#define _Py_static_string(varname, value)  static _Py_Identifier varname = _Py_static_string_init(value)
 #define _Py_IDENTIFIER(varname) _Py_static_string(PyId_##varname, #varname)
 
 /*
@@ -438,6 +439,9 @@ PyAPI_FUNC(PyObject*) PyType_FromSpec(PyType_Spec*);
 #if !defined(Py_LIMITED_API) || Py_LIMITED_API+0 >= 0x03030000
 PyAPI_FUNC(PyObject*) PyType_FromSpecWithBases(PyType_Spec*, PyObject*);
 #endif
+#if !defined(Py_LIMITED_API) || Py_LIMITED_API+0 >= 0x03040000
+PyAPI_FUNC(void*) PyType_GetSlot(PyTypeObject*, int);
+#endif
 
 #ifndef Py_LIMITED_API
 /* The *real* layout of a type object when allocated on the heap */
@@ -491,6 +495,11 @@ PyAPI_FUNC(PyTypeObject *) _PyType_CalculateMetaclass(PyTypeObject *, PyObject *
 PyAPI_FUNC(unsigned int) PyType_ClearCache(void);
 PyAPI_FUNC(void) PyType_Modified(PyTypeObject *);
 
+#ifndef Py_LIMITED_API
+PyAPI_FUNC(PyObject *) _PyType_GetDocFromInternalDoc(const char *, const char *);
+PyAPI_FUNC(PyObject *) _PyType_GetTextSignatureFromInternalDoc(const char *, const char *);
+#endif
+
 /* Generic operations on objects */
 struct _Py_Identifier;
 #ifndef Py_LIMITED_API
@@ -532,8 +541,10 @@ PyAPI_FUNC(int) PyObject_Not(PyObject *);
 PyAPI_FUNC(int) PyCallable_Check(PyObject *);
 
 PyAPI_FUNC(void) PyObject_ClearWeakRefs(PyObject *);
+#ifndef Py_LIMITED_API
 PyAPI_FUNC(void) PyObject_CallFinalizer(PyObject *);
 PyAPI_FUNC(int) PyObject_CallFinalizerFromDealloc(PyObject *);
+#endif
 
 /* Same as PyObject_Generic{Get,Set}Attr, but passing the attributes
    dict as the last parameter. */
@@ -560,23 +571,6 @@ PyAPI_FUNC(PyObject *) PyObject_Dir(PyObject *);
 /* Helpers for printing recursive container types */
 PyAPI_FUNC(int) Py_ReprEnter(PyObject *);
 PyAPI_FUNC(void) Py_ReprLeave(PyObject *);
-
-/* Helpers for hash functions */
-#ifndef Py_LIMITED_API
-PyAPI_FUNC(Py_hash_t) _Py_HashDouble(double);
-PyAPI_FUNC(Py_hash_t) _Py_HashPointer(void*);
-PyAPI_FUNC(Py_hash_t) _Py_HashBytes(unsigned char*, Py_ssize_t);
-#endif
-
-typedef struct {
-    Py_hash_t prefix;
-    Py_hash_t suffix;
-} _Py_HashSecret_t;
-PyAPI_DATA(_Py_HashSecret_t) _Py_HashSecret;
-
-#ifdef Py_DEBUG
-PyAPI_DATA(int) _Py_HashSecret_Initialized;
-#endif
 
 /* Helper for passing objects to printf and the like */
 #define PyObject_REPR(obj) _PyUnicode_AsString(PyObject_Repr(obj))
@@ -829,7 +823,7 @@ PyAPI_FUNC(void) _Py_Dealloc(PyObject *);
         PyObject *_py_xincref_tmp = (PyObject *)(op); \
         if (_py_xincref_tmp != NULL)                  \
             Py_INCREF(_py_xincref_tmp);               \
-    } while (0)                                    
+    } while (0)
 
 #define Py_XDECREF(op)                                \
     do {                                              \
@@ -844,6 +838,9 @@ they can have object code that is not dependent on Python compilation flags.
 */
 PyAPI_FUNC(void) Py_IncRef(PyObject *);
 PyAPI_FUNC(void) Py_DecRef(PyObject *);
+
+PyAPI_DATA(PyTypeObject) _PyNone_Type;
+PyAPI_DATA(PyTypeObject) _PyNotImplemented_Type;
 
 /*
 _Py_NoneStruct is an object of undefined type which can be used in contexts

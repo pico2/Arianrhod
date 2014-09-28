@@ -55,11 +55,11 @@ extern char **completion_matches(char *, CPFunction *);
  * with the "real" readline and cannot be detected at compile-time,
  * hence we use a runtime check to detect if we're using libedit
  *
- * Currently there is one know API incompatibility:
+ * Currently there is one known API incompatibility:
  * - 'get_history' has a 1-based index with GNU readline, and a 0-based
- *   index with libedit's emulation.
+ *   index with older versions of libedit's emulation.
  * - Note that replace_history and remove_history use a 0-based index
- *   with both implementation.
+ *   with both implementations.
  */
 static int using_libedit_emulation = 0;
 static const char libedit_version_tag[] = "EditLine wrapper";
@@ -281,8 +281,7 @@ set_hook(const char *funcname, PyObject **hook_var, PyObject *args)
     if (!PyArg_ParseTuple(args, buf, &function))
         return NULL;
     if (function == Py_None) {
-        Py_XDECREF(*hook_var);
-        *hook_var = NULL;
+        Py_CLEAR(*hook_var);
     }
     else if (PyCallable_Check(function)) {
         PyObject *tmp = *hook_var;
@@ -816,7 +815,11 @@ on_hook(PyObject *func)
 }
 
 static int
+#if defined(_RL_FUNCTION_TYPEDEF)
 on_startup_hook(void)
+#else
+on_startup_hook()
+#endif
 {
     int r;
 #ifdef WITH_THREAD
@@ -831,7 +834,11 @@ on_startup_hook(void)
 
 #ifdef HAVE_RL_PRE_INPUT_HOOK
 static int
+#if defined(_RL_FUNCTION_TYPEDEF)
 on_pre_input_hook(void)
+#else
+on_pre_input_hook()
+#endif
 {
     int r;
 #ifdef WITH_THREAD
@@ -877,7 +884,7 @@ on_completion_display_matches_hook(char **matches,
         (r != Py_None && PyLong_AsLong(r) == -1 && PyErr_Occurred())) {
         goto error;
     }
-    Py_XDECREF(r); r=NULL;
+    Py_CLEAR(r);
 
     if (0) {
     error:
@@ -935,7 +942,7 @@ on_completion(const char *text, int state)
  * before calling the normal completer */
 
 static char **
-flex_complete(char *text, int start, int end)
+flex_complete(const char *text, int start, int end)
 {
     char **result;
 #ifdef WITH_THREAD
@@ -998,12 +1005,12 @@ setup_readline(readlinestate *mod_state)
     rl_bind_key_in_map ('\t', rl_complete, emacs_meta_keymap);
     rl_bind_key_in_map ('\033', rl_complete, emacs_meta_keymap);
     /* Set our hook functions */
-    rl_startup_hook = (Function *)on_startup_hook;
+    rl_startup_hook = on_startup_hook;
 #ifdef HAVE_RL_PRE_INPUT_HOOK
-    rl_pre_input_hook = (Function *)on_pre_input_hook;
+    rl_pre_input_hook = on_pre_input_hook;
 #endif
     /* Set our completion function */
-    rl_attempted_completion_function = (CPPFunction *)flex_complete;
+    rl_attempted_completion_function = flex_complete;
     /* Set Python word break characters */
     completer_word_break_characters =
         rl_completer_word_break_characters =
@@ -1012,6 +1019,21 @@ setup_readline(readlinestate *mod_state)
 
     mod_state->begidx = PyLong_FromLong(0L);
     mod_state->endidx = PyLong_FromLong(0L);
+
+#ifndef __APPLE__
+    if (!isatty(STDOUT_FILENO)) {
+        /* Issue #19884: stdout is no a terminal. Disable meta modifier
+           keys to not write the ANSI sequence "\033[1034h" into stdout. On
+           terminals supporting 8 bit characters like TERM=xterm-256color
+           (which is now the default Fedora since Fedora 18), the meta key is
+           used to enable support of 8 bit characters (ANSI sequence
+           "\033[1034h").
+
+           With libedit, this call makes readline() crash. */
+        rl_variable_bind ("enable-meta-key", "off");
+    }
+#endif
+
     /* Initialize (allows .inputrc to override)
      *
      * XXX: A bug in the readline-2.2 library causes a memory leak
@@ -1043,7 +1065,7 @@ rlhandler(char *text)
 extern PyThreadState* _PyOS_ReadlineTState;
 
 static char *
-readline_until_enter_or_signal(char *prompt, int *signal)
+readline_until_enter_or_signal(const char *prompt, int *signal)
 {
     char * not_done_reading = "";
     fd_set selectset;
@@ -1118,7 +1140,7 @@ onintr(int sig)
 
 
 static char *
-readline_until_enter_or_signal(char *prompt, int *signal)
+readline_until_enter_or_signal(const char *prompt, int *signal)
 {
     PyOS_sighandler_t old_inthandler;
     char *p;
@@ -1145,7 +1167,7 @@ readline_until_enter_or_signal(char *prompt, int *signal)
 
 
 static char *
-call_readline(FILE *sys_stdin, FILE *sys_stdout, char *prompt)
+call_readline(FILE *sys_stdin, FILE *sys_stdout, const char *prompt)
 {
     size_t n;
     char *p, *q;
@@ -1176,7 +1198,7 @@ call_readline(FILE *sys_stdin, FILE *sys_stdout, char *prompt)
 
     /* We got an EOF, return a empty string. */
     if (p == NULL) {
-        p = PyMem_Malloc(1);
+        p = PyMem_RawMalloc(1);
         if (p != NULL)
             *p = '\0';
         RESTORE_LOCALE(saved_locale)
@@ -1204,7 +1226,7 @@ call_readline(FILE *sys_stdin, FILE *sys_stdout, char *prompt)
     /* Copy the malloc'ed buffer into a PyMem_Malloc'ed one and
        release the original. */
     q = p;
-    p = PyMem_Malloc(n+2);
+    p = PyMem_RawMalloc(n+2);
     if (p != NULL) {
         strncpy(p, q, n);
         p[n] = '\n';

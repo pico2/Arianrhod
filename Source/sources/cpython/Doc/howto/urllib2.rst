@@ -57,7 +57,7 @@ The simplest way to use urllib.request is as follows::
     html = response.read()
 
 If you wish to retrieve a resource via URL and store it in a temporary location,
-you can do so via the :func:`urlretrieve` function::
+you can do so via the :func:`~urllib.request.urlretrieve` function::
 
     import urllib.request
     local_filename, headers = urllib.request.urlretrieve('http://python.org/')
@@ -97,7 +97,7 @@ Data
 ----
 
 Sometimes you want to send data to a URL (often the URL will refer to a CGI
-(Common Gateway Interface) script [#]_ or other web application). With HTTP,
+(Common Gateway Interface) script or other web application). With HTTP,
 this is often done using what's known as a **POST** request. This is often what
 your browser does when you submit a HTML form that you filled in on the web. Not
 all POSTs have to come from forms: you can use a POST to transmit arbitrary data
@@ -160,7 +160,7 @@ We'll discuss here one particular HTTP header, to illustrate how to add headers
 to your HTTP request.
 
 Some websites [#]_ dislike being browsed by programs, or send different versions
-to different browsers [#]_ . By default urllib identifies itself as
+to different browsers [#]_. By default urllib identifies itself as
 ``Python-urllib/x.y`` (where ``x`` and ``y`` are the major and minor version
 numbers of the Python release,
 e.g. ``Python-urllib/2.5``), which may confuse the site, or just plain
@@ -454,7 +454,7 @@ Authentication Tutorial
 
 When authentication is required, the server sends a header (as well as the 401
 error code) requesting authentication.  This specifies the authentication scheme
-and a 'realm'. The header looks like : ``WWW-Authenticate: SCHEME
+and a 'realm'. The header looks like: ``WWW-Authenticate: SCHEME
 realm="REALM"``.
 
 e.g. ::
@@ -526,7 +526,7 @@ the ``ProxyHandler``, which is part of the normal handler chain when a proxy
 setting is detected.  Normally that's a good thing, but there are occasions
 when it may not be helpful [#]_. One way to do this is to setup our own
 ``ProxyHandler``, with no proxies defined. This is done using similar steps to
-setting up a `Basic Authentication`_ handler : ::
+setting up a `Basic Authentication`_ handler: ::
 
     >>> proxy_support = urllib.request.ProxyHandler({})
     >>> opener = urllib.request.build_opener(proxy_support)
@@ -572,8 +572,6 @@ Footnotes
 
 This document was reviewed and revised by John Lee.
 
-.. [#] For an introduction to the CGI protocol see
-       `Writing Web Applications in Python <http://www.pyzine.com/Issue008/Section_Articles/article_CGIOne.html>`_.
 .. [#] Like Google for example. The *proper* way to use google from a program
        is to use `PyGoogle <http://pygoogle.sourceforge.net>`_ of course. See
        `Voidspace Google <http://www.voidspace.org.uk/python/recipebook.shtml#google>`_

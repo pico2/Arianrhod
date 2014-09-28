@@ -31,7 +31,7 @@
                || c == '_'\
                || (c >= 128))
 
-extern char *PyOS_Readline(FILE *, FILE *, char *);
+extern char *PyOS_Readline(FILE *, FILE *, const char *);
 /* Return malloc'ed string including trailing \n;
    empty malloc'ed string for EOF;
    NULL if interrupted */
@@ -283,13 +283,27 @@ check_coding_spec(const char* line, Py_ssize_t size, struct tok_state *tok,
     char *cs;
     int r = 1;
 
-    if (tok->cont_line)
+    if (tok->cont_line) {
         /* It's a continuation line, so it can't be a coding spec. */
+        tok->read_coding_spec = 1;
         return 1;
+    }
     if (!get_coding_spec(line, &cs, size, tok))
         return 0;
-    if (!cs)
+    if (!cs) {
+        Py_ssize_t i;
+        for (i = 0; i < size; i++) {
+            if (line[i] == '#' || line[i] == '\n' || line[i] == '\r')
+                break;
+            if (line[i] != ' ' && line[i] != '\t' && line[i] != '\014') {
+                /* Stop checking coding spec after a line containing
+                 * anything except a comment. */
+                tok->read_coding_spec = 1;
+                break;
+            }
+        }
         return 1;
+    }
     tok->read_coding_spec = 1;
     if (tok->encoding == NULL) {
         assert(tok->decoding_state == STATE_RAW);
@@ -476,13 +490,21 @@ fp_setreadl(struct tok_state *tok, const char* enc)
     _Py_IDENTIFIER(open);
     _Py_IDENTIFIER(readline);
     int fd;
+    long pos;
 
     io = PyImport_ImportModuleNoBlock("io");
     if (io == NULL)
         goto cleanup;
 
     fd = fileno(tok->fp);
-    if (lseek(fd, 0, SEEK_SET) == (off_t)-1) {
+    /* Due to buffering the file offset for fd can be different from the file
+     * position of tok->fp.  If tok->fp was opened in text mode on Windows,
+     * its file position counts CRLF as one char and can't be directly mapped
+     * to the file offset for fd.  Instead we step back one byte and read to
+     * the end of line.*/
+    pos = ftell(tok->fp);
+    if (pos == -1 ||
+        lseek(fd, (off_t)(pos > 0 ? pos - 1 : pos), SEEK_SET) == (off_t)-1) {
         PyErr_SetFromErrnoWithFilename(PyExc_OSError, NULL);
         goto cleanup;
     }
@@ -495,14 +517,12 @@ fp_setreadl(struct tok_state *tok, const char* enc)
     Py_XDECREF(tok->decoding_readline);
     readline = _PyObject_GetAttrId(stream, &PyId_readline);
     tok->decoding_readline = readline;
-
-    /* The file has been reopened; parsing will restart from
-     * the beginning of the file, we have to reset the line number.
-     * But this function has been called from inside tok_nextc() which
-     * will increment lineno before it returns. So we set it -1 so that
-     * the next call to tok_nextc() will start with tok->lineno == 0.
-     */
-    tok->lineno = -1;
+    if (pos > 0) {
+        if (PyObject_CallObject(readline, NULL) == NULL) {
+            readline = NULL;
+            goto cleanup;
+        }
+    }
 
   cleanup:
     Py_XDECREF(stream);
@@ -752,7 +772,7 @@ decode_str(const char *input, int single, struct tok_state *tok)
     if (newl[0]) {
         if (!check_coding_spec(str, newl[0] - str, tok, buf_setreadl))
             return error_ret(tok);
-        if (tok->enc == NULL && newl[1]) {
+        if (tok->enc == NULL && !tok->read_coding_spec && newl[1]) {
             if (!check_coding_spec(newl[0]+1, newl[1] - newl[0],
                                    tok, buf_setreadl))
                 return error_ret(tok);
@@ -780,7 +800,7 @@ PyTokenizer_FromString(const char *str, int exec_input)
     struct tok_state *tok = tok_new();
     if (tok == NULL)
         return NULL;
-    str = (char *)decode_str(str, exec_input, tok);
+    str = decode_str(str, exec_input, tok);
     if (str == NULL) {
         PyTokenizer_Free(tok);
         return NULL;
@@ -823,7 +843,8 @@ PyTokenizer_FromUTF8(const char *str, int exec_input)
 /* Set up tokenizer for file */
 
 struct tok_state *
-PyTokenizer_FromFile(FILE *fp, char* enc, char *ps1, char *ps2)
+PyTokenizer_FromFile(FILE *fp, const char* enc,
+                     const char *ps1, const char *ps2)
 {
     struct tok_state *tok = tok_new();
     if (tok == NULL)
@@ -1576,15 +1597,24 @@ tok_get(struct tok_state *tok, char **p_start, char **p_end)
                     } while (isdigit(c));
                 }
                 if (c == 'e' || c == 'E') {
-        exponent:
+                    int e;
+                  exponent:
+                    e = c;
                     /* Exponent part */
                     c = tok_nextc(tok);
-                    if (c == '+' || c == '-')
+                    if (c == '+' || c == '-') {
                         c = tok_nextc(tok);
-                    if (!isdigit(c)) {
-                        tok->done = E_TOKEN;
+                        if (!isdigit(c)) {
+                            tok->done = E_TOKEN;
+                            tok_backup(tok, c);
+                            return ERRORTOKEN;
+                        }
+                    } else if (!isdigit(c)) {
                         tok_backup(tok, c);
-                        return ERRORTOKEN;
+                        tok_backup(tok, e);
+                        *p_start = tok->start;
+                        *p_end = tok->cur;
+                        return NUMBER;
                     }
                     do {
                         c = tok_nextc(tok);

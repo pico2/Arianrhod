@@ -90,6 +90,16 @@ in various ways.  There is a separate error indicator for each thread.
    the class in that case.  If the values are already normalized, nothing happens.
    The delayed normalization is implemented to improve performance.
 
+   .. note::
+
+      This function *does not* implicitly set the ``__traceback__``
+      attribute on the exception value. If setting the traceback
+      appropriately is desired, the following additional snippet is needed::
+
+         if (tb != NULL) {
+           PyException_SetTraceback(val, tb);
+         }
+
 
 .. c:function:: void PyErr_Clear()
 
@@ -226,9 +236,18 @@ in various ways.  There is a separate error indicator for each thread.
 
    Similar to :c:func:`PyErr_SetFromErrno`, with the additional behavior that if
    *filenameObject* is not *NULL*, it is passed to the constructor of *type* as
-   a third parameter.  In the case of exceptions such as :exc:`IOError` and
-   :exc:`OSError`, this is used to define the :attr:`filename` attribute of the
+   a third parameter.  In the case of :exc:`OSError` exception,
+   this is used to define the :attr:`filename` attribute of the
    exception instance.
+
+
+.. c:function:: PyObject* PyErr_SetFromErrnoWithFilenameObjects(PyObject *type, PyObject *filenameObject, PyObject *filenameObject2)
+
+   Similar to :c:func:`PyErr_SetFromErrnoWithFilenameObject`, but takes a second
+   filename object, for raising errors when a function that takes two filenames
+   fails.
+
+   .. versionadded:: 3.4
 
 
 .. c:function:: PyObject* PyErr_SetFromErrnoWithFilename(PyObject *type, const char *filename)
@@ -256,13 +275,6 @@ in various ways.  There is a separate error indicator for each thread.
    specifying the exception type to be raised. Availability: Windows.
 
 
-.. c:function:: PyObject* PyErr_SetFromWindowsErrWithFilenameObject(int ierr, PyObject *filenameObject)
-
-   Similar to :c:func:`PyErr_SetFromWindowsErr`, with the additional behavior
-   that if *filenameObject* is not *NULL*, it is passed to the constructor of
-   :exc:`WindowsError` as a third parameter.  Availability: Windows.
-
-
 .. c:function:: PyObject* PyErr_SetFromWindowsErrWithFilename(int ierr, const char *filename)
 
    Similar to :c:func:`PyErr_SetFromWindowsErrWithFilenameObject`, but the
@@ -275,6 +287,15 @@ in various ways.  There is a separate error indicator for each thread.
    Similar to :c:func:`PyErr_SetFromWindowsErrWithFilenameObject`, with an
    additional parameter specifying the exception type to be raised.
    Availability: Windows.
+
+
+.. c:function:: PyObject* PyErr_SetExcFromWindowsErrWithFilenameObjects(PyObject *type, int ierr, PyObject *filename, PyObject *filename2)
+
+   Similar to :c:func:`PyErr_SetExcFromWindowsErrWithFilenameObject`,
+   but accepts a second filename object.
+   Availability: Windows.
+
+   .. versionadded:: 3.4
 
 
 .. c:function:: PyObject* PyErr_SetExcFromWindowsErrWithFilename(PyObject *type, int ierr, const char *filename)
@@ -300,7 +321,7 @@ in various ways.  There is a separate error indicator for each thread.
    attributes, which make the exception printing subsystem think the exception
    is a :exc:`SyntaxError`.
 
-.. versionadded:: 3.4
+   .. versionadded:: 3.4
 
 
 .. c:function:: void PyErr_SyntaxLocationEx(char *filename, int lineno, int col_offset)
@@ -308,7 +329,7 @@ in various ways.  There is a separate error indicator for each thread.
    Like :c:func:`PyErr_SyntaxLocationObject`, but *filename* is a byte string
    decoded from the filesystem encoding (:func:`os.fsdecode`).
 
-.. versionadded:: 3.2
+   .. versionadded:: 3.2
 
 
 .. c:function:: void PyErr_SyntaxLocation(char *filename, int lineno)
@@ -504,11 +525,11 @@ Exception Objects
    reference, as accessible from Python through :attr:`__cause__`.
 
 
-.. c:function:: void PyException_SetCause(PyObject *ex, PyObject *ctx)
+.. c:function:: void PyException_SetCause(PyObject *ex, PyObject *cause)
 
-   Set the cause associated with the exception to *ctx*.  Use *NULL* to clear
-   it.  There is no type check to make sure that *ctx* is either an exception
-   instance or :const:`None`.  This steals a reference to *ctx*.
+   Set the cause associated with the exception to *cause*.  Use *NULL* to clear
+   it.  There is no type check to make sure that *cause* is either an exception
+   instance or :const:`None`.  This steals a reference to *cause*.
 
    :attr:`__suppress_context__` is implicitly set to ``True`` by this function.
 

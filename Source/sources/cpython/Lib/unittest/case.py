@@ -9,6 +9,7 @@ import re
 import warnings
 import collections
 import contextlib
+import traceback
 
 from . import result
 from .util import (strclass, safe_repr, _count_diff_all_purpose,
@@ -69,6 +70,9 @@ class _Outcome(object):
             else:
                 self.success = False
                 self.errors.append((test_case, exc_info))
+            # explicitly break a reference cycle:
+            # exc_info -> frame -> exc_info
+            exc_info = None
         else:
             if self.result_supports_subtests and self.success:
                 self.errors.append((test_case, None))
@@ -140,7 +144,7 @@ class _AssertRaisesBaseContext(_BaseTestCaseContext):
                 self.obj_name = str(callable_obj)
         else:
             self.obj_name = None
-        if isinstance(expected_regex, (bytes, str)):
+        if expected_regex is not None:
             expected_regex = re.compile(expected_regex)
         self.expected_regex = expected_regex
         self.msg = None
@@ -175,6 +179,8 @@ class _AssertRaisesContext(_AssertRaisesBaseContext):
                                                                 self.obj_name))
             else:
                 self._raiseFailure("{} not raised".format(exc_name))
+        else:
+            traceback.clear_frames(tb)
         if not issubclass(exc_type, self.expected):
             # let unexpected exceptions pass through
             return False
@@ -559,8 +565,8 @@ class TestCase(object):
             return
         expecting_failure = getattr(testMethod,
                                     "__unittest_expecting_failure__", False)
+        outcome = _Outcome(result)
         try:
-            outcome = _Outcome(result)
             self._outcome = outcome
 
             with outcome.testPartExecutor(self):
@@ -592,6 +598,15 @@ class TestCase(object):
                 stopTestRun = getattr(result, 'stopTestRun', None)
                 if stopTestRun is not None:
                     stopTestRun()
+
+            # explicitly break reference cycles:
+            # outcome.errors -> frame -> outcome -> outcome.errors
+            # outcome.expectedFailure -> frame -> outcome -> outcome.expectedFailure
+            outcome.errors.clear()
+            outcome.expectedFailure = None
+
+            # clear the outcome, no more needed
+            self._outcome = None
 
     def doCleanups(self):
         """Execute all cleanup functions. Normally called for you after

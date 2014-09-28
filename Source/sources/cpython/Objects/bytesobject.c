@@ -107,7 +107,7 @@ PyBytes_FromStringAndSize(const char *str, Py_ssize_t size)
     op = (PyBytesObject *)PyObject_MALLOC(PyBytesObject_SIZE + size);
     if (op == NULL)
         return PyErr_NoMemory();
-    PyObject_INIT_VAR(op, &PyBytes_Type, size);
+    (void)PyObject_INIT_VAR(op, &PyBytes_Type, size);
     op->ob_shash = -1;
     if (str != NULL)
         Py_MEMCPY(op->ob_sval, str, size);
@@ -155,7 +155,7 @@ PyBytes_FromString(const char *str)
     op = (PyBytesObject *)PyObject_MALLOC(PyBytesObject_SIZE + size);
     if (op == NULL)
         return PyErr_NoMemory();
-    PyObject_INIT_VAR(op, &PyBytes_Type, size);
+    (void)PyObject_INIT_VAR(op, &PyBytes_Type, size);
     op->ob_shash = -1;
     Py_MEMCPY(op->ob_sval, str, size+1);
     /* share short strings */
@@ -195,8 +195,17 @@ PyBytes_FromFormatV(const char *format, va_list vargs)
 
             switch (*f) {
             case 'c':
-                (void)va_arg(count, int);
-                /* fall through... */
+            {
+                int c = va_arg(count, int);
+                if (c < 0 || c > 255) {
+                    PyErr_SetString(PyExc_OverflowError,
+                                    "PyBytes_FromFormatV(): %c format "
+                                    "expects an integer in range [0; 255]");
+                    return NULL;
+                }
+                n++;
+                break;
+            }
             case '%':
                 n++;
                 break;
@@ -276,8 +285,12 @@ PyBytes_FromFormatV(const char *format, va_list vargs)
 
             switch (*f) {
             case 'c':
-                *s++ = va_arg(vargs, int);
+            {
+                int c = va_arg(vargs, int);
+                /* c has been checked for overflow in the first step */
+                *s++ = (unsigned char)c;
                 break;
+            }
             case 'd':
                 if (longflag)
                     sprintf(s, "%ld", va_arg(vargs, long));
@@ -749,7 +762,7 @@ bytes_repeat(PyBytesObject *a, Py_ssize_t n)
     op = (PyBytesObject *)PyObject_MALLOC(PyBytesObject_SIZE + nbytes);
     if (op == NULL)
         return PyErr_NoMemory();
-    PyObject_INIT_VAR(op, &PyBytes_Type, size);
+    (void)PyObject_INIT_VAR(op, &PyBytes_Type, size);
     op->ob_shash = -1;
     op->ob_sval[size] = '\0';
     if (Py_SIZE(a) == 1 && n > 0) {
@@ -802,6 +815,23 @@ bytes_item(PyBytesObject *a, Py_ssize_t i)
     return PyLong_FromLong((unsigned char)a->ob_sval[i]);
 }
 
+Py_LOCAL(int)
+bytes_compare_eq(PyBytesObject *a, PyBytesObject *b)
+{
+    int cmp;
+    Py_ssize_t len;
+
+    len = Py_SIZE(a);
+    if (Py_SIZE(b) != len)
+        return 0;
+
+    if (a->ob_sval[0] != b->ob_sval[0])
+        return 0;
+
+    cmp = memcmp(a->ob_sval, b->ob_sval, len);
+    return (cmp == 0);
+}
+
 static PyObject*
 bytes_richcompare(PyBytesObject *a, PyBytesObject *b, int op)
 {
@@ -822,53 +852,55 @@ bytes_richcompare(PyBytesObject *a, PyBytesObject *b, int op)
                 return NULL;
         }
         result = Py_NotImplemented;
-        goto out;
     }
-    if (a == b) {
+    else if (a == b) {
         switch (op) {
-        case Py_EQ:case Py_LE:case Py_GE:
+        case Py_EQ:
+        case Py_LE:
+        case Py_GE:
+            /* a string is equal to itself */
             result = Py_True;
-            goto out;
-        case Py_NE:case Py_LT:case Py_GT:
+            break;
+        case Py_NE:
+        case Py_LT:
+        case Py_GT:
             result = Py_False;
-            goto out;
+            break;
+        default:
+            PyErr_BadArgument();
+            return NULL;
         }
     }
-    if (op == Py_EQ) {
-        /* Supporting Py_NE here as well does not save
-           much time, since Py_NE is rarely used.  */
-        if (Py_SIZE(a) == Py_SIZE(b)
-            && (a->ob_sval[0] == b->ob_sval[0]
-            && memcmp(a->ob_sval, b->ob_sval, Py_SIZE(a)) == 0)) {
-            result = Py_True;
-        } else {
-            result = Py_False;
+    else if (op == Py_EQ || op == Py_NE) {
+        int eq = bytes_compare_eq(a, b);
+        eq ^= (op == Py_NE);
+        result = eq ? Py_True : Py_False;
+    }
+    else {
+        len_a = Py_SIZE(a);
+        len_b = Py_SIZE(b);
+        min_len = Py_MIN(len_a, len_b);
+        if (min_len > 0) {
+            c = Py_CHARMASK(*a->ob_sval) - Py_CHARMASK(*b->ob_sval);
+            if (c == 0)
+                c = memcmp(a->ob_sval, b->ob_sval, min_len);
         }
-        goto out;
+        else
+            c = 0;
+        if (c == 0)
+            c = (len_a < len_b) ? -1 : (len_a > len_b) ? 1 : 0;
+        switch (op) {
+        case Py_LT: c = c <  0; break;
+        case Py_LE: c = c <= 0; break;
+        case Py_GT: c = c >  0; break;
+        case Py_GE: c = c >= 0; break;
+        default:
+            PyErr_BadArgument();
+            return NULL;
+        }
+        result = c ? Py_True : Py_False;
     }
-    len_a = Py_SIZE(a); len_b = Py_SIZE(b);
-    min_len = (len_a < len_b) ? len_a : len_b;
-    if (min_len > 0) {
-        c = Py_CHARMASK(*a->ob_sval) - Py_CHARMASK(*b->ob_sval);
-        if (c==0)
-            c = memcmp(a->ob_sval, b->ob_sval, min_len);
-    } else
-        c = 0;
-    if (c == 0)
-        c = (len_a < len_b) ? -1 : (len_a > len_b) ? 1 : 0;
-    switch (op) {
-    case Py_LT: c = c <  0; break;
-    case Py_LE: c = c <= 0; break;
-    case Py_EQ: assert(0);  break; /* unreachable */
-    case Py_NE: c = c != 0; break;
-    case Py_GT: c = c >  0; break;
-    case Py_GE: c = c >= 0; break;
-    default:
-        result = Py_NotImplemented;
-        goto out;
-    }
-    result = c ? Py_True : Py_False;
-  out:
+
     Py_INCREF(result);
     return result;
 }
@@ -878,7 +910,7 @@ bytes_hash(PyBytesObject *a)
 {
     if (a->ob_shash == -1) {
         /* Can't fail */
-        a->ob_shash = _Py_HashBytes((unsigned char *) a->ob_sval, Py_SIZE(a));
+        a->ob_shash = _Py_HashBytes(a->ob_sval, Py_SIZE(a));
     }
     return a->ob_shash;
 }
@@ -1347,7 +1379,7 @@ do_argstrip(PyBytesObject *self, int striptype, PyObject *args)
 {
     PyObject *sep = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)stripformat[striptype], &sep))
+    if (!PyArg_ParseTuple(args, stripformat[striptype], &sep))
         return NULL;
 
     if (sep != NULL && sep != Py_None) {
@@ -2370,7 +2402,7 @@ bytes_methods[] = {
     {"decode", (PyCFunction)bytes_decode, METH_VARARGS | METH_KEYWORDS, decode__doc__},
     {"endswith", (PyCFunction)bytes_endswith, METH_VARARGS,
      endswith__doc__},
-    {"expandtabs", (PyCFunction)stringlib_expandtabs, METH_VARARGS,
+    {"expandtabs", (PyCFunction)stringlib_expandtabs, METH_VARARGS | METH_KEYWORDS,
      expandtabs__doc__},
     {"find", (PyCFunction)bytes_find, METH_VARARGS, find__doc__},
     {"fromhex", (PyCFunction)bytes_fromhex, METH_VARARGS|METH_CLASS,
@@ -2660,9 +2692,8 @@ PyBytes_FromObject(PyObject *x)
     return new;
 
   error:
-    /* Error handling when new != NULL */
     Py_XDECREF(it);
-    Py_DECREF(new);
+    Py_XDECREF(new);
     return NULL;
 }
 
@@ -2906,9 +2937,13 @@ striter_setstate(striterobject *it, PyObject *state)
     Py_ssize_t index = PyLong_AsSsize_t(state);
     if (index == -1 && PyErr_Occurred())
         return NULL;
-    if (index < 0)
-        index = 0;
-    it->it_index = index;
+    if (it->it_seq != NULL) {
+        if (index < 0)
+            index = 0;
+        else if (index > PyBytes_GET_SIZE(it->it_seq))
+            index = PyBytes_GET_SIZE(it->it_seq); /* iterator exhausted */
+        it->it_index = index;
+    }
     Py_RETURN_NONE;
 }
 

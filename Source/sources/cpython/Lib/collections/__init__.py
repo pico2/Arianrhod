@@ -3,9 +3,9 @@ __all__ = ['deque', 'defaultdict', 'namedtuple', 'UserDict', 'UserList',
 
 # For backwards compatibility, continue to make the collections ABCs
 # available through the collections module.
-from collections.abc import *
-import collections.abc
-__all__ += collections.abc.__all__
+from _collections_abc import *
+import _collections_abc
+__all__ += _collections_abc.__all__
 
 from _collections import deque, defaultdict
 from operator import itemgetter as _itemgetter, eq as _eq
@@ -274,9 +274,7 @@ class {typename}(tuple):
         return OrderedDict(zip(self._fields, self))
 
     def _asdict(self):
-        '''Return a new OrderedDict which maps field names to their values.
-           This method is obsolete.  Use vars(nt) or nt.__dict__ instead.
-        '''
+        'Return a new OrderedDict which maps field names to their values.'
         return self.__dict__
 
     def __getnewargs__(self):
@@ -325,6 +323,7 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
     if isinstance(field_names, str):
         field_names = field_names.replace(',', ' ').split()
     field_names = list(map(str, field_names))
+    typename = str(typename)
     if rename:
         seen = set()
         for index, name in enumerate(field_names):
@@ -335,6 +334,8 @@ def namedtuple(typename, field_names, verbose=False, rename=False):
                 field_names[index] = '_%d' % index
             seen.add(name)
     for name in [typename] + field_names:
+        if type(name) != str:
+            raise TypeError('Type names and field names must be strings')
         if not name.isidentifier():
             raise ValueError('Type names and field names must be valid '
                              'identifiers: %r' % name)

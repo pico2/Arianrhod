@@ -24,7 +24,7 @@ import traceback
 # If threading is available then ThreadPool should be provided.  Therefore
 # we avoid top-level imports which are liable to fail on some systems.
 from . import util
-from . import Process, cpu_count, TimeoutError, SimpleQueue
+from . import get_context, TimeoutError
 
 #
 # Constants representing the state of a pool
@@ -90,7 +90,8 @@ class MaybeEncodingError(Exception):
         return "<MaybeEncodingError: %s>" % str(self)
 
 
-def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None):
+def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None,
+           wrap_exception=False):
     assert maxtasks is None or (type(maxtasks) == int and maxtasks > 0)
     put = outqueue.put
     get = inqueue.get
@@ -117,7 +118,8 @@ def worker(inqueue, outqueue, initializer=None, initargs=(), maxtasks=None):
         try:
             result = (True, func(*args, **kwds))
         except Exception as e:
-            e = ExceptionWithTraceback(e, e.__traceback__)
+            if wrap_exception:
+                e = ExceptionWithTraceback(e, e.__traceback__)
             result = (False, e)
         try:
             put((job, i, result))
@@ -137,10 +139,14 @@ class Pool(object):
     '''
     Class which supports an async version of applying functions to arguments.
     '''
-    Process = Process
+    _wrap_exception = True
+
+    def Process(self, *args, **kwds):
+        return self._ctx.Process(*args, **kwds)
 
     def __init__(self, processes=None, initializer=None, initargs=(),
-                 maxtasksperchild=None):
+                 maxtasksperchild=None, context=None):
+        self._ctx = context or get_context()
         self._setup_queues()
         self._taskqueue = queue.Queue()
         self._cache = {}
@@ -172,7 +178,8 @@ class Pool(object):
 
         self._task_handler = threading.Thread(
             target=Pool._handle_tasks,
-            args=(self._taskqueue, self._quick_put, self._outqueue, self._pool)
+            args=(self._taskqueue, self._quick_put, self._outqueue,
+                  self._pool, self._cache)
             )
         self._task_handler.daemon = True
         self._task_handler._state = RUN
@@ -217,7 +224,8 @@ class Pool(object):
             w = self.Process(target=worker,
                              args=(self._inqueue, self._outqueue,
                                    self._initializer,
-                                   self._initargs, self._maxtasksperchild)
+                                   self._initargs, self._maxtasksperchild,
+                                   self._wrap_exception)
                             )
             self._pool.append(w)
             w.name = w.name.replace('Process', 'PoolWorker')
@@ -232,8 +240,8 @@ class Pool(object):
             self._repopulate_pool()
 
     def _setup_queues(self):
-        self._inqueue = SimpleQueue()
-        self._outqueue = SimpleQueue()
+        self._inqueue = self._ctx.SimpleQueue()
+        self._outqueue = self._ctx.SimpleQueue()
         self._quick_put = self._inqueue._writer.send
         self._quick_get = self._outqueue._reader.recv
 
@@ -362,7 +370,7 @@ class Pool(object):
         util.debug('worker handler exiting')
 
     @staticmethod
-    def _handle_tasks(taskqueue, put, outqueue, pool):
+    def _handle_tasks(taskqueue, put, outqueue, pool, cache):
         thread = threading.current_thread()
 
         for taskseq, set_length in iter(taskqueue.get, None):
@@ -373,9 +381,12 @@ class Pool(object):
                     break
                 try:
                     put(task)
-                except OSError:
-                    util.debug('could not put task on queue')
-                    break
+                except Exception as e:
+                    job, ind = task[:2]
+                    try:
+                        cache[job]._set(ind, (False, e))
+                    except KeyError:
+                        pass
             else:
                 if set_length:
                     util.debug('doing set_length()')
@@ -730,6 +741,7 @@ class IMapUnorderedIterator(IMapIterator):
 #
 
 class ThreadPool(Pool):
+    _wrap_exception = False
 
     @staticmethod
     def Process(*args, **kwds):

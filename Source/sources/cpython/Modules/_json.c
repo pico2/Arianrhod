@@ -287,7 +287,7 @@ _build_rval_index_tuple(PyObject *rval, Py_ssize_t idx) {
             } \
         } \
         if (PyList_Append(chunks, chunk)) { \
-            Py_DECREF(chunk); \
+            Py_CLEAR(chunk); \
             goto bail; \
         } \
         Py_CLEAR(chunk); \
@@ -409,17 +409,10 @@ scanstring_unicode(PyObject *pystr, Py_ssize_t end, int strict, Py_ssize_t *next
                 }
             }
             /* Surrogate pair */
-            if (Py_UNICODE_IS_HIGH_SURROGATE(c)) {
+            if (Py_UNICODE_IS_HIGH_SURROGATE(c) && end + 6 < len &&
+                PyUnicode_READ(kind, buf, next++) == '\\' &&
+                PyUnicode_READ(kind, buf, next++) == 'u') {
                 Py_UCS4 c2 = 0;
-                if (end + 6 >= len) {
-                    raise_errmsg("Unpaired high surrogate", pystr, end - 5);
-                    goto bail;
-                }
-                if (PyUnicode_READ(kind, buf, next++) != '\\' ||
-                    PyUnicode_READ(kind, buf, next++) != 'u') {
-                    raise_errmsg("Unpaired high surrogate", pystr, end - 5);
-                    goto bail;
-                }
                 end += 6;
                 /* Decode 4 hex digits */
                 for (; next < end; next++) {
@@ -440,15 +433,10 @@ scanstring_unicode(PyObject *pystr, Py_ssize_t end, int strict, Py_ssize_t *next
                             goto bail;
                     }
                 }
-                if (!Py_UNICODE_IS_LOW_SURROGATE(c2)) {
-                    raise_errmsg("Unpaired high surrogate", pystr, end - 5);
-                    goto bail;
-                }
-                c = Py_UNICODE_JOIN_SURROGATES(c, c2);
-            }
-            else if (Py_UNICODE_IS_LOW_SURROGATE(c)) {
-                raise_errmsg("Unpaired low surrogate", pystr, end - 5);
-                goto bail;
+                if (Py_UNICODE_IS_LOW_SURROGATE(c2))
+                    c = Py_UNICODE_JOIN_SURROGATES(c, c2);
+                else
+                    end -= 6;
             }
         }
         APPEND_OLD_CHUNK
@@ -953,6 +941,10 @@ scan_once_unicode(PyScannerObject *s, PyObject *pystr, Py_ssize_t idx, Py_ssize_
     kind = PyUnicode_KIND(pystr);
     length = PyUnicode_GET_LENGTH(pystr);
 
+    if (idx < 0) {
+        PyErr_SetString(PyExc_ValueError, "idx cannot be negative");
+        return NULL;
+    }
     if (idx >= length) {
         raise_stop_iteration(idx);
         return NULL;
@@ -1563,6 +1555,7 @@ encoder_listencode_dict(PyEncoderObject *s, _PyAccu *acc,
             if (item == NULL)
                 goto bail;
             PyList_SET_ITEM(items, i, item);
+            item = NULL;
             Py_DECREF(key);
         }
     }

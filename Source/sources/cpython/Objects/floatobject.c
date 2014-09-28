@@ -9,8 +9,6 @@
 #include <ctype.h>
 #include <float.h>
 
-#include "crtwrap.h"
-
 
 /* Special free list
    free_list is a singly-linked list of available PyFloatObjects, linked
@@ -121,7 +119,7 @@ PyFloat_FromDouble(double fval)
             return PyErr_NoMemory();
     }
     /* Inline PyObject_New */
-    PyObject_INIT(op, &PyFloat_Type);
+    (void)PyObject_INIT(op, &PyFloat_Type);
     op->ob_fval = fval;
     return (PyObject *) op;
 }
@@ -146,8 +144,9 @@ PyFloat_FromString(PyObject *v)
         }
     }
     else if (PyObject_AsCharBuffer(v, &s, &len)) {
-        PyErr_SetString(PyExc_TypeError,
-            "float() argument must be a string or a number");
+        PyErr_Format(PyExc_TypeError,
+            "float() argument must be a string or a number, not '%.200s'",
+            Py_TYPE(v)->tp_name);
         return NULL;
     }
     last = s + len;
@@ -1418,7 +1417,7 @@ Create a floating-point number from a hexadecimal string.\n\
 >>> float.fromhex('0x1.ffffp10')\n\
 2047.984375\n\
 >>> float.fromhex('-0x1p-1074')\n\
--4.9406564584124654e-324");
+-5e-324");
 
 
 static PyObject *

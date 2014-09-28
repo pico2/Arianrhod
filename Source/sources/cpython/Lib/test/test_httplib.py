@@ -21,13 +21,15 @@ CACERT_svn_python_org = os.path.join(here, 'https_svn_python_org_root.pem')
 HOST = support.HOST
 
 class FakeSocket:
-    def __init__(self, text, fileclass=io.BytesIO):
+    def __init__(self, text, fileclass=io.BytesIO, host=None, port=None):
         if isinstance(text, str):
             text = text.encode("ascii")
         self.text = text
         self.fileclass = fileclass
         self.data = b''
         self.sendall_calls = 0
+        self.host = host
+        self.port = port
 
     def sendall(self, data):
         self.sendall_calls += 1
@@ -37,6 +39,9 @@ class FakeSocket:
         if mode != 'r' and mode != 'rb':
             raise client.UnimplementedFileMode()
         return self.fileclass(self.text)
+
+    def close(self):
+        pass
 
 class EPipeSocket(FakeSocket):
 
@@ -134,7 +139,7 @@ class HeaderTests(TestCase):
         conn.sock = FakeSocket(None)
         conn.putrequest('GET','/')
         conn.putheader('Content-length', 42)
-        self.assertTrue(b'Content-length: 42' in conn._buffer)
+        self.assertIn(b'Content-length: 42', conn._buffer)
 
     def test_ipv6host_header(self):
         # Default host header on IPv6 transaction should wrapped by [] if
@@ -164,6 +169,9 @@ class BasicTest(TestCase):
         sock = FakeSocket(body)
         resp = client.HTTPResponse(sock)
         resp.begin()
+        self.assertEqual(resp.read(0), b'')  # Issue #20007
+        self.assertFalse(resp.isclosed())
+        self.assertFalse(resp.closed)
         self.assertEqual(resp.read(), b"Text")
         self.assertTrue(resp.isclosed())
         self.assertFalse(resp.closed)
@@ -346,6 +354,15 @@ class BasicTest(TestCase):
         if resp.readinto(b) != 0:
             self.fail("Did not expect response from HEAD request")
         self.assertEqual(bytes(b), b'\x00'*5)
+
+    def test_too_many_headers(self):
+        headers = '\r\n'.join('Header%d: foo' % i
+                              for i in range(client._MAXHEADERS + 1)) + '\r\n'
+        text = ('HTTP/1.1 200 OK\r\n' + headers)
+        s = FakeSocket(text)
+        r = client.HTTPResponse(s)
+        self.assertRaisesRegex(client.HTTPException,
+                               r"got more than \d+ headers", r.begin)
 
     def test_send_file(self):
         expected = (b'GET /foo HTTP/1.1\r\nHost: example.com\r\n'
@@ -711,7 +728,7 @@ class TimeoutTest(TestCase):
         # and into the socket.
 
         # default -- use global socket timeout
-        self.assertTrue(socket.getdefaulttimeout() is None)
+        self.assertIsNone(socket.getdefaulttimeout())
         socket.setdefaulttimeout(30)
         try:
             httpConn = client.HTTPConnection(HOST, TimeoutTest.PORT)
@@ -722,7 +739,7 @@ class TimeoutTest(TestCase):
         httpConn.close()
 
         # no timeout -- do not use global socket default
-        self.assertTrue(socket.getdefaulttimeout() is None)
+        self.assertIsNone(socket.getdefaulttimeout())
         socket.setdefaulttimeout(30)
         try:
             httpConn = client.HTTPConnection(HOST, TimeoutTest.PORT,
@@ -958,10 +975,51 @@ class HTTPResponseTest(TestCase):
         header = self.resp.getheader('No-Such-Header',default=42)
         self.assertEqual(header, 42)
 
+class TunnelTests(TestCase):
+
+    def test_connect(self):
+        response_text = (
+            'HTTP/1.0 200 OK\r\n\r\n' # Reply to CONNECT
+            'HTTP/1.1 200 OK\r\n' # Reply to HEAD
+            'Content-Length: 42\r\n\r\n'
+        )
+
+        def create_connection(address, timeout=None, source_address=None):
+            return FakeSocket(response_text, host=address[0],
+                              port=address[1])
+
+        conn = client.HTTPConnection('proxy.com')
+        conn._create_connection = create_connection
+
+        # Once connected, we shouldn't be able to tunnel anymore
+        conn.connect()
+        self.assertRaises(RuntimeError, conn.set_tunnel,
+                          'destination.com')
+
+        # But if we close the connection, we're good
+        conn.close()
+        conn.set_tunnel('destination.com')
+        conn.request('HEAD', '/', '')
+
+        self.assertEqual(conn.sock.host, 'proxy.com')
+        self.assertEqual(conn.sock.port, 80)
+        self.assertTrue(b'CONNECT destination.com' in conn.sock.data)
+        self.assertTrue(b'Host: destination.com' in conn.sock.data)
+
+        # This test should be removed when CONNECT gets the HTTP/1.1 blessing
+        self.assertTrue(b'Host: proxy.com' not in conn.sock.data)
+
+        conn.close()
+        conn.request('PUT', '/', '')
+        self.assertEqual(conn.sock.host, 'proxy.com')
+        self.assertEqual(conn.sock.port, 80)
+        self.assertTrue(b'CONNECT destination.com' in conn.sock.data)
+        self.assertTrue(b'Host: destination.com' in conn.sock.data)
+
 def test_main(verbose=None):
     support.run_unittest(HeaderTests, OfflineTest, BasicTest, TimeoutTest,
                          HTTPSTest, RequestBodyTest, SourceAddressTest,
-                         HTTPResponseTest)
+                         HTTPResponseTest, TunnelTests)
 
 if __name__ == '__main__':
     test_main()

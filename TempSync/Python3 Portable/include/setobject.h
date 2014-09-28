@@ -50,7 +50,7 @@ struct _setobject {
      * saves repeated runtime null-tests.
      */
     setentry *table;
-    setentry *(*lookup)(PySetObject *so, PyObject *key, Py_hash_t hash);
+    setentry *(__cdecl *lookup)(PySetObject *so, PyObject *key, Py_hash_t hash);
     Py_hash_t hash;             /* only used by frozenset objects */
     setentry smalltable[PySet_MINSIZE];
 

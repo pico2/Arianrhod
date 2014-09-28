@@ -26,11 +26,16 @@ def iglob(pathname):
     patterns.
 
     """
-    if not has_magic(pathname):
-        if os.path.lexists(pathname):
-            yield pathname
-        return
     dirname, basename = os.path.split(pathname)
+    if not has_magic(pathname):
+        if basename:
+            if os.path.lexists(pathname):
+                yield pathname
+        else:
+            # Patterns ending with a slash should match only directories
+            if os.path.isdir(dirname):
+                yield pathname
+        return
     if not dirname:
         yield from glob1(None, basename)
         return
@@ -79,8 +84,8 @@ def glob0(dirname, basename):
     return []
 
 
-magic_check = re.compile('[*?[]')
-magic_check_bytes = re.compile(b'[*?[]')
+magic_check = re.compile('([*?[])')
+magic_check_bytes = re.compile(b'([*?[])')
 
 def has_magic(s):
     if isinstance(s, bytes):
@@ -91,3 +96,15 @@ def has_magic(s):
 
 def _ishidden(path):
     return path[0] in ('.', b'.'[0])
+
+def escape(pathname):
+    """Escape all special characters.
+    """
+    # Escaping is done by wrapping any of "*?[" between square brackets.
+    # Metacharacters do not work in the drive part and shouldn't be escaped.
+    drive, pathname = os.path.splitdrive(pathname)
+    if isinstance(pathname, bytes):
+        pathname = magic_check_bytes.sub(br'[\1]', pathname)
+    else:
+        pathname = magic_check.sub(r'[\1]', pathname)
+    return drive + pathname

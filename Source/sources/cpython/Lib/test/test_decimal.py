@@ -300,7 +300,6 @@ class IBMTestCases(unittest.TestCase):
                     #Exception raised where there shouldn't have been one.
                     self.fail('Exception "'+exception.__class__.__name__ + '" raised on line '+line)
 
-        return
 
     def eval_line(self, s):
         if s.find(' -> ') >= 0 and s[:2] != '--' and not s.startswith('  --'):
@@ -460,7 +459,6 @@ class IBMTestCases(unittest.TestCase):
 
         self.assertEqual(myexceptions, theirexceptions,
               'Incorrect flags set in ' + s + ' -- got ' + str(myexceptions))
-        return
 
     def getexceptions(self):
         return [e for e in Signals[self.decimal] if self.context.flags[e]]
@@ -1059,6 +1057,11 @@ class FormatTest(unittest.TestCase):
 
             # issue 6850
             ('a=-7.0', '0.12345', 'aaaa0.1'),
+
+            # issue 22090
+            ('<^+15.20%', 'inf', '<<+Infinity%<<<'),
+            ('\x07>,%', 'sNaN1234567', 'sNaN1234567%'),
+            ('=10.10%', 'NaN123', '   NaN123%'),
             ]
         for fmt, d, result in test_values:
             self.assertEqual(format(Decimal(d), fmt), result)
@@ -1072,7 +1075,7 @@ class FormatTest(unittest.TestCase):
         try:
             from locale import CHAR_MAX
         except ImportError:
-            return
+            self.skipTest('locale.CHAR_MAX not available')
 
         def make_grouping(lst):
             return ''.join([chr(x) for x in lst]) if self.decimal == C else lst
@@ -1163,8 +1166,12 @@ class FormatTest(unittest.TestCase):
 
         decimal_point = locale.localeconv()['decimal_point']
         thousands_sep = locale.localeconv()['thousands_sep']
-        if decimal_point != '\u066b' or thousands_sep != '\u066c':
-            return
+        if decimal_point != '\u066b':
+            self.skipTest('inappropriate decimal point separator'
+                          '({!a} not {!a})'.format(decimal_point, '\u066b'))
+        if thousands_sep != '\u066c':
+            self.skipTest('inappropriate thousands separator'
+                          '({!a} not {!a})'.format(thousands_sep, '\u066c'))
 
         self.assertEqual(format(Decimal('100000000.123'), 'n'),
                          '100\u066c000\u066c000\u066b123')
@@ -1514,7 +1521,6 @@ def thfunc1(cls):
     cls.assertTrue(c1.flags[Inexact])
     for sig in Overflow, Underflow, DivisionByZero, InvalidOperation:
         cls.assertFalse(c1.flags[sig])
-    return
 
 def thfunc2(cls):
     Decimal = cls.decimal.Decimal
@@ -1559,7 +1565,6 @@ def thfunc2(cls):
     cls.assertTrue(thiscontext.flags[Inexact])
     for sig in Overflow, Underflow, DivisionByZero, InvalidOperation:
         cls.assertFalse(thiscontext.flags[sig])
-    return
 
 class ThreadingTest(unittest.TestCase):
     '''Unit tests for thread local contexts in Decimal.'''
@@ -1601,7 +1606,6 @@ class ThreadingTest(unittest.TestCase):
         DefaultContext.prec = save_prec
         DefaultContext.Emax = save_emax
         DefaultContext.Emin = save_emin
-        return
 
 @unittest.skipUnless(threading, 'threading required')
 class CThreadingTest(ThreadingTest):
@@ -2430,6 +2434,23 @@ class PythonAPItests(unittest.TestCase):
             sys.modules['decimal'] = C
             r = pickle.loads(sy)
             self.assertIsInstance(r, C.Decimal)
+            self.assertEqual(r, x)
+
+            x = C.Decimal('-3.123e81723').as_tuple()
+            y = P.Decimal('-3.123e81723').as_tuple()
+
+            sys.modules['decimal'] = C
+            sx = pickle.dumps(x)
+            sys.modules['decimal'] = P
+            r = pickle.loads(sx)
+            self.assertIsInstance(r, P.DecimalTuple)
+            self.assertEqual(r, y)
+
+            sys.modules['decimal'] = P
+            sy = pickle.dumps(y)
+            sys.modules['decimal'] = C
+            r = pickle.loads(sy)
+            self.assertIsInstance(r, C.DecimalTuple)
             self.assertEqual(r, x)
 
         sys.modules['decimal'] = savedecimal
@@ -4149,6 +4170,7 @@ class CheckAttributes(unittest.TestCase):
         self.assertTrue(P.HAVE_THREADS is True or P.HAVE_THREADS is False)
 
         self.assertEqual(C.__version__, P.__version__)
+        self.assertEqual(C.__libmpdec_version__, P.__libmpdec_version__)
 
         x = dir(C)
         y = [s for s in dir(P) if '__' in s or not s.startswith('_')]
@@ -4523,7 +4545,6 @@ class PyWhitebox(unittest.TestCase):
                 self.assertEqual(d1._sign, b1._sign)
                 self.assertEqual(d1._int, b1._int)
                 self.assertEqual(d1._exp, b1._exp)
-            return
 
         Decimal(d1)
         self.assertEqual(d1._sign, b1._sign)
@@ -5269,7 +5290,7 @@ class CWhitebox(unittest.TestCase):
         try:
             from locale import CHAR_MAX
         except ImportError:
-            return
+            self.skipTest('locale.CHAR_MAX not available')
 
         def make_grouping(lst):
             return ''.join([chr(x) for x in lst])
@@ -5413,7 +5434,7 @@ else:
     all_tests.insert(0, CheckAttributes)
 
 
-def test_main(arith=False, verbose=None, todo_tests=None, debug=None):
+def test_main(arith=None, verbose=None, todo_tests=None, debug=None):
     """ Execute the tests.
 
     Runs all arithmetic tests if arith is True or if the "decimal" resource
@@ -5423,7 +5444,7 @@ def test_main(arith=False, verbose=None, todo_tests=None, debug=None):
     init(C)
     init(P)
     global TEST_ALL, DEBUG
-    TEST_ALL = arith or is_resource_enabled('decimal')
+    TEST_ALL = arith if arith is not None else is_resource_enabled('decimal')
     DEBUG = debug
 
     if todo_tests is None:

@@ -228,21 +228,12 @@ Operations which work with sequences (some of them with mappings too) include:
 
    Set the value of *a* at index *b* to *c*.
 
-Example: Build a dictionary that maps the ordinals from ``0`` to ``255`` to
-their character equivalents.
-
-   >>> d = {}
-   >>> keys = range(256)
-   >>> vals = map(chr, keys)
-   >>> map(operator.setitem, [d]*len(keys), keys, vals)   # doctest: +SKIP
-
-.. XXX: find a better, readable, example
 
 .. function:: length_hint(obj, default=0)
 
-   Return an estimated length for the object *o*. First trying to return its
+   Return an estimated length for the object *o*. First try to return its
    actual length, then an estimate using :meth:`object.__length_hint__`, and
-   finally returning the default value.
+   finally return the default value.
 
    .. versionadded:: 3.4
 
@@ -265,7 +256,7 @@ expect a function argument.
      ``(b.name, b.date)``.
 
    * After ``f = attrgetter('name.first', 'name.last')``, the call ``f(b)``
-     returns ``(r.name.first, r.name.last)``.
+     returns ``(b.name.first, b.name.last)``.
 
    Equivalent to::
 

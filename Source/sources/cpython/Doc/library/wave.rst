@@ -19,7 +19,7 @@ The :mod:`wave` module defines the following function and exception:
 .. function:: open(file, mode=None)
 
    If *file* is a string, open the file by that name, otherwise treat it as a
-   seekable file-like object.  *mode* can be:
+   file-like object.  *mode* can be:
 
    ``'rb'``
       Read only mode.
@@ -43,6 +43,8 @@ The :mod:`wave` module defines the following function and exception:
    <wave.Wave_read.close>` or :meth:`Wave_write.close()
    <wave.Wave_write.close()>` method is called.
 
+   .. versionchanged:: 3.4
+      Added support for unseekable files.
 
 .. function:: openfp(file, mode)
 
@@ -148,13 +150,30 @@ them, and is otherwise implementation dependent.
 Wave_write Objects
 ------------------
 
+For seekable output streams, the ``wave`` header will automatically be updated
+to reflect the number of frames actually written.  For unseekable streams, the
+*nframes* value must be accurate when the first frame data is written.  An
+accurate *nframes* value can be achieved either by calling
+:meth:`~Wave_write.setnframes` or :meth:`~Wave_write.setparams` with the number
+of frames that will be written before :meth:`~Wave_write.close` is called and
+then using :meth:`~Wave_write.writeframesraw` to write the frame data, or by
+calling :meth:`~Wave_write.writeframes` with all of the frame data to be
+written.  In the latter case :meth:`~Wave_write.writeframes` will calculate
+the number of frames in the data and set *nframes* accordingly before writing
+the frame data.
+
 Wave_write objects, as returned by :func:`.open`, have the following methods:
+
+.. versionchanged:: 3.4
+   Added support for unseekable files.
 
 
 .. method:: Wave_write.close()
 
    Make sure *nframes* is correct, and close the file if it was opened by
-   :mod:`wave`.  This method is called upon object collection.
+   :mod:`wave`.  This method is called upon object collection.  It will raise
+   an exception if the output stream is not seekable and *nframes* does not
+   match the number of frames actually written.
 
 
 .. method:: Wave_write.setnchannels(n)
@@ -178,8 +197,9 @@ Wave_write objects, as returned by :func:`.open`, have the following methods:
 
 .. method:: Wave_write.setnframes(n)
 
-   Set the number of frames to *n*. This will be changed later if more frames are
-   written.
+   Set the number of frames to *n*.  This will be changed later if the number
+   of frames actually written is different (this update attempt will
+   raise an error if the output stream is not seekable).
 
 
 .. method:: Wave_write.setcomptype(type, name)
@@ -205,10 +225,19 @@ Wave_write objects, as returned by :func:`.open`, have the following methods:
 
    Write audio frames, without correcting *nframes*.
 
+   .. versionchanged:: 3.4
+      Any :term:`bytes-like object` is now accepted.
+
 
 .. method:: Wave_write.writeframes(data)
 
-   Write audio frames and make sure *nframes* is correct.
+   Write audio frames and make sure *nframes* is correct.  It will raise an
+   error if the output stream is not seekable and the total number of frames
+   that have been written after *data* has been written does not match the
+   previously set value for *nframes*.
+
+   .. versionchanged:: 3.4
+      Any :term:`bytes-like object` is now accepted.
 
 
 Note that it is invalid to set any parameters after calling :meth:`writeframes`

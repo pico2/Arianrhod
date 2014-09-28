@@ -1,20 +1,33 @@
 Building a Python Mac OS X distribution
 =======================================
 
-The ``build-install.py`` script creates Python distributions, including
+The ``build-installer.py`` script creates Python distributions, including
 certain third-party libraries as necessary.  It builds a complete 
 framework-based Python out-of-tree, installs it in a funny place with 
 $DESTROOT, massages that installation to remove .pyc files and such, creates 
 an Installer package from the installation plus other files in ``resources`` 
 and ``scripts`` and placed that on a ``.dmg`` disk image.
 
-As of Python 3.3.0, PSF practice is to build two installer variants
+This installers built by this script are legacy bundle installers that have
+been supported from the early days of OS X.  In particular, they are supported
+on OS X 10.3.9, the earliest supported release for builds from this script.
+
+Beginning with Python 3.4.2, PSF practice is to build two installer variants
+using the newer flat package format, supported on 10.5+, and signed with the
+builder's Apple developer key, allowing downloaded packages to satisfy Apple's
+default Gatekeeper policy (e.g. starting with 10.8, Apple store downloads and
+Apple developer ID signed apps and installer packages).  The process for
+transforming the output build artifacts into signed flat packages is not
+yet integrated into ``build-installer.py``.  The steps prior to the flat
+package creation are the same as for 3.4.1 below.
+
+For Python 3.4.0 and 3.4.1, PSF practice was to build two installer variants
 for each release.
 
 1.  32-bit-only, i386 and PPC universal, capable on running on all machines
-    supported by Mac OS X 10.5 through (at least) 10.8::
+    supported by Mac OS X 10.5 through (at least) 10.9::
 
-        /usr/bin/python build-installer.py \
+        /path/to/bootstrap/python2.7 build-installer.py \
             --sdk-path=/Developer/SDKs/MacOSX10.5.sdk \
             --universal-archs=32-bit \
             --dep-target=10.5
@@ -22,14 +35,14 @@ for each release.
     - builds the following third-party libraries
 
         * NCurses 5.9 (http://bugs.python.org/issue15037)
-        * SQLite 3.7.13
-        * XZ 5.0.3
+        * SQLite 3.8.3.1
+        * XZ 5.0.5
 
     - uses system-supplied versions of third-party libraries
 
         * readline module links with Apple BSD editline (libedit)
 
-    - requires ActiveState ``Tcl/Tk 8.4`` (currently 8.4.19) to be installed for building
+    - requires ActiveState ``Tcl/Tk 8.4`` (currently 8.4.20) to be installed for building
 
     - recommended build environment:
 
@@ -38,7 +51,8 @@ for each release.
         * ``MacOSX10.5`` SDK
         * ``MACOSX_DEPLOYMENT_TARGET=10.5``
         * Apple ``gcc-4.2``
-        * system Python 2.5 for documentation build with Sphinx
+        * bootstrap non-framework Python 2.7 for documentation build with
+          Sphinx (as of 3.4.1)
 
     - alternate build environments:
 
@@ -48,7 +62,7 @@ for each release.
 
 2.  64-bit / 32-bit, x86_64 and i386 universal, for OS X 10.6 (and later)::
 
-        /usr/bin/python build-installer.py \
+        /path/to/bootstrap/python2.7 build-installer.py \
             --sdk-path=/Developer/SDKs/MacOSX10.6.sdk \
             --universal-archs=intel \
             --dep-target=10.6
@@ -56,43 +70,14 @@ for each release.
     - builds the following third-party libraries
 
         * NCurses 5.9 (http://bugs.python.org/issue15037)
-        * SQLite 3.7.13
-        * Tcl 8.5.14
-        * Tk 8.5.14
-        * XZ 5.0.3
+        * SQLite 3.8.3.1
+        * XZ 5.0.5
 
     - uses system-supplied versions of third-party libraries
 
         * readline module links with Apple BSD editline (libedit)
 
-    - requires ActiveState Tcl/Tk 8.5.14 (or later) to be installed for building
-
-        * Beginning with Python 3.4 alpha2, this installer now includes its own
-          private copy of Tcl and Tk 8.5.14 libraries and thus is no longer
-          dependent on the buggy releases of Aqua Cocoa Tk 8.5 shipped with
-          OS X 10.6 or on installing a newer third-party version of Tcl/Tk
-          in /Library/Frameworks, such as from ActiveState.  Because this
-          is a new feature, it should be considered somewhat experimental and
-          subject to change prior to the final release of Python 3.4.  If it
-          is necessary to fallback to using a third-party Tcl/Tk because of
-          a problem with the private Tcl/Tk, there is a backup version of
-          the _tkinter extension included which will dynamically link to
-          Tcl and Tk frameworks in /Library/Frameworks as in previous releases.
-          To enable (for all users of this Python 3.4)::
-
-              sudo bash
-              cd /Library/Frameworks/Python.framework/Versions/3.4
-              cd ./lib/python3.4/lib-dynload
-              cp -p _tkinter.so.framework _tkinter.so
-              exit
-
-          To restore using Python's private versions of Tcl and Tk::
-
-              sudo bash
-              cd /Library/Frameworks/Python.framework/Versions/3.4
-              cd ./lib/python3.4/lib-dynload
-              cp -p _tkinter.so.private _tkinter.so
-              exit
+    - requires ActiveState Tcl/Tk 8.5.15.1 (or later) to be installed for building
 
     - recommended build environment:
 
@@ -101,7 +86,8 @@ for each release.
         * ``MacOSX10.6`` SDK
         * ``MACOSX_DEPLOYMENT_TARGET=10.6``
         * Apple ``gcc-4.2``
-        * system Python 2.6 for documentation build with Sphinx
+        * bootstrap non-framework Python 2.7 for documentation build with
+          Sphinx (as of 3.4.1)
 
     - alternate build environments:
 
@@ -111,10 +97,10 @@ for each release.
           considered a migration aid by Apple and is not likely to be fixed,
           its use should be avoided.  The other compiler, ``clang``, has been
           undergoing rapid development.  While it appears to have become
-          production-ready in the most recent Xcode 4 releases (Xcode 4.6.3
-          as of this writing), there are still some open issues when
-          building Python and there has not yet been the level of exposure in
-          production environments that the Xcode 3 gcc-4.2 compiler has had.
+          production-ready in the most recent Xcode 5 releases, the versions
+          available on the deprecated Xcode 4.x for 10.6 were early releases
+          and did not receive the level of exposure in production environments
+          that the Xcode 3 gcc-4.2 compiler has had.
 
 
 *   For Python 2.7.x and 3.2.x, the 32-bit-only installer was configured to
@@ -140,7 +126,7 @@ for each release.
         * Zlib 1.2.3
         * Oracle Sleepycat DB 4.8 (Python 2.x only)
 
-    - requires ActiveState ``Tcl/Tk 8.4`` (currently 8.4.19) to be installed for building
+    - requires ActiveState ``Tcl/Tk 8.4`` (currently 8.4.20) to be installed for building
 
     - recommended build environment:
         
@@ -166,7 +152,13 @@ General Prerequisites
   interfere with the build.
 
 * The documentation for the release is built using Sphinx
-  because it is included in the installer.
+  because it is included in the installer.  For 2.7.x and 3.x.x up to and
+  including 3.4.0, the ``Doc/Makefile`` uses ``svn`` to download repos of
+  ``Sphinx`` and its dependencies.  Beginning with 3.4.1, the ``Doc/Makefile``
+  assumes there is an externally-provided ``sphinx-build`` and requires at
+  least Python 2.6 to run.  Because of this, it is no longer possible to
+  build a 3.4.1 or later installer on OS X 10.5 using the Apple-supplied
+  Python 2.5.
 
 * It is safest to start each variant build with an empty source directory
   populated with a fresh copy of the untarred source.
@@ -224,8 +216,8 @@ Ideally, the resulting binaries should be installed and the test suite run
 on all supported OS X releases and architectures.  As a practical matter,
 that is generally not possible.  At a minimum, variant 1 should be run on
 a PPC G4 system with OS X 10.5 and at least one Intel system running OS X
-10.8, 10.7, 10.6, or 10.5.  Variant 2 should be run on 10.8, 10.7, and 10.6
-systems in both 32-bit and 64-bit modes.::
+10.9, 10.8, 10.7, 10.6, or 10.5.  Variant 2 should be run on 10.9, 10.8,
+10.7, and 10.6 systems in both 32-bit and 64-bit modes.::
 
     /usr/local/bin/pythonn.n -m test -w -u all,-largefile
     /usr/local/bin/pythonn.n-32 -m test -w -u all
@@ -236,7 +228,7 @@ to be generated at several points during a test run.  These are normal
 during testing and can be ignored.
 
 It is also recommend to launch IDLE and verify that it is at least
-functional.  Double-click on the IDLE app icon in ``/Applications/Pythonn.n``.
+functional.  Double-click on the IDLE app icon in ``/Applications/Python n.n``.
 It should also be tested from the command line::
 
     /usr/local/bin/idlen.n

@@ -43,17 +43,17 @@ The module provides the following classes:
    For example, the following calls all create instances that connect to the server
    at the same host and port::
 
-      >>> h1 = http.client.HTTPConnection('www.cwi.nl')
-      >>> h2 = http.client.HTTPConnection('www.cwi.nl:80')
-      >>> h3 = http.client.HTTPConnection('www.cwi.nl', 80)
-      >>> h3 = http.client.HTTPConnection('www.cwi.nl', 80, timeout=10)
+      >>> h1 = http.client.HTTPConnection('www.python.org')
+      >>> h2 = http.client.HTTPConnection('www.python.org:80')
+      >>> h3 = http.client.HTTPConnection('www.python.org', 80)
+      >>> h4 = http.client.HTTPConnection('www.python.org', 80, timeout=10)
 
    .. versionchanged:: 3.2
       *source_address* was added.
 
    .. versionchanged:: 3.4
-      The  *strict* parameter is removed. HTTP 0.9-style "Simple Responses" are
-      not supported.
+      The  *strict* parameter was removed. HTTP 0.9-style "Simple Responses" are
+      not longer supported.
 
 
 .. class:: HTTPSConnection(host, port=None, key_file=None, \
@@ -64,23 +64,27 @@ The module provides the following classes:
    A subclass of :class:`HTTPConnection` that uses SSL for communication with
    secure servers.  Default port is ``443``.  If *context* is specified, it
    must be a :class:`ssl.SSLContext` instance describing the various SSL
-   options.  If *context* is specified and has a :attr:`~ssl.SSLContext.verify_mode`
-   of either :data:`~ssl.CERT_OPTIONAL` or :data:`~ssl.CERT_REQUIRED`, then
-   by default *host* is matched against the host name(s) allowed by the
-   server's certificate.  If you want to change that behaviour, you can
-   explicitly set *check_hostname* to False.
+   options.
 
    *key_file* and *cert_file* are deprecated, please use
-   :meth:`ssl.SSLContext.load_cert_chain` instead.
+   :meth:`ssl.SSLContext.load_cert_chain` instead, or let
+   :func:`ssl.create_default_context` select the system's trusted CA
+   certificates for you.
 
-   If you access arbitrary hosts on the Internet, it is recommended to
-   require certificate checking and feed the *context* with a set of
-   trusted CA certificates::
+   The recommended way to connect to HTTPS hosts on the Internet is as
+   follows::
 
-      context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-      context.verify_mode = ssl.CERT_REQUIRED
-      context.load_verify_locations('/etc/pki/tls/certs/ca-bundle.crt')
-      h = client.HTTPSConnection('svn.python.org', 443, context=context)
+      context = ssl.create_default_context()
+      h = client.HTTPSConnection('www.python.org', 443, context=context)
+
+   Please read :ref:`ssl-security` for more information on best practices.
+
+   .. note::
+      If *context* is specified and has a :attr:`~ssl.SSLContext.verify_mode`
+      of either :data:`~ssl.CERT_OPTIONAL` or :data:`~ssl.CERT_REQUIRED`, then
+      by default *host* is matched against the host name(s) allowed by the
+      server's certificate.  If you want to change that behaviour, you can
+      explicitly set *check_hostname* to False.
 
    .. versionchanged:: 3.2
       *source_address*, *context* and *check_hostname* were added.
@@ -90,8 +94,8 @@ The module provides the following classes:
       if :data:`ssl.HAS_SNI` is true).
 
    .. versionchanged:: 3.4
-      The *strict* parameter is removed. HTTP 0.9-style "Simple Responses" are
-      not supported anymore.
+      The *strict* parameter was removed. HTTP 0.9-style "Simple Responses" are
+      no longer supported.
 
 
 .. class:: HTTPResponse(sock, debuglevel=0, method=None, url=None)
@@ -100,8 +104,8 @@ The module provides the following classes:
    instantiated directly by user.
 
    .. versionchanged:: 3.4
-      The *strict* parameter is removed. HTTP 0.9 style "Simple Responses" are
-      not supported anymore.
+      The *strict* parameter was removed. HTTP 0.9 style "Simple Responses" are
+      no longer supported.
 
 
 The following exceptions are raised as appropriate:
@@ -169,8 +173,8 @@ The following exceptions are raised as appropriate:
    A subclass of :exc:`HTTPException`.  Raised if a server responds with a HTTP
    status code that we don't understand.
 
-The constants defined in this module are:
 
+The constants defined in this module are:
 
 .. data:: HTTP_PORT
 
@@ -451,11 +455,25 @@ HTTPConnection Objects
 
 .. method:: HTTPConnection.set_tunnel(host, port=None, headers=None)
 
-   Set the host and the port for HTTP Connect Tunnelling. Normally used when it
-   is required to a HTTPS Connection through a proxy server.
+   Set the host and the port for HTTP Connect Tunnelling. This allows running
+   the connection through a proxy server.
 
-   The headers argument should be a mapping of extra HTTP headers to send
-   with the CONNECT request.
+   The host and port arguments specify the endpoint of the tunneled connection
+   (i.e. the address included in the CONNECT request, *not* the address of the
+   proxy server).
+
+   The headers argument should be a mapping of extra HTTP headers to send with
+   the CONNECT request.
+
+   For example, to tunnel through a HTTPS proxy server running locally on port
+   8080, we would pass the address of the proxy to the :class:`HTTPSConnection`
+   constructor, and the address of the host that we eventually want to reach to
+   the :meth:`~HTTPConnection.set_tunnel` method::
+
+      >>> import http.client
+      >>> conn = http.client.HTTPSConnection("localhost", 8080)
+      >>> conn.set_tunnel("www.python.org")
+      >>> conn.request("HEAD","/index.html")
 
    .. versionadded:: 3.2
 
@@ -573,7 +591,7 @@ statement.
 
 .. attribute:: HTTPResponse.closed
 
-   Is True if the stream is closed.
+   Is ``True`` if the stream is closed.
 
 Examples
 --------
@@ -642,7 +660,7 @@ request using http.client::
 
     >>> # This creates an HTTP message
     >>> # with the content of BODY as the enclosed representation
-    >>> # for the resource http://localhost:8080/foobar
+    >>> # for the resource http://localhost:8080/file
     ...
     >>> import http.client
     >>> BODY = "***filecontents***"

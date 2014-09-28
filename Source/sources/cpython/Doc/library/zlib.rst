@@ -88,8 +88,7 @@ The available exception and functions in this module are:
    that are expected to be most common should come at the end of the dictionary.
 
    .. versionchanged:: 3.3
-      Added the *method*, *wbits*, *memlevel*, *strategy* and *zdict*
-      parameters.
+      Added the *zdict* parameter and keyword argument support.
 
 
 .. function:: crc32(data[, value])
@@ -198,7 +197,7 @@ Decompression objects support the following methods and attributes:
 .. attribute:: Decompress.unused_data
 
    A bytes object which contains any bytes past the end of the compressed data. That is,
-   this remains ``""`` until the last byte that contains compression data is
+   this remains ``b""`` until the last byte that contains compression data is
    available.  If the whole bytestring turned out to contain compressed data, this is
    ``b""``, an empty bytes object.
 

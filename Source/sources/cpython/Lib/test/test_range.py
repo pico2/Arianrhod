@@ -353,9 +353,10 @@ class RangeTest(unittest.TestCase):
                      (13, 21, 3), (-2, 2, 2), (2**65, 2**65+2)]
         for proto in range(pickle.HIGHEST_PROTOCOL + 1):
             for t in testcases:
-                r = range(*t)
-                self.assertEqual(list(pickle.loads(pickle.dumps(r, proto))),
-                                 list(r))
+                with self.subTest(proto=proto, test=t):
+                    r = range(*t)
+                    self.assertEqual(list(pickle.loads(pickle.dumps(r, proto))),
+                                     list(r))
 
     def test_iterator_pickling(self):
         testcases = [(13,), (0, 11), (-22, 10), (20, 3, -1),
@@ -378,6 +379,30 @@ class RangeTest(unittest.TestCase):
                 d = pickle.dumps(it)
                 it = pickle.loads(d)
                 self.assertEqual(list(it), data[1:])
+
+    def test_exhausted_iterator_pickling(self):
+        r = range(2**65, 2**65+2)
+        i = iter(r)
+        while True:
+            r = next(i)
+            if r == 2**65+1:
+                break
+        d = pickle.dumps(i)
+        i2 = pickle.loads(d)
+        self.assertEqual(list(i), [])
+        self.assertEqual(list(i2), [])
+
+    def test_large_exhausted_iterator_pickling(self):
+        r = range(20)
+        i = iter(r)
+        while True:
+            r = next(i)
+            if r == 19:
+                break
+        d = pickle.dumps(i)
+        i2 = pickle.loads(d)
+        self.assertEqual(list(i), [])
+        self.assertEqual(list(i2), [])
 
     def test_odd_bug(self):
         # This used to raise a "SystemError: NULL result without error"

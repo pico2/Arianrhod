@@ -12,7 +12,7 @@ The :mod:`curses` module provides an interface to the curses library, the
 de-facto standard for portable advanced terminal handling.
 
 While curses is most widely used in the Unix environment, versions are available
-for DOS, OS/2, and possibly other systems as well.  This extension module is
+for Windows, DOS, and possibly other systems as well.  This extension module is
 designed to match the API of ncurses, an open-source curses library hosted on
 Linux and the BSD variants of Unix.
 
@@ -377,7 +377,7 @@ The module :mod:`curses` defines the following functions:
    is to be displayed.
 
 
-.. function:: newwin(begin_y, begin_x)
+.. function:: newwin(nlines, ncols)
               newwin(nlines, ncols, begin_y, begin_x)
 
    Return a new window, whose left-upper corner is at  ``(begin_y, begin_x)``, and

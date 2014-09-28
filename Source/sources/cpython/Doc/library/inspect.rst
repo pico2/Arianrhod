@@ -69,7 +69,12 @@ attributes:
 |           |                 | :term:`bytecode`          |
 +-----------+-----------------+---------------------------+
 |           | __defaults__    | tuple of any default      |
-|           |                 | values for arguments      |
+|           |                 | values for positional or  |
+|           |                 | keyword parameters        |
++-----------+-----------------+---------------------------+
+|           | __kwdefaults__  | mapping of any default    |
+|           |                 | values for keyword-only   |
+|           |                 | parameters                |
 +-----------+-----------------+---------------------------+
 |           | __globals__     | global namespace in which |
 |           |                 | this function was defined |
@@ -173,9 +178,9 @@ attributes:
 
    .. note::
 
-      :func:`getmembers` will only return metaclass attributes when the
-      argument is a class and those attributes have been listed in a custom
-      :meth:`__dir__`.
+      :func:`getmembers` will only return class attributes defined in the
+      metaclass when the argument is a class and those attributes have been
+      listed in the metaclass' custom :meth:`__dir__`.
 
 
 .. function:: getmoduleinfo(path)
@@ -429,18 +434,30 @@ function.
    Accepts a wide range of python callables, from plain functions and classes to
    :func:`functools.partial` objects.
 
+   Raises :exc:`ValueError` if no signature can be provided, and
+   :exc:`TypeError` if that type of object is not supported.
+
    .. note::
 
       Some callables may not be introspectable in certain implementations of
-      Python.  For example, in CPython, built-in functions defined in C provide
-      no metadata about their arguments.
+      Python.  For example, in CPython, some built-in functions defined in
+      C provide no metadata about their arguments.
 
 
-.. class:: Signature
+.. class:: Signature(parameters=None, \*, return_annotation=Signature.empty)
 
    A Signature object represents the call signature of a function and its return
    annotation.  For each parameter accepted by the function it stores a
    :class:`Parameter` object in its :attr:`parameters` collection.
+
+   The optional *parameters* argument is a sequence of :class:`Parameter`
+   objects, which is validated to check that there are no parameters with
+   duplicate names, and that the parameters are in the right order, i.e.
+   positional-only first, then positional-or-keyword, and that parameters with
+   defaults follow parameters without defaults.
+
+   The optional *return_annotation* argument, can be an arbitrary Python object,
+   is the "return" annotation of the callable.
 
    Signature objects are *immutable*.  Use :meth:`Signature.replace` to make a
    modified copy.
@@ -490,7 +507,7 @@ function.
          "(a, b) -> 'new return anno'"
 
 
-.. class:: Parameter
+.. class:: Parameter(name, kind, \*, default=Parameter.empty, annotation=Parameter.empty)
 
    Parameter objects are *immutable*.  Instead of modifying a Parameter object,
    you can use :meth:`Parameter.replace` to create a modified copy.
@@ -502,9 +519,8 @@ function.
 
    .. attribute:: Parameter.name
 
-      The name of the parameter as a string.  Must be a valid python identifier
-      name (with the exception of ``POSITIONAL_ONLY`` parameters, which can have
-      it set to ``None``).
+      The name of the parameter as a string.  The name must be a valid
+      Python identifier.
 
    .. attribute:: Parameter.default
 
@@ -588,6 +604,10 @@ function.
          >>> str(param.replace(default=Parameter.empty, annotation='spam'))
          "foo:'spam'"
 
+    .. versionchanged:: 3.4
+        In Python 3.3 Parameter objects were allowed to have ``name`` set
+        to ``None`` if their ``kind`` was set to ``POSITIONAL_ONLY``.
+        This is no longer permitted.
 
 .. class:: BoundArguments
 
@@ -709,6 +729,11 @@ Classes and functions
       Consider using the new :ref:`Signature Object <inspect-signature-object>`
       interface, which provides a better way of introspecting functions.
 
+   .. versionchanged:: 3.4
+      This function is now based on :func:`signature`, but still ignores
+      ``__wrapped__`` attributes and includes the already bound first
+      parameter in the signature output for bound methods.
+
 
 .. function:: getargvalues(frame)
 
@@ -753,7 +778,7 @@ Classes and functions
    metatype is in use, cls will be the first element of the tuple.
 
 
-.. function:: getcallargs(func[, *args][, **kwds])
+.. function:: getcallargs(func, *args, **kwds)
 
    Bind the *args* and *kwds* to the argument names of the Python function or
    method *func*, as if it was called with them. For bound methods, bind also the
@@ -928,8 +953,9 @@ but avoids executing code when it fetches attributes.
    that raise AttributeError). It can also return descriptors objects
    instead of instance members.
 
-   If the instance :attr:`__dict__` is shadowed by another member (for example a
-   property) then this function will be unable to find instance members.
+   If the instance :attr:`~object.__dict__` is shadowed by another member (for
+   example a property) then this function will be unable to find instance
+   members.
 
    .. versionadded:: 3.2
 
@@ -1007,6 +1033,8 @@ updated as expected:
 
    .. versionadded:: 3.3
 
+
+.. _inspect-module-cli:
 
 Command Line Interface
 ----------------------

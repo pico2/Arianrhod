@@ -17,6 +17,8 @@ static PyObject *ThreadError;
 static long nb_threads = 0;
 static PyObject *str_dict;
 
+_Py_IDENTIFIER(stderr);
+
 /* Lock objects */
 
 typedef struct {
@@ -68,7 +70,7 @@ acquire_timed(PyThread_type_lock lock, PY_TIMEOUT_T microseconds)
             Py_BEGIN_ALLOW_THREADS
             r = PyThread_acquire_lock_timed(lock, microseconds, 1);
             Py_END_ALLOW_THREADS
-        } 
+        }
 
         if (r == PY_LOCK_INTR) {
             /* Run signal handlers if we were interrupted.  Propagate
@@ -255,14 +257,17 @@ typedef struct {
 static void
 rlock_dealloc(rlockobject *self)
 {
-    assert(self->rlock_lock);
     if (self->in_weakreflist != NULL)
         PyObject_ClearWeakRefs((PyObject *) self);
-    /* Unlock the lock so it's safe to free it */
-    if (self->rlock_count > 0)
-        PyThread_release_lock(self->rlock_lock);
+    /* self->rlock_lock can be NULL if PyThread_allocate_lock() failed
+       in rlock_new() */
+    if (self->rlock_lock != NULL) {
+        /* Unlock the lock so it's safe to free it */
+        if (self->rlock_count > 0)
+            PyThread_release_lock(self->rlock_lock);
 
-    PyThread_free_lock(self->rlock_lock);
+        PyThread_free_lock(self->rlock_lock);
+    }
     Py_TYPE(self)->tp_free(self);
 }
 
@@ -374,13 +379,13 @@ current thread, release() needs to be called as many times for the lock\n\
 to be available for other threads.");
 
 static PyObject *
-rlock_acquire_restore(rlockobject *self, PyObject *arg)
+rlock_acquire_restore(rlockobject *self, PyObject *args)
 {
     long owner;
     unsigned long count;
     int r = 1;
 
-    if (!PyArg_ParseTuple(arg, "kl:_acquire_restore", &count, &owner))
+    if (!PyArg_ParseTuple(args, "(kl):_acquire_restore", &count, &owner))
         return NULL;
 
     if (!PyThread_acquire_lock(self->rlock_lock, 0)) {
@@ -452,15 +457,16 @@ rlock_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (rlockobject *) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->rlock_lock = PyThread_allocate_lock();
-        if (self->rlock_lock == NULL) {
-            type->tp_free(self);
-            PyErr_SetString(ThreadError, "can't allocate lock");
-            return NULL;
-        }
         self->in_weakreflist = NULL;
         self->rlock_owner = 0;
         self->rlock_count = 0;
+
+        self->rlock_lock = PyThread_allocate_lock();
+        if (self->rlock_lock == NULL) {
+            Py_DECREF(self);
+            PyErr_SetString(ThreadError, "can't allocate lock");
+            return NULL;
+        }
     }
 
     return (PyObject *) self;
@@ -482,7 +488,7 @@ static PyMethodDef rlock_methods[] = {
     {"_is_owned",     (PyCFunction)rlock_is_owned,
      METH_NOARGS, rlock_is_owned_doc},
     {"_acquire_restore", (PyCFunction)rlock_acquire_restore,
-     METH_O, rlock_acquire_restore_doc},
+     METH_VARARGS, rlock_acquire_restore_doc},
     {"_release_save", (PyCFunction)rlock_release_save,
      METH_NOARGS, rlock_release_save_doc},
     {"__enter__",    (PyCFunction)rlock_acquire,
@@ -1001,7 +1007,7 @@ t_bootstrap(void *boot_raw)
             PySys_WriteStderr(
                 "Unhandled exception in thread started by ");
             PyErr_Fetch(&exc, &value, &tb);
-            file = PySys_GetObject("stderr");
+            file = _PySys_GetObjectId(&PyId_stderr);
             if (file != NULL && file != Py_None)
                 PyFile_WriteObject(boot->func, file, 0);
             else

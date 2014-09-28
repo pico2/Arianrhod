@@ -109,6 +109,7 @@ import types
 import math
 import time
 import inspect
+import sys
 
 from os.path import isfile, split, join
 from copy import deepcopy
@@ -139,7 +140,7 @@ _tg_turtle_functions = ['back', 'backward', 'begin_fill', 'begin_poly', 'bk',
 _tg_utilities = ['write_docstringdict', 'done']
 
 __all__ = (_tg_classes + _tg_screen_functions + _tg_turtle_functions +
-           _tg_utilities) # + _math_functions)
+           _tg_utilities + ['Terminator']) # + _math_functions)
 
 _alias_list = ['addshape', 'backward', 'bk', 'fd', 'ht', 'lt', 'pd', 'pos',
                'pu', 'rt', 'seth', 'setpos', 'setposition', 'st',
@@ -992,6 +993,13 @@ class TurtleScreen(TurtleScreenBase):
         self._colormode = _CFG["colormode"]
         self._keys = []
         self.clear()
+        if sys.platform == 'darwin':
+            # Force Turtle window to the front on OS X. This is needed because
+            # the Turtle window will show behind the Terminal window when you
+            # start the demo from the command line.
+            rootwindow = cv.winfo_toplevel()
+            rootwindow.call('wm', 'attributes', '.', '-topmost', '1')
+            rootwindow.call('wm', 'attributes', '.', '-topmost', '0')
 
     def clear(self):
         """Delete all drawings and all turtles from the TurtleScreen.
@@ -2587,7 +2595,7 @@ class RawTurtle(TPen, TNavigator):
         Example (for a Turtle instance named turtle):
         >>> turtle.setundobuffer(42)
         """
-        if size is None:
+        if size is None or size <= 0:
             self.undobuffer = None
         else:
             self.undobuffer = Tbuffer(size)
@@ -2938,7 +2946,7 @@ class RawTurtle(TPen, TNavigator):
         self._stretchfactor = a11, a22
         self._shearfactor = a12/a22
         self._tilt = alfa
-        self._update()
+        self.pen(resizemode="user")
 
 
     def _polytrafo(self, poly):

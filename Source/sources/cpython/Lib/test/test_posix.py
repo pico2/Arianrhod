@@ -17,7 +17,6 @@ import stat
 import tempfile
 import unittest
 import warnings
-import _testcapi
 
 _DUMMY_SYMLINK = os.path.join(tempfile.gettempdir(),
                               support.TESTFN + '-dummy-symlink')
@@ -54,47 +53,55 @@ class PosixTester(unittest.TestCase):
                 posix_func()
                 self.assertRaises(TypeError, posix_func, 1)
 
-    if hasattr(posix, 'getresuid'):
-        def test_getresuid(self):
-            user_ids = posix.getresuid()
-            self.assertEqual(len(user_ids), 3)
-            for val in user_ids:
-                self.assertGreaterEqual(val, 0)
+    @unittest.skipUnless(hasattr(posix, 'getresuid'),
+                         'test needs posix.getresuid()')
+    def test_getresuid(self):
+        user_ids = posix.getresuid()
+        self.assertEqual(len(user_ids), 3)
+        for val in user_ids:
+            self.assertGreaterEqual(val, 0)
 
-    if hasattr(posix, 'getresgid'):
-        def test_getresgid(self):
-            group_ids = posix.getresgid()
-            self.assertEqual(len(group_ids), 3)
-            for val in group_ids:
-                self.assertGreaterEqual(val, 0)
+    @unittest.skipUnless(hasattr(posix, 'getresgid'),
+                         'test needs posix.getresgid()')
+    def test_getresgid(self):
+        group_ids = posix.getresgid()
+        self.assertEqual(len(group_ids), 3)
+        for val in group_ids:
+            self.assertGreaterEqual(val, 0)
 
-    if hasattr(posix, 'setresuid'):
-        def test_setresuid(self):
-            current_user_ids = posix.getresuid()
-            self.assertIsNone(posix.setresuid(*current_user_ids))
-            # -1 means don't change that value.
-            self.assertIsNone(posix.setresuid(-1, -1, -1))
+    @unittest.skipUnless(hasattr(posix, 'setresuid'),
+                         'test needs posix.setresuid()')
+    def test_setresuid(self):
+        current_user_ids = posix.getresuid()
+        self.assertIsNone(posix.setresuid(*current_user_ids))
+        # -1 means don't change that value.
+        self.assertIsNone(posix.setresuid(-1, -1, -1))
 
-        def test_setresuid_exception(self):
-            # Don't do this test if someone is silly enough to run us as root.
-            current_user_ids = posix.getresuid()
-            if 0 not in current_user_ids:
-                new_user_ids = (current_user_ids[0]+1, -1, -1)
-                self.assertRaises(OSError, posix.setresuid, *new_user_ids)
+    @unittest.skipUnless(hasattr(posix, 'setresuid'),
+                         'test needs posix.setresuid()')
+    def test_setresuid_exception(self):
+        # Don't do this test if someone is silly enough to run us as root.
+        current_user_ids = posix.getresuid()
+        if 0 not in current_user_ids:
+            new_user_ids = (current_user_ids[0]+1, -1, -1)
+            self.assertRaises(OSError, posix.setresuid, *new_user_ids)
 
-    if hasattr(posix, 'setresgid'):
-        def test_setresgid(self):
-            current_group_ids = posix.getresgid()
-            self.assertIsNone(posix.setresgid(*current_group_ids))
-            # -1 means don't change that value.
-            self.assertIsNone(posix.setresgid(-1, -1, -1))
+    @unittest.skipUnless(hasattr(posix, 'setresgid'),
+                         'test needs posix.setresgid()')
+    def test_setresgid(self):
+        current_group_ids = posix.getresgid()
+        self.assertIsNone(posix.setresgid(*current_group_ids))
+        # -1 means don't change that value.
+        self.assertIsNone(posix.setresgid(-1, -1, -1))
 
-        def test_setresgid_exception(self):
-            # Don't do this test if someone is silly enough to run us as root.
-            current_group_ids = posix.getresgid()
-            if 0 not in current_group_ids:
-                new_group_ids = (current_group_ids[0]+1, -1, -1)
-                self.assertRaises(OSError, posix.setresgid, *new_group_ids)
+    @unittest.skipUnless(hasattr(posix, 'setresgid'),
+                         'test needs posix.setresgid()')
+    def test_setresgid_exception(self):
+        # Don't do this test if someone is silly enough to run us as root.
+        current_group_ids = posix.getresgid()
+        if 0 not in current_group_ids:
+            new_group_ids = (current_group_ids[0]+1, -1, -1)
+            self.assertRaises(OSError, posix.setresgid, *new_group_ids)
 
     @unittest.skipUnless(hasattr(posix, 'initgroups'),
                          "test needs os.initgroups()")
@@ -121,29 +128,32 @@ class PosixTester(unittest.TestCase):
             else:
                 self.fail("Expected OSError to be raised by initgroups")
 
+    @unittest.skipUnless(hasattr(posix, 'statvfs'),
+                         'test needs posix.statvfs()')
     def test_statvfs(self):
-        if hasattr(posix, 'statvfs'):
-            self.assertTrue(posix.statvfs(os.curdir))
+        self.assertTrue(posix.statvfs(os.curdir))
 
+    @unittest.skipUnless(hasattr(posix, 'fstatvfs'),
+                         'test needs posix.fstatvfs()')
     def test_fstatvfs(self):
-        if hasattr(posix, 'fstatvfs'):
-            fp = open(support.TESTFN)
-            try:
-                self.assertTrue(posix.fstatvfs(fp.fileno()))
-                self.assertTrue(posix.statvfs(fp.fileno()))
-            finally:
-                fp.close()
+        fp = open(support.TESTFN)
+        try:
+            self.assertTrue(posix.fstatvfs(fp.fileno()))
+            self.assertTrue(posix.statvfs(fp.fileno()))
+        finally:
+            fp.close()
 
+    @unittest.skipUnless(hasattr(posix, 'ftruncate'),
+                         'test needs posix.ftruncate()')
     def test_ftruncate(self):
-        if hasattr(posix, 'ftruncate'):
-            fp = open(support.TESTFN, 'w+')
-            try:
-                # we need to have some data to truncate
-                fp.write('test')
-                fp.flush()
-                posix.ftruncate(fp.fileno(), 0)
-            finally:
-                fp.close()
+        fp = open(support.TESTFN, 'w+')
+        try:
+            # we need to have some data to truncate
+            fp.write('test')
+            fp.flush()
+            posix.ftruncate(fp.fileno(), 0)
+        finally:
+            fp.close()
 
     @unittest.skipUnless(hasattr(posix, 'truncate'), "test needs posix.truncate()")
     def test_truncate(self):
@@ -272,9 +282,21 @@ class PosixTester(unittest.TestCase):
     def test_writev(self):
         fd = os.open(support.TESTFN, os.O_RDWR | os.O_CREAT)
         try:
-            os.writev(fd, (b'test1', b'tt2', b't3'))
+            n = os.writev(fd, (b'test1', b'tt2', b't3'))
+            self.assertEqual(n, 10)
+
             os.lseek(fd, 0, os.SEEK_SET)
             self.assertEqual(b'test1tt2t3', posix.read(fd, 10))
+
+            # Issue #20113: empty list of buffers should not crash
+            try:
+                size = posix.writev(fd, [])
+            except OSError:
+                # writev(fd, []) raises OSError(22, "Invalid argument")
+                # on OpenIndiana
+                pass
+            else:
+                self.assertEqual(size, 0)
         finally:
             os.close(fd)
 
@@ -287,33 +309,46 @@ class PosixTester(unittest.TestCase):
             buf = [bytearray(i) for i in [5, 3, 2]]
             self.assertEqual(posix.readv(fd, buf), 10)
             self.assertEqual([b'test1', b'tt2', b't3'], [bytes(i) for i in buf])
+
+            # Issue #20113: empty list of buffers should not crash
+            try:
+                size = posix.readv(fd, [])
+            except OSError:
+                # readv(fd, []) raises OSError(22, "Invalid argument")
+                # on OpenIndiana
+                pass
+            else:
+                self.assertEqual(size, 0)
         finally:
             os.close(fd)
 
+    @unittest.skipUnless(hasattr(posix, 'dup'),
+                         'test needs posix.dup()')
     def test_dup(self):
-        if hasattr(posix, 'dup'):
-            fp = open(support.TESTFN)
-            try:
-                fd = posix.dup(fp.fileno())
-                self.assertIsInstance(fd, int)
-                os.close(fd)
-            finally:
-                fp.close()
+        fp = open(support.TESTFN)
+        try:
+            fd = posix.dup(fp.fileno())
+            self.assertIsInstance(fd, int)
+            os.close(fd)
+        finally:
+            fp.close()
 
+    @unittest.skipUnless(hasattr(posix, 'confstr'),
+                         'test needs posix.confstr()')
     def test_confstr(self):
-        if hasattr(posix, 'confstr'):
-            self.assertRaises(ValueError, posix.confstr, "CS_garbage")
-            self.assertEqual(len(posix.confstr("CS_PATH")) > 0, True)
+        self.assertRaises(ValueError, posix.confstr, "CS_garbage")
+        self.assertEqual(len(posix.confstr("CS_PATH")) > 0, True)
 
+    @unittest.skipUnless(hasattr(posix, 'dup2'),
+                         'test needs posix.dup2()')
     def test_dup2(self):
-        if hasattr(posix, 'dup2'):
-            fp1 = open(support.TESTFN)
-            fp2 = open(support.TESTFN)
-            try:
-                posix.dup2(fp1.fileno(), fp2.fileno())
-            finally:
-                fp1.close()
-                fp2.close()
+        fp1 = open(support.TESTFN)
+        fp2 = open(support.TESTFN)
+        try:
+            posix.dup2(fp1.fileno(), fp2.fileno())
+        finally:
+            fp1.close()
+            fp2.close()
 
     @unittest.skipUnless(hasattr(os, 'O_CLOEXEC'), "needs os.O_CLOEXEC")
     @support.requires_linux_version(2, 6, 23)
@@ -322,65 +357,69 @@ class PosixTester(unittest.TestCase):
         self.addCleanup(os.close, fd)
         self.assertTrue(fcntl.fcntl(fd, fcntl.F_GETFD) & fcntl.FD_CLOEXEC)
 
+    @unittest.skipUnless(hasattr(posix, 'O_EXLOCK'),
+                         'test needs posix.O_EXLOCK')
     def test_osexlock(self):
-        if hasattr(posix, "O_EXLOCK"):
+        fd = os.open(support.TESTFN,
+                     os.O_WRONLY|os.O_EXLOCK|os.O_CREAT)
+        self.assertRaises(OSError, os.open, support.TESTFN,
+                          os.O_WRONLY|os.O_EXLOCK|os.O_NONBLOCK)
+        os.close(fd)
+
+        if hasattr(posix, "O_SHLOCK"):
             fd = os.open(support.TESTFN,
-                         os.O_WRONLY|os.O_EXLOCK|os.O_CREAT)
+                         os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
             self.assertRaises(OSError, os.open, support.TESTFN,
                               os.O_WRONLY|os.O_EXLOCK|os.O_NONBLOCK)
             os.close(fd)
 
-            if hasattr(posix, "O_SHLOCK"):
-                fd = os.open(support.TESTFN,
-                             os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
-                self.assertRaises(OSError, os.open, support.TESTFN,
-                                  os.O_WRONLY|os.O_EXLOCK|os.O_NONBLOCK)
-                os.close(fd)
-
+    @unittest.skipUnless(hasattr(posix, 'O_SHLOCK'),
+                         'test needs posix.O_SHLOCK')
     def test_osshlock(self):
-        if hasattr(posix, "O_SHLOCK"):
-            fd1 = os.open(support.TESTFN,
+        fd1 = os.open(support.TESTFN,
+                     os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
+        fd2 = os.open(support.TESTFN,
+                      os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
+        os.close(fd2)
+        os.close(fd1)
+
+        if hasattr(posix, "O_EXLOCK"):
+            fd = os.open(support.TESTFN,
                          os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
-            fd2 = os.open(support.TESTFN,
-                          os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
-            os.close(fd2)
-            os.close(fd1)
+            self.assertRaises(OSError, os.open, support.TESTFN,
+                              os.O_RDONLY|os.O_EXLOCK|os.O_NONBLOCK)
+            os.close(fd)
 
-            if hasattr(posix, "O_EXLOCK"):
-                fd = os.open(support.TESTFN,
-                             os.O_WRONLY|os.O_SHLOCK|os.O_CREAT)
-                self.assertRaises(OSError, os.open, support.TESTFN,
-                                  os.O_RDONLY|os.O_EXLOCK|os.O_NONBLOCK)
-                os.close(fd)
-
+    @unittest.skipUnless(hasattr(posix, 'fstat'),
+                         'test needs posix.fstat()')
     def test_fstat(self):
-        if hasattr(posix, 'fstat'):
-            fp = open(support.TESTFN)
-            try:
-                self.assertTrue(posix.fstat(fp.fileno()))
-                self.assertTrue(posix.stat(fp.fileno()))
+        fp = open(support.TESTFN)
+        try:
+            self.assertTrue(posix.fstat(fp.fileno()))
+            self.assertTrue(posix.stat(fp.fileno()))
 
-                self.assertRaisesRegex(TypeError,
-                        'should be string, bytes or integer, not',
-                        posix.stat, float(fp.fileno()))
-            finally:
-                fp.close()
+            self.assertRaisesRegex(TypeError,
+                    'should be string, bytes or integer, not',
+                    posix.stat, float(fp.fileno()))
+        finally:
+            fp.close()
 
+    @unittest.skipUnless(hasattr(posix, 'stat'),
+                         'test needs posix.stat()')
     def test_stat(self):
-        if hasattr(posix, 'stat'):
-            self.assertTrue(posix.stat(support.TESTFN))
-            self.assertTrue(posix.stat(os.fsencode(support.TESTFN)))
-            self.assertTrue(posix.stat(bytearray(os.fsencode(support.TESTFN))))
+        self.assertTrue(posix.stat(support.TESTFN))
+        self.assertTrue(posix.stat(os.fsencode(support.TESTFN)))
+        self.assertTrue(posix.stat(bytearray(os.fsencode(support.TESTFN))))
 
-            self.assertRaisesRegex(TypeError,
-                    'can\'t specify None for path argument',
-                    posix.stat, None)
-            self.assertRaisesRegex(TypeError,
-                    'should be string, bytes or integer, not',
-                    posix.stat, list(support.TESTFN))
-            self.assertRaisesRegex(TypeError,
-                    'should be string, bytes or integer, not',
-                    posix.stat, list(os.fsencode(support.TESTFN)))
+        self.assertRaisesRegex(TypeError,
+                'can\'t specify None for path argument',
+                posix.stat, None)
+        self.assertRaisesRegex(TypeError,
+                'should be string, bytes or integer, not',
+                posix.stat, list(support.TESTFN))
+        self.assertRaisesRegex(TypeError,
+                'should be string, bytes or integer, not',
+                posix.stat, list(os.fsencode(support.TESTFN)))
 
     @unittest.skipUnless(hasattr(posix, 'mkfifo'), "don't have mkfifo()")
     def test_mkfifo(self):
@@ -495,10 +534,10 @@ class PosixTester(unittest.TestCase):
         self._test_all_chown_common(posix.lchown, support.TESTFN,
                                     getattr(posix, 'lstat', None))
 
+    @unittest.skipUnless(hasattr(posix, 'chdir'), 'test needs posix.chdir()')
     def test_chdir(self):
-        if hasattr(posix, 'chdir'):
-            posix.chdir(os.curdir)
-            self.assertRaises(OSError, posix.chdir, support.TESTFN)
+        posix.chdir(os.curdir)
+        self.assertRaises(OSError, posix.chdir, support.TESTFN)
 
     def test_listdir(self):
         self.assertTrue(support.TESTFN in posix.listdir(os.curdir))
@@ -528,25 +567,26 @@ class PosixTester(unittest.TestCase):
             sorted(posix.listdir(f))
             )
 
+    @unittest.skipUnless(hasattr(posix, 'access'), 'test needs posix.access()')
     def test_access(self):
-        if hasattr(posix, 'access'):
-            self.assertTrue(posix.access(support.TESTFN, os.R_OK))
+        self.assertTrue(posix.access(support.TESTFN, os.R_OK))
 
+    @unittest.skipUnless(hasattr(posix, 'umask'), 'test needs posix.umask()')
     def test_umask(self):
-        if hasattr(posix, 'umask'):
-            old_mask = posix.umask(0)
-            self.assertIsInstance(old_mask, int)
-            posix.umask(old_mask)
+        old_mask = posix.umask(0)
+        self.assertIsInstance(old_mask, int)
+        posix.umask(old_mask)
 
+    @unittest.skipUnless(hasattr(posix, 'strerror'),
+                         'test needs posix.strerror()')
     def test_strerror(self):
-        if hasattr(posix, 'strerror'):
-            self.assertTrue(posix.strerror(0))
+        self.assertTrue(posix.strerror(0))
 
+    @unittest.skipUnless(hasattr(posix, 'pipe'), 'test needs posix.pipe()')
     def test_pipe(self):
-        if hasattr(posix, 'pipe'):
-            reader, writer = posix.pipe()
-            os.close(reader)
-            os.close(writer)
+        reader, writer = posix.pipe()
+        os.close(reader)
+        os.close(writer)
 
     @unittest.skipUnless(hasattr(os, 'pipe2'), "test needs os.pipe2()")
     @support.requires_linux_version(2, 6, 27)
@@ -576,19 +616,24 @@ class PosixTester(unittest.TestCase):
         except OSError:
             pass
 
+    @support.cpython_only
+    @unittest.skipUnless(hasattr(os, 'pipe2'), "test needs os.pipe2()")
+    @support.requires_linux_version(2, 6, 27)
+    def test_pipe2_c_limits(self):
         # Issue 15989
+        import _testcapi
         self.assertRaises(OverflowError, os.pipe2, _testcapi.INT_MAX + 1)
         self.assertRaises(OverflowError, os.pipe2, _testcapi.UINT_MAX + 1)
 
+    @unittest.skipUnless(hasattr(posix, 'utime'), 'test needs posix.utime()')
     def test_utime(self):
-        if hasattr(posix, 'utime'):
-            now = time.time()
-            posix.utime(support.TESTFN, None)
-            self.assertRaises(TypeError, posix.utime, support.TESTFN, (None, None))
-            self.assertRaises(TypeError, posix.utime, support.TESTFN, (now, None))
-            self.assertRaises(TypeError, posix.utime, support.TESTFN, (None, now))
-            posix.utime(support.TESTFN, (int(now), int(now)))
-            posix.utime(support.TESTFN, (now, now))
+        now = time.time()
+        posix.utime(support.TESTFN, None)
+        self.assertRaises(TypeError, posix.utime, support.TESTFN, (None, None))
+        self.assertRaises(TypeError, posix.utime, support.TESTFN, (now, None))
+        self.assertRaises(TypeError, posix.utime, support.TESTFN, (None, now))
+        posix.utime(support.TESTFN, (int(now), int(now)))
+        posix.utime(support.TESTFN, (now, now))
 
     def _test_chflags_regular_file(self, chflags_func, target_file, **kwargs):
         st = os.stat(target_file)
@@ -665,6 +710,7 @@ class PosixTester(unittest.TestCase):
             self.assertEqual(type(k), item_type)
             self.assertEqual(type(v), item_type)
 
+    @unittest.skipUnless(hasattr(posix, 'getcwd'), 'test needs posix.getcwd()')
     def test_getcwd_long_pathnames(self):
         dirname = 'getcwd-test-directory-0123456789abcdef-01234567890abcdef'
         curdir = os.getcwd()
@@ -711,7 +757,7 @@ class PosixTester(unittest.TestCase):
 
     @unittest.skipUnless(hasattr(os, 'getegid'), "test needs os.getegid()")
     def test_getgroups(self):
-        with os.popen('id -G') as idg:
+        with os.popen('id -G 2>/dev/null') as idg:
             groups = idg.read().strip()
             ret = idg.close()
 
@@ -722,7 +768,7 @@ class PosixTester(unittest.TestCase):
         if sys.platform == 'darwin':
             import sysconfig
             dt = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET') or '10.0'
-            if float(dt) < 10.6:
+            if tuple(int(n) for n in dt.split('.')[0:2]) < (10, 6):
                 raise unittest.SkipTest("getgroups(2) is broken prior to 10.6")
 
         # 'id -G' and 'os.getgroups()' should return the same
@@ -1075,6 +1121,23 @@ class PosixTester(unittest.TestCase):
                 # http://lists.freebsd.org/pipermail/freebsd-amd64/2012-January/014332.html
                 raise unittest.SkipTest("OSError raised!")
 
+    def test_path_error2(self):
+        """
+        Test functions that call path_error2(), providing two filenames in their exceptions.
+        """
+        for name in ("rename", "replace", "link", "symlink"):
+            function = getattr(os, name, None)
+
+            if function:
+                for dst in ("noodly2", support.TESTFN):
+                    try:
+                        function('doesnotexistfilename', dst)
+                    except OSError as e:
+                        self.assertIn("'doesnotexistfilename' -> '{}'".format(dst), str(e))
+                        break
+                else:
+                    self.fail("No valid path_error2() test for os." + name)
+
 class PosixGroupsTester(unittest.TestCase):
 
     def setUp(self):
@@ -1098,7 +1161,7 @@ class PosixGroupsTester(unittest.TestCase):
     def test_initgroups(self):
         # find missing group
 
-        g = max(self.saved_groups) + 1
+        g = max(self.saved_groups or [0]) + 1
         name = pwd.getpwuid(posix.getuid()).pw_name
         posix.initgroups(name, g)
         self.assertIn(g, posix.getgroups())

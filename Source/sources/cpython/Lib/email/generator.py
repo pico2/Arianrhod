@@ -10,13 +10,10 @@ import re
 import sys
 import time
 import random
-import warnings
 
+from copy import deepcopy
 from io import StringIO, BytesIO
-from email._policybase import compat32
-from email.header import Header
 from email.utils import _has_surrogates
-import email.charset as _charset
 
 UNDERSCORE = '_'
 NL = '\n'  # XXX: no longer used by the code below.
@@ -54,8 +51,9 @@ class Generator:
         by RFC 2822.
 
         The policy keyword specifies a policy object that controls a number of
-        aspects of the generator's operation.  The default policy maintains
-        backward compatibility.
+        aspects of the generator's operation.  If no policy is specified,
+        the policy associated with the Message object passed to the
+        flatten method is used.
 
         """
         self._fp = outfp
@@ -79,7 +77,9 @@ class Generator:
         Note that for subobjects, no From_ line is printed.
 
         linesep specifies the characters used to indicate a new line in
-        the output.  The default value is determined by the policy.
+        the output.  The default value is determined by the policy specified
+        when the Generator instance was created or, if none was specified,
+        from the policy associated with the msg.
 
         """
         # We use the _XXX constants for operating on data that comes directly
@@ -173,10 +173,18 @@ class Generator:
         # necessary.
         oldfp = self._fp
         try:
+            self._munge_cte = None
             self._fp = sfp = self._new_buffer()
             self._dispatch(msg)
         finally:
             self._fp = oldfp
+            munge_cte = self._munge_cte
+            del self._munge_cte
+        # If we munged the cte, copy the message again and re-fix the CTE.
+        if munge_cte:
+            msg = deepcopy(msg)
+            msg.replace_header('content-transfer-encoding', munge_cte[0])
+            msg.replace_header('content-type', munge_cte[1])
         # Write the headers.  First we see if the message object wants to
         # handle that itself.  If not, we'll do it generically.
         meth = getattr(msg, '_write_headers', None)
@@ -225,9 +233,14 @@ class Generator:
         if _has_surrogates(msg._payload):
             charset = msg.get_param('charset')
             if charset is not None:
+                # XXX: This copy stuff is an ugly hack to avoid modifying the
+                # existing message.
+                msg = deepcopy(msg)
                 del msg['content-transfer-encoding']
                 msg.set_payload(payload, charset)
                 payload = msg.get_payload()
+                self._munge_cte = (msg['content-transfer-encoding'],
+                                   msg['content-type'])
         if self._mangle_from_:
             payload = fcre.sub('>From ', payload)
         self._write_lines(payload)
@@ -285,9 +298,8 @@ class Generator:
             # body-part
             self._fp.write(body_part)
         # close-delimiter transport-padding
-        self.write(self._NL + '--' + boundary + '--')
+        self.write(self._NL + '--' + boundary + '--' + self._NL)
         if msg.epilogue is not None:
-            self.write(self._NL)
             if self._mangle_from_:
                 epilogue = fcre.sub('>From ', msg.epilogue)
             else:

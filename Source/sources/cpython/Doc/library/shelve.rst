@@ -106,8 +106,8 @@ Restrictions
 
 .. class:: Shelf(dict, protocol=None, writeback=False, keyencoding='utf-8')
 
-   A subclass of :class:`collections.MutableMapping` which stores pickled values
-   in the *dict* object.
+   A subclass of :class:`collections.abc.MutableMapping` which stores pickled
+   values in the *dict* object.
 
    By default, version 0 pickles are used to serialize values.  The version of the
    pickle protocol can be specified with the *protocol* parameter. See the
@@ -121,7 +121,8 @@ Restrictions
    The *keyencoding* parameter is the encoding used to encode keys before they
    are used with the underlying dict.
 
-   :class:`Shelf` objects can also be used as context managers.
+   A :class:`Shelf` object can also be used as a context manager, in which
+   case it will be automatically closed when the :keyword:`with` block ends.
 
    .. versionchanged:: 3.2
       Added the *keyencoding* parameter; previously, keys were always encoded in

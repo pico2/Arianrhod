@@ -601,6 +601,8 @@ def main(tests=None, **kwargs):
         print("==", platform.python_implementation(), *sys.version.split())
         print("==  ", platform.platform(aliased=True),
                       "%s-endian" % sys.byteorder)
+        print("==  ", "hash algorithm:", sys.hash_info.algorithm,
+              "64bit" if sys.maxsize > 2**32 else "32bit")
         print("==  ", os.getcwd())
         print("Testing with flags:", sys.flags)
 
@@ -1271,8 +1273,10 @@ def runtest_inner(test, verbose, quiet,
             # tests.  If not, use normal unittest test loading.
             test_runner = getattr(the_module, "test_main", None)
             if test_runner is None:
-                tests = unittest.TestLoader().loadTestsFromModule(the_module)
-                test_runner = lambda: support.run_unittest(tests)
+                def test_runner():
+                    loader = unittest.TestLoader()
+                    tests = loader.loadTestsFromModule(the_module)
+                    support.run_unittest(tests)
             test_runner()
             if huntrleaks:
                 refleak = dash_R(the_module, test, test_runner, huntrleaks)

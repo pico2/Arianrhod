@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from test import support
 import array
 import io
@@ -262,11 +260,11 @@ class BugsTestCase(unittest.TestCase):
 
     def test_bad_reader(self):
         class BadReader(io.BytesIO):
-            def read(self, n=-1):
-                b = super().read(n)
+            def readinto(self, buf):
+                n = super().readinto(buf)
                 if n is not None and n > 4:
-                    b += b' ' * 10**6
-                return b
+                    n += 10**6
+                return n
         for value in (1.0, 1j, b'0123456789', '0123456789'):
             self.assertRaises(ValueError, marshal.load,
                               BadReader(marshal.dumps(value)))
@@ -288,19 +286,19 @@ class LargeValuesTestCase(unittest.TestCase):
     def check_unmarshallable(self, data):
         self.assertRaises(ValueError, marshal.dump, data, NullWriter())
 
-    @support.bigmemtest(size=LARGE_SIZE, memuse=1, dry_run=False)
+    @support.bigmemtest(size=LARGE_SIZE, memuse=2, dry_run=False)
     def test_bytes(self, size):
         self.check_unmarshallable(b'x' * size)
 
-    @support.bigmemtest(size=LARGE_SIZE, memuse=1, dry_run=False)
+    @support.bigmemtest(size=LARGE_SIZE, memuse=2, dry_run=False)
     def test_str(self, size):
         self.check_unmarshallable('x' * size)
 
-    @support.bigmemtest(size=LARGE_SIZE, memuse=pointer_size, dry_run=False)
+    @support.bigmemtest(size=LARGE_SIZE, memuse=pointer_size + 1, dry_run=False)
     def test_tuple(self, size):
         self.check_unmarshallable((None,) * size)
 
-    @support.bigmemtest(size=LARGE_SIZE, memuse=pointer_size, dry_run=False)
+    @support.bigmemtest(size=LARGE_SIZE, memuse=pointer_size + 1, dry_run=False)
     def test_list(self, size):
         self.check_unmarshallable([None] * size)
 
@@ -316,7 +314,7 @@ class LargeValuesTestCase(unittest.TestCase):
     def test_frozenset(self, size):
         self.check_unmarshallable(frozenset(range(size)))
 
-    @support.bigmemtest(size=LARGE_SIZE, memuse=1, dry_run=False)
+    @support.bigmemtest(size=LARGE_SIZE, memuse=2, dry_run=False)
     def test_bytearray(self, size):
         self.check_unmarshallable(bytearray(size))
 

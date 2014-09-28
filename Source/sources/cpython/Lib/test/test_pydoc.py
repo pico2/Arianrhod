@@ -6,12 +6,15 @@ import difflib
 import inspect
 import pydoc
 import keyword
+import _pickle
 import pkgutil
 import re
 import string
 import test.support
 import time
+import types
 import unittest
+import urllib.parse
 import xml.etree
 import textwrap
 from io import StringIO
@@ -20,7 +23,7 @@ from test.script_helper import assert_python_ok
 from test.support import (
     TESTFN, rmtree,
     reap_children, reap_threads, captured_output, captured_stdout,
-    captured_stderr, unlink
+    captured_stderr, unlink, requires_docstrings
 )
 from test import pydoc_mod
 
@@ -45,6 +48,7 @@ CLASSES
     builtins.object
         A
         B
+        C
 \x20\x20\x20\x20
     class A(builtins.object)
      |  Hello and goodbye
@@ -72,6 +76,26 @@ CLASSES
      |  Data and other attributes defined here:
      |\x20\x20
      |  NO_MEANING = 'eggs'
+\x20\x20\x20\x20
+    class C(builtins.object)
+     |  Methods defined here:
+     |\x20\x20
+     |  get_answer(self)
+     |      Return say_no()
+     |\x20\x20
+     |  is_it_true(self)
+     |      Return self.get_answer()
+     |\x20\x20
+     |  say_no(self)
+     |\x20\x20
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |\x20\x20
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |\x20\x20
+     |  __weakref__
+     |      list of weak references to the object (if defined)
 
 FUNCTIONS
     doc_func()
@@ -122,6 +146,7 @@ expected_html_pattern = """
 <dl>
 <dt><font face="helvetica, arial"><a href="test.pydoc_mod.html#A">A</a>
 </font></dt><dt><font face="helvetica, arial"><a href="test.pydoc_mod.html#B">B</a>
+</font></dt><dt><font face="helvetica, arial"><a href="test.pydoc_mod.html#C">C</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -163,6 +188,28 @@ Data descriptors defined here:<br>
 Data and other attributes defined here:<br>
 <dl><dt><strong>NO_MEANING</strong> = 'eggs'</dl>
 
+</td></tr></table> <p>
+<table width="100%%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="C">class <strong>C</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+\x20\x20\x20\x20
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%%">Methods defined here:<br>
+<dl><dt><a name="C-get_answer"><strong>get_answer</strong></a>(self)</dt><dd><tt>Return&nbsp;<a href="#C-say_no">say_no</a>()</tt></dd></dl>
+
+<dl><dt><a name="C-is_it_true"><strong>is_it_true</strong></a>(self)</dt><dd><tt>Return&nbsp;self.<a href="#C-get_answer">get_answer</a>()</tt></dd></dl>
+
+<dl><dt><a name="C-say_no"><strong>say_no</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
@@ -207,6 +254,75 @@ missing_pattern = "no Python documentation found for '%s'"
 
 # output pattern for module with bad imports
 badimport_pattern = "problem in %s - ImportError: No module named %r"
+
+expected_dynamicattribute_pattern = """
+Help on class DA in module %s:
+
+class DA(builtins.object)
+ |  Data descriptors defined here:
+ |\x20\x20
+ |  __dict__%s
+ |\x20\x20
+ |  __weakref__%s
+ |\x20\x20
+ |  ham
+ |\x20\x20
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from Meta:
+ |\x20\x20
+ |  ham = 'spam'
+""".strip()
+
+expected_virtualattribute_pattern1 = """
+Help on class Class in module %s:
+
+class Class(builtins.object)
+ |  Data and other attributes inherited from Meta:
+ |\x20\x20
+ |  LIFE = 42
+""".strip()
+
+expected_virtualattribute_pattern2 = """
+Help on class Class1 in module %s:
+
+class Class1(builtins.object)
+ |  Data and other attributes inherited from Meta1:
+ |\x20\x20
+ |  one = 1
+""".strip()
+
+expected_virtualattribute_pattern3 = """
+Help on class Class2 in module %s:
+
+class Class2(Class1)
+ |  Method resolution order:
+ |      Class2
+ |      Class1
+ |      builtins.object
+ |\x20\x20
+ |  Data and other attributes inherited from Meta1:
+ |\x20\x20
+ |  one = 1
+ |\x20\x20
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from Meta3:
+ |\x20\x20
+ |  three = 3
+ |\x20\x20
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from Meta2:
+ |\x20\x20
+ |  two = 2
+""".strip()
+
+expected_missingattribute_pattern = """
+Help on class C in module %s:
+
+class C(builtins.object)
+ |  Data and other attributes defined here:
+ |\x20\x20
+ |  here = 'present!'
+""".strip()
 
 def run_pydoc(module_name, *args, **env):
     """
@@ -287,14 +403,11 @@ class PydocDocTest(unittest.TestCase):
                      "Docstrings are omitted with -O2 and above")
     @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
                      'trace function introduces __locals__ unexpectedly')
+    @requires_docstrings
     def test_html_doc(self):
         result, doc_loc = get_pydoc_html(pydoc_mod)
         mod_file = inspect.getabsfile(pydoc_mod)
-        if sys.platform == 'win32':
-            import nturl2path
-            mod_url = nturl2path.pathname2url(mod_file)
-        else:
-            mod_url = mod_file
+        mod_url = urllib.parse.quote(mod_file)
         expected_html = expected_html_pattern % (
                         (mod_url, mod_file, doc_loc) +
                         expected_html_data_docstrings)
@@ -306,6 +419,7 @@ class PydocDocTest(unittest.TestCase):
                      "Docstrings are omitted with -O2 and above")
     @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
                      'trace function introduces __locals__ unexpectedly')
+    @requires_docstrings
     def test_text_doc(self):
         result, doc_loc = get_pydoc_text(pydoc_mod)
         expected_text = expected_text_pattern % (
@@ -316,10 +430,28 @@ class PydocDocTest(unittest.TestCase):
             print_diffs(expected_text, result)
             self.fail("outputs are not equal, see diff above")
 
+    def test_text_enum_member_with_value_zero(self):
+        # Test issue #20654 to ensure enum member with value 0 can be
+        # displayed. It used to throw KeyError: 'zero'.
+        import enum
+        class BinaryInteger(enum.IntEnum):
+            zero = 0
+            one = 1
+        doc = pydoc.render_doc(BinaryInteger)
+        self.assertIn('<BinaryInteger.zero: 0>', doc)
+
     def test_issue8225(self):
         # Test issue8225 to ensure no doc link appears for xml.etree
         result, doc_loc = get_pydoc_text(xml.etree)
         self.assertEqual(doc_loc, "", "MODULE DOCS incorrectly includes a link")
+
+    def test_getpager_with_stdin_none(self):
+        previous_stdin = sys.stdin
+        try:
+            sys.stdin = None
+            pydoc.getpager() # Shouldn't fail.
+        finally:
+            sys.stdin = previous_stdin
 
     def test_non_str_name(self):
         # issue14638
@@ -362,6 +494,7 @@ class PydocDocTest(unittest.TestCase):
                      'Docstrings are omitted with -O2 and above')
     @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
                      'trace function introduces __locals__ unexpectedly')
+    @requires_docstrings
     def test_help_output_redirect(self):
         # issue 940286, if output is set in Helper, then all output from
         # Helper.help should be redirected
@@ -400,7 +533,7 @@ class PydocDocTest(unittest.TestCase):
     def test_namedtuple_public_underscore(self):
         NT = namedtuple('NT', ['abc', 'def'], rename=True)
         with captured_stdout() as help_io:
-            help(NT)
+            pydoc.help(NT)
         helptext = help_io.getvalue()
         self.assertIn('_1', helptext)
         self.assertIn('_replace', helptext)
@@ -416,6 +549,13 @@ class PydocDocTest(unittest.TestCase):
                 print('line 2: hi"""', file=script)
             synopsis = pydoc.synopsis(TESTFN, {})
             self.assertEqual(synopsis, 'line 1: h\xe9')
+
+    def test_synopsis_sourceless(self):
+        expected = os.__doc__.splitlines()[0]
+        filename = os.__cached__
+        synopsis = pydoc.synopsis(filename)
+
+        self.assertEqual(synopsis, expected)
 
     def test_splitdoc_with_description(self):
         example_string = "I Am A Doc\n\n\nHere is my description"
@@ -530,6 +670,55 @@ class PydocImportTest(PydocBaseTest):
         self.assertEqual(out.getvalue(), '')
         self.assertEqual(err.getvalue(), '')
 
+    @unittest.skip('causes undesireable side-effects (#20128)')
+    def test_modules(self):
+        # See Helper.listmodules().
+        num_header_lines = 2
+        num_module_lines_min = 5  # Playing it safe.
+        num_footer_lines = 3
+        expected = num_header_lines + num_module_lines_min + num_footer_lines
+
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        helper('modules')
+        result = output.getvalue().strip()
+        num_lines = len(result.splitlines())
+
+        self.assertGreaterEqual(num_lines, expected)
+
+    @unittest.skip('causes undesireable side-effects (#20128)')
+    def test_modules_search(self):
+        # See Helper.listmodules().
+        expected = 'pydoc - '
+
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        with captured_stdout() as help_io:
+            helper('modules pydoc')
+        result = help_io.getvalue()
+
+        self.assertIn(expected, result)
+
+    @unittest.skip('some buildbots are not cooperating (#20128)')
+    def test_modules_search_builtin(self):
+        expected = 'gc - '
+
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        with captured_stdout() as help_io:
+            helper('modules garbage')
+        result = help_io.getvalue()
+
+        self.assertTrue(result.startswith(expected))
+
+    def test_importfile(self):
+        loaded_pydoc = pydoc.importfile(pydoc.__file__)
+
+        self.assertIsNot(loaded_pydoc, pydoc)
+        self.assertEqual(loaded_pydoc.__name__, 'pydoc')
+        self.assertEqual(loaded_pydoc.__file__, pydoc.__file__)
+        self.assertEqual(loaded_pydoc.__spec__, pydoc.__spec__)
+
 
 class TestDescriptions(unittest.TestCase):
 
@@ -557,13 +746,49 @@ class TestDescriptions(unittest.TestCase):
             try:
                 pydoc.render_doc(name)
             except ImportError:
-                self.fail('finding the doc of {!r} failed'.format(o))
+                self.fail('finding the doc of {!r} failed'.format(name))
 
         for name in ('notbuiltins', 'strrr', 'strr.translate',
                      'str.trrrranslate', 'builtins.strrr',
                      'builtins.str.trrranslate'):
             self.assertIsNone(pydoc.locate(name))
             self.assertRaises(ImportError, pydoc.render_doc, name)
+
+    @staticmethod
+    def _get_summary_line(o):
+        text = pydoc.plain(pydoc.render_doc(o))
+        lines = text.split('\n')
+        assert len(lines) >= 2
+        return lines[2]
+
+    # these should include "self"
+    def test_unbound_python_method(self):
+        self.assertEqual(self._get_summary_line(textwrap.TextWrapper.wrap),
+            "wrap(self, text)")
+
+    @requires_docstrings
+    def test_unbound_builtin_method(self):
+        self.assertEqual(self._get_summary_line(_pickle.Pickler.dump),
+            "dump(self, obj, /)")
+
+    # these no longer include "self"
+    def test_bound_python_method(self):
+        t = textwrap.TextWrapper()
+        self.assertEqual(self._get_summary_line(t.wrap),
+            "wrap(text) method of textwrap.TextWrapper instance")
+
+    @requires_docstrings
+    def test_bound_builtin_method(self):
+        s = StringIO()
+        p = _pickle.Pickler(s)
+        self.assertEqual(self._get_summary_line(p.dump),
+            "dump(obj, /) method of _pickle.Pickler instance")
+
+    # this should *never* include self!
+    @requires_docstrings
+    def test_module_level_callable(self):
+        self.assertEqual(self._get_summary_line(os.stat),
+            "stat(path, *, dir_fd=None, follow_symlinks=True)")
 
 
 @unittest.skipUnless(threading, 'Threading required for this test.')
@@ -578,6 +803,8 @@ class PydocServerTest(unittest.TestCase):
             return text
 
         serverthread = pydoc._start_server(my_url_handler, port=0)
+        self.assertIn('localhost', serverthread.docserver.address)
+
         starttime = time.time()
         timeout = 1  #seconds
 
@@ -636,6 +863,128 @@ class TestHelper(unittest.TestCase):
         self.assertEqual(sorted(pydoc.Helper.keywords),
                          sorted(keyword.kwlist))
 
+class PydocWithMetaClasses(unittest.TestCase):
+    @unittest.skipIf(sys.flags.optimize >= 2,
+                     "Docstrings are omitted with -O2 and above")
+    @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
+                     'trace function introduces __locals__ unexpectedly')
+    def test_DynamicClassAttribute(self):
+        class Meta(type):
+            def __getattr__(self, name):
+                if name == 'ham':
+                    return 'spam'
+                return super().__getattr__(name)
+        class DA(metaclass=Meta):
+            @types.DynamicClassAttribute
+            def ham(self):
+                return 'eggs'
+        expected_text_data_docstrings = tuple('\n |      ' + s if s else ''
+                                      for s in expected_data_docstrings)
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        helper(DA)
+        expected_text = expected_dynamicattribute_pattern % (
+                (__name__,) + expected_text_data_docstrings[:2])
+        result = output.getvalue().strip()
+        if result != expected_text:
+            print_diffs(expected_text, result)
+            self.fail("outputs are not equal, see diff above")
+
+    @unittest.skipIf(sys.flags.optimize >= 2,
+                     "Docstrings are omitted with -O2 and above")
+    @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
+                     'trace function introduces __locals__ unexpectedly')
+    def test_virtualClassAttributeWithOneMeta(self):
+        class Meta(type):
+            def __dir__(cls):
+                return ['__class__', '__module__', '__name__', 'LIFE']
+            def __getattr__(self, name):
+                if name =='LIFE':
+                    return 42
+                return super().__getattr(name)
+        class Class(metaclass=Meta):
+            pass
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        helper(Class)
+        expected_text = expected_virtualattribute_pattern1 % __name__
+        result = output.getvalue().strip()
+        if result != expected_text:
+            print_diffs(expected_text, result)
+            self.fail("outputs are not equal, see diff above")
+
+    @unittest.skipIf(sys.flags.optimize >= 2,
+                     "Docstrings are omitted with -O2 and above")
+    @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
+                     'trace function introduces __locals__ unexpectedly')
+    def test_virtualClassAttributeWithTwoMeta(self):
+        class Meta1(type):
+            def __dir__(cls):
+                return ['__class__', '__module__', '__name__', 'one']
+            def __getattr__(self, name):
+                if name =='one':
+                    return 1
+                return super().__getattr__(name)
+        class Meta2(type):
+            def __dir__(cls):
+                return ['__class__', '__module__', '__name__', 'two']
+            def __getattr__(self, name):
+                if name =='two':
+                    return 2
+                return super().__getattr__(name)
+        class Meta3(Meta1, Meta2):
+            def __dir__(cls):
+                return list(sorted(set(
+                    ['__class__', '__module__', '__name__', 'three'] +
+                    Meta1.__dir__(cls) + Meta2.__dir__(cls))))
+            def __getattr__(self, name):
+                if name =='three':
+                    return 3
+                return super().__getattr__(name)
+        class Class1(metaclass=Meta1):
+            pass
+        class Class2(Class1, metaclass=Meta3):
+            pass
+        fail1 = fail2 = False
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        helper(Class1)
+        expected_text1 = expected_virtualattribute_pattern2 % __name__
+        result1 = output.getvalue().strip()
+        if result1 != expected_text1:
+            print_diffs(expected_text1, result1)
+            fail1 = True
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        helper(Class2)
+        expected_text2 = expected_virtualattribute_pattern3 % __name__
+        result2 = output.getvalue().strip()
+        if result2 != expected_text2:
+            print_diffs(expected_text2, result2)
+            fail2 = True
+        if fail1 or fail2:
+            self.fail("outputs are not equal, see diff above")
+
+    @unittest.skipIf(sys.flags.optimize >= 2,
+                     "Docstrings are omitted with -O2 and above")
+    @unittest.skipIf(hasattr(sys, 'gettrace') and sys.gettrace(),
+                     'trace function introduces __locals__ unexpectedly')
+    def test_buggy_dir(self):
+        class M(type):
+            def __dir__(cls):
+                return ['__class__', '__name__', 'missing', 'here']
+        class C(metaclass=M):
+            here = 'present!'
+        output = StringIO()
+        helper = pydoc.Helper(output=output)
+        helper(C)
+        expected_text = expected_missingattribute_pattern % __name__
+        result = output.getvalue().strip()
+        if result != expected_text:
+            print_diffs(expected_text, result)
+            self.fail("outputs are not equal, see diff above")
+
+
 @reap_threads
 def test_main():
     try:
@@ -645,6 +994,7 @@ def test_main():
                                   PydocServerTest,
                                   PydocUrlHandlerTest,
                                   TestHelper,
+                                  PydocWithMetaClasses,
                                   )
     finally:
         reap_children()

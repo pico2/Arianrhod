@@ -51,7 +51,7 @@ struct _frame; /* Avoid including frameobject.h */
 
 #ifndef Py_LIMITED_API
 /* Py_tracefunc return -1 when raising an exception, or 0 for success. */
-typedef int (*Py_tracefunc)(PyObject *, struct _frame *, int, PyObject *);
+typedef int (__cdecl *Py_tracefunc)(PyObject *, struct _frame *, int, PyObject *);
 
 /* The following values are used for 'what' for tracefunc functions: */
 #define PyTrace_CALL 0
@@ -131,7 +131,7 @@ typedef struct _ts {
      * weakref-to-lock (on_delete_data) argument, and release_sentinel releases
      * the indirectly held lock.
      */
-    void (*on_delete)(void *);
+    void (__cdecl *on_delete)(void *);
     void *on_delete_data;
 
     /* XXX signal handlers should also be here */
@@ -257,7 +257,7 @@ PyAPI_FUNC(PyInterpreterState *) PyInterpreterState_Next(PyInterpreterState *);
 PyAPI_FUNC(PyThreadState *) PyInterpreterState_ThreadHead(PyInterpreterState *);
 PyAPI_FUNC(PyThreadState *) PyThreadState_Next(PyThreadState *);
 
-typedef struct _frame *(*PyThreadFrameGetter)(PyThreadState *self_);
+typedef struct _frame *(__cdecl *PyThreadFrameGetter)(PyThreadState *self_);
 #endif
 
 /* hook for PyEval_GetFrame(), requested for Psyco */

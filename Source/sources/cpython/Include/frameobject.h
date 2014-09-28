@@ -39,7 +39,6 @@ typedef struct _frame {
     /* Borrowed reference to a generator, or NULL */
     PyObject *f_gen;
 
-    PyThreadState *f_tstate;
     int f_lasti;                /* Last instruction if called */
     /* Call PyFrame_GetLineNumber() instead of reading this field
        directly.  As of 2.3 f_lineno is only valid when tracing is
@@ -78,6 +77,8 @@ PyAPI_FUNC(PyObject **) PyFrame_ExtendStack(PyFrameObject *, int, int);
 /* Conversions between "fast locals" and locals in dictionary */
 
 PyAPI_FUNC(void) PyFrame_LocalsToFast(PyFrameObject *, int);
+
+PyAPI_FUNC(int) PyFrame_FastToLocalsWithError(PyFrameObject *f);
 PyAPI_FUNC(void) PyFrame_FastToLocals(PyFrameObject *);
 
 PyAPI_FUNC(int) PyFrame_ClearFreeList(void);

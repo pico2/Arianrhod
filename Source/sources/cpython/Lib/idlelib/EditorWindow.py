@@ -1,6 +1,8 @@
 import importlib
 import importlib.abc
+import importlib.util
 import os
+import platform
 import re
 import string
 import sys
@@ -23,6 +25,8 @@ from idlelib import macosxSupport
 
 # The default tab setting for a Text widget, in average-width characters.
 TK_TABWIDTH_DEFAULT = 8
+
+_py_version = ' (%s)' % platform.python_version()
 
 def _sphinx_version():
     "Format sys.version_info to produce the Sphinx version string used to install the chm docs"
@@ -77,6 +81,8 @@ class HelpDialog(object):
         self.parent = None
 
 helpDialog = HelpDialog()  # singleton instance
+def _help_dialog(parent):  # wrapper for htest
+    helpDialog.show_dialog(parent)
 
 
 class EditorWindow(object):
@@ -107,8 +113,8 @@ class EditorWindow(object):
                                        'Python%s.chm' % _sphinx_version())
                 if os.path.isfile(chmfile):
                     dochome = chmfile
-            elif macosxSupport.runningAsOSXApp():
-                # documentation is stored inside the python framework
+            elif sys.platform == 'darwin':
+                # documentation may be stored inside a python framework
                 dochome = os.path.join(sys.base_prefix,
                         'Resources/English.lproj/Documentation/index.html')
             dochome = os.path.normpath(dochome)
@@ -118,7 +124,7 @@ class EditorWindow(object):
                     # Safari requires real file:-URLs
                     EditorWindow.help_url = 'file://' + EditorWindow.help_url
             else:
-                EditorWindow.help_url = "http://docs.python.org/%d.%d" % sys.version_info[:2]
+                EditorWindow.help_url = "https://docs.python.org/%d.%d/" % sys.version_info[:2]
         currentTheme=idleConf.CurrentTheme()
         self.flist = flist
         root = root or flist.root
@@ -164,7 +170,7 @@ class EditorWindow(object):
 
         self.top.protocol("WM_DELETE_WINDOW", self.close)
         self.top.bind("<<close-window>>", self.close_event)
-        if macosxSupport.runningAsOSXApp():
+        if macosxSupport.isAquaTk():
             # Command-W on editorwindows doesn't work without this.
             text.bind('<<close-window>>', self.close_event)
             # Some OS X systems have only one mouse button,
@@ -218,6 +224,7 @@ class EditorWindow(object):
             text.bind("<<close-all-windows>>", self.flist.close_all_callback)
             text.bind("<<open-class-browser>>", self.open_class_browser)
             text.bind("<<open-path-browser>>", self.open_path_browser)
+            text.bind("<<open-turtle-demo>>", self.open_turtle_demo)
 
         self.set_status_bar()
         vbar['command'] = text.yview
@@ -407,7 +414,7 @@ class EditorWindow(object):
 
     def set_status_bar(self):
         self.status_bar = self.MultiStatusBar(self.top)
-        if macosxSupport.runningAsOSXApp():
+        if sys.platform == "darwin":
             # Insert some padding to avoid obscuring some of the statusbar
             # by the resize widget.
             self.status_bar.set_label('_padding1', '    ', side=RIGHT)
@@ -434,7 +441,7 @@ class EditorWindow(object):
         ("help", "_Help"),
     ]
 
-    if macosxSupport.runningAsOSXApp():
+    if sys.platform == "darwin":
         menu_specs[-2] = ("windows", "_Window")
 
 
@@ -445,7 +452,7 @@ class EditorWindow(object):
             underline, label = prepstr(label)
             menudict[name] = menu = Menu(mbar, name=name)
             mbar.add_cascade(label=label, menu=menu, underline=underline)
-        if macosxSupport.isCarbonAquaTk(self.root):
+        if macosxSupport.isCarbonTk():
             # Insert the application menu
             menudict['application'] = menu = Menu(mbar, name='apple')
             mbar.add_cascade(label='IDLE', menu=menu)
@@ -659,20 +666,20 @@ class EditorWindow(object):
             return
         # XXX Ought to insert current file's directory in front of path
         try:
-            loader = importlib.find_loader(name)
+            spec = importlib.util.find_spec(name)
         except (ValueError, ImportError) as msg:
             tkMessageBox.showerror("Import error", str(msg), parent=self.text)
             return
-        if loader is None:
+        if spec is None:
             tkMessageBox.showerror("Import error", "module not found",
                                    parent=self.text)
             return
-        if not isinstance(loader, importlib.abc.SourceLoader):
+        if not isinstance(spec.loader, importlib.abc.SourceLoader):
             tkMessageBox.showerror("Import error", "not a source-based module",
                                    parent=self.text)
             return
         try:
-            file_path = loader.get_filename(name)
+            file_path = spec.loader.get_filename(name)
         except AttributeError:
             tkMessageBox.showerror("Import error",
                                    "loader does not support get_filename",
@@ -700,6 +707,14 @@ class EditorWindow(object):
     def open_path_browser(self, event=None):
         from idlelib import PathBrowser
         PathBrowser.PathBrowser(self.flist)
+
+    def open_turtle_demo(self, event = None):
+        import subprocess
+
+        cmd = [sys.executable,
+               '-c',
+               'from turtledemo.__main__ import main; main()']
+        p = subprocess.Popen(cmd, shell=False)
 
     def gotoline(self, lineno):
         if lineno is not None and lineno > 0:
@@ -931,7 +946,7 @@ class EditorWindow(object):
         short = self.short_title()
         long = self.long_title()
         if short and long:
-            title = short + " - " + long
+            title = short + " - " + long + _py_version
         elif short:
             title = short
         elif long:
@@ -958,6 +973,8 @@ class EditorWindow(object):
         filename = self.io.filename
         if filename:
             filename = os.path.basename(filename)
+        else:
+            filename = "Untitled"
         # return unicode string to display non-ASCII chars correctly
         return self._filename_to_unicode(filename)
 
@@ -1059,7 +1076,7 @@ class EditorWindow(object):
         try:
             try:
                 mod = importlib.import_module('.' + name, package=__package__)
-            except ImportError:
+            except (ImportError, TypeError):
                 mod = importlib.import_module(name)
         except ImportError:
             print("\nFailed to import extension: ", name)
@@ -1668,7 +1685,7 @@ def get_accelerator(keydefs, eventname):
     keylist = keydefs.get(eventname)
     # issue10940: temporary workaround to prevent hang with OS X Cocoa Tk 8.5
     # if not keylist:
-    if (not keylist) or (macosxSupport.runningAsOSXApp() and eventname in {
+    if (not keylist) or (macosxSupport.isCocoaTk() and eventname in {
                             "<<open-module>>",
                             "<<goto-line>>",
                             "<<change-indentwidth>>"}):
@@ -1695,19 +1712,18 @@ def fixwordbreaks(root):
     tk.call('set', 'tcl_nonwordchars', '[^a-zA-Z0-9_]')
 
 
-def test():
-    root = Tk()
+def _editor_window(parent):
+    root = parent
     fixwordbreaks(root)
-    root.withdraw()
     if sys.argv[1:]:
         filename = sys.argv[1]
     else:
         filename = None
+    macosxSupport.setupApp(root, None)
     edit = EditorWindow(root=root, filename=filename)
-    edit.set_close_hook(root.quit)
     edit.text.bind("<<close-all-windows>>", edit.close_event)
-    root.mainloop()
-    root.destroy()
+    parent.mainloop()
 
 if __name__ == '__main__':
-    test()
+    from idlelib.idle_test.htest import run
+    run(_help_dialog, _editor_window)

@@ -16,6 +16,7 @@ import unittest
 import warnings
 from operator import neg
 from test.support import TESTFN, unlink,  run_unittest, check_warnings
+from test.script_helper import assert_python_ok
 try:
     import pty, signal
 except ImportError:
@@ -1592,21 +1593,45 @@ class TestSorted(unittest.TestCase):
         data = 'The quick Brown fox Jumped over The lazy Dog'.split()
         self.assertRaises(TypeError, sorted, data, None, lambda x,y: 0)
 
-def test_main(verbose=None):
-    test_classes = (BuiltinTest, TestSorted)
 
-    run_unittest(*test_classes)
+class ShutdownTest(unittest.TestCase):
 
-    # verify reference counting
-    if verbose and hasattr(sys, "gettotalrefcount"):
-        import gc
-        counts = [None] * 5
-        for i in range(len(counts)):
-            run_unittest(*test_classes)
-            gc.collect()
-            counts[i] = sys.gettotalrefcount()
-        print(counts)
+    def test_cleanup(self):
+        # Issue #19255: builtins are still available at shutdown
+        code = """if 1:
+            import builtins
+            import sys
 
+            class C:
+                def __del__(self):
+                    print("before")
+                    # Check that builtins still exist
+                    len(())
+                    print("after")
+
+            c = C()
+            # Make this module survive until builtins and sys are cleaned
+            builtins.here = sys.modules[__name__]
+            sys.here = sys.modules[__name__]
+            # Create a reference loop so that this module needs to go
+            # through a GC phase.
+            here = sys.modules[__name__]
+            """
+        # Issue #20599: Force ASCII encoding to get a codec implemented in C,
+        # otherwise the codec may be unloaded before C.__del__() is called, and
+        # so print("before") fails because the codec cannot be used to encode
+        # "before" to sys.stdout.encoding. For example, on Windows,
+        # sys.stdout.encoding is the OEM code page and these code pages are
+        # implemented in Python
+        rc, out, err = assert_python_ok("-c", code,
+                                        PYTHONIOENCODING="ascii")
+        self.assertEqual(["before", "after"], out.decode().splitlines())
+
+
+def load_tests(loader, tests, pattern):
+    from doctest import DocTestSuite
+    tests.addTest(DocTestSuite(builtins))
+    return tests
 
 if __name__ == "__main__":
-    test_main(verbose=True)
+    unittest.main()

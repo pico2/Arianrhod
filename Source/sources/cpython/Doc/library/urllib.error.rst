@@ -31,8 +31,9 @@ The following exceptions are raised by :mod:`urllib.error` as appropriate:
 
    Though being an exception (a subclass of :exc:`URLError`), an
    :exc:`HTTPError` can also function as a non-exceptional file-like return
-   value (the same thing that :func:`urlopen` returns).  This is useful when
-   handling exotic HTTP errors, such as requests for authentication.
+   value (the same thing that :func:`~urllib.request.urlopen` returns).  This
+   is useful when handling exotic HTTP errors, such as requests for
+   authentication.
 
    .. attribute:: code
 
@@ -47,14 +48,15 @@ The following exceptions are raised by :mod:`urllib.error` as appropriate:
 
    .. attribute:: headers
 
-      The HTTP response headers for the HTTP request that cause the
+      The HTTP response headers for the HTTP request that caused the
       :exc:`HTTPError`.
 
       .. versionadded:: 3.4
 
 .. exception:: ContentTooShortError(msg, content)
 
-   This exception is raised when the :func:`urlretrieve` function detects that
+   This exception is raised when the :func:`~urllib.request.urlretrieve`
+   function detects that
    the amount of the downloaded data is less than the expected amount (given by
    the *Content-Length* header).  The :attr:`content` attribute stores the
    downloaded (and supposedly truncated) data.

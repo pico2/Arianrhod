@@ -5,15 +5,21 @@
 
     Sphinx extension with Python doc-specific markup.
 
-    :copyright: 2008, 2009, 2010, 2011, 2012 by Georg Brandl.
+    :copyright: 2008-2014 by Georg Brandl.
     :license: Python license.
 """
 
 ISSUE_URI = 'http://bugs.python.org/issue%s'
-SOURCE_URI = 'http://hg.python.org/cpython/file/default/%s'
+SOURCE_URI = 'https://hg.python.org/cpython/file/3.4/%s'
 
 from docutils import nodes, utils
+
+import sphinx
 from sphinx.util.nodes import split_explicit_title
+from sphinx.util.compat import Directive
+from sphinx.writers.html import HTMLTranslator
+from sphinx.writers.latex import LaTeXTranslator
+from sphinx.locale import versionlabels
 
 # monkey-patch reST parser to disable alphabetic and roman enumerated lists
 from docutils.parsers.rst.states import Body
@@ -22,21 +28,19 @@ Body.enum.converters['loweralpha'] = \
     Body.enum.converters['lowerroman'] = \
     Body.enum.converters['upperroman'] = lambda x: None
 
-# monkey-patch HTML translator to give versionmodified paragraphs a class
-def new_visit_versionmodified(self, node):
-    self.body.append(self.starttag(node, 'p', CLASS=node['type']))
-    text = versionlabels[node['type']] % node['version']
-    if len(node):
-        text += ':'
-    else:
-        text += '.'
-    self.body.append('<span class="versionmodified">%s</span> ' % text)
+SPHINX11 = sphinx.__version__[:3] < '1.2'
 
-from sphinx.writers.html import HTMLTranslator
-from sphinx.writers.latex import LaTeXTranslator
-from sphinx.locale import versionlabels
-HTMLTranslator.visit_versionmodified = new_visit_versionmodified
-HTMLTranslator.visit_versionmodified = new_visit_versionmodified
+if SPHINX11:
+    # monkey-patch HTML translator to give versionmodified paragraphs a class
+    def new_visit_versionmodified(self, node):
+        self.body.append(self.starttag(node, 'p', CLASS=node['type']))
+        text = versionlabels[node['type']] % node['version']
+        if len(node):
+            text += ':'
+        else:
+            text += '.'
+        self.body.append('<span class="versionmodified">%s</span> ' % text)
+    HTMLTranslator.visit_versionmodified = new_visit_versionmodified
 
 # monkey-patch HTML and LaTeX translators to keep doctest blocks in the
 # doctest docs themselves
@@ -86,8 +90,6 @@ def source_role(typ, rawtext, text, lineno, inliner, options={}, content=[]):
 
 
 # Support for marking up implementation details
-
-from sphinx.util.compat import Directive
 
 class ImplementationDetail(Directive):
 
@@ -141,12 +143,6 @@ class PyDecoratorMethod(PyDecoratorMixin, PyClassmember):
 
 # Support for documenting version of removal in deprecations
 
-from sphinx.locale import versionlabels
-from sphinx.util.compat import Directive
-
-versionlabels['deprecated-removed'] = \
-    'Deprecated since version %s, will be removed in version %s'
-
 class DeprecatedRemoved(Directive):
     has_content = True
     required_arguments = 2
@@ -154,24 +150,46 @@ class DeprecatedRemoved(Directive):
     final_argument_whitespace = True
     option_spec = {}
 
+    _label = 'Deprecated since version %s, will be removed in version %s'
+
     def run(self):
         node = addnodes.versionmodified()
         node.document = self.state.document
         node['type'] = 'deprecated-removed'
         version = (self.arguments[0], self.arguments[1])
         node['version'] = version
+        text = self._label % version
         if len(self.arguments) == 3:
             inodes, messages = self.state.inline_text(self.arguments[2],
                                                       self.lineno+1)
-            node.extend(inodes)
-            if self.content:
-                self.state.nested_parse(self.content, self.content_offset, node)
-            ret = [node] + messages
+            para = nodes.paragraph(self.arguments[2], '', *inodes)
+            node.append(para)
         else:
-            ret = [node]
+            messages = []
+        if self.content:
+            self.state.nested_parse(self.content, self.content_offset, node)
+            if isinstance(node[0], nodes.paragraph) and node[0].rawsource:
+                content = nodes.inline(node[0].rawsource, translatable=True)
+                content.source = node[0].source
+                content.line = node[0].line
+                content += node[0].children
+                node[0].replace_self(nodes.paragraph('', '', content))
+            if not SPHINX11:
+                node[0].insert(0, nodes.inline('', '%s: ' % text,
+                                               classes=['versionmodified']))
+        elif not SPHINX11:
+            para = nodes.paragraph('', '',
+                nodes.inline('', '%s.' % text, classes=['versionmodified']))
+            if len(node):
+                node.insert(0, para)
+            else:
+                node.append(para)
         env = self.state.document.settings.env
         env.note_versionchange('deprecated', version[0], node, self.lineno)
-        return ret
+        return [node] + messages
+
+# for Sphinx < 1.2
+versionlabels['deprecated-removed'] = DeprecatedRemoved._label
 
 
 # Support for including Misc/NEWS
