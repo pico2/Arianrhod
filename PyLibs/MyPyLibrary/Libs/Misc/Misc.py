@@ -1,3 +1,5 @@
+from .SysLib import OrderedDict
+
 def RoundDown(Value, Multiple):
     return type(Value)(type(Value)(Value / Multiple) * Multiple)
 
@@ -85,6 +87,9 @@ def FormatList(obj, depth = 0, itergen = sorted):
 def FormatDictionary(obj, depth = 0, itergen = sorted):
     info = []
     space = '  ' * depth
+
+    if isinstance(obj, OrderedDict):
+        itergen = iter
 
     for k in itergen(obj):
         try:

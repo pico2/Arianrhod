@@ -15,8 +15,12 @@ class AsyncHttp(object):
         def __str__(self):
             return self.response.__str__()
 
+        @property
+        def status(self):
+            return self.response.status
+
         def json(self, encoding = None):
-            return json.loads(self.decode(encoding))
+            return dict2(json.loads(self.decode(encoding)))
 
         def text(self, encoding = None):
             return self.decode(encoding)
@@ -32,11 +36,16 @@ class AsyncHttp(object):
         self.TCPConnector.cookies = cookie_class()
         self.ProxyConnector.cookies = cookie_class()
 
+        self.headers = {}
+
         self.connector = self.TCPConnector
 
     @property
     def cookies(self):
         return self.connector.cookies
+
+    def SetHeaders(self, headers):
+        self.headers = headers
 
     def SetCookies(self, cookies):
         self.connector.update_cookies(cookies)
@@ -53,6 +62,10 @@ class AsyncHttp(object):
     @asyncio.coroutine
     def request(self, method, url, **kwargs):
         kwargs['connector'] = self.connector
+
+        if 'headers' not in kwargs:
+            kwargs['headers'] = self.headers
+
         response = yield from aiohttp.request(method, url, **kwargs)
         content = yield from response.read()
 
