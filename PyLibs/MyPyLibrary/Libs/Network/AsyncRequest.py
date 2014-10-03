@@ -113,6 +113,9 @@ class AsyncHttpRequest(object):
         param = dict2(param, deep_convert = False)
 
         def RequestWorker(param):
+            if 'proxies' not in param.kwargs:
+                param.kwargs['proxies'] = self.Proxies
+
             response = self.session.request(
                         param.Method,
                         param.Url,
@@ -121,7 +124,6 @@ class AsyncHttpRequest(object):
                         headers         = param.Headers or self.DefaultHeaders,
                         timeout         = param.Timeout,
                         allow_redirects = param.AllowRedirects,
-                        proxies         = self.Proxies,
                         **param.kwargs
                     )
             return response
