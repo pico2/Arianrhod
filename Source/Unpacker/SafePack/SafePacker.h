@@ -401,7 +401,8 @@ public:
 
     UPK_STATUS
     EncryptPackHeader(
-        PSAFE_PACK_HEADER Header
+        PSAFE_PACK_HEADER   Header,
+        ULONG_PTR           HeaderSize
     )
     {
         return STATUS_NOT_IMPLEMENTED;
@@ -499,13 +500,12 @@ public:
     {
         PWSTR Buffer, Text;
 
-        ++Length;
         Length *= sizeof(WCHAR);
 
         Buffer = (PWSTR)AllocStack(Length);
         CopyMemory(Buffer, FileName, Length);
 
-        FOR_EACH(Text, Buffer, Length / sizeof(WCHAR) - 1)
+        FOR_EACH(Text, Buffer, Length / sizeof(WCHAR))
         {
             switch (*Text)
             {
@@ -519,7 +519,7 @@ public:
             }
         }
 
-        sha256(Buffer, Length - sizeof(WCHAR), Hash);
+        sha256(Buffer, Length, Hash);
     }
 };
 
@@ -693,8 +693,8 @@ Pack(
         Entry->Attributes       = FileList->Attributes;
 
         if (FLAG_ON(Entry->Attributes, FILE_ATTRIBUTE_DIRECTORY))
-            //goto PACK_NEXT_FILE;
-            continue;
+            goto PACK_NEXT_FILE;
+            // continue;
 
         CopyMemory(FileName, FileList->GetFileName(), Length + sizeof(WCHAR));
 
@@ -728,11 +728,7 @@ Pack(
         Entry->FileSize.QuadPart    = FileList->Size.QuadPart;
         FileList->Offset.QuadPart   = Entry->Offset.QuadPart;
 
-        SourceBuffer.Buffer             = Buffer;
-        SourceBuffer.Flags              = Flags;
-        SourceBuffer.Offset.QuadPart    = 0;
-        SourceBuffer.Size.QuadPart      = FileSize;
-
+        SourceBuffer.Initialize(Buffer, Flags, FileSize, 0);
         Status = This->PreCompressData(FileList, &SourceBuffer);
         if (Status == STATUS_NOT_IMPLEMENTED)
         {
@@ -760,14 +756,8 @@ Pack(
 
         FileBuffer = Buffer;
 
-        SourceBuffer.Buffer                 = Buffer;
-        SourceBuffer.Flags                  = Flags;
-        SourceBuffer.Offset.QuadPart        = 0;
-        SourceBuffer.Size.QuadPart          = FileSize;
-
-        DestinationBuffer.Flags             = Flags;
-        DestinationBuffer.Offset.QuadPart   = 0;
-        DestinationBuffer.Size.QuadPart     = CompressedBufferSize;
+        SourceBuffer.Initialize(Buffer, Flags, FileSize, 0);
+        DestinationBuffer.Initialize(nullptr, Flags, CompressedBufferSize, 0);
 
         LOOP_FOREVER
         {
@@ -807,10 +797,7 @@ Pack(
             WriteSize   = (ULONG_PTR)DestinationBuffer.Size.QuadPart;
         }
 
-        SourceBuffer.Buffer                 = WriteBuffer;
-        SourceBuffer.Flags                  = Flags;
-        SourceBuffer.Offset.QuadPart        = 0;
-        SourceBuffer.Size.QuadPart          = WriteSize;
+        SourceBuffer.Initialize(WriteBuffer, Flags, WriteSize, 0);
         Status = This->PostCompressData(FileList, &SourceBuffer);
         if (!NT_SUCCESS(Status))
         {
@@ -830,7 +817,7 @@ Pack(
 
         DataOffset.QuadPart += WriteSize;
 
-//PACK_NEXT_FILE:
+PACK_NEXT_FILE:
 
         CopyMemory(Entry->Buffer, FileList->GetFileName(), Length);
 
@@ -907,22 +894,11 @@ Pack(
         FreeMemoryP(Compact);
     }
 
-    SourceBuffer.Buffer             = EntryBase;
-    SourceBuffer.Flags              = Flags;
-    SourceBuffer.Offset.QuadPart    = 0;
-    SourceBuffer.Size.QuadPart      = Header.EntrySize.QuadPart;
-
+    SourceBuffer.Initialize(EntryBase, Flags, Header.EntrySize.QuadPart, 0);
     Status = This->PreCompressEntry(&Header, &SourceBuffer);
 
-    SourceBuffer.Buffer                 = EntryBase;
-    SourceBuffer.Flags                  = Flags;
-    SourceBuffer.Offset.QuadPart        = 0;
-    SourceBuffer.Size.QuadPart          = Header.EntrySize.QuadPart;
-
-    DestinationBuffer.Buffer            = Compressed;
-    DestinationBuffer.Flags             = Flags;
-    DestinationBuffer.Offset.QuadPart   = 0;
-    DestinationBuffer.Size.QuadPart     = CompressedBufferSize;
+    SourceBuffer.Initialize(EntryBase, Flags, Header.EntrySize.QuadPart, 0);
+    DestinationBuffer.Initialize(Compressed, Flags, CompressedBufferSize, 0);
 
     LOOP_FOREVER
     {
@@ -957,11 +933,7 @@ Pack(
         WriteSize   = (ULONG_PTR)DestinationBuffer.Size.QuadPart;
     }
 
-    SourceBuffer.Buffer                 = WriteBuffer;
-    SourceBuffer.Flags                  = Flags;
-    SourceBuffer.Offset.QuadPart        = 0;
-    SourceBuffer.Size.QuadPart          = WriteSize;
-
+    SourceBuffer.Initialize(WriteBuffer, Flags, WriteSize, 0);
     Status = This->PostCompressEntry(&Header, &SourceBuffer);
 
     pack.Seek(0ll, FILE_END);
@@ -971,7 +943,7 @@ Pack(
 
     Header.EntrySize.QuadPart = WriteSize;
 
-    EncryptPackHeader(&Header);
+    This->EncryptPackHeader(&Header, sizeof(Header));
     pack.Seek(0ll, FILE_BEGIN);
     Status = pack.Write(&Header, sizeof(Header));
 

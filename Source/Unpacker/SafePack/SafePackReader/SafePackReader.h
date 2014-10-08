@@ -6,7 +6,7 @@
 
 typedef struct SAFE_PACK_READER_ENTRY : public UNPACKER_FILE_ENTRY_BASE
 {
-    //ULONG FileNameHash[4];
+    ULONG Context[8];
 
 } SAFE_PACK_READER_ENTRY, *PSAFE_PACK_READER_ENTRY;
 
@@ -129,7 +129,8 @@ protected:
 
     UPK_STATUS
     DecryptPackHeader(
-        PSAFE_PACK_HEADER Header
+        PSAFE_PACK_HEADER   Header,
+        ULONG_PTR           HeaderSize
     )
     {
         return STATUS_NOT_IMPLEMENTED;
@@ -163,7 +164,7 @@ protected:
         return STATUS_NOT_IMPLEMENTED;
     }
 
-    UPK_STATUS FillEntryByPackEntry(PSAFE_PACK_READER_ENTRY Entry, PSAFE_PACK_ENTRY PackEntry, PVOID PackEntryBase)
+    UPK_STATUS FillEntryFromPackEntry(PSAFE_PACK_READER_ENTRY Entry, PSAFE_PACK_ENTRY PackEntry, PVOID PackEntryBase)
     {
         PackEntry->FileName.Buffer = PtrAdd(PackEntry->FileName.Buffer, PackEntryBase);
 
@@ -206,7 +207,7 @@ protected:
 
         Header = (PSAFE_PACK_COMPRESSED_HEADER)SourceBuffer->Buffer;
 
-        if (Header->Magic != LZNT1_MAGIC || Header->CompressMethod != CompressMethodLZNT1)
+        if ((Header->Magic * 2) != (LZNT1_MAGIC * 2) || Header->CompressMethod != CompressMethodLZNT1)
             return STATUS_UNSUPPORTED_COMPRESSION;
 
         if (Header->OriginalSize.HighPart != 0)
@@ -283,10 +284,10 @@ public:
         Status = File.Read(&HeaderBuffer, sizeof(HeaderBuffer));
         FAIL_RETURN(Status);
 
-        This->DecryptPackHeader(&HeaderBuffer);
+        This->DecryptPackHeader(&HeaderBuffer, sizeof(HeaderBuffer));
         FAIL_RETURN(Status);
 
-        if (HeaderBuffer.Magic != This->GetHeaderMagic())
+        if (((HeaderBuffer.Magic * 2) ^ (This->GetHeaderMagic() * 2)) != 0)
             return STATUS_INVALID_IMAGE_FORMAT;
 
         if (HeaderBuffer.HeaderSize < sizeof(HeaderBuffer))
@@ -300,7 +301,7 @@ public:
             Status = File.Read(Header, HeaderBuffer.HeaderSize);
             FAIL_RETURN(Status);
 
-            This->DecryptPackHeader(Header);
+            This->DecryptPackHeader(Header, HeaderBuffer.HeaderSize);
             FAIL_RETURN(Status);
         }
         else
@@ -380,6 +381,11 @@ public:
         PackEntry = (PSAFE_PACK_ENTRY)EntryBuffer;
         PackEntryEnd = PtrAdd(PackEntry, EntrySize);
 
+        DestinationBuffer.Initialize(PackEntry, 0, EntrySize);
+        Status = This->PostDecompressEntry(Header, &SourceBuffer);
+        if (Status != STATUS_NOT_IMPLEMENTED)
+            FAIL_RETURN(Status);
+
         --Entry;
 
         for (ULONG_PTR NumberOfFiles = Header->NumberOfFiles.QuadPart;
@@ -387,7 +393,7 @@ public:
              PackEntry = PtrAdd(PackEntry, PackEntry->EntrySize), --NumberOfFiles)
         {
             ++Entry;
-            This->FillEntryByPackEntry(Entry, PackEntry, EntryBuffer);
+            This->FillEntryFromPackEntry(Entry, PackEntry, EntryBuffer);
             ++m_Index.FileCount.QuadPart;
         }
 
@@ -439,7 +445,7 @@ public:
             *Buffer++ = ch;
         }
 
-        return Lookup((PVOID)Buffer, Length * sizeof(FileName[0]));
+        return GetTopClass()->Lookup((PVOID)Buffer, Length * sizeof(FileName[0]));
     }
 
     PSAFE_PACK_READER_ENTRY Lookup(PCWSTR FileName)
@@ -690,6 +696,7 @@ public:
             {
                 SAFE_PACK_BUFFER DestinationBuffer;
                 DestinationBuffer.Initialize(FileInfo->BinaryData.Buffer, 0, Entry->Size.QuadPart, 0);
+                Status = GetTopClass()->PreDecompressData(Entry, &DestinationBuffer);
                 Status = GetTopClass()->PostDecompressData(Entry, &DestinationBuffer);
                 Status = Status == STATUS_NOT_IMPLEMENTED ? STATUS_SUCCESS : Status;
             }

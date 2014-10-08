@@ -1,47 +1,22 @@
-a::r:
-return
-a::t:
-true
-a::f:
-false
-a::ifel:
-if ($end$) {
-} else {
-}
-a::if:
-if ($end$) {
-}
-a::al:
-alert($end$);
-a::while:
-while ($end$) {
-}
-a::do:
-do {
-	$end$
-} while();
-a::switch:
-switch($end$) {
-case :
-	break;
-case :
-	break;
-default:
-}
-a::fun:
-function $end$() {
-}
-a::///:
-//////////////////////////////////////////////////////////////////////////
-
-a::/*:
-/*
- *	$end$
- */
 a::/**:
 /************************************************************************/
 /* $end$                                                                     */
 /************************************************************************/
+a::/*:
+/*
+ *	$end$
+ */
+a::///:
+//////////////////////////////////////////////////////////////////////////
+
+a::al:
+alert($end$);
+a::do:
+do {
+	$end$
+} while();
+a::f:
+false
 a:File header::
 /********************************************************************
 	created:	$DATE$
@@ -55,6 +30,9 @@ a:File header::
 	purpose:	$end$
 *********************************************************************/
 
+a::fun:
+function $end$() {
+}
 a:function GetCookie()::
 function GetCookie(sName)
 {
@@ -77,3 +55,25 @@ function SetCookie(sName, sValue)
 	document.cookie = sName + "=" + escape(sValue) + "; expires=" + exp + "; path=/;";
 }
 
+a::if:
+if ($end$) {
+}
+a::ifel:
+if ($end$) {
+} else {
+}
+a::r:
+return
+a::switch:
+switch($end$) {
+case :
+	break;
+case :
+	break;
+default:
+}
+a::t:
+true
+a::while:
+while ($end$) {
+}

@@ -1,3 +1,5 @@
+a::n0:
+!= 0
 a::#d:
 #define 
 a::#if:
@@ -5,59 +7,98 @@ a::#if:
 $selected$
 #endif
 
-a::b:
-bool
-a::r:
-return
-a::n:
-null
-a::fl:
-float
-a::n0:
-!= 0
-a::Gui:
-GuidAttribute("$GUID_STRING$"), 
-a:namespace { ... }:namespace:
-namespace $end$
-{
-	$selected$
-}
+readme:
+VA Snippet used by Surround With #region.
+If you have modified this item, you may delete it to restore the default upon next use.
 
-a::struct:
-struct $end$ 
-{
-}
-a::switch:
-switch ($end$)
-{
-	$selected$
-}
+a:#region (VA):#r:
+#region $end$
+$selected$
+#endregion
 
-a::switch:
-switch ($end$)
-{
-case :
-	break;
-}
+readme:
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:(...)::
+($selected$)
+a::/**:
+/************************************************************************/
+/* $end$                                                                     */
+/************************************************************************/
+a::/*-:
+/*
+ *	$end$
+ */
+a::///:
+//////////////////////////////////////////////////////////////////////////
 
 a:://-:
 // $end$ [$MONTH$/$DAY$/$YEAR$ %USERNAME%]
-a::///:
-//////////////////////////////////////////////////////////////////////////
+readme:
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:{...}::
+{
+	$end$$selected$
+}
 
 a:<summary> ... </summary>:sum:
 /// <summary>
 ///   $end$
 /// </summary>
 
-a::/*-:
-/*
- *	$end$
- */
-a::/**:
-/************************************************************************/
-/* $end$                                                                     */
-/************************************************************************/
+a::bas:
+base.$MethodName$($MethodArgs$);
+
+
+a::b:
+bool
+a:do { ... } while ():do:
+do 
+{
+	$selected$
+} while ($end$);
+
+a:File header detailed::
+/********************************************************************
+	created:	$DATE$
+	created:	$DAY$:$MONTH$:$YEAR$   $HOUR$:$MINUTE$
+	filename: 	$FILE$
+	file path:	$FILE_PATH$
+	file base:	$FILE_BASE$
+	file ext:	$FILE_EXT$
+	author:		$Author$
+	
+	purpose:	$end$
+*********************************************************************/
+
+a::fl:
+float
+a:for () { ... }:for:
+for ($end$)
+{
+	$selected$
+}
+
+a::fore:
+foreach ($end$)
+{
+}
+
+a:for loop forward:forr:
+for (int $Index$ = 0; $Index$ < $Length$ ; $Index$++)
+{
+	$end$
+}
+
+a:for loop reverse:forr:
+for (int $Index$ = $Length$ - 1; $Index$ >= 0 ; $Index$--)
+{
+	$end$
+}
+
+a::Gui:
+GuidAttribute("$GUID_STRING$"), 
 a:if () { ... }:if:
 if ($end$)
 {
@@ -82,40 +123,42 @@ else
 	$selected$
 }
 
-a:while () { ... }:while:
-while ($end$)
+readme:
+VA Snippet used by Surround With Namespace.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:namespace (VA)::
+namespace $end$
 {
 	$selected$
 }
 
-a:for () { ... }:for:
-for ($end$)
+a:namespace { ... }:namespace:
+namespace $end$
 {
 	$selected$
 }
 
-a:for loop forward:forr:
-for (int $Index$ = 0; $Index$ < $Length$ ; $Index$++)
+a::n:
+null
+a::r:
+return
+a::struct:
+struct $end$ 
 {
-	$end$
+}
+a::switch:
+switch ($end$)
+{
+case :
+	break;
 }
 
-a:for loop reverse:forr:
-for (int $Index$ = $Length$ - 1; $Index$ >= 0 ; $Index$--)
-{
-	$end$
-}
-
-a::fore:
-foreach ($end$)
-{
-}
-
-a:do { ... } while ():do:
-do 
+a::switch:
+switch ($end$)
 {
 	$selected$
-} while ($end$);
+}
 
 a:try { ... } catch {}:try:
 try
@@ -140,45 +183,12 @@ finally
 {
 }
 
-a::bas:
-base.$MethodName$($MethodArgs$);
-
-
-a:File header detailed::
-/********************************************************************
-	created:	$DATE$
-	created:	$DAY$:$MONTH$:$YEAR$   $HOUR$:$MINUTE$
-	filename: 	$FILE$
-	file path:	$FILE_PATH$
-	file base:	$FILE_BASE$
-	file ext:	$FILE_EXT$
-	author:		$Author$
-	
-	purpose:	$end$
-*********************************************************************/
-
-readme:
-VA Snippet used by Surround With #region.
-If you have modified this item, you may delete it to restore the default upon next use.
-
-a:#region (VA):#r:
-#region $end$
-$selected$
-#endregion
-
-readme:
-If you have modified this item, you may delete it to restore the default upon next use.
-
-a:{...}::
+a:while () { ... }:while:
+while ($end$)
 {
-	$end$$selected$
+	$selected$
 }
 
-readme:
-If you have modified this item, you may delete it to restore the default upon next use.
-
-a:(...)::
-($selected$)
 readme:
 VA Snippet used for suggestions of type bool.
 If you have modified this item, you may delete it to restore the default upon next use.
@@ -303,15 +313,5 @@ a:Refactor Extract Method::
 $end$$SymbolPrivileges$ $SymbolType$ $SymbolContext$($ParameterList$)
 {
 	$MethodBody$
-}
-
-readme:
-VA Snippet used by Surround With Namespace.
-If you have modified this item, you may delete it to restore the default upon next use.
-
-a:namespace (VA)::
-namespace $end$
-{
-	$selected$
 }
 

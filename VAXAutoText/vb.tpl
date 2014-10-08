@@ -1,26 +1,24 @@
-a::Pr:
-Private
-a::Pu:
-Public
-a::E:
-Else
+readme:
+VA Snippet used by Surround With #region.
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:#region (VA):#r:
+#Region "$end$"
+$selected$
+#End Region
+
+readme:
+If you have modified this item, you may delete it to restore the default upon next use.
+
+a:(...)::
+($selected$)
 a::D:
 Dim
-a::If:
-If $end$ Then
-End If
-a::Function:
-Function $end$ ( )
-End Function
-a::Sub:
-Sub $end$ ( )
-End Sub
 a::Do:
 Do While $end$
 Loop
-a::For:
-For $end$ To 
-Next
+a::E:
+Else
 a:File header::
 '*************************************************************************
 '	created:	$DATE$
@@ -34,22 +32,29 @@ a:File header::
 '	purpose:	$end$
 '*************************************************************************
 
-
+a::For:
+For $end$ To 
+Next
+a::Function:
+Function $end$ ( )
+End Function
+a::If:
+If $end$ Then
+End If
+a::Pr:
+Private
+a::Pu:
+Public
+a::Sub:
+Sub $end$ ( )
+End Sub
 readme:
-VA Snippet used by Surround With #region.
+VA Snippet used for suggestions of type Boolean.
 If you have modified this item, you may delete it to restore the default upon next use.
 
-a:#region (VA):#r:
-#Region "$end$"
-$selected$
-#End Region
-
-
-readme:
-If you have modified this item, you may delete it to restore the default upon next use.
-
-a:(...)::
-($selected$)
+a:SuggestionsForType Boolean::
+True
+False
 
 readme:
 VA Snippet used for suggestions in class definitions.
@@ -60,16 +65,6 @@ Public
 Private
 Protected
 
-
-readme:
-VA Snippet used for suggestions of type Boolean.
-If you have modified this item, you may delete it to restore the default upon next use.
-
-a:SuggestionsForType Boolean::
-True
-False
-
-
 readme:
 VA Snippet used for refactoring.
 Delete this item to restore the default upon next use.
@@ -78,7 +73,6 @@ a:Refactor Create Implementation::
 $SymbolPrivileges$ Sub $SymbolName$($ParameterList$)
 	$end$$MethodBody$
 End Sub
-
 
 readme:
 VA Snippet used for refactoring.
@@ -94,7 +88,6 @@ a:Refactor Document Method::
 ' Parameter: $MethodArg$
 '//////////////////////////////////////////////////
 
-
 readme:
 VA Snippet used for refactoring.
 Delete this item to restore the default upon next use.
@@ -108,7 +101,6 @@ a:Refactor Encapsulate Field::
 			$SymbolName$ = value
 		End Set
 	End Property
-
 
 readme:
 VA Snippet used for refactoring.

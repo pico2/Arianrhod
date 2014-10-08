@@ -117,13 +117,15 @@ struct PyTypeConverter<PyObject *>
 {
     static PyObject* FromNative(PyObject *object)
     {
-        PyAddRef(object);
+        if (object != nullptr)
+            PyAddRef(object);
         return object;
     }
 
     static PyObject* ToNative(PyObject *object)
     {
-        PyAddRef(object);
+        if (object != nullptr)
+            PyAddRef(object);
         return object;
     }
 };
@@ -175,6 +177,71 @@ PY_INTEGER_CONVERTER_32(ULONG);
 PY_INTEGER_CONVERTER_64(LONG64);
 PY_INTEGER_CONVERTER_64(ULONG64);
 
+
+template<>
+struct PyTypeConverter<ml::ByteArray>
+{
+    static PyObject* FromNative(ml::ByteArray &object)
+    {
+        return PyBytes_FromStringAndSize((PCHAR)object.GetData(), object.GetSize());
+    }
+
+    static ml::ByteArray ToNative(PyObject *object)
+    {
+        ml::ByteArray   bytes;
+        Py_ssize_t      Size;
+        PCHAR           Buffer;
+
+        if (object == nullptr)
+            return bytes;
+
+        if (PyBytes_Check(object) != FALSE)
+        {
+            PyBytes_AsStringAndSize(object, &Buffer, &Size);
+        }
+        else if (PyByteArray_Check(object) != FALSE)
+        {
+            Size = PyByteArray_Size(object);
+            Buffer = PyByteArray_AsString(object);
+        }
+        else
+        {
+            return bytes;
+        }
+
+        if (NT_SUCCESS(bytes.SetSize(Size)))
+        {
+            CopyMemory(bytes.GetData(), Buffer, Size);
+            bytes.UpdateDataCount(Size);
+        }
+
+        return bytes;
+    }
+};
+
+template<>
+struct PyTypeConverter<ml::String>
+{
+    static PyObject* FromNative(ml::String &object)
+    {
+        return PyUnicode_FromUnicode(object, object.GetCount());
+    }
+
+    static ml::String ToNative(PyObject *object)
+    {
+        ml::String text;
+        Py_ssize_t size;
+        Py_UNICODE *buffer;
+
+        if (object == nullptr || PyUnicode_Check(object) == FALSE)
+            return text;
+
+        buffer = PyUnicode_AsUnicodeAndSize(object, &size);
+        text.CopyFrom(buffer, size);
+
+        return text;
+    }
+};
 
 //////////////////////////////////////////////////////////////////////////
 // func helper
@@ -993,7 +1060,7 @@ protected:
 
         if (PyCallable_Check(callable) == FALSE)
         {
-            this->SetPyException(String::Format(L"'%S' object is not callable", Py_TYPE(callable)->tp_name));
+            this->SetPyException(String::Format(L"'%S' object is not callable", callable != nullptr ? Py_TYPE(callable)->tp_name : (PSTR)callable));
             return nullptr;
         }
 
