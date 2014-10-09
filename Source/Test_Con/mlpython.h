@@ -1040,6 +1040,12 @@ protected:
             return nullptr;
         }
 
+        if (PyErr_Occurred())
+        {
+            CapturePyException();
+            return nullptr;
+        }
+
         func = PyObject_GetAttr(module, MlPyObject(FunctionName));
         if (func == nullptr)
         {
