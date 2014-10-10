@@ -42,7 +42,10 @@
 #include <frameobject.h>
 
 #define PYTHON_DLL              L"python34.dll"
-#define PYTHON_PACKAGE_PATH     L"python\\"
+
+#if !defined(PYTHON_PACKAGE_PATH)
+    #define PYTHON_PACKAGE_PATH     L"python\\"
+#endif
 
 typedef LONG PYSTATUS;
 #define PY_SUCCESS NT_SUCCESS
@@ -421,6 +424,11 @@ struct PyNativeClassHelper : public MlPyObjectBase
 
         self->object = self->InitClassObject(args, ctor);
 
+        IF_EXIST(BASE_CLASS::self)
+        {
+            self->object->self = (PyObject *)self;
+        }
+
         return self->object == nullptr ? -1 : 0;
     }
 
@@ -638,16 +646,20 @@ public:
     MlPython()
     {
         ml::MlInitialize();
-        if (Py_IsInitialized() == FALSE)
-        {
-            InitializePackage();
-            Py_Initialize();
-        }
     }
 
     ~MlPython()
     {
         ;
+    }
+
+    VOID Initialize()
+    {
+        if (Py_IsInitialized() == FALSE)
+        {
+            InitializePackage();
+            Py_Initialize();
+        }
     }
 
     MlPython(const MlPython&) = delete;
