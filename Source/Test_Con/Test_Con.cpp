@@ -214,6 +214,19 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     using namespace ml;
 
     ml::MlInitialize();
+
+    NtFileDisk f;
+    UNICODE_STRING name;
+
+    RtlInitEmptyString(&name);
+
+    f.Open(Ldr::FindLdrModuleByHandle(nullptr)->FullDllName.Buffer);
+    Io::QueryDosPathFromHandle(&name, f);
+    PrintConsole(L"%wZ\n", &name);
+    PauseConsole();
+
+    return;
+
     MlPython py;
 
     LONG_PTR& a = argc;

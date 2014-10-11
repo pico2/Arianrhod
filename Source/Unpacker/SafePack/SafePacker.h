@@ -693,8 +693,12 @@ Pack(
         Entry->Attributes       = FileList->Attributes;
 
         if (FLAG_ON(Entry->Attributes, FILE_ATTRIBUTE_DIRECTORY))
+        {
+            Entry->Offset.QuadPart = DataOffset.QuadPart + GetRandom32Range(0x100, 0x200);
+            Entry->FileSize.QuadPart = DataOffset.QuadPart + GetRandom32Range(0x200, 0x300);
             goto PACK_NEXT_FILE;
             // continue;
+        }
 
         CopyMemory(FileName, FileList->GetFileName(), Length + sizeof(WCHAR));
 

@@ -116,6 +116,20 @@ template<typename NATIVE_TYPE>
 struct PyTypeConverter;
 
 template<>
+struct PyTypeConverter<PVOID>
+{
+    static PyObject* FromNative(PVOID object)
+    {
+        return (PyObject *)object;
+    }
+
+    static PVOID ToNative(PyObject *object)
+    {
+        return object;
+    }
+};
+
+template<>
 struct PyTypeConverter<PyObject *>
 {
     static PyObject* FromNative(PyObject *object)
@@ -184,7 +198,7 @@ PY_INTEGER_CONVERTER_64(ULONG64);
 template<>
 struct PyTypeConverter<ml::ByteArray>
 {
-    static PyObject* FromNative(ml::ByteArray &object)
+    static PyObject* FromNative(const ml::ByteArray &object)
     {
         return PyBytes_FromStringAndSize((PCHAR)object.GetData(), object.GetSize());
     }
@@ -225,7 +239,7 @@ struct PyTypeConverter<ml::ByteArray>
 template<>
 struct PyTypeConverter<ml::String>
 {
-    static PyObject* FromNative(ml::String &object)
+    static PyObject* FromNative(const ml::String &object)
     {
         return PyUnicode_FromUnicode(object, object.GetCount());
     }
@@ -325,7 +339,7 @@ struct PyStaticFunctionHelper : public MlPyObjectBase
     static INT PYCALL InitObject(SELF *self, PyObject *args, PyObject *kwargs)
     {
         new (self) SELF(PyUnicode_AsUnicode(PyTuple_GetItem(args, 1)));
-        *(FUNC_OBJECT **)&self->func = (FUNC_OBJECT *)(ULONG_PTR)PyLong_AsUnsignedLongLong(PyTuple_GetItem(args, 0));
+        *(FUNC_OBJECT **)&self->func = (FUNC_OBJECT *)PyTuple_GetItem(args, 0);
         return 0;
     }
 
@@ -634,6 +648,12 @@ protected:
         PVOID       Address;
         String      Name;
         String      Doc;
+        ULONG_PTR   Flags;
+
+        PY_STATIC_FUNCTION()
+        {
+            Flags = 0;
+        }
     };
 
     MlPythonException                   PyException;
@@ -1231,7 +1251,7 @@ protected:
                 //if (PyModule_AddObject(Module, type.tp_name, (PyObject *)&type) != 0)
                 //    break;
 
-                args = Py_BuildValue("(Ku)", (ULONG64)func.Address, func.Name);
+                args = Py_BuildValue("(Ou)", func.Address, func.Name);
                 if (args == nullptr)
                     break;
 
@@ -1311,8 +1331,6 @@ protected:
             PyAddRef((PyObject *)&type);
             if (PyType_Ready(&type) != 0)
                 continue;
-
-            PyObject *dict = type.tp_dict;
 
             Success = TRUE;
 
@@ -1428,7 +1446,7 @@ protected:
             return;
         }
 
-        auto &doc = str.Encode(CP_UTF8);
+        const auto &doc = str.Encode(CP_UTF8);
 
         ansi = new CHAR[doc.GetSize()];
         if (ansi != nullptr)

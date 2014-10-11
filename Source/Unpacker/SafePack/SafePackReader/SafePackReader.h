@@ -266,6 +266,10 @@ protected:
     ml::String FileName;
 
 public:
+    HANDLE GetHandle()
+    {
+        return this->File;
+    }
 
     UPK_STATUS Open(PCWSTR FileName)
     {
@@ -438,13 +442,14 @@ public:
                     break;
 
                 default:
-                    ch = CHAR_LOWER(ch);
+                    ch = CHAR_UPPER(ch);
                     break;
             }
 
             *Buffer++ = ch;
         }
 
+        Buffer -= Length;
         return GetTopClass()->Lookup((PVOID)Buffer, Length * sizeof(FileName[0]));
     }
 
