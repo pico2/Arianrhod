@@ -1,8 +1,9 @@
-from ml import *
+from Libs.IO.FileStream import BytesStream
+from Libs.Misc.Console import SetConsoleTitle
 import time
+import os
 
 class UnpackerFileType:
-
     UnpackerFileBinary  = 0
     UnpackerFileBitmap  = 1
     UnpackerFilePNG     = 2

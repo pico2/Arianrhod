@@ -6,8 +6,8 @@
 星期六	妖精的尾巴							203
 	琴浦小姐							08
 	Date A Live II							01
-星期天	刀剑神域2							14
-	Fate/Stay Night UBW						00
+星期天	刀剑神域2							14.5
+	Fate/Stay Night UBW						01
 
 
 《心理学》
