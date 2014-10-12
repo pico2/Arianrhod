@@ -632,6 +632,12 @@ struct MlWrapperBase : public wrapperbase
 
 class MlPython
 {
+public:
+    enum
+    {
+        IgnoreSetPath = 1 << 0,
+    };
+
 protected:
     typedef ml::String String;
     typedef PCSTR PY_FUNCTION_NAME;
@@ -673,11 +679,11 @@ public:
         ;
     }
 
-    VOID Initialize()
+    VOID Initialize(ULONG_PTR Flags = 0)
     {
         if (Py_IsInitialized() == FALSE)
         {
-            InitializePackage();
+            InitializePackage(Flags);
             Py_Initialize();
         }
     }
@@ -1464,7 +1470,7 @@ protected:
         SafeDeleteT(ansi);
     }
 
-    PYSTATUS InitializePackage()
+    PYSTATUS InitializePackage(ULONG_PTR Flags = 0)
     {
         PLDR_MODULE Self;
         UNICODE_STRING SelfPath;
@@ -1483,15 +1489,18 @@ protected:
         SelfPath = Self->FullDllName;
         SelfPath.Length -= Self->BaseDllName.Length;
 
-        Py_SetPath(String::Format(
-            L"%wZ%s;%wZ%s%s;%wZ%s%s\\site-packages;%wZ%slib;%wZ%sDLLs;%wZ%sUserSite",
-            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python
-            &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip
-            &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip/site-packages
-            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python/lib
-            &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python/DLLs
-            &SelfPath, PYTHON_PACKAGE_PATH                       // ./python/UserSite
-        ));
+        if (FLAG_OFF(Flags, IgnoreSetPath))
+        {
+            Py_SetPath(String::Format(
+                L"%wZ%s;%wZ%s%s;%wZ%s%s\\site-packages;%wZ%slib;%wZ%sDLLs;%wZ%sUserSite",
+                &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python
+                &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip
+                &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip/site-packages
+                //&SelfPath, PYTHON_PACKAGE_PATH,                      // ./python/lib
+                &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python/DLLs
+                &SelfPath, PYTHON_PACKAGE_PATH                       // ./python/UserSite
+            ));
+        }
 
         String          PathEnv, UserSite;
         PWSTR           EnvBuffer;
