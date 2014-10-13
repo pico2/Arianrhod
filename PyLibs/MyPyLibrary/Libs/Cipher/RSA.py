@@ -1,4 +1,5 @@
 import rsa
+import base64
 from pyasn1.type.error import PyAsn1Error
 
 class RsaCipher:
@@ -32,6 +33,12 @@ class RsaCipher:
             message.extend(self.decryptor(crypto[start : start + self.DecryptBlockSize], self.key))
 
         return encoding is None and message or message.decode(encoding)
+
+    def encryptstring(self, string, *, encoding = 'UTF8'):
+        return base64.encodestring(self.encrypt(string.encode(encoding))).decode('ASCII')
+
+    def decryptstring(self, crypto, *, encoding = 'UTF8'):
+        return self.decrypt(base64.decodestring(crypto.encode('ASCII'))).decode(encoding)
 
     def private_decryptor(self, crypto, key):
         return rsa.decrypt(crypto, key)

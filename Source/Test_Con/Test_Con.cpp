@@ -211,19 +211,15 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
 #if 1
 
-    using namespace ml;
-
-    ml::MlInitialize();
-
-    NtFileDisk f;
-    UNICODE_STRING name;
-
-    RtlInitEmptyString(&name);
-
-    f.Open(Ldr::FindLdrModuleByHandle(nullptr)->FullDllName.Buffer);
-    Io::QueryDosPathFromHandle(&name, f);
-    PrintConsole(L"%wZ\n", &name);
-    PauseConsole();
+    SEH_TRY
+    {
+        char *fuck = (char *)_malloca(0x40000000);
+        printf("%p", fuck);
+    }
+    SEH_EXCEPT(1)
+    {
+        ;
+    }
 
     return;
 
