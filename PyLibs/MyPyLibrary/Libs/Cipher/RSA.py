@@ -35,10 +35,10 @@ class RsaCipher:
         return encoding is None and message or message.decode(encoding)
 
     def encryptstring(self, string, *, encoding = 'UTF8'):
-        return base64.encodestring(self.encrypt(string.encode(encoding))).decode('ASCII')
+        return base64.encodebytes(self.encrypt(string.encode(encoding))).decode('ASCII')
 
     def decryptstring(self, crypto, *, encoding = 'UTF8'):
-        return self.decrypt(base64.decodestring(crypto.encode('ASCII'))).decode(encoding)
+        return self.decrypt(base64.decodebytes(crypto.encode('ASCII'))).decode(encoding)
 
     def private_decryptor(self, crypto, key):
         return rsa.decrypt(crypto, key)
