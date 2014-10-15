@@ -227,7 +227,8 @@ public:
     CompressData(
         PSAFE_PACK_ENTRY2 FileInfo,
         PSAFE_PACK_BUFFER SourceBuffer,
-        PSAFE_PACK_BUFFER DestinationBuffer
+        PSAFE_PACK_BUFFER DestinationBuffer,
+        ULONG_PTR         CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_STANDARD
     )
     {
 
@@ -239,7 +240,6 @@ public:
 #else
 
         NTSTATUS                        Status;
-        ULONG                           CompressionFormatAndEngine;
         ULONG                           CompressBufferWorkSpaceSize;
         ULONG                           CompressFragmentWorkSpaceSize;
         PVOID                           WorkSpace;
@@ -253,9 +253,6 @@ public:
             DestinationBuffer->Size.QuadPart = SourceBuffer->Size.QuadPart * 2;
             return STATUS_BUFFER_TOO_SMALL;
         }
-
-
-        CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_STANDARD;
 
         Status = RtlGetCompressionWorkSpaceSize(
                     CompressionFormatAndEngine,

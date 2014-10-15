@@ -191,7 +191,8 @@ protected:
     DecompressData(
         PSAFE_PACK_READER_ENTRY FileInfo,
         PSAFE_PACK_BUFFER       SourceBuffer,
-        PSAFE_PACK_BUFFER       DestinationBuffer
+        PSAFE_PACK_BUFFER       DestinationBuffer,
+        ULONG_PTR               CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_STANDARD
     )
     {
 
@@ -202,7 +203,6 @@ protected:
 #else
 
         UPK_STATUS                      Status;
-        ULONG                           CompressionFormatAndEngine;
         PSAFE_PACK_COMPRESSED_HEADER    Header;
 
         Header = (PSAFE_PACK_COMPRESSED_HEADER)SourceBuffer->Buffer;
@@ -218,9 +218,6 @@ protected:
             DestinationBuffer->Size.QuadPart = Header->OriginalSize.QuadPart;
             return STATUS_BUFFER_TOO_SMALL;
         }
-
-
-        CompressionFormatAndEngine = COMPRESSION_FORMAT_LZNT1 | COMPRESSION_ENGINE_MAXIMUM;
 
         Status = RtlDecompressBuffer(
                     CompressionFormatAndEngine,

@@ -4,8 +4,11 @@ from ctypes.wintypes import *
 import xml.etree.ElementTree as ET
 from ctypes.wintypes import *
 from ctypes import windll, cdll, byref, wintypes
-from pdb import set_trace as bp
 
+def bp():
+    from pdb import set_trace as p_bp
+    bp = p_bp
+    return bp()
 
 def ibp_init():
     global ibp

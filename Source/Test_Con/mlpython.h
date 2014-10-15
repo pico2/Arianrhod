@@ -200,7 +200,7 @@ struct PyTypeConverter<ml::ByteArray>
 {
     static PyObject* FromNative(const ml::ByteArray &object)
     {
-        return PyBytes_FromStringAndSize((PCHAR)object.GetData(), object.GetSize());
+        return PyByteArray_FromStringAndSize((PCHAR)object.GetData(), object.GetSize());
     }
 
     static ml::ByteArray ToNative(PyObject *object)
