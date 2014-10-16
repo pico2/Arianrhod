@@ -41,11 +41,20 @@ class AsyncSocket(object):
 
     @asyncio.coroutine
     def send(self, data):
-        return self.loop.sock_sendall(self.sock, data)
+        return (yield from self.loop.sock_sendall(self.sock, data))
 
     @asyncio.coroutine
     def recv(self, n):
-        return self.loop.sock_recv(self.sock, n)
+        data = bytearray()
+        while n > 0:
+            ret = yield from self.loop.sock_recv(self.sock, n)
+            if not ret:
+                break
+
+            data.extend(ret)
+            n -= len(ret)
+
+        return data
 
     @asyncio.coroutine
     def close(self):
