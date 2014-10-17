@@ -13,7 +13,7 @@ public class ClearableNotification implements IXposedHookLoadPackage {
         if (pkg.packageName.equals("com.tencent.mobileqq") == false)
             return;
 
-        XposedHelpers.findAndHookMethod("android.app.NotificationManager", pkg.classLoader, "notify", int.class, Notification.class,new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("android.app.NotificationManager", pkg.classLoader, "notify", int.class, Notification.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 modifyFlag(param.args[1]);
@@ -21,7 +21,7 @@ public class ClearableNotification implements IXposedHookLoadPackage {
             }
         });
 
-        XposedHelpers.findAndHookMethod("android.app.NotificationManager", pkg.classLoader, "notify", String.class, int.class, Notification.class,new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("android.app.NotificationManager", pkg.classLoader, "notify", String.class, int.class, Notification.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 modifyFlag(param.args[2]);
