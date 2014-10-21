@@ -3,19 +3,42 @@ import base64
 from pyasn1.type.error import PyAsn1Error
 
 class RsaCipher:
-    def __init__(self, key):
-        try:
-            self.key = rsa.key.PublicKey.load_pkcs1(key, 'DER')
-            self.encryptor = self.public_encryptor
-            self.decryptor = self.public_decryptor
+    def __init__(self, key, *, Fast = False):
+        Fast = False
+        if Fast:
+            from Crypto.PublicKey import RSA
+            from Crypto.Random import random
 
-        except PyAsn1Error:
-            self.key = rsa.key.PrivateKey.load_pkcs1(key, 'DER')
-            self.encryptor = self.private_encryptor
-            self.decryptor = self.private_decryptor
+            try:
+                self.key = RSA.importKey(key)
+            except ValueError:
+                raise
 
-        self.DecryptBlockSize = rsa.common.byte_size(self.key.n)
-        self.EncryptBlockSize = self.DecryptBlockSize - 11
+            self.random = random.StrongRandom()
+
+            if self.key.has_private():
+                self.encryptor = self.fast_private_encryptor
+                self.decryptor = self.fast_private_decryptor
+            else:
+                self.encryptor = self.fast_public_encryptor
+                self.decryptor = self.fast_public_decryptor
+
+            self.DecryptBlockSize = (self.key.size() + 1) // 8
+            self.EncryptBlockSize = self.DecryptBlockSize - 11
+
+        else:
+            try:
+                self.key = rsa.key.PublicKey.load_pkcs1(key, 'DER')
+                self.encryptor = self.slow_public_encryptor
+                self.decryptor = self.slow_public_decryptor
+
+            except PyAsn1Error:
+                self.key = rsa.key.PrivateKey.load_pkcs1(key, 'DER')
+                self.encryptor = self.slow_private_encryptor
+                self.decryptor = self.slow_private_decryptor
+
+            self.DecryptBlockSize = rsa.common.byte_size(self.key.n)
+            self.EncryptBlockSize = self.DecryptBlockSize - 11
 
     def encrypt(self, message, *, encoding = 'UTF8'):
         if isinstance(message, str):
@@ -40,16 +63,36 @@ class RsaCipher:
     def decryptstring(self, crypto, *, encoding = 'UTF8'):
         return self.decrypt(base64.decodebytes(crypto.encode('ASCII'))).decode(encoding)
 
-    def private_decryptor(self, crypto, key):
+    def slow_private_decryptor(self, crypto, key):
         return rsa.decrypt(crypto, key)
 
-    def private_encryptor(self, message, key):
+    def slow_private_encryptor(self, message, key):
         pub = rsa.key.PublicKey(n = key.n, e = key.d)
         return rsa.encrypt(message, pub)
 
-    def public_encryptor(self, message, key):
+    def slow_public_encryptor(self, message, key):
         return rsa.encrypt(message, key)
 
-    def public_decryptor(self, crypto, key):
+    def slow_public_decryptor(self, crypto, key):
         private = rsa.key.PrivateKey(n = key.n, e = 0, d = key.e, p = 0, q = 0, exp1 = 0, exp2 = 0, coef = 0)
         return rsa.decrypt(crypto, private)
+
+    def fast_private_decryptor(self, crypto, key):
+        message = key.decrypt(crypto)
+        return message[message.index(b'\x00', 2) + 1:]
+
+    def fast_private_encryptor(self, message, key):
+        # N, E = key.n, key.d
+        message = rsa.pkcs1._pad_for_encryption(message, key.size() + 1)
+        return key.implementation.construct((key.n, key.d)).encrypt(message, self.random.randrange(999))[0]
+
+    def fast_public_encryptor(self, message, key):
+        message = rsa.pkcs1._pad_for_encryption(message, key.size() + 1)
+        return key.encrypt(message, self.random.randrange(999))[0]
+
+    def fast_public_decryptor(self, crypto, key):
+        # N, D = key.n, key.e
+        pk = key.implementation.construct((key.n, 0))
+        pk.d = key.e
+        message = pk.decrypt(crypto)
+        return message[message.index(b'\x00', 2) + 1:]

@@ -1448,7 +1448,7 @@ protected:
     {
         if (!str)
         {
-            ansi = "";
+            ansi = nullptr;
             return;
         }
 

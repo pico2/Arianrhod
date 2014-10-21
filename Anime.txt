@@ -3,11 +3,11 @@
 星期三	TRINITY SEVEN 七人魔法使					02
 星期四	
 星期五	
-星期六	妖精的尾巴							203
+星期六	妖精的尾巴							204
 	琴浦小姐							08
 	Date A Live II							01
-星期天	刀剑神域2							14.5
-	Fate/Stay Night UBW						01
+星期天	刀剑神域2							15
+	Fate/Stay Night UBW						02
 
 
 《心理学》
