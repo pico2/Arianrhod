@@ -205,21 +205,20 @@ struct fuck
     ;
 };
 
+BOOL NTAPI handler(DWORD CtrlType)
+{
+    PrintConsole(L"%d\n", CtrlType);
+    return FALSE;
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
 #if 1
 
-    SEH_TRY
-    {
-        char *fuck = (char *)_malloca(0x40000000);
-        printf("%p", fuck);
-    }
-    SEH_EXCEPT(1)
-    {
-        ;
-    }
+    SetConsoleCtrlHandler(handler, TRUE);
+    PauseConsole();
 
     return;
 
