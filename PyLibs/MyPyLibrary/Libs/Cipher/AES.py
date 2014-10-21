@@ -25,6 +25,9 @@ class AesCipher:
 
         crypto = bytearray()
         pad = self.EncryptBlockSize - len(message) % self.EncryptBlockSize
+        if pad == self.EncryptBlockSize:
+            pad = 0
+
         for start in range(0, len(message), self.EncryptBlockSize):
             crypto.extend(self.encrypt_block(message[start : start + self.EncryptBlockSize]))
 
