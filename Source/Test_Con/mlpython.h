@@ -1,14 +1,6 @@
 #ifndef _MLPYTHON_H_13f13917_f5da_49af_b443_052ccfc01ea9_
 #define _MLPYTHON_H_13f13917_f5da_49af_b443_052ccfc01ea9_
 
-/*++
-
-    linker option:
-        /DELAYLOAD:python34.dll
-
---*/
-
-
 //
 //                       _oo0oo_
 //                      o8888888o
@@ -676,7 +668,7 @@ public:
 
     ~MlPython()
     {
-        ;
+        Py_Finalize();
     }
 
     VOID Initialize(ULONG_PTR Flags = 0)
