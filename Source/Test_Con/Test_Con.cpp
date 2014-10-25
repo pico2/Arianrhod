@@ -197,6 +197,11 @@ struct test_class
     {
         PrintConsole(L"%S, %u\n", __FUNCTION__, this->member);
     }
+
+    ml::String __repr__()
+    {
+        return L"FUCK";
+    }
 };
 
 template<typename wchar_t*>
@@ -205,28 +210,21 @@ struct fuck
     ;
 };
 
-BOOL NTAPI handler(DWORD CtrlType)
-{
-    PrintConsole(L"%d\n", CtrlType);
-    return FALSE;
-}
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
 #if 1
 
-    SetConsoleCtrlHandler(handler, TRUE);
-    PauseConsole();
-
-    return;
+    ml::MlInitialize();
 
     MlPython py;
 
     LONG_PTR& a = argc;
 
     argc = 123;
+
+    py.Initialize();
 
     py.Register(test_void_void0, L"test_void_void0")
       .Register(
@@ -249,8 +247,6 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
       .RegisterMethod(&test_class::void_void, L"void_void")
       .RegisterProperty(&test_class::member, L"member")
       .AddToModule(L"mlpy");
-
-    py.Initialize();
 
     MlPyObject func = py.Invoke<PyObject *>(L"fuck - Copy", L"getfunc");
 
