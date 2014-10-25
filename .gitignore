@@ -97,3 +97,5 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/sources/Python-*
 /Source/Android/hookTaobao
 /Source/PythonProtector
+/Source/sources/cpython
+/Source/Test_Con/python
