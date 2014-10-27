@@ -246,6 +246,12 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    auto x = &test_class::member;
+
+    while (malloc(0x1000));
+    PauseConsole();
+    return;
+
     int array[] = { 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1 };
 
     quick_sort(array, countof(array));

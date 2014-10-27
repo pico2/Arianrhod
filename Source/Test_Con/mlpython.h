@@ -911,7 +911,7 @@ public:
                 R CLASS::*member;
                 FAKE_CLASS *thiz = (FAKE_CLASS *)self;
 
-                *(PVOID *)&member = Closure;
+                *(PULONG)&member = (ULONG)Closure;
 
                 return PyTypeConverter<R>::FromNative(thiz->object->*member);
             };
@@ -921,7 +921,7 @@ public:
                 R CLASS::*member;
                 FAKE_CLASS *thiz = (FAKE_CLASS *)self;
 
-                *(PVOID *)&member = Closure;
+                *(PULONG)&member = (ULONG)Closure;
                 thiz->object->*member = PyTypeConverter<R>::ToNative(value);
 
                 return 0;
