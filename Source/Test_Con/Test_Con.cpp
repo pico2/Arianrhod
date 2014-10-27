@@ -210,9 +210,51 @@ struct fuck
     ;
 };
 
+void quick_sort(int *array, int count)
+{
+    int *left, *right, base;
+
+    left = array;
+    right = &array[count - 1];
+
+    if (left > right)
+        return;
+
+    base = *left;
+
+    while (left < right)
+    {
+        while (*right >= base && left < right)
+            --right;
+
+        while (*left <= base && left < right)
+            ++left;
+
+        if (left < right)
+            Swap(*left, *right);
+    }
+
+    Swap(*array, *left);
+
+    quick_sort(array, left - array);
+
+    ++left;
+    quick_sort(left, &array[count] - left);
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    int array[] = { 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1 };
+
+    quick_sort(array, countof(array));
+
+    for (int i = 0; i != countof(array); ++i)
+        printf("%X ", array[i]);
+
+    printf("\n");
+    return;
 
 #if 1
 
