@@ -1484,7 +1484,7 @@ protected:
         if (FLAG_OFF(Flags, IgnoreSetPath))
         {
             Py_SetPath(String::Format(
-                L"%wZ%s;%wZ%s%s;%wZ%s%s\\site-packages;%wZ%slib;%wZ%sDLLs;%wZ%sUserSite",
+                L"%wZ%s;%wZ%s%s;%wZ%s%s\\site-packages;%wZ%sDLLs;%wZ%sUserSite",
                 &SelfPath, PYTHON_PACKAGE_PATH,                      // ./python
                 &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip
                 &SelfPath, PYTHON_PACKAGE_PATH, PythonZip,           // ./python/python.zip/site-packages
