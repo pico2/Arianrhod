@@ -73,9 +73,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/sources/Python-3.3.2/PCbuild/*.exe
 /Source/sources/Python-3.3.2/PCbuild/*.dll
 /Source/Hooks/KrKr2Protect
-/PyLibs/IPython
-/PyLibs/pyreadline
-/PyLibs/readline.py
 
 /TempSync/SublimeText Packages/User/Package Control.last-run
 /TempSync/SublimeText Packages/User/encoding_cache.json
