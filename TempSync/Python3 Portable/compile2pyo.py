@@ -21,10 +21,10 @@ def main():
     [
         'test',
         'site-packages\\PyQt',
-        'site-packages\\IPython',
+        'site-packages\\IPython-',
         'site-packages\\ipdb',
-        'site-packages\\pyreadline',
-        'site-packages\\readline.py',
+        # 'site-packages\\pyreadline',
+        # 'site-packages\\readline.py',
     ]
 
     copytrees = \
@@ -34,6 +34,7 @@ def main():
         (False, 'site-packages\\Crypto'),
         (False, 'site-packages\\bson'),
         (False, 'site-packages\\pymongo'),
+        (True,  'site-packages\\IPython'),
         (True,  'lib2to3'),
     ]
 
