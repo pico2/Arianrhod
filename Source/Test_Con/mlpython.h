@@ -1511,10 +1511,9 @@ protected:
         UserSite += PYTHON_PACKAGE_PATH;
         UserSite + L"UserSite";
 
-        PathEnv = Path;
-        PathEnv += ';';
         PathEnv += SelfPath;
         PathEnv += L"DLLs;";
+        PathEnv += Path;
 
         EnumDirectoryFiles(
             nullptr, L"*.*", 0, UserSite, nullptr,
