@@ -1511,9 +1511,7 @@ protected:
         UserSite += PYTHON_PACKAGE_PATH;
         UserSite + L"UserSite";
 
-        PathEnv += SelfPath;
-        PathEnv += L"DLLs;";
-        PathEnv += Path;
+        PathEnv = String::Format(L"%wZ%sDLLs;%wZ", &SelfPath, PYTHON_PACKAGE_PATH, &Path);
 
         EnumDirectoryFiles(
             nullptr, L"*.*", 0, UserSite, nullptr,
