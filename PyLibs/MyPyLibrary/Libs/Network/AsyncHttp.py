@@ -3,6 +3,116 @@ import aiohttp
 import asyncio
 import http.cookies
 
+class Request(aiohttp.Request):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.headers = _CaseInsensitiveDict()
+
+    def add_header(self, name, value):
+        """Analyze headers. Calculate content length,
+        removes hop headers, etc."""
+        assert not self.headers_sent, 'headers have been sent already'
+        assert isinstance(name, str), \
+            'Header name should be a string, got {!r}'.format(name)
+        assert set(name).issubset(aiohttp.protocol.ASCIISET), \
+            'Header name should contain ASCII chars, got {!r}'.format(name)
+        assert isinstance(value, str), \
+            'Header {!r} should have string value, got {!r}'.format(
+                name, value)
+
+        name = name.strip()
+        value = value.strip()
+
+        name_upper = name.upper()
+
+        if name_upper == 'CONTENT-LENGTH':
+            self.length = int(value)
+
+        if name_upper == 'CONNECTION':
+            val = value.lower()
+            # handle websocket
+            if 'upgrade' in val:
+                self.upgrade = True
+            # connection keep-alive
+            elif 'close' in val:
+                self.keepalive = False
+            elif 'keep-alive' in val and self.version >= aiohttp.protocol.HttpVersion11:
+                self.keepalive = True
+
+        elif name_upper == 'UPGRADE':
+            if 'websocket' in value.lower():
+                self.websocket = True
+                self.headers[name] = value
+
+        elif name_upper == 'TRANSFER-ENCODING' and not self.chunked:
+            self.chunked = value.lower().strip() == 'chunked'
+
+        elif name_upper not in self.HOP_HEADERS:
+            if name_upper == 'USER-AGENT':
+                self._has_user_agent = True
+
+            # ignore hop-by-hop headers
+            self.headers.add(name, value)
+
+aiohttp.Request = Request
+
+class _CaseInsensitiveDict(CaseInsensitiveDict):
+    def add(self, key, value):
+        self[key] = value
+
+    def items(self, **kwargs):
+        return super().items()
+
+class _ClientRequest(aiohttp.client.ClientRequest):
+    def update_cookies(self, cookies):
+        """Update request cookies header."""
+        if not cookies:
+            return
+
+        c = http.cookies.BaseCookie()
+        if 'COOKIE' in self.headers:
+            c.load(self.headers.get('COOKIE', ''))
+            del self.headers['COOKIE']
+
+        if isinstance(cookies, dict):
+            cookies = cookies.items()
+
+        for name, value in cookies:
+            if isinstance(value, http.cookies.Morsel):
+                # use dict method because SimpleCookie class modifies value
+                dict.__setitem__(c, name, value)
+            else:
+                c[name] = value
+
+        # ibp()
+        self.headers['Cookie'] = c.output(header='', sep=';').strip()
+
+    def update_headers(self, headers):
+        """Update request headers."""
+        self.headers = _CaseInsensitiveDict()
+
+        if headers:
+            if isinstance(headers, dict):
+                headers = headers.items()
+            elif isinstance(headers, MultiDict):
+                headers = headers.items()
+
+            for key, value in headers:
+                self.headers[key] = value
+
+        DEFAULT_HEADERS = {
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate',
+        }
+
+        for hdr, val in DEFAULT_HEADERS.items():
+            if hdr not in self.headers:
+                self.headers[hdr] = val
+
+        # add host
+        if 'HOST' not in self.headers:
+            self.headers['Host'] = self.netloc
+
 class AsyncHttp(object):
     class Response(object):
         def __init__(self, response, content):
@@ -62,6 +172,7 @@ class AsyncHttp(object):
     @asyncio.coroutine
     def request(self, method, url, **kwargs):
         kwargs['connector'] = self.connector
+        kwargs['request_class'] = _ClientRequest
 
         if 'headers' not in kwargs:
             kwargs['headers'] = self.headers

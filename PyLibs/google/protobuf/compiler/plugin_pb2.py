@@ -11,12 +11,21 @@ if sys.version_info >= (3,):
   long = int
   range = range
   unichr = chr
+  def b(s):
+    return s.encode("latin-1")
+  def u(s):
+    return s
 else:
   #some constants that are python2 only
   range = xrange
   unicode = unicode
   long = long
   unichr = unichr
+  def b(s):
+    return s
+  # Workaround for standalone backslash
+  def u(s):
+    return unicode(s.replace(r'\\', r'\\\\'), "unicode_escape")
 
 from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
@@ -28,7 +37,7 @@ import google.protobuf.descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='google/protobuf/compiler/plugin.proto',
   package='google.protobuf.compiler',
-  serialized_pb=b'\n%google/protobuf/compiler/plugin.proto\x12\x18google.protobuf.compiler\x1a google/protobuf/descriptor.proto\"}\n\x14\x43odeGeneratorRequest\x12\x18\n\x10\x66ile_to_generate\x18\x01 \x03(\t\x12\x11\n\tparameter\x18\x02 \x01(\t\x12\x38\n\nproto_file\x18\x0f \x03(\x0b\x32$.google.protobuf.FileDescriptorProto\"\xaa\x01\n\x15\x43odeGeneratorResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\x12\x42\n\x04\x66ile\x18\x0f \x03(\x0b\x32\x34.google.protobuf.compiler.CodeGeneratorResponse.File\x1a>\n\x04\x46ile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x17\n\x0finsertion_point\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x0f \x01(\tB,\n\x1c\x63om.google.protobuf.compilerB\x0cPluginProtos')
+  serialized_pb=b('\n%google/protobuf/compiler/plugin.proto\x12\x18google.protobuf.compiler\x1a google/protobuf/descriptor.proto\"}\n\x14\x43odeGeneratorRequest\x12\x18\n\x10\x66ile_to_generate\x18\x01 \x03(\t\x12\x11\n\tparameter\x18\x02 \x01(\t\x12\x38\n\nproto_file\x18\x0f \x03(\x0b\x32$.google.protobuf.FileDescriptorProto\"\xaa\x01\n\x15\x43odeGeneratorResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\x12\x42\n\x04\x66ile\x18\x0f \x03(\x0b\x32\x34.google.protobuf.compiler.CodeGeneratorResponse.File\x1a>\n\x04\x46ile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x17\n\x0finsertion_point\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x0f \x01(\tB,\n\x1c\x63om.google.protobuf.compilerB\x0cPluginProtos'))
 
 
 
@@ -50,7 +59,7 @@ _CODEGENERATORREQUEST = _descriptor.Descriptor(
     _descriptor.FieldDescriptor(
       name='parameter', full_name='google.protobuf.compiler.CodeGeneratorRequest.parameter', index=1,
       number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode(b"", "utf-8"),
+      has_default_value=False, default_value=unicode(b(""), "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -85,21 +94,21 @@ _CODEGENERATORRESPONSE_FILE = _descriptor.Descriptor(
     _descriptor.FieldDescriptor(
       name='name', full_name='google.protobuf.compiler.CodeGeneratorResponse.File.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode(b"", "utf-8"),
+      has_default_value=False, default_value=unicode(b(""), "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
       name='insertion_point', full_name='google.protobuf.compiler.CodeGeneratorResponse.File.insertion_point', index=1,
       number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode(b"", "utf-8"),
+      has_default_value=False, default_value=unicode(b(""), "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
       name='content', full_name='google.protobuf.compiler.CodeGeneratorResponse.File.content', index=2,
       number=15, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode(b"", "utf-8"),
+      has_default_value=False, default_value=unicode(b(""), "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -126,7 +135,7 @@ _CODEGENERATORRESPONSE = _descriptor.Descriptor(
     _descriptor.FieldDescriptor(
       name='error', full_name='google.protobuf.compiler.CodeGeneratorResponse.error', index=0,
       number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode(b"", "utf-8"),
+      has_default_value=False, default_value=unicode(b(""), "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -175,5 +184,5 @@ CodeGeneratorResponse = _reflection.GeneratedProtocolMessageType('CodeGeneratorR
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\034com.google.protobuf.compilerB\014PluginProtos')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b('\n\034com.google.protobuf.compilerB\014PluginProtos'))
 # @@protoc_insertion_point(module_scope)

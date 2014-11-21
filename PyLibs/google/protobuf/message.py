@@ -31,8 +31,6 @@
 # TODO(robinson): We should just make these methods all "pure-virtual" and move
 # all implementation out, into reflection.py for now.
 
-from __future__ import unicode_literals
-
 """Contains an abstract base class for protocol messages."""
 
 __author__ = 'robinson@google.com (Will Robinson)'

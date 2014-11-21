@@ -32,31 +32,29 @@
 Descriptor objects at runtime backed by the protocol buffer C++ API.
 """
 
-from __future__ import unicode_literals
-
 __author__ = 'petar@google.com (Petar Petrov)'
 
 import operator
+
 from google.protobuf.internal import _net_proto2___python
 from google.protobuf.internal.utils import cmp
 from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import message
-from google.internal.utils import bytestr_to_string
+from google.protobuf.internal.utils import bytestr_to_string, PY2
 
-import sys
-if sys.version > '3':
-    import collections
-	import copyreg
-    def is_sequence(other):
-        return isinstance(other, collections.Sequence)
-	def copy_reg_pickle(type, function):
-	    return copyreg.pickle(type,function)
+if PY2:
+  import copy_reg
+  def is_sequence(other):
+    return operator.isSequenceType(other)
+  def copy_reg_pickle(type, function):
+    return copy_reg.pickle(type,function)
 else:
-	import copy_reg
-    def is_sequence(other):
-        return operator.isSequenceType(other)
-	def copy_reg_pickle(type, function):
-	    return copy_reg.pickle(type,function)
+  import collections
+  import copyreg
+  def is_sequence(other):
+    return isinstance(other, collections.Sequence)
+  def copy_reg_pickle(type, function):
+    return copyreg.pickle(type,function)
 
 _LABEL_REPEATED = _net_proto2___python.LABEL_REPEATED
 _LABEL_OPTIONAL = _net_proto2___python.LABEL_OPTIONAL
@@ -569,7 +567,7 @@ def _AddMessageMethods(message_descriptor, cls):
     if self._cmsg.IsInitialized():
       return True
     if errors is not None:
-      errors.extend(self.FindInitializationErrors());
+      errors.extend(self.FindInitializationErrors())
     return False
 
   def SerializeToString(self):

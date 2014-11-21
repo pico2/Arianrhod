@@ -271,9 +271,10 @@ class Session(SessionRedirectMixin):
     """
 
     __attrs__ = [
-        'headers', 'cookies', 'auth', 'timeout', 'proxies', 'hooks',
-        'params', 'verify', 'cert', 'prefetch', 'adapters', 'stream',
-        'trust_env', 'max_redirects', 'redirect_cache']
+        'headers', 'cookies', 'auth', 'proxies', 'hooks', 'params', 'verify',
+        'cert', 'prefetch', 'adapters', 'stream', 'trust_env',
+        'max_redirects', 'redirect_cache'
+    ]
 
     def __init__(self):
 
@@ -365,6 +366,7 @@ class Session(SessionRedirectMixin):
             url=request.url,
             files=request.files,
             data=request.data,
+            json=request.json,
             headers=merge_setting(request.headers, self.headers, dict_class=CaseInsensitiveDict),
             params=merge_setting(request.params, self.params),
             auth=merge_setting(auth, self.auth),
@@ -386,7 +388,8 @@ class Session(SessionRedirectMixin):
         hooks=None,
         stream=None,
         verify=None,
-        cert=None):
+        cert=None,
+        json=None):
         """Constructs a :class:`Request <Request>`, prepares it and sends it.
         Returns :class:`Response <Response>` object.
 
@@ -395,6 +398,8 @@ class Session(SessionRedirectMixin):
         :param params: (optional) Dictionary or bytes to be sent in the query
             string for the :class:`Request`.
         :param data: (optional) Dictionary or bytes to send in the body of the
+            :class:`Request`.
+        :param json: (optional) json to send in the body of the
             :class:`Request`.
         :param headers: (optional) Dictionary of HTTP Headers to send with the
             :class:`Request`.
@@ -429,6 +434,7 @@ class Session(SessionRedirectMixin):
             headers = headers,
             files = files,
             data = data or {},
+            json = json,
             params = params or {},
             auth = auth,
             cookies = cookies,
@@ -482,15 +488,16 @@ class Session(SessionRedirectMixin):
         kwargs.setdefault('allow_redirects', False)
         return self.request('HEAD', url, **kwargs)
 
-    def post(self, url, data=None, **kwargs):
+    def post(self, url, data=None, json=None, **kwargs):
         """Sends a POST request. Returns :class:`Response` object.
 
         :param url: URL for the new :class:`Request` object.
         :param data: (optional) Dictionary, bytes, or file-like object to send in the body of the :class:`Request`.
+        :param json: (optional) json to send in the body of the :class:`Request`.
         :param \*\*kwargs: Optional arguments that ``request`` takes.
         """
 
-        return self.request('POST', url, data=data, **kwargs)
+        return self.request('POST', url, data=data, json=json, **kwargs)
 
     def put(self, url, data=None, **kwargs):
         """Sends a PUT request. Returns :class:`Response` object.
@@ -535,8 +542,13 @@ class Session(SessionRedirectMixin):
         if not isinstance(request, PreparedRequest):
             raise ValueError('You can only send PreparedRequests.')
 
+        checked_urls = set()
         while request.url in self.redirect_cache:
-            request.url = self.redirect_cache.get(request.url)
+            checked_urls.add(request.url)
+            new_url = self.redirect_cache.get(request.url)
+            if new_url in checked_urls:
+                break
+            request.url = new_url
 
         # Set up variables needed for resolve_redirects and dispatching of hooks
         allow_redirects = kwargs.pop('allow_redirects', True)

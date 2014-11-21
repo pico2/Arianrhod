@@ -27,7 +27,6 @@ class AsyncHttpRequest(object):
 
     def __init__(self):
         self.session = requests.sessions.Session()
-        self.session.mount('https://', _HTTPSWithoutCertVerifyAdapter())
         self.DefaultHeaders = \
         {
             'User-agent' : 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.8 Safari/537.36',
@@ -44,6 +43,10 @@ class AsyncHttpRequest(object):
 
     def SetProxy(self, Proxies):
         self.Proxies = Proxies
+        if Proxies:
+            self.session.mount('https://', _HTTPSWithoutCertVerifyAdapter())
+        else:
+            self.session.mount('https://', requests.adapters.HTTPAdapter())
 
     def Close(self):
         self.session.close()

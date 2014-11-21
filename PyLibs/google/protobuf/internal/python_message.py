@@ -48,19 +48,18 @@ details for ALL pure-Python protocol buffers are *here in
 this file*.
 """
 
-from __future__ import unicode_literals
-
 __author__ = 'robinson@google.com (Will Robinson)'
 
 import sys
-if sys.version > '3':
-	import copyreg
-	def copy_reg_pickle(type, function):
-	    return copyreg.pickle(type,function)
+
+if sys.version_info >= (3,):
+  import copyreg
+  def copy_reg_pickle(type, function):
+    return copyreg.pickle(type, function)
 else:
-	import copy_reg
-	def copy_reg_pickle(type, function):
-	    return copy_reg.pickle(type,function)
+  import copy_reg
+  def copy_reg_pickle(type, function):
+    return copy_reg.pickle(type, function)
 
 import struct
 import weakref
@@ -73,7 +72,6 @@ from google.protobuf.internal import enum_type_wrapper
 from google.protobuf.internal import message_listener as message_listener_mod
 from google.protobuf.internal import type_checkers
 from google.protobuf.internal import wire_format
-from google.protobuf.internal import utils
 
 from google.protobuf.internal.utils import SimIO, bytestr_to_string, \
     iteritems, range
@@ -809,7 +807,8 @@ def _AddMergeFromStringMethod(message_descriptor, cls):
         raise message_mod.DecodeError('Unexpected end-group tag.')
     except IndexError:
       raise message_mod.DecodeError('Truncated message.')
-    except struct.error as e:
+    except struct.error:
+      _, e, _ = sys.exc_info()
       raise message_mod.DecodeError(e)
     return length   # Return this for legacy reasons.
   cls.MergeFromString = MergeFromString

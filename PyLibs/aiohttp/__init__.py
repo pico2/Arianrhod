@@ -1,15 +1,15 @@
 # This relies on each of the submodules having an __all__ variable.
 
-__version__ = '0.9.1'
+__version__ = '0.10.2'
 
 
-from .protocol import *
-from .connector import *
-from .client import *
-from .errors import *
-from .helpers import *
-from .parsers import *
-from .streams import *
+from .protocol import *  # noqa
+from .connector import *  # noqa
+from .client import *  # noqa
+from .errors import *  # noqa
+from .helpers import *  # noqa
+from .parsers import *  # noqa
+from .streams import *  # noqa
 
 
 __all__ = (client.__all__ +

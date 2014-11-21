@@ -89,6 +89,10 @@ class ServerHttpProtocol(aiohttp.StreamProtocol):
         self.access_log = access_log
         self.access_log_format = access_log_format
 
+    @property
+    def keep_alive_timeout(self):
+        return self._keep_alive_period
+
     def closing(self):
         """Worker process is about to exit, we need cleanup everything and
         stop accepting requests. It is especially important for keep-alive
@@ -98,6 +102,7 @@ class ServerHttpProtocol(aiohttp.StreamProtocol):
         if ((not self._reading_request or self._request_handler is None) and
                 self.transport is not None):
             self.transport.close()
+            self.transport = None
 
     def connection_made(self, transport):
         super().connection_made(transport)
@@ -219,9 +224,10 @@ class ServerHttpProtocol(aiohttp.StreamProtocol):
                 self.log_debug('Ignored premature client disconnection.')
                 break
             except errors.HttpException as exc:
-                self.handle_error(exc.code, message, None, exc, exc.headers)
+                yield from self.handle_error(exc.code, message,
+                                             None, exc, exc.headers)
             except Exception as exc:
-                self.handle_error(500, message, None, exc)
+                yield from self.handle_error(500, message, None, exc)
             finally:
                 if self.transport is None:
                     self.log_debug('Ignored premature client disconnection.')
@@ -290,9 +296,10 @@ class ServerHttpProtocol(aiohttp.StreamProtocol):
             response.send_headers()
 
             response.write(html)
-            response.write_eof()
+            drain = response.write_eof()
 
             self.log_access(message, None, response, time.time() - now)
+            return drain
         finally:
             self.keep_alive(False)
 

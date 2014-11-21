@@ -5,9 +5,9 @@ __all__ = ['request', 'HttpClient']
 import asyncio
 import collections
 import http.cookies
-import json
 import io
-import inspect
+import json
+import mimetypes
 import random
 import time
 import urllib.parse
@@ -89,6 +89,7 @@ def request(method, url, *,
 
     """
     redirects = 0
+    method = method.upper()
     if loop is None:
         loop = asyncio.get_event_loop()
     if request_class is None:
@@ -119,11 +120,18 @@ def request(method, url, *,
             raise aiohttp.OsConnectionError(exc)
 
         # redirects
-        if resp.status in (301, 302) and allow_redirects:
+        if resp.status in (301, 302, 303, 307) and allow_redirects:
             redirects += 1
             if max_redirects and redirects >= max_redirects:
                 resp.close(force=True)
                 break
+
+            # For 301 and 302, mimic IE behaviour, now changed in RFC.
+            # Details: https://github.com/kennethreitz/requests/pull/269
+            if resp.status != 307:
+                method = 'GET'
+                data = None
+            cookies = resp.cookies
 
             r_url = resp.headers.get('LOCATION') or resp.headers.get('URI')
 
@@ -368,10 +376,24 @@ class ClientRequest:
         elif isinstance(data, (asyncio.StreamReader, streams.DataQueue)):
             self.body = data
 
-        elif inspect.isgenerator(data):
+        elif asyncio.iscoroutine(data):
             self.body = data
             if 'CONTENT-LENGTH' not in self.headers and self.chunked is None:
                 self.chunked = True
+
+        elif isinstance(data, io.IOBase):
+            assert not isinstance(data, io.StringIO), \
+                'attempt to send text data instead of binary'
+            self.body = data
+            self.chunked = True
+            if hasattr(data, 'mode'):
+                if data.mode == 'r':
+                    raise ValueError('file {!r} should be open in binary mode'
+                                     ''.format(data))
+            if 'CONTENT-TYPE' not in self.headers and hasattr(data, 'name'):
+                mime = mimetypes.guess_type(data.name)[0]
+                mime = 'application/octet-stream' if mime is None else mime
+                self.headers['CONTENT-TYPE'] = mime
 
         else:
             if not isinstance(data, helpers.FormData):
@@ -380,9 +402,9 @@ class ClientRequest:
             self.body = data(self.encoding)
 
             if 'CONTENT-TYPE' not in self.headers:
-                self.headers['CONTENT-TYPE'] = data.contenttype
+                self.headers['CONTENT-TYPE'] = data.content_type
 
-            if data.is_form_data():
+            if data.is_multipart:
                 self.chunked = self.chunked or 8196
             else:
                 if 'CONTENT-LENGTH' not in self.headers and not self.chunked:
@@ -424,7 +446,7 @@ class ClientRequest:
             yield from self._continue
 
         try:
-            if inspect.isgenerator(self.body):
+            if asyncio.iscoroutine(self.body):
                 exc = None
                 value = None
                 stream = self.body
@@ -474,6 +496,12 @@ class ClientRequest:
                     except streams.EofStream:
                         break
 
+            elif isinstance(self.body, io.IOBase):
+                chunk = self.body.read(self.chunked)
+                while chunk:
+                    request.write(chunk)
+                    chunk = self.body.read(self.chunked)
+
             else:
                 if isinstance(self.body, (bytes, bytearray)):
                     self.body = (self.body,)
@@ -486,7 +514,12 @@ class ClientRequest:
                     'Can not write request body for %s' % self.url))
         else:
             try:
-                request.write_eof()
+                ret = request.write_eof()
+                # NB: in asyncio 3.4.1+ StreamWriter.drain() is coroutine
+                # see bug #170
+                if (asyncio.iscoroutine(ret) or
+                        isinstance(ret, asyncio.Future)):
+                    yield from ret
             except Exception as exc:
                 reader.set_exception(
                     aiohttp.ClientConnectionError(
@@ -683,8 +716,7 @@ class ClientResponse:
         if decode:
             warnings.warn(
                 '.read(True) is deprecated. use .json() instead',
-                DeprecationWarning
-            )
+                DeprecationWarning)
             return (yield from self.json())
 
         return data
@@ -694,8 +726,7 @@ class ClientResponse:
         """Read response payload and then close response."""
         warnings.warn(
             'read_and_close is deprecated, use .read() instead',
-            DeprecationWarning
-        )
+            DeprecationWarning)
         return (yield from self.read(decode))
 
     def _get_encoding(self, encoding):

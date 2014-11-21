@@ -205,6 +205,11 @@ class HttpResponseParser(HttpParser):
 
     def __call__(self, out, buf):
         try:
+            yield from buf.wait(1)
+        except aiohttp.EofStream:
+            raise errors.ClientConnectionError(
+                'Connection closed by server') from None
+        try:
             # read http message (response line + headers)
             try:
                 raw_data = yield from buf.readuntil(
@@ -579,7 +584,8 @@ class HttpMessage:
         assert set(name).issubset(ASCIISET), \
             'Header name should contain ASCII chars, got {!r}'.format(name)
         assert isinstance(value, str), \
-            'Header {!r} should have string value, got {!r}'.format(name, value)
+            'Header {!r} should have string value, got {!r}'.format(
+                name, value)
 
         name = name.strip().upper()
         value = value.strip()
@@ -821,14 +827,26 @@ class Response(HttpMessage):
         'DATE',
     }
 
+    @staticmethod
+    def calc_reason(status):
+        record = RESPONSES.get(status)
+        if record is not None:
+            reason = record[0]
+        else:
+            reason = str(status)
+        return reason
+
     def __init__(self, transport, status,
-                 http_version=HttpVersion11, close=False):
+                 http_version=HttpVersion11, close=False, reason=None):
         super().__init__(transport, http_version, close)
 
         self.status = status
+        if reason is None:
+            reason = self.calc_reason(status)
+
+        self.reason = reason
         self.status_line = 'HTTP/{}.{} {} {}\r\n'.format(
-            http_version[0], http_version[1], status,
-            RESPONSES.get(status, (status,))[0])
+            http_version[0], http_version[1], status, reason)
 
     def _add_default_headers(self):
         super()._add_default_headers()
