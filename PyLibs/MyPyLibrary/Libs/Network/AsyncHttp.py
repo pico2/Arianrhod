@@ -158,7 +158,10 @@ class AsyncHttp(object):
         self.headers = headers
 
     def SetCookies(self, cookies):
-        self.connector.update_cookies(cookies)
+        if not cookies:
+            self.connector.cookies.clear()
+        else:
+            self.connector.update_cookies(cookies)
 
     def SetProxy(self, host, port):
         self.connector = self.ProxyConnector
