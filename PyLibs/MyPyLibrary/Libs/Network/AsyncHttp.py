@@ -100,14 +100,14 @@ class _ClientRequest(aiohttp.client.ClientRequest):
             for key, value in headers:
                 self.headers[key] = value
 
-        DEFAULT_HEADERS = {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate',
-        }
+        # DEFAULT_HEADERS = {
+        #     'Accept': '*/*',
+        #     'Accept-Encoding': 'gzip, deflate',
+        # }
 
-        for hdr, val in DEFAULT_HEADERS.items():
-            if hdr not in self.headers:
-                self.headers[hdr] = val
+        # for hdr, val in DEFAULT_HEADERS.items():
+        #     if hdr not in self.headers:
+        #         self.headers[hdr] = val
 
         # add host
         if 'HOST' not in self.headers:
