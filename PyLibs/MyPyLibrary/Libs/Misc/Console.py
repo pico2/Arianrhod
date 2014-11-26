@@ -16,23 +16,23 @@ def cls2():
 def PrintLog(value, *args, sep=' ', end='\n', file=sys.stdout, flush=False):
     pass
 
-class _flushstdout(type(sys.stdout)):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.stdout = args[0]
-
-        for attr in dir(self.stdout):
-            try:
-                setattr(self, attr, getattr(self.stdout, attr))
-            except:
-                pass
-
-        self.write = self._flush_write
-
-    def _flush_write(self, *args):
-        self.stdout.write(*args)
-        self.stdout.flush()
-
 if isinstance(sys.stdout, TextIOWrapper):
+    class _flushstdout(type(sys.stdout)):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            self.stdout = args[0]
+
+            for attr in dir(self.stdout):
+                try:
+                    setattr(self, attr, getattr(self.stdout, attr))
+                except:
+                    pass
+
+            self.write = self._flush_write
+
+        def _flush_write(self, *args):
+            self.stdout.write(*args)
+            self.stdout.flush()
+
     sys.stdout = _flushstdout(sys.stdout)
