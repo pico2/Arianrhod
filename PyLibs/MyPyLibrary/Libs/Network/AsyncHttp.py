@@ -140,8 +140,8 @@ class AsyncHttp(object):
 
     def __init__(self, *, loop = None, cookie_class = http.cookies.BaseCookie):
         self.loop = loop or asyncio.get_event_loop()
-        self.TCPConnector = aiohttp.connector.TCPConnector(share_cookies = True, loop = self.loop)
-        self.ProxyConnector = aiohttp.connector.ProxyConnector('http://localhost:80', share_cookies = True, loop = self.loop)
+        self.TCPConnector = aiohttp.connector.TCPConnector(verify_ssl = False, share_cookies = True, loop = self.loop)
+        self.ProxyConnector = aiohttp.connector.ProxyConnector('http://localhost:80', verify_ssl = False, share_cookies = True, loop = self.loop)
 
         self.TCPConnector.cookies = cookie_class()
         self.ProxyConnector.cookies = cookie_class()
