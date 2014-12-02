@@ -87,6 +87,10 @@ if sys.winver == '2.7':
         addr = int(addr)
         return gbk(imm.readString(addr))
 
+    def utf8(addr):
+        addr = int(addr)
+        return utf8(imm.readString(addr))
+
     def wstr(addr):
         addr = int(addr)
         return imm.readWString(addr).decode('U16')
