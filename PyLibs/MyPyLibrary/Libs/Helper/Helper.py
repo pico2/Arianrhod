@@ -101,8 +101,8 @@ def ReadTextToList(filename, cp = '936'):
         stm = stm.decode('utf-8-sig')
     else:
         try:
-            stm = stm.decode(cp)
-        except UnicodeDecodeError:
             stm = stm.decode('UTF8')
+        except UnicodeDecodeError:
+            stm = stm.decode(cp)
 
     return stm.replace('\r\n','\n').replace('\r','\n').split('\n')

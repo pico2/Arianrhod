@@ -44,7 +44,7 @@ class BpCondition(LogBpHook):
     def run_pyfile(self, regs):
         try:
             #if not hasattr(self, 'mod'): self.mod = loadmod(self.modname)
-            self.mod = reloadmod(self.mod)
+            # self.mod = reloadmod(self.mod)
 
             _regs = CaseInsensitiveDict()
             _regs['EAX'] = Register(regs['EAX'])
