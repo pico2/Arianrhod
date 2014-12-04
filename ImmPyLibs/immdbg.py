@@ -53,6 +53,9 @@ if sys.winver == '2.7':
         def astr(self):
             return gbk(imm.readString(self._reg))
 
+        def utf8(self):
+            return utf8(imm.readString(self._reg))
+
         def wstr(self):
             return imm.readWString(self._reg).decode('U16')
 
@@ -89,7 +92,7 @@ if sys.winver == '2.7':
 
     def utf8(addr):
         addr = int(addr)
-        return utf8(imm.readString(addr))
+        return imm.readString(addr).decode('UTF8')
 
     def wstr(addr):
         addr = int(addr)

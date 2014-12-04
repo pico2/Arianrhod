@@ -407,35 +407,7 @@ EXTC_EXPORT VOID CDECL Run()
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
-    NTSTATUS                Status;
-    PVOID                   itunes;
-
-    return;
-
-    ml::MlInitialize();
-
-    SetExeDirectoryAsCurrent();
-
-    LoadDll(L"CoreFP.dll");
-    itunes = LoadDll(L"iTunes.dll");
-
-    Mp::PATCH_MEMORY_DATA p[] =
-    {
-        Mp::MemoryPatchVa((ULONG_PTR)ItLoadLibraryA, sizeof(PVOID), LookupImportTable(itunes, nullptr, KERNEL32_LoadLibraryA)),
-        Mp::FunctionJumpRva(0x75BCB0, Run),
-    };
-
-    Mp::PatchMemory(p, countof(p), itunes);
-
-    INT(NTAPI *iTunesMainEntryPoint)(PVOID Base, PVOID, PSTR CommandLine, ULONG Show, ULONG64 StartupTime);
-
-    *(PVOID *)&iTunesMainEntryPoint = GetRoutineAddress(itunes, "_iTunesMainEntryPoint@24");
-
-    iTunesMainEntryPoint(&__ImageBase, nullptr, "", SW_SHOWDEFAULT, 0);
-
-    Ps::ExitProcess(0);
-
-    return;
+    NTSTATUS Status;
 
 #if 1
 
