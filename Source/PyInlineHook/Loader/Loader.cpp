@@ -18,9 +18,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     ml::MlInitialize();
 
-    hooker = new PyHooker();
+    hooker = PyHooker::GetInstance();
     test(hooker);
-    delete hooker;
+    hooker->Release();
 }
 
 int __cdecl main(LONG_PTR argc, PWSTR *argv)
