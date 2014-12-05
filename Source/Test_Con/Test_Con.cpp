@@ -242,174 +242,39 @@ void quick_sort(int *array, int count)
     quick_sort(left, &array[count] - left);
 }
 
-#pragma comment(lib, "ws2_32.lib")
-
-typedef struct
-{
-    ULONG   Length;
-    BYTE    Data[0x14];
-
-} INIT_KEY_DATA, *PINIT_KEY_DATA;
-
-typedef struct
-{
-    ULONG               Tag;
-    ULONG_PTR           ThreadId;
-    ULONG               RecursionCount;
-    CRITICAL_SECTION    Lock;
-    ULONG_PTR           Key;
-
-} ACTION_SIGNATURE_DATA, *PACTION_SIGNATURE_DATA;
-
-PVOID NTAPI ItLoadLibraryA(PCSTR LibName)
-{
-    ml::String lib = ml::String::Decode(LibName, StrLengthA(LibName), CP_ACP);
-
-    if (lib.EndsWith(L"CoreFP.dll", TRUE))
-        lib = L"CoreFP.dll";
-
-    return Ldr::LoadDll(lib);
-}
-
-EXTC_EXPORT VOID CDECL Run()
-{
-    PVOID                   itunes;
-    INIT_KEY_DATA           init;
-    PULONG_PTR              data[3];
-    PACTION_SIGNATURE_DATA  SigData;
-
-    VOID (FASTCALL *InitializeKey)(PINIT_KEY_DATA);
-    VOID (FASTCALL *GetKey)(PINIT_KEY_DATA, PULONG_PTR*);
-    ULONG (CDECL *DecryptCert)(ULONG Type, PINIT_KEY_DATA, ULONG_PTR Key, PVOID Cert, ULONG_PTR CertSize, PVOID *Output, PULONG_PTR OutputSize, PCHAR What);
-    ULONG (CDECL *GenerateActionSignature)(ULONG_PTR Key, PVOID Buffer, ULONG_PTR Size, PVOID *Output, PULONG_PTR OutputSize);
-    VOID (CDECL *FreeBytesObject)(PVOID);
-    VOID (CDECL *InitializeKbSync)(PVOID);
-    ULONG (CDECL *CalcKbSync)(ULONG What, ULONG64 Dsid, ULONG QuickTimeVersion, ULONG Always1, PVOID *Output, PULONG_PTR OutputSize);
-
-    ml::MlInitialize();
-
-    itunes = LoadDll(L"iTunes.dll");
-
-    *(PVOID *)&InitializeKey            = PtrAdd(itunes, 0x3546A0);
-    *(PVOID *)&GetKey                   = PtrAdd(itunes, 0x80C490);
-    *(PVOID *)&GenerateActionSignature  = PtrAdd(itunes, 0x3A350);
-    *(PVOID *)&FreeBytesObject          = PtrAdd(itunes, 0x9D60);
-    *(PVOID *)&DecryptCert              = PtrAdd(itunes, 0x8CD0);
-    *(PVOID *)&InitializeKbSync         = PtrAdd(itunes, 0x355670);
-    *(PVOID *)&CalcKbSync               = PtrAdd(itunes, 0x2D900);
-
-    ZeroMemory(data, sizeof(data));
-
-    InitializeKey(&init);
-    GetKey(&init, data);
-    SigData = (PACTION_SIGNATURE_DATA)data[0];
-
-    InitializeKbSync(nullptr);
-
-    MlPython py;
-
-    py.Initialize();
-
-    py.Register(
-        [&]()
-        {
-            return SigData->Key;
-        },
-        L"GetKey"
-    )
-    .Register(
-        [&](ULONG64 Dsid)
-        {
-            ULONG           ret;
-            PVOID           Output;
-            ULONG_PTR       OutputSize;
-            CHAR            Success;
-            ml::ByteArray   kbsync;
-
-            ret = CalcKbSync(*(PULONG)PtrAdd(itunes, 0x19B8100), Dsid, 0, 1, &Output, &OutputSize);
-            if (ret != 0)
-                return kbsync;
-
-            if (OutputSize != 0 && Output != nullptr)
-            {
-                kbsync.SetSize(OutputSize);
-                kbsync.UpdateDataCount(OutputSize);
-                CopyMemory(kbsync.GetData(), Output, OutputSize);
-                FreeBytesObject(Output);
-            }
-
-            return kbsync;
-        },
-        L"CalcKbSync"
-    )
-    .Register(
-        [&](ml::ByteArray& Cert)
-        {
-            ULONG           ret;
-            PVOID           Output;
-            ULONG_PTR       OutputSize;
-            CHAR            Success;
-            ml::ByteArray   Decrypted;
-
-            ret = DecryptCert(0xC8, &init, SigData->Key, Cert.GetData(), Cert.GetSize(), &Output, &OutputSize, &Success);
-            if (ret != 0)
-                return Decrypted;
-
-            if (OutputSize != 0 && Output != nullptr)
-            {
-                Decrypted.SetSize(OutputSize);
-                Decrypted.UpdateDataCount(OutputSize);
-                CopyMemory(Decrypted.GetData(), Output, OutputSize);
-                FreeBytesObject(Output);
-            }
-
-            return Decrypted;
-
-        },
-        L"DecryptCert"
-    )
-    .Register(
-        [&](ml::ByteArray& Buffer)
-        {
-            ULONG           ret;
-            PVOID           Output;
-            ULONG_PTR       OutputSize;
-            ml::ByteArray   Signature;
-
-            Output = nullptr;
-            OutputSize = 0;
-
-            ret = GenerateActionSignature(SigData->Key, Buffer.GetData(), Buffer.GetSize(), &Output, &OutputSize);
-            if (ret != 0)
-                return Signature;
-
-            if (OutputSize != 0 && Output != nullptr)
-            {
-                Signature.SetSize(OutputSize);
-                Signature.UpdateDataCount(OutputSize);
-                CopyMemory(Signature.GetData(), Output, OutputSize);
-                FreeBytesObject(Output);
-            }
-
-            return Signature;
-        },
-        L"GenerateActionSignature"
-    )
-    .AddToModule(L"itunes");
-
-    auto ret1 = py.Invoke<ULONG>(L"main", L"main");
-
-    PrintConsole(L"ret = %u\n", ret1);
-
-    if (py.GetPyException().ErrorOccurred())
-        PrintConsole(L"%s\n", py.GetPyException().Message);
-}
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-#if 1
+    RtlAddVectoredExceptionHandler(TRUE,
+        [](PEXCEPTION_POINTERS ExceptionPointers) -> LONG
+        {
+            if (ExceptionPointers->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT)
+            {
+                ++ExceptionPointers->ContextRecord->Eip;
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+    );
+
+    ULONG64 beg, end;
+
+    beg = NtGetTickCount();
+
+    for (ULONG_PTR i = 10000; i != 0; --i)
+    {
+        _asm int 3;
+    	_asm nop;
+    }
+
+    end = NtGetTickCount();
+    PrintConsole(L"fuck, %ds\n", (ULONG)((end - beg) / 1000));
+
+    return;
+
+#if 0
 
     ml::MlInitialize();
 
