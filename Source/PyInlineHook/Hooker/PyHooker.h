@@ -29,6 +29,7 @@ typedef struct HOOK_RECORD
     HOOK_RECORD()
     {
         ZeroMemory(this, sizeof(*this));
+        this->RefCount = 1;
     }
 
     ULONG_PTR AddRef()
@@ -36,17 +37,7 @@ typedef struct HOOK_RECORD
         return _InterlockedIncrementPtr(&this->RefCount);
     }
 
-    ULONG_PTR Release()
-    {
-        ULONG_PTR Ref = _InterlockedDecrementPtr(&this->RefCount);
-
-        if (Ref == 0)
-        {
-            ;
-        }
-
-        return Ref;
-    }
+    ULONG_PTR Release();
 
     ~HOOK_RECORD()
     {
@@ -72,7 +63,7 @@ protected:
     ~PyHooker();
 
 public:
-    static PyHooker* GetInstance()
+    NoInline static PyHooker* GetInstance()
     {
         if (instance != nullptr)
             return instance;
@@ -98,6 +89,8 @@ protected:
     NTSTATUS InitPython();
     NTSTATUS InitRecordTable();
 
+    PHOOK_RECORD LookupAndReferenceRecord(PVOID Address);
+
     static LONG NTAPI StaticExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers);
     LONG ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers);
 
@@ -109,5 +102,18 @@ protected:
 };
 
 DECL_SELECTANY PyHooker* PyHooker::instance = nullptr;
+
+ULONG_PTR HOOK_RECORD::Release()
+{
+    ULONG_PTR Ref = _InterlockedDecrementPtr(&this->RefCount);
+
+    if (Ref == 0)
+    {
+        this->~HOOK_RECORD();
+        PyHooker::GetInstance()->Free(this);
+    }
+
+    return Ref;
+}
 
 #endif // _PYHOOKER_H_a831a88f_9272_4882_a723_dfd24cbb9e76_

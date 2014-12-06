@@ -1,6 +1,8 @@
 #include "PyHooker.h"
 #include "HandleTable.cpp"
 
+#define POINTER_SIZE sizeof(PVOID)
+
 PyHooker::PyHooker() : MemoryAllocator(RtlCreateHeap(HEAP_CREATE_ENABLE_EXECUTE | HEAP_GROWABLE | HEAP_CREATE_ALIGN_16, nullptr, 0, 0, nullptr, nullptr))
 {
     this->VehHandle = nullptr;
@@ -79,23 +81,10 @@ NTSTATUS PyHooker::InitRecordTable()
     return this->RecordTable.Create() == nullptr ? STATUS_NO_MEMORY : STATUS_SUCCESS;
 }
 
-LONG NTAPI PyHooker::StaticExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
+PHOOK_RECORD PyHooker::LookupAndReferenceRecord(PVOID Address)
 {
-    return PyHooker::instance->ExceptionHandler(ExceptionPointers);
-}
-
-LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
-{
-    switch (ExceptionPointers->ExceptionRecord->ExceptionCode)
-    {
-        case EXCEPTION_PRIV_INSTRUCTION:
-            break;
-        //case EXCEPTION_BREAKPOINT:
-        //    break;
-
-        default:
-            return EXCEPTION_CONTINUE_SEARCH;
-    }
+    PHOOK_RECORD            Record;
+    PML_HANDLE_TABLE_ENTRY  Entry;
 
     auto IsBreakPoint = [=](PVOID Address)
     {
@@ -113,40 +102,84 @@ LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
         return IsBreakPoint;
     };
 
-    PML_HANDLE_TABLE_ENTRY  Entry;
+    PROTECT_SECTION(&this->Lock)
+    {
+        if (IsBreakPoint(Address) == FALSE)
+            return EXCEPTION_CONTINUE_SEARCH;
+
+        Entry = this->RecordTable.Lookup(Address);
+        if (Entry == nullptr || Entry->Handle == nullptr)
+            break;
+
+        Record = (PHOOK_RECORD)Entry->Handle;
+        if (Record == nullptr)
+            break;
+
+        Record->AddRef();
+        return Record;
+    }
+
+    return nullptr;
+}
+
+LONG NTAPI PyHooker::StaticExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
+{
+    return PyHooker::instance->ExceptionHandler(ExceptionPointers);
+}
+
+VOID FASTCALL PyDispatcher(PHOOK_RECORD Record, PCONTEXT Context)
+{
+    FreeMemoryP(Context);
+    Record->Release();
+}
+
+LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
+{
+    switch (ExceptionPointers->ExceptionRecord->ExceptionCode)
+    {
+        case EXCEPTION_PRIV_INSTRUCTION:
+            break;
+        //case EXCEPTION_BREAKPOINT:
+        //    break;
+
+        default:
+            return EXCEPTION_CONTINUE_SEARCH;
+    }
+
+    PULONG_PTR              Esp;
     PHOOK_RECORD            Record;
-    PCONTEXT                Context;
+    PCONTEXT                Context, NewContext;
     PEXCEPTION_RECORD       ExceptionRecord;
 
     Context         = ExceptionPointers->ContextRecord;
     ExceptionRecord = ExceptionPointers->ExceptionRecord;
 
-    PROTECT_SECTION(&this->Lock)
+    Record = LookupAndReferenceRecord(ExceptionRecord->ExceptionAddress);
+    if (Record == nullptr)
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    NewContext = (PCONTEXT)AllocateMemoryP(sizeof(*NewContext));
+    if (NewContext == nullptr)
     {
-        if (IsBreakPoint(ExceptionRecord->ExceptionAddress) == FALSE)
-            return EXCEPTION_CONTINUE_SEARCH;
-
-        LOOP_ONCE
-        {
-            Entry = this->RecordTable.Lookup(ExceptionRecord->ExceptionAddress);
-            if (Entry == nullptr || Entry->Handle == nullptr)
-                continue;
-
-            Record = (PHOOK_RECORD)Entry->Handle;
-            if (Record == nullptr)
-                break;
-
-            Record->AddRef();
-            Context->Eip = (ULONG_PTR)Record->Instruction;
-
-            return EXCEPTION_CONTINUE_EXECUTION;
-        }
-
-        if (IsBreakPoint(ExceptionRecord->ExceptionAddress) == FALSE)
-            return EXCEPTION_CONTINUE_EXECUTION;
+        Record->Release();
+        return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    return EXCEPTION_CONTINUE_SEARCH;
+    *NewContext = *Context;
+
+    Esp = (PULONG_PTR)Context->Esp;
+
+    //Esp = PtrSub(Esp, sizeof(*Context));
+    //CopyStruct(Esp, Context, sizeof(*Context));
+
+    *--Esp = (ULONG_PTR)Record->Instruction;
+
+    Context->Esp = (ULONG_PTR)Esp;
+    Context->Ecx = (ULONG_PTR)Record;
+    Context->Edx = (ULONG_PTR)NewContext;
+    Context->Eip = (ULONG_PTR)PyDispatcher;
+
+    return EXCEPTION_CONTINUE_EXECUTION;
 }
 
 NTSTATUS PyHooker::PyHookFunction(PVOID Address, PyObject* Callable)
@@ -156,11 +189,15 @@ NTSTATUS PyHooker::PyHookFunction(PVOID Address, PyObject* Callable)
     //if (PyCallable_Check(Callable) == FALSE)
     //    return STATUS_OBJECT_TYPE_MISMATCH;
 
+    Record = LookupAndReferenceRecord(Address);
+    if (Record != nullptr)
+    {
+        Record->Release();
+        return STATUS_ADDRESS_ALREADY_EXISTS;
+    }
+
     PROTECT_SECTION(&this->Lock)
     {
-        if (this->RecordTable.Lookup(Address) != nullptr)
-            return STATUS_ADDRESS_ALREADY_EXISTS;
-
         Record = this->CreateHookRecord(Address, Callable);
         if (Record == nullptr)
             return STATUS_NO_MEMORY;
@@ -173,19 +210,16 @@ NTSTATUS PyHooker::PyHookFunction(PVOID Address, PyObject* Callable)
 
 NTSTATUS PyHooker::PyUnHookFunction(PVOID Address)
 {
+    PHOOK_RECORD Record;
+
+    Record = LookupAndReferenceRecord(Address);
+    if (Record == nullptr)
+        return STATUS_ADDRESS_NOT_ASSOCIATED;
+
+    Record->Release();
+
     PROTECT_SECTION(&this->Lock)
     {
-        PML_HANDLE_TABLE_ENTRY  Entry;
-        PHOOK_RECORD            Record;
-
-        Entry = this->RecordTable.Lookup(Address);
-        if (Entry == nullptr || Entry->Handle == nullptr)
-            return STATUS_ADDRESS_NOT_ASSOCIATED;
-
-        Record = (PHOOK_RECORD)Entry->Handle;
-        if (Record == nullptr)
-            break;
-
         this->RecordTable.Remove(Record->Address);
         DestroyHookRecord(Record);
     }
@@ -271,9 +305,6 @@ NTSTATUS PyHooker::DestroyHookRecord(PHOOK_RECORD Record)
     NTSTATUS    Status;
     ULONG       Protect;
 
-    if (Record == nullptr)
-        return STATUS_SUCCESS;
-
     Status = Mm::ProtectVirtualMemory(Record->Address, 1, PAGE_EXECUTE_READWRITE, &Protect);
     FAIL_RETURN(Status);
 
@@ -281,8 +312,7 @@ NTSTATUS PyHooker::DestroyHookRecord(PHOOK_RECORD Record)
 
     Mm::ProtectVirtualMemory(Record->Address, 1, Protect, &Protect);
 
-    Record->~HOOK_RECORD();
-    Free(Record);
+    Record->Release();
 
     return STATUS_SUCCESS;
 }
