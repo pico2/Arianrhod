@@ -273,9 +273,8 @@ NTSTATUS LeGlobalData::Initialize()
     );
 
     Status = InstallHookPort();
+    WriteLog(L"inst hp: %08X", Status);
     FAIL_RETURN(Status);
-
-    WriteLog(L"inst hp");
 
     HookNtdllRoutines(Ntdll->DllBase);
 

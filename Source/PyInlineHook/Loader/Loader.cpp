@@ -10,6 +10,9 @@ ML_OVERLOAD_NEW
 VOID test(PyHooker *hooker)
 {
     hooker->Initialize();
+
+    hooker->PyHookFunction(NtClose, 0);
+    PrintConsole(L"%p\n", NtClose(0));
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
