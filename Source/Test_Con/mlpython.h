@@ -100,12 +100,34 @@ struct PyTypeHelper<const T&>
 };
 
 
+template<>
+struct PyTypeHelper<VOID>
+{
+    typedef VOID VALUE_TYPE;
+    typedef VOID REF_TYPE;
+    typedef VOID CONST_REF_TYPE;
+};
+
 //////////////////////////////////////////////////////////////////////////
 // type converter
 //////////////////////////////////////////////////////////////////////////
 
 template<typename NATIVE_TYPE>
 struct PyTypeConverter;
+
+template<>
+struct PyTypeConverter<VOID>
+{
+    static PyObject* FromNative()
+    {
+        Py_RETURN_NONE;
+    }
+
+    static VOID ToNative(PyObject *object)
+    {
+        return;
+    }
+};
 
 template<>
 struct PyTypeConverter<PVOID>
@@ -1090,6 +1112,7 @@ protected:
     NoInline PyObject* InvokeInternal(PyObject *callable, const String& FunctionName, ARGS... args)
     {
         BOOL                InvalidNumberOfArguments;
+        LONG_PTR            NumberOfArguments;
         PYSTATUS            status;
         MlPyObject          tuple, value;
         PyCodeObject*       code;
@@ -1102,6 +1125,8 @@ protected:
 
         code = nullptr;
         InvalidNumberOfArguments = FALSE;
+        NumberOfArguments = sizeof...(ARGS);
+
         if (PyFunction_Check(callable))
         {
             code = (PyCodeObject *)PyFunction_GET_CODE(callable);
@@ -1109,11 +1134,12 @@ protected:
         else if (PyMethod_Check(callable))
         {
             code = (PyCodeObject *)PyFunction_GET_CODE(PyMethod_GET_FUNCTION(callable));
+            NumberOfArguments += PyMethod_GET_SELF(callable) != nullptr;
         }
 
         if (code != nullptr)
         {
-            InvalidNumberOfArguments = FLAG_OFF(code->co_flags, CO_VARARGS | CO_VARKEYWORDS) && code->co_argcount != sizeof...(ARGS);
+            InvalidNumberOfArguments = FLAG_OFF(code->co_flags, CO_VARARGS | CO_VARKEYWORDS) && code->co_argcount != NumberOfArguments;
         }
 
         if (InvalidNumberOfArguments)
@@ -1174,7 +1200,7 @@ protected:
             return PYSTATUS_CREATE_OBJECT_FAILED;
 
         PyTuple_SetItem(tuple, Index, obj);
-        PyRelease(obj);
+        //PyRelease(obj);
 
         return BuildPyArgs(tuple, Index + 1, rest...);
     }
