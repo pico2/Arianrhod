@@ -10,8 +10,9 @@ ML_OVERLOAD_NEW
 VOID test(PyHooker *hooker)
 {
     hooker->Initialize();
+    hooker->LoadPyFile();
 
-    hooker->PyHookFunction(NtClose, 0);
+    //hooker->PyHookFunction(NtClose, 0);
     PrintConsole(L"%p\n", NtClose(0));
 }
 

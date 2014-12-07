@@ -55,8 +55,14 @@ protected:
     RTL_CRITICAL_SECTION    Lock;
 
     static PyHooker *instance;
-
     static const ULONG_PTR BreakOpCode = 0xF4;  // hlt
+
+    typedef struct
+    {
+        CONTEXT     Context;
+        PyHooker*   hooker;
+
+    } DISPATCHER_CONTEXT, *PDISPATCHER_CONTEXT;
 
 protected:
     PyHooker();
@@ -80,6 +86,7 @@ public:
 
 public:
     NTSTATUS Initialize();
+    NTSTATUS LoadPyFile();
 
     NTSTATUS PyHookFunction(PVOID Address, PyObject* Callable);
     NTSTATUS PyUnHookFunction(PVOID Address);
@@ -92,7 +99,9 @@ protected:
     PHOOK_RECORD LookupAndReferenceRecord(PVOID Address);
 
     static LONG NTAPI StaticExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers);
+    static VOID FASTCALL StaticPyDispatcher(PHOOK_RECORD Record, PDISPATCHER_CONTEXT Context);
     LONG ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers);
+    VOID PyDispatcher(PHOOK_RECORD Record, PCONTEXT Context);
 
     /************************************************************************
       hook methods
