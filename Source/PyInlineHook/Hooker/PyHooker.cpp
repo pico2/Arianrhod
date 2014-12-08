@@ -50,7 +50,7 @@ NTSTATUS PyHooker::Initialize()
 NTSTATUS PyHooker::InitPython()
 {
     this->python.Initialize();
-    
+
     LONG_PTR argc;
     PWSTR *argv;
 
@@ -108,6 +108,20 @@ NTSTATUS PyHooker::InitPython()
             return Length;
         },
         L"WriteMemory"
+    )
+    .Register(
+        [=] (ULONG_PTR Address) -> ByteArray
+        {
+            return ByteArray((PBYTE)Address, StrLengthA((PCSTR)Address));
+        },
+        L"ReadAnsi"
+    )
+    .Register(
+        [=] (ULONG_PTR Address) -> String
+        {
+            return String((PCWSTR)Address);
+        },
+        L"ReadUnicode"
     )
     .AddToModule(L"_pyhooker");
 

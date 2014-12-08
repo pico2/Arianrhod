@@ -3,9 +3,8 @@ import pyhooker
 import binascii
 
 def HookNtClose(context):
-    print('%X' % context.OriginalEip)
-    print(binascii.hexlify(context.OriginalEip.read(16)))
-    print(binascii.hexlify(context.Eip.read(16)))
+    print('%s' % context.OriginalEip.read(16))
+    print(pyhooker._pyhooker.ReadAnsi(int(context.Eip)))
     # print('%X' % context.Eip)
     # print()
     # print('%X' % context.GetArgument(context.ARG_RETURN_ADDRESS))
