@@ -18,13 +18,9 @@ PyHooker::~PyHooker()
             {
                 FOR_EACH(Entry, Entry, Count)
                 {
-                    if (Entry->Handle != nullptr)
-                    {
-                        ((PyHooker *)Context)->PyUnHookFunction(((PHOOK_RECORD)(Entry->Handle))->Address);
-                        //((PHOOK_RECORD)(Entry->Handle))->~HOOK_RECORD();
-                        //((PyHooker *)Context)->Free(Entry->Handle);
-                        //Entry->Handle = nullptr;
-                    }
+                    if (Entry->Handle == nullptr)
+                        continue;
+                    ((PyHooker *)Context)->PyUnHookFunction(((PHOOK_RECORD)(Entry->Handle))->Address);
                 }
 
                 return STATUS_SUCCESS;
@@ -169,7 +165,7 @@ PHOOK_RECORD PyHooker::LookupAndReferenceRecord(PVOID Address)
     PROTECT_SECTION(&this->Lock)
     {
         if (IsBreakPoint(Address) == FALSE)
-            return EXCEPTION_CONTINUE_SEARCH;
+            break;
 
         Entry = this->RecordTable.Lookup(Address);
         if (Entry == nullptr || Entry->Handle == nullptr)

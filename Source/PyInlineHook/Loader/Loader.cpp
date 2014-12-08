@@ -12,10 +12,15 @@ VOID test(PyHooker *hooker)
     hooker->Initialize();
     hooker->LoadPyFile();
 
-    //hooker->PyHookFunction(NtClose, 0);
+    ULONG64 beg, end;
+
+    beg = NtGetTickCount();
 
     for (ULONG_PTR i = 1; i != 0; --i)
         NtClose(0);
+
+    end = NtGetTickCount();
+    printf("%fs\n", (end - beg) / 1024.f);
 }
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
@@ -25,17 +30,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     ml::MlInitialize();
 
     hooker = PyHooker::GetInstance();
-
-    ULONG64 beg, end;
-
-    beg = NtGetTickCount();
-
     test(hooker);
-
-    end = NtGetTickCount();
-
-    printf("%fs\n", (end - beg) / 1024.f);
-
     hooker->Release();
 }
 

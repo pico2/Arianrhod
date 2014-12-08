@@ -19,7 +19,7 @@ class Register(object):
 
     def __eq__(self, y):
         if isinstance(y, str):
-            return self.str() == y
+            return self.unicode() == y
 
         return self.address == y
 
