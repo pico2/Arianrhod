@@ -72,6 +72,43 @@ NTSTATUS PyHooker::InitPython()
         },
         L"UnHook"
     )
+    .Register(
+        [=] (ULONG_PTR Address, ULONG_PTR Length) -> ByteArray
+        {
+            NTSTATUS    Status;
+            ByteArray   Buffer;
+
+            if (Length == 0)
+                return Buffer;
+
+            Buffer.SetSize(Length);
+            Status = Mm::ReadMemory(CurrentProcess, (PVOID)Address, Buffer.GetData(), Length, &Length);
+            if (NT_FAILED(Status))
+                return Buffer;
+
+            Buffer.UpdateDataCount(Length);
+
+            return Buffer;
+        },
+        L"ReadMemory"
+    )
+    .Register(
+        [=] (ULONG_PTR Address, ByteArray &Buffer) -> ULONG_PTR
+        {
+            NTSTATUS    Status;
+            ULONG_PTR   Length;
+
+            if (Buffer.GetSize() == 0)
+                return 0;
+
+            Status = Mm::WriteMemory(CurrentProcess, (PVOID)Address, Buffer.GetData(), Buffer.GetSize(), &Length);
+            if (NT_FAILED(Status))
+                return 0;
+
+            return Length;
+        },
+        L"WriteMemory"
+    )
     .AddToModule(L"_pyhooker");
 
     return STATUS_SUCCESS;
@@ -147,14 +184,19 @@ VOID FASTCALL PyHooker::StaticPyDispatcher(PHOOK_RECORD Record, PDISPATCHER_CONT
 
 VOID PyHooker::PyDispatcher(PHOOK_RECORD Record, PCONTEXT Context)
 {
-    CONTEXT LocalContext = *Context;
+    CONTEXT LocalContext;
+    TEB_ACTIVE_FRAME trap = PY_CALLBACK_IN_PROGRESS;
+
+    trap.Push();
+
+    LocalContext = *Context;
 
     Context = &LocalContext;
     Context->Eip = (ULONG_PTR)Record->Instruction;
 
     PROTECT_SECTION(&this->Lock)
     {
-        this->python.Invoke<VOID>(Record->Callback, (ULONG_PTR)Context);
+        this->python.Invoke<VOID>(Record->Callback, (ULONG_PTR)Record->Address, (ULONG_PTR)Context);
     }
 
     Record->Release();
@@ -188,6 +230,13 @@ LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
     Record = LookupAndReferenceRecord(ExceptionRecord->ExceptionAddress);
     if (Record == nullptr)
         return EXCEPTION_CONTINUE_SEARCH;
+
+    if (FindThreadFrame(PY_CALLBACK_IN_PROGRESS) != nullptr)
+    {
+        Record->Release();
+        Context->Eip = (ULONG_PTR)Record->Instruction;
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
 
     StackLimit = (PULONG_PTR)CurrentTeb()->NtTib.StackLimit;
     Esp = (PULONG_PTR)Context->Esp;

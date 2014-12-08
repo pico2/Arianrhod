@@ -22,7 +22,11 @@ def main():
         'test',
         'site-packages\\PyQt',
         'site-packages\\IPython-',
-        'site-packages\\ipdb',
+        'site-packages\\flask',
+        'site-packages\\werkzeug',
+        'site-packages\\Jinja2',
+        'site-packages\\itsdangerous',
+        # 'site-packages\\ipdb',
         # 'site-packages\\pyreadline',
         # 'site-packages\\readline.py',
     ]

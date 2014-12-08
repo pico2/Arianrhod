@@ -1,14 +1,16 @@
 from ml import *
 import pyhooker
+import binascii
 
 def HookNtClose(context):
-    print(context)
+    print('%X' % context.OriginalEip)
+    print(binascii.hexlify(context.OriginalEip.read(16)))
+    print(binascii.hexlify(context.Eip.read(16)))
+    # print('%X' % context.Eip)
+    # print()
+    # print('%X' % context.GetArgument(context.ARG_RETURN_ADDRESS))
+    pass
 
 def main():
-    print(pyhooker.Hook)
-    print(pyhooker.UnHook)
     NtClose = windll.kernel32.GetProcAddress(windll.ntdll._handle, b'NtClose')
-    print('%08X' % NtClose)
-
-    ibp()
     pyhooker.Hook(NtClose, HookNtClose)

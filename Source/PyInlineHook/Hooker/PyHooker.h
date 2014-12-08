@@ -10,6 +10,8 @@ using ml::String;
 using ml::ByteArray;
 using ml::StringArray;
 
+#define PY_CALLBACK_IN_PROGRESS TAG4('PCIP')
+
 typedef struct HOOK_RECORD
 {
     ULONG_PTR   RefCount;
