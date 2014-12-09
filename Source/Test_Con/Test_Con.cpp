@@ -242,35 +242,78 @@ void quick_sort(int *array, int count)
     quick_sort(left, &array[count] - left);
 }
 
+#include "iTunes.h"
+
+using ml::String;
+using namespace iTunesApi::CF;
+using namespace iTunesApi::ATH;
+
+ULONG NTAPI ATHThread(ATH_CONNECTION Connection)
+{
+    CFDictionary    Message;
+    CFDataRef       XmlData;
+
+    while (Message = ATHostConnectionReadMessage(Connection))
+    {
+        PrintConsole(L"%08X\n", NtGetTickCount());
+
+        if (CFGetTypeID(Message) != CFDictionaryGetTypeID())
+            continue;
+
+        XmlData = CFPropertyListCreateXMLData(nullptr, Message);
+        CFRelease(Message);
+
+        String msg = String::Decode(CFDataGetBytePtr(XmlData), CFDataGetLength(XmlData), CP_UTF8).Replace(L"\t", L"  ");
+        PrintConsole(L"%s\n\n", msg);
+
+        CFRelease(XmlData);
+    }
+
+    return 0;
+}
+
+VOID Legacy()
+{
+    CFStringRef     LibraryID, Uuid;
+    ATH_CONNECTION  Connection;
+
+    LibraryID = CFStringMakeConstantString("5B2D82310D4DC29E");
+    Uuid = CFStringMakeConstantString("4e0e3f92175d6473f075538bf7fe31095f3f9a30");
+
+    Connection = ATHostConnectionCreateWithLibrary(LibraryID, Uuid, 0);
+
+    Ps::CreateThread(ATHThread, Connection);
+
+    while (1)
+    {
+        SetConsoleTitleW(L"Press any key to send power assertion ...");
+        PauseConsole();
+        SetConsoleTitleW(L"sending power assertion ...");
+        ATHostConnectionSendPowerAssertion(Connection, *kCFBooleanTrue);
+    }
+
+    ATHostConnectionDestroy(Connection);
+
+    CFRelease(LibraryID);
+    CFRelease(Uuid);
+
+    return;
+}
+
+VOID Direct()
+{
+    ;
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    RtlAddVectoredExceptionHandler(TRUE,
-        [](PEXCEPTION_POINTERS ExceptionPointers) -> LONG
-        {
-            if (ExceptionPointers->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT)
-            {
-                ++ExceptionPointers->ContextRecord->Eip;
-                return EXCEPTION_CONTINUE_EXECUTION;
-            }
+    ml::MlInitialize();
 
-            return EXCEPTION_CONTINUE_SEARCH;
-        }
-    );
+    iTunesApi::Initialize();
 
-    ULONG64 beg, end;
-
-    beg = NtGetTickCount();
-
-    for (ULONG_PTR i = 10000; i != 0; --i)
-    {
-        _asm int 3;
-    	_asm nop;
-    }
-
-    end = NtGetTickCount();
-    PrintConsole(L"fuck, %ds\n", (ULONG)((end - beg) / 1000));
+    Direct();
 
     return;
 
