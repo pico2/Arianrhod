@@ -11,17 +11,21 @@
 
 DECLARE_HANDLE(CFObjectRef);
 
-DECLARE_HANDLE_CHILD(CFDataRef,         CFObjectRef);
-DECLARE_HANDLE_CHILD(CFStringRef,       CFObjectRef);
-DECLARE_HANDLE_CHILD(CFBooleanRef,      CFObjectRef);
-DECLARE_HANDLE_CHILD(CFDictionary,      CFObjectRef);
-DECLARE_HANDLE_CHILD(CFPropertyList,    CFDataRef);
+DECLARE_HANDLE_CHILD(CFDataRef,             CFObjectRef);
+DECLARE_HANDLE_CHILD(CFStringRef,           CFObjectRef);
+DECLARE_HANDLE_CHILD(CFBooleanRef,          CFObjectRef);
+DECLARE_HANDLE_CHILD(CFArrayRef,            CFObjectRef);
+DECLARE_HANDLE_CHILD(CFMutableArrayRef,     CFObjectRef);
+DECLARE_HANDLE_CHILD(CFDictionaryRef,       CFObjectRef);
+DECLARE_HANDLE_CHILD(CFPropertyListRef,     CFDictionaryRef);
 
-typedef CFDataRef*      PCFDataRef;
-typedef CFStringRef*    PCFStringRef;
-typedef CFBooleanRef*   PCFBooleanRef;
-typedef CFDictionary*   PCFDictionary;
-typedef CFPropertyList* PCFPropertyList;
+typedef CFDataRef*              PCFDataRef;
+typedef CFStringRef*            PCFStringRef;
+typedef CFBooleanRef*           PCFBooleanRef;
+typedef CFArrayRef*             PCFArrayRef;
+typedef CFMutableArrayRef*      PCFMutableArray;
+typedef CFDictionaryRef*        PCFDictionaryRef;
+typedef CFPropertyListRef*      PCFPropertyList;
 
 typedef LONG            CFTypeID;
 typedef LONG            CFIndex;
@@ -52,15 +56,37 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         );
 
         DECL_SELECTANY
-        CFPropertyList
+        CFDataRef
         (CDECL
         *CFPropertyListCreateXMLData)(
-            PVOID           Allocator,
-            CFDictionary    PropertyList
+            PVOID               Allocator,
+            CFPropertyListRef   PropertyList
         );
 
         DECL_SELECTANY CFIndex  (CDECL *CFDataGetLength)(CFDataRef Data);
         DECL_SELECTANY PBYTE    (CDECL *CFDataGetBytePtr)(CFDataRef Data);
+
+
+        // array
+
+        DECL_SELECTANY
+        CFArrayRef
+        (CDECL
+        *CFArrayCreate)(
+            PVOID   Allocator,
+            PVOID*  Values,
+            CFIndex NumberOfValues,
+            PVOID   Callbacks
+        );
+
+        DECL_SELECTANY
+        CFMutableArrayRef
+        (CDECL
+        *CFArrayCreateMutable)(
+            PVOID   Allocator,
+            CFIndex Capacity,
+            PVOID   Callbacks
+        );
 
 
         // string
@@ -101,6 +127,9 @@ ML_NAMESPACE_BEGIN(iTunesApi)
             LOAD_INTERFACE(CFDataGetLength);
             LOAD_INTERFACE(CFDataGetBytePtr);
 
+            LOAD_INTERFACE(CFArrayCreate);
+            LOAD_INTERFACE(CFArrayCreateMutable);
+
             LOAD_INTERFACE_(CFStringMakeConstantString, "__CFStringMakeConstantString");
             LOAD_INTERFACE(CFStringGetCString);
             LOAD_INTERFACE(CFStringGetLength);
@@ -123,7 +152,7 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         *ATHostConnectionCreateWithLibrary)(
             CFStringRef LibraryID,
             CFStringRef Uuid,
-            ULONG       Unknown0
+            CFStringRef ATHPath
         );
 
         DECL_SELECTANY
@@ -139,9 +168,9 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         (CDECL
         *ATHostConnectionSendSyncRequest)(
             ATH_CONNECTION  Connection,
-            PVOID           cfarrayParam1,
-            PVOID           cfmudictParam2,
-            CFDictionary    HostInfo
+            CFArrayRef      Dataclasses,
+            CFDictionaryRef DataclassAnchors,
+            CFDictionaryRef HostInfo
         );
 
         DECL_SELECTANY
@@ -149,11 +178,11 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         (CDECL
         *ATHostConnectionSendHostInfo)(
             ATH_CONNECTION  Connection,
-            CFDictionary    Dict
+            CFDictionaryRef HostInfo
         );
 
         DECL_SELECTANY
-        CFDictionary
+        CFPropertyListRef
         (CDECL
         *ATHostConnectionReadMessage)(
             ATH_CONNECTION Connection
@@ -312,12 +341,18 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         NTSTATUS
         (CDECL
         *AMDeviceNotificationSubscribe)(
-            ON_DEVICE_CONNECTION_CHANGED *OnDeviceConnectionChanged,
+            ON_DEVICE_CONNECTION_CHANGED OnDeviceConnectionChanged,
             LONG,
             LONG,
             LONG,
             PHANDLE Device
         );
+
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceIsPaired)(HANDLE Device);
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceValidatePairing)(HANDLE Device);
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStartSession)(HANDLE Device);
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStopSession)(HANDLE Device);
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceConnect)(HANDLE Device);
 
 
         /*++
@@ -345,6 +380,9 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(AFC_CONNECTION Connection);
         DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(AFC_CONNECTION Connection);
 
+        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(AFC_CONNECTION Connection, PVOID Data, ULONG Length);
+        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(AFC_CONNECTION Connection, PVOID Buffer, ULONG Length);
+
         inline NTSTATUS Initialize()
         {
             SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
@@ -352,9 +390,17 @@ ML_NAMESPACE_BEGIN(iTunesApi)
             PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
 
             LOAD_INTERFACE(AMDeviceNotificationSubscribe);
+            LOAD_INTERFACE(AMDeviceIsPaired);
+            LOAD_INTERFACE(AMDeviceValidatePairing);
+            LOAD_INTERFACE(AMDeviceStartSession);
+            LOAD_INTERFACE(AMDeviceStopSession);
+            LOAD_INTERFACE(AMDeviceConnect);
+
             LOAD_INTERFACE(AMDeviceSecureStartService);
             LOAD_INTERFACE(AMDServiceConnectionGetSocket);
             LOAD_INTERFACE(AMDServiceConnectionGetSecureIOContext);
+            LOAD_INTERFACE(AMDServiceConnectionSend);
+            LOAD_INTERFACE(AMDServiceConnectionReceive);
 
             return STATUS_SUCCESS;
         }
