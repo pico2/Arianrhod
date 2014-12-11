@@ -18733,3 +18733,27 @@ def NT_SUCCESS(x):
 
 def NT_FAILED(x):
     return not NT_SUCCESS(x)
+
+from ml import *
+
+def main():
+    status = {}
+
+    for k, v in globals().items():
+        if not isinstance(k, str) or not k.startswith('STATUS_'):
+            continue
+
+        status[k] = v
+
+    for k, v in sorted(status.items(), key = lambda t : t[1]):
+        if not isinstance(k, str) or not k.startswith('STATUS_'):
+            continue
+
+        print('case %s:' % k)
+        print('    return "%s"' % k)
+        print('')
+
+    PauseConsole()
+
+if __name__ == '__main__':
+    TryInvoke(main)
