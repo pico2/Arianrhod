@@ -369,11 +369,11 @@ VOID OnDeviceConnected(HANDLE Device)
     AFC_CONNECTION      Connection;
 
     AMDeviceConnect(Device);
-    AMDeviceIsPaired(Device);
     AMDeviceValidatePairing(Device);
     AMDeviceStartSession(Device);
-
     AMDeviceSecureStartService(Device, CFStringMakeConstantString("com.apple.afc"), 0, &Connection);
+    AMDeviceStopSession(Device);
+    AMDeviceDisconnect(Device);
 
     Grappa = nullptr;
     Length = 0;

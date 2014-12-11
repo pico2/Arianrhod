@@ -353,6 +353,7 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStartSession)(HANDLE Device);
         DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStopSession)(HANDLE Device);
         DECL_SELECTANY NTSTATUS (CDECL *AMDeviceConnect)(HANDLE Device);
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceDisconnect)(HANDLE Device);
 
 
         /*++
@@ -395,6 +396,7 @@ ML_NAMESPACE_BEGIN(iTunesApi)
             LOAD_INTERFACE(AMDeviceStartSession);
             LOAD_INTERFACE(AMDeviceStopSession);
             LOAD_INTERFACE(AMDeviceConnect);
+            LOAD_INTERFACE(AMDeviceDisconnect);
 
             LOAD_INTERFACE(AMDeviceSecureStartService);
             LOAD_INTERFACE(AMDServiceConnectionGetSocket);
