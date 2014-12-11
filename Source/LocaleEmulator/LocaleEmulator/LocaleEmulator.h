@@ -341,7 +341,7 @@ OpenOrCreateLePeb(
     return LePeb;
 }
 
-#define ENABLE_LOG 1
+#define ENABLE_LOG 0
 
 #if ENABLE_LOG
 

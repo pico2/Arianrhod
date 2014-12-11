@@ -31,7 +31,7 @@ typedef LONG            CFTypeID;
 typedef LONG            CFIndex;
 
 typedef PVOID           ATH_CONNECTION;
-typedef PVOID           AFC_CONNECTION, *PAFC_CONNECTION;
+typedef PVOID           SERVICE_CONNECTION, *PSERVICE_CONNECTION;
 
 ML_NAMESPACE_BEGIN(iTunesApi)
 
@@ -335,7 +335,7 @@ ML_NAMESPACE_BEGIN(iTunesApi)
 
         } DEVICE_CONNECTION_INFO, *PDEVICE_CONNECTION_INFO;
 
-        typedef VOID (CDECL *ON_DEVICE_CONNECTION_CHANGED)(PDEVICE_CONNECTION_INFO);
+        typedef VOID (CDECL *ON_DEVICE_CONNECTION_CHANGED)(PDEVICE_CONNECTION_INFO, PVOID UserData);
 
         DECL_SELECTANY
         NTSTATUS
@@ -344,10 +344,11 @@ ML_NAMESPACE_BEGIN(iTunesApi)
             ON_DEVICE_CONNECTION_CHANGED OnDeviceConnectionChanged,
             LONG,
             LONG,
-            LONG,
+            PVOID UserData,
             PHANDLE Device
         );
 
+        DECL_SELECTANY NTSTATUS (CDECL *AMDeviceRetain)(HANDLE Device);
         DECL_SELECTANY NTSTATUS (CDECL *AMDeviceIsPaired)(HANDLE Device);
         DECL_SELECTANY NTSTATUS (CDECL *AMDeviceValidatePairing)(HANDLE Device);
         DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStartSession)(HANDLE Device);
@@ -372,17 +373,17 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         NTSTATUS
         (CDECL
         *AMDeviceSecureStartService)(
-            HANDLE          Device,
-            CFStringRef     ServiceName,
-            LONG            Option,
-            PAFC_CONNECTION Connection
+            HANDLE              Device,
+            CFStringRef         ServiceName,
+            LONG                Option,
+            PSERVICE_CONNECTION Connection
         );
 
-        DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(AFC_CONNECTION Connection);
-        DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(AFC_CONNECTION Connection);
+        DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(SERVICE_CONNECTION Connection);
+        DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(SERVICE_CONNECTION Connection);
 
-        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(AFC_CONNECTION Connection, PVOID Data, ULONG Length);
-        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(AFC_CONNECTION Connection, PVOID Buffer, ULONG Length);
+        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(SERVICE_CONNECTION Connection, PVOID Data, ULONG Length);
+        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(SERVICE_CONNECTION Connection, PVOID Buffer, ULONG Length);
 
         inline NTSTATUS Initialize()
         {
@@ -391,6 +392,8 @@ ML_NAMESPACE_BEGIN(iTunesApi)
             PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
 
             LOAD_INTERFACE(AMDeviceNotificationSubscribe);
+
+            LOAD_INTERFACE(AMDeviceRetain);
             LOAD_INTERFACE(AMDeviceIsPaired);
             LOAD_INTERFACE(AMDeviceValidatePairing);
             LOAD_INTERFACE(AMDeviceStartSession);
