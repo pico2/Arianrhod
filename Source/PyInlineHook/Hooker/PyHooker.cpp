@@ -119,9 +119,50 @@ NTSTATUS PyHooker::InitPython()
         },
         L"ReadUnicode"
     )
+    .Register(
+        [=] (PVOID _Context) -> ULONG64
+        {
+            PCONTEXT Context = (PCONTEXT)_Context;
+
+            extern VOID InvokeCFunction(PCONTEXT Context, BOOL TestAlert = FALSE);
+
+            InvokeCFunction(Context);
+
+            ULARGE_INTEGER ret;
+
+            ret.LowPart = Context->Eax;
+            ret.HighPart = Context->Edx;
+
+            return ret.QuadPart;
+        },
+        L"Call"
+    )
     .AddToModule(L"_pyhooker");
 
     return STATUS_SUCCESS;
+}
+
+NoInline VOID CFunctionInvoker(PCONTEXT Context, BOOL TestAlert = FALSE)
+{
+    NtContinue(Context, TestAlert);
+}
+
+NoInline VOID InvokeCFunction(PCONTEXT Context, BOOL TestAlert = FALSE)
+{
+    auto X = [] (PEXCEPTION_POINTERS p, PCONTEXT Context)
+    {
+        *Context = *p->ContextRecord;
+        return EXCEPTION_EXECUTE_HANDLER;
+    };
+
+    SEH_TRY
+    {
+        CFunctionInvoker(Context, TestAlert);
+        DebugBreakPoint();
+    }
+    SEH_EXCEPT(X(GetExceptionInformation(), Context))
+    {
+    }
 }
 
 NTSTATUS PyHooker::InitDispatcher()

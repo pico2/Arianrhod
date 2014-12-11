@@ -123,9 +123,7 @@ class PyHooker(object):
             cb.add(callback)
             return
 
-        cb = self.AddressTable.setdefault(address, OrderedSet())
-        cb.add(callback)
-
+        self.AddressTable.setdefault(address, OrderedSet()).add(callback)
         _pyhooker.Hook(address, self.Dispatcher)
 
     def UnHook(self, address, callback):
@@ -155,10 +153,14 @@ class PyHooker(object):
 
         hookctx.Flush(ctx)
 
+    def Call(self, Context):
+        return _pyhooker.Call(ctypes.addressof(Context))
+
 _hooker = PyHooker()
 
 Hook = _hooker.Hook
 UnHook = _hooker.UnHook
+Call = _hooker.Call
 
 def main():
     name = os.path.splitext(os.path.basename(sys.argv[0]))[0]

@@ -8,6 +8,10 @@ def HookNtClose(context):
     # print('%X' % context.Eip)
     # print()
     # print('%X' % context.GetArgument(context.ARG_RETURN_ADDRESS))
+
+    ctx = WinTypes.CONTEXT()
+    ctx.Eip = 0x87654321
+    pyhooker.Call(ctx)
     pass
 
 def main():

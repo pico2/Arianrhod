@@ -99,7 +99,6 @@ struct PyTypeHelper<const T&>
     VALUE_TYPE          value;
 };
 
-
 template<>
 struct PyTypeHelper<VOID>
 {
@@ -128,7 +127,7 @@ struct PyTypeConverter<VOID>
         return;
     }
 };
-
+/*
 template<>
 struct PyTypeConverter<PVOID>
 {
@@ -142,7 +141,7 @@ struct PyTypeConverter<PVOID>
         return object;
     }
 };
-
+*/
 template<>
 struct PyTypeConverter<PyObject *>
 {
@@ -1055,6 +1054,13 @@ public:
         return PyTypeConverter<PyTypeHelper<RET_TYPE>::VALUE_TYPE>::ToNative(retval);
     }
 
+    template<typename RET_TYPE, typename... ARGS>
+    NoInline RET_TYPE Invoke(PyObject *object, const String& MethodName, ARGS... args)
+    {
+        MlPyObject retval = this->InvokeObjectMethod(object, MethodName, args...);
+        return PyTypeConverter<PyTypeHelper<RET_TYPE>::VALUE_TYPE>::ToNative(retval);
+    }
+
 protected:
 
     template<typename RET_TYPE>
@@ -1082,8 +1088,7 @@ protected:
     template<typename... ARGS>
     NoInline PyObject* InvokeModuleMethod(const String& ModuleName, const String& FunctionName, ARGS... args)
     {
-        MlPyObject module, tuple, func, value;
-        PyCodeObject* code;
+        MlPyObject module;
 
         module = Import(ModuleName);
         if (module == nullptr)
@@ -1098,14 +1103,23 @@ protected:
             return nullptr;
         }
 
-        func = PyObject_GetAttr(module, MlPyObject(FunctionName));
+        return this->InvokeObjectMethod(module, FunctionName, args...);
+    }
+
+    template<typename... ARGS>
+    NoInline PyObject* InvokeObjectMethod(PyObject* object, const String& MethodName, ARGS... args)
+    {
+        MlPyObject func;
+        PyCodeObject* code;
+
+        func = PyObject_GetAttr(object, MlPyObject(MethodName));
         if (func == nullptr)
         {
-            this->SetPyException(String::Format(L"'%s' object has no attribute '%s'", ModuleName, FunctionName), PyExc_AttributeError);
+            this->SetPyException(String::Format(L"'%S' object has no attribute '%s'", object->ob_type->tp_name, MethodName), PyExc_AttributeError);
             return nullptr;
         }
 
-        return InvokeInternal(func, FunctionName, args...);
+        return InvokeInternal(func, MethodName, args...);
     }
 
     template<typename... ARGS>
