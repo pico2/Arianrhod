@@ -1,7 +1,7 @@
 #ifndef _STDAFX_H_09d541c2_cb84_4ae2_9d98_febf90394945_
 #define _STDAFX_H_09d541c2_cb84_4ae2_9d98_febf90394945_
 
-#include "MyLibrary.h"
+#include "ml.h"
 #include <CommCtrl.h>
 #include "LocaleEmulator.h"
 #include "NtdllHook.h"
