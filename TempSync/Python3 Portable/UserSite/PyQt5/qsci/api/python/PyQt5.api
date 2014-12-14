@@ -2988,6 +2988,89 @@ PyQt5.QtCore.QItemSelection.first?4() -> QItemSelectionRange
 PyQt5.QtCore.QItemSelection.last?4() -> QItemSelectionRange
 PyQt5.QtCore.QItemSelection.indexOf?4(QItemSelectionRange, int from=0) -> int
 PyQt5.QtCore.QItemSelection.lastIndexOf?4(QItemSelectionRange, int from=-1) -> int
+PyQt5.QtCore.QJsonParseError.ParseError?10
+PyQt5.QtCore.QJsonParseError.NoError?10
+PyQt5.QtCore.QJsonParseError.UnterminatedObject?10
+PyQt5.QtCore.QJsonParseError.MissingNameSeparator?10
+PyQt5.QtCore.QJsonParseError.UnterminatedArray?10
+PyQt5.QtCore.QJsonParseError.MissingValueSeparator?10
+PyQt5.QtCore.QJsonParseError.IllegalValue?10
+PyQt5.QtCore.QJsonParseError.TerminationByNumber?10
+PyQt5.QtCore.QJsonParseError.IllegalNumber?10
+PyQt5.QtCore.QJsonParseError.IllegalEscapeSequence?10
+PyQt5.QtCore.QJsonParseError.IllegalUTF8String?10
+PyQt5.QtCore.QJsonParseError.UnterminatedString?10
+PyQt5.QtCore.QJsonParseError.MissingObject?10
+PyQt5.QtCore.QJsonParseError.DeepNesting?10
+PyQt5.QtCore.QJsonParseError.DocumentTooLarge?10
+PyQt5.QtCore.QJsonParseError.error?7
+PyQt5.QtCore.QJsonParseError.offset?7
+PyQt5.QtCore.QJsonParseError?1()
+PyQt5.QtCore.QJsonParseError.__init__?1(self)
+PyQt5.QtCore.QJsonParseError?1(QJsonParseError)
+PyQt5.QtCore.QJsonParseError.__init__?1(self, QJsonParseError)
+PyQt5.QtCore.QJsonParseError.errorString?4() -> str
+PyQt5.QtCore.QJsonDocument.JsonFormat?10
+PyQt5.QtCore.QJsonDocument.Indented?10
+PyQt5.QtCore.QJsonDocument.Compact?10
+PyQt5.QtCore.QJsonDocument.DataValidation?10
+PyQt5.QtCore.QJsonDocument.Validate?10
+PyQt5.QtCore.QJsonDocument.BypassValidation?10
+PyQt5.QtCore.QJsonDocument?1()
+PyQt5.QtCore.QJsonDocument.__init__?1(self)
+PyQt5.QtCore.QJsonDocument?1(dict-of-str-QJsonValue)
+PyQt5.QtCore.QJsonDocument.__init__?1(self, dict-of-str-QJsonValue)
+PyQt5.QtCore.QJsonDocument?1(list-of-QJsonValue)
+PyQt5.QtCore.QJsonDocument.__init__?1(self, list-of-QJsonValue)
+PyQt5.QtCore.QJsonDocument?1(QJsonDocument)
+PyQt5.QtCore.QJsonDocument.__init__?1(self, QJsonDocument)
+PyQt5.QtCore.QJsonDocument.fromRawData?4(str, int, QJsonDocument.DataValidation validation=QJsonDocument.Validate) -> QJsonDocument
+PyQt5.QtCore.QJsonDocument.rawData?4() -> (str, int)
+PyQt5.QtCore.QJsonDocument.fromBinaryData?4(QByteArray, QJsonDocument.DataValidation validation=QJsonDocument.Validate) -> QJsonDocument
+PyQt5.QtCore.QJsonDocument.toBinaryData?4() -> QByteArray
+PyQt5.QtCore.QJsonDocument.fromVariant?4(QVariant) -> QJsonDocument
+PyQt5.QtCore.QJsonDocument.toVariant?4() -> QVariant
+PyQt5.QtCore.QJsonDocument.fromJson?4(QByteArray, QJsonParseError error=None) -> QJsonDocument
+PyQt5.QtCore.QJsonDocument.toJson?4() -> QByteArray
+PyQt5.QtCore.QJsonDocument.toJson?4(QJsonDocument.JsonFormat) -> QByteArray
+PyQt5.QtCore.QJsonDocument.isEmpty?4() -> bool
+PyQt5.QtCore.QJsonDocument.isArray?4() -> bool
+PyQt5.QtCore.QJsonDocument.isObject?4() -> bool
+PyQt5.QtCore.QJsonDocument.object?4() -> dict-of-str-QJsonValue
+PyQt5.QtCore.QJsonDocument.array?4() -> list-of-QJsonValue
+PyQt5.QtCore.QJsonDocument.setObject?4(dict-of-str-QJsonValue)
+PyQt5.QtCore.QJsonDocument.setArray?4(list-of-QJsonValue)
+PyQt5.QtCore.QJsonDocument.isNull?4() -> bool
+PyQt5.QtCore.QJsonValue.Type?10
+PyQt5.QtCore.QJsonValue.Null?10
+PyQt5.QtCore.QJsonValue.Bool?10
+PyQt5.QtCore.QJsonValue.Double?10
+PyQt5.QtCore.QJsonValue.String?10
+PyQt5.QtCore.QJsonValue.Array?10
+PyQt5.QtCore.QJsonValue.Object?10
+PyQt5.QtCore.QJsonValue.Undefined?10
+PyQt5.QtCore.QJsonValue?1(QJsonValue.Type type=QJsonValue.Null)
+PyQt5.QtCore.QJsonValue.__init__?1(self, QJsonValue.Type type=QJsonValue.Null)
+PyQt5.QtCore.QJsonValue?1(QJsonValue)
+PyQt5.QtCore.QJsonValue.__init__?1(self, QJsonValue)
+PyQt5.QtCore.QJsonValue.fromVariant?4(QVariant) -> QJsonValue
+PyQt5.QtCore.QJsonValue.toVariant?4() -> QVariant
+PyQt5.QtCore.QJsonValue.type?4() -> QJsonValue.Type
+PyQt5.QtCore.QJsonValue.isNull?4() -> bool
+PyQt5.QtCore.QJsonValue.isBool?4() -> bool
+PyQt5.QtCore.QJsonValue.isDouble?4() -> bool
+PyQt5.QtCore.QJsonValue.isString?4() -> bool
+PyQt5.QtCore.QJsonValue.isArray?4() -> bool
+PyQt5.QtCore.QJsonValue.isObject?4() -> bool
+PyQt5.QtCore.QJsonValue.isUndefined?4() -> bool
+PyQt5.QtCore.QJsonValue.toBool?4(bool defaultValue=False) -> bool
+PyQt5.QtCore.QJsonValue.toInt?4(int defaultValue=0) -> int
+PyQt5.QtCore.QJsonValue.toDouble?4(float defaultValue=0) -> float
+PyQt5.QtCore.QJsonValue.toString?4(str defaultValue=QString()) -> str
+PyQt5.QtCore.QJsonValue.toArray?4() -> list-of-QJsonValue
+PyQt5.QtCore.QJsonValue.toArray?4(list-of-QJsonValue) -> list-of-QJsonValue
+PyQt5.QtCore.QJsonValue.toObject?4() -> dict-of-str-QJsonValue
+PyQt5.QtCore.QJsonValue.toObject?4(dict-of-str-QJsonValue) -> dict-of-str-QJsonValue
 PyQt5.QtCore.QLibrary.LoadHint?10
 PyQt5.QtCore.QLibrary.ResolveAllSymbolsHint?10
 PyQt5.QtCore.QLibrary.ExportExternalSymbolsHint?10
@@ -14599,7 +14682,7 @@ PyQt5.QtOpenGL.QGLWidget.glDraw?4()
 PyQt5.QtOpenGL.QGLWidget.bindTexture?4(QImage, int, int, QGLContext.BindOptions) -> int
 PyQt5.QtOpenGL.QGLWidget.bindTexture?4(QPixmap, int, int, QGLContext.BindOptions) -> int
 PyQt5.QtPrintSupport.QAbstractPrintDialog.PrintDialogOption?10
-PyQt5.QtPrintSupport.QAbstractPrintDialog.None?10
+PyQt5.QtPrintSupport.QAbstractPrintDialog.None_?10
 PyQt5.QtPrintSupport.QAbstractPrintDialog.PrintToFile?10
 PyQt5.QtPrintSupport.QAbstractPrintDialog.PrintSelection?10
 PyQt5.QtPrintSupport.QAbstractPrintDialog.PrintPageRange?10
@@ -14925,14 +15008,6 @@ PyQt5.QtQml.QJSValue?1(QJSValue.SpecialValue value=QJSValue.UndefinedValue)
 PyQt5.QtQml.QJSValue.__init__?1(self, QJSValue.SpecialValue value=QJSValue.UndefinedValue)
 PyQt5.QtQml.QJSValue?1(QJSValue)
 PyQt5.QtQml.QJSValue.__init__?1(self, QJSValue)
-PyQt5.QtQml.QJSValue?1(bool)
-PyQt5.QtQml.QJSValue.__init__?1(self, bool)
-PyQt5.QtQml.QJSValue?1(int)
-PyQt5.QtQml.QJSValue.__init__?1(self, int)
-PyQt5.QtQml.QJSValue?1(float)
-PyQt5.QtQml.QJSValue.__init__?1(self, float)
-PyQt5.QtQml.QJSValue?1(str)
-PyQt5.QtQml.QJSValue.__init__?1(self, str)
 PyQt5.QtQml.QJSValue.isBool?4() -> bool
 PyQt5.QtQml.QJSValue.isNumber?4() -> bool
 PyQt5.QtQml.QJSValue.isNull?4() -> bool
@@ -17611,6 +17686,7 @@ PyQt5.QtWidgets.QWidget.setInputMethodHints?4(Qt.InputMethodHints)
 PyQt5.QtWidgets.QWidget.hasHeightForWidth?4() -> bool
 PyQt5.QtWidgets.QWidget.grab?4(QRect rectangle=QRect(QPoint(0,0),QSize(-1,-1))) -> QPixmap
 PyQt5.QtWidgets.QWidget.createWindowContainer?4(QWindow, QWidget parent=None, Qt.WindowFlags flags=0) -> QWidget
+PyQt5.QtWidgets.QWidget.windowHandle?4() -> QWindow
 PyQt5.QtWidgets.QWidget.nativeEvent?4(QByteArray, sip.voidptr) -> (bool, int)
 PyQt5.QtWidgets.QWidget.redirected?4(QPoint) -> QPaintDevice
 PyQt5.QtWidgets.QWidget.sharedPainter?4() -> QPainter
@@ -22065,6 +22141,8 @@ PyQt5.QtWidgets.QMainWindow.setDockOptions?4(QMainWindow.DockOptions)
 PyQt5.QtWidgets.QMainWindow.dockOptions?4() -> QMainWindow.DockOptions
 PyQt5.QtWidgets.QMainWindow.removeToolBarBreak?4(QToolBar)
 PyQt5.QtWidgets.QMainWindow.toolBarBreak?4(QToolBar) -> bool
+PyQt5.QtWidgets.QMainWindow.setUnifiedTitleAndToolBarOnMac?4(bool)
+PyQt5.QtWidgets.QMainWindow.unifiedTitleAndToolBarOnMac?4() -> bool
 PyQt5.QtWidgets.QMainWindow.restoreDockWidget?4(QDockWidget) -> bool
 PyQt5.QtWidgets.QMainWindow.documentMode?4() -> bool
 PyQt5.QtWidgets.QMainWindow.setDocumentMode?4(bool)
@@ -27094,6 +27172,8 @@ PyQt5.QtQuickWidgets.QQuickWidget.showEvent?4(QShowEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.hideEvent?4(QHideEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.wheelEvent?4(QWheelEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.event?4(QEvent) -> bool
+PyQt5.QtQuickWidgets.QQuickWidget.focusInEvent?4(QFocusEvent)
+PyQt5.QtQuickWidgets.QQuickWidget.focusOutEvent?4(QFocusEvent)
 PyQt5.QtWebSockets.QMaskGenerator?1(QObject parent=None)
 PyQt5.QtWebSockets.QMaskGenerator.__init__?1(self, QObject parent=None)
 PyQt5.QtWebSockets.QMaskGenerator.seed?4() -> bool
@@ -27216,3 +27296,84 @@ PyQt5.QtWebSockets.QWebSocketServer.newConnection?4()
 PyQt5.QtWebSockets.QWebSocketServer.peerVerifyError?4(QSslError)
 PyQt5.QtWebSockets.QWebSocketServer.sslErrors?4(list-of-QSslError)
 PyQt5.QtWebSockets.QWebSocketServer.closed?4()
+PyQt5.Enginio.Enginio.ErrorType?10
+PyQt5.Enginio.Enginio.NoError?10
+PyQt5.Enginio.Enginio.NetworkError?10
+PyQt5.Enginio.Enginio.BackendError?10
+PyQt5.Enginio.Enginio.Role?10
+PyQt5.Enginio.Enginio.SyncedRole?10
+PyQt5.Enginio.Enginio.CreatedAtRole?10
+PyQt5.Enginio.Enginio.UpdatedAtRole?10
+PyQt5.Enginio.Enginio.IdRole?10
+PyQt5.Enginio.Enginio.ObjectTypeRole?10
+PyQt5.Enginio.Enginio.CustomPropertyRole?10
+PyQt5.Enginio.Enginio.Operation?10
+PyQt5.Enginio.Enginio.ObjectOperation?10
+PyQt5.Enginio.Enginio.AccessControlOperation?10
+PyQt5.Enginio.Enginio.UserOperation?10
+PyQt5.Enginio.Enginio.UsergroupOperation?10
+PyQt5.Enginio.Enginio.UsergroupMembersOperation?10
+PyQt5.Enginio.Enginio.FileOperation?10
+PyQt5.Enginio.Enginio.AuthenticationState?10
+PyQt5.Enginio.Enginio.NotAuthenticated?10
+PyQt5.Enginio.Enginio.Authenticating?10
+PyQt5.Enginio.Enginio.Authenticated?10
+PyQt5.Enginio.Enginio.AuthenticationFailure?10
+PyQt5.Enginio.EnginioClientConnection.backendId?4() -> QByteArray
+PyQt5.Enginio.EnginioClientConnection.setBackendId?4(QByteArray)
+PyQt5.Enginio.EnginioClientConnection.identity?4() -> EnginioIdentity
+PyQt5.Enginio.EnginioClientConnection.setIdentity?4(EnginioIdentity)
+PyQt5.Enginio.EnginioClientConnection.authenticationState?4() -> Enginio.AuthenticationState
+PyQt5.Enginio.EnginioClientConnection.serviceUrl?4() -> QUrl
+PyQt5.Enginio.EnginioClientConnection.setServiceUrl?4(QUrl)
+PyQt5.Enginio.EnginioClientConnection.networkManager?4() -> QNetworkAccessManager
+PyQt5.Enginio.EnginioClientConnection.backendIdChanged?4(QByteArray)
+PyQt5.Enginio.EnginioClientConnection.serviceUrlChanged?4(QUrl)
+PyQt5.Enginio.EnginioClientConnection.authenticationStateChanged?4(Enginio.AuthenticationState)
+PyQt5.Enginio.EnginioClientConnection.identityChanged?4(EnginioIdentity)
+PyQt5.Enginio.EnginioClient?1(QObject parent=None)
+PyQt5.Enginio.EnginioClient.__init__?1(self, QObject parent=None)
+PyQt5.Enginio.EnginioClient.fullTextSearch?4(dict-of-str-QJsonValue) -> EnginioReply
+PyQt5.Enginio.EnginioClient.query?4(dict-of-str-QJsonValue, Enginio.Operation operation=Enginio.ObjectOperation) -> EnginioReply
+PyQt5.Enginio.EnginioClient.create?4(dict-of-str-QJsonValue, Enginio.Operation operation=Enginio.ObjectOperation) -> EnginioReply
+PyQt5.Enginio.EnginioClient.update?4(dict-of-str-QJsonValue, Enginio.Operation operation=Enginio.ObjectOperation) -> EnginioReply
+PyQt5.Enginio.EnginioClient.remove?4(dict-of-str-QJsonValue, Enginio.Operation operation=Enginio.ObjectOperation) -> EnginioReply
+PyQt5.Enginio.EnginioClient.uploadFile?4(dict-of-str-QJsonValue, QUrl) -> EnginioReply
+PyQt5.Enginio.EnginioClient.downloadUrl?4(dict-of-str-QJsonValue) -> EnginioReply
+PyQt5.Enginio.EnginioClient.sessionAuthenticated?4(EnginioReply)
+PyQt5.Enginio.EnginioClient.sessionAuthenticationError?4(EnginioReply)
+PyQt5.Enginio.EnginioClient.sessionTerminated?4()
+PyQt5.Enginio.EnginioClient.finished?4(EnginioReply)
+PyQt5.Enginio.EnginioClient.error?4(EnginioReply)
+PyQt5.Enginio.EnginioModel?1(QObject parent=None)
+PyQt5.Enginio.EnginioModel.__init__?1(self, QObject parent=None)
+PyQt5.Enginio.EnginioModel.client?4() -> EnginioClient
+PyQt5.Enginio.EnginioModel.setClient?4(EnginioClient)
+PyQt5.Enginio.EnginioModel.query?4() -> dict-of-str-QJsonValue
+PyQt5.Enginio.EnginioModel.setQuery?4(dict-of-str-QJsonValue)
+PyQt5.Enginio.EnginioModel.operation?4() -> Enginio.Operation
+PyQt5.Enginio.EnginioModel.setOperation?4(Enginio.Operation)
+PyQt5.Enginio.EnginioModel.append?4(dict-of-str-QJsonValue) -> EnginioReply
+PyQt5.Enginio.EnginioModel.remove?4(int) -> EnginioReply
+PyQt5.Enginio.EnginioModel.setData?4(int, QVariant, str) -> EnginioReply
+PyQt5.Enginio.EnginioModel.queryChanged?4(dict-of-str-QJsonValue)
+PyQt5.Enginio.EnginioModel.clientChanged?4(EnginioClient)
+PyQt5.Enginio.EnginioModel.operationChanged?4(Enginio.Operation)
+PyQt5.Enginio.EnginioOAuth2Authentication?1(QObject parent=None)
+PyQt5.Enginio.EnginioOAuth2Authentication.__init__?1(self, QObject parent=None)
+PyQt5.Enginio.EnginioOAuth2Authentication.user?4() -> str
+PyQt5.Enginio.EnginioOAuth2Authentication.password?4() -> str
+PyQt5.Enginio.EnginioOAuth2Authentication.setUser?4(str)
+PyQt5.Enginio.EnginioOAuth2Authentication.setPassword?4(str)
+PyQt5.Enginio.EnginioOAuth2Authentication.userChanged?4(str)
+PyQt5.Enginio.EnginioOAuth2Authentication.passwordChanged?4(str)
+PyQt5.Enginio.EnginioReply.data?4() -> dict-of-str-QJsonValue
+PyQt5.Enginio.EnginioReply.progress?4(int, int)
+PyQt5.Enginio.EnginioReply.errorType?4() -> Enginio.ErrorType
+PyQt5.Enginio.EnginioReply.networkError?4() -> QNetworkReply.NetworkError
+PyQt5.Enginio.EnginioReply.errorString?4() -> str
+PyQt5.Enginio.EnginioReply.backendStatus?4() -> int
+PyQt5.Enginio.EnginioReply.isError?4() -> bool
+PyQt5.Enginio.EnginioReply.isFinished?4() -> bool
+PyQt5.Enginio.EnginioReply.finished?4(EnginioReply)
+PyQt5.Enginio.EnginioReply.dataChanged?4()

@@ -67,6 +67,7 @@ const char *QSCINTILLA_VERSION_STR;
 %Include qscilexerbash.sip
 %Include qscilexerbatch.sip
 %Include qscilexercmake.sip
+%Include qscilexercoffeescript.sip
 %Include qscilexercpp.sip
 %Include qscilexercsharp.sip
 %Include qscilexercss.sip

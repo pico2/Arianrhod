@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "mlns.h"
 #include "MessageTable.h"
 
 VOID ResetDCCharset(PLeGlobalData GlobalData, HWND hWnd);
