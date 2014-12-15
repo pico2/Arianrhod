@@ -67,11 +67,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Hooks/ZWEI2Plus/zw/
 
 /PyLibs/PyQt5
-/Source/sources/Python-3.3.2/PCbuild/Win32-temp-Release/
-
-/Source/sources/Python-3.3.2/PCbuild/*.lib
-/Source/sources/Python-3.3.2/PCbuild/*.exe
-/Source/sources/Python-3.3.2/PCbuild/*.dll
 /Source/Hooks/KrKr2Protect
 
 /TempSync/SublimeText Packages/User/Package Control.last-run
@@ -81,7 +76,7 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
 /PyLibs/*.pth
 /PyLibs/MyPyLibrary/AMFHelper/PyAmfHelper.pyd
-/Source/Glorius
+/Source/Project/Glorius
 /Library/qt-everywhere-opensource-src-5.3.0
 /Source/sources/x64_dbg
 /Source/Android/*/bin
@@ -93,9 +88,9 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Hooks/Falcom/ZWEI2Plus/zw
 /Source/sources/Python-*
 /Source/Android/hookTaobao
-/Source/PythonProtector
+/Source/Project/PythonProtector
 /Source/sources/cpython
 /Source/Test_Con/python
 /Source/Android/.metadata
-/Source/starsfutech
-/Source/PyInlineHook/python
+/Source/Project/starsfutech
+/Source/Project/PyInlineHook/python
