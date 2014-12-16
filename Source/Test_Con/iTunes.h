@@ -11,27 +11,28 @@
 
 DECLARE_HANDLE(CFObjectRef);
 
-DECLARE_HANDLE_CHILD(CFDataRef,             CFObjectRef);
-DECLARE_HANDLE_CHILD(CFStringRef,           CFObjectRef);
-DECLARE_HANDLE_CHILD(CFBooleanRef,          CFObjectRef);
-DECLARE_HANDLE_CHILD(CFArrayRef,            CFObjectRef);
-DECLARE_HANDLE_CHILD(CFMutableArrayRef,     CFObjectRef);
-DECLARE_HANDLE_CHILD(CFDictionaryRef,       CFObjectRef);
-DECLARE_HANDLE_CHILD(CFPropertyListRef,     CFDictionaryRef);
+DECLARE_HANDLE_CHILD(CFDataRef,                 CFObjectRef);
+DECLARE_HANDLE_CHILD(CFStringRef,               CFObjectRef);
+DECLARE_HANDLE_CHILD(CFBooleanRef,              CFObjectRef);
+DECLARE_HANDLE_CHILD(CFArrayRef,                CFObjectRef);
+DECLARE_HANDLE_CHILD(CFMutableArrayRef,         CFObjectRef);
+DECLARE_HANDLE_CHILD(CFDictionaryRef,           CFObjectRef);
+DECLARE_HANDLE_CHILD(CFPropertyListRef,         CFDictionaryRef);
+DECLARE_HANDLE_CHILD(CFServiceConnection,    CFObjectRef);
 
-typedef CFDataRef*              PCFDataRef;
-typedef CFStringRef*            PCFStringRef;
-typedef CFBooleanRef*           PCFBooleanRef;
-typedef CFArrayRef*             PCFArrayRef;
-typedef CFMutableArrayRef*      PCFMutableArray;
-typedef CFDictionaryRef*        PCFDictionaryRef;
-typedef CFPropertyListRef*      PCFPropertyList;
+typedef CFDataRef*                  PCFDataRef;
+typedef CFStringRef*                PCFStringRef;
+typedef CFBooleanRef*               PCFBooleanRef;
+typedef CFArrayRef*                 PCFArrayRef;
+typedef CFMutableArrayRef*          PCFMutableArray;
+typedef CFDictionaryRef*            PCFDictionaryRef;
+typedef CFPropertyListRef*          PCFPropertyListRef;
+typedef CFServiceConnection*        PCFServiceConnection;
 
 typedef LONG            CFTypeID;
 typedef LONG            CFIndex;
 
 typedef PVOID           ATH_CONNECTION;
-typedef PVOID           SERVICE_CONNECTION, *PSERVICE_CONNECTION;
 
 ML_NAMESPACE_BEGIN(iTunesApi)
 
@@ -373,17 +374,19 @@ ML_NAMESPACE_BEGIN(iTunesApi)
         NTSTATUS
         (CDECL
         *AMDeviceSecureStartService)(
-            HANDLE              Device,
-            CFStringRef         ServiceName,
-            LONG                Option,
-            PSERVICE_CONNECTION Connection
+            HANDLE                  Device,
+            CFStringRef             ServiceName,
+            LONG                    Option,
+            PCFServiceConnection    Connection
         );
 
-        DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(SERVICE_CONNECTION Connection);
-        DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(SERVICE_CONNECTION Connection);
+        DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(CFServiceConnection Connection);
+        DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(CFServiceConnection Connection);
 
-        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(SERVICE_CONNECTION Connection, PVOID Data, ULONG Length);
-        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(SERVICE_CONNECTION Connection, PVOID Buffer, ULONG Length);
+        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(CFServiceConnection Connection, PVOID Data, ULONG Length);
+        DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
+
+        DECL_SELECTANY VOID (CDECL *AMDServiceConnectionInvalidate)(CFServiceConnection Connection);
 
         inline NTSTATUS Initialize()
         {
@@ -406,6 +409,7 @@ ML_NAMESPACE_BEGIN(iTunesApi)
             LOAD_INTERFACE(AMDServiceConnectionGetSecureIOContext);
             LOAD_INTERFACE(AMDServiceConnectionSend);
             LOAD_INTERFACE(AMDServiceConnectionReceive);
+            LOAD_INTERFACE(AMDServiceConnectionInvalidate);
 
             return STATUS_SUCCESS;
         }

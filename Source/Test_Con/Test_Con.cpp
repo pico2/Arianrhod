@@ -388,7 +388,7 @@ BYTE HostInfo[] =
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x97
 };
 
-VOID ServiceSendData(SERVICE_CONNECTION Connection, PVOID Data, ULONG_PTR Length)
+VOID ServiceSendData(CFServiceConnection Connection, PVOID Data, ULONG_PTR Length)
 {
     ULONG BytesTransferred;
 
@@ -398,7 +398,7 @@ VOID ServiceSendData(SERVICE_CONNECTION Connection, PVOID Data, ULONG_PTR Length
     AMDServiceConnectionSend(Connection, Data, Length);
 }
 
-ULONG_PTR ServiceRecvData(SERVICE_CONNECTION Connection, PVOID *Data)
+ULONG_PTR ServiceRecvData(CFServiceConnection Connection, PVOID *Data)
 {
     ULONG BytesTransferred;
 
@@ -410,19 +410,19 @@ ULONG_PTR ServiceRecvData(SERVICE_CONNECTION Connection, PVOID *Data)
     return AMDServiceConnectionReceive(Connection, *Data, BytesTransferred);
 }
 
-VOID SendPowerAssertion(SERVICE_CONNECTION Connection)
+VOID SendPowerAssertion(CFServiceConnection Connection)
 {
     PrintConsole(L"PowerAssertion1\n");
     return ServiceSendData(Connection, PowerAssertion1, sizeof(PowerAssertion1));
 }
 
-VOID SendHostInfo(SERVICE_CONNECTION Connection)
+VOID SendHostInfo(CFServiceConnection Connection)
 {
     PrintConsole(L"HostInfo\n");
     return ServiceSendData(Connection, HostInfo, sizeof(HostInfo));
 }
 
-VOID SendRequestingSync(SERVICE_CONNECTION Connection)
+VOID SendRequestingSync(CFServiceConnection Connection)
 {
     PrintConsole(L"RequestingSync\n");
 
@@ -491,7 +491,7 @@ EXTC_EXPORT VOID CDECL OnDeviceConnected(HANDLE Device)
     PVOID               Grappa, Data;
     ULONG               GrappaKey;
     LONG                Length;
-    SERVICE_CONNECTION      Connection;
+    CFServiceConnection Connection;
 
     AMDeviceRetain(Device);
 
@@ -507,7 +507,7 @@ EXTC_EXPORT VOID CDECL OnDeviceConnected(HANDLE Device)
     //AMDeviceStopSession(Device);
     //AMDeviceDisconnect(Device);
 
-    for (;;)
+    for (ULONG_PTR i = 10; i != 0; --i)
     {
         PrintConsole(L"\n");
 
@@ -531,6 +531,8 @@ EXTC_EXPORT VOID CDECL OnDeviceConnected(HANDLE Device)
 
         Ps::Sleep(1000);
     }
+
+    CFRelease(Connection);
 
     Ps::ExitProcess(0);
 }
@@ -565,6 +567,10 @@ VOID Direct()
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    PrintLocaleDefaultAnsiCodePage();
+
+    return;
 
     ml::MlInitialize();
 
