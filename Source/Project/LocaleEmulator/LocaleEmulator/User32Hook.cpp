@@ -792,25 +792,41 @@ VOID UninstallCbtHook(PCBT_PROC_PARAM CbtParam)
     CbtParam->Pop();
 }
 
-HWND
-NTAPI
-LeNtUserCreateWindowEx_Win7(
-    ULONG                   ExStyle,
-    PLARGE_UNICODE_STRING   ClassName,
-    PLARGE_UNICODE_STRING   ClassVersion,
-    PLARGE_UNICODE_STRING   WindowName,
-    ULONG                   Style,
-    LONG                    X,
-    LONG                    Y,
-    LONG                    Width,
-    LONG                    Height,
-    HWND                    ParentWnd,
-    HMENU                   Menu,
-    PVOID                   Instance,
-    LPVOID                  Param,
-    ULONG                   ShowMode,
-    ULONG                   Unknown
-)
+typedef struct
+{
+    ULONG                   ExStyle;
+    PLARGE_UNICODE_STRING   ClassName;
+    PLARGE_UNICODE_STRING   ClassVersion;
+    PLARGE_UNICODE_STRING   WindowName;
+    ULONG                   Style;
+    LONG                    X;
+    LONG                    Y;
+    LONG                    Width;
+    LONG                    Height;
+    HWND                    ParentWnd;
+    HMENU                   Menu;
+    PVOID                   Instance;
+    LPVOID                  Param;
+    ULONG                   ShowMode;
+    ULONG                   Unknown1;
+    ULONG                   Unknown2;
+    ULONG                   Unknown3;
+
+} *PCREATE_USER_WINDOW;
+
+typedef struct { PVOID _[15]; } CREATE_USER_WINDOW_WIN7;
+typedef struct { PVOID _[16]; } CREATE_USER_WINDOW_WIN8;
+typedef struct { PVOID _[17]; } CREATE_USER_WINDOW_WIN9;
+
+template<class PARAM_TYPE>
+HWND NtUserCreateWindowExInvoker(PVOID Routine, PCREATE_USER_WINDOW Parameters)
+{
+    HWND (NTAPI *NtUserCreateWindowEx)(PARAM_TYPE);
+    *(PVOID *)&NtUserCreateWindowEx = Routine;
+    return NtUserCreateWindowEx(*(PARAM_TYPE *)Parameters);
+}
+
+HWND LeNtUserCreateWindowExWorker(PCREATE_USER_WINDOW Parameters, HWND (*Invoker)(PVOID, PCREATE_USER_WINDOW))
 {
     HWND                    hWnd;
     NTSTATUS                LastError;
@@ -825,40 +841,24 @@ LeNtUserCreateWindowEx_Win7(
 
     LOOP_ONCE
     {
-        if (!FLAG_ON(ExStyle, WS_EX_ANSI))
+        if (!FLAG_ON(Parameters->ExStyle, WS_EX_ANSI))
         {
             InstallUnicodeCbtHook(GlobalData, &CbtParam);
             break;
         }
 
-        if (WindowName != nullptr)
+        if (Parameters->WindowName != nullptr)
         {
-            if (CaptureAnsiWindowName(WindowName, &UnicodeWindowName) == nullptr)
+            if (CaptureAnsiWindowName(Parameters->WindowName, &UnicodeWindowName) == nullptr)
                 break;
         }
 
-        WindowName = &UnicodeWindowName;
+        Parameters->WindowName = &UnicodeWindowName;
 
-        InstallCbtHook(GlobalData, &CbtParam, &CreateParam, _AddressOfReturnAddress(), Param);
+        InstallCbtHook(GlobalData, &CbtParam, &CreateParam, _AddressOfReturnAddress(), Parameters->Param);
     }
 
-    hWnd = GlobalData->NtUserCreateWindowEx_Win7(
-                ExStyle,
-                ClassName,
-                ClassVersion,
-                WindowName,
-                Style,
-                X,
-                Y,
-                Width,
-                Height,
-                ParentWnd,
-                Menu,
-                Instance,
-                Param,
-                ShowMode,
-                Unknown
-            );
+    hWnd = Invoker(GlobalData->HookStub.StubNtUserCreateWindowEx, Parameters);
 
     LastError = RtlGetLastWin32Error();
 /*
@@ -887,101 +887,19 @@ LeNtUserCreateWindowEx_Win7(
     return hWnd;
 }
 
-HWND
-NTAPI
-LeNtUserCreateWindowEx_Win8(
-    ULONG                   ExStyle,
-    PLARGE_UNICODE_STRING   ClassName,
-    PLARGE_UNICODE_STRING   ClassVersion,
-    PLARGE_UNICODE_STRING   WindowName,
-    ULONG                   Style,
-    LONG                    X,
-    LONG                    Y,
-    LONG                    Width,
-    LONG                    Height,
-    HWND                    ParentWnd,
-    HMENU                   Menu,
-    PVOID                   Instance,
-    LPVOID                  Param,
-    ULONG                   ShowMode,
-    ULONG                   Unknown,
-    ULONG                   Unknown2
-)
+HWND NTAPI LeNtUserCreateWindowEx_Win7(CREATE_USER_WINDOW_WIN7 Parameters)
 {
-    HWND                    hWnd;
-    NTSTATUS                LastError;
-    LARGE_UNICODE_STRING    UnicodeWindowName;
-    PLeGlobalData           GlobalData;
-    CBT_PROC_PARAM          CbtParam;
-    CBT_CREATE_PARAM        CreateParam;
+    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN7>);
+}
 
-    GlobalData = LeGetGlobalData();
+HWND NTAPI LeNtUserCreateWindowEx_Win8(CREATE_USER_WINDOW_WIN8 Parameters)
+{
+    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN8>);
+}
 
-    InitEmptyLargeString(&UnicodeWindowName);
-
-    LOOP_ONCE
-    {
-        if (!FLAG_ON(ExStyle, WS_EX_ANSI))
-        {
-            InstallUnicodeCbtHook(GlobalData, &CbtParam);
-            break;
-        }
-
-        if (WindowName != nullptr)
-        {
-            if (CaptureAnsiWindowName(WindowName, &UnicodeWindowName) == nullptr)
-                break;
-        }
-
-        WindowName = &UnicodeWindowName;
-
-        InstallCbtHook(GlobalData, &CbtParam, &CreateParam, _AddressOfReturnAddress(), Param);
-    }
-
-    hWnd = GlobalData->NtUserCreateWindowEx_Win8(
-                ExStyle,
-                ClassName,
-                ClassVersion,
-                WindowName,
-                Style,
-                X,
-                Y,
-                Width,
-                Height,
-                ParentWnd,
-                Menu,
-                Instance,
-                Param,
-                ShowMode,
-                Unknown,
-                Unknown2
-            );
-
-    LastError = RtlGetLastWin32Error();
-/*
-    if (hWnd != nullptr)
-    {
-        HDC hDC;
-
-        hDC= GetDC(hWnd);
-
-        CheckDC(hDC);
-
-        ReleaseDC(hWnd, hDC);
-
-        hDC= GetWindowDC(hWnd);
-
-        CheckDC(hDC);
-
-        ReleaseDC(hWnd, hDC);
-    }
-*/
-    UninstallCbtHook(&CbtParam);
-    FreeLargeString(&UnicodeWindowName);
-
-    RtlSetLastWin32Error(LastError);
-
-    return hWnd;
+HWND NTAPI LeNtUserCreateWindowEx_Win9(CREATE_USER_WINDOW_WIN9 Parameters)
+{
+    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN9>);
 }
 
 LONG_PTR NTAPI LeGetWindowLongA(HWND hWnd, int Index)
@@ -1577,7 +1495,23 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         InitFontCharsetInfo();
     }
 
-    LeNtUserCreateWindowEx = CurrentPeb()->OSBuildNumber >= 8000 ? (PVOID)LeNtUserCreateWindowEx_Win8 : LeNtUserCreateWindowEx_Win7;
+    switch (CurrentPeb()->OSBuildNumber / 1000)
+    {
+        case 7:
+            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win7;
+            break;
+
+        case 8:
+            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win8;
+            break;
+
+        case 9:
+            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win9;
+            break;
+
+        default:
+            return STATUS_UNKNOWN_REVISION;
+    }
 
     Mp::PATCH_MEMORY_DATA p[] =
     {

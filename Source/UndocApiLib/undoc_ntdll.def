@@ -43,3 +43,4 @@ EXPORTS
 	_ftol
 	_stricmp
 	_wcsicmp
+	_vswprintf

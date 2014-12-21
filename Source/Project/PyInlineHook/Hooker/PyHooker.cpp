@@ -294,7 +294,7 @@ LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
 
     while (PtrOffset(Esp, StackLimit) <= 0x5000)
     {
-        *PtrSub(StackLimit, 0x10) = 0;
+        *PtrSub(StackLimit, 0x10) |= 0;
         StackLimit = (PULONG_PTR)CurrentTeb()->NtTib.StackLimit;
     }
 

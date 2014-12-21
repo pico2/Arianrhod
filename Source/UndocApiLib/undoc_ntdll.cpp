@@ -40,6 +40,11 @@ int __cdecl swprintf(wchar_t * _DstBuf, const wchar_t * _Format, ...)
     return 0;
 }
 
+int __cdecl _vswprintf(wchar_t *string, const wchar_t *format, va_list ap)
+{
+    return 0;
+}
+
 int __cdecl _snwprintf(wchar_t * _DstBuf, size_t _MaxCount, const wchar_t * _Format, ...)
 {
     return 0;

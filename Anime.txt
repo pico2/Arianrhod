@@ -6,8 +6,7 @@
 星期六	妖精的尾巴							213
 	琴浦小姐							08
 	Date A Live II							01
-星期天	刀剑神域2							23
-	Fate/Stay Night UBW						09
+星期天	Fate/Stay Night UBW						11
 
 
 《心理学》
@@ -42,8 +41,12 @@ sola
 娇蛮之吻
 
 
+2014-10
+
 2014-07
 星期一	月刊少女野崎君							12
+星期天	刀剑神域2							24
+
 
 2014-04
 星期四	No Game No Life						12
