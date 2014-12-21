@@ -816,7 +816,7 @@ typedef struct
 
 typedef struct { PVOID _[15]; } CREATE_USER_WINDOW_WIN7;
 typedef struct { PVOID _[16]; } CREATE_USER_WINDOW_WIN8;
-typedef struct { PVOID _[17]; } CREATE_USER_WINDOW_WIN9;
+typedef struct { PVOID _[17]; } CREATE_USER_WINDOW_WIN10;
 
 template<class PARAM_TYPE>
 HWND NtUserCreateWindowExInvoker(PVOID Routine, PCREATE_USER_WINDOW Parameters)
@@ -897,9 +897,9 @@ HWND NTAPI LeNtUserCreateWindowEx_Win8(CREATE_USER_WINDOW_WIN8 Parameters)
     return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN8>);
 }
 
-HWND NTAPI LeNtUserCreateWindowEx_Win9(CREATE_USER_WINDOW_WIN9 Parameters)
+HWND NTAPI LeNtUserCreateWindowEx_Win10(CREATE_USER_WINDOW_WIN10 Parameters)
 {
-    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN9>);
+    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN10>);
 }
 
 LONG_PTR NTAPI LeGetWindowLongA(HWND hWnd, int Index)
@@ -1506,7 +1506,7 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
             break;
 
         case 9:
-            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win9;
+            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win10;
             break;
 
         default:
