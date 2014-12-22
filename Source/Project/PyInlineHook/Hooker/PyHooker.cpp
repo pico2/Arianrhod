@@ -124,9 +124,9 @@ NTSTATUS PyHooker::InitPython()
         {
             PCONTEXT Context = (PCONTEXT)_Context;
 
-            extern VOID InvokeCFunction(PCONTEXT Context, BOOL TestAlert = FALSE);
+            extern VOID InvokeNativeFunction(PCONTEXT Context, BOOL TestAlert = FALSE);
 
-            InvokeCFunction(Context);
+            InvokeNativeFunction(Context);
 
             ULARGE_INTEGER ret;
 
@@ -142,12 +142,13 @@ NTSTATUS PyHooker::InitPython()
     return STATUS_SUCCESS;
 }
 
-NoInline VOID CFunctionInvoker(PCONTEXT Context, BOOL TestAlert = FALSE)
+NoInline VOID NativeInvoker(PCONTEXT Context, BOOL TestAlert = FALSE)
 {
+    *(PVOID *)Context->Esp = _ReturnAddress();
     NtContinue(Context, TestAlert);
 }
 
-NoInline VOID InvokeCFunction(PCONTEXT Context, BOOL TestAlert = FALSE)
+NoInline VOID InvokeNativeFunction(PCONTEXT Context, BOOL TestAlert = FALSE)
 {
     auto X = [] (PEXCEPTION_POINTERS p, PCONTEXT Context)
     {
@@ -157,7 +158,7 @@ NoInline VOID InvokeCFunction(PCONTEXT Context, BOOL TestAlert = FALSE)
 
     SEH_TRY
     {
-        CFunctionInvoker(Context, TestAlert);
+        NativeInvoker(Context, TestAlert);
         DebugBreakPoint();
     }
     SEH_EXCEPT(X(GetExceptionInformation(), Context))

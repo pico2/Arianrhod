@@ -812,21 +812,21 @@ typedef struct
     ULONG                   Unknown2;
     ULONG                   Unknown3;
 
-} *PCREATE_USER_WINDOW;
+} *PUSER_CREATE_WINDOW;
 
-typedef struct { PVOID _[15]; } CREATE_USER_WINDOW_WIN7;
-typedef struct { PVOID _[16]; } CREATE_USER_WINDOW_WIN8;
-typedef struct { PVOID _[17]; } CREATE_USER_WINDOW_WIN10;
+typedef struct { PVOID _[15]; } USER_CREATE_WINDOW_WIN7;
+typedef struct { PVOID _[16]; } USER_CREATE_WINDOW_WIN8;
+typedef struct { PVOID _[17]; } USER_CREATE_WINDOW_WIN10;
 
 template<class PARAM_TYPE>
-HWND NtUserCreateWindowExInvoker(PVOID Routine, PCREATE_USER_WINDOW Parameters)
+HWND NtUserCreateWindowExInvoker(PVOID Routine, PUSER_CREATE_WINDOW Parameters)
 {
     HWND (NTAPI *NtUserCreateWindowEx)(PARAM_TYPE);
     *(PVOID *)&NtUserCreateWindowEx = Routine;
     return NtUserCreateWindowEx(*(PARAM_TYPE *)Parameters);
 }
 
-HWND LeNtUserCreateWindowExWorker(PCREATE_USER_WINDOW Parameters, HWND (*Invoker)(PVOID, PCREATE_USER_WINDOW))
+HWND LeNtUserCreateWindowExWorker(PUSER_CREATE_WINDOW Parameters, HWND (*Invoker)(PVOID, PUSER_CREATE_WINDOW))
 {
     HWND                    hWnd;
     NTSTATUS                LastError;
@@ -887,19 +887,19 @@ HWND LeNtUserCreateWindowExWorker(PCREATE_USER_WINDOW Parameters, HWND (*Invoker
     return hWnd;
 }
 
-HWND NTAPI LeNtUserCreateWindowEx_Win7(CREATE_USER_WINDOW_WIN7 Parameters)
+HWND NTAPI LeNtUserCreateWindowEx_Win7(USER_CREATE_WINDOW_WIN7 Parameters)
 {
-    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN7>);
+    return LeNtUserCreateWindowExWorker((PUSER_CREATE_WINDOW)&Parameters, NtUserCreateWindowExInvoker<USER_CREATE_WINDOW_WIN7>);
 }
 
-HWND NTAPI LeNtUserCreateWindowEx_Win8(CREATE_USER_WINDOW_WIN8 Parameters)
+HWND NTAPI LeNtUserCreateWindowEx_Win8(USER_CREATE_WINDOW_WIN8 Parameters)
 {
-    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN8>);
+    return LeNtUserCreateWindowExWorker((PUSER_CREATE_WINDOW)&Parameters, NtUserCreateWindowExInvoker<USER_CREATE_WINDOW_WIN8>);
 }
 
-HWND NTAPI LeNtUserCreateWindowEx_Win10(CREATE_USER_WINDOW_WIN10 Parameters)
+HWND NTAPI LeNtUserCreateWindowEx_Win10(USER_CREATE_WINDOW_WIN10 Parameters)
 {
-    return LeNtUserCreateWindowExWorker((PCREATE_USER_WINDOW)&Parameters, NtUserCreateWindowExInvoker<CREATE_USER_WINDOW_WIN10>);
+    return LeNtUserCreateWindowExWorker((PUSER_CREATE_WINDOW)&Parameters, NtUserCreateWindowExInvoker<USER_CREATE_WINDOW_WIN10>);
 }
 
 LONG_PTR NTAPI LeGetWindowLongA(HWND hWnd, int Index)
