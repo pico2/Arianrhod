@@ -1506,6 +1506,7 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
             break;
 
         case 9:
+        case 10:
             LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win10;
             break;
 
