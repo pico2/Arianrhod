@@ -9,9 +9,11 @@ def HookNtClose(context):
     # print()
     # print('%X' % context.GetArgument(context.ARG_RETURN_ADDRESS))
 
-    ctx = WinTypes.CONTEXT()
-    ctx.Eip = 0x87654321
-    pyhooker.Call(ctx)
+    st = 2
+    NtClose = pyhooker.StdCall(pyhooker.FindRoutine('ntdll', 'NtClose'))
+    st = NtClose(0)
+    print(type(st))
+    PauseConsole('%X' % st)
     pass
 
 def main():

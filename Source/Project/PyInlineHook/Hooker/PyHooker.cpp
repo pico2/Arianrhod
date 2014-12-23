@@ -120,7 +120,7 @@ NTSTATUS PyHooker::InitPython()
         L"ReadUnicode"
     )
     .Register(
-        [=] (PVOID _Context) -> ULONG64
+        [=] (PVOID _Context, PVOID Stack, ULONG_PTR StackSize) -> ULONG64
         {
             PCONTEXT Context = (PCONTEXT)_Context;
 
@@ -142,10 +142,10 @@ NTSTATUS PyHooker::InitPython()
     return STATUS_SUCCESS;
 }
 
-NoInline VOID NativeInvoker(PCONTEXT Context, BOOL TestAlert = FALSE)
+NoInline VOID CDECL NativeInvoker(PCONTEXT Context, BOOL TestAlert = FALSE)
 {
     *(PVOID *)Context->Esp = _ReturnAddress();
-    NtContinue(Context, TestAlert);
+    *(PVOID *)_AddressOfReturnAddress() = NtContinue;
 }
 
 NoInline VOID InvokeNativeFunction(PCONTEXT Context, BOOL TestAlert = FALSE)
@@ -158,12 +158,17 @@ NoInline VOID InvokeNativeFunction(PCONTEXT Context, BOOL TestAlert = FALSE)
 
     SEH_TRY
     {
-        NativeInvoker(Context, TestAlert);
+        VOID (NTAPI *_NativeInvoker)(PCONTEXT Context, BOOL TestAlert);
+
+        *(PVOID *)&_NativeInvoker = NativeInvoker;
+        _NativeInvoker(Context, TestAlert);
         DebugBreakPoint();
     }
-    SEH_EXCEPT(X(GetExceptionInformation(), Context))
+    SEH_EXCEPT(*Context = *(((PEXCEPTION_POINTERS)GetExceptionInformation())->ContextRecord), EXCEPTION_EXECUTE_HANDLER)
     {
     }
+
+    CLEAR_FLAG(Context->ContextFlags, CONTEXT_XSTATE ^ CONTEXT_i386);
 }
 
 NTSTATUS PyHooker::InitDispatcher()
@@ -239,6 +244,7 @@ VOID PyHooker::PyDispatcher(PHOOK_RECORD Record, PCONTEXT Context)
     CONTEXT LocalContext;
     TEB_ACTIVE_FRAME trap = PY_CALLBACK_IN_PROGRESS;
 
+    trap.Data = (ULONG_PTR)Record;
     trap.Push();
 
     LocalContext = *Context;
@@ -283,7 +289,7 @@ LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
     if (Record == nullptr)
         return EXCEPTION_CONTINUE_SEARCH;
 
-    if (FindThreadFrame(PY_CALLBACK_IN_PROGRESS) != nullptr)
+    if (FindThreadFrameEx(PY_CALLBACK_IN_PROGRESS, (ULONG_PTR)Record) != nullptr)
     {
         Record->Release();
         Context->Eip = (ULONG_PTR)Record->Instruction;
@@ -295,14 +301,14 @@ LONG PyHooker::ExceptionHandler(PEXCEPTION_POINTERS ExceptionPointers)
 
     while (PtrOffset(Esp, StackLimit) <= 0x5000)
     {
-        *PtrSub(StackLimit, 0x10) |= 0;
+        _InterlockedOr((PLONG)PtrSub(StackLimit, 0x10), 0);
         StackLimit = (PULONG_PTR)CurrentTeb()->NtTib.StackLimit;
     }
 
     DispatcherContext = (PDISPATCHER_CONTEXT)StackLimit;
     DispatcherContext->Context = *Context;
 
-    CLEAR_FLAG(DispatcherContext->Context.ContextFlags, (CONTEXT_XSTATE) ^ CONTEXT_i386);
+    CLEAR_FLAG(DispatcherContext->Context.ContextFlags, CONTEXT_XSTATE ^ CONTEXT_i386);
     DispatcherContext->hooker = this;
 
     Context->Ecx = (ULONG_PTR)Record;

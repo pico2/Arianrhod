@@ -112,6 +112,8 @@ class HookContext(object):
         raise
 
 class PyHooker(object):
+    FASTCALL, STDCALL, CDECL, SPEC_CONTEXT = range(4)
+
     def __init__(self):
         self.AddressTable = {}
 
@@ -153,14 +155,57 @@ class PyHooker(object):
 
         hookctx.Flush(ctx)
 
-    def Call(self, Context):
-        return _pyhooker.Call(ctypes.addressof(Context))
+    def FastCall(self, Address):
+        def wrapper(*args, **kwargs):
+            return self._Call(self.FASTCALL, Address, *args, **kwargs)
+        return wrapper
+
+    def Cdecl(self, Address):
+        def wrapper(*args, **kwargs):
+            return self._Call(self.CDECL, Address, *args, **kwargs)
+        return wrapper
+
+    def StdCall(self, Address):
+        def wrapper(*args, **kwargs):
+            return self._Call(self.STDCALL, Address, *args, **kwargs)
+        return wrapper
+
+    def _Call(self, CallingConventions, Address, *args, **kwargs):
+        converter = {
+            int         : lambda arg : ULONG_PTR(arg),
+            float       : lambda arg : FLOAT(arg),
+            str         : lambda arg : PWSTR(arg),
+            bytes       : lambda arg : (BYTE * len(arg)).from_buffer_copy(arg),
+            bytearray   : lambda arg : (BYTE * len(arg)).from_buffer(arg),
+        }
+
+        nativeargs = [converter[type(arg)](arg) for arg in args]
+
+        if CallingConventions == self.STDCALL:
+            func = ctypes.WINFUNCTYPE(ULONG_PTR, *[type(arg) for arg in nativeargs])
+
+        elif CallingConventions == self.CDECL:
+            func = ctypes.CFUNCTYPE(ULONG_PTR, *[type(arg) for arg in nativeargs])
+
+        elif CallingConventions == self.FASTCALL:
+            raise NotImplementedError
+
+        elif CallingConventions == self.SPEC_CONTEXT:
+            raise NotImplementedError
+
+        return func(Address)(*nativeargs)
+
+    def FindRoutine(self, module, routine):
+        return windll.kernel32.GetProcAddress(getattr(windll, module)._handle, routine.encode('mbcs'))
 
 _hooker = PyHooker()
 
-Hook = _hooker.Hook
-UnHook = _hooker.UnHook
-Call = _hooker.Call
+Hook                = _hooker.Hook
+UnHook              = _hooker.UnHook
+FastCall            = _hooker.FastCall
+Cdecl               = _hooker.Cdecl
+StdCall             = _hooker.StdCall
+FindRoutine         = _hooker.FindRoutine
 
 def main():
     name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
