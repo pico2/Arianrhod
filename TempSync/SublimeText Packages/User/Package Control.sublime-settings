@@ -1,9 +1,15 @@
 {
+	"installed_dependencies":
+	[
+		"0_package_control_loader",
+		"bz2"
+	],
 	"installed_packages":
 	[
 		"Alignment",
 		"AutoHotkey",
 		"Origami",
+		"Package Control",
 		"PowerShell",
 		"Protocol Buffer Syntax",
 		"SideBarEnhancements",
