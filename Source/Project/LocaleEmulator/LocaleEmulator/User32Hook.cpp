@@ -1495,18 +1495,27 @@ NTSTATUS LeGlobalData::HookUser32Routines(PVOID User32)
         InitFontCharsetInfo();
     }
 
-    switch (CurrentPeb()->OSBuildNumber / 1000)
+    switch (CurrentPeb()->OSMajorVersion)
     {
-        case 7:
-            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win7;
+        case 6:
+            switch (CurrentPeb()->OSMinorVersion)
+            {
+                case 2: // win 8
+                case 3: // win 8.1
+                    LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win8;
+                    break;
+
+                case 4: // win 10
+                    LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win10;
+                    break;
+
+                default:
+                    LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win7;
+                    break;
+            }
             break;
 
-        case 8:
-            LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win8;
-            break;
-
-        case 9:
-        case 10:
+        case 10: // win 10
             LeNtUserCreateWindowEx = LeNtUserCreateWindowEx_Win10;
             break;
 
