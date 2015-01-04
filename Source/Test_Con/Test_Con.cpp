@@ -246,6 +246,14 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    NtFileMemory file;
+    PVOID b;
+
+    file.Open(GetNtdllLdrModule()->FullDllName.Buffer);
+
+    LoadDllFromMemory(file.GetBuffer(), file.GetSize32(), &USTR(L"\\\\FFFF."), &b);
+    LdrUnloadDll(b);
+
     return;
 
 #if 0
