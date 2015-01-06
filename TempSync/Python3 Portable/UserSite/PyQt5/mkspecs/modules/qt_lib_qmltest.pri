@@ -1,7 +1,7 @@
-QT.qmltest.VERSION = 5.3.1
+QT.qmltest.VERSION = 5.4.0
 QT.qmltest.MAJOR_VERSION = 5
-QT.qmltest.MINOR_VERSION = 3
-QT.qmltest.PATCH_VERSION = 1
+QT.qmltest.MINOR_VERSION = 4
+QT.qmltest.PATCH_VERSION = 0
 QT.qmltest.name = QtQuickTest
 QT.qmltest.libs = $$QT_MODULE_LIB_BASE
 QT.qmltest.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtQuickTest

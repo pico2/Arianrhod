@@ -1,10 +1,10 @@
-QT.clucene_private.VERSION = 5.3.1
+QT.clucene_private.VERSION = 5.4.0
 QT.clucene_private.MAJOR_VERSION = 5
-QT.clucene_private.MINOR_VERSION = 3
-QT.clucene_private.PATCH_VERSION = 1
+QT.clucene_private.MINOR_VERSION = 4
+QT.clucene_private.PATCH_VERSION = 0
 QT.clucene_private.name = QtCLucene
 QT.clucene_private.libs = $$QT_MODULE_LIB_BASE
-QT.clucene_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtCLucene $$QT_MODULE_INCLUDE_BASE/QtCLucene/5.3.1 $$QT_MODULE_INCLUDE_BASE/QtCLucene/5.3.1/QtCLucene
+QT.clucene_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtCLucene $$QT_MODULE_INCLUDE_BASE/QtCLucene/5.4.0 $$QT_MODULE_INCLUDE_BASE/QtCLucene/5.4.0/QtCLucene
 QT.clucene_private.bins = $$QT_MODULE_BIN_BASE
 QT.clucene_private.libexecs = $$QT_MODULE_LIBEXEC_BASE
 QT.clucene_private.plugins = $$QT_MODULE_PLUGIN_BASE

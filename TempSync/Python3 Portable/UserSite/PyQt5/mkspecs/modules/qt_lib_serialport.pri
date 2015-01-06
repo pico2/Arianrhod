@@ -1,7 +1,7 @@
-QT.serialport.VERSION = 5.3.1
+QT.serialport.VERSION = 5.4.0
 QT.serialport.MAJOR_VERSION = 5
-QT.serialport.MINOR_VERSION = 3
-QT.serialport.PATCH_VERSION = 1
+QT.serialport.MINOR_VERSION = 4
+QT.serialport.PATCH_VERSION = 0
 QT.serialport.name = QtSerialPort
 QT.serialport.libs = $$QT_MODULE_LIB_BASE
 QT.serialport.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtSerialPort

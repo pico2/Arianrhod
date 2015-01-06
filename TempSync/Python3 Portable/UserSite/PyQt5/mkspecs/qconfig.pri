@@ -5,9 +5,9 @@ host_build {
 } else {
     QT_ARCH = i386
 }
-QT_CONFIG += minimal-config small-config medium-config large-config full-config release shared zlib icu angle png freetype accessibility opengl opengles2 egl openssl-linked audio-backend wmf-backend native-gestures qpa concurrent
+QT_CONFIG += minimal-config small-config medium-config large-config full-config release shared zlib icu dynamicgl png freetype harfbuzz accessibility opengl openssl-linked audio-backend wmf-backend native-gestures qpa concurrent
 #versioning 
-QT_VERSION = 5.3.1
+QT_VERSION = 5.4.0
 QT_MAJOR_VERSION = 5
-QT_MINOR_VERSION = 3
-QT_PATCH_VERSION = 1
+QT_MINOR_VERSION = 4
+QT_PATCH_VERSION = 0

@@ -37,6 +37,7 @@ PyQt5.QtCore.qFatal?4(str)
 PyQt5.QtCore.qWarning?4(str)
 PyQt5.QtCore.qInstallMessageHandler?4(callable) -> callable
 PyQt5.QtCore.qSetMessagePattern?4(str)
+PyQt5.QtCore.qFormatLogMessage?4(QtMsgType, QMessageLogContext, str) -> str
 PyQt5.QtCore.qIsInf?4(float) -> bool
 PyQt5.QtCore.qIsFinite?4(float) -> bool
 PyQt5.QtCore.qIsNaN?4(float) -> bool
@@ -252,6 +253,8 @@ PyQt5.QtCore.Qt.AA_UseHighDpiPixmaps?10
 PyQt5.QtCore.Qt.AA_ForceRasterWidgets?10
 PyQt5.QtCore.Qt.AA_UseDesktopOpenGL?10
 PyQt5.QtCore.Qt.AA_UseOpenGLES?10
+PyQt5.QtCore.Qt.AA_UseSoftwareOpenGL?10
+PyQt5.QtCore.Qt.AA_ShareOpenGLContexts?10
 PyQt5.QtCore.Qt.WindowModality?10
 PyQt5.QtCore.Qt.NonModal?10
 PyQt5.QtCore.Qt.WindowModal?10
@@ -949,6 +952,13 @@ PyQt5.QtCore.Qt.Key_Guide?10
 PyQt5.QtCore.Qt.Key_Info?10
 PyQt5.QtCore.Qt.Key_Settings?10
 PyQt5.QtCore.Qt.Key_Exit?10
+PyQt5.QtCore.Qt.Key_MicVolumeUp?10
+PyQt5.QtCore.Qt.Key_MicVolumeDown?10
+PyQt5.QtCore.Qt.Key_New?10
+PyQt5.QtCore.Qt.Key_Open?10
+PyQt5.QtCore.Qt.Key_Find?10
+PyQt5.QtCore.Qt.Key_Undo?10
+PyQt5.QtCore.Qt.Key_Redo?10
 PyQt5.QtCore.Qt.BGMode?10
 PyQt5.QtCore.Qt.TransparentMode?10
 PyQt5.QtCore.Qt.OpaqueMode?10
@@ -1065,6 +1075,7 @@ PyQt5.QtCore.Qt.WA_AcceptTouchEvents?10
 PyQt5.QtCore.Qt.WA_TouchPadAcceptSingleTouchEvents?10
 PyQt5.QtCore.Qt.WA_X11DoNotAcceptFocus?10
 PyQt5.QtCore.Qt.WA_MacNoShadow?10
+PyQt5.QtCore.Qt.WA_AlwaysStackOnTop?10
 PyQt5.QtCore.Qt.WindowState?10
 PyQt5.QtCore.Qt.WindowNoState?10
 PyQt5.QtCore.Qt.WindowMinimized?10
@@ -1643,10 +1654,15 @@ PyQt5.QtCore.QAbstractProxyModel.supportedDropActions?4() -> Qt.DropActions
 PyQt5.QtCore.QAbstractProxyModel.sibling?4(int, int, QModelIndex) -> QModelIndex
 PyQt5.QtCore.QAbstractProxyModel.resetInternalData?4()
 PyQt5.QtCore.QAbstractProxyModel.sourceModelChanged?4()
+PyQt5.QtCore.QAbstractProxyModel.canDropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
+PyQt5.QtCore.QAbstractProxyModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
+PyQt5.QtCore.QAbstractProxyModel.supportedDragActions?4() -> Qt.DropActions
 PyQt5.QtCore.QAbstractState?1(QState parent=None)
 PyQt5.QtCore.QAbstractState.__init__?1(self, QState parent=None)
 PyQt5.QtCore.QAbstractState.parentState?4() -> QState
 PyQt5.QtCore.QAbstractState.machine?4() -> QStateMachine
+PyQt5.QtCore.QAbstractState.active?4() -> bool
+PyQt5.QtCore.QAbstractState.activeChanged?4(bool)
 PyQt5.QtCore.QAbstractState.entered?4()
 PyQt5.QtCore.QAbstractState.exited?4()
 PyQt5.QtCore.QAbstractState.onEntry?4(QEvent)
@@ -1664,6 +1680,8 @@ PyQt5.QtCore.QAbstractTransition.addAnimation?4(QAbstractAnimation)
 PyQt5.QtCore.QAbstractTransition.removeAnimation?4(QAbstractAnimation)
 PyQt5.QtCore.QAbstractTransition.animations?4() -> list-of-QAbstractAnimation
 PyQt5.QtCore.QAbstractTransition.triggered?4()
+PyQt5.QtCore.QAbstractTransition.targetStateChanged?4()
+PyQt5.QtCore.QAbstractTransition.targetStatesChanged?4()
 PyQt5.QtCore.QAbstractTransition.eventTest?4(QEvent) -> bool
 PyQt5.QtCore.QAbstractTransition.onTransition?4(QEvent)
 PyQt5.QtCore.QAbstractTransition.event?4(QEvent) -> bool
@@ -1900,10 +1918,14 @@ PyQt5.QtCore.QCollator.setIgnorePunctuation?4(bool)
 PyQt5.QtCore.QCollator.ignorePunctuation?4() -> bool
 PyQt5.QtCore.QCollator.compare?4(str, str) -> int
 PyQt5.QtCore.QCollator.sortKey?4(str) -> QCollatorSortKey
-PyQt5.QtCore.QCommandLineOption?1(str, str description=QString(), str valueName=QString(), str defaultValue=QString())
-PyQt5.QtCore.QCommandLineOption.__init__?1(self, str, str description=QString(), str valueName=QString(), str defaultValue=QString())
-PyQt5.QtCore.QCommandLineOption?1(list-of-str, str description=QString(), str valueName=QString(), str defaultValue=QString())
-PyQt5.QtCore.QCommandLineOption.__init__?1(self, list-of-str, str description=QString(), str valueName=QString(), str defaultValue=QString())
+PyQt5.QtCore.QCommandLineOption?1(str)
+PyQt5.QtCore.QCommandLineOption.__init__?1(self, str)
+PyQt5.QtCore.QCommandLineOption?1(list-of-str)
+PyQt5.QtCore.QCommandLineOption.__init__?1(self, list-of-str)
+PyQt5.QtCore.QCommandLineOption?1(str, str, str valueName=QString(), str defaultValue=QString())
+PyQt5.QtCore.QCommandLineOption.__init__?1(self, str, str, str valueName=QString(), str defaultValue=QString())
+PyQt5.QtCore.QCommandLineOption?1(list-of-str, str, str valueName=QString(), str defaultValue=QString())
+PyQt5.QtCore.QCommandLineOption.__init__?1(self, list-of-str, str, str valueName=QString(), str defaultValue=QString())
 PyQt5.QtCore.QCommandLineOption?1(QCommandLineOption)
 PyQt5.QtCore.QCommandLineOption.__init__?1(self, QCommandLineOption)
 PyQt5.QtCore.QCommandLineOption.swap?4(QCommandLineOption)
@@ -1943,6 +1965,8 @@ PyQt5.QtCore.QCommandLineParser.optionNames?4() -> list-of-str
 PyQt5.QtCore.QCommandLineParser.unknownOptionNames?4() -> list-of-str
 PyQt5.QtCore.QCommandLineParser.showHelp?4(int exitCode=0)
 PyQt5.QtCore.QCommandLineParser.helpText?4() -> str
+PyQt5.QtCore.QCommandLineParser.addOptions?4(list-of-QCommandLineOption) -> bool
+PyQt5.QtCore.QCommandLineParser.showVersion?4()
 PyQt5.QtCore.QCoreApplication?1(list-of-str)
 PyQt5.QtCore.QCoreApplication.__init__?1(self, list-of-str)
 PyQt5.QtCore.QCoreApplication.setOrganizationDomain?4(str)
@@ -2129,6 +2153,7 @@ PyQt5.QtCore.QEvent.OrientationChange?10
 PyQt5.QtCore.QEvent.TouchCancel?10
 PyQt5.QtCore.QEvent.PlatformPanel?10
 PyQt5.QtCore.QEvent.ApplicationStateChange?10
+PyQt5.QtCore.QEvent.ReadOnlyChange?10
 PyQt5.QtCore.QEvent.User?10
 PyQt5.QtCore.QEvent.MaxUser?10
 PyQt5.QtCore.QEvent?1(QEvent.Type)
@@ -2212,6 +2237,7 @@ PyQt5.QtCore.QDataStream.Qt_5_0?10
 PyQt5.QtCore.QDataStream.Qt_5_1?10
 PyQt5.QtCore.QDataStream.Qt_5_2?10
 PyQt5.QtCore.QDataStream.Qt_5_3?10
+PyQt5.QtCore.QDataStream.Qt_5_4?10
 PyQt5.QtCore.QDataStream?1()
 PyQt5.QtCore.QDataStream.__init__?1(self)
 PyQt5.QtCore.QDataStream?1(QIODevice)
@@ -2670,6 +2696,7 @@ PyQt5.QtCore.QEventTransition.onTransition?4(QEvent)
 PyQt5.QtCore.QEventTransition.event?4(QEvent) -> bool
 PyQt5.QtCore.QFileDevice.MemoryMapFlags?10
 PyQt5.QtCore.QFileDevice.NoOptions?10
+PyQt5.QtCore.QFileDevice.MapPrivateOption?10
 PyQt5.QtCore.QFileDevice.FileHandleFlag?10
 PyQt5.QtCore.QFileDevice.AutoCloseHandle?10
 PyQt5.QtCore.QFileDevice.DontCloseHandle?10
@@ -2862,6 +2889,8 @@ PyQt5.QtCore.QHistoryState.setHistoryType?4(QHistoryState.HistoryType)
 PyQt5.QtCore.QHistoryState.onEntry?4(QEvent)
 PyQt5.QtCore.QHistoryState.onExit?4(QEvent)
 PyQt5.QtCore.QHistoryState.event?4(QEvent) -> bool
+PyQt5.QtCore.QHistoryState.defaultStateChanged?4()
+PyQt5.QtCore.QHistoryState.historyTypeChanged?4()
 PyQt5.QtCore.QIdentityProxyModel?1(QObject parent=None)
 PyQt5.QtCore.QIdentityProxyModel.__init__?1(self, QObject parent=None)
 PyQt5.QtCore.QIdentityProxyModel.columnCount?4(QModelIndex parent=QModelIndex()) -> int
@@ -3003,6 +3032,7 @@ PyQt5.QtCore.QJsonParseError.UnterminatedString?10
 PyQt5.QtCore.QJsonParseError.MissingObject?10
 PyQt5.QtCore.QJsonParseError.DeepNesting?10
 PyQt5.QtCore.QJsonParseError.DocumentTooLarge?10
+PyQt5.QtCore.QJsonParseError.GarbageAtEnd?10
 PyQt5.QtCore.QJsonParseError.error?7
 PyQt5.QtCore.QJsonParseError.offset?7
 PyQt5.QtCore.QJsonParseError?1()
@@ -4237,6 +4267,7 @@ PyQt5.QtCore.QMetaType.QJsonValue?10
 PyQt5.QtCore.QMetaType.QJsonObject?10
 PyQt5.QtCore.QMetaType.QJsonArray?10
 PyQt5.QtCore.QMetaType.QJsonDocument?10
+PyQt5.QtCore.QMetaType.QByteArrayList?10
 PyQt5.QtCore.QMetaType.User?10
 PyQt5.QtCore.QMetaType?1(int)
 PyQt5.QtCore.QMetaType.__init__?1(self, int)
@@ -4785,6 +4816,7 @@ PyQt5.QtCore.QRegExp.swap?4(QRegExp)
 PyQt5.QtCore.QRegularExpression.MatchOption?10
 PyQt5.QtCore.QRegularExpression.NoMatchOption?10
 PyQt5.QtCore.QRegularExpression.AnchoredMatchOption?10
+PyQt5.QtCore.QRegularExpression.DontCheckSubjectStringMatchOption?10
 PyQt5.QtCore.QRegularExpression.MatchType?10
 PyQt5.QtCore.QRegularExpression.NormalMatch?10
 PyQt5.QtCore.QRegularExpression.PartialPreferCompleteMatch?10
@@ -4799,6 +4831,8 @@ PyQt5.QtCore.QRegularExpression.ExtendedPatternSyntaxOption?10
 PyQt5.QtCore.QRegularExpression.InvertedGreedinessOption?10
 PyQt5.QtCore.QRegularExpression.DontCaptureOption?10
 PyQt5.QtCore.QRegularExpression.UseUnicodePropertiesOption?10
+PyQt5.QtCore.QRegularExpression.OptimizeOnFirstUsageOption?10
+PyQt5.QtCore.QRegularExpression.DontAutomaticallyOptimizeOption?10
 PyQt5.QtCore.QRegularExpression?1()
 PyQt5.QtCore.QRegularExpression.__init__?1(self)
 PyQt5.QtCore.QRegularExpression?1(str, QRegularExpression.PatternOptions options=QRegularExpression.NoPatternOption)
@@ -4818,6 +4852,7 @@ PyQt5.QtCore.QRegularExpression.match?4(str, int offset=0, QRegularExpression.Ma
 PyQt5.QtCore.QRegularExpression.globalMatch?4(str, int offset=0, QRegularExpression.MatchType matchType=QRegularExpression.NormalMatch, QRegularExpression.MatchOptions matchOptions=QRegularExpression.NoMatchOption) -> QRegularExpressionMatchIterator
 PyQt5.QtCore.QRegularExpression.escape?4(str) -> str
 PyQt5.QtCore.QRegularExpression.namedCaptureGroups?4() -> list-of-str
+PyQt5.QtCore.QRegularExpression.optimize?4()
 PyQt5.QtCore.QRegularExpression.PatternOptions?1(QRegularExpression.PatternOptions)
 PyQt5.QtCore.QRegularExpression.PatternOptions.__init__?1(self, QRegularExpression.PatternOptions)
 PyQt5.QtCore.QRegularExpression.PatternOptions?1(int)
@@ -5033,6 +5068,8 @@ PyQt5.QtCore.QSignalTransition.setSignal?4(QByteArray)
 PyQt5.QtCore.QSignalTransition.eventTest?4(QEvent) -> bool
 PyQt5.QtCore.QSignalTransition.onTransition?4(QEvent)
 PyQt5.QtCore.QSignalTransition.event?4(QEvent) -> bool
+PyQt5.QtCore.QSignalTransition.senderObjectChanged?4()
+PyQt5.QtCore.QSignalTransition.signalChanged?4()
 PyQt5.QtCore.QSize?1()
 PyQt5.QtCore.QSize.__init__?1(self)
 PyQt5.QtCore.QSize?1(int, int)
@@ -5170,6 +5207,8 @@ PyQt5.QtCore.QStandardPaths.ConfigLocation?10
 PyQt5.QtCore.QStandardPaths.DownloadLocation?10
 PyQt5.QtCore.QStandardPaths.GenericCacheLocation?10
 PyQt5.QtCore.QStandardPaths.GenericConfigLocation?10
+PyQt5.QtCore.QStandardPaths.AppDataLocation?10
+PyQt5.QtCore.QStandardPaths.AppLocalDataLocation?10
 PyQt5.QtCore.QStandardPaths?1(QStandardPaths)
 PyQt5.QtCore.QStandardPaths.__init__?1(self, QStandardPaths)
 PyQt5.QtCore.QStandardPaths.writableLocation?4(QStandardPaths.StandardLocation) -> str
@@ -5213,6 +5252,9 @@ PyQt5.QtCore.QState.propertiesAssigned?4()
 PyQt5.QtCore.QState.onEntry?4(QEvent)
 PyQt5.QtCore.QState.onExit?4(QEvent)
 PyQt5.QtCore.QState.event?4(QEvent) -> bool
+PyQt5.QtCore.QState.childModeChanged?4()
+PyQt5.QtCore.QState.initialStateChanged?4()
+PyQt5.QtCore.QState.errorStateChanged?4()
 PyQt5.QtCore.QStateMachine.Error?10
 PyQt5.QtCore.QStateMachine.NoError?10
 PyQt5.QtCore.QStateMachine.NoInitialStateError?10
@@ -5245,8 +5287,10 @@ PyQt5.QtCore.QStateMachine.configuration?4() -> set-of-QAbstractState
 PyQt5.QtCore.QStateMachine.eventFilter?4(QObject, QEvent) -> bool
 PyQt5.QtCore.QStateMachine.start?4()
 PyQt5.QtCore.QStateMachine.stop?4()
+PyQt5.QtCore.QStateMachine.setRunning?4(bool)
 PyQt5.QtCore.QStateMachine.started?4()
 PyQt5.QtCore.QStateMachine.stopped?4()
+PyQt5.QtCore.QStateMachine.runningChanged?4(bool)
 PyQt5.QtCore.QStateMachine.onEntry?4(QEvent)
 PyQt5.QtCore.QStateMachine.onExit?4(QEvent)
 PyQt5.QtCore.QStateMachine.event?4(QEvent) -> bool
@@ -5255,6 +5299,31 @@ PyQt5.QtCore.QStateMachine.SignalEvent.signalIndex?4() -> int
 PyQt5.QtCore.QStateMachine.SignalEvent.arguments?4() -> list-of-QVariant
 PyQt5.QtCore.QStateMachine.WrappedEvent.object?4() -> QObject
 PyQt5.QtCore.QStateMachine.WrappedEvent.event?4() -> QEvent
+PyQt5.QtCore.QStorageInfo?1()
+PyQt5.QtCore.QStorageInfo.__init__?1(self)
+PyQt5.QtCore.QStorageInfo?1(str)
+PyQt5.QtCore.QStorageInfo.__init__?1(self, str)
+PyQt5.QtCore.QStorageInfo?1(QDir)
+PyQt5.QtCore.QStorageInfo.__init__?1(self, QDir)
+PyQt5.QtCore.QStorageInfo?1(QStorageInfo)
+PyQt5.QtCore.QStorageInfo.__init__?1(self, QStorageInfo)
+PyQt5.QtCore.QStorageInfo.swap?4(QStorageInfo)
+PyQt5.QtCore.QStorageInfo.setPath?4(str)
+PyQt5.QtCore.QStorageInfo.rootPath?4() -> str
+PyQt5.QtCore.QStorageInfo.device?4() -> QByteArray
+PyQt5.QtCore.QStorageInfo.fileSystemType?4() -> QByteArray
+PyQt5.QtCore.QStorageInfo.name?4() -> str
+PyQt5.QtCore.QStorageInfo.displayName?4() -> str
+PyQt5.QtCore.QStorageInfo.bytesTotal?4() -> int
+PyQt5.QtCore.QStorageInfo.bytesFree?4() -> int
+PyQt5.QtCore.QStorageInfo.bytesAvailable?4() -> int
+PyQt5.QtCore.QStorageInfo.isReadOnly?4() -> bool
+PyQt5.QtCore.QStorageInfo.isReady?4() -> bool
+PyQt5.QtCore.QStorageInfo.isValid?4() -> bool
+PyQt5.QtCore.QStorageInfo.refresh?4()
+PyQt5.QtCore.QStorageInfo.mountedVolumes?4() -> list-of-QStorageInfo
+PyQt5.QtCore.QStorageInfo.root?4() -> QStorageInfo
+PyQt5.QtCore.QStorageInfo.isRoot?4() -> bool
 PyQt5.QtCore.QStringListModel?1(QObject parent=None)
 PyQt5.QtCore.QStringListModel.__init__?1(self, QObject parent=None)
 PyQt5.QtCore.QStringListModel?1(list-of-str, QObject parent=None)
@@ -5651,6 +5720,9 @@ PyQt5.QtCore.QTranslator.isEmpty?4() -> bool
 PyQt5.QtCore.QTranslator.load?4(str, str directory='', str searchDelimiters='', str suffix='') -> bool
 PyQt5.QtCore.QTranslator.load?4(QLocale, str, str prefix='', str directory='', str suffix='') -> bool
 PyQt5.QtCore.QTranslator.loadFromData?4(str, str directory=QString()) -> bool
+PyQt5.QtCore.QUrl.UserInputResolutionOption?10
+PyQt5.QtCore.QUrl.DefaultResolution?10
+PyQt5.QtCore.QUrl.AssumeLocalFile?10
 PyQt5.QtCore.QUrl.ComponentFormattingOption?10
 PyQt5.QtCore.QUrl.PrettyDecoded?10
 PyQt5.QtCore.QUrl.EncodeSpaces?10
@@ -5739,6 +5811,7 @@ PyQt5.QtCore.QUrl.fromStringList?4(list-of-str, QUrl.ParsingMode mode=QUrl.Toler
 PyQt5.QtCore.QUrl.adjusted?4(QUrl.FormattingOptions) -> QUrl
 PyQt5.QtCore.QUrl.fileName?4(QUrl.ComponentFormattingOptions options=QUrl.FullyDecoded) -> str
 PyQt5.QtCore.QUrl.matches?4(QUrl, QUrl.FormattingOptions) -> bool
+PyQt5.QtCore.QUrl.fromUserInput?4(str, str, QUrl.UserInputResolutionOptions options=QUrl.DefaultResolution) -> QUrl
 PyQt5.QtCore.QUrl.FormattingOptions?1(QUrl.FormattingOptions)
 PyQt5.QtCore.QUrl.FormattingOptions.__init__?1(self, QUrl.FormattingOptions)
 PyQt5.QtCore.QUrl.ComponentFormattingOptions?1(QUrl.ComponentFormattingOptions)
@@ -5747,6 +5820,12 @@ PyQt5.QtCore.QUrl.ComponentFormattingOptions?1(int)
 PyQt5.QtCore.QUrl.ComponentFormattingOptions.__init__?1(self, int)
 PyQt5.QtCore.QUrl.ComponentFormattingOptions?1()
 PyQt5.QtCore.QUrl.ComponentFormattingOptions.__init__?1(self)
+PyQt5.QtCore.QUrl.UserInputResolutionOptions?1(QUrl.UserInputResolutionOptions)
+PyQt5.QtCore.QUrl.UserInputResolutionOptions.__init__?1(self, QUrl.UserInputResolutionOptions)
+PyQt5.QtCore.QUrl.UserInputResolutionOptions?1(int)
+PyQt5.QtCore.QUrl.UserInputResolutionOptions.__init__?1(self, int)
+PyQt5.QtCore.QUrl.UserInputResolutionOptions?1()
+PyQt5.QtCore.QUrl.UserInputResolutionOptions.__init__?1(self)
 PyQt5.QtCore.QUrlQuery?1()
 PyQt5.QtCore.QUrlQuery.__init__?1(self)
 PyQt5.QtCore.QUrlQuery?1(QUrl)
@@ -6144,6 +6223,12 @@ PyQt5.QtCore.QWinEventNotifier.setEnabled?4(bool)
 PyQt5.QtCore.QWinEventNotifier.activated?4(sip.voidptr)
 PyQt5.QtCore.QWinEventNotifier.event?4(QEvent) -> bool
 PyQt5.QtGui.qFuzzyCompare?4(QMatrix4x4, QMatrix4x4) -> bool
+PyQt5.QtGui.qPixelFormatRgba?4(int, int, int, int, QPixelFormat.AlphaUsage, QPixelFormat.AlphaPosition, QPixelFormat.AlphaPremultiplied premultiplied=QPixelFormat.NotPremultiplied, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.UnsignedInteger) -> QPixelFormat
+PyQt5.QtGui.qPixelFormatGrayscale?4(int, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.UnsignedInteger) -> QPixelFormat
+PyQt5.QtGui.qPixelFormatCmyk?4(int, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.UnsignedInteger) -> QPixelFormat
+PyQt5.QtGui.qPixelFormatHsl?4(int, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.FloatingPoint) -> QPixelFormat
+PyQt5.QtGui.qPixelFormatHsv?4(int, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.FloatingPoint) -> QPixelFormat
+PyQt5.QtGui.qPixelFormatYuv?4(QPixelFormat.YUVLayout, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.AlphaPremultiplied premultiplied=QPixelFormat.NotPremultiplied, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.UnsignedByte, QPixelFormat.ByteOrder byteOrder=QPixelFormat.LittleEndian) -> QPixelFormat
 PyQt5.QtGui.qFuzzyCompare?4(QQuaternion, QQuaternion) -> bool
 PyQt5.QtGui.qRed?4(int) -> int
 PyQt5.QtGui.qGreen?4(int) -> int
@@ -6678,6 +6763,8 @@ PyQt5.QtGui.QTabletEvent.Airbrush?10
 PyQt5.QtGui.QTabletEvent.FourDMouse?10
 PyQt5.QtGui.QTabletEvent.XFreeEraser?10
 PyQt5.QtGui.QTabletEvent.RotationStylus?10
+PyQt5.QtGui.QTabletEvent?1(QEvent.Type, QPointF, QPointF, int, int, float, int, int, float, float, int, Qt.KeyboardModifiers, int, Qt.MouseButton, Qt.MouseButtons)
+PyQt5.QtGui.QTabletEvent.__init__?1(self, QEvent.Type, QPointF, QPointF, int, int, float, int, int, float, float, int, Qt.KeyboardModifiers, int, Qt.MouseButton, Qt.MouseButtons)
 PyQt5.QtGui.QTabletEvent?1(QEvent.Type, QPointF, QPointF, int, int, float, int, int, float, float, int, Qt.KeyboardModifiers, int)
 PyQt5.QtGui.QTabletEvent.__init__?1(self, QEvent.Type, QPointF, QPointF, int, int, float, int, int, float, float, int, Qt.KeyboardModifiers, int)
 PyQt5.QtGui.QTabletEvent?1(QTabletEvent)
@@ -6701,6 +6788,8 @@ PyQt5.QtGui.QTabletEvent.xTilt?4() -> int
 PyQt5.QtGui.QTabletEvent.yTilt?4() -> int
 PyQt5.QtGui.QTabletEvent.posF?4() -> QPointF
 PyQt5.QtGui.QTabletEvent.globalPosF?4() -> QPointF
+PyQt5.QtGui.QTabletEvent.button?4() -> Qt.MouseButton
+PyQt5.QtGui.QTabletEvent.buttons?4() -> Qt.MouseButtons
 PyQt5.QtGui.QKeyEvent?1(QEvent.Type, int, Qt.KeyboardModifiers, int, int, int, str text=QString(), bool autorep=False, int count=1)
 PyQt5.QtGui.QKeyEvent.__init__?1(self, QEvent.Type, int, Qt.KeyboardModifiers, int, int, int, str text=QString(), bool autorep=False, int count=1)
 PyQt5.QtGui.QKeyEvent?1(QEvent.Type, int, Qt.KeyboardModifiers, str text='', bool autorep=False, int count=1)
@@ -7014,6 +7103,7 @@ PyQt5.QtGui.QFont.PreferMatch?10
 PyQt5.QtGui.QFont.PreferQuality?10
 PyQt5.QtGui.QFont.PreferAntialias?10
 PyQt5.QtGui.QFont.NoAntialias?10
+PyQt5.QtGui.QFont.NoSubpixelAntialias?10
 PyQt5.QtGui.QFont.OpenGLCompatible?10
 PyQt5.QtGui.QFont.NoFontMerging?10
 PyQt5.QtGui.QFont.ForceIntegerMetrics?10
@@ -7453,6 +7543,9 @@ PyQt5.QtGui.QGuiApplication.sync?4()
 PyQt5.QtGui.QGuiApplication.setWindowIcon?4(QIcon)
 PyQt5.QtGui.QGuiApplication.windowIcon?4() -> QIcon
 PyQt5.QtGui.QGuiApplication.event?4(QEvent) -> bool
+PyQt5.QtGui.QGuiApplication.screenRemoved?4(QScreen)
+PyQt5.QtGui.QGuiApplication.layoutDirectionChanged?4(Qt.LayoutDirection)
+PyQt5.QtGui.QGuiApplication.paletteChanged?4(QPalette)
 PyQt5.QtGui.QIcon.State?10
 PyQt5.QtGui.QIcon.On?10
 PyQt5.QtGui.QIcon.Off?10
@@ -7540,6 +7633,10 @@ PyQt5.QtGui.QImage.Format_ARGB4444_Premultiplied?10
 PyQt5.QtGui.QImage.Format_RGBX8888?10
 PyQt5.QtGui.QImage.Format_RGBA8888?10
 PyQt5.QtGui.QImage.Format_RGBA8888_Premultiplied?10
+PyQt5.QtGui.QImage.Format_BGR30?10
+PyQt5.QtGui.QImage.Format_A2BGR30_Premultiplied?10
+PyQt5.QtGui.QImage.Format_RGB30?10
+PyQt5.QtGui.QImage.Format_A2RGB30_Premultiplied?10
 PyQt5.QtGui.QImage.InvertMode?10
 PyQt5.QtGui.QImage.InvertRgb?10
 PyQt5.QtGui.QImage.InvertRgba?10
@@ -7641,6 +7738,9 @@ PyQt5.QtGui.QImage.bitPlaneCount?4() -> int
 PyQt5.QtGui.QImage.swap?4(QImage)
 PyQt5.QtGui.QImage.devicePixelRatio?4() -> float
 PyQt5.QtGui.QImage.setDevicePixelRatio?4(float)
+PyQt5.QtGui.QImage.pixelFormat?4() -> QPixelFormat
+PyQt5.QtGui.QImage.toPixelFormat?4(QImage.Format) -> QPixelFormat
+PyQt5.QtGui.QImage.toImageFormat?4(QPixelFormat) -> QImage.Format
 PyQt5.QtGui.QImageIOHandler.ImageOption?10
 PyQt5.QtGui.QImageIOHandler.Size?10
 PyQt5.QtGui.QImageIOHandler.ClipRect?10
@@ -7656,6 +7756,7 @@ PyQt5.QtGui.QImageIOHandler.IncrementalReading?10
 PyQt5.QtGui.QImageIOHandler.Endianness?10
 PyQt5.QtGui.QImageIOHandler.Animation?10
 PyQt5.QtGui.QImageIOHandler.BackgroundColor?10
+PyQt5.QtGui.QImageIOHandler.SupportedSubTypes?10
 PyQt5.QtGui.QImageIOHandler?1()
 PyQt5.QtGui.QImageIOHandler.__init__?1(self)
 PyQt5.QtGui.QImageIOHandler.setDevice?4(QIODevice)
@@ -7729,6 +7830,8 @@ PyQt5.QtGui.QImageReader.imageFormat?4() -> QImage.Format
 PyQt5.QtGui.QImageReader.setDecideFormatFromContent?4(bool)
 PyQt5.QtGui.QImageReader.decideFormatFromContent?4() -> bool
 PyQt5.QtGui.QImageReader.supportedMimeTypes?4() -> list-of-QByteArray
+PyQt5.QtGui.QImageReader.subType?4() -> QByteArray
+PyQt5.QtGui.QImageReader.supportedSubTypes?4() -> list-of-QByteArray
 PyQt5.QtGui.QImageWriter.ImageWriterError?10
 PyQt5.QtGui.QImageWriter.UnknownError?10
 PyQt5.QtGui.QImageWriter.DeviceError?10
@@ -7759,6 +7862,9 @@ PyQt5.QtGui.QImageWriter.supportsOption?4(QImageIOHandler.ImageOption) -> bool
 PyQt5.QtGui.QImageWriter.setCompression?4(int)
 PyQt5.QtGui.QImageWriter.compression?4() -> int
 PyQt5.QtGui.QImageWriter.supportedMimeTypes?4() -> list-of-QByteArray
+PyQt5.QtGui.QImageWriter.setSubType?4(QByteArray)
+PyQt5.QtGui.QImageWriter.subType?4() -> QByteArray
+PyQt5.QtGui.QImageWriter.supportedSubTypes?4() -> list-of-QByteArray
 PyQt5.QtGui.QInputMethod.Action?10
 PyQt5.QtGui.QInputMethod.Click?10
 PyQt5.QtGui.QInputMethod.ContextMenu?10
@@ -7933,6 +8039,8 @@ PyQt5.QtGui.QMatrix4x4.map?4(QPointF) -> QPointF
 PyQt5.QtGui.QMatrix4x4.map?4(QVector3D) -> QVector3D
 PyQt5.QtGui.QMatrix4x4.mapVector?4(QVector3D) -> QVector3D
 PyQt5.QtGui.QMatrix4x4.map?4(QVector4D) -> QVector4D
+PyQt5.QtGui.QMatrix4x4.viewport?4(float, float, float, float, float nearPlane=0, float farPlane=1)
+PyQt5.QtGui.QMatrix4x4.viewport?4(QRectF)
 PyQt5.QtGui.QMovie.CacheMode?10
 PyQt5.QtGui.QMovie.CacheNone?10
 PyQt5.QtGui.QMovie.CacheAll?10
@@ -8011,6 +8119,13 @@ PyQt5.QtGui.QOffscreenSurface.size?4() -> QSize
 PyQt5.QtGui.QOffscreenSurface.screen?4() -> QScreen
 PyQt5.QtGui.QOffscreenSurface.setScreen?4(QScreen)
 PyQt5.QtGui.QOffscreenSurface.screenChanged?4(QScreen)
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlag?10
+PyQt5.QtGui.QOpenGLBuffer.RangeRead?10
+PyQt5.QtGui.QOpenGLBuffer.RangeWrite?10
+PyQt5.QtGui.QOpenGLBuffer.RangeInvalidate?10
+PyQt5.QtGui.QOpenGLBuffer.RangeInvalidateBuffer?10
+PyQt5.QtGui.QOpenGLBuffer.RangeFlushExplicit?10
+PyQt5.QtGui.QOpenGLBuffer.RangeUnsynchronized?10
 PyQt5.QtGui.QOpenGLBuffer.Access?10
 PyQt5.QtGui.QOpenGLBuffer.ReadOnly?10
 PyQt5.QtGui.QOpenGLBuffer.WriteOnly?10
@@ -8053,6 +8168,13 @@ PyQt5.QtGui.QOpenGLBuffer.allocate?4(sip.voidptr, int)
 PyQt5.QtGui.QOpenGLBuffer.allocate?4(int)
 PyQt5.QtGui.QOpenGLBuffer.map?4(QOpenGLBuffer.Access) -> sip.voidptr
 PyQt5.QtGui.QOpenGLBuffer.unmap?4() -> bool
+PyQt5.QtGui.QOpenGLBuffer.mapRange?4(int, int, QOpenGLBuffer.RangeAccessFlags) -> sip.voidptr
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlags?1(QOpenGLBuffer.RangeAccessFlags)
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlags.__init__?1(self, QOpenGLBuffer.RangeAccessFlags)
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlags?1(int)
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlags.__init__?1(self, int)
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlags?1()
+PyQt5.QtGui.QOpenGLBuffer.RangeAccessFlags.__init__?1(self)
 PyQt5.QtGui.QOpenGLContextGroup.shares?4() -> list-of-QOpenGLContext
 PyQt5.QtGui.QOpenGLContextGroup.currentContextGroup?4() -> QOpenGLContextGroup
 PyQt5.QtGui.QOpenGLContext.OpenGLModuleType?10
@@ -8083,6 +8205,8 @@ PyQt5.QtGui.QOpenGLContext.versionFunctions?4(QOpenGLVersionProfile versionProfi
 PyQt5.QtGui.QOpenGLContext.openGLModuleHandle?4() -> sip.voidptr
 PyQt5.QtGui.QOpenGLContext.openGLModuleType?4() -> QOpenGLContext.OpenGLModuleType
 PyQt5.QtGui.QOpenGLContext.isOpenGLES?4() -> bool
+PyQt5.QtGui.QOpenGLContext.setNativeHandle?4(QVariant)
+PyQt5.QtGui.QOpenGLContext.nativeHandle?4() -> QVariant
 PyQt5.QtGui.QOpenGLVersionProfile?1()
 PyQt5.QtGui.QOpenGLVersionProfile.__init__?1(self)
 PyQt5.QtGui.QOpenGLVersionProfile?1(QSurfaceFormat)
@@ -8200,6 +8324,7 @@ PyQt5.QtGui.QOpenGLFramebufferObject.height?4() -> int
 PyQt5.QtGui.QOpenGLFramebufferObject.texture?4() -> int
 PyQt5.QtGui.QOpenGLFramebufferObject.size?4() -> QSize
 PyQt5.QtGui.QOpenGLFramebufferObject.toImage?4() -> QImage
+PyQt5.QtGui.QOpenGLFramebufferObject.toImage?4(bool) -> QImage
 PyQt5.QtGui.QOpenGLFramebufferObject.attachment?4() -> QOpenGLFramebufferObject.Attachment
 PyQt5.QtGui.QOpenGLFramebufferObject.setAttachment?4(QOpenGLFramebufferObject.Attachment)
 PyQt5.QtGui.QOpenGLFramebufferObject.handle?4() -> int
@@ -8458,6 +8583,10 @@ PyQt5.QtGui.QOpenGLTexture.UInt16_RGBA4?10
 PyQt5.QtGui.QOpenGLTexture.UInt16_RGBA4_Rev?10
 PyQt5.QtGui.QOpenGLTexture.UInt32_RGB10A2?10
 PyQt5.QtGui.QOpenGLTexture.UInt32_RGB10A2_Rev?10
+PyQt5.QtGui.QOpenGLTexture.UInt32_RGBA8?10
+PyQt5.QtGui.QOpenGLTexture.UInt32_RGBA8_Rev?10
+PyQt5.QtGui.QOpenGLTexture.UInt32_D24S8?10
+PyQt5.QtGui.QOpenGLTexture.Float32_D32_UInt32_S8_X24?10
 PyQt5.QtGui.QOpenGLTexture.PixelFormat?10
 PyQt5.QtGui.QOpenGLTexture.NoSourceFormat?10
 PyQt5.QtGui.QOpenGLTexture.Red?10
@@ -8477,6 +8606,7 @@ PyQt5.QtGui.QOpenGLTexture.DepthStencil?10
 PyQt5.QtGui.QOpenGLTexture.Alpha?10
 PyQt5.QtGui.QOpenGLTexture.Luminance?10
 PyQt5.QtGui.QOpenGLTexture.LuminanceAlpha?10
+PyQt5.QtGui.QOpenGLTexture.Stencil?10
 PyQt5.QtGui.QOpenGLTexture.CubeMapFace?10
 PyQt5.QtGui.QOpenGLTexture.CubeMapPositiveX?10
 PyQt5.QtGui.QOpenGLTexture.CubeMapNegativeX?10
@@ -8571,6 +8701,7 @@ PyQt5.QtGui.QOpenGLTexture.RGBFormat?10
 PyQt5.QtGui.QOpenGLTexture.RGBAFormat?10
 PyQt5.QtGui.QOpenGLTexture.LuminanceFormat?10
 PyQt5.QtGui.QOpenGLTexture.LuminanceAlphaFormat?10
+PyQt5.QtGui.QOpenGLTexture.S8?10
 PyQt5.QtGui.QOpenGLTexture.TextureUnitReset?10
 PyQt5.QtGui.QOpenGLTexture.ResetTextureUnit?10
 PyQt5.QtGui.QOpenGLTexture.DontResetTextureUnit?10
@@ -8633,7 +8764,15 @@ PyQt5.QtGui.QOpenGLTexture.allocateStorage?4()
 PyQt5.QtGui.QOpenGLTexture.isStorageAllocated?4() -> bool
 PyQt5.QtGui.QOpenGLTexture.createTextureView?4(QOpenGLTexture.Target, QOpenGLTexture.TextureFormat, int, int, int, int) -> QOpenGLTexture
 PyQt5.QtGui.QOpenGLTexture.isTextureView?4() -> bool
+PyQt5.QtGui.QOpenGLTexture.setData?4(int, int, QOpenGLTexture.CubeMapFace, QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.setData?4(int, int, QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.setData?4(int, QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.setData?4(QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
 PyQt5.QtGui.QOpenGLTexture.setData?4(QImage, QOpenGLTexture.MipMapGeneration genMipMaps=QOpenGLTexture.GenerateMipMaps)
+PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, int, QOpenGLTexture.CubeMapFace, int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, int, int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
 PyQt5.QtGui.QOpenGLTexture.hasFeature?4(QOpenGLTexture.Feature) -> bool
 PyQt5.QtGui.QOpenGLTexture.setMipBaseLevel?4(int)
 PyQt5.QtGui.QOpenGLTexture.mipBaseLevel?4() -> int
@@ -8671,20 +8810,42 @@ PyQt5.QtGui.QOpenGLTexture.setLevelOfDetailRange?4(float, float)
 PyQt5.QtGui.QOpenGLTexture.levelOfDetailRange?4() -> tuple-of-float-float
 PyQt5.QtGui.QOpenGLTexture.setLevelofDetailBias?4(float)
 PyQt5.QtGui.QOpenGLTexture.levelofDetailBias?4() -> float
-PyQt5.QtGui.QOpenGLTexture.setData?4(int, int, QOpenGLTexture.CubeMapFace, QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setData?4(int, int, QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setData?4(int, QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setData?4(QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, int, QOpenGLTexture.CubeMapFace, int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, int, int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
-PyQt5.QtGui.QOpenGLTexture.setCompressedData?4(int, sip.voidptr, QOpenGLPixelTransferOptions options=None)
+PyQt5.QtGui.QOpenGLTexture.target?4() -> QOpenGLTexture.Target
+PyQt5.QtGui.QOpenGLTexture.setSamples?4(int)
+PyQt5.QtGui.QOpenGLTexture.samples?4() -> int
+PyQt5.QtGui.QOpenGLTexture.setFixedSamplePositions?4(bool)
+PyQt5.QtGui.QOpenGLTexture.isFixedSamplePositions?4() -> bool
 PyQt5.QtGui.QOpenGLTexture.Features?1(QOpenGLTexture.Features)
 PyQt5.QtGui.QOpenGLTexture.Features.__init__?1(self, QOpenGLTexture.Features)
 PyQt5.QtGui.QOpenGLTexture.Features?1(int)
 PyQt5.QtGui.QOpenGLTexture.Features.__init__?1(self, int)
 PyQt5.QtGui.QOpenGLTexture.Features?1()
 PyQt5.QtGui.QOpenGLTexture.Features.__init__?1(self)
+PyQt5.QtGui.QOpenGLTimerQuery?1(QObject parent=None)
+PyQt5.QtGui.QOpenGLTimerQuery.__init__?1(self, QObject parent=None)
+PyQt5.QtGui.QOpenGLTimerQuery.create?4() -> bool
+PyQt5.QtGui.QOpenGLTimerQuery.destroy?4()
+PyQt5.QtGui.QOpenGLTimerQuery.isCreated?4() -> bool
+PyQt5.QtGui.QOpenGLTimerQuery.objectId?4() -> int
+PyQt5.QtGui.QOpenGLTimerQuery.begin?4()
+PyQt5.QtGui.QOpenGLTimerQuery.end?4()
+PyQt5.QtGui.QOpenGLTimerQuery.waitForTimestamp?4() -> int
+PyQt5.QtGui.QOpenGLTimerQuery.recordTimestamp?4()
+PyQt5.QtGui.QOpenGLTimerQuery.isResultAvailable?4() -> bool
+PyQt5.QtGui.QOpenGLTimerQuery.waitForResult?4() -> int
+PyQt5.QtGui.QOpenGLTimeMonitor?1(QObject parent=None)
+PyQt5.QtGui.QOpenGLTimeMonitor.__init__?1(self, QObject parent=None)
+PyQt5.QtGui.QOpenGLTimeMonitor.setSampleCount?4(int)
+PyQt5.QtGui.QOpenGLTimeMonitor.sampleCount?4() -> int
+PyQt5.QtGui.QOpenGLTimeMonitor.create?4() -> bool
+PyQt5.QtGui.QOpenGLTimeMonitor.destroy?4()
+PyQt5.QtGui.QOpenGLTimeMonitor.isCreated?4() -> bool
+PyQt5.QtGui.QOpenGLTimeMonitor.objectIds?4() -> list-of-int
+PyQt5.QtGui.QOpenGLTimeMonitor.recordSample?4() -> int
+PyQt5.QtGui.QOpenGLTimeMonitor.isResultAvailable?4() -> bool
+PyQt5.QtGui.QOpenGLTimeMonitor.waitForSamples?4() -> list-of-int
+PyQt5.QtGui.QOpenGLTimeMonitor.waitForIntervals?4() -> list-of-int
+PyQt5.QtGui.QOpenGLTimeMonitor.reset?4()
 PyQt5.QtGui.QOpenGLVertexArrayObject?1(QObject parent=None)
 PyQt5.QtGui.QOpenGLVertexArrayObject.__init__?1(self, QObject parent=None)
 PyQt5.QtGui.QOpenGLVertexArrayObject.create?4() -> bool
@@ -8699,6 +8860,184 @@ PyQt5.QtGui.QOpenGLVertexArrayObject.Binder.release?4()
 PyQt5.QtGui.QOpenGLVertexArrayObject.Binder.rebind?4()
 PyQt5.QtGui.QOpenGLVertexArrayObject.Binder.__enter__?4() -> object
 PyQt5.QtGui.QOpenGLVertexArrayObject.Binder.__exit__?4(object, object, object)
+PyQt5.QtGui.QWindow.Visibility?10
+PyQt5.QtGui.QWindow.Hidden?10
+PyQt5.QtGui.QWindow.AutomaticVisibility?10
+PyQt5.QtGui.QWindow.Windowed?10
+PyQt5.QtGui.QWindow.Minimized?10
+PyQt5.QtGui.QWindow.Maximized?10
+PyQt5.QtGui.QWindow.FullScreen?10
+PyQt5.QtGui.QWindow.AncestorMode?10
+PyQt5.QtGui.QWindow.ExcludeTransients?10
+PyQt5.QtGui.QWindow.IncludeTransients?10
+PyQt5.QtGui.QWindow?1(QScreen screen=None)
+PyQt5.QtGui.QWindow.__init__?1(self, QScreen screen=None)
+PyQt5.QtGui.QWindow?1(QWindow)
+PyQt5.QtGui.QWindow.__init__?1(self, QWindow)
+PyQt5.QtGui.QWindow.setSurfaceType?4(QSurface.SurfaceType)
+PyQt5.QtGui.QWindow.surfaceType?4() -> QSurface.SurfaceType
+PyQt5.QtGui.QWindow.isVisible?4() -> bool
+PyQt5.QtGui.QWindow.create?4()
+PyQt5.QtGui.QWindow.winId?4() -> sip.voidptr
+PyQt5.QtGui.QWindow.parent?4() -> QWindow
+PyQt5.QtGui.QWindow.setParent?4(QWindow)
+PyQt5.QtGui.QWindow.isTopLevel?4() -> bool
+PyQt5.QtGui.QWindow.isModal?4() -> bool
+PyQt5.QtGui.QWindow.modality?4() -> Qt.WindowModality
+PyQt5.QtGui.QWindow.setModality?4(Qt.WindowModality)
+PyQt5.QtGui.QWindow.setFormat?4(QSurfaceFormat)
+PyQt5.QtGui.QWindow.format?4() -> QSurfaceFormat
+PyQt5.QtGui.QWindow.requestedFormat?4() -> QSurfaceFormat
+PyQt5.QtGui.QWindow.setFlags?4(Qt.WindowFlags)
+PyQt5.QtGui.QWindow.flags?4() -> Qt.WindowFlags
+PyQt5.QtGui.QWindow.type?4() -> Qt.WindowType
+PyQt5.QtGui.QWindow.title?4() -> str
+PyQt5.QtGui.QWindow.setOpacity?4(float)
+PyQt5.QtGui.QWindow.requestActivate?4()
+PyQt5.QtGui.QWindow.isActive?4() -> bool
+PyQt5.QtGui.QWindow.reportContentOrientationChange?4(Qt.ScreenOrientation)
+PyQt5.QtGui.QWindow.contentOrientation?4() -> Qt.ScreenOrientation
+PyQt5.QtGui.QWindow.devicePixelRatio?4() -> float
+PyQt5.QtGui.QWindow.windowState?4() -> Qt.WindowState
+PyQt5.QtGui.QWindow.setWindowState?4(Qt.WindowState)
+PyQt5.QtGui.QWindow.setTransientParent?4(QWindow)
+PyQt5.QtGui.QWindow.transientParent?4() -> QWindow
+PyQt5.QtGui.QWindow.isAncestorOf?4(QWindow, QWindow.AncestorMode mode=QWindow.IncludeTransients) -> bool
+PyQt5.QtGui.QWindow.isExposed?4() -> bool
+PyQt5.QtGui.QWindow.minimumWidth?4() -> int
+PyQt5.QtGui.QWindow.minimumHeight?4() -> int
+PyQt5.QtGui.QWindow.maximumWidth?4() -> int
+PyQt5.QtGui.QWindow.maximumHeight?4() -> int
+PyQt5.QtGui.QWindow.minimumSize?4() -> QSize
+PyQt5.QtGui.QWindow.maximumSize?4() -> QSize
+PyQt5.QtGui.QWindow.baseSize?4() -> QSize
+PyQt5.QtGui.QWindow.sizeIncrement?4() -> QSize
+PyQt5.QtGui.QWindow.setMinimumSize?4(QSize)
+PyQt5.QtGui.QWindow.setMaximumSize?4(QSize)
+PyQt5.QtGui.QWindow.setBaseSize?4(QSize)
+PyQt5.QtGui.QWindow.setSizeIncrement?4(QSize)
+PyQt5.QtGui.QWindow.setGeometry?4(int, int, int, int)
+PyQt5.QtGui.QWindow.setGeometry?4(QRect)
+PyQt5.QtGui.QWindow.geometry?4() -> QRect
+PyQt5.QtGui.QWindow.frameMargins?4() -> QMargins
+PyQt5.QtGui.QWindow.frameGeometry?4() -> QRect
+PyQt5.QtGui.QWindow.framePosition?4() -> QPoint
+PyQt5.QtGui.QWindow.setFramePosition?4(QPoint)
+PyQt5.QtGui.QWindow.width?4() -> int
+PyQt5.QtGui.QWindow.height?4() -> int
+PyQt5.QtGui.QWindow.x?4() -> int
+PyQt5.QtGui.QWindow.y?4() -> int
+PyQt5.QtGui.QWindow.size?4() -> QSize
+PyQt5.QtGui.QWindow.position?4() -> QPoint
+PyQt5.QtGui.QWindow.setPosition?4(QPoint)
+PyQt5.QtGui.QWindow.setPosition?4(int, int)
+PyQt5.QtGui.QWindow.resize?4(QSize)
+PyQt5.QtGui.QWindow.resize?4(int, int)
+PyQt5.QtGui.QWindow.setFilePath?4(str)
+PyQt5.QtGui.QWindow.filePath?4() -> str
+PyQt5.QtGui.QWindow.setIcon?4(QIcon)
+PyQt5.QtGui.QWindow.icon?4() -> QIcon
+PyQt5.QtGui.QWindow.destroy?4()
+PyQt5.QtGui.QWindow.setKeyboardGrabEnabled?4(bool) -> bool
+PyQt5.QtGui.QWindow.setMouseGrabEnabled?4(bool) -> bool
+PyQt5.QtGui.QWindow.screen?4() -> QScreen
+PyQt5.QtGui.QWindow.setScreen?4(QScreen)
+PyQt5.QtGui.QWindow.focusObject?4() -> QObject
+PyQt5.QtGui.QWindow.mapToGlobal?4(QPoint) -> QPoint
+PyQt5.QtGui.QWindow.mapFromGlobal?4(QPoint) -> QPoint
+PyQt5.QtGui.QWindow.cursor?4() -> QCursor
+PyQt5.QtGui.QWindow.setCursor?4(QCursor)
+PyQt5.QtGui.QWindow.unsetCursor?4()
+PyQt5.QtGui.QWindow.setVisible?4(bool)
+PyQt5.QtGui.QWindow.show?4()
+PyQt5.QtGui.QWindow.hide?4()
+PyQt5.QtGui.QWindow.showMinimized?4()
+PyQt5.QtGui.QWindow.showMaximized?4()
+PyQt5.QtGui.QWindow.showFullScreen?4()
+PyQt5.QtGui.QWindow.showNormal?4()
+PyQt5.QtGui.QWindow.close?4() -> bool
+PyQt5.QtGui.QWindow.raise_?4()
+PyQt5.QtGui.QWindow.lower?4()
+PyQt5.QtGui.QWindow.setTitle?4(str)
+PyQt5.QtGui.QWindow.setX?4(int)
+PyQt5.QtGui.QWindow.setY?4(int)
+PyQt5.QtGui.QWindow.setWidth?4(int)
+PyQt5.QtGui.QWindow.setHeight?4(int)
+PyQt5.QtGui.QWindow.setMinimumWidth?4(int)
+PyQt5.QtGui.QWindow.setMinimumHeight?4(int)
+PyQt5.QtGui.QWindow.setMaximumWidth?4(int)
+PyQt5.QtGui.QWindow.setMaximumHeight?4(int)
+PyQt5.QtGui.QWindow.screenChanged?4(QScreen)
+PyQt5.QtGui.QWindow.modalityChanged?4(Qt.WindowModality)
+PyQt5.QtGui.QWindow.windowStateChanged?4(Qt.WindowState)
+PyQt5.QtGui.QWindow.xChanged?4(int)
+PyQt5.QtGui.QWindow.yChanged?4(int)
+PyQt5.QtGui.QWindow.widthChanged?4(int)
+PyQt5.QtGui.QWindow.heightChanged?4(int)
+PyQt5.QtGui.QWindow.minimumWidthChanged?4(int)
+PyQt5.QtGui.QWindow.minimumHeightChanged?4(int)
+PyQt5.QtGui.QWindow.maximumWidthChanged?4(int)
+PyQt5.QtGui.QWindow.maximumHeightChanged?4(int)
+PyQt5.QtGui.QWindow.visibleChanged?4(bool)
+PyQt5.QtGui.QWindow.contentOrientationChanged?4(Qt.ScreenOrientation)
+PyQt5.QtGui.QWindow.focusObjectChanged?4(QObject)
+PyQt5.QtGui.QWindow.windowTitleChanged?4(str)
+PyQt5.QtGui.QWindow.exposeEvent?4(QExposeEvent)
+PyQt5.QtGui.QWindow.resizeEvent?4(QResizeEvent)
+PyQt5.QtGui.QWindow.moveEvent?4(QMoveEvent)
+PyQt5.QtGui.QWindow.focusInEvent?4(QFocusEvent)
+PyQt5.QtGui.QWindow.focusOutEvent?4(QFocusEvent)
+PyQt5.QtGui.QWindow.showEvent?4(QShowEvent)
+PyQt5.QtGui.QWindow.hideEvent?4(QHideEvent)
+PyQt5.QtGui.QWindow.event?4(QEvent) -> bool
+PyQt5.QtGui.QWindow.keyPressEvent?4(QKeyEvent)
+PyQt5.QtGui.QWindow.keyReleaseEvent?4(QKeyEvent)
+PyQt5.QtGui.QWindow.mousePressEvent?4(QMouseEvent)
+PyQt5.QtGui.QWindow.mouseReleaseEvent?4(QMouseEvent)
+PyQt5.QtGui.QWindow.mouseDoubleClickEvent?4(QMouseEvent)
+PyQt5.QtGui.QWindow.mouseMoveEvent?4(QMouseEvent)
+PyQt5.QtGui.QWindow.wheelEvent?4(QWheelEvent)
+PyQt5.QtGui.QWindow.touchEvent?4(QTouchEvent)
+PyQt5.QtGui.QWindow.tabletEvent?4(QTabletEvent)
+PyQt5.QtGui.QWindow.visibility?4() -> QWindow.Visibility
+PyQt5.QtGui.QWindow.setVisibility?4(QWindow.Visibility)
+PyQt5.QtGui.QWindow.opacity?4() -> float
+PyQt5.QtGui.QWindow.setMask?4(QRegion)
+PyQt5.QtGui.QWindow.mask?4() -> QRegion
+PyQt5.QtGui.QWindow.fromWinId?4(sip.voidptr) -> QWindow
+PyQt5.QtGui.QWindow.alert?4(int)
+PyQt5.QtGui.QWindow.visibilityChanged?4(QWindow.Visibility)
+PyQt5.QtGui.QWindow.activeChanged?4()
+PyQt5.QtGui.QWindow.opacityChanged?4(float)
+PyQt5.QtGui.QPaintDeviceWindow.update?4(QRect)
+PyQt5.QtGui.QPaintDeviceWindow.update?4(QRegion)
+PyQt5.QtGui.QPaintDeviceWindow.update?4()
+PyQt5.QtGui.QPaintDeviceWindow.paintEvent?4(QPaintEvent)
+PyQt5.QtGui.QPaintDeviceWindow.metric?4(QPaintDevice.PaintDeviceMetric) -> int
+PyQt5.QtGui.QPaintDeviceWindow.exposeEvent?4(QExposeEvent)
+PyQt5.QtGui.QPaintDeviceWindow.event?4(QEvent) -> bool
+PyQt5.QtGui.QOpenGLWindow.UpdateBehavior?10
+PyQt5.QtGui.QOpenGLWindow.NoPartialUpdate?10
+PyQt5.QtGui.QOpenGLWindow.PartialUpdateBlit?10
+PyQt5.QtGui.QOpenGLWindow.PartialUpdateBlend?10
+PyQt5.QtGui.QOpenGLWindow?1(QOpenGLWindow.UpdateBehavior updateBehavior=QOpenGLWindow.NoPartialUpdate, QWindow parent=None)
+PyQt5.QtGui.QOpenGLWindow.__init__?1(self, QOpenGLWindow.UpdateBehavior updateBehavior=QOpenGLWindow.NoPartialUpdate, QWindow parent=None)
+PyQt5.QtGui.QOpenGLWindow.updateBehavior?4() -> QOpenGLWindow.UpdateBehavior
+PyQt5.QtGui.QOpenGLWindow.isValid?4() -> bool
+PyQt5.QtGui.QOpenGLWindow.makeCurrent?4()
+PyQt5.QtGui.QOpenGLWindow.doneCurrent?4()
+PyQt5.QtGui.QOpenGLWindow.context?4() -> QOpenGLContext
+PyQt5.QtGui.QOpenGLWindow.defaultFramebufferObject?4() -> int
+PyQt5.QtGui.QOpenGLWindow.grabFramebuffer?4() -> QImage
+PyQt5.QtGui.QOpenGLWindow.frameSwapped?4()
+PyQt5.QtGui.QOpenGLWindow.initializeGL?4()
+PyQt5.QtGui.QOpenGLWindow.resizeGL?4(int, int)
+PyQt5.QtGui.QOpenGLWindow.paintGL?4()
+PyQt5.QtGui.QOpenGLWindow.paintUnderGL?4()
+PyQt5.QtGui.QOpenGLWindow.paintOverGL?4()
+PyQt5.QtGui.QOpenGLWindow.paintEvent?4(QPaintEvent)
+PyQt5.QtGui.QOpenGLWindow.resizeEvent?4(QResizeEvent)
+PyQt5.QtGui.QOpenGLWindow.metric?4(QPaintDevice.PaintDeviceMetric) -> int
 PyQt5.QtGui.QPagedPaintDevice.PageSize?10
 PyQt5.QtGui.QPagedPaintDevice.A4?10
 PyQt5.QtGui.QPagedPaintDevice.B5?10
@@ -9773,6 +10112,78 @@ PyQt5.QtGui.QPictureIO.pictureFormat?4(QIODevice) -> QByteArray
 PyQt5.QtGui.QPictureIO.inputFormats?4() -> list-of-QByteArray
 PyQt5.QtGui.QPictureIO.outputFormats?4() -> list-of-QByteArray
 PyQt5.QtGui.QPictureIO.defineIOHandler?4(str, str, str, callable, callable)
+PyQt5.QtGui.QPixelFormat.ByteOrder?10
+PyQt5.QtGui.QPixelFormat.LittleEndian?10
+PyQt5.QtGui.QPixelFormat.BigEndian?10
+PyQt5.QtGui.QPixelFormat.CurrentSystemEndian?10
+PyQt5.QtGui.QPixelFormat.YUVLayout?10
+PyQt5.QtGui.QPixelFormat.YUV444?10
+PyQt5.QtGui.QPixelFormat.YUV422?10
+PyQt5.QtGui.QPixelFormat.YUV411?10
+PyQt5.QtGui.QPixelFormat.YUV420P?10
+PyQt5.QtGui.QPixelFormat.YUV420SP?10
+PyQt5.QtGui.QPixelFormat.YV12?10
+PyQt5.QtGui.QPixelFormat.UYVY?10
+PyQt5.QtGui.QPixelFormat.YUYV?10
+PyQt5.QtGui.QPixelFormat.NV12?10
+PyQt5.QtGui.QPixelFormat.NV21?10
+PyQt5.QtGui.QPixelFormat.IMC1?10
+PyQt5.QtGui.QPixelFormat.IMC2?10
+PyQt5.QtGui.QPixelFormat.IMC3?10
+PyQt5.QtGui.QPixelFormat.IMC4?10
+PyQt5.QtGui.QPixelFormat.Y8?10
+PyQt5.QtGui.QPixelFormat.Y16?10
+PyQt5.QtGui.QPixelFormat.TypeInterpretation?10
+PyQt5.QtGui.QPixelFormat.UnsignedInteger?10
+PyQt5.QtGui.QPixelFormat.UnsignedShort?10
+PyQt5.QtGui.QPixelFormat.UnsignedByte?10
+PyQt5.QtGui.QPixelFormat.FloatingPoint?10
+PyQt5.QtGui.QPixelFormat.AlphaPremultiplied?10
+PyQt5.QtGui.QPixelFormat.NotPremultiplied?10
+PyQt5.QtGui.QPixelFormat.Premultiplied?10
+PyQt5.QtGui.QPixelFormat.AlphaPosition?10
+PyQt5.QtGui.QPixelFormat.AtBeginning?10
+PyQt5.QtGui.QPixelFormat.AtEnd?10
+PyQt5.QtGui.QPixelFormat.AlphaUsage?10
+PyQt5.QtGui.QPixelFormat.UsesAlpha?10
+PyQt5.QtGui.QPixelFormat.IgnoresAlpha?10
+PyQt5.QtGui.QPixelFormat.ColorModel?10
+PyQt5.QtGui.QPixelFormat.RGB?10
+PyQt5.QtGui.QPixelFormat.BGR?10
+PyQt5.QtGui.QPixelFormat.Indexed?10
+PyQt5.QtGui.QPixelFormat.Grayscale?10
+PyQt5.QtGui.QPixelFormat.CMYK?10
+PyQt5.QtGui.QPixelFormat.HSL?10
+PyQt5.QtGui.QPixelFormat.HSV?10
+PyQt5.QtGui.QPixelFormat.YUV?10
+PyQt5.QtGui.QPixelFormat?1()
+PyQt5.QtGui.QPixelFormat.__init__?1(self)
+PyQt5.QtGui.QPixelFormat?1(QPixelFormat.ColorModel, int, int, int, int, int, int, QPixelFormat.AlphaUsage, QPixelFormat.AlphaPosition, QPixelFormat.AlphaPremultiplied, QPixelFormat.TypeInterpretation, QPixelFormat.ByteOrder byteOrder=QPixelFormat.CurrentSystemEndian, int subEnum=0)
+PyQt5.QtGui.QPixelFormat.__init__?1(self, QPixelFormat.ColorModel, int, int, int, int, int, int, QPixelFormat.AlphaUsage, QPixelFormat.AlphaPosition, QPixelFormat.AlphaPremultiplied, QPixelFormat.TypeInterpretation, QPixelFormat.ByteOrder byteOrder=QPixelFormat.CurrentSystemEndian, int subEnum=0)
+PyQt5.QtGui.QPixelFormat?1(QPixelFormat)
+PyQt5.QtGui.QPixelFormat.__init__?1(self, QPixelFormat)
+PyQt5.QtGui.QPixelFormat.colorModel?4() -> QPixelFormat.ColorModel
+PyQt5.QtGui.QPixelFormat.channelCount?4() -> int
+PyQt5.QtGui.QPixelFormat.redSize?4() -> int
+PyQt5.QtGui.QPixelFormat.greenSize?4() -> int
+PyQt5.QtGui.QPixelFormat.blueSize?4() -> int
+PyQt5.QtGui.QPixelFormat.cyanSize?4() -> int
+PyQt5.QtGui.QPixelFormat.magentaSize?4() -> int
+PyQt5.QtGui.QPixelFormat.yellowSize?4() -> int
+PyQt5.QtGui.QPixelFormat.blackSize?4() -> int
+PyQt5.QtGui.QPixelFormat.hueSize?4() -> int
+PyQt5.QtGui.QPixelFormat.saturationSize?4() -> int
+PyQt5.QtGui.QPixelFormat.lightnessSize?4() -> int
+PyQt5.QtGui.QPixelFormat.brightnessSize?4() -> int
+PyQt5.QtGui.QPixelFormat.alphaSize?4() -> int
+PyQt5.QtGui.QPixelFormat.bitsPerPixel?4() -> int
+PyQt5.QtGui.QPixelFormat.alphaUsage?4() -> QPixelFormat.AlphaUsage
+PyQt5.QtGui.QPixelFormat.alphaPosition?4() -> QPixelFormat.AlphaPosition
+PyQt5.QtGui.QPixelFormat.premultiplied?4() -> QPixelFormat.AlphaPremultiplied
+PyQt5.QtGui.QPixelFormat.typeInterpretation?4() -> QPixelFormat.TypeInterpretation
+PyQt5.QtGui.QPixelFormat.byteOrder?4() -> QPixelFormat.ByteOrder
+PyQt5.QtGui.QPixelFormat.yuvLayout?4() -> QPixelFormat.YUVLayout
+PyQt5.QtGui.QPixelFormat.subEnum?4() -> int
 PyQt5.QtGui.QPixmapCache?1()
 PyQt5.QtGui.QPixmapCache.__init__?1(self)
 PyQt5.QtGui.QPixmapCache?1(QPixmapCache)
@@ -9924,6 +10335,9 @@ PyQt5.QtGui.QQuaternion.setVector?4(QVector3D)
 PyQt5.QtGui.QQuaternion.vector?4() -> QVector3D
 PyQt5.QtGui.QQuaternion.setVector?4(float, float, float)
 PyQt5.QtGui.QQuaternion.toVector4D?4() -> QVector4D
+PyQt5.QtGui.QRasterWindow?1(QWindow parent=None)
+PyQt5.QtGui.QRasterWindow.__init__?1(self, QWindow parent=None)
+PyQt5.QtGui.QRasterWindow.metric?4(QPaintDevice.PaintDeviceMetric) -> int
 PyQt5.QtGui.QRawFont.LayoutFlag?10
 PyQt5.QtGui.QRawFont.SeparateAdvances?10
 PyQt5.QtGui.QRawFont.KernedAdvances?10
@@ -10052,6 +10466,7 @@ PyQt5.QtGui.QScreen.orientationChanged?4(Qt.ScreenOrientation)
 PyQt5.QtGui.QScreen.refreshRateChanged?4(float)
 PyQt5.QtGui.QScreen.physicalSizeChanged?4(QSizeF)
 PyQt5.QtGui.QScreen.virtualGeometryChanged?4(QRect)
+PyQt5.QtGui.QScreen.availableGeometryChanged?4(QRect)
 PyQt5.QtGui.QSessionManager.RestartHint?10
 PyQt5.QtGui.QSessionManager.RestartIfRunning?10
 PyQt5.QtGui.QSessionManager.RestartAnyway?10
@@ -10324,6 +10739,8 @@ PyQt5.QtGui.QSurfaceFormat.testOption?4(QSurfaceFormat.FormatOption) -> bool
 PyQt5.QtGui.QSurfaceFormat.options?4() -> QSurfaceFormat.FormatOptions
 PyQt5.QtGui.QSurfaceFormat.swapInterval?4() -> int
 PyQt5.QtGui.QSurfaceFormat.setSwapInterval?4(int)
+PyQt5.QtGui.QSurfaceFormat.setDefaultFormat?4(QSurfaceFormat)
+PyQt5.QtGui.QSurfaceFormat.defaultFormat?4() -> QSurfaceFormat
 PyQt5.QtGui.QSurfaceFormat.FormatOptions?1(QSurfaceFormat.FormatOptions)
 PyQt5.QtGui.QSurfaceFormat.FormatOptions.__init__?1(self, QSurfaceFormat.FormatOptions)
 PyQt5.QtGui.QSurfaceFormat.FormatOptions?1(int)
@@ -11564,155 +11981,6 @@ PyQt5.QtGui.QVector4D.setZ?4(float)
 PyQt5.QtGui.QVector4D.setW?4(float)
 PyQt5.QtGui.QVector4D.toPoint?4() -> QPoint
 PyQt5.QtGui.QVector4D.toPointF?4() -> QPointF
-PyQt5.QtGui.QWindow.Visibility?10
-PyQt5.QtGui.QWindow.Hidden?10
-PyQt5.QtGui.QWindow.AutomaticVisibility?10
-PyQt5.QtGui.QWindow.Windowed?10
-PyQt5.QtGui.QWindow.Minimized?10
-PyQt5.QtGui.QWindow.Maximized?10
-PyQt5.QtGui.QWindow.FullScreen?10
-PyQt5.QtGui.QWindow.AncestorMode?10
-PyQt5.QtGui.QWindow.ExcludeTransients?10
-PyQt5.QtGui.QWindow.IncludeTransients?10
-PyQt5.QtGui.QWindow?1(QScreen screen=None)
-PyQt5.QtGui.QWindow.__init__?1(self, QScreen screen=None)
-PyQt5.QtGui.QWindow?1(QWindow)
-PyQt5.QtGui.QWindow.__init__?1(self, QWindow)
-PyQt5.QtGui.QWindow.setSurfaceType?4(QSurface.SurfaceType)
-PyQt5.QtGui.QWindow.surfaceType?4() -> QSurface.SurfaceType
-PyQt5.QtGui.QWindow.isVisible?4() -> bool
-PyQt5.QtGui.QWindow.create?4()
-PyQt5.QtGui.QWindow.winId?4() -> sip.voidptr
-PyQt5.QtGui.QWindow.parent?4() -> QWindow
-PyQt5.QtGui.QWindow.setParent?4(QWindow)
-PyQt5.QtGui.QWindow.isTopLevel?4() -> bool
-PyQt5.QtGui.QWindow.isModal?4() -> bool
-PyQt5.QtGui.QWindow.modality?4() -> Qt.WindowModality
-PyQt5.QtGui.QWindow.setModality?4(Qt.WindowModality)
-PyQt5.QtGui.QWindow.setFormat?4(QSurfaceFormat)
-PyQt5.QtGui.QWindow.format?4() -> QSurfaceFormat
-PyQt5.QtGui.QWindow.requestedFormat?4() -> QSurfaceFormat
-PyQt5.QtGui.QWindow.setFlags?4(Qt.WindowFlags)
-PyQt5.QtGui.QWindow.flags?4() -> Qt.WindowFlags
-PyQt5.QtGui.QWindow.type?4() -> Qt.WindowType
-PyQt5.QtGui.QWindow.title?4() -> str
-PyQt5.QtGui.QWindow.setOpacity?4(float)
-PyQt5.QtGui.QWindow.requestActivate?4()
-PyQt5.QtGui.QWindow.isActive?4() -> bool
-PyQt5.QtGui.QWindow.reportContentOrientationChange?4(Qt.ScreenOrientation)
-PyQt5.QtGui.QWindow.contentOrientation?4() -> Qt.ScreenOrientation
-PyQt5.QtGui.QWindow.devicePixelRatio?4() -> float
-PyQt5.QtGui.QWindow.windowState?4() -> Qt.WindowState
-PyQt5.QtGui.QWindow.setWindowState?4(Qt.WindowState)
-PyQt5.QtGui.QWindow.setTransientParent?4(QWindow)
-PyQt5.QtGui.QWindow.transientParent?4() -> QWindow
-PyQt5.QtGui.QWindow.isAncestorOf?4(QWindow, QWindow.AncestorMode mode=QWindow.IncludeTransients) -> bool
-PyQt5.QtGui.QWindow.isExposed?4() -> bool
-PyQt5.QtGui.QWindow.minimumWidth?4() -> int
-PyQt5.QtGui.QWindow.minimumHeight?4() -> int
-PyQt5.QtGui.QWindow.maximumWidth?4() -> int
-PyQt5.QtGui.QWindow.maximumHeight?4() -> int
-PyQt5.QtGui.QWindow.minimumSize?4() -> QSize
-PyQt5.QtGui.QWindow.maximumSize?4() -> QSize
-PyQt5.QtGui.QWindow.baseSize?4() -> QSize
-PyQt5.QtGui.QWindow.sizeIncrement?4() -> QSize
-PyQt5.QtGui.QWindow.setMinimumSize?4(QSize)
-PyQt5.QtGui.QWindow.setMaximumSize?4(QSize)
-PyQt5.QtGui.QWindow.setBaseSize?4(QSize)
-PyQt5.QtGui.QWindow.setSizeIncrement?4(QSize)
-PyQt5.QtGui.QWindow.setGeometry?4(int, int, int, int)
-PyQt5.QtGui.QWindow.setGeometry?4(QRect)
-PyQt5.QtGui.QWindow.geometry?4() -> QRect
-PyQt5.QtGui.QWindow.frameMargins?4() -> QMargins
-PyQt5.QtGui.QWindow.frameGeometry?4() -> QRect
-PyQt5.QtGui.QWindow.framePosition?4() -> QPoint
-PyQt5.QtGui.QWindow.setFramePosition?4(QPoint)
-PyQt5.QtGui.QWindow.width?4() -> int
-PyQt5.QtGui.QWindow.height?4() -> int
-PyQt5.QtGui.QWindow.x?4() -> int
-PyQt5.QtGui.QWindow.y?4() -> int
-PyQt5.QtGui.QWindow.size?4() -> QSize
-PyQt5.QtGui.QWindow.position?4() -> QPoint
-PyQt5.QtGui.QWindow.setPosition?4(QPoint)
-PyQt5.QtGui.QWindow.setPosition?4(int, int)
-PyQt5.QtGui.QWindow.resize?4(QSize)
-PyQt5.QtGui.QWindow.resize?4(int, int)
-PyQt5.QtGui.QWindow.setFilePath?4(str)
-PyQt5.QtGui.QWindow.filePath?4() -> str
-PyQt5.QtGui.QWindow.setIcon?4(QIcon)
-PyQt5.QtGui.QWindow.icon?4() -> QIcon
-PyQt5.QtGui.QWindow.destroy?4()
-PyQt5.QtGui.QWindow.setKeyboardGrabEnabled?4(bool) -> bool
-PyQt5.QtGui.QWindow.setMouseGrabEnabled?4(bool) -> bool
-PyQt5.QtGui.QWindow.screen?4() -> QScreen
-PyQt5.QtGui.QWindow.setScreen?4(QScreen)
-PyQt5.QtGui.QWindow.focusObject?4() -> QObject
-PyQt5.QtGui.QWindow.mapToGlobal?4(QPoint) -> QPoint
-PyQt5.QtGui.QWindow.mapFromGlobal?4(QPoint) -> QPoint
-PyQt5.QtGui.QWindow.cursor?4() -> QCursor
-PyQt5.QtGui.QWindow.setCursor?4(QCursor)
-PyQt5.QtGui.QWindow.unsetCursor?4()
-PyQt5.QtGui.QWindow.setVisible?4(bool)
-PyQt5.QtGui.QWindow.show?4()
-PyQt5.QtGui.QWindow.hide?4()
-PyQt5.QtGui.QWindow.showMinimized?4()
-PyQt5.QtGui.QWindow.showMaximized?4()
-PyQt5.QtGui.QWindow.showFullScreen?4()
-PyQt5.QtGui.QWindow.showNormal?4()
-PyQt5.QtGui.QWindow.close?4() -> bool
-PyQt5.QtGui.QWindow.raise_?4()
-PyQt5.QtGui.QWindow.lower?4()
-PyQt5.QtGui.QWindow.setTitle?4(str)
-PyQt5.QtGui.QWindow.setX?4(int)
-PyQt5.QtGui.QWindow.setY?4(int)
-PyQt5.QtGui.QWindow.setWidth?4(int)
-PyQt5.QtGui.QWindow.setHeight?4(int)
-PyQt5.QtGui.QWindow.setMinimumWidth?4(int)
-PyQt5.QtGui.QWindow.setMinimumHeight?4(int)
-PyQt5.QtGui.QWindow.setMaximumWidth?4(int)
-PyQt5.QtGui.QWindow.setMaximumHeight?4(int)
-PyQt5.QtGui.QWindow.screenChanged?4(QScreen)
-PyQt5.QtGui.QWindow.modalityChanged?4(Qt.WindowModality)
-PyQt5.QtGui.QWindow.windowStateChanged?4(Qt.WindowState)
-PyQt5.QtGui.QWindow.xChanged?4(int)
-PyQt5.QtGui.QWindow.yChanged?4(int)
-PyQt5.QtGui.QWindow.widthChanged?4(int)
-PyQt5.QtGui.QWindow.heightChanged?4(int)
-PyQt5.QtGui.QWindow.minimumWidthChanged?4(int)
-PyQt5.QtGui.QWindow.minimumHeightChanged?4(int)
-PyQt5.QtGui.QWindow.maximumWidthChanged?4(int)
-PyQt5.QtGui.QWindow.maximumHeightChanged?4(int)
-PyQt5.QtGui.QWindow.visibleChanged?4(bool)
-PyQt5.QtGui.QWindow.contentOrientationChanged?4(Qt.ScreenOrientation)
-PyQt5.QtGui.QWindow.focusObjectChanged?4(QObject)
-PyQt5.QtGui.QWindow.windowTitleChanged?4(str)
-PyQt5.QtGui.QWindow.exposeEvent?4(QExposeEvent)
-PyQt5.QtGui.QWindow.resizeEvent?4(QResizeEvent)
-PyQt5.QtGui.QWindow.moveEvent?4(QMoveEvent)
-PyQt5.QtGui.QWindow.focusInEvent?4(QFocusEvent)
-PyQt5.QtGui.QWindow.focusOutEvent?4(QFocusEvent)
-PyQt5.QtGui.QWindow.showEvent?4(QShowEvent)
-PyQt5.QtGui.QWindow.hideEvent?4(QHideEvent)
-PyQt5.QtGui.QWindow.event?4(QEvent) -> bool
-PyQt5.QtGui.QWindow.keyPressEvent?4(QKeyEvent)
-PyQt5.QtGui.QWindow.keyReleaseEvent?4(QKeyEvent)
-PyQt5.QtGui.QWindow.mousePressEvent?4(QMouseEvent)
-PyQt5.QtGui.QWindow.mouseReleaseEvent?4(QMouseEvent)
-PyQt5.QtGui.QWindow.mouseDoubleClickEvent?4(QMouseEvent)
-PyQt5.QtGui.QWindow.mouseMoveEvent?4(QMouseEvent)
-PyQt5.QtGui.QWindow.wheelEvent?4(QWheelEvent)
-PyQt5.QtGui.QWindow.touchEvent?4(QTouchEvent)
-PyQt5.QtGui.QWindow.tabletEvent?4(QTabletEvent)
-PyQt5.QtGui.QWindow.visibility?4() -> QWindow.Visibility
-PyQt5.QtGui.QWindow.setVisibility?4(QWindow.Visibility)
-PyQt5.QtGui.QWindow.opacity?4() -> float
-PyQt5.QtGui.QWindow.setMask?4(QRegion)
-PyQt5.QtGui.QWindow.mask?4() -> QRegion
-PyQt5.QtGui.QWindow.fromWinId?4(sip.voidptr) -> QWindow
-PyQt5.QtGui.QWindow.alert?4(int)
-PyQt5.QtGui.QWindow.visibilityChanged?4(QWindow.Visibility)
-PyQt5.QtGui.QWindow.activeChanged?4()
-PyQt5.QtGui.QWindow.opacityChanged?4(float)
 PyQt5.QtHelp.QHelpContentItem.child?4(int) -> QHelpContentItem
 PyQt5.QtHelp.QHelpContentItem.childCount?4() -> int
 PyQt5.QtHelp.QHelpContentItem.title?4() -> str
@@ -11766,6 +12034,7 @@ PyQt5.QtHelp.QHelpEngineCore.setupStarted?4()
 PyQt5.QtHelp.QHelpEngineCore.setupFinished?4()
 PyQt5.QtHelp.QHelpEngineCore.currentFilterChanged?4(str)
 PyQt5.QtHelp.QHelpEngineCore.warning?4(str)
+PyQt5.QtHelp.QHelpEngineCore.readersAboutToBeInvalidated?4()
 PyQt5.QtHelp.QHelpEngine?1(str, QObject parent=None)
 PyQt5.QtHelp.QHelpEngine.__init__?1(self, str, QObject parent=None)
 PyQt5.QtHelp.QHelpEngine.contentModel?4() -> QHelpContentModel
@@ -11833,6 +12102,7 @@ PyQt5.QtMultimedia.QAbstractVideoBuffer.GLTextureHandle?10
 PyQt5.QtMultimedia.QAbstractVideoBuffer.XvShmImageHandle?10
 PyQt5.QtMultimedia.QAbstractVideoBuffer.CoreImageHandle?10
 PyQt5.QtMultimedia.QAbstractVideoBuffer.QPixmapHandle?10
+PyQt5.QtMultimedia.QAbstractVideoBuffer.EGLImageHandle?10
 PyQt5.QtMultimedia.QAbstractVideoBuffer.UserHandle?10
 PyQt5.QtMultimedia.QAbstractVideoBuffer?1(QAbstractVideoBuffer.HandleType)
 PyQt5.QtMultimedia.QAbstractVideoBuffer.__init__?1(self, QAbstractVideoBuffer.HandleType)
@@ -13102,7 +13372,9 @@ PyQt5.QtMultimedia.QVideoFrame.mapMode?4() -> QAbstractVideoBuffer.MapMode
 PyQt5.QtMultimedia.QVideoFrame.map?4(QAbstractVideoBuffer.MapMode) -> bool
 PyQt5.QtMultimedia.QVideoFrame.unmap?4()
 PyQt5.QtMultimedia.QVideoFrame.bytesPerLine?4() -> int
+PyQt5.QtMultimedia.QVideoFrame.bytesPerLine?4(int) -> int
 PyQt5.QtMultimedia.QVideoFrame.bits?4() -> sip.voidptr
+PyQt5.QtMultimedia.QVideoFrame.bits?4(int) -> sip.voidptr
 PyQt5.QtMultimedia.QVideoFrame.mappedBytes?4() -> int
 PyQt5.QtMultimedia.QVideoFrame.handle?4() -> QVariant
 PyQt5.QtMultimedia.QVideoFrame.startTime?4() -> int
@@ -13114,6 +13386,7 @@ PyQt5.QtMultimedia.QVideoFrame.imageFormatFromPixelFormat?4(QVideoFrame.PixelFor
 PyQt5.QtMultimedia.QVideoFrame.availableMetaData?4() -> dict-of-str-object
 PyQt5.QtMultimedia.QVideoFrame.metaData?4(str) -> QVariant
 PyQt5.QtMultimedia.QVideoFrame.setMetaData?4(str, QVariant)
+PyQt5.QtMultimedia.QVideoFrame.planeCount?4() -> int
 PyQt5.QtMultimedia.QVideoProbe?1(QObject parent=None)
 PyQt5.QtMultimedia.QVideoProbe.__init__?1(self, QObject parent=None)
 PyQt5.QtMultimedia.QVideoProbe.setSource?4(QMediaObject) -> bool
@@ -14209,6 +14482,8 @@ PyQt5.QtNetwork.QSslCertificate.issuerInfoAttributes?4() -> list-of-QByteArray
 PyQt5.QtNetwork.QSslCertificate.extensions?4() -> list-of-QSslCertificateExtension
 PyQt5.QtNetwork.QSslCertificate.toText?4() -> str
 PyQt5.QtNetwork.QSslCertificate.verify?4(list-of-QSslCertificate, str hostName=QString()) -> list-of-QSslError
+PyQt5.QtNetwork.QSslCertificate.isSelfSigned?4() -> bool
+PyQt5.QtNetwork.QSslCertificate.importPkcs12?4(QIODevice, QSslKey, QSslCertificate, list-of-QSslCertificate caCertificates=None, QByteArray passPhrase=QByteArray()) -> bool
 PyQt5.QtNetwork.QSslCertificateExtension?1()
 PyQt5.QtNetwork.QSslCertificateExtension.__init__?1(self)
 PyQt5.QtNetwork.QSslCertificateExtension?1(QSslCertificateExtension)
@@ -14261,6 +14536,7 @@ PyQt5.QtNetwork.QSslConfiguration.setAllowedNextProtocols?4(list-of-QByteArray)
 PyQt5.QtNetwork.QSslConfiguration.allowedNextProtocols?4() -> list-of-QByteArray
 PyQt5.QtNetwork.QSslConfiguration.nextNegotiatedProtocol?4() -> QByteArray
 PyQt5.QtNetwork.QSslConfiguration.nextProtocolNegotiationStatus?4() -> QSslConfiguration.NextProtocolNegotiationStatus
+PyQt5.QtNetwork.QSslConfiguration.sessionProtocol?4() -> QSsl.SslProtocol
 PyQt5.QtNetwork.QSslCipher?1()
 PyQt5.QtNetwork.QSslCipher.__init__?1(self)
 PyQt5.QtNetwork.QSslCipher?1(str)
@@ -14428,6 +14704,9 @@ PyQt5.QtNetwork.QSslSocket.sslLibraryVersionNumber?4() -> int
 PyQt5.QtNetwork.QSslSocket.sslLibraryVersionString?4() -> str
 PyQt5.QtNetwork.QSslSocket.setLocalCertificateChain?4(list-of-QSslCertificate)
 PyQt5.QtNetwork.QSslSocket.localCertificateChain?4() -> list-of-QSslCertificate
+PyQt5.QtNetwork.QSslSocket.sessionProtocol?4() -> QSsl.SslProtocol
+PyQt5.QtNetwork.QSslSocket.sslLibraryBuildVersionNumber?4() -> int
+PyQt5.QtNetwork.QSslSocket.sslLibraryBuildVersionString?4() -> str
 PyQt5.QtNetwork.QTcpServer?1(QObject parent=None)
 PyQt5.QtNetwork.QTcpServer.__init__?1(self, QObject parent=None)
 PyQt5.QtNetwork.QTcpServer.listen?4(QHostAddress address=QHostAddress.Any, int port=0) -> bool
@@ -14935,6 +15214,8 @@ PyQt5.QtPrintSupport.QPrinterInfo.maximumPhysicalPageSize?4() -> QPageSize
 PyQt5.QtPrintSupport.QPrinterInfo.supportedResolutions?4() -> list-of-int
 PyQt5.QtPrintSupport.QPrinterInfo.availablePrinterNames?4() -> list-of-str
 PyQt5.QtPrintSupport.QPrinterInfo.defaultPrinterName?4() -> str
+PyQt5.QtPrintSupport.QPrinterInfo.defaultDuplexMode?4() -> QPrinter.DuplexMode
+PyQt5.QtPrintSupport.QPrinterInfo.supportedDuplexModes?4() -> list-of-QPrinter.DuplexMode
 PyQt5.QtPrintSupport.QPrintPreviewDialog?1(QWidget parent=None, Qt.WindowFlags flags=0)
 PyQt5.QtPrintSupport.QPrintPreviewDialog.__init__?1(self, QWidget parent=None, Qt.WindowFlags flags=0)
 PyQt5.QtPrintSupport.QPrintPreviewDialog?1(QPrinter, QWidget parent=None, Qt.WindowFlags flags=0)
@@ -14985,7 +15266,9 @@ PyQt5.QtPrintSupport.QPrintPreviewWidget.previewChanged?4()
 PyQt5.QtPrintSupport.QPrintPreviewWidget.pageCount?4() -> int
 PyQt5.QtQml.qmlAttachedPropertiesObject?4(type, QObject, bool create=True) -> QObject
 PyQt5.QtQml.qmlRegisterRevision?4(type, int, str, int, int, type attachedProperties=0) -> int
+PyQt5.QtQml.qmlRegisterSingletonType?4(QUrl, str, int, int, str) -> int
 PyQt5.QtQml.qmlRegisterSingletonType?4(type, str, int, int, str, callable) -> int
+PyQt5.QtQml.qmlRegisterType?4(QUrl, str, int, int, str) -> int
 PyQt5.QtQml.qmlRegisterType?4(type, type attachedProperties=0) -> int
 PyQt5.QtQml.qmlRegisterType?4(type, str, int, int, str, type attachedProperties=0) -> int
 PyQt5.QtQml.qmlRegisterType?4(type, int, str, int, int, str, type attachedProperties=0) -> int
@@ -15001,6 +15284,7 @@ PyQt5.QtQml.QJSEngine.newObject?4() -> QJSValue
 PyQt5.QtQml.QJSEngine.newArray?4(int length=0) -> QJSValue
 PyQt5.QtQml.QJSEngine.newQObject?4(QObject) -> QJSValue
 PyQt5.QtQml.QJSEngine.collectGarbage?4()
+PyQt5.QtQml.QJSEngine.installTranslatorFunctions?4(QJSValue object=QJSValue(QJSValue.UndefinedValue))
 PyQt5.QtQml.QJSValue.SpecialValue?10
 PyQt5.QtQml.QJSValue.NullValue?10
 PyQt5.QtQml.QJSValue.UndefinedValue?10
@@ -15364,21 +15648,6 @@ PyQt5.QtQml.QQmlScriptString.isNullLiteral?4() -> bool
 PyQt5.QtQml.QQmlScriptString.stringLiteral?4() -> str
 PyQt5.QtQml.QQmlScriptString.numberLiteral?4() -> (float, bool)
 PyQt5.QtQml.QQmlScriptString.booleanLiteral?4() -> (bool, bool)
-PyQt5.QtQuick.QQuickTextureFactory?1()
-PyQt5.QtQuick.QQuickTextureFactory.__init__?1(self)
-PyQt5.QtQuick.QQuickTextureFactory.createTexture?4(QQuickWindow) -> QSGTexture
-PyQt5.QtQuick.QQuickTextureFactory.textureSize?4() -> QSize
-PyQt5.QtQuick.QQuickTextureFactory.textureByteCount?4() -> int
-PyQt5.QtQuick.QQuickTextureFactory.image?4() -> QImage
-PyQt5.QtQuick.QQuickImageProvider?1(QQmlImageProviderBase.ImageType, QQmlImageProviderBase.Flags flags=0)
-PyQt5.QtQuick.QQuickImageProvider.__init__?1(self, QQmlImageProviderBase.ImageType, QQmlImageProviderBase.Flags flags=0)
-PyQt5.QtQuick.QQuickImageProvider?1(QQuickImageProvider)
-PyQt5.QtQuick.QQuickImageProvider.__init__?1(self, QQuickImageProvider)
-PyQt5.QtQuick.QQuickImageProvider.imageType?4() -> QQmlImageProviderBase.ImageType
-PyQt5.QtQuick.QQuickImageProvider.flags?4() -> QQmlImageProviderBase.Flags
-PyQt5.QtQuick.QQuickImageProvider.requestImage?4(str, QSize) -> (QImage, QSize)
-PyQt5.QtQuick.QQuickImageProvider.requestPixmap?4(str, QSize) -> (QPixmap, QSize)
-PyQt5.QtQuick.QQuickImageProvider.requestTexture?4(str, QSize) -> (QQuickTextureFactory, QSize)
 PyQt5.QtQuick.QQuickItem.TransformOrigin?10
 PyQt5.QtQuick.QQuickItem.TopLeft?10
 PyQt5.QtQuick.QQuickItem.Top?10
@@ -15533,6 +15802,43 @@ PyQt5.QtQuick.QQuickItem.forceActiveFocus?4(Qt.FocusReason)
 PyQt5.QtQuick.QQuickItem.nextItemInFocusChain?4(bool forward=True) -> QQuickItem
 PyQt5.QtQuick.QQuickItem.windowChanged?4(QQuickWindow)
 PyQt5.QtQuick.QQuickItem.resetAntialiasing?4()
+PyQt5.QtQuick.QQuickItem.grabToImage?4(QSize targetSize=QSize()) -> QQuickItemGrabResult
+PyQt5.QtQuick.QQuickFramebufferObject?1(QQuickItem parent=None)
+PyQt5.QtQuick.QQuickFramebufferObject.__init__?1(self, QQuickItem parent=None)
+PyQt5.QtQuick.QQuickFramebufferObject.textureFollowsItemSize?4() -> bool
+PyQt5.QtQuick.QQuickFramebufferObject.setTextureFollowsItemSize?4(bool)
+PyQt5.QtQuick.QQuickFramebufferObject.createRenderer?4() -> QQuickFramebufferObject.Renderer
+PyQt5.QtQuick.QQuickFramebufferObject.geometryChanged?4(QRectF, QRectF)
+PyQt5.QtQuick.QQuickFramebufferObject.updatePaintNode?4(QSGNode, QQuickItem.UpdatePaintNodeData) -> QSGNode
+PyQt5.QtQuick.QQuickFramebufferObject.textureFollowsItemSizeChanged?4(bool)
+PyQt5.QtQuick.QQuickFramebufferObject.isTextureProvider?4() -> bool
+PyQt5.QtQuick.QQuickFramebufferObject.textureProvider?4() -> QSGTextureProvider
+PyQt5.QtQuick.QQuickFramebufferObject.releaseResources?4()
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer?1()
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.__init__?1(self)
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer?1(QQuickFramebufferObject.Renderer)
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.__init__?1(self, QQuickFramebufferObject.Renderer)
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.render?4()
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.createFramebufferObject?4(QSize) -> QOpenGLFramebufferObject
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.synchronize?4(QQuickFramebufferObject)
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.framebufferObject?4() -> QOpenGLFramebufferObject
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.update?4()
+PyQt5.QtQuick.QQuickFramebufferObject.Renderer.invalidateFramebufferObject?4()
+PyQt5.QtQuick.QQuickTextureFactory?1()
+PyQt5.QtQuick.QQuickTextureFactory.__init__?1(self)
+PyQt5.QtQuick.QQuickTextureFactory.createTexture?4(QQuickWindow) -> QSGTexture
+PyQt5.QtQuick.QQuickTextureFactory.textureSize?4() -> QSize
+PyQt5.QtQuick.QQuickTextureFactory.textureByteCount?4() -> int
+PyQt5.QtQuick.QQuickTextureFactory.image?4() -> QImage
+PyQt5.QtQuick.QQuickImageProvider?1(QQmlImageProviderBase.ImageType, QQmlImageProviderBase.Flags flags=0)
+PyQt5.QtQuick.QQuickImageProvider.__init__?1(self, QQmlImageProviderBase.ImageType, QQmlImageProviderBase.Flags flags=0)
+PyQt5.QtQuick.QQuickImageProvider?1(QQuickImageProvider)
+PyQt5.QtQuick.QQuickImageProvider.__init__?1(self, QQuickImageProvider)
+PyQt5.QtQuick.QQuickImageProvider.imageType?4() -> QQmlImageProviderBase.ImageType
+PyQt5.QtQuick.QQuickImageProvider.flags?4() -> QQmlImageProviderBase.Flags
+PyQt5.QtQuick.QQuickImageProvider.requestImage?4(str, QSize) -> (QImage, QSize)
+PyQt5.QtQuick.QQuickImageProvider.requestPixmap?4(str, QSize) -> (QPixmap, QSize)
+PyQt5.QtQuick.QQuickImageProvider.requestTexture?4(str, QSize) -> (QQuickTextureFactory, QSize)
 PyQt5.QtQuick.QQuickItem.Flags?1(QQuickItem.Flags)
 PyQt5.QtQuick.QQuickItem.Flags.__init__?1(self, QQuickItem.Flags)
 PyQt5.QtQuick.QQuickItem.Flags?1(int)
@@ -15556,6 +15862,11 @@ PyQt5.QtQuick.QQuickItem.ItemChangeData.__init__?1(self, QQuickItem.ItemChangeDa
 PyQt5.QtQuick.QQuickItem.UpdatePaintNodeData.transformNode?7
 PyQt5.QtQuick.QQuickItem.UpdatePaintNodeData?1(QQuickItem.UpdatePaintNodeData)
 PyQt5.QtQuick.QQuickItem.UpdatePaintNodeData.__init__?1(self, QQuickItem.UpdatePaintNodeData)
+PyQt5.QtQuick.QQuickItemGrabResult.image?4() -> QImage
+PyQt5.QtQuick.QQuickItemGrabResult.url?4() -> QUrl
+PyQt5.QtQuick.QQuickItemGrabResult.saveToFile?4(str) -> bool
+PyQt5.QtQuick.QQuickItemGrabResult.event?4(QEvent) -> bool
+PyQt5.QtQuick.QQuickItemGrabResult.ready?4()
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHint?10
 PyQt5.QtQuick.QQuickPaintedItem.FastFBOResizing?10
 PyQt5.QtQuick.QQuickPaintedItem.RenderTarget?10
@@ -15590,15 +15901,36 @@ PyQt5.QtQuick.QQuickPaintedItem.contentsSizeChanged?4()
 PyQt5.QtQuick.QQuickPaintedItem.contentsScaleChanged?4()
 PyQt5.QtQuick.QQuickPaintedItem.renderTargetChanged?4()
 PyQt5.QtQuick.QQuickPaintedItem.updatePaintNode?4(QSGNode, QQuickItem.UpdatePaintNodeData) -> QSGNode
+PyQt5.QtQuick.QQuickPaintedItem.isTextureProvider?4() -> bool
+PyQt5.QtQuick.QQuickPaintedItem.textureProvider?4() -> QSGTextureProvider
+PyQt5.QtQuick.QQuickPaintedItem.releaseResources?4()
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHints?1(QQuickPaintedItem.PerformanceHints)
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHints.__init__?1(self, QQuickPaintedItem.PerformanceHints)
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHints?1(int)
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHints.__init__?1(self, int)
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHints?1()
 PyQt5.QtQuick.QQuickPaintedItem.PerformanceHints.__init__?1(self)
+PyQt5.QtQuick.QQuickRenderControl?1(QObject parent=None)
+PyQt5.QtQuick.QQuickRenderControl.__init__?1(self, QObject parent=None)
+PyQt5.QtQuick.QQuickRenderControl.initialize?4(QOpenGLContext)
+PyQt5.QtQuick.QQuickRenderControl.invalidate?4()
+PyQt5.QtQuick.QQuickRenderControl.polishItems?4()
+PyQt5.QtQuick.QQuickRenderControl.render?4()
+PyQt5.QtQuick.QQuickRenderControl.sync?4() -> bool
+PyQt5.QtQuick.QQuickRenderControl.grab?4() -> QImage
+PyQt5.QtQuick.QQuickRenderControl.renderWindowFor?4(QQuickWindow, QPoint offset=None) -> QWindow
+PyQt5.QtQuick.QQuickRenderControl.renderWindow?4(QPoint) -> QWindow
+PyQt5.QtQuick.QQuickRenderControl.renderRequested?4()
+PyQt5.QtQuick.QQuickRenderControl.sceneChanged?4()
 PyQt5.QtQuick.QQuickTextDocument?1(QQuickItem)
 PyQt5.QtQuick.QQuickTextDocument.__init__?1(self, QQuickItem)
 PyQt5.QtQuick.QQuickTextDocument.textDocument?4() -> QTextDocument
+PyQt5.QtQuick.QQuickWindow.RenderStage?10
+PyQt5.QtQuick.QQuickWindow.BeforeSynchronizingStage?10
+PyQt5.QtQuick.QQuickWindow.AfterSynchronizingStage?10
+PyQt5.QtQuick.QQuickWindow.BeforeRenderingStage?10
+PyQt5.QtQuick.QQuickWindow.AfterRenderingStage?10
+PyQt5.QtQuick.QQuickWindow.AfterSwapStage?10
 PyQt5.QtQuick.QQuickWindow.SceneGraphError?10
 PyQt5.QtQuick.QQuickWindow.ContextNotAvailable?10
 PyQt5.QtQuick.QQuickWindow.CreateTextureOption?10
@@ -15664,6 +15996,8 @@ PyQt5.QtQuick.QQuickWindow.afterSynchronizing?4()
 PyQt5.QtQuick.QQuickWindow.afterAnimating?4()
 PyQt5.QtQuick.QQuickWindow.sceneGraphAboutToStop?4()
 PyQt5.QtQuick.QQuickWindow.sceneGraphError?4(QQuickWindow.SceneGraphError, str)
+PyQt5.QtQuick.QQuickWindow.scheduleRenderJob?4(QRunnable, QQuickWindow.RenderStage)
+PyQt5.QtQuick.QQuickWindow.effectiveDevicePixelRatio?4() -> float
 PyQt5.QtQuick.QQuickView.Status?10
 PyQt5.QtQuick.QQuickView.Null?10
 PyQt5.QtQuick.QQuickView.Ready?10
@@ -15702,6 +16036,48 @@ PyQt5.QtQuick.QQuickWindow.CreateTextureOptions?1(int)
 PyQt5.QtQuick.QQuickWindow.CreateTextureOptions.__init__?1(self, int)
 PyQt5.QtQuick.QQuickWindow.CreateTextureOptions?1()
 PyQt5.QtQuick.QQuickWindow.CreateTextureOptions.__init__?1(self)
+PyQt5.QtQuick.QSGAbstractRenderer.ClearModeBit?10
+PyQt5.QtQuick.QSGAbstractRenderer.ClearColorBuffer?10
+PyQt5.QtQuick.QSGAbstractRenderer.ClearDepthBuffer?10
+PyQt5.QtQuick.QSGAbstractRenderer.ClearStencilBuffer?10
+PyQt5.QtQuick.QSGAbstractRenderer.setDeviceRect?4(QRect)
+PyQt5.QtQuick.QSGAbstractRenderer.setDeviceRect?4(QSize)
+PyQt5.QtQuick.QSGAbstractRenderer.deviceRect?4() -> QRect
+PyQt5.QtQuick.QSGAbstractRenderer.setViewportRect?4(QRect)
+PyQt5.QtQuick.QSGAbstractRenderer.setViewportRect?4(QSize)
+PyQt5.QtQuick.QSGAbstractRenderer.viewportRect?4() -> QRect
+PyQt5.QtQuick.QSGAbstractRenderer.setProjectionMatrixToRect?4(QRectF)
+PyQt5.QtQuick.QSGAbstractRenderer.setProjectionMatrix?4(QMatrix4x4)
+PyQt5.QtQuick.QSGAbstractRenderer.projectionMatrix?4() -> QMatrix4x4
+PyQt5.QtQuick.QSGAbstractRenderer.setClearColor?4(QColor)
+PyQt5.QtQuick.QSGAbstractRenderer.clearColor?4() -> QColor
+PyQt5.QtQuick.QSGAbstractRenderer.setClearMode?4(QSGAbstractRenderer.ClearMode)
+PyQt5.QtQuick.QSGAbstractRenderer.clearMode?4() -> QSGAbstractRenderer.ClearMode
+PyQt5.QtQuick.QSGAbstractRenderer.renderScene?4(int fboId=0)
+PyQt5.QtQuick.QSGAbstractRenderer.sceneGraphChanged?4()
+PyQt5.QtQuick.QSGAbstractRenderer.ClearMode?1(QSGAbstractRenderer.ClearMode)
+PyQt5.QtQuick.QSGAbstractRenderer.ClearMode.__init__?1(self, QSGAbstractRenderer.ClearMode)
+PyQt5.QtQuick.QSGAbstractRenderer.ClearMode?1(int)
+PyQt5.QtQuick.QSGAbstractRenderer.ClearMode.__init__?1(self, int)
+PyQt5.QtQuick.QSGAbstractRenderer.ClearMode?1()
+PyQt5.QtQuick.QSGAbstractRenderer.ClearMode.__init__?1(self)
+PyQt5.QtQuick.QSGEngine.CreateTextureOption?10
+PyQt5.QtQuick.QSGEngine.TextureHasAlphaChannel?10
+PyQt5.QtQuick.QSGEngine.TextureOwnsGLTexture?10
+PyQt5.QtQuick.QSGEngine.TextureCanUseAtlas?10
+PyQt5.QtQuick.QSGEngine?1(QObject parent=None)
+PyQt5.QtQuick.QSGEngine.__init__?1(self, QObject parent=None)
+PyQt5.QtQuick.QSGEngine.initialize?4(QOpenGLContext)
+PyQt5.QtQuick.QSGEngine.invalidate?4()
+PyQt5.QtQuick.QSGEngine.createRenderer?4() -> QSGAbstractRenderer
+PyQt5.QtQuick.QSGEngine.createTextureFromImage?4(QImage, QSGEngine.CreateTextureOptions options=(QSGEngine::CreateTextureOption)0) -> QSGTexture
+PyQt5.QtQuick.QSGEngine.createTextureFromId?4(int, QSize, QSGEngine.CreateTextureOptions options=(QSGEngine::CreateTextureOption)0) -> QSGTexture
+PyQt5.QtQuick.QSGEngine.CreateTextureOptions?1(QSGEngine.CreateTextureOptions)
+PyQt5.QtQuick.QSGEngine.CreateTextureOptions.__init__?1(self, QSGEngine.CreateTextureOptions)
+PyQt5.QtQuick.QSGEngine.CreateTextureOptions?1(int)
+PyQt5.QtQuick.QSGEngine.CreateTextureOptions.__init__?1(self, int)
+PyQt5.QtQuick.QSGEngine.CreateTextureOptions?1()
+PyQt5.QtQuick.QSGEngine.CreateTextureOptions.__init__?1(self)
 PyQt5.QtQuick.QSGMaterial.Flag?10
 PyQt5.QtQuick.QSGMaterial.Blending?10
 PyQt5.QtQuick.QSGMaterial.RequiresDeterminant?10
@@ -15722,24 +16098,6 @@ PyQt5.QtQuick.QSGFlatColorMaterial.createShader?4() -> QSGMaterialShader
 PyQt5.QtQuick.QSGFlatColorMaterial.setColor?4(QColor)
 PyQt5.QtQuick.QSGFlatColorMaterial.color?4() -> QColor
 PyQt5.QtQuick.QSGFlatColorMaterial.compare?4(QSGMaterial) -> int
-PyQt5.QtQuick.QQuickFramebufferObject?1(QQuickItem parent=None)
-PyQt5.QtQuick.QQuickFramebufferObject.__init__?1(self, QQuickItem parent=None)
-PyQt5.QtQuick.QQuickFramebufferObject.textureFollowsItemSize?4() -> bool
-PyQt5.QtQuick.QQuickFramebufferObject.setTextureFollowsItemSize?4(bool)
-PyQt5.QtQuick.QQuickFramebufferObject.createRenderer?4() -> QQuickFramebufferObject.Renderer
-PyQt5.QtQuick.QQuickFramebufferObject.geometryChanged?4(QRectF, QRectF)
-PyQt5.QtQuick.QQuickFramebufferObject.updatePaintNode?4(QSGNode, QQuickItem.UpdatePaintNodeData) -> QSGNode
-PyQt5.QtQuick.QQuickFramebufferObject.textureFollowsItemSizeChanged?4(bool)
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer?1()
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.__init__?1(self)
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer?1(QQuickFramebufferObject.Renderer)
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.__init__?1(self, QQuickFramebufferObject.Renderer)
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.render?4()
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.createFramebufferObject?4(QSize) -> QOpenGLFramebufferObject
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.synchronize?4(QQuickFramebufferObject)
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.framebufferObject?4() -> QOpenGLFramebufferObject
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.update?4()
-PyQt5.QtQuick.QQuickFramebufferObject.Renderer.invalidateFramebufferObject?4()
 PyQt5.QtQuick.QSGGeometry.DataPattern?10
 PyQt5.QtQuick.QSGGeometry.AlwaysUploadPattern?10
 PyQt5.QtQuick.QSGGeometry.StreamPattern?10
@@ -15753,6 +16111,7 @@ PyQt5.QtQuick.QSGGeometry.GL_TRIANGLES?10
 PyQt5.QtQuick.QSGGeometry.GL_TRIANGLE_STRIP?10
 PyQt5.QtQuick.QSGGeometry.GL_TRIANGLE_FAN?10
 PyQt5.QtQuick.QSGGeometry.GL_BYTE?10
+PyQt5.QtQuick.QSGGeometry.GL_DOUBLE?10
 PyQt5.QtQuick.QSGGeometry.GL_FLOAT?10
 PyQt5.QtQuick.QSGGeometry.GL_INT?10
 PyQt5.QtQuick.QSGGeometry?1(QSGGeometry.AttributeSet, int, int indexCount=0, int indexType=GL_UNSIGNED_SHORT)
@@ -15977,6 +16336,8 @@ PyQt5.QtQuick.QSGSimpleTextureNode.setFiltering?4(QSGTexture.Filtering)
 PyQt5.QtQuick.QSGSimpleTextureNode.filtering?4() -> QSGTexture.Filtering
 PyQt5.QtQuick.QSGSimpleTextureNode.setTextureCoordinatesTransform?4(QSGSimpleTextureNode.TextureCoordinatesTransformMode)
 PyQt5.QtQuick.QSGSimpleTextureNode.textureCoordinatesTransform?4() -> QSGSimpleTextureNode.TextureCoordinatesTransformMode
+PyQt5.QtQuick.QSGSimpleTextureNode.setOwnsTexture?4(bool)
+PyQt5.QtQuick.QSGSimpleTextureNode.ownsTexture?4() -> bool
 PyQt5.QtQuick.QSGSimpleTextureNode.TextureCoordinatesTransformMode?1(QSGSimpleTextureNode.TextureCoordinatesTransformMode)
 PyQt5.QtQuick.QSGSimpleTextureNode.TextureCoordinatesTransformMode.__init__?1(self, QSGSimpleTextureNode.TextureCoordinatesTransformMode)
 PyQt5.QtQuick.QSGSimpleTextureNode.TextureCoordinatesTransformMode?1(int)
@@ -16120,6 +16481,16 @@ PyQt5.QtSql.QSqlDatabase.registerSqlDriver?4(str, QSqlDriverCreatorBase)
 PyQt5.QtSql.QSqlDatabase.isDriverAvailable?4(str) -> bool
 PyQt5.QtSql.QSqlDatabase.setNumericalPrecisionPolicy?4(QSql.NumericalPrecisionPolicy)
 PyQt5.QtSql.QSqlDatabase.numericalPrecisionPolicy?4() -> QSql.NumericalPrecisionPolicy
+PyQt5.QtSql.QSqlDriver.DbmsType?10
+PyQt5.QtSql.QSqlDriver.UnknownDbms?10
+PyQt5.QtSql.QSqlDriver.MSSqlServer?10
+PyQt5.QtSql.QSqlDriver.MySqlServer?10
+PyQt5.QtSql.QSqlDriver.PostgreSQL?10
+PyQt5.QtSql.QSqlDriver.Oracle?10
+PyQt5.QtSql.QSqlDriver.Sybase?10
+PyQt5.QtSql.QSqlDriver.SQLite?10
+PyQt5.QtSql.QSqlDriver.Interbase?10
+PyQt5.QtSql.QSqlDriver.DB2?10
 PyQt5.QtSql.QSqlDriver.NotificationSource?10
 PyQt5.QtSql.QSqlDriver.UnknownSource?10
 PyQt5.QtSql.QSqlDriver.SelfSource?10
@@ -16179,6 +16550,7 @@ PyQt5.QtSql.QSqlDriver.isIdentifierEscaped?4(str, QSqlDriver.IdentifierType) -> 
 PyQt5.QtSql.QSqlDriver.stripDelimiters?4(str, QSqlDriver.IdentifierType) -> str
 PyQt5.QtSql.QSqlDriver.setNumericalPrecisionPolicy?4(QSql.NumericalPrecisionPolicy)
 PyQt5.QtSql.QSqlDriver.numericalPrecisionPolicy?4() -> QSql.NumericalPrecisionPolicy
+PyQt5.QtSql.QSqlDriver.dbmsType?4() -> QSqlDriver.DbmsType
 PyQt5.QtSql.QSqlError.ErrorType?10
 PyQt5.QtSql.QSqlError.NoError?10
 PyQt5.QtSql.QSqlError.ConnectionError?10
@@ -16859,6 +17231,7 @@ PyQt5.QtWebKit.QWebSettings.ScrollAnimatorEnabled?10
 PyQt5.QtWebKit.QWebSettings.CaretBrowsingEnabled?10
 PyQt5.QtWebKit.QWebSettings.NotificationsEnabled?10
 PyQt5.QtWebKit.QWebSettings.WebAudioEnabled?10
+PyQt5.QtWebKit.QWebSettings.Accelerated2dCanvasEnabled?10
 PyQt5.QtWebKit.QWebSettings.FontFamily?10
 PyQt5.QtWebKit.QWebSettings.StandardFont?10
 PyQt5.QtWebKit.QWebSettings.FixedFont?10
@@ -17688,7 +18061,6 @@ PyQt5.QtWidgets.QWidget.grab?4(QRect rectangle=QRect(QPoint(0,0),QSize(-1,-1))) 
 PyQt5.QtWidgets.QWidget.createWindowContainer?4(QWindow, QWidget parent=None, Qt.WindowFlags flags=0) -> QWidget
 PyQt5.QtWidgets.QWidget.windowHandle?4() -> QWindow
 PyQt5.QtWidgets.QWidget.nativeEvent?4(QByteArray, sip.voidptr) -> (bool, int)
-PyQt5.QtWidgets.QWidget.redirected?4(QPoint) -> QPaintDevice
 PyQt5.QtWidgets.QWidget.sharedPainter?4() -> QPainter
 PyQt5.QtWidgets.QWidget.initPainter?4(QPainter)
 PyQt5.QtWidgets.QWidget.setToolTipDuration?4(int)
@@ -18963,6 +19335,8 @@ PyQt5.QtWidgets.QStyle.SH_ToolTip_WakeUpDelay?10
 PyQt5.QtWidgets.QStyle.SH_ToolTip_FallAsleepDelay?10
 PyQt5.QtWidgets.QStyle.SH_Widget_Animate?10
 PyQt5.QtWidgets.QStyle.SH_Splitter_OpaqueResize?10
+PyQt5.QtWidgets.QStyle.SH_LineEdit_PasswordMaskDelay?10
+PyQt5.QtWidgets.QStyle.SH_TabBar_ChangeCurrentDelay?10
 PyQt5.QtWidgets.QStyle.SH_CustomBase?10
 PyQt5.QtWidgets.QStyle.ContentsType?10
 PyQt5.QtWidgets.QStyle.CT_PushButton?10
@@ -19083,6 +19457,7 @@ PyQt5.QtWidgets.QStyle.PM_TabCloseIndicatorHeight?10
 PyQt5.QtWidgets.QStyle.PM_ScrollView_ScrollBarSpacing?10
 PyQt5.QtWidgets.QStyle.PM_SubMenuOverlap?10
 PyQt5.QtWidgets.QStyle.PM_ScrollView_ScrollBarOverlap?10
+PyQt5.QtWidgets.QStyle.PM_TreeViewIndentation?10
 PyQt5.QtWidgets.QStyle.PM_CustomBase?10
 PyQt5.QtWidgets.QStyle.SubControl?10
 PyQt5.QtWidgets.QStyle.SC_None?10
@@ -20426,6 +20801,7 @@ PyQt5.QtWidgets.QGraphicsItem.ItemAcceptsInputMethod?10
 PyQt5.QtWidgets.QGraphicsItem.ItemNegativeZStacksBehindParent?10
 PyQt5.QtWidgets.QGraphicsItem.ItemIsPanel?10
 PyQt5.QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges?10
+PyQt5.QtWidgets.QGraphicsItem.ItemContainsChildrenInShape?10
 PyQt5.QtWidgets.QGraphicsItem.GraphicsItemChange?10
 PyQt5.QtWidgets.QGraphicsItem.ItemPositionChange?10
 PyQt5.QtWidgets.QGraphicsItem.ItemMatrixChange?10
@@ -21137,6 +21513,8 @@ PyQt5.QtWidgets.QGraphicsScene.activePanel?4() -> QGraphicsItem
 PyQt5.QtWidgets.QGraphicsScene.setActivePanel?4(QGraphicsItem)
 PyQt5.QtWidgets.QGraphicsScene.sendEvent?4(QGraphicsItem, QEvent) -> bool
 PyQt5.QtWidgets.QGraphicsScene.invalidate?4(float, float, float, float, QGraphicsScene.SceneLayers layers=QGraphicsScene.AllLayers)
+PyQt5.QtWidgets.QGraphicsScene.minimumRenderSize?4() -> float
+PyQt5.QtWidgets.QGraphicsScene.setMinimumRenderSize?4(float)
 PyQt5.QtWidgets.QGraphicsScene.focusItemChanged?4(QGraphicsItem, QGraphicsItem, Qt.FocusReason)
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers?1(QGraphicsScene.SceneLayers)
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers.__init__?1(self, QGraphicsScene.SceneLayers)
@@ -21158,6 +21536,8 @@ PyQt5.QtWidgets.QGraphicsSceneMouseEvent.lastScreenPos?4() -> QPoint
 PyQt5.QtWidgets.QGraphicsSceneMouseEvent.buttons?4() -> Qt.MouseButtons
 PyQt5.QtWidgets.QGraphicsSceneMouseEvent.button?4() -> Qt.MouseButton
 PyQt5.QtWidgets.QGraphicsSceneMouseEvent.modifiers?4() -> Qt.KeyboardModifiers
+PyQt5.QtWidgets.QGraphicsSceneMouseEvent.source?4() -> Qt.MouseEventSource
+PyQt5.QtWidgets.QGraphicsSceneMouseEvent.flags?4() -> Qt.MouseEventFlags
 PyQt5.QtWidgets.QGraphicsSceneWheelEvent.pos?4() -> QPointF
 PyQt5.QtWidgets.QGraphicsSceneWheelEvent.scenePos?4() -> QPointF
 PyQt5.QtWidgets.QGraphicsSceneWheelEvent.screenPos?4() -> QPoint
@@ -22497,6 +22877,28 @@ PyQt5.QtWidgets.QMouseEventTransition.hitTestPath?4() -> QPainterPath
 PyQt5.QtWidgets.QMouseEventTransition.setHitTestPath?4(QPainterPath)
 PyQt5.QtWidgets.QMouseEventTransition.onTransition?4(QEvent)
 PyQt5.QtWidgets.QMouseEventTransition.eventTest?4(QEvent) -> bool
+PyQt5.QtWidgets.QOpenGLWidget?1(QWidget parent=None, Qt.WindowFlags flags=0)
+PyQt5.QtWidgets.QOpenGLWidget.__init__?1(self, QWidget parent=None, Qt.WindowFlags flags=0)
+PyQt5.QtWidgets.QOpenGLWidget.setFormat?4(QSurfaceFormat)
+PyQt5.QtWidgets.QOpenGLWidget.format?4() -> QSurfaceFormat
+PyQt5.QtWidgets.QOpenGLWidget.isValid?4() -> bool
+PyQt5.QtWidgets.QOpenGLWidget.makeCurrent?4()
+PyQt5.QtWidgets.QOpenGLWidget.doneCurrent?4()
+PyQt5.QtWidgets.QOpenGLWidget.context?4() -> QOpenGLContext
+PyQt5.QtWidgets.QOpenGLWidget.defaultFramebufferObject?4() -> int
+PyQt5.QtWidgets.QOpenGLWidget.grabFramebuffer?4() -> QImage
+PyQt5.QtWidgets.QOpenGLWidget.aboutToCompose?4()
+PyQt5.QtWidgets.QOpenGLWidget.frameSwapped?4()
+PyQt5.QtWidgets.QOpenGLWidget.aboutToResize?4()
+PyQt5.QtWidgets.QOpenGLWidget.resized?4()
+PyQt5.QtWidgets.QOpenGLWidget.initializeGL?4()
+PyQt5.QtWidgets.QOpenGLWidget.resizeGL?4(int, int)
+PyQt5.QtWidgets.QOpenGLWidget.paintGL?4()
+PyQt5.QtWidgets.QOpenGLWidget.paintEvent?4(QPaintEvent)
+PyQt5.QtWidgets.QOpenGLWidget.resizeEvent?4(QResizeEvent)
+PyQt5.QtWidgets.QOpenGLWidget.event?4(QEvent) -> bool
+PyQt5.QtWidgets.QOpenGLWidget.metric?4(QPaintDevice.PaintDeviceMetric) -> int
+PyQt5.QtWidgets.QOpenGLWidget.paintEngine?4() -> QPaintEngine
 PyQt5.QtWidgets.QPlainTextEdit.LineWrapMode?10
 PyQt5.QtWidgets.QPlainTextEdit.NoWrap?10
 PyQt5.QtWidgets.QPlainTextEdit.WidgetWidth?10
@@ -23833,6 +24235,11 @@ PyQt5.QtWidgets.QTabBar.wheelEvent?4(QWheelEvent)
 PyQt5.QtWidgets.QTabBar.minimumTabSizeHint?4(int) -> QSize
 PyQt5.QtWidgets.QTabBar.tabBarClicked?4(int)
 PyQt5.QtWidgets.QTabBar.tabBarDoubleClicked?4(int)
+PyQt5.QtWidgets.QTabBar.autoHide?4() -> bool
+PyQt5.QtWidgets.QTabBar.setAutoHide?4(bool)
+PyQt5.QtWidgets.QTabBar.changeCurrentOnDrag?4() -> bool
+PyQt5.QtWidgets.QTabBar.setChangeCurrentOnDrag?4(bool)
+PyQt5.QtWidgets.QTabBar.timerEvent?4(QTimerEvent)
 PyQt5.QtWidgets.QTableView?1(QWidget parent=None)
 PyQt5.QtWidgets.QTableView.__init__?1(self, QWidget parent=None)
 PyQt5.QtWidgets.QTableView.setModel?4(QAbstractItemModel)
@@ -24114,6 +24521,8 @@ PyQt5.QtWidgets.QTabWidget.heightForWidth?4(int) -> int
 PyQt5.QtWidgets.QTabWidget.hasHeightForWidth?4() -> bool
 PyQt5.QtWidgets.QTabWidget.tabBarClicked?4(int)
 PyQt5.QtWidgets.QTabWidget.tabBarDoubleClicked?4(int)
+PyQt5.QtWidgets.QTabWidget.tabBarAutoHide?4() -> bool
+PyQt5.QtWidgets.QTabWidget.setTabBarAutoHide?4(bool)
 PyQt5.QtWidgets.QTextEdit.AutoFormattingFlag?10
 PyQt5.QtWidgets.QTextEdit.AutoNone?10
 PyQt5.QtWidgets.QTextEdit.AutoBulletList?10
@@ -24516,6 +24925,7 @@ PyQt5.QtWidgets.QTreeView.setHeaderHidden?4(bool)
 PyQt5.QtWidgets.QTreeView.setTreePosition?4(int)
 PyQt5.QtWidgets.QTreeView.treePosition?4() -> int
 PyQt5.QtWidgets.QTreeView.viewportSizeHint?4() -> QSize
+PyQt5.QtWidgets.QTreeView.resetIndentation?4()
 PyQt5.QtWidgets.QTreeWidgetItem.ChildIndicatorPolicy?10
 PyQt5.QtWidgets.QTreeWidgetItem.ShowIndicator?10
 PyQt5.QtWidgets.QTreeWidgetItem.DontShowIndicator?10
@@ -24924,6 +25334,476 @@ PyQt5.QtWidgets.QWizardPage.field?4(str) -> QVariant
 PyQt5.QtWidgets.QWizardPage.registerField?4(str, QWidget, str property=None, signal changedSignal=0)
 PyQt5.QtWidgets.QWizardPage.registerField?4(str, QWidget, str property=None, str changedSignal=None)
 PyQt5.QtWidgets.QWizardPage.wizard?4() -> QWizard
+PyQt5.QtXml.QXmlNamespaceSupport?1()
+PyQt5.QtXml.QXmlNamespaceSupport.__init__?1(self)
+PyQt5.QtXml.QXmlNamespaceSupport.setPrefix?4(str, str)
+PyQt5.QtXml.QXmlNamespaceSupport.prefix?4(str) -> str
+PyQt5.QtXml.QXmlNamespaceSupport.uri?4(str) -> str
+PyQt5.QtXml.QXmlNamespaceSupport.splitName?4(str, str, str)
+PyQt5.QtXml.QXmlNamespaceSupport.processName?4(str, bool, str, str)
+PyQt5.QtXml.QXmlNamespaceSupport.prefixes?4() -> list-of-str
+PyQt5.QtXml.QXmlNamespaceSupport.prefixes?4(str) -> list-of-str
+PyQt5.QtXml.QXmlNamespaceSupport.pushContext?4()
+PyQt5.QtXml.QXmlNamespaceSupport.popContext?4()
+PyQt5.QtXml.QXmlNamespaceSupport.reset?4()
+PyQt5.QtXml.QXmlAttributes?1()
+PyQt5.QtXml.QXmlAttributes.__init__?1(self)
+PyQt5.QtXml.QXmlAttributes?1(QXmlAttributes)
+PyQt5.QtXml.QXmlAttributes.__init__?1(self, QXmlAttributes)
+PyQt5.QtXml.QXmlAttributes.index?4(str) -> int
+PyQt5.QtXml.QXmlAttributes.index?4(str, str) -> int
+PyQt5.QtXml.QXmlAttributes.length?4() -> int
+PyQt5.QtXml.QXmlAttributes.localName?4(int) -> str
+PyQt5.QtXml.QXmlAttributes.qName?4(int) -> str
+PyQt5.QtXml.QXmlAttributes.uri?4(int) -> str
+PyQt5.QtXml.QXmlAttributes.type?4(int) -> str
+PyQt5.QtXml.QXmlAttributes.type?4(str) -> str
+PyQt5.QtXml.QXmlAttributes.type?4(str, str) -> str
+PyQt5.QtXml.QXmlAttributes.value?4(int) -> str
+PyQt5.QtXml.QXmlAttributes.value?4(str) -> str
+PyQt5.QtXml.QXmlAttributes.value?4(str, str) -> str
+PyQt5.QtXml.QXmlAttributes.clear?4()
+PyQt5.QtXml.QXmlAttributes.append?4(str, str, str, str)
+PyQt5.QtXml.QXmlAttributes.count?4() -> int
+PyQt5.QtXml.QXmlInputSource.EndOfData?7
+PyQt5.QtXml.QXmlInputSource.EndOfDocument?7
+PyQt5.QtXml.QXmlInputSource?1()
+PyQt5.QtXml.QXmlInputSource.__init__?1(self)
+PyQt5.QtXml.QXmlInputSource?1(QIODevice)
+PyQt5.QtXml.QXmlInputSource.__init__?1(self, QIODevice)
+PyQt5.QtXml.QXmlInputSource?1(QXmlInputSource)
+PyQt5.QtXml.QXmlInputSource.__init__?1(self, QXmlInputSource)
+PyQt5.QtXml.QXmlInputSource.setData?4(str)
+PyQt5.QtXml.QXmlInputSource.setData?4(QByteArray)
+PyQt5.QtXml.QXmlInputSource.fetchData?4()
+PyQt5.QtXml.QXmlInputSource.data?4() -> str
+PyQt5.QtXml.QXmlInputSource.next?4() -> str
+PyQt5.QtXml.QXmlInputSource.reset?4()
+PyQt5.QtXml.QXmlInputSource.fromRawData?4(QByteArray, bool beginning=False) -> str
+PyQt5.QtXml.QXmlParseException?1(str name='', int column=-1, int line=-1, str publicId='', str systemId='')
+PyQt5.QtXml.QXmlParseException.__init__?1(self, str name='', int column=-1, int line=-1, str publicId='', str systemId='')
+PyQt5.QtXml.QXmlParseException?1(QXmlParseException)
+PyQt5.QtXml.QXmlParseException.__init__?1(self, QXmlParseException)
+PyQt5.QtXml.QXmlParseException.columnNumber?4() -> int
+PyQt5.QtXml.QXmlParseException.lineNumber?4() -> int
+PyQt5.QtXml.QXmlParseException.publicId?4() -> str
+PyQt5.QtXml.QXmlParseException.systemId?4() -> str
+PyQt5.QtXml.QXmlParseException.message?4() -> str
+PyQt5.QtXml.QXmlReader?1()
+PyQt5.QtXml.QXmlReader.__init__?1(self)
+PyQt5.QtXml.QXmlReader?1(QXmlReader)
+PyQt5.QtXml.QXmlReader.__init__?1(self, QXmlReader)
+PyQt5.QtXml.QXmlReader.feature?4(str) -> (bool, bool)
+PyQt5.QtXml.QXmlReader.setFeature?4(str, bool)
+PyQt5.QtXml.QXmlReader.hasFeature?4(str) -> bool
+PyQt5.QtXml.QXmlReader.property?4(str) -> (sip.voidptr, bool)
+PyQt5.QtXml.QXmlReader.setProperty?4(str, sip.voidptr)
+PyQt5.QtXml.QXmlReader.hasProperty?4(str) -> bool
+PyQt5.QtXml.QXmlReader.setEntityResolver?4(QXmlEntityResolver)
+PyQt5.QtXml.QXmlReader.entityResolver?4() -> QXmlEntityResolver
+PyQt5.QtXml.QXmlReader.setDTDHandler?4(QXmlDTDHandler)
+PyQt5.QtXml.QXmlReader.DTDHandler?4() -> QXmlDTDHandler
+PyQt5.QtXml.QXmlReader.setContentHandler?4(QXmlContentHandler)
+PyQt5.QtXml.QXmlReader.contentHandler?4() -> QXmlContentHandler
+PyQt5.QtXml.QXmlReader.setErrorHandler?4(QXmlErrorHandler)
+PyQt5.QtXml.QXmlReader.errorHandler?4() -> QXmlErrorHandler
+PyQt5.QtXml.QXmlReader.setLexicalHandler?4(QXmlLexicalHandler)
+PyQt5.QtXml.QXmlReader.lexicalHandler?4() -> QXmlLexicalHandler
+PyQt5.QtXml.QXmlReader.setDeclHandler?4(QXmlDeclHandler)
+PyQt5.QtXml.QXmlReader.declHandler?4() -> QXmlDeclHandler
+PyQt5.QtXml.QXmlReader.parse?4(QXmlInputSource) -> bool
+PyQt5.QtXml.QXmlReader.parse?4(QXmlInputSource) -> bool
+PyQt5.QtXml.QXmlSimpleReader?1()
+PyQt5.QtXml.QXmlSimpleReader.__init__?1(self)
+PyQt5.QtXml.QXmlSimpleReader.feature?4(str) -> (bool, bool)
+PyQt5.QtXml.QXmlSimpleReader.setFeature?4(str, bool)
+PyQt5.QtXml.QXmlSimpleReader.hasFeature?4(str) -> bool
+PyQt5.QtXml.QXmlSimpleReader.property?4(str) -> (sip.voidptr, bool)
+PyQt5.QtXml.QXmlSimpleReader.setProperty?4(str, sip.voidptr)
+PyQt5.QtXml.QXmlSimpleReader.hasProperty?4(str) -> bool
+PyQt5.QtXml.QXmlSimpleReader.setEntityResolver?4(QXmlEntityResolver)
+PyQt5.QtXml.QXmlSimpleReader.entityResolver?4() -> QXmlEntityResolver
+PyQt5.QtXml.QXmlSimpleReader.setDTDHandler?4(QXmlDTDHandler)
+PyQt5.QtXml.QXmlSimpleReader.DTDHandler?4() -> QXmlDTDHandler
+PyQt5.QtXml.QXmlSimpleReader.setContentHandler?4(QXmlContentHandler)
+PyQt5.QtXml.QXmlSimpleReader.contentHandler?4() -> QXmlContentHandler
+PyQt5.QtXml.QXmlSimpleReader.setErrorHandler?4(QXmlErrorHandler)
+PyQt5.QtXml.QXmlSimpleReader.errorHandler?4() -> QXmlErrorHandler
+PyQt5.QtXml.QXmlSimpleReader.setLexicalHandler?4(QXmlLexicalHandler)
+PyQt5.QtXml.QXmlSimpleReader.lexicalHandler?4() -> QXmlLexicalHandler
+PyQt5.QtXml.QXmlSimpleReader.setDeclHandler?4(QXmlDeclHandler)
+PyQt5.QtXml.QXmlSimpleReader.declHandler?4() -> QXmlDeclHandler
+PyQt5.QtXml.QXmlSimpleReader.parse?4(QXmlInputSource) -> bool
+PyQt5.QtXml.QXmlSimpleReader.parse?4(QXmlInputSource, bool) -> bool
+PyQt5.QtXml.QXmlSimpleReader.parseContinue?4() -> bool
+PyQt5.QtXml.QXmlLocator?1()
+PyQt5.QtXml.QXmlLocator.__init__?1(self)
+PyQt5.QtXml.QXmlLocator?1(QXmlLocator)
+PyQt5.QtXml.QXmlLocator.__init__?1(self, QXmlLocator)
+PyQt5.QtXml.QXmlLocator.columnNumber?4() -> int
+PyQt5.QtXml.QXmlLocator.lineNumber?4() -> int
+PyQt5.QtXml.QXmlContentHandler?1()
+PyQt5.QtXml.QXmlContentHandler.__init__?1(self)
+PyQt5.QtXml.QXmlContentHandler?1(QXmlContentHandler)
+PyQt5.QtXml.QXmlContentHandler.__init__?1(self, QXmlContentHandler)
+PyQt5.QtXml.QXmlContentHandler.setDocumentLocator?4(QXmlLocator)
+PyQt5.QtXml.QXmlContentHandler.startDocument?4() -> bool
+PyQt5.QtXml.QXmlContentHandler.endDocument?4() -> bool
+PyQt5.QtXml.QXmlContentHandler.startPrefixMapping?4(str, str) -> bool
+PyQt5.QtXml.QXmlContentHandler.endPrefixMapping?4(str) -> bool
+PyQt5.QtXml.QXmlContentHandler.startElement?4(str, str, str, QXmlAttributes) -> bool
+PyQt5.QtXml.QXmlContentHandler.endElement?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlContentHandler.characters?4(str) -> bool
+PyQt5.QtXml.QXmlContentHandler.ignorableWhitespace?4(str) -> bool
+PyQt5.QtXml.QXmlContentHandler.processingInstruction?4(str, str) -> bool
+PyQt5.QtXml.QXmlContentHandler.skippedEntity?4(str) -> bool
+PyQt5.QtXml.QXmlContentHandler.errorString?4() -> str
+PyQt5.QtXml.QXmlErrorHandler?1()
+PyQt5.QtXml.QXmlErrorHandler.__init__?1(self)
+PyQt5.QtXml.QXmlErrorHandler?1(QXmlErrorHandler)
+PyQt5.QtXml.QXmlErrorHandler.__init__?1(self, QXmlErrorHandler)
+PyQt5.QtXml.QXmlErrorHandler.warning?4(QXmlParseException) -> bool
+PyQt5.QtXml.QXmlErrorHandler.error?4(QXmlParseException) -> bool
+PyQt5.QtXml.QXmlErrorHandler.fatalError?4(QXmlParseException) -> bool
+PyQt5.QtXml.QXmlErrorHandler.errorString?4() -> str
+PyQt5.QtXml.QXmlDTDHandler?1()
+PyQt5.QtXml.QXmlDTDHandler.__init__?1(self)
+PyQt5.QtXml.QXmlDTDHandler?1(QXmlDTDHandler)
+PyQt5.QtXml.QXmlDTDHandler.__init__?1(self, QXmlDTDHandler)
+PyQt5.QtXml.QXmlDTDHandler.notationDecl?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlDTDHandler.unparsedEntityDecl?4(str, str, str, str) -> bool
+PyQt5.QtXml.QXmlDTDHandler.errorString?4() -> str
+PyQt5.QtXml.QXmlEntityResolver?1()
+PyQt5.QtXml.QXmlEntityResolver.__init__?1(self)
+PyQt5.QtXml.QXmlEntityResolver?1(QXmlEntityResolver)
+PyQt5.QtXml.QXmlEntityResolver.__init__?1(self, QXmlEntityResolver)
+PyQt5.QtXml.QXmlEntityResolver.resolveEntity?4(str, str) -> (bool, QXmlInputSource)
+PyQt5.QtXml.QXmlEntityResolver.errorString?4() -> str
+PyQt5.QtXml.QXmlLexicalHandler?1()
+PyQt5.QtXml.QXmlLexicalHandler.__init__?1(self)
+PyQt5.QtXml.QXmlLexicalHandler?1(QXmlLexicalHandler)
+PyQt5.QtXml.QXmlLexicalHandler.__init__?1(self, QXmlLexicalHandler)
+PyQt5.QtXml.QXmlLexicalHandler.startDTD?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlLexicalHandler.endDTD?4() -> bool
+PyQt5.QtXml.QXmlLexicalHandler.startEntity?4(str) -> bool
+PyQt5.QtXml.QXmlLexicalHandler.endEntity?4(str) -> bool
+PyQt5.QtXml.QXmlLexicalHandler.startCDATA?4() -> bool
+PyQt5.QtXml.QXmlLexicalHandler.endCDATA?4() -> bool
+PyQt5.QtXml.QXmlLexicalHandler.comment?4(str) -> bool
+PyQt5.QtXml.QXmlLexicalHandler.errorString?4() -> str
+PyQt5.QtXml.QXmlDeclHandler?1()
+PyQt5.QtXml.QXmlDeclHandler.__init__?1(self)
+PyQt5.QtXml.QXmlDeclHandler?1(QXmlDeclHandler)
+PyQt5.QtXml.QXmlDeclHandler.__init__?1(self, QXmlDeclHandler)
+PyQt5.QtXml.QXmlDeclHandler.attributeDecl?4(str, str, str, str, str) -> bool
+PyQt5.QtXml.QXmlDeclHandler.internalEntityDecl?4(str, str) -> bool
+PyQt5.QtXml.QXmlDeclHandler.externalEntityDecl?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlDeclHandler.errorString?4() -> str
+PyQt5.QtXml.QXmlDefaultHandler?1()
+PyQt5.QtXml.QXmlDefaultHandler.__init__?1(self)
+PyQt5.QtXml.QXmlDefaultHandler.setDocumentLocator?4(QXmlLocator)
+PyQt5.QtXml.QXmlDefaultHandler.startDocument?4() -> bool
+PyQt5.QtXml.QXmlDefaultHandler.endDocument?4() -> bool
+PyQt5.QtXml.QXmlDefaultHandler.startPrefixMapping?4(str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.endPrefixMapping?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.startElement?4(str, str, str, QXmlAttributes) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.endElement?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.characters?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.ignorableWhitespace?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.processingInstruction?4(str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.skippedEntity?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.warning?4(QXmlParseException) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.error?4(QXmlParseException) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.fatalError?4(QXmlParseException) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.notationDecl?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.unparsedEntityDecl?4(str, str, str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.resolveEntity?4(str, str) -> (bool, QXmlInputSource)
+PyQt5.QtXml.QXmlDefaultHandler.startDTD?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.endDTD?4() -> bool
+PyQt5.QtXml.QXmlDefaultHandler.startEntity?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.endEntity?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.startCDATA?4() -> bool
+PyQt5.QtXml.QXmlDefaultHandler.endCDATA?4() -> bool
+PyQt5.QtXml.QXmlDefaultHandler.comment?4(str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.attributeDecl?4(str, str, str, str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.internalEntityDecl?4(str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.externalEntityDecl?4(str, str, str) -> bool
+PyQt5.QtXml.QXmlDefaultHandler.errorString?4() -> str
+PyQt5.QtXml.QDomImplementation.InvalidDataPolicy?10
+PyQt5.QtXml.QDomImplementation.AcceptInvalidChars?10
+PyQt5.QtXml.QDomImplementation.DropInvalidChars?10
+PyQt5.QtXml.QDomImplementation.ReturnNullNode?10
+PyQt5.QtXml.QDomImplementation?1()
+PyQt5.QtXml.QDomImplementation.__init__?1(self)
+PyQt5.QtXml.QDomImplementation?1(QDomImplementation)
+PyQt5.QtXml.QDomImplementation.__init__?1(self, QDomImplementation)
+PyQt5.QtXml.QDomImplementation.hasFeature?4(str, str) -> bool
+PyQt5.QtXml.QDomImplementation.createDocumentType?4(str, str, str) -> QDomDocumentType
+PyQt5.QtXml.QDomImplementation.createDocument?4(str, str, QDomDocumentType) -> QDomDocument
+PyQt5.QtXml.QDomImplementation.invalidDataPolicy?4() -> QDomImplementation.InvalidDataPolicy
+PyQt5.QtXml.QDomImplementation.setInvalidDataPolicy?4(QDomImplementation.InvalidDataPolicy)
+PyQt5.QtXml.QDomImplementation.isNull?4() -> bool
+PyQt5.QtXml.QDomNode.EncodingPolicy?10
+PyQt5.QtXml.QDomNode.EncodingFromDocument?10
+PyQt5.QtXml.QDomNode.EncodingFromTextStream?10
+PyQt5.QtXml.QDomNode.NodeType?10
+PyQt5.QtXml.QDomNode.ElementNode?10
+PyQt5.QtXml.QDomNode.AttributeNode?10
+PyQt5.QtXml.QDomNode.TextNode?10
+PyQt5.QtXml.QDomNode.CDATASectionNode?10
+PyQt5.QtXml.QDomNode.EntityReferenceNode?10
+PyQt5.QtXml.QDomNode.EntityNode?10
+PyQt5.QtXml.QDomNode.ProcessingInstructionNode?10
+PyQt5.QtXml.QDomNode.CommentNode?10
+PyQt5.QtXml.QDomNode.DocumentNode?10
+PyQt5.QtXml.QDomNode.DocumentTypeNode?10
+PyQt5.QtXml.QDomNode.DocumentFragmentNode?10
+PyQt5.QtXml.QDomNode.NotationNode?10
+PyQt5.QtXml.QDomNode.BaseNode?10
+PyQt5.QtXml.QDomNode.CharacterDataNode?10
+PyQt5.QtXml.QDomNode?1()
+PyQt5.QtXml.QDomNode.__init__?1(self)
+PyQt5.QtXml.QDomNode?1(QDomNode)
+PyQt5.QtXml.QDomNode.__init__?1(self, QDomNode)
+PyQt5.QtXml.QDomNode.insertBefore?4(QDomNode, QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNode.insertAfter?4(QDomNode, QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNode.replaceChild?4(QDomNode, QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNode.removeChild?4(QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNode.appendChild?4(QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNode.hasChildNodes?4() -> bool
+PyQt5.QtXml.QDomNode.cloneNode?4(bool deep=True) -> QDomNode
+PyQt5.QtXml.QDomNode.normalize?4()
+PyQt5.QtXml.QDomNode.isSupported?4(str, str) -> bool
+PyQt5.QtXml.QDomNode.nodeName?4() -> str
+PyQt5.QtXml.QDomNode.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomNode.parentNode?4() -> QDomNode
+PyQt5.QtXml.QDomNode.childNodes?4() -> QDomNodeList
+PyQt5.QtXml.QDomNode.firstChild?4() -> QDomNode
+PyQt5.QtXml.QDomNode.lastChild?4() -> QDomNode
+PyQt5.QtXml.QDomNode.previousSibling?4() -> QDomNode
+PyQt5.QtXml.QDomNode.nextSibling?4() -> QDomNode
+PyQt5.QtXml.QDomNode.attributes?4() -> QDomNamedNodeMap
+PyQt5.QtXml.QDomNode.ownerDocument?4() -> QDomDocument
+PyQt5.QtXml.QDomNode.namespaceURI?4() -> str
+PyQt5.QtXml.QDomNode.localName?4() -> str
+PyQt5.QtXml.QDomNode.hasAttributes?4() -> bool
+PyQt5.QtXml.QDomNode.nodeValue?4() -> str
+PyQt5.QtXml.QDomNode.setNodeValue?4(str)
+PyQt5.QtXml.QDomNode.prefix?4() -> str
+PyQt5.QtXml.QDomNode.setPrefix?4(str)
+PyQt5.QtXml.QDomNode.isAttr?4() -> bool
+PyQt5.QtXml.QDomNode.isCDATASection?4() -> bool
+PyQt5.QtXml.QDomNode.isDocumentFragment?4() -> bool
+PyQt5.QtXml.QDomNode.isDocument?4() -> bool
+PyQt5.QtXml.QDomNode.isDocumentType?4() -> bool
+PyQt5.QtXml.QDomNode.isElement?4() -> bool
+PyQt5.QtXml.QDomNode.isEntityReference?4() -> bool
+PyQt5.QtXml.QDomNode.isText?4() -> bool
+PyQt5.QtXml.QDomNode.isEntity?4() -> bool
+PyQt5.QtXml.QDomNode.isNotation?4() -> bool
+PyQt5.QtXml.QDomNode.isProcessingInstruction?4() -> bool
+PyQt5.QtXml.QDomNode.isCharacterData?4() -> bool
+PyQt5.QtXml.QDomNode.isComment?4() -> bool
+PyQt5.QtXml.QDomNode.namedItem?4(str) -> QDomNode
+PyQt5.QtXml.QDomNode.isNull?4() -> bool
+PyQt5.QtXml.QDomNode.clear?4()
+PyQt5.QtXml.QDomNode.toAttr?4() -> QDomAttr
+PyQt5.QtXml.QDomNode.toCDATASection?4() -> QDomCDATASection
+PyQt5.QtXml.QDomNode.toDocumentFragment?4() -> QDomDocumentFragment
+PyQt5.QtXml.QDomNode.toDocument?4() -> QDomDocument
+PyQt5.QtXml.QDomNode.toDocumentType?4() -> QDomDocumentType
+PyQt5.QtXml.QDomNode.toElement?4() -> QDomElement
+PyQt5.QtXml.QDomNode.toEntityReference?4() -> QDomEntityReference
+PyQt5.QtXml.QDomNode.toText?4() -> QDomText
+PyQt5.QtXml.QDomNode.toEntity?4() -> QDomEntity
+PyQt5.QtXml.QDomNode.toNotation?4() -> QDomNotation
+PyQt5.QtXml.QDomNode.toProcessingInstruction?4() -> QDomProcessingInstruction
+PyQt5.QtXml.QDomNode.toCharacterData?4() -> QDomCharacterData
+PyQt5.QtXml.QDomNode.toComment?4() -> QDomComment
+PyQt5.QtXml.QDomNode.save?4(QTextStream, int, QDomNode.EncodingPolicy=QDomNode.EncodingFromDocument)
+PyQt5.QtXml.QDomNode.firstChildElement?4(str tagName='') -> QDomElement
+PyQt5.QtXml.QDomNode.lastChildElement?4(str tagName='') -> QDomElement
+PyQt5.QtXml.QDomNode.previousSiblingElement?4(str tagName='') -> QDomElement
+PyQt5.QtXml.QDomNode.nextSiblingElement?4(str taName='') -> QDomElement
+PyQt5.QtXml.QDomNode.lineNumber?4() -> int
+PyQt5.QtXml.QDomNode.columnNumber?4() -> int
+PyQt5.QtXml.QDomNodeList?1()
+PyQt5.QtXml.QDomNodeList.__init__?1(self)
+PyQt5.QtXml.QDomNodeList?1(QDomNodeList)
+PyQt5.QtXml.QDomNodeList.__init__?1(self, QDomNodeList)
+PyQt5.QtXml.QDomNodeList.item?4(int) -> QDomNode
+PyQt5.QtXml.QDomNodeList.at?4(int) -> QDomNode
+PyQt5.QtXml.QDomNodeList.length?4() -> int
+PyQt5.QtXml.QDomNodeList.count?4() -> int
+PyQt5.QtXml.QDomNodeList.size?4() -> int
+PyQt5.QtXml.QDomNodeList.isEmpty?4() -> bool
+PyQt5.QtXml.QDomDocumentType?1()
+PyQt5.QtXml.QDomDocumentType.__init__?1(self)
+PyQt5.QtXml.QDomDocumentType?1(QDomDocumentType)
+PyQt5.QtXml.QDomDocumentType.__init__?1(self, QDomDocumentType)
+PyQt5.QtXml.QDomDocumentType.name?4() -> str
+PyQt5.QtXml.QDomDocumentType.entities?4() -> QDomNamedNodeMap
+PyQt5.QtXml.QDomDocumentType.notations?4() -> QDomNamedNodeMap
+PyQt5.QtXml.QDomDocumentType.publicId?4() -> str
+PyQt5.QtXml.QDomDocumentType.systemId?4() -> str
+PyQt5.QtXml.QDomDocumentType.internalSubset?4() -> str
+PyQt5.QtXml.QDomDocumentType.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomDocument?1()
+PyQt5.QtXml.QDomDocument.__init__?1(self)
+PyQt5.QtXml.QDomDocument?1(str)
+PyQt5.QtXml.QDomDocument.__init__?1(self, str)
+PyQt5.QtXml.QDomDocument?1(QDomDocumentType)
+PyQt5.QtXml.QDomDocument.__init__?1(self, QDomDocumentType)
+PyQt5.QtXml.QDomDocument?1(QDomDocument)
+PyQt5.QtXml.QDomDocument.__init__?1(self, QDomDocument)
+PyQt5.QtXml.QDomDocument.createElement?4(str) -> QDomElement
+PyQt5.QtXml.QDomDocument.createDocumentFragment?4() -> QDomDocumentFragment
+PyQt5.QtXml.QDomDocument.createTextNode?4(str) -> QDomText
+PyQt5.QtXml.QDomDocument.createComment?4(str) -> QDomComment
+PyQt5.QtXml.QDomDocument.createCDATASection?4(str) -> QDomCDATASection
+PyQt5.QtXml.QDomDocument.createProcessingInstruction?4(str, str) -> QDomProcessingInstruction
+PyQt5.QtXml.QDomDocument.createAttribute?4(str) -> QDomAttr
+PyQt5.QtXml.QDomDocument.createEntityReference?4(str) -> QDomEntityReference
+PyQt5.QtXml.QDomDocument.elementsByTagName?4(str) -> QDomNodeList
+PyQt5.QtXml.QDomDocument.importNode?4(QDomNode, bool) -> QDomNode
+PyQt5.QtXml.QDomDocument.createElementNS?4(str, str) -> QDomElement
+PyQt5.QtXml.QDomDocument.createAttributeNS?4(str, str) -> QDomAttr
+PyQt5.QtXml.QDomDocument.elementsByTagNameNS?4(str, str) -> QDomNodeList
+PyQt5.QtXml.QDomDocument.elementById?4(str) -> QDomElement
+PyQt5.QtXml.QDomDocument.doctype?4() -> QDomDocumentType
+PyQt5.QtXml.QDomDocument.implementation?4() -> QDomImplementation
+PyQt5.QtXml.QDomDocument.documentElement?4() -> QDomElement
+PyQt5.QtXml.QDomDocument.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomDocument.setContent?4(QByteArray, bool) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(str, bool) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(QIODevice, bool) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(QXmlInputSource, bool) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(QByteArray) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(str) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(QIODevice) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.setContent?4(QXmlInputSource, QXmlReader) -> (bool, str, int, int)
+PyQt5.QtXml.QDomDocument.toString?4(int indent=1) -> str
+PyQt5.QtXml.QDomDocument.toByteArray?4(int indent=1) -> QByteArray
+PyQt5.QtXml.QDomNamedNodeMap?1()
+PyQt5.QtXml.QDomNamedNodeMap.__init__?1(self)
+PyQt5.QtXml.QDomNamedNodeMap?1(QDomNamedNodeMap)
+PyQt5.QtXml.QDomNamedNodeMap.__init__?1(self, QDomNamedNodeMap)
+PyQt5.QtXml.QDomNamedNodeMap.namedItem?4(str) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.setNamedItem?4(QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.removeNamedItem?4(str) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.item?4(int) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.namedItemNS?4(str, str) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.setNamedItemNS?4(QDomNode) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.removeNamedItemNS?4(str, str) -> QDomNode
+PyQt5.QtXml.QDomNamedNodeMap.length?4() -> int
+PyQt5.QtXml.QDomNamedNodeMap.count?4() -> int
+PyQt5.QtXml.QDomNamedNodeMap.size?4() -> int
+PyQt5.QtXml.QDomNamedNodeMap.isEmpty?4() -> bool
+PyQt5.QtXml.QDomNamedNodeMap.contains?4(str) -> bool
+PyQt5.QtXml.QDomDocumentFragment?1()
+PyQt5.QtXml.QDomDocumentFragment.__init__?1(self)
+PyQt5.QtXml.QDomDocumentFragment?1(QDomDocumentFragment)
+PyQt5.QtXml.QDomDocumentFragment.__init__?1(self, QDomDocumentFragment)
+PyQt5.QtXml.QDomDocumentFragment.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomCharacterData?1()
+PyQt5.QtXml.QDomCharacterData.__init__?1(self)
+PyQt5.QtXml.QDomCharacterData?1(QDomCharacterData)
+PyQt5.QtXml.QDomCharacterData.__init__?1(self, QDomCharacterData)
+PyQt5.QtXml.QDomCharacterData.substringData?4(int, int) -> str
+PyQt5.QtXml.QDomCharacterData.appendData?4(str)
+PyQt5.QtXml.QDomCharacterData.insertData?4(int, str)
+PyQt5.QtXml.QDomCharacterData.deleteData?4(int, int)
+PyQt5.QtXml.QDomCharacterData.replaceData?4(int, int, str)
+PyQt5.QtXml.QDomCharacterData.length?4() -> int
+PyQt5.QtXml.QDomCharacterData.data?4() -> str
+PyQt5.QtXml.QDomCharacterData.setData?4(str)
+PyQt5.QtXml.QDomCharacterData.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomAttr?1()
+PyQt5.QtXml.QDomAttr.__init__?1(self)
+PyQt5.QtXml.QDomAttr?1(QDomAttr)
+PyQt5.QtXml.QDomAttr.__init__?1(self, QDomAttr)
+PyQt5.QtXml.QDomAttr.name?4() -> str
+PyQt5.QtXml.QDomAttr.specified?4() -> bool
+PyQt5.QtXml.QDomAttr.ownerElement?4() -> QDomElement
+PyQt5.QtXml.QDomAttr.value?4() -> str
+PyQt5.QtXml.QDomAttr.setValue?4(str)
+PyQt5.QtXml.QDomAttr.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomElement?1()
+PyQt5.QtXml.QDomElement.__init__?1(self)
+PyQt5.QtXml.QDomElement?1(QDomElement)
+PyQt5.QtXml.QDomElement.__init__?1(self, QDomElement)
+PyQt5.QtXml.QDomElement.attribute?4(str, str defaultValue='') -> str
+PyQt5.QtXml.QDomElement.setAttribute?4(str, str)
+PyQt5.QtXml.QDomElement.setAttribute?4(str, int)
+PyQt5.QtXml.QDomElement.setAttribute?4(str, int)
+PyQt5.QtXml.QDomElement.setAttribute?4(str, float)
+PyQt5.QtXml.QDomElement.setAttribute?4(str, int)
+PyQt5.QtXml.QDomElement.removeAttribute?4(str)
+PyQt5.QtXml.QDomElement.attributeNode?4(str) -> QDomAttr
+PyQt5.QtXml.QDomElement.setAttributeNode?4(QDomAttr) -> QDomAttr
+PyQt5.QtXml.QDomElement.removeAttributeNode?4(QDomAttr) -> QDomAttr
+PyQt5.QtXml.QDomElement.elementsByTagName?4(str) -> QDomNodeList
+PyQt5.QtXml.QDomElement.hasAttribute?4(str) -> bool
+PyQt5.QtXml.QDomElement.attributeNS?4(str, str, str defaultValue='') -> str
+PyQt5.QtXml.QDomElement.setAttributeNS?4(str, str, str)
+PyQt5.QtXml.QDomElement.setAttributeNS?4(str, str, int)
+PyQt5.QtXml.QDomElement.setAttributeNS?4(str, str, int)
+PyQt5.QtXml.QDomElement.setAttributeNS?4(str, str, float)
+PyQt5.QtXml.QDomElement.setAttributeNS?4(str, str, int)
+PyQt5.QtXml.QDomElement.removeAttributeNS?4(str, str)
+PyQt5.QtXml.QDomElement.attributeNodeNS?4(str, str) -> QDomAttr
+PyQt5.QtXml.QDomElement.setAttributeNodeNS?4(QDomAttr) -> QDomAttr
+PyQt5.QtXml.QDomElement.elementsByTagNameNS?4(str, str) -> QDomNodeList
+PyQt5.QtXml.QDomElement.hasAttributeNS?4(str, str) -> bool
+PyQt5.QtXml.QDomElement.tagName?4() -> str
+PyQt5.QtXml.QDomElement.setTagName?4(str)
+PyQt5.QtXml.QDomElement.attributes?4() -> QDomNamedNodeMap
+PyQt5.QtXml.QDomElement.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomElement.text?4() -> str
+PyQt5.QtXml.QDomText?1()
+PyQt5.QtXml.QDomText.__init__?1(self)
+PyQt5.QtXml.QDomText?1(QDomText)
+PyQt5.QtXml.QDomText.__init__?1(self, QDomText)
+PyQt5.QtXml.QDomText.splitText?4(int) -> QDomText
+PyQt5.QtXml.QDomText.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomComment?1()
+PyQt5.QtXml.QDomComment.__init__?1(self)
+PyQt5.QtXml.QDomComment?1(QDomComment)
+PyQt5.QtXml.QDomComment.__init__?1(self, QDomComment)
+PyQt5.QtXml.QDomComment.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomCDATASection?1()
+PyQt5.QtXml.QDomCDATASection.__init__?1(self)
+PyQt5.QtXml.QDomCDATASection?1(QDomCDATASection)
+PyQt5.QtXml.QDomCDATASection.__init__?1(self, QDomCDATASection)
+PyQt5.QtXml.QDomCDATASection.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomNotation?1()
+PyQt5.QtXml.QDomNotation.__init__?1(self)
+PyQt5.QtXml.QDomNotation?1(QDomNotation)
+PyQt5.QtXml.QDomNotation.__init__?1(self, QDomNotation)
+PyQt5.QtXml.QDomNotation.publicId?4() -> str
+PyQt5.QtXml.QDomNotation.systemId?4() -> str
+PyQt5.QtXml.QDomNotation.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomEntity?1()
+PyQt5.QtXml.QDomEntity.__init__?1(self)
+PyQt5.QtXml.QDomEntity?1(QDomEntity)
+PyQt5.QtXml.QDomEntity.__init__?1(self, QDomEntity)
+PyQt5.QtXml.QDomEntity.publicId?4() -> str
+PyQt5.QtXml.QDomEntity.systemId?4() -> str
+PyQt5.QtXml.QDomEntity.notationName?4() -> str
+PyQt5.QtXml.QDomEntity.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomEntityReference?1()
+PyQt5.QtXml.QDomEntityReference.__init__?1(self)
+PyQt5.QtXml.QDomEntityReference?1(QDomEntityReference)
+PyQt5.QtXml.QDomEntityReference.__init__?1(self, QDomEntityReference)
+PyQt5.QtXml.QDomEntityReference.nodeType?4() -> QDomNode.NodeType
+PyQt5.QtXml.QDomProcessingInstruction?1()
+PyQt5.QtXml.QDomProcessingInstruction.__init__?1(self)
+PyQt5.QtXml.QDomProcessingInstruction?1(QDomProcessingInstruction)
+PyQt5.QtXml.QDomProcessingInstruction.__init__?1(self, QDomProcessingInstruction)
+PyQt5.QtXml.QDomProcessingInstruction.target?4() -> str
+PyQt5.QtXml.QDomProcessingInstruction.data?4() -> str
+PyQt5.QtXml.QDomProcessingInstruction.setData?4(str)
+PyQt5.QtXml.QDomProcessingInstruction.nodeType?4() -> QDomNode.NodeType
 PyQt5.QtXmlPatterns.QAbstractMessageHandler?1(QObject parent=None)
 PyQt5.QtXmlPatterns.QAbstractMessageHandler.__init__?1(self, QObject parent=None)
 PyQt5.QtXmlPatterns.QAbstractMessageHandler.message?4(QtMsgType, str, QUrl identifier=QUrl(), QSourceLocation sourceLocation=QSourceLocation())
@@ -25507,145 +26387,544 @@ PyQt5.QAxContainer.QAxWidget.changeEvent?4(QEvent)
 PyQt5.QAxContainer.QAxWidget.resizeEvent?4(QResizeEvent)
 PyQt5.QAxContainer.QAxWidget.translateKeyEvent?4(int, int) -> bool
 PyQt5.QAxContainer.QAxWidget.connectNotify?4(QMetaMethod)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2?1()
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.__init__?1(self)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.initializeOpenGLFunctions?4() -> bool
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glActiveTexture?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glAttachShader?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBindAttribLocation?4(int, int, str)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBindBuffer?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBindFramebuffer?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBindRenderbuffer?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBindTexture?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBlendColor?4(float, float, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBlendEquation?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBlendEquationSeparate?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBlendFunc?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBlendFuncSeparate?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBufferData?4(int, int, sequence-or-buffer, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glBufferSubData?4(int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCheckFramebufferStatus?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glClear?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glClearColor?4(float, float, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glClearDepthf?4(float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glClearStencil?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glColorMask?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCompileShader?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCompressedTexImage2D?4(int, int, int, int, int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCompressedTexSubImage2D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCopyTexImage2D?4(int, int, int, int, int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCopyTexSubImage2D?4(int, int, int, int, int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCreateProgram?4() -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCreateShader?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glCullFace?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDeleteBuffers?4(int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDeleteFramebuffers?4(int, object)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDeleteProgram?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDeleteRenderbuffers?4(int, object)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDeleteShader?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDeleteTextures?4(int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDepthFunc?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDepthMask?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDepthRangef?4(float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDetachShader?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDisable?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDisableVertexAttribArray?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDrawArrays?4(int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glDrawElements?4(int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glEnable?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glEnableVertexAttribArray?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glFinish?4()
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glFlush?4()
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glFramebufferRenderbuffer?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glFramebufferTexture2D?4(int, int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glFrontFace?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGenBuffers?4(int) -> int-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGenerateMipmap?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGenFramebuffers?4(int, int-or-tuple)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGenRenderbuffers?4(int) -> int-ot-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGenTextures?4(int, int-or-tuple)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetActiveAttrib?4(int, int) -> str, int, int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetActiveUniform?4(int, int) -> str, int, int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetAttachedShaders?4(int) -> tuple-of-int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetAttribLocation?4(int, str) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetBooleanv?4(int) -> bool-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetBufferParameteriv?4(int, int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetError?4() -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetFloatv?4(int) -> float-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetFramebufferAttachmentParameteriv?4(int, int, int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetIntegerv?4(int) -> int-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetProgramiv?4(int, int) -> int-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetProgramInfoLog?4(int) -> bytes
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetRenderbufferParameteriv?4(int, int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetShaderiv?4(int, int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetShaderInfoLog?4(int) -> bytes
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetShaderPrecisionFormat?4(int, int) -> (int, int), int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetShaderSource?4(int) -> bytes
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetString?4(int) -> str
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetTexParameterfv?4(int, int) -> float-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetTexParameteriv?4(int, int) -> int-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetUniformLocation?4(int, str) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetVertexAttribfv?4(int, int) -> float-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glGetVertexAttribiv?4(int, int) -> int-or-tuple
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glHint?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsBuffer?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsEnabled?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsFramebuffer?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsProgram?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsRenderbuffer?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsShader?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glIsTexture?4(int) -> int
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glLineWidth?4(float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glLinkProgram?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glPixelStorei?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glPolygonOffset?4(float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glReleaseShaderCompiler?4()
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glRenderbufferStorage?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glSampleCoverage?4(float, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glScissor?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glStencilFunc?4(int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glStencilFuncSeparate?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glStencilMask?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glStencilMaskSeparate?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glStencilOp?4(int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glStencilOpSeparate?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glTexImage2D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glTexParameterf?4(int, int, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glTexParameterfv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glTexParameteri?4(int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glTexParameteriv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glTexSubImage2D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform1f?4(int, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform1fv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform1i?4(int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform1iv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform2f?4(int, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform2fv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform2i?4(int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform2iv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform3f?4(int, float, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform3fv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform3i?4(int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform3iv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform4f?4(int, float, float, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform4fv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform4i?4(int, int, int, int, int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniform4iv?4(int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniformMatrix2fv?4(int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniformMatrix3fv?4(int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUniformMatrix4fv?4(int, int, int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glUseProgram?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glValidateProgram?4(int)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib1f?4(int, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib1fv?4(int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib2f?4(int, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib2fv?4(int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib3f?4(int, float, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib3fv?4(int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib4f?4(int, float, float, float, float)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttrib4fv?4(int, sequence-or-buffer)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glVertexAttribPointer?4(int, int, int, int, int, sequence-or-buffer-or-offset)
-PyQt5._QOpenGLFunctions_ES2.QOpenGLFunctions_ES2.glViewport?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0?1()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.__init__?1(self)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.initializeOpenGLFunctions?4() -> bool
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glViewport?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDepthRange?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsEnabled?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexLevelParameteriv?4(int, int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexLevelParameterfv?4(int, int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexParameteriv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexParameterfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetString?4(int) -> str
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetIntegerv?4(int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetFloatv?4(int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetError?4() -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetDoublev?4(int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetBooleanv?4(int) -> bool-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glReadBuffer?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelStorei?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelStoref?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDepthFunc?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glStencilOp?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glStencilFunc?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLogicOp?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBlendFunc?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFlush?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFinish?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEnable?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDisable?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDepthMask?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorMask?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glStencilMask?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClearDepth?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClearStencil?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClearColor?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClear?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDrawBuffer?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexImage2D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexImage1D?4(int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexParameteriv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexParameteri?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexParameterfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexParameterf?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glScissor?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPolygonMode?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPointSize?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLineWidth?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glHint?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFrontFace?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCullFace?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexubv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexub?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsTexture?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGenTextures?4(int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDeleteTextures?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBindTexture?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexSubImage2D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexSubImage1D?4(int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyTexSubImage2D?4(int, int, int, int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyTexSubImage1D?4(int, int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyTexImage2D?4(int, int, int, int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyTexImage1D?4(int, int, int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPolygonOffset?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDrawElements?4(int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDrawArrays?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyTexSubImage3D?4(int, int, int, int, int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexSubImage3D?4(int, int, int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexImage3D?4(int, int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDrawRangeElements?4(int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBlendEquation?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBlendColor?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompressedTexSubImage1D?4(int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompressedTexSubImage2D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompressedTexSubImage3D?4(int, int, int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompressedTexImage1D?4(int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompressedTexImage2D?4(int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompressedTexImage3D?4(int, int, int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSampleCoverage?4(float, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glActiveTexture?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPointParameteriv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPointParameteri?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPointParameterfv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPointParameterf?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBlendFuncSeparate?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetBufferParameteriv?4(int, int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUnmapBuffer?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBufferSubData?4(int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBufferData?4(int, int, sequence-or-buffer, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsBuffer?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGenBuffers?4(int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDeleteBuffers?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBindBuffer?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetQueryiv?4(int, int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEndQuery?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBeginQuery?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsQuery?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDeleteQueries?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGenQueries?4(int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttribPointer?4(int, int, int, int, int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glValidateProgram?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniformMatrix4fv?4(int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniformMatrix3fv?4(int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniformMatrix2fv?4(int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform4iv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform3iv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform2iv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform1iv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform4fv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform3fv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform2fv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform1fv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform4i?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform3i?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform2i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform1i?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform4f?4(int, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform3f?4(int, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform2f?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUniform1f?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glUseProgram?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLinkProgram?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsShader?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsProgram?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetVertexAttribiv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetVertexAttribfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetVertexAttribdv?4(int, int) -> double-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetUniformLocation?4(int, str) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetShaderSource?4(int) -> bytes
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetShaderInfoLog?4(int) -> bytes
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetShaderiv?4(int, int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetProgramInfoLog?4(int) -> bytes
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetProgramiv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetAttribLocation?4(int, str) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetAttachedShaders?4(int) -> tuple-of-int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetActiveUniform?4(int, int) -> str, int, int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetActiveAttrib?4(int, int) -> str, int, int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEnableVertexAttribArray?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDisableVertexAttribArray?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDetachShader?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDeleteShader?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDeleteProgram?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCreateShader?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCreateProgram?4() -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCompileShader?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBindAttribLocation?4(int, int, str)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glAttachShader?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glStencilMaskSeparate?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glStencilFuncSeparate?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glStencilOpSeparate?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDrawBuffers?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBlendEquationSeparate?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTranslatef?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTranslated?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glScalef?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glScaled?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRotatef?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRotated?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPushMatrix?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPopMatrix?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glOrtho?4(float, float, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultMatrixd?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultMatrixf?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMatrixMode?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLoadMatrixd?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLoadMatrixf?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLoadIdentity?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFrustum?4(float, float, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIsList?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexGeniv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexGenfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexGendv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexEnviv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetTexEnvfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetMaterialiv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetMaterialfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetLightiv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetLightfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetClipPlane?4(int) -> tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDrawPixels?4(int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyPixels?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelMapusv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelMapuiv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelMapfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelTransferi?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelTransferf?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPixelZoom?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glAlphaFunc?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalPoint2?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalMesh2?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalPoint1?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalMesh1?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord2fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord2f?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord2dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord2d?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord1fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord1f?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord1dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEvalCoord1d?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMapGrid2f?4(int, float, float, int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMapGrid2d?4(int, float, float, int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMapGrid1f?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMapGrid1d?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMap2f?4(int, float, float, int, int, float, float, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMap2d?4(int, float, float, int, int, float, float, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMap1f?4(int, float, float, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMap1d?4(int, float, float, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPushAttrib?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPopAttrib?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glAccum?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexMask?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClearIndex?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClearAccum?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPushName?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPopName?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPassThrough?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLoadName?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glInitNames?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRenderMode?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexGeniv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexGeni?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexGenfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexGenf?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexGendv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexGend?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexEnviv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexEnvi?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexEnvfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexEnvf?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glShadeModel?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPolygonStipple?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMaterialiv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMateriali?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMaterialfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMaterialf?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLineStipple?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightModeliv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightModeli?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightModelfv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightModelf?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightiv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLighti?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLightf?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogiv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogi?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogfv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogf?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorMaterial?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClipPlane?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4s?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4i?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4f?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex4d?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2s?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2i?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2f?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertex2d?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4s?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4i?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4f?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord4d?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2s?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2i?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2f?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord2d?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1s?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1i?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1f?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoord1d?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRects?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRecti?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRectf?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRectd?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4s?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4i?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4f?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos4d?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2s?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2i?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2f?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glRasterPos2d?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3bv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormal3b?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexsv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexs?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexiv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexi?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexfv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexf?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexdv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexd?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEnd?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEdgeFlagv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEdgeFlag?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4usv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4us?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4uiv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4ui?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4ubv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4ub?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4s?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4i?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4f?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4d?4(float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4bv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor4b?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3usv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3us?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3uiv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3ui?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3ubv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3ub?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3bv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColor3b?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBitmap?4(int, int, float, float, float, float, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glBegin?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glListBase?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGenLists?4(int) -> int
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDeleteLists?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCallList?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEndList?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNewList?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPushClientAttrib?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glPopClientAttrib?4()
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexPointer?4(int, int, int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glTexCoordPointer?4(int, int, int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glNormalPointer?4(int, int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glIndexPointer?4(int, int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEnableClientState?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glEdgeFlagPointer?4(int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glDisableClientState?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorPointer?4(int, int, int, sequence-or-buffer-or-offset)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glArrayElement?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glResetMinmax?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glResetHistogram?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMinmax?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glHistogram?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetConvolutionParameteriv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetConvolutionParameterfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyConvolutionFilter2D?4(int, int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyConvolutionFilter1D?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glConvolutionParameteriv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glConvolutionParameteri?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glConvolutionParameterfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glConvolutionParameterf?4(int, int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glConvolutionFilter2D?4(int, int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glConvolutionFilter1D?4(int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyColorSubTable?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorSubTable?4(int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetColorTableParameteriv?4(int, int) -> int-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glGetColorTableParameterfv?4(int, int) -> float-or-tuple
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glCopyColorTable?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorTableParameteriv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorTableParameterfv?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glColorTable?4(int, int, int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultTransposeMatrixd?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultTransposeMatrixf?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLoadTransposeMatrixd?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glLoadTransposeMatrixf?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4s?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4iv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4i?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4f?4(int, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord4d?4(int, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3s?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3iv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3i?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3f?4(int, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord3d?4(int, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2iv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2f?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord2d?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1s?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1iv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1i?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1f?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glMultiTexCoord1d?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glClientActiveTexture?4(int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2s?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2i?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2f?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glWindowPos2d?4(float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColorPointer?4(int, int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3usv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3us?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3uiv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3ui?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3ubv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3ub?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3sv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3iv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3i?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3fv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3f?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3dv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3d?4(float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3bv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glSecondaryColor3b?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogCoordPointer?4(int, int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogCoorddv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogCoordd?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogCoordfv?4(sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glFogCoordf?4(float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4usv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4uiv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4ubv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4s?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4iv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4f?4(int, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4d?4(int, float, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4bv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Nusv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Nuiv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Nubv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Nub?4(int, int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Nsv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Niv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib4Nbv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib3sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib3s?4(int, int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib3fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib3f?4(int, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib3dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib3d?4(int, float, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib2sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib2s?4(int, int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib2fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib2f?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib2dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib2d?4(int, float, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib1sv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib1s?4(int, int)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib1fv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib1f?4(int, float)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib1dv?4(int, sequence-or-buffer)
+PyQt5._QOpenGLFunctions_2_0.QOpenGLFunctions_2_0.glVertexAttrib1d?4(int, float)
 PyQt5.QtSensors.QSensorReading.timestamp?4() -> int
 PyQt5.QtSensors.QSensorReading.setTimestamp?4(int)
 PyQt5.QtSensors.QSensorReading.valueCount?4() -> int
@@ -25796,6 +27075,16 @@ PyQt5.QtSensors.QCompassFilter.filter?4(QCompassReading) -> bool
 PyQt5.QtSensors.QCompass?1(QObject parent=None)
 PyQt5.QtSensors.QCompass.__init__?1(self, QObject parent=None)
 PyQt5.QtSensors.QCompass.reading?4() -> QCompassReading
+PyQt5.QtSensors.QDistanceReading.distance?4() -> float
+PyQt5.QtSensors.QDistanceReading.setDistance?4(float)
+PyQt5.QtSensors.QDistanceFilter?1()
+PyQt5.QtSensors.QDistanceFilter.__init__?1(self)
+PyQt5.QtSensors.QDistanceFilter?1(QDistanceFilter)
+PyQt5.QtSensors.QDistanceFilter.__init__?1(self, QDistanceFilter)
+PyQt5.QtSensors.QDistanceFilter.filter?4(QDistanceReading) -> bool
+PyQt5.QtSensors.QDistanceSensor?1(QObject parent=None)
+PyQt5.QtSensors.QDistanceSensor.__init__?1(self, QObject parent=None)
+PyQt5.QtSensors.QDistanceSensor.reading?4() -> QDistanceReading
 PyQt5.QtSensors.QGyroscopeReading.x?4() -> float
 PyQt5.QtSensors.QGyroscopeReading.setX?4(float)
 PyQt5.QtSensors.QGyroscopeReading.y?4() -> float
@@ -26179,6 +27468,11 @@ PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.deviceDiscovered?4(QBluetoothDe
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.finished?4()
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.error?4(QBluetoothDeviceDiscoveryAgent.Error)
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.canceled?4()
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfiguration?10
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.UnknownCoreConfiguration?10
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.LowEnergyCoreConfiguration?10
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.BaseRateCoreConfiguration?10
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.BaseRateAndLowEnergyCoreConfiguration?10
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.DataCompleteness?10
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.DataComplete?10
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.DataIncomplete?10
@@ -26309,12 +27603,20 @@ PyQt5.QtBluetooth.QBluetoothDeviceInfo.setRssi?4(int)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.setServiceUuids?4(list-of-QBluetoothUuid, QBluetoothDeviceInfo.DataCompleteness)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.serviceUuids?4() -> (list-of-QBluetoothUuid, QBluetoothDeviceInfo.DataCompleteness)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.serviceUuidsCompleteness?4() -> QBluetoothDeviceInfo.DataCompleteness
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.setCoreConfigurations?4(QBluetoothDeviceInfo.CoreConfigurations)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.coreConfigurations?4() -> QBluetoothDeviceInfo.CoreConfigurations
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses?1(QBluetoothDeviceInfo.ServiceClasses)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses.__init__?1(self, QBluetoothDeviceInfo.ServiceClasses)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses?1(int)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses.__init__?1(self, int)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses?1()
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses.__init__?1(self)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfigurations?1(QBluetoothDeviceInfo.CoreConfigurations)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfigurations.__init__?1(self, QBluetoothDeviceInfo.CoreConfigurations)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfigurations?1(int)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfigurations.__init__?1(self, int)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfigurations?1()
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.CoreConfigurations.__init__?1(self)
 PyQt5.QtBluetooth.QBluetoothHostInfo?1()
 PyQt5.QtBluetooth.QBluetoothHostInfo.__init__?1(self)
 PyQt5.QtBluetooth.QBluetoothHostInfo?1(QBluetoothHostInfo)
@@ -26531,6 +27833,7 @@ PyQt5.QtBluetooth.QBluetoothTransferReply.HostNotFoundError?10
 PyQt5.QtBluetooth.QBluetoothTransferReply.UserCanceledTransferError?10
 PyQt5.QtBluetooth.QBluetoothTransferReply.IODeviceNotReadableError?10
 PyQt5.QtBluetooth.QBluetoothTransferReply.ResourceBusyError?10
+PyQt5.QtBluetooth.QBluetoothTransferReply.SessionError?10
 PyQt5.QtBluetooth.QBluetoothTransferReply?1(QObject parent=None)
 PyQt5.QtBluetooth.QBluetoothTransferReply.__init__?1(self, QObject parent=None)
 PyQt5.QtBluetooth.QBluetoothTransferReply.isFinished?4() -> bool
@@ -26542,6 +27845,7 @@ PyQt5.QtBluetooth.QBluetoothTransferReply.request?4() -> QBluetoothTransferReque
 PyQt5.QtBluetooth.QBluetoothTransferReply.abort?4()
 PyQt5.QtBluetooth.QBluetoothTransferReply.finished?4(QBluetoothTransferReply)
 PyQt5.QtBluetooth.QBluetoothTransferReply.transferProgress?4(int, int)
+PyQt5.QtBluetooth.QBluetoothTransferReply.error?4(QBluetoothTransferReply.TransferError)
 PyQt5.QtBluetooth.QBluetoothTransferReply.setManager?4(QBluetoothTransferManager)
 PyQt5.QtBluetooth.QBluetoothTransferReply.setRequest?4(QBluetoothTransferRequest)
 PyQt5.QtBluetooth.QBluetoothTransferRequest.Attribute?10
@@ -26557,6 +27861,99 @@ PyQt5.QtBluetooth.QBluetoothTransferRequest.__init__?1(self, QBluetoothTransferR
 PyQt5.QtBluetooth.QBluetoothTransferRequest.attribute?4(QBluetoothTransferRequest.Attribute, QVariant defaultValue=QVariant()) -> QVariant
 PyQt5.QtBluetooth.QBluetoothTransferRequest.setAttribute?4(QBluetoothTransferRequest.Attribute, QVariant)
 PyQt5.QtBluetooth.QBluetoothTransferRequest.address?4() -> QBluetoothAddress
+PyQt5.QtBluetooth.QBluetoothUuid.DescriptorType?10
+PyQt5.QtBluetooth.QBluetoothUuid.UnknownDescriptorType?10
+PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicExtendedProperties?10
+PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicUserDescription?10
+PyQt5.QtBluetooth.QBluetoothUuid.ClientCharacteristicConfiguration?10
+PyQt5.QtBluetooth.QBluetoothUuid.ServerCharacteristicConfiguration?10
+PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicPresentationFormat?10
+PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicAggregateFormat?10
+PyQt5.QtBluetooth.QBluetoothUuid.ValidRange?10
+PyQt5.QtBluetooth.QBluetoothUuid.ExternalReportReference?10
+PyQt5.QtBluetooth.QBluetoothUuid.ReportReference?10
+PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicType?10
+PyQt5.QtBluetooth.QBluetoothUuid.DeviceName?10
+PyQt5.QtBluetooth.QBluetoothUuid.Appearance?10
+PyQt5.QtBluetooth.QBluetoothUuid.PeripheralPrivacyFlag?10
+PyQt5.QtBluetooth.QBluetoothUuid.ReconnectionAddress?10
+PyQt5.QtBluetooth.QBluetoothUuid.PeripheralPreferredConnectionParameters?10
+PyQt5.QtBluetooth.QBluetoothUuid.ServiceChanged?10
+PyQt5.QtBluetooth.QBluetoothUuid.AlertLevel?10
+PyQt5.QtBluetooth.QBluetoothUuid.TxPowerLevel?10
+PyQt5.QtBluetooth.QBluetoothUuid.DateTime?10
+PyQt5.QtBluetooth.QBluetoothUuid.DayOfWeek?10
+PyQt5.QtBluetooth.QBluetoothUuid.DayDateTime?10
+PyQt5.QtBluetooth.QBluetoothUuid.ExactTime256?10
+PyQt5.QtBluetooth.QBluetoothUuid.DSTOffset?10
+PyQt5.QtBluetooth.QBluetoothUuid.TimeZone?10
+PyQt5.QtBluetooth.QBluetoothUuid.LocalTimeInformation?10
+PyQt5.QtBluetooth.QBluetoothUuid.TimeWithDST?10
+PyQt5.QtBluetooth.QBluetoothUuid.TimeAccuracy?10
+PyQt5.QtBluetooth.QBluetoothUuid.TimeSource?10
+PyQt5.QtBluetooth.QBluetoothUuid.ReferenceTimeInformation?10
+PyQt5.QtBluetooth.QBluetoothUuid.TimeUpdateControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.TimeUpdateState?10
+PyQt5.QtBluetooth.QBluetoothUuid.GlucoseMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.BatteryLevel?10
+PyQt5.QtBluetooth.QBluetoothUuid.TemperatureMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.TemperatureType?10
+PyQt5.QtBluetooth.QBluetoothUuid.IntermediateTemperature?10
+PyQt5.QtBluetooth.QBluetoothUuid.MeasurementInterval?10
+PyQt5.QtBluetooth.QBluetoothUuid.BootKeyboardInputReport?10
+PyQt5.QtBluetooth.QBluetoothUuid.SystemID?10
+PyQt5.QtBluetooth.QBluetoothUuid.ModelNumberString?10
+PyQt5.QtBluetooth.QBluetoothUuid.SerialNumberString?10
+PyQt5.QtBluetooth.QBluetoothUuid.FirmwareRevisionString?10
+PyQt5.QtBluetooth.QBluetoothUuid.HardwareRevisionString?10
+PyQt5.QtBluetooth.QBluetoothUuid.SoftwareRevisionString?10
+PyQt5.QtBluetooth.QBluetoothUuid.ManufacturerNameString?10
+PyQt5.QtBluetooth.QBluetoothUuid.IEEE1107320601RegulatoryCertificationDataList?10
+PyQt5.QtBluetooth.QBluetoothUuid.CurrentTime?10
+PyQt5.QtBluetooth.QBluetoothUuid.ScanRefresh?10
+PyQt5.QtBluetooth.QBluetoothUuid.BootKeyboardOutputReport?10
+PyQt5.QtBluetooth.QBluetoothUuid.BootMouseInputReport?10
+PyQt5.QtBluetooth.QBluetoothUuid.GlucoseMeasurementContext?10
+PyQt5.QtBluetooth.QBluetoothUuid.BloodPressureMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.IntermediateCuffPressure?10
+PyQt5.QtBluetooth.QBluetoothUuid.HeartRateMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.BodySensorLocation?10
+PyQt5.QtBluetooth.QBluetoothUuid.HeartRateControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.AlertStatus?10
+PyQt5.QtBluetooth.QBluetoothUuid.RingerControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.RingerSetting?10
+PyQt5.QtBluetooth.QBluetoothUuid.AlertCategoryIDBitMask?10
+PyQt5.QtBluetooth.QBluetoothUuid.AlertCategoryID?10
+PyQt5.QtBluetooth.QBluetoothUuid.AlertNotificationControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.UnreadAlertStatus?10
+PyQt5.QtBluetooth.QBluetoothUuid.NewAlert?10
+PyQt5.QtBluetooth.QBluetoothUuid.SupportedNewAlertCategory?10
+PyQt5.QtBluetooth.QBluetoothUuid.SupportedUnreadAlertCategory?10
+PyQt5.QtBluetooth.QBluetoothUuid.BloodPressureFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.HIDInformation?10
+PyQt5.QtBluetooth.QBluetoothUuid.ReportMap?10
+PyQt5.QtBluetooth.QBluetoothUuid.HIDControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.Report?10
+PyQt5.QtBluetooth.QBluetoothUuid.ProtocolMode?10
+PyQt5.QtBluetooth.QBluetoothUuid.ScanIntervalWindow?10
+PyQt5.QtBluetooth.QBluetoothUuid.PnPID?10
+PyQt5.QtBluetooth.QBluetoothUuid.GlucoseFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.RecordAccessControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.RSCMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.RSCFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.SCControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.CSCMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.CSCFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.SensorLocation?10
+PyQt5.QtBluetooth.QBluetoothUuid.CyclingPowerMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.CyclingPowerVector?10
+PyQt5.QtBluetooth.QBluetoothUuid.CyclingPowerFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.CyclingPowerControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.LocationAndSpeed?10
+PyQt5.QtBluetooth.QBluetoothUuid.Navigation?10
+PyQt5.QtBluetooth.QBluetoothUuid.PositionQuality?10
+PyQt5.QtBluetooth.QBluetoothUuid.LNFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.LNControlPoint?10
 PyQt5.QtBluetooth.QBluetoothUuid.ServiceClassUuid?10
 PyQt5.QtBluetooth.QBluetoothUuid.ServiceDiscoveryServer?10
 PyQt5.QtBluetooth.QBluetoothUuid.BrowseGroupDescriptor?10
@@ -26621,6 +28018,28 @@ PyQt5.QtBluetooth.QBluetoothUuid.Glasses3D?10
 PyQt5.QtBluetooth.QBluetoothUuid.Synchronization3D?10
 PyQt5.QtBluetooth.QBluetoothUuid.MPSProfile?10
 PyQt5.QtBluetooth.QBluetoothUuid.MPSService?10
+PyQt5.QtBluetooth.QBluetoothUuid.GenericAccess?10
+PyQt5.QtBluetooth.QBluetoothUuid.GenericAttribute?10
+PyQt5.QtBluetooth.QBluetoothUuid.ImmediateAlert?10
+PyQt5.QtBluetooth.QBluetoothUuid.LinkLoss?10
+PyQt5.QtBluetooth.QBluetoothUuid.TxPower?10
+PyQt5.QtBluetooth.QBluetoothUuid.CurrentTimeService?10
+PyQt5.QtBluetooth.QBluetoothUuid.ReferenceTimeUpdateService?10
+PyQt5.QtBluetooth.QBluetoothUuid.NextDSTChangeService?10
+PyQt5.QtBluetooth.QBluetoothUuid.Glucose?10
+PyQt5.QtBluetooth.QBluetoothUuid.HealthThermometer?10
+PyQt5.QtBluetooth.QBluetoothUuid.DeviceInformation?10
+PyQt5.QtBluetooth.QBluetoothUuid.HeartRate?10
+PyQt5.QtBluetooth.QBluetoothUuid.PhoneAlertStatusService?10
+PyQt5.QtBluetooth.QBluetoothUuid.BatteryService?10
+PyQt5.QtBluetooth.QBluetoothUuid.BloodPressure?10
+PyQt5.QtBluetooth.QBluetoothUuid.AlertNotificationService?10
+PyQt5.QtBluetooth.QBluetoothUuid.HumanInterfaceDevice?10
+PyQt5.QtBluetooth.QBluetoothUuid.ScanParameters?10
+PyQt5.QtBluetooth.QBluetoothUuid.RunningSpeedAndCadence?10
+PyQt5.QtBluetooth.QBluetoothUuid.CyclingSpeedAndCadence?10
+PyQt5.QtBluetooth.QBluetoothUuid.CyclingPower?10
+PyQt5.QtBluetooth.QBluetoothUuid.LocationAndNavigation?10
 PyQt5.QtBluetooth.QBluetoothUuid.ProtocolUuid?10
 PyQt5.QtBluetooth.QBluetoothUuid.Sdp?10
 PyQt5.QtBluetooth.QBluetoothUuid.Udp?10
@@ -26663,6 +28082,126 @@ PyQt5.QtBluetooth.QBluetoothUuid.minimumSize?4() -> int
 PyQt5.QtBluetooth.QBluetoothUuid.toUInt16?4() -> (int, bool)
 PyQt5.QtBluetooth.QBluetoothUuid.toUInt32?4() -> (int, bool)
 PyQt5.QtBluetooth.QBluetoothUuid.toUInt128?4() -> 16-tuple-of-int
+PyQt5.QtBluetooth.QBluetoothUuid.serviceClassToString?4(QBluetoothUuid.ServiceClassUuid) -> str
+PyQt5.QtBluetooth.QBluetoothUuid.protocolToString?4(QBluetoothUuid.ProtocolUuid) -> str
+PyQt5.QtBluetooth.QBluetoothUuid.characteristicToString?4(QBluetoothUuid.CharacteristicType) -> str
+PyQt5.QtBluetooth.QBluetoothUuid.descriptorToString?4(QBluetoothUuid.DescriptorType) -> str
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyType?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.Unknown?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.Broadcasting?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.Read?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.WriteNoResponse?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.Write?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.Notify?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.Indicate?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.WriteSigned?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.ExtendedProperty?10
+PyQt5.QtBluetooth.QLowEnergyCharacteristic?1()
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.__init__?1(self)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic?1(QLowEnergyCharacteristic)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.__init__?1(self, QLowEnergyCharacteristic)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.name?4() -> str
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.uuid?4() -> QBluetoothUuid
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.value?4() -> QByteArray
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.properties?4() -> QLowEnergyCharacteristic.PropertyTypes
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.handle?4() -> int
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.descriptor?4(QBluetoothUuid) -> QLowEnergyDescriptor
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.descriptors?4() -> list-of-QLowEnergyDescriptor
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.isValid?4() -> bool
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyTypes?1(QLowEnergyCharacteristic.PropertyTypes)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyTypes.__init__?1(self, QLowEnergyCharacteristic.PropertyTypes)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyTypes?1(int)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyTypes.__init__?1(self, int)
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyTypes?1()
+PyQt5.QtBluetooth.QLowEnergyCharacteristic.PropertyTypes.__init__?1(self)
+PyQt5.QtBluetooth.QLowEnergyController.RemoteAddressType?10
+PyQt5.QtBluetooth.QLowEnergyController.PublicAddress?10
+PyQt5.QtBluetooth.QLowEnergyController.RandomAddress?10
+PyQt5.QtBluetooth.QLowEnergyController.ControllerState?10
+PyQt5.QtBluetooth.QLowEnergyController.UnconnectedState?10
+PyQt5.QtBluetooth.QLowEnergyController.ConnectingState?10
+PyQt5.QtBluetooth.QLowEnergyController.ConnectedState?10
+PyQt5.QtBluetooth.QLowEnergyController.DiscoveringState?10
+PyQt5.QtBluetooth.QLowEnergyController.DiscoveredState?10
+PyQt5.QtBluetooth.QLowEnergyController.ClosingState?10
+PyQt5.QtBluetooth.QLowEnergyController.Error?10
+PyQt5.QtBluetooth.QLowEnergyController.NoError?10
+PyQt5.QtBluetooth.QLowEnergyController.UnknownError?10
+PyQt5.QtBluetooth.QLowEnergyController.UnknownRemoteDeviceError?10
+PyQt5.QtBluetooth.QLowEnergyController.NetworkError?10
+PyQt5.QtBluetooth.QLowEnergyController.InvalidBluetoothAdapterError?10
+PyQt5.QtBluetooth.QLowEnergyController?1(QBluetoothAddress, QObject parent=None)
+PyQt5.QtBluetooth.QLowEnergyController.__init__?1(self, QBluetoothAddress, QObject parent=None)
+PyQt5.QtBluetooth.QLowEnergyController?1(QBluetoothAddress, QBluetoothAddress, QObject parent=None)
+PyQt5.QtBluetooth.QLowEnergyController.__init__?1(self, QBluetoothAddress, QBluetoothAddress, QObject parent=None)
+PyQt5.QtBluetooth.QLowEnergyController.localAddress?4() -> QBluetoothAddress
+PyQt5.QtBluetooth.QLowEnergyController.remoteAddress?4() -> QBluetoothAddress
+PyQt5.QtBluetooth.QLowEnergyController.state?4() -> QLowEnergyController.ControllerState
+PyQt5.QtBluetooth.QLowEnergyController.remoteAddressType?4() -> QLowEnergyController.RemoteAddressType
+PyQt5.QtBluetooth.QLowEnergyController.setRemoteAddressType?4(QLowEnergyController.RemoteAddressType)
+PyQt5.QtBluetooth.QLowEnergyController.connectToDevice?4()
+PyQt5.QtBluetooth.QLowEnergyController.disconnectFromDevice?4()
+PyQt5.QtBluetooth.QLowEnergyController.discoverServices?4()
+PyQt5.QtBluetooth.QLowEnergyController.services?4() -> list-of-QBluetoothUuid
+PyQt5.QtBluetooth.QLowEnergyController.createServiceObject?4(QBluetoothUuid, QObject parent=None) -> QLowEnergyService
+PyQt5.QtBluetooth.QLowEnergyController.error?4() -> QLowEnergyController.Error
+PyQt5.QtBluetooth.QLowEnergyController.errorString?4() -> str
+PyQt5.QtBluetooth.QLowEnergyController.connected?4()
+PyQt5.QtBluetooth.QLowEnergyController.disconnected?4()
+PyQt5.QtBluetooth.QLowEnergyController.stateChanged?4(QLowEnergyController.ControllerState)
+PyQt5.QtBluetooth.QLowEnergyController.error?4(QLowEnergyController.Error)
+PyQt5.QtBluetooth.QLowEnergyController.serviceDiscovered?4(QBluetoothUuid)
+PyQt5.QtBluetooth.QLowEnergyController.discoveryFinished?4()
+PyQt5.QtBluetooth.QLowEnergyDescriptor?1()
+PyQt5.QtBluetooth.QLowEnergyDescriptor.__init__?1(self)
+PyQt5.QtBluetooth.QLowEnergyDescriptor?1(QLowEnergyDescriptor)
+PyQt5.QtBluetooth.QLowEnergyDescriptor.__init__?1(self, QLowEnergyDescriptor)
+PyQt5.QtBluetooth.QLowEnergyDescriptor.isValid?4() -> bool
+PyQt5.QtBluetooth.QLowEnergyDescriptor.value?4() -> QByteArray
+PyQt5.QtBluetooth.QLowEnergyDescriptor.uuid?4() -> QBluetoothUuid
+PyQt5.QtBluetooth.QLowEnergyDescriptor.handle?4() -> int
+PyQt5.QtBluetooth.QLowEnergyDescriptor.name?4() -> str
+PyQt5.QtBluetooth.QLowEnergyDescriptor.type?4() -> QBluetoothUuid.DescriptorType
+PyQt5.QtBluetooth.QLowEnergyService.WriteMode?10
+PyQt5.QtBluetooth.QLowEnergyService.WriteWithResponse?10
+PyQt5.QtBluetooth.QLowEnergyService.WriteWithoutResponse?10
+PyQt5.QtBluetooth.QLowEnergyService.ServiceState?10
+PyQt5.QtBluetooth.QLowEnergyService.InvalidService?10
+PyQt5.QtBluetooth.QLowEnergyService.DiscoveryRequired?10
+PyQt5.QtBluetooth.QLowEnergyService.DiscoveringServices?10
+PyQt5.QtBluetooth.QLowEnergyService.ServiceDiscovered?10
+PyQt5.QtBluetooth.QLowEnergyService.ServiceError?10
+PyQt5.QtBluetooth.QLowEnergyService.NoError?10
+PyQt5.QtBluetooth.QLowEnergyService.OperationError?10
+PyQt5.QtBluetooth.QLowEnergyService.CharacteristicWriteError?10
+PyQt5.QtBluetooth.QLowEnergyService.DescriptorWriteError?10
+PyQt5.QtBluetooth.QLowEnergyService.ServiceType?10
+PyQt5.QtBluetooth.QLowEnergyService.PrimaryService?10
+PyQt5.QtBluetooth.QLowEnergyService.IncludedService?10
+PyQt5.QtBluetooth.QLowEnergyService.includedServices?4() -> list-of-QBluetoothUuid
+PyQt5.QtBluetooth.QLowEnergyService.type?4() -> QLowEnergyService.ServiceTypes
+PyQt5.QtBluetooth.QLowEnergyService.state?4() -> QLowEnergyService.ServiceState
+PyQt5.QtBluetooth.QLowEnergyService.characteristic?4(QBluetoothUuid) -> QLowEnergyCharacteristic
+PyQt5.QtBluetooth.QLowEnergyService.characteristics?4() -> list-of-QLowEnergyCharacteristic
+PyQt5.QtBluetooth.QLowEnergyService.serviceUuid?4() -> QBluetoothUuid
+PyQt5.QtBluetooth.QLowEnergyService.serviceName?4() -> str
+PyQt5.QtBluetooth.QLowEnergyService.discoverDetails?4()
+PyQt5.QtBluetooth.QLowEnergyService.error?4() -> QLowEnergyService.ServiceError
+PyQt5.QtBluetooth.QLowEnergyService.contains?4(QLowEnergyCharacteristic) -> bool
+PyQt5.QtBluetooth.QLowEnergyService.contains?4(QLowEnergyDescriptor) -> bool
+PyQt5.QtBluetooth.QLowEnergyService.writeCharacteristic?4(QLowEnergyCharacteristic, QByteArray, QLowEnergyService.WriteMode mode=QLowEnergyService.WriteWithResponse)
+PyQt5.QtBluetooth.QLowEnergyService.writeDescriptor?4(QLowEnergyDescriptor, QByteArray)
+PyQt5.QtBluetooth.QLowEnergyService.stateChanged?4(QLowEnergyService.ServiceState)
+PyQt5.QtBluetooth.QLowEnergyService.characteristicChanged?4(QLowEnergyCharacteristic, QByteArray)
+PyQt5.QtBluetooth.QLowEnergyService.characteristicWritten?4(QLowEnergyCharacteristic, QByteArray)
+PyQt5.QtBluetooth.QLowEnergyService.descriptorWritten?4(QLowEnergyDescriptor, QByteArray)
+PyQt5.QtBluetooth.QLowEnergyService.error?4(QLowEnergyService.ServiceError)
+PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes?1(QLowEnergyService.ServiceTypes)
+PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes.__init__?1(self, QLowEnergyService.ServiceTypes)
+PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes?1(int)
+PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes.__init__?1(self, int)
+PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes?1()
+PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes.__init__?1(self)
 PyQt5.QtPositioning.QGeoAddress?1()
 PyQt5.QtPositioning.QGeoAddress.__init__?1(self)
 PyQt5.QtPositioning.QGeoAddress?1(QGeoAddress)
@@ -27112,7 +28651,15 @@ PyQt5.QtWinExtras.QWinThumbnailToolBar.removeButton?4(QWinThumbnailToolButton)
 PyQt5.QtWinExtras.QWinThumbnailToolBar.setButtons?4(list-of-QWinThumbnailToolButton)
 PyQt5.QtWinExtras.QWinThumbnailToolBar.buttons?4() -> list-of-QWinThumbnailToolButton
 PyQt5.QtWinExtras.QWinThumbnailToolBar.count?4() -> int
+PyQt5.QtWinExtras.QWinThumbnailToolBar.iconicPixmapNotificationsEnabled?4() -> bool
+PyQt5.QtWinExtras.QWinThumbnailToolBar.setIconicPixmapNotificationsEnabled?4(bool)
+PyQt5.QtWinExtras.QWinThumbnailToolBar.iconicThumbnailPixmap?4() -> QPixmap
+PyQt5.QtWinExtras.QWinThumbnailToolBar.iconicLivePreviewPixmap?4() -> QPixmap
 PyQt5.QtWinExtras.QWinThumbnailToolBar.clear?4()
+PyQt5.QtWinExtras.QWinThumbnailToolBar.setIconicThumbnailPixmap?4(QPixmap)
+PyQt5.QtWinExtras.QWinThumbnailToolBar.setIconicLivePreviewPixmap?4(QPixmap)
+PyQt5.QtWinExtras.QWinThumbnailToolBar.iconicThumbnailPixmapRequested?4()
+PyQt5.QtWinExtras.QWinThumbnailToolBar.iconicLivePreviewPixmapRequested?4()
 PyQt5.QtWinExtras.QWinThumbnailToolButton?1(QObject parent=None)
 PyQt5.QtWinExtras.QWinThumbnailToolButton.__init__?1(self, QObject parent=None)
 PyQt5.QtWinExtras.QWinThumbnailToolButton.setToolTip?4(str)
@@ -27174,6 +28721,8 @@ PyQt5.QtQuickWidgets.QQuickWidget.wheelEvent?4(QWheelEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.event?4(QEvent) -> bool
 PyQt5.QtQuickWidgets.QQuickWidget.focusInEvent?4(QFocusEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.focusOutEvent?4(QFocusEvent)
+PyQt5.QtQuickWidgets.QQuickWidget.grabFramebuffer?4() -> QImage
+PyQt5.QtQuickWidgets.QQuickWidget.setClearColor?4(QColor)
 PyQt5.QtWebSockets.QMaskGenerator?1(QObject parent=None)
 PyQt5.QtWebSockets.QMaskGenerator.__init__?1(self, QObject parent=None)
 PyQt5.QtWebSockets.QMaskGenerator.seed?4() -> bool
@@ -27289,6 +28838,7 @@ PyQt5.QtWebSockets.QWebSocketServer.proxy?4() -> QNetworkProxy
 PyQt5.QtWebSockets.QWebSocketServer.setSslConfiguration?4(QSslConfiguration)
 PyQt5.QtWebSockets.QWebSocketServer.sslConfiguration?4() -> QSslConfiguration
 PyQt5.QtWebSockets.QWebSocketServer.supportedVersions?4() -> list-of-QWebSocketProtocol.Version
+PyQt5.QtWebSockets.QWebSocketServer.serverUrl?4() -> QUrl
 PyQt5.QtWebSockets.QWebSocketServer.acceptError?4(QAbstractSocket.SocketError)
 PyQt5.QtWebSockets.QWebSocketServer.serverError?4(QWebSocketProtocol.CloseCode)
 PyQt5.QtWebSockets.QWebSocketServer.originAuthenticationRequired?4(QWebSocketCorsAuthenticator)
@@ -27307,6 +28857,7 @@ PyQt5.Enginio.Enginio.UpdatedAtRole?10
 PyQt5.Enginio.Enginio.IdRole?10
 PyQt5.Enginio.Enginio.ObjectTypeRole?10
 PyQt5.Enginio.Enginio.CustomPropertyRole?10
+PyQt5.Enginio.Enginio.JsonObjectRole?10
 PyQt5.Enginio.Enginio.Operation?10
 PyQt5.Enginio.Enginio.ObjectOperation?10
 PyQt5.Enginio.Enginio.AccessControlOperation?10
@@ -27356,6 +28907,8 @@ PyQt5.Enginio.EnginioModel.setOperation?4(Enginio.Operation)
 PyQt5.Enginio.EnginioModel.append?4(dict-of-str-QJsonValue) -> EnginioReply
 PyQt5.Enginio.EnginioModel.remove?4(int) -> EnginioReply
 PyQt5.Enginio.EnginioModel.setData?4(int, QVariant, str) -> EnginioReply
+PyQt5.Enginio.EnginioModel.setData?4(int, dict-of-str-QJsonValue) -> EnginioReply
+PyQt5.Enginio.EnginioModel.reload?4() -> EnginioReply
 PyQt5.Enginio.EnginioModel.queryChanged?4(dict-of-str-QJsonValue)
 PyQt5.Enginio.EnginioModel.clientChanged?4(EnginioClient)
 PyQt5.Enginio.EnginioModel.operationChanged?4(Enginio.Operation)
@@ -27377,3 +28930,18 @@ PyQt5.Enginio.EnginioReply.isError?4() -> bool
 PyQt5.Enginio.EnginioReply.isFinished?4() -> bool
 PyQt5.Enginio.EnginioReply.finished?4(EnginioReply)
 PyQt5.Enginio.EnginioReply.dataChanged?4()
+PyQt5.QtWebChannel.QWebChannel?1(QObject parent=None)
+PyQt5.QtWebChannel.QWebChannel.__init__?1(self, QObject parent=None)
+PyQt5.QtWebChannel.QWebChannel.registerObjects?4(dict-of-QString-QObject)
+PyQt5.QtWebChannel.QWebChannel.registeredObjects?4() -> dict-of-QString-QObject
+PyQt5.QtWebChannel.QWebChannel.registerObject?4(str, QObject)
+PyQt5.QtWebChannel.QWebChannel.deregisterObject?4(QObject)
+PyQt5.QtWebChannel.QWebChannel.blockUpdates?4() -> bool
+PyQt5.QtWebChannel.QWebChannel.setBlockUpdates?4(bool)
+PyQt5.QtWebChannel.QWebChannel.blockUpdatesChanged?4(bool)
+PyQt5.QtWebChannel.QWebChannel.connectTo?4(QWebChannelAbstractTransport)
+PyQt5.QtWebChannel.QWebChannel.disconnectFrom?4(QWebChannelAbstractTransport)
+PyQt5.QtWebChannel.QWebChannelAbstractTransport?1(QObject parent=None)
+PyQt5.QtWebChannel.QWebChannelAbstractTransport.__init__?1(self, QObject parent=None)
+PyQt5.QtWebChannel.QWebChannelAbstractTransport.sendMessage?4(dict-of-str-QJsonValue)
+PyQt5.QtWebChannel.QWebChannelAbstractTransport.messageReceived?4(dict-of-str-QJsonValue, QWebChannelAbstractTransport)

@@ -1,7 +1,7 @@
-QT.uitools.VERSION = 5.3.1
+QT.uitools.VERSION = 5.4.0
 QT.uitools.MAJOR_VERSION = 5
-QT.uitools.MINOR_VERSION = 3
-QT.uitools.PATCH_VERSION = 1
+QT.uitools.MINOR_VERSION = 4
+QT.uitools.PATCH_VERSION = 0
 QT.uitools.name = QtUiTools
 QT.uitools.libs = $$QT_MODULE_LIB_BASE
 QT.uitools.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtUiTools

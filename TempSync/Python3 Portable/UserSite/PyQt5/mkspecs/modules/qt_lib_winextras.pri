@@ -1,7 +1,7 @@
-QT.winextras.VERSION = 5.3.1
+QT.winextras.VERSION = 5.4.0
 QT.winextras.MAJOR_VERSION = 5
-QT.winextras.MINOR_VERSION = 3
-QT.winextras.PATCH_VERSION = 1
+QT.winextras.MINOR_VERSION = 4
+QT.winextras.PATCH_VERSION = 0
 QT.winextras.name = QtWinExtras
 QT.winextras.libs = $$QT_MODULE_LIB_BASE
 QT.winextras.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtWinExtras

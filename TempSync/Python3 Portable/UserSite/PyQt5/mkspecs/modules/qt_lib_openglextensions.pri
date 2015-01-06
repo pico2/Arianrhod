@@ -1,7 +1,7 @@
-QT.openglextensions.VERSION = 5.3.1
+QT.openglextensions.VERSION = 5.4.0
 QT.openglextensions.MAJOR_VERSION = 5
-QT.openglextensions.MINOR_VERSION = 3
-QT.openglextensions.PATCH_VERSION = 1
+QT.openglextensions.MINOR_VERSION = 4
+QT.openglextensions.PATCH_VERSION = 0
 QT.openglextensions.name = QtOpenGLExtensions
 QT.openglextensions.libs = $$QT_MODULE_LIB_BASE
 QT.openglextensions.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtOpenGLExtensions

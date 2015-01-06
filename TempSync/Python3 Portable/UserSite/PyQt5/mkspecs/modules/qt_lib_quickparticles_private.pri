@@ -1,10 +1,10 @@
-QT.quickparticles_private.VERSION = 5.3.1
+QT.quickparticles_private.VERSION = 5.4.0
 QT.quickparticles_private.MAJOR_VERSION = 5
-QT.quickparticles_private.MINOR_VERSION = 3
-QT.quickparticles_private.PATCH_VERSION = 1
+QT.quickparticles_private.MINOR_VERSION = 4
+QT.quickparticles_private.PATCH_VERSION = 0
 QT.quickparticles_private.name = QtQuickParticles
 QT.quickparticles_private.libs = $$QT_MODULE_LIB_BASE
-QT.quickparticles_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtQuickParticles $$QT_MODULE_INCLUDE_BASE/QtQuickParticles/5.3.1 $$QT_MODULE_INCLUDE_BASE/QtQuickParticles/5.3.1/QtQuickParticles
+QT.quickparticles_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtQuickParticles $$QT_MODULE_INCLUDE_BASE/QtQuickParticles/5.4.0 $$QT_MODULE_INCLUDE_BASE/QtQuickParticles/5.4.0/QtQuickParticles
 QT.quickparticles_private.bins = $$QT_MODULE_BIN_BASE
 QT.quickparticles_private.libexecs = $$QT_MODULE_LIBEXEC_BASE
 QT.quickparticles_private.plugins = $$QT_MODULE_PLUGIN_BASE

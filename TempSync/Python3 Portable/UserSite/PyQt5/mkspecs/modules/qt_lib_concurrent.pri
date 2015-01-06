@@ -1,7 +1,7 @@
-QT.concurrent.VERSION = 5.3.1
+QT.concurrent.VERSION = 5.4.0
 QT.concurrent.MAJOR_VERSION = 5
-QT.concurrent.MINOR_VERSION = 3
-QT.concurrent.PATCH_VERSION = 1
+QT.concurrent.MINOR_VERSION = 4
+QT.concurrent.PATCH_VERSION = 0
 QT.concurrent.name = QtConcurrent
 QT.concurrent.libs = $$QT_MODULE_LIB_BASE
 QT.concurrent.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtConcurrent

@@ -1,7 +1,7 @@
-QT.multimedia.VERSION = 5.3.1
+QT.multimedia.VERSION = 5.4.0
 QT.multimedia.MAJOR_VERSION = 5
-QT.multimedia.MINOR_VERSION = 3
-QT.multimedia.PATCH_VERSION = 1
+QT.multimedia.MINOR_VERSION = 4
+QT.multimedia.PATCH_VERSION = 0
 QT.multimedia.name = QtMultimedia
 QT.multimedia.libs = $$QT_MODULE_LIB_BASE
 QT.multimedia.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtMultimedia
