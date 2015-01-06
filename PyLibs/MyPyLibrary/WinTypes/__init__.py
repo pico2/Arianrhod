@@ -4,3 +4,4 @@ from .NtProcess import *
 from .NtDebug import *
 from .NtMemory import *
 from .NtFileIo import *
+from .WinMessage import *
