@@ -7,6 +7,63 @@
 
 #include "ml.cpp"
 
+typedef struct
+{
+    ULONG _;
+
+    union
+    {
+        CHAR SmallBuffer[0x10];
+        PSTR Buffer;
+    };
+
+    ULONG Length;
+    ULONG MaximumLength;
+
+    PSTR GetBuffer()
+    {
+        return Length > countof(SmallBuffer) - 1 ? Buffer : SmallBuffer;
+    }
+
+} STL_STRING, *PSTL_STRING;
+
+typedef struct
+{
+    STL_STRING FileName;
+    STL_STRING FileVersion;
+    STL_STRING FileText;
+
+    BOOLEAN Selectable;
+    BOOLEAN SelectPrompt;
+    BOOLEAN Selected;
+
+} DEB_ENTRY, *PDEB_ENTRY;
+
+VOID (FASTCALL *StubPushDebList)(PVOID vec, PVOID, PVOID v1, PVOID v2, DEB_ENTRY*& Entry);
+LONG (CDECL *StubFormatCheckboxXml)(PVOID str, PWSTR format, ULONG index);
+
+VOID FASTCALL PushDebList(PVOID vec, PVOID, PVOID v1, PVOID v2, DEB_ENTRY*& Entry)
+{
+    if (StrCompareA(Entry->FileName.GetBuffer(), "Cydia") != 0)
+    {
+        //Entry->Selectable    = FALSE;
+        Entry->SelectPrompt  = FALSE;
+        Entry->Selected      = FALSE;
+    }
+
+    return StubPushDebList(vec, 0, v1, v2, Entry);
+}
+
+LONG CDECL FormatCheckboxXml(PVOID str, PWSTR format, ULONG index)
+{
+    if (index != 0)
+    {
+        return StubFormatCheckboxXml(str, ml::String(format).Replace(LR"(selected="true")", LR"(selected="false" enabled="false")"), index);
+    }
+
+    return StubFormatCheckboxXml(str, format, index);
+}
+
 BOOL CDECL IsJailbroken(HANDLE Device)
 {
     RtlSetLastWin32Error(STATUS_UNSUCCESSFUL);
@@ -38,21 +95,23 @@ BOOL Initialize(PVOID BaseAddress)
     BaseAddress = LoadDll(L"TaiG.dll");
 
     {
-
         PATCH_MEMORY_DATA p[] =
         {
-            FunctionJumpRva(0x11360, IsJailbroken),
-            FunctionJumpRva(0x145B0, IsDeviceUnActivated),
+            //FunctionJumpRva(0x11360, IsJailbroken),
+            FunctionCallRva(0x09357, PushDebList, &StubPushDebList),
+            //FunctionJumpRva(0x145B0, IsDeviceUnActivated),
         };
 
         PatchMemory(p, countof(p), BaseAddress);
     }
 
     {
-
         PATCH_MEMORY_DATA p[] =
         {
+            MemoryPatchRva(0x80, 1, 0x18D9B),
+
             FunctionCallRva(0x1500B, LoadTaiGDll),
+            //FunctionCallRva(0x18BBC, FormatCheckboxXml, &StubFormatCheckboxXml),
         };
 
         PatchMemory(p, countof(p), GetExeModuleHandle());
