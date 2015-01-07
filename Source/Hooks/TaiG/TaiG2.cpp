@@ -97,8 +97,10 @@ BOOL Initialize(PVOID BaseAddress)
     {
         PATCH_MEMORY_DATA p[] =
         {
+            MemoryPatchRva(0x00ull, 1, 0x9301),
+
             //FunctionJumpRva(0x11360, IsJailbroken),
-            FunctionCallRva(0x09357, PushDebList, &StubPushDebList),
+            //FunctionCallRva(0x09357, PushDebList, &StubPushDebList),
             //FunctionJumpRva(0x145B0, IsDeviceUnActivated),
         };
 
