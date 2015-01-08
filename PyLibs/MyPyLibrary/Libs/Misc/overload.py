@@ -16,7 +16,7 @@ For example:
 ...   @method.add
 ...   def method(self, a, b):
 ...     return 'a, b'
-... 
+...
 >>> a = A()
 >>> a.method(1)
 'a'
@@ -31,11 +31,11 @@ It also handles annotations if those annotations are types:
 >>> @overload
 ... def func(a:int):
 ...   return 'int'
-... 
+...
 >>> @func.add
 ... def func(a:str):
 ...   return 'str'
-... 
+...
 >>> func(1)
 'int'
 >>> func('s')
@@ -94,7 +94,6 @@ __version__ = '1.1'
 
 import functools
 import types
-import unittest
 
 def overload(callable):
     '''Allow overloading of a callable.
@@ -192,182 +191,185 @@ def overload(callable):
     return f
 
 
-class TestOverload(unittest.TestCase):
-    def test_wrapping(self):
-        'check that we generate a nicely-wrapped result'
-        @overload
-        def func(arg):
-            'doc'
-            pass
-        @func.add
-        def func(*args):
-            'doc2'
-            pass
-        self.assertEqual(func.__doc__, 'doc')
+if __name__ == '__main__':
 
-    def test_method(self):
-        'check we can overload instance methods'
-        class A:
+    import unittest
+
+    class TestOverload(unittest.TestCase):
+        def test_wrapping(self):
+            'check that we generate a nicely-wrapped result'
             @overload
-            def method(self):
-                return 'ok'
-            @method.add
-            def method(self, *args):
-                return 'args'
-        self.assertEqual(A().method(), 'ok')
-        self.assertEqual(A().method(1), 'args')
+            def func(arg):
+                'doc'
+                pass
+            @func.add
+            def func(*args):
+                'doc2'
+                pass
+            self.assertEqual(func.__doc__, 'doc')
 
-    def test_classmethod(self):
-        'check we can overload classmethods'
-        class A:
+        def test_method(self):
+            'check we can overload instance methods'
+            class A:
+                @overload
+                def method(self):
+                    return 'ok'
+                @method.add
+                def method(self, *args):
+                    return 'args'
+            self.assertEqual(A().method(), 'ok')
+            self.assertEqual(A().method(1), 'args')
+
+        def test_classmethod(self):
+            'check we can overload classmethods'
+            class A:
+                @overload
+                @classmethod
+                def method(cls):
+                    return 'ok'
+                @method.add
+                @classmethod
+                def method(cls, *args):
+                    return 'args'
+            self.assertEqual(A.method(), 'ok')
+            self.assertEqual(A.method(1), 'args')
+
+        def test_staticmethod(self):
+            'check we can overload staticmethods'
+            class A:
+                @overload
+                @staticmethod
+                def method():
+                    return 'ok'
+                @method.add
+                @staticmethod
+                def method(*args):
+                    return 'args'
+            self.assertEqual(A.method(), 'ok')
+            self.assertEqual(A.method(1), 'args')
+
+        def test_class(self):
             @overload
-            @classmethod
-            def method(cls):
-                return 'ok'
-            @method.add
-            @classmethod
-            def method(cls, *args):
-                return 'args'
-        self.assertEqual(A.method(), 'ok')
-        self.assertEqual(A.method(1), 'args')
+            class A(object):
+                first = True
+                def __new__(cls):
+                    # must explicitly reference the base class
+                    return object.__new__(cls)
 
-    def test_staticmethod(self):
-        'check we can overload staticmethods'
-        class A:
+            @A.add
+            class A(object):
+                first = False
+                def __new__(cls, a):
+                    # must explicitly reference the base class
+                    return object.__new__(cls)
+            self.assertEqual(A().first, True)
+            self.assertEqual(A(1).first, False)
+
+        def test_arg_pattern(self):
             @overload
-            @staticmethod
-            def method():
-                return 'ok'
-            @method.add
-            @staticmethod
-            def method(*args):
-                return 'args'
-        self.assertEqual(A.method(), 'ok')
-        self.assertEqual(A.method(1), 'args')
+            def func(a):
+                return 'with a'
 
-    def test_class(self):
-        @overload
-        class A(object):
-            first = True
-            def __new__(cls):
-                # must explicitly reference the base class
-                return object.__new__(cls)
+            @func.add
+            def func(a, b):
+                return 'with a and b'
 
-        @A.add
-        class A(object):
-            first = False
-            def __new__(cls, a):
-                # must explicitly reference the base class
-                return object.__new__(cls)
-        self.assertEqual(A().first, True)
-        self.assertEqual(A(1).first, False)
+            self.assertEqual(func('a'), 'with a')
+            self.assertEqual(func('a', 'b'), 'with a and b')
+            self.assertRaises(TypeError, func)
+            self.assertRaises(TypeError, func, 'a', 'b', 'c')
+            self.assertRaises(TypeError, func, b=1)
 
-    def test_arg_pattern(self):
-        @overload
-        def func(a):
-            return 'with a'
+        def test_overload_independent(self):
+            class A(object):
+                @overload
+                def method(self):
+                    return 'a'
 
-        @func.add
-        def func(a, b):
-            return 'with a and b'
+            class B(object):
+                @overload
+                def method(self):
+                    return 'b'
 
-        self.assertEqual(func('a'), 'with a')
-        self.assertEqual(func('a', 'b'), 'with a and b')
-        self.assertRaises(TypeError, func)
-        self.assertRaises(TypeError, func, 'a', 'b', 'c')
-        self.assertRaises(TypeError, func, b=1)
+            self.assertEqual(A().method(), 'a')
+            self.assertEqual(B().method(), 'b')
 
-    def test_overload_independent(self):
-        class A(object):
+        def test_arg_types(self):
             @overload
-            def method(self):
+            def func(a:int):
+                return 'int'
+
+            @func.add
+            def func(a:str):
+                return 'str'
+
+            self.assertEqual(func(1), 'int')
+            self.assertEqual(func('1'), 'str')
+
+        def test_varargs(self):
+            @overload
+            def func(a):
                 return 'a'
 
-        class B(object):
+            @func.add
+            def func(*args):
+                return '*args {}'.format(len(args))
+
+            self.assertEqual(func(1), 'a')
+            self.assertEqual(func(1, 2), '*args 2')
+
+        def test_varargs_mixed(self):
             @overload
-            def method(self):
-                return 'b'
+            def func(a):
+                return 'a'
 
-        self.assertEqual(A().method(), 'a')
-        self.assertEqual(B().method(), 'b')
+            @func.add
+            def func(a, *args):
+                return '*args {}'.format(len(args))
 
-    def test_arg_types(self):
-        @overload
-        def func(a:int):
-            return 'int'
+            self.assertEqual(func(1), 'a')
+            self.assertEqual(func(1, 2), '*args 1')
+            self.assertEqual(func(1, 2, 3), '*args 2')
 
-        @func.add
-        def func(a:str):
-            return 'str'
+        def test_kw(self):
+            @overload
+            def func(a):
+                return 'a'
 
-        self.assertEqual(func(1), 'int')
-        self.assertEqual(func('1'), 'str')
+            @func.add
+            def func(**kw):
+                return '**kw {}'.format(len(kw))
 
-    def test_varargs(self):
-        @overload
-        def func(a):
-            return 'a'
+            self.assertEqual(func(1), 'a')
+            self.assertEqual(func(a=1), 'a')
+            self.assertEqual(func(a=1, b=2), '**kw 2')
 
-        @func.add
-        def func(*args):
-            return '*args {}'.format(len(args))
+        def test_kw_mixed(self):
+            @overload
+            def func(a):
+                return 'a'
 
-        self.assertEqual(func(1), 'a')
-        self.assertEqual(func(1, 2), '*args 2')
+            @func.add
+            def func(a, **kw):
+                return '**kw {}'.format(len(kw))
 
-    def test_varargs_mixed(self):
-        @overload
-        def func(a):
-            return 'a'
+            self.assertEqual(func(1), 'a')
+            self.assertEqual(func(a=1), 'a')
+            self.assertEqual(func(a=1, b=2), '**kw 1')
 
-        @func.add
-        def func(a, *args):
-            return '*args {}'.format(len(args))
+        def test_kw_mixed2(self):
+            @overload
+            def func(a):
+                return 'a'
 
-        self.assertEqual(func(1), 'a')
-        self.assertEqual(func(1, 2), '*args 1')
-        self.assertEqual(func(1, 2, 3), '*args 2')
+            @func.add
+            def func(c=1, **kw):
+                return '**kw {}'.format(len(kw))
 
-    def test_kw(self):
-        @overload
-        def func(a):
-            return 'a'
+            self.assertEqual(func(1), 'a')
+            self.assertEqual(func(a=1), 'a')
+            self.assertEqual(func(c=1, b=2), '**kw 1')
 
-        @func.add
-        def func(**kw):
-            return '**kw {}'.format(len(kw))
-
-        self.assertEqual(func(1), 'a')
-        self.assertEqual(func(a=1), 'a')
-        self.assertEqual(func(a=1, b=2), '**kw 2')
-
-    def test_kw_mixed(self):
-        @overload
-        def func(a):
-            return 'a'
-
-        @func.add
-        def func(a, **kw):
-            return '**kw {}'.format(len(kw))
-
-        self.assertEqual(func(1), 'a')
-        self.assertEqual(func(a=1), 'a')
-        self.assertEqual(func(a=1, b=2), '**kw 1')
-
-    def test_kw_mixed2(self):
-        @overload
-        def func(a):
-            return 'a'
-
-        @func.add
-        def func(c=1, **kw):
-            return '**kw {}'.format(len(kw))
-
-        self.assertEqual(func(1), 'a')
-        self.assertEqual(func(a=1), 'a')
-        self.assertEqual(func(c=1, b=2), '**kw 1')
-
-if __name__ == '__main__':
     unittest.main()
 
 

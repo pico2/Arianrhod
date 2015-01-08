@@ -97,7 +97,7 @@ BOOL Initialize(PVOID BaseAddress)
     {
         PATCH_MEMORY_DATA p[] =
         {
-            MemoryPatchRva(0x00ull, 1, 0x9301),
+            MemoryPatchRva(0x00ull, 1, 0x9301),     // DebEntry->Selected = FALSE
 
             //FunctionJumpRva(0x11360, IsJailbroken),
             //FunctionCallRva(0x09357, PushDebList, &StubPushDebList),
@@ -110,7 +110,7 @@ BOOL Initialize(PVOID BaseAddress)
     {
         PATCH_MEMORY_DATA p[] =
         {
-            MemoryPatchRva(0x80, 1, 0x18D9B),
+            MemoryPatchRva(0x80, 1, 0x18D9B),       // jo
 
             FunctionCallRva(0x1500B, LoadTaiGDll),
             //FunctionCallRva(0x18BBC, FormatCheckboxXml, &StubFormatCheckboxXml),
