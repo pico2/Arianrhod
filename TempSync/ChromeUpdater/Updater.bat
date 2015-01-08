@@ -13,7 +13,7 @@ for /F "delims=" %%j in (CHECK) do set CHECK=%%j
 if not "%LATEST_CHANGE%"=="%CHECK%" goto Download
 echo You have the latest Chromium version - Build %LATEST_CHANGE%
 
-ping -n 5 localhost > NUL
+timeout /t 5
 goto eof
 
 :Download
@@ -21,6 +21,8 @@ goto eof
 echo Downloading latest version of Chromium Build %Check%
 wget.exe -N %URL%/%CHECK%/%FILE%
 
+ren mini_installer.exe %CHECK%.exe
+
 echo Updating Chromium from Build %LATEST_CHANGE% to version %Check% ...
 rem mini_installer.exe
-copy /y CHECK LATEST_CHANGE
+move /y CHECK LATEST_CHANGE

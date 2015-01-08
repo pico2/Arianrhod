@@ -2,13 +2,36 @@ from ml import *
 
 class MSG(Structure):
     _fields_ = [
-        ("hwnd",    HWND),
-        ("message", UINT),
-        ("wParam",  WPARAM),
-        ("lParam",  LPARAM),
-        ("time",    ULONG),
-        ("pt",      POINT)
+        ('hwnd',    HWND),
+        ('message', UINT),
+        ('wParam',  WPARAM),
+        ('lParam',  LPARAM),
+        ('time',    ULONG),
+        ('pt',      POINT)
     ]
+
+PMSG = ctypes.POINTER(MSG)
+
+class WINDOWPOS(Structure):
+    _fields_ = [
+        ('hwnd',            HWND),
+        ('hwndInsertAfter', HWND),
+        ('x',               LONG),
+        ('y',               LONG),
+        ('cx',              LONG),
+        ('cy',              LONG),
+        ('flags',           ULONG),
+    ]
+
+PWINDOWPOS = ctypes.POINTER(WINDOWPOS)
+
+class NCCALCSIZE_PARAMS(Structure):
+    _fields_ = [
+        ('rgrc',    RECT * 3),
+        ('lppos',   PWINDOWPOS),
+    ]
+
+PNCCALCSIZE_PARAMS = ctypes.POINTER(NCCALCSIZE_PARAMS)
 
 WM_NULL                                 = 0x0000
 WM_CREATE                               = 0x0001
