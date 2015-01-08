@@ -120,6 +120,8 @@ BOOL Initialize(PVOID BaseAddress)
         {
             MemoryPatchRva(0x00ull, 1, 0x9301),     // DebEntry->Selected = FALSE
 
+            FunctionJumpRva(0x5CD0, VerifyTaiGExe),
+
             //FunctionJumpRva(0x11360, IsJailbroken),
             //FunctionCallRva(0x09357, PushDebList, &StubPushDebList),
             //FunctionJumpRva(0x145B0, IsDeviceUnActivated),
