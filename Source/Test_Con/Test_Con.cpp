@@ -242,17 +242,17 @@ void quick_sort(int *array, int count)
     quick_sort(left, &array[count] - left);
 }
 
+#include <Dwmapi.h>
+#pragma comment(lib, "Dwmapi.lib")
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    NtFileMemory file;
-    PVOID b;
+    RECT r;
 
-    file.Open(GetNtdllLdrModule()->FullDllName.Buffer);
-
-    LoadDllFromMemory(file.GetBuffer(), file.GetSize32(), &USTR(L"\\\\FFFF."), &b);
-    LdrUnloadDll(b);
+    DwmGetWindowAttribute(GetConsoleWindow(), DWMWA_EXTENDED_FRAME_BOUNDS, &r, sizeof(r));
+    PrintConsole(L"%d, %d, %d, %d\n", r);
 
     return;
 
