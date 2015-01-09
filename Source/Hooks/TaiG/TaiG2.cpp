@@ -101,6 +101,20 @@ PVOID NTAPI LoadTaiGDll(PCSTR)
     return LoadDll(L"TaiG.dll");
 }
 
+BOOL CDECL VerifyTaiGExe()
+{
+    return TRUE;
+}
+
+PVOID CDECL TgGetRoutine(PVOID BaseAddress, PVOID OrdinalOrName)
+{
+}
+
+BOOL CDECL IsiTunesMobileAndAirTrafficHasBreakPoint()
+{
+    return FALSE;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -120,7 +134,10 @@ BOOL Initialize(PVOID BaseAddress)
         {
             MemoryPatchRva(0x00ull, 1, 0x9301),     // DebEntry->Selected = FALSE
 
-            FunctionJumpRva(0x5CD0, VerifyTaiGExe),
+            FunctionJumpRva(0x149A0, IsiTunesMobileAndAirTrafficHasBreakPoint),
+
+            //FunctionJumpRva(0x35870, TgGetRoutine),
+            //FunctionJumpRva(0x5CD0, VerifyTaiGExe),
 
             //FunctionJumpRva(0x11360, IsJailbroken),
             //FunctionCallRva(0x09357, PushDebList, &StubPushDebList),

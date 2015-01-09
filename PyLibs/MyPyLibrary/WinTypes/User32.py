@@ -33,6 +33,17 @@ class NCCALCSIZE_PARAMS(Structure):
 
 PNCCALCSIZE_PARAMS = ctypes.POINTER(NCCALCSIZE_PARAMS)
 
+class MARGINS(Structure):
+    _fields_ = [
+        ('cxLeftWidth',     LONG),  # width of left border that retains its size
+        ('cxRightWidth',    LONG),  # width of right border that retains its size
+        ('cyTopHeight',     LONG),  # height of top border that retains its size
+        ('cyBottomHeight',  LONG),  # height of bottom border that retains its size
+    ]
+
+PMARGINS = ctypes.POINTER(MARGINS)
+
+
 WM_NULL                                 = 0x0000
 WM_CREATE                               = 0x0001
 WM_DESTROY                              = 0x0002
@@ -405,3 +416,86 @@ LB_MULTIPLEADDSTRING                    = 0x01B1
 LB_GETLISTBOXINFO                       = 0x01B2
 
 HTCAPTION                               = 0x0002
+
+#
+# SetWindowPos Flags
+#
+
+SWP_NOSIZE                              = 0x0001
+SWP_NOMOVE                              = 0x0002
+SWP_NOZORDER                            = 0x0004
+SWP_NOREDRAW                            = 0x0008
+SWP_NOACTIVATE                          = 0x0010
+SWP_FRAMECHANGED                        = 0x0020  # The frame changed: send WM_NCCALCSIZE
+SWP_SHOWWINDOW                          = 0x0040
+SWP_HIDEWINDOW                          = 0x0080
+SWP_NOCOPYBITS                          = 0x0100
+SWP_NOOWNERZORDER                       = 0x0200  # Don't do owner Z ordering
+SWP_NOSENDCHANGING                      = 0x0400  # Don't send WM_WINDOWPOSCHANGING
+
+SWP_DRAWFRAME                           = SWP_FRAMECHANGED
+SWP_NOREPOSITION                        = SWP_NOOWNERZORDER
+
+#
+# Window Styles
+#
+
+WS_OVERLAPPED                           = 0x00000000
+WS_POPUP                                = 0x80000000
+WS_CHILD                                = 0x40000000
+WS_MINIMIZE                             = 0x20000000
+WS_VISIBLE                              = 0x10000000
+WS_DISABLED                             = 0x08000000
+WS_CLIPSIBLINGS                         = 0x04000000
+WS_CLIPCHILDREN                         = 0x02000000
+WS_MAXIMIZE                             = 0x01000000
+WS_CAPTION                              = 0x00C00000   # WS_BORDER | WS_DLGFRAME
+WS_BORDER                               = 0x00800000
+WS_DLGFRAME                             = 0x00400000
+WS_VSCROLL                              = 0x00200000
+WS_HSCROLL                              = 0x00100000
+WS_SYSMENU                              = 0x00080000
+WS_THICKFRAME                           = 0x00040000
+WS_GROUP                                = 0x00020000
+WS_TABSTOP                              = 0x00010000
+
+WS_MINIMIZEBOX                          = 0x00020000
+WS_MAXIMIZEBOX                          = 0x00010000
+
+
+#
+# Common Window Styles
+#
+
+WS_OVERLAPPEDWINDOW                     = (WS_OVERLAPPED     | \
+                                             WS_CAPTION        | \
+                                             WS_SYSMENU        | \
+                                             WS_THICKFRAME     | \
+                                             WS_MINIMIZEBOX    | \
+                                             WS_MAXIMIZEBOX)
+
+WS_POPUPWINDOW                          = (WS_POPUP          | \
+                                             WS_BORDER         | \
+                                             WS_SYSMENU)
+
+WS_CHILDWINDOW                          = (WS_CHILD)
+
+
+WS_TILED                                = WS_OVERLAPPED
+WS_ICONIC                               = WS_MINIMIZE
+WS_SIZEBOX                              = WS_THICKFRAME
+WS_TILEDWINDOW                          = WS_OVERLAPPEDWINDOW
+
+
+#
+# Window field offsets for GetWindowLong()
+#
+
+GWL_STYLE                               = (-16)
+GWL_EXSTYLE                             = (-20)
+GWL_ID                                  = (-12)
+GWLP_WNDPROC                            = (-4)
+GWLP_HINSTANCE                          = (-6)
+GWLP_HWNDPARENT                         = (-8)
+GWLP_USERDATA                           = (-21)
+GWLP_ID                                 = (-12)
