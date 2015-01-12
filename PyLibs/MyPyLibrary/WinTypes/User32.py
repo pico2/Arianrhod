@@ -33,6 +33,19 @@ class NCCALCSIZE_PARAMS(Structure):
 
 PNCCALCSIZE_PARAMS = ctypes.POINTER(NCCALCSIZE_PARAMS)
 
+#
+# WM_NCCALCSIZE "window valid rect" return values
+#
+WVR_ALIGNTOP            = 0x0010
+WVR_ALIGNLEFT           = 0x0020
+WVR_ALIGNBOTTOM         = 0x0040
+WVR_ALIGNRIGHT          = 0x0080
+WVR_HREDRAW             = 0x0100
+WVR_VREDRAW             = 0x0200
+WVR_REDRAW              = WVR_HREDRAW | WVR_VREDRAW
+WVR_VALIDRECTS          = 0x0400
+
+
 class MARGINS(Structure):
     _fields_ = [
         ('cxLeftWidth',     LONG),  # width of left border that retains its size
