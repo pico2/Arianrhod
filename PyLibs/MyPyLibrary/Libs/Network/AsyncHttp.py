@@ -164,11 +164,16 @@ class AsyncHttp(object):
             self.connector.update_cookies(cookies)
 
     def SetProxy(self, host, port):
-        self.connector = self.ProxyConnector
+        if self.connector is not self.ProxyConnector:
+            self.connector = self.ProxyConnector
+            self.SetCookies(self.TCPConnector.cookies)
+
         self.ProxyConnector._proxy = 'http://%s:%d' % (host, port)
-        self.SetCookies(self.TCPConnector.cookies)
 
     def ClearProxy(self):
+        if self.connector is not self.ProxyConnector:
+            return
+
         self.connector = self.TCPConnector
         self.SetCookies(self.ProxyConnector.cookies)
 

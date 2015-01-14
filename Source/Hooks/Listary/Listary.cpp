@@ -30,83 +30,6 @@ MSIMG32_AlphaBlend(
     return StubAlphaBlend(hdcDest, xoriginDest, yoriginDest, wDest, hDest, hdcSrc, xoriginSrc, yoriginSrc, wSrc, hSrc, ftn);
 }
 
-PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
-{
-    PVOID StringValue, StringReference;
-
-    SEARCH_PATTERN_DATA Str[] =
-    {
-        ADD_PATTERN_(String, SizeInBytes),
-    };
-
-    StringValue = SearchPattern(Str, countof(Str), Module->DllBase, Module->SizeOfImage);
-    if (StringValue == nullptr)
-        return nullptr;
-
-    SEARCH_PATTERN_DATA Stub[] =
-    {
-        ADD_PATTERN(&StringValue),
-    };
-
-    StringReference = SearchPattern(Stub, countof(Stub), PtrAdd(Module->DllBase, BeginOffset), PtrSub(Module->SizeOfImage, BeginOffset));
-    if (StringReference == nullptr)
-        return nullptr;
-
-    return StringReference;
-}
-
-PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
-{
-    PBYTE Buffer;
-
-    Buffer = (PBYTE)Start;
-
-    for (; Length != 0; --Buffer, --Length)
-    {
-        switch (Buffer[0])
-        {
-            case CALL:
-                // push    local_var_size
-                // mov     eax, exception_handler
-                // call    _SEH_prolog
-
-                if (Buffer[-5] != 0xB8)
-                    continue;
-
-                if (Buffer[-7] == 0x6A)
-                {
-                    Buffer -= 7;
-                }
-                else if (Buffer[-10] == 0x68)
-                {
-                    Buffer -= 10;
-                }
-                else
-                {
-                    continue;
-                }
-
-                break;
-
-            case 0x55:
-                if (Buffer[1] != 0x8B || Buffer[2] != 0xEC)
-                    continue;
-
-                // push ebp
-                // mov ebp, esp
-
-                break;
-
-            default:
-                continue;
-        }
-
-        return Buffer;
-    }
-
-    return nullptr;
-}
-
 PVOID
 SearchStringAndReverseSearchHeader(
     PVOID       ImageBase,
@@ -261,6 +184,8 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    using namespace Mp;
+
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
@@ -283,13 +208,13 @@ BOOL Initialize(PVOID BaseAddress)
 
     GetLicenseManagerAddress = SearchGetLicenseManager(BaseAddress);
 
-    MEMORY_FUNCTION_PATCH f[] =
+    PATCH_MEMORY_DATA f[] =
     {
-        INLINE_HOOK_JUMP(GetLicenseManagerAddress, GetLicenseManager, StubGetLicenseManager),
-        INLINE_HOOK_JUMP(GetRoutineAddress(Ldr::LoadDll(L"SHELL32.dll"), "ShellExecuteExW"), Listary_ShellExecuteExW, StubShellExecuteExW),
+        FunctionJumpVa(GetLicenseManagerAddress, GetLicenseManager, &StubGetLicenseManager),
+        FunctionJumpVa(GetRoutineAddress(Ldr::LoadDll(L"SHELL32.dll"), "ShellExecuteExW"), Listary_ShellExecuteExW, &StubShellExecuteExW),
     };
 
-    Nt_PatchMemory(nullptr, 0, f, countof(f));
+    PatchMemory(f, countof(f));
 
     return TRUE;
 }
