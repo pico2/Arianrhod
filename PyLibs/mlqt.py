@@ -7,6 +7,8 @@ from PyQt5.QtWebKitWidgets import *
 from PyQt5.QtNetwork import *
 from PyQt5.QtWebKit import *
 
+QEvent.EmbeddingControl = 79
+
 class QtThread(QtCore.QThread):
     def __init__(self, parent = None):
         super(type(self), self).__init__(parent)
