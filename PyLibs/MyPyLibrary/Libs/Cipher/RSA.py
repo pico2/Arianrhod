@@ -4,7 +4,6 @@ from pyasn1.type.error import PyAsn1Error
 
 class RsaCipher:
     def __init__(self, key, *, Fast = False):
-        Fast = False
         if Fast:
             from Crypto.PublicKey import RSA
             from Crypto.Random import random
@@ -79,6 +78,7 @@ class RsaCipher:
 
     def fast_private_decrypt_block(self, crypto, key):
         message = key.decrypt(crypto)
+        print(message)
         return message[message.index(b'\x00', 2) + 1:]
 
     def fast_private_encrypt_block(self, message, key):
