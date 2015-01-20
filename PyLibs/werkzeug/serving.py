@@ -365,7 +365,8 @@ class _SSLConnectionFix(object):
         self._con = con
 
     def makefile(self, mode, bufsize):
-        return socket._fileobject(self._con, mode, bufsize)
+        # return socket._fileobject(self._con, mode, bufsize)
+        return socket.SocketIO(self._con, mode)
 
     def __getattr__(self, attrib):
         return getattr(self._con, attrib)
