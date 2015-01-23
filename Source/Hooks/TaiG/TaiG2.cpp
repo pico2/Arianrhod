@@ -44,15 +44,13 @@ BOOL Initialize(PVOID BaseAddress)
     FuckAnti_Initialize(BaseAddress);
     Record_Initialize(BaseAddress);
 
+    PATCH_MEMORY_DATA p[] =
     {
-        //PATCH_MEMORY_DATA p[] =
-        //{
-            //FunctionJumpRva(0x11360, IsJailbroken),
-            //FunctionJumpRva(0x145B0, IsDeviceUnActivated),
-        //};
+        FunctionJumpRva(0x11360, IsJailbroken),
+        FunctionJumpRva(0x145B0, IsDeviceUnActivated),
+    };
 
-        //PatchMemory(p, countof(p), BaseAddress);
-    }
+    //PatchMemory(p, countof(p), BaseAddress);
 
     return TRUE;
 }

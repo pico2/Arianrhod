@@ -80,7 +80,7 @@ ML_NAMESPACE_BEGIN(AFC);
     );
 
     DECL_SELECTANY
-    LONG
+    NTSTATUS
     (CDECL
     *AFCSendData)(
         AFCConnection   Connection,
@@ -89,7 +89,7 @@ ML_NAMESPACE_BEGIN(AFC);
     );
 
     DECL_SELECTANY
-    LONG
+    NTSTATUS
     (CDECL
     *AFCReadData)(
         AFCConnection   Connection,

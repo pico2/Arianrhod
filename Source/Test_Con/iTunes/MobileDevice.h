@@ -61,7 +61,7 @@ ML_NAMESPACE_BEGIN(AMD);
     DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(CFServiceConnection Connection);
     DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(CFServiceConnection Connection);
 
-    DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(CFServiceConnection Connection, PVOID Data, ULONG Length);
+    DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
     DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
 
     DECL_SELECTANY VOID (CDECL *AMDServiceConnectionInvalidate)(CFServiceConnection Connection);
@@ -70,7 +70,7 @@ ML_NAMESPACE_BEGIN(AMD);
     {
         // SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
 
-        PVOID Module = LoadDll(L"MobileDevice.dll");
+        PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
 
         LOAD_INTERFACE(AMDeviceNotificationSubscribe);
 
