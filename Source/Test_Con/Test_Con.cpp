@@ -242,9 +242,13 @@ void quick_sort(int *array, int count)
     quick_sort(left, &array[count] - left);
 }
 
+#include "iTunes/iTunes.h"
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    iTunesApi::Initialize();
 
     return;
 

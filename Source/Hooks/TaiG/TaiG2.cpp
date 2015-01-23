@@ -5,6 +5,7 @@
 #pragma comment(linker, "/EXPORT:GetFileVersionInfoSizeW=VERSION.GetFileVersionInfoSizeW")
 #pragma comment(linker, "/EXPORT:VerQueryValueW=VERSION.VerQueryValueW")
 
+#include "D:\Desktop\Source\Test_Con\iTunes\iTunes.h"
 #include "ml.cpp"
 
 typedef struct
@@ -60,8 +61,11 @@ typedef struct
 
 } DEB_ENTRY, *PDEB_ENTRY;
 
+PVOID TaiGBase;
+
 VOID (FASTCALL *StubPushDebList)(PVOID vec, PVOID, PVOID v1, PVOID v2, DEB_ENTRY*& Entry);
 LONG (CDECL *StubFormatCheckboxXml)(PVOID str, PWSTR format, ULONG index);
+VOID (*StubiTunesInit)();
 
 VOID FASTCALL PushDebList(PVOID vec, PVOID, PVOID v1, PVOID v2, DEB_ENTRY*& Entry)
 {
@@ -115,6 +119,16 @@ BOOL CDECL IsiTunesMobileAndAirTrafficHasBreakPoint()
     return FALSE;
 }
 
+VOID iTunesInit()
+{
+    StubiTunesInit();
+
+    iTunesApi::Initialize();
+
+    *(PVOID *)PtrAdd(TaiGBase, 0x868A8) = iTunesApi::AFC::AFCReadData;
+    *(PVOID *)PtrAdd(TaiGBase, 0x868AC) = iTunesApi::AFC::AFCSendData;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -128,6 +142,7 @@ BOOL Initialize(PVOID BaseAddress)
     ml::MlInitialize();
 
     BaseAddress = LoadDll(L"TaiG.dll");
+    TaiGBase = BaseAddress;
 
     {
         PATCH_MEMORY_DATA p[] =
@@ -135,6 +150,7 @@ BOOL Initialize(PVOID BaseAddress)
             MemoryPatchRva(0x00ull, 1, 0x9301),     // DebEntry->Selected = FALSE
 
             FunctionJumpRva(0x149A0, IsiTunesMobileAndAirTrafficHasBreakPoint),
+            FunctionJumpRva(0x147D0, iTunesInit, &StubiTunesInit),
 
             //FunctionJumpRva(0x35870, TgGetRoutine),
             //FunctionJumpRva(0x5CD0, VerifyTaiGExe),
