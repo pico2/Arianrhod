@@ -40,7 +40,7 @@ typedef PVOID           ATH_CONNECTION;
 
 ML_NAMESPACE_BEGIN(iTunesApi)
 
-#include "AppleMobileDevice.h"
+#include "MobileDevice.h"
 #include "AirTrafficHost.h"
 #include "CoreFoundation.h"
 #include "AppleFileConduit.h"

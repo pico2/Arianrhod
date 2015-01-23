@@ -70,7 +70,7 @@ ML_NAMESPACE_BEGIN(AMD);
     {
         // SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
 
-        PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
+        PVOID Module = LoadDll(L"MobileDevice.dll");
 
         LOAD_INTERFACE(AMDeviceNotificationSubscribe);
 
