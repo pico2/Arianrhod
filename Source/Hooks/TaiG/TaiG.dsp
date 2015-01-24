@@ -56,7 +56,23 @@ LINK32=link.exe
 # Name "TaiG - Win32 Release"
 # Begin Source File
 
+SOURCE=.\FuckAnti.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Record.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Remove3K.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TaiG2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\TaiG2.h
 # End Source File
 # End Target
 # End Project
