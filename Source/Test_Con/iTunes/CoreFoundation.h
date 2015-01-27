@@ -13,16 +13,16 @@ ML_NAMESPACE_BEGIN(CF);
     CFDataRef
     (CDECL
     *CFDataCreate)(
-        PVOID Allocator,
-        PBYTE Buffer,
-        ULONG Size
+        CFAllocatorRef  Allocator,
+        PVOID           Buffer,
+        ULONG           Size
     );
 
     DECL_SELECTANY
     CFDataRef
     (CDECL
     *CFPropertyListCreateXMLData)(
-        PVOID               Allocator,
+        CFAllocatorRef      Allocator,
         CFPropertyListRef   PropertyList
     );
 
@@ -36,19 +36,19 @@ ML_NAMESPACE_BEGIN(CF);
     CFArrayRef
     (CDECL
     *CFArrayCreate)(
-        PVOID   Allocator,
-        PVOID*  Values,
-        CFIndex NumberOfValues,
-        PVOID   Callbacks
+        CFAllocatorRef  Allocator,
+        PVOID*          Values,
+        CFIndex         NumberOfValues,
+        PVOID           Callbacks
     );
 
     DECL_SELECTANY
     CFMutableArrayRef
     (CDECL
     *CFArrayCreateMutable)(
-        PVOID   Allocator,
-        CFIndex Capacity,
-        PVOID   Callbacks
+        CFAllocatorRef  Allocator,
+        CFIndex         Capacity,
+        PVOID           Callbacks
     );
 
 
@@ -56,16 +56,24 @@ ML_NAMESPACE_BEGIN(CF);
 
     DECL_SELECTANY CFStringRef (CDECL *CFStringMakeConstantString)(PCSTR String);
     DECL_SELECTANY CFIndex  (CDECL *CFStringGetLength)(CFStringRef String);
+
     DECL_SELECTANY
     BOOL
     (CDECL
     *CFStringGetCString)(
-        CFStringRef String,
-        PSTR        Buffer,
-        ULONG       BufferSize,
-        ULONG       Encoding
+        CFStringRef         String,
+        PVOID               Buffer,
+        CFIndex             BufferSize,
+        CFStringEncoding    Encoding
     );
 
+    DECL_SELECTANY
+    PVOID
+    (CDECL
+    *CFStringGetCStringPtr)(
+        CFStringRef         String,
+        CFStringEncoding    Encoding
+    );
 
     // object
 
@@ -95,6 +103,7 @@ ML_NAMESPACE_BEGIN(CF);
 
         LOAD_INTERFACE_(CFStringMakeConstantString, "__CFStringMakeConstantString");
         LOAD_INTERFACE(CFStringGetCString);
+        LOAD_INTERFACE(CFStringGetCStringPtr);
         LOAD_INTERFACE(CFStringGetLength);
 
         LOAD_INTERFACE(CFRelease);

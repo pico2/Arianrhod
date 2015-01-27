@@ -1,8 +1,11 @@
 #include "TaiG2.h"
 
+using ml::String;
+
 enum
 {
     STATE_NONE,
+    STATE_SERVICE_START,
     STATE_SERVICE_SEND,
     STATE_SERVICE_RECV,
     STATE_AFC_SEND,
@@ -10,10 +13,14 @@ enum
 };
 
 LONG (CDECL *StubJailBreak)(HANDLE Device);
-NTSTATUS (CDECL *StubTGAFCSendData)(AFCConnection Connection, PVOID Buffer, LONG Length);
-NTSTATUS (CDECL *StubTGAFCReadData)(AFCConnection Connection, PVOID Buffer, LONG Length);
-LONG (CDECL *StubTGAMDServiceConnectionSend)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
-LONG (CDECL *StubTGAMDServiceConnectionReceive)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
+
+TYPE_OF(iTunesApi::AFC::AFCConnectionCreate)            StubAFCConnectionCreate;
+TYPE_OF(iTunesApi::AFC::AFCSendData)                    StubAFCSendData;
+TYPE_OF(iTunesApi::AFC::AFCReadData)                    StubAFCReadData;
+
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionSend)       StubAMDServiceConnectionSend;
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionReceive)    StubAMDServiceConnectionReceive;
+TYPE_OF(iTunesApi::AMD::AMDeviceSecureStartService)     StubAMDeviceSecureStartService;
 
 ULONG_PTR PreviousState = STATE_NONE;
 ULONG_PTR JailBreakThreadId;
@@ -26,7 +33,7 @@ VOID DumpData(ULONG_PTR State, PCWSTR Prefix, PVOID Buffer, ULONG_PTR Size, PCST
 
     if (CurrentTid() != JailBreakThreadId) return;
 
-    if (PreviousState != State)
+    if (PreviousState != State || State == STATE_SERVICE_START)
     {
         ++Sequence;
         PreviousState = State;
@@ -54,27 +61,32 @@ VOID DumpData(ULONG_PTR State, PCWSTR Prefix, PVOID Buffer, ULONG_PTR Size, PCST
     bin.Write(Buffer, Size);
 }
 
+VOID DumpData(ULONG_PTR State, PCWSTR Prefix, const String &str, PCSTR ServiceName = nullptr)
+{
+    return DumpData(State, Prefix, (PWSTR)str, str.GetCount() * 2, ServiceName);
+}
+
 NTSTATUS CDECL TGAFCSendData(AFCConnection Connection, PVOID Buffer, LONG Length)
 {
-    NTSTATUS st = StubTGAFCSendData(Connection, Buffer, Length);
+    NTSTATUS st = StubAFCSendData(Connection, Buffer, Length);
 
-    DumpData(STATE_AFC_SEND, L"AFCSendData", Buffer, Length);
+    DumpData(STATE_AFC_SEND, String::Format(L"AFCSendData@%p", Connection), Buffer, Length);
 
     return st;
 }
 
 NTSTATUS CDECL TGAFCReadData(AFCConnection Connection, PVOID Buffer, LONG Length)
 {
-    NTSTATUS st = StubTGAFCReadData(Connection, Buffer, Length);
+    NTSTATUS st = StubAFCReadData(Connection, Buffer, Length);
 
-    DumpData(STATE_AFC_READ, L"AFCReadData", Buffer, Length);
+    DumpData(STATE_AFC_READ, String::Format(L"AFCReadData@%p", Connection), Buffer, Length);
 
     return st;
 }
 
 LONG CDECL TGAMDServiceConnectionSend(CFServiceConnection Connection, PVOID Buffer, ULONG Length)
 {
-    LONG ret = StubTGAMDServiceConnectionSend(Connection, Buffer, Length);
+    LONG ret = StubAMDServiceConnectionSend(Connection, Buffer, Length);
 
     DumpData(STATE_SERVICE_SEND, L"AMDServiceConnectionSend", Buffer, ret, (PCSTR)PtrAdd(Connection, 0x18));
 
@@ -83,11 +95,65 @@ LONG CDECL TGAMDServiceConnectionSend(CFServiceConnection Connection, PVOID Buff
 
 LONG CDECL TGAMDServiceConnectionReceive(CFServiceConnection Connection, PVOID Buffer, ULONG Length)
 {
-    LONG ret = StubTGAMDServiceConnectionReceive(Connection, Buffer, Length);
+    LONG ret = StubAMDServiceConnectionReceive(Connection, Buffer, Length);
 
     DumpData(STATE_SERVICE_RECV, L"AMDServiceConnectionReceive", Buffer, ret, (PCSTR)PtrAdd(Connection, 0x18));
 
     return ret;
+}
+
+NTSTATUS
+CDECL
+TGAMDeviceSecureStartService(
+    HANDLE                  Device,
+    CFStringRef             ServiceName,
+    LONG                    Option,
+    PCFServiceConnection    Connection
+)
+{
+    NTSTATUS st = StubAMDeviceSecureStartService(Device, ServiceName, Option, Connection);
+
+    if (st != STATUS_SUCCESS)
+        return st;
+
+    CFIndex Length = iTunesApi::CF::CFStringGetLength(ServiceName);
+    PWSTR Buffer = (PWSTR)AllocStack(Length * 2 + 2);
+
+    iTunesApi::CF::CFStringGetCString(ServiceName, Buffer, Length * 2 + 2, kCFStringEncodingUTF16LE);
+
+    Buffer[Length] = 0;
+
+    DumpData(
+        STATE_SERVICE_START,
+        L"AMDeviceSecureStartService",
+        String::Format(L"%s: %p", Buffer, iTunesApi::AMD::AMDServiceConnectionGetSocket(*Connection))
+    );
+
+    return st;
+}
+
+AFCConnection
+CDECL
+TGAFCConnectionCreate(
+    CFAllocatorRef  Allocator,
+    SOCKET          ServiceSocket,
+    PVOID           Unknown1,
+    PVOID           Unknown2,
+    ULONG           Timeout
+)
+{
+    AFCConnection Connection = StubAFCConnectionCreate(Allocator, ServiceSocket, Unknown1, Unknown2, Timeout);
+
+    if (Connection != nullptr)
+    {
+        DumpData(
+            STATE_SERVICE_START,
+            L"AFCConnectionCreate",
+            String::Format(L"Create %p from %p", Connection, ServiceSocket)
+        );
+    }
+
+    return Connection;
 }
 
 LONG CDECL JailBreak(HANDLE Device)
@@ -107,10 +173,13 @@ NTSTATUS Record_Initialize(PVOID TaiGBase)
     PATCH_MEMORY_DATA p[] =
     {
         FunctionJumpRva(0x18DD0, JailBreak, &StubJailBreak),
-        FunctionJumpVa(iTunesApi::AFC::AFCSendData,                 TGAFCSendData,                  &StubTGAFCSendData),
-        FunctionJumpVa(iTunesApi::AFC::AFCReadData,                 TGAFCReadData,                  &StubTGAFCReadData),
-        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionSend,    TGAMDServiceConnectionSend,     &StubTGAMDServiceConnectionSend),
-        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionReceive, TGAMDServiceConnectionReceive,  &StubTGAMDServiceConnectionReceive),
+
+        FunctionJumpVa(iTunesApi::AFC::AFCConnectionCreate,         TGAFCConnectionCreate,          &StubAFCConnectionCreate),
+        FunctionJumpVa(iTunesApi::AFC::AFCSendData,                 TGAFCSendData,                  &StubAFCSendData),
+        FunctionJumpVa(iTunesApi::AFC::AFCReadData,                 TGAFCReadData,                  &StubAFCReadData),
+        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionSend,    TGAMDServiceConnectionSend,     &StubAMDServiceConnectionSend),
+        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionReceive, TGAMDServiceConnectionReceive,  &StubAMDServiceConnectionReceive),
+        FunctionJumpVa(iTunesApi::AMD::AMDeviceSecureStartService,  TGAMDeviceSecureStartService,   &StubAMDeviceSecureStartService),
     };
 
     PatchMemory(p, countof(p), TaiGBase);

@@ -11,6 +11,7 @@
 
 DECLARE_HANDLE(CFObjectRef);
 
+DECLARE_HANDLE_CHILD(CFAllocatorRef,            CFObjectRef);
 DECLARE_HANDLE_CHILD(CFDataRef,                 CFObjectRef);
 DECLARE_HANDLE_CHILD(CFStringRef,               CFObjectRef);
 DECLARE_HANDLE_CHILD(CFBooleanRef,              CFObjectRef);
@@ -22,7 +23,9 @@ DECLARE_HANDLE_CHILD(CFServiceConnection,       CFObjectRef);
 
 DECLARE_HANDLE_CHILD(AFCConnection,             CFObjectRef);
 DECLARE_HANDLE_CHILD(AFCDirectory,              CFObjectRef);
-DECLARE_HANDLE_CHILD(AFCFileRef,                CFObjectRef);
+// DECLARE_HANDLE_CHILD(AFCFileRef,                CFObjectRef);
+
+typedef HANDLE64                    AFCFileRef;
 
 typedef CFDataRef*                  PCFDataRef;
 typedef CFStringRef*                PCFStringRef;
@@ -35,8 +38,28 @@ typedef CFServiceConnection*        PCFServiceConnection;
 
 typedef LONG            CFTypeID;
 typedef LONG            CFIndex;
+typedef LONG            CFStringEncoding;
 
 typedef PVOID           ATH_CONNECTION;
+
+enum CFStringBuiltInEncodings
+{
+   kCFStringEncodingMacRoman      = 0,
+   kCFStringEncodingWindowsLatin1 = 0x0500,
+   kCFStringEncodingISOLatin1     = 0x0201,
+   kCFStringEncodingNextStepLatin = 0x0B01,
+   kCFStringEncodingASCII         = 0x0600,
+   kCFStringEncodingUnicode       = 0x0100,
+   kCFStringEncodingUTF8          = 0x08000100,
+   kCFStringEncodingNonLossyASCII = 0x0BFF,
+
+   kCFStringEncodingUTF16         = 0x0100,
+   kCFStringEncodingUTF16BE       = 0x10000100,
+   kCFStringEncodingUTF16LE       = 0x14000100,
+   kCFStringEncodingUTF32         = 0x0c000100,
+   kCFStringEncodingUTF32BE       = 0x18000100,
+   kCFStringEncodingUTF32LE       = 0x1c000100,
+};
 
 ML_NAMESPACE_BEGIN(iTunesApi)
 
