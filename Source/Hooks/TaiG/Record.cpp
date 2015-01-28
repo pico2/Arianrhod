@@ -23,6 +23,10 @@ TYPE_OF(iTunesApi::AMD::AMDServiceConnectionReceive)    StubAMDServiceConnection
 TYPE_OF(iTunesApi::AMD::AMDeviceSecureStartService)     StubAMDeviceSecureStartService;
 TYPE_OF(iTunesApi::AMD::AMDServiceConnectionInvalidate) StubAMDServiceConnectionInvalidate;
 
+LPWSPSTARTUP    StubWSPStartup;
+LPWSPSEND       StubWSPSend;
+LPWSPRECV       StubWSPRecv;
+
 ULONG_PTR PreviousState = STATE_NONE;
 ULONG_PTR JailBreakThreadId;
 
@@ -173,6 +177,64 @@ TGAFCConnectionCreate(
     return Connection;
 }
 
+INT
+NTAPI
+WSPSend(
+    SOCKET                              s,
+    LPWSABUF                            Buffers,
+    DWORD                               BufferCount,
+    LPDWORD                             NumberOfBytesSent,
+    DWORD                               Flags,
+    LPWSAOVERLAPPED                     Overlapped,
+    LPWSAOVERLAPPED_COMPLETION_ROUTINE  CompletionRoutine,
+    LPWSATHREADID                       ThreadId,
+    LPINT                               Errno
+)
+{
+    return StubWSPSend(s, Buffers, BufferCount, NumberOfBytesSent, Flags, Overlapped, CompletionRoutine, ThreadId, Errno);
+}
+
+INT
+NTAPI
+WSPRecv(
+    SOCKET                              s,
+    LPWSABUF                            Buffers,
+    DWORD                               BufferCount,
+    LPDWORD                             NumberOfBytesRecvd,
+    LPDWORD                             Flags,
+    LPWSAOVERLAPPED                     Overlapped,
+    LPWSAOVERLAPPED_COMPLETION_ROUTINE  CompletionRoutine,
+    LPWSATHREADID                       ThreadId,
+    LPINT                               Errno
+)
+{
+    return StubWSPRecv(s, Buffers, BufferCount, NumberOfBytesRecvd, Flags, Overlapped, CompletionRoutine, ThreadId, Errno);
+}
+
+int
+NTAPI
+WSPStartup(
+  WORD                  VersionRequested,
+  LPWSPDATA             WSPData,
+  LPWSAPROTOCOL_INFOW   ProtocolInfo,
+  WSPUPCALLTABLE        callTable,
+  LPWSPPROC_TABLE       ProcTable
+)
+{
+    int r = StubWSPStartup(VersionRequested, WSPData, ProtocolInfo, callTable, ProcTable);
+
+    if (r == 0)
+    {
+        StubWSPSend = ProcTable->lpWSPSend;
+        StubWSPRecv = ProcTable->lpWSPRecv;
+
+        ProcTable->lpWSPSend = WSPSend;
+        ProcTable->lpWSPRecv = WSPRecv;
+    }
+
+    return r;
+}
+
 LONG CDECL JailBreak(HANDLE Device)
 {
     JailBreakThreadId = CurrentTid();
@@ -183,9 +245,13 @@ NTSTATUS Record_Initialize(PVOID TaiGBase)
 {
     using namespace Mp;
 
+    PVOID mswsock;
+
     NtFileDisk().CreateDirectory(L"dumps");
 
     iTunesApi::Initialize();
+
+    mswsock = LoadDll(L"mswsock.dll");
 
     PATCH_MEMORY_DATA p[] =
     {
@@ -198,6 +264,8 @@ NTSTATUS Record_Initialize(PVOID TaiGBase)
         FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionReceive,     TGAMDServiceConnectionReceive,      &StubAMDServiceConnectionReceive),
         FunctionJumpVa(iTunesApi::AMD::AMDeviceSecureStartService,      TGAMDeviceSecureStartService,       &StubAMDeviceSecureStartService),
         FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionInvalidate,  TGAMDServiceConnectionInvalidate,   &StubAMDServiceConnectionInvalidate),
+
+        FunctionJumpVa(GetRoutineAddress(mswsock, "WSPStartup"), WSPStartup, &StubWSPStartup),
     };
 
     PatchMemory(p, countof(p), TaiGBase);

@@ -1,6 +1,7 @@
 #ifndef _TAIG2_H_4ec3cd5a_8227_47ed_a9aa_256432b5034d_
 #define _TAIG2_H_4ec3cd5a_8227_47ed_a9aa_256432b5034d_
 
+#include <Ws2spi.h>
 #include "ml.h"
 #include "D:\Desktop\Source\Test_Con\iTunes\iTunes.h"
 
