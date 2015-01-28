@@ -21,6 +21,7 @@ TYPE_OF(iTunesApi::AFC::AFCReadData)                    StubAFCReadData;
 TYPE_OF(iTunesApi::AMD::AMDServiceConnectionSend)       StubAMDServiceConnectionSend;
 TYPE_OF(iTunesApi::AMD::AMDServiceConnectionReceive)    StubAMDServiceConnectionReceive;
 TYPE_OF(iTunesApi::AMD::AMDeviceSecureStartService)     StubAMDeviceSecureStartService;
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionInvalidate) StubAMDServiceConnectionInvalidate;
 
 ULONG_PTR PreviousState = STATE_NONE;
 ULONG_PTR JailBreakThreadId;
@@ -126,10 +127,26 @@ TGAMDeviceSecureStartService(
     DumpData(
         STATE_SERVICE_START,
         L"AMDeviceSecureStartService",
-        String::Format(L"%s: %p", Buffer, iTunesApi::AMD::AMDServiceConnectionGetSocket(*Connection))
+        String::Format(L"%s: %p: %p", Buffer, iTunesApi::AMD::AMDServiceConnectionGetSocket(*Connection), *Connection)
     );
 
     return st;
+}
+
+VOID CDECL TGAMDServiceConnectionInvalidate(CFServiceConnection Connection)
+{
+    SOCKET sock = iTunesApi::AMD::AMDServiceConnectionGetSocket(Connection);
+
+    if (sock != INVALID_SOCKET)
+    {
+        DumpData(
+            STATE_SERVICE_START,
+            L"AMDServiceConnectionInvalidate",
+            String::Format(L"%S: %p: %p", (PSTR)PtrAdd(Connection, 0x18), sock, Connection)
+        );
+    }
+
+    return StubAMDServiceConnectionInvalidate(Connection);
 }
 
 AFCConnection
@@ -174,12 +191,13 @@ NTSTATUS Record_Initialize(PVOID TaiGBase)
     {
         FunctionJumpRva(0x18DD0, JailBreak, &StubJailBreak),
 
-        FunctionJumpVa(iTunesApi::AFC::AFCConnectionCreate,         TGAFCConnectionCreate,          &StubAFCConnectionCreate),
-        FunctionJumpVa(iTunesApi::AFC::AFCSendData,                 TGAFCSendData,                  &StubAFCSendData),
-        FunctionJumpVa(iTunesApi::AFC::AFCReadData,                 TGAFCReadData,                  &StubAFCReadData),
-        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionSend,    TGAMDServiceConnectionSend,     &StubAMDServiceConnectionSend),
-        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionReceive, TGAMDServiceConnectionReceive,  &StubAMDServiceConnectionReceive),
-        FunctionJumpVa(iTunesApi::AMD::AMDeviceSecureStartService,  TGAMDeviceSecureStartService,   &StubAMDeviceSecureStartService),
+        FunctionJumpVa(iTunesApi::AFC::AFCConnectionCreate,             TGAFCConnectionCreate,              &StubAFCConnectionCreate),
+        FunctionJumpVa(iTunesApi::AFC::AFCSendData,                     TGAFCSendData,                      &StubAFCSendData),
+        FunctionJumpVa(iTunesApi::AFC::AFCReadData,                     TGAFCReadData,                      &StubAFCReadData),
+        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionSend,        TGAMDServiceConnectionSend,         &StubAMDServiceConnectionSend),
+        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionReceive,     TGAMDServiceConnectionReceive,      &StubAMDServiceConnectionReceive),
+        FunctionJumpVa(iTunesApi::AMD::AMDeviceSecureStartService,      TGAMDeviceSecureStartService,       &StubAMDeviceSecureStartService),
+        FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionInvalidate,  TGAMDServiceConnectionInvalidate,   &StubAMDServiceConnectionInvalidate),
     };
 
     PatchMemory(p, countof(p), TaiGBase);

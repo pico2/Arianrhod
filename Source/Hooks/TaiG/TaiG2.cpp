@@ -50,7 +50,7 @@ BOOL Initialize(PVOID BaseAddress)
         FunctionJumpRva(0x145B0, IsDeviceUnActivated),
     };
 
-    //PatchMemory(p, countof(p), BaseAddress);
+    PatchMemory(p, countof(p), BaseAddress);
 
     return TRUE;
 }
