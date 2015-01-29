@@ -10,6 +10,8 @@ enum
     STATE_SERVICE_RECV,
     STATE_AFC_SEND,
     STATE_AFC_READ,
+    STATE_SOCKET_SEND,
+    STATE_SOCKET_RECV,
 };
 
 LONG (CDECL *StubJailBreak)(HANDLE Device);
@@ -26,6 +28,7 @@ TYPE_OF(iTunesApi::AMD::AMDServiceConnectionInvalidate) StubAMDServiceConnection
 LPWSPSTARTUP    StubWSPStartup;
 LPWSPSEND       StubWSPSend;
 LPWSPRECV       StubWSPRecv;
+LPWSPCLOSESOCKET StubWSPCloseSocket;
 
 ULONG_PTR PreviousState = STATE_NONE;
 ULONG_PTR JailBreakThreadId;
@@ -38,11 +41,14 @@ VOID DumpData(ULONG_PTR State, PCWSTR Prefix, PVOID Buffer, ULONG_PTR Size, PCST
 
     if (CurrentTid() != JailBreakThreadId) return;
 
-    if (PreviousState != State || State == STATE_SERVICE_START)
+    if (State == STATE_SOCKET_SEND || State == STATE_SOCKET_RECV)
+    {
+        CreateNew = TRUE;
+    }
+    else if (PreviousState != State || State == STATE_SERVICE_START)
     {
         ++Sequence;
         PreviousState = State;
-
         CreateNew = TRUE;
     }
 
@@ -191,7 +197,15 @@ WSPSend(
     LPINT                               Errno
 )
 {
-    return StubWSPSend(s, Buffers, BufferCount, NumberOfBytesSent, Flags, Overlapped, CompletionRoutine, ThreadId, Errno);
+    INT r = StubWSPSend(s, Buffers, BufferCount, NumberOfBytesSent, Flags, Overlapped, CompletionRoutine, ThreadId, Errno);
+
+    if (r == 0)
+    {
+        //DumpData(STATE_SOCKET_SEND, L"WSPSend", Buffers->buf, *NumberOfBytesSent);
+        DumpData(STATE_SOCKET_RECV, L"WSPSend", String::Format(L"%p", s));
+    }
+
+    return r;
 }
 
 INT
@@ -208,7 +222,26 @@ WSPRecv(
     LPINT                               Errno
 )
 {
-    return StubWSPRecv(s, Buffers, BufferCount, NumberOfBytesRecvd, Flags, Overlapped, CompletionRoutine, ThreadId, Errno);
+    INT r = StubWSPRecv(s, Buffers, BufferCount, NumberOfBytesRecvd, Flags, Overlapped, CompletionRoutine, ThreadId, Errno);
+
+    if (r == 0)
+    {
+        //DumpData(STATE_SOCKET_SEND, L"WSPRecv", Buffers->buf, *NumberOfBytesRecvd);
+        DumpData(STATE_SOCKET_RECV, L"WSPRecv", String::Format(L"%p", s));
+    }
+
+    return r;
+}
+
+INT
+NTAPI
+WSPCloseSocket(
+    SOCKET  s,
+    LPINT   Errno
+)
+{
+    DumpData(STATE_SOCKET_RECV, L"WSPCloseSocket", String::Format(L"%p", s));
+    return StubWSPCloseSocket(s, Errno);
 }
 
 int
@@ -217,19 +250,21 @@ WSPStartup(
   WORD                  VersionRequested,
   LPWSPDATA             WSPData,
   LPWSAPROTOCOL_INFOW   ProtocolInfo,
-  WSPUPCALLTABLE        callTable,
+  WSPUPCALLTABLE        UpcallTable,
   LPWSPPROC_TABLE       ProcTable
 )
 {
-    int r = StubWSPStartup(VersionRequested, WSPData, ProtocolInfo, callTable, ProcTable);
+    int r = StubWSPStartup(VersionRequested, WSPData, ProtocolInfo, UpcallTable, ProcTable);
 
     if (r == 0)
     {
         StubWSPSend = ProcTable->lpWSPSend;
         StubWSPRecv = ProcTable->lpWSPRecv;
+        StubWSPCloseSocket = ProcTable->lpWSPCloseSocket;
 
         ProcTable->lpWSPSend = WSPSend;
         ProcTable->lpWSPRecv = WSPRecv;
+        ProcTable->lpWSPCloseSocket = WSPCloseSocket;
     }
 
     return r;

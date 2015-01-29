@@ -26,6 +26,7 @@ DECLARE_HANDLE_CHILD(AFCDirectory,              CFObjectRef);
 // DECLARE_HANDLE_CHILD(AFCFileRef,                CFObjectRef);
 
 typedef HANDLE64                    AFCFileRef;
+typedef HANDLE64                    AFCHandle;
 
 typedef CFDataRef*                  PCFDataRef;
 typedef CFStringRef*                PCFStringRef;

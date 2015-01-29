@@ -23,6 +23,14 @@ NTSTATUS
 DECL_SELECTANY
 NTSTATUS
 (CDECL
+*AFCDirectoryCreate)(
+    AFCConnection   Connection,
+    PCSTR           Path
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
 *AFCDirectoryRead)(
     AFCConnection   Connection,
     AFCDirectory*   Directory,
@@ -144,6 +152,16 @@ NTSTATUS
     AFCConnection   Connection,
     PVOID           Buffer,
     LONG            Length
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AFCReadPacket)(
+    AFCConnection   Connection,
+    PBYTE*          PacketHeader,
+    PBYTE*          PacketBody,
+    PULONG          PacketSize
 );
 
 DECL_SELECTANY
