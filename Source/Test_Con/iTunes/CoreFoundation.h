@@ -54,6 +54,15 @@ ML_NAMESPACE_BEGIN(CF);
 
     // string
 
+    DECL_SELECTANY
+    CFStringRef
+    (CDECL
+    *CFStringCreateWithCString)(
+        CFAllocatorRef      Allocator,
+        PCSTR               String,
+        CFStringEncoding    Encoding
+    );
+
     DECL_SELECTANY CFStringRef (CDECL *CFStringMakeConstantString)(PCSTR String);
     DECL_SELECTANY CFIndex  (CDECL *CFStringGetLength)(CFStringRef String);
 
@@ -101,6 +110,7 @@ ML_NAMESPACE_BEGIN(CF);
         LOAD_INTERFACE(CFArrayCreate);
         LOAD_INTERFACE(CFArrayCreateMutable);
 
+        LOAD_INTERFACE(CFStringCreateWithCString);
         LOAD_INTERFACE_(CFStringMakeConstantString, "__CFStringMakeConstantString");
         LOAD_INTERFACE(CFStringGetCString);
         LOAD_INTERFACE(CFStringGetCStringPtr);
