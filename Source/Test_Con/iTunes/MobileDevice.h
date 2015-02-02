@@ -1,3 +1,11 @@
+ML_NAMESPACE_BEGIN(CF);
+
+extern VOID (CDECL *CFRelease)(CFObjectRef Object);
+extern VOID (CDECL *CFRetain)(CFObjectRef Object);
+
+ML_NAMESPACE_END_(CF);
+
+
 ML_NAMESPACE_BEGIN(AMD);
 
 #define AMDErrorMake(num) (0xe8000000 | (num))
@@ -167,8 +175,16 @@ enum MOBILE_DEVICE_ERROR_CODE
 
 typedef struct
 {
-    HANDLE  Device;
-    ULONG   State;
+
+} IOS_DEVICE, *PIOS_DEVICE;
+
+struct NOTIFICATION_OBJECT;
+
+typedef struct
+{
+    PIOS_DEVICE             Device;
+    ULONG                   State;
+    NOTIFICATION_OBJECT*    Notification;
 
     enum
     {
@@ -181,26 +197,253 @@ typedef struct
 
 typedef VOID (CDECL *ON_DEVICE_CONNECTION_CHANGED)(PDEVICE_CONNECTION_INFO, PVOID UserData);
 
+typedef struct NOTIFICATION_OBJECT
+{
+    LONG                            Mode;
+    CFArrayRef                      Array;
+    CFObjectRef                     USBListener;
+    CFRunLoopSourceRef              RunLoopSource;
+    ULONG                           Flags;
+    ON_DEVICE_CONNECTION_CHANGED    Callback;
+    PVOID                           CallbackContext;
+
+} NOTIFICATION_OBJECT, *PNOTIFICATION_OBJECT;
+
+
+
+/*  Registers a notification with the current run loop. The callback gets
+*  copied into the notification struct, as well as being registered with the
+*  current run loop. Cookie gets copied into cookie in the same.
+*  (Cookie is a user info parameter that gets passed as an arg to
+*  the callback) unused0 and unused1 are both 0 when iTunes calls this.
+*
+*  Never try to acces directly or copy contents of dev and subscription fields
+*  in am_device_notification_callback_info. Treat them as abstract handles.
+*  When done with connection use AMDeviceRelease to free resources allocated for am_device.
+*
+*  Returns:
+*      MDERR_OK            if successful
+*      MDERR_SYSCALL       if CFRunLoopAddSource() failed
+*      MDERR_OUT_OF_MEMORY if we ran out of memory
+*/
+
 DECL_SELECTANY
 NTSTATUS
 (CDECL
 *AMDeviceNotificationSubscribe)(
-    ON_DEVICE_CONNECTION_CHANGED OnDeviceConnectionChanged,
+    ON_DEVICE_CONNECTION_CHANGED    OnDeviceConnectionChanged,
     LONG,
     LONG,
-    PVOID UserData,
-    PHANDLE NotificationContext
+    PVOID                           UserData,
+    PNOTIFICATION_OBJECT*           Notification
 );
 
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceNotificationUnsubscribe)(HANDLE NotificationContext);
 
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceRetain)(HANDLE Device);
-DECL_SELECTANY BOOL     (CDECL *AMDeviceIsPaired)(HANDLE Device);
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceValidatePairing)(HANDLE Device);
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStartSession)(HANDLE Device);
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceStopSession)(HANDLE Device);
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceConnect)(HANDLE Device);
-DECL_SELECTANY NTSTATUS (CDECL *AMDeviceDisconnect)(HANDLE Device);
+/* Unregisters notifications. Buggy (iTunes 8.2): if you subscribe, unsubscribe and subscribe again, arriving
+   notifications will contain cookie and subscription from 1st call to subscribe, not the 2nd one. iTunes
+   calls this function only once on exit.
+*/
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceNotificationUnsubscribe)(
+    PNOTIFICATION_OBJECT Notification
+);
+
+/* Decrements reference counter and, if nothing left, releases resources hold
+* by connection, invalidates  pointer to device
+*/
+
+DECL_SELECTANY
+VOID
+(CDECL
+*AMDeviceRelease)(
+    PIOS_DEVICE Device
+);
+
+/*
+    Returns device_id field of am_device structure
+*/
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceGetConnectionID)(
+    PIOS_DEVICE Device
+);
+
+
+/*
+    Returns serial field of am_device structure
+*/
+
+DECL_SELECTANY
+CFStringRef
+(CDECL
+*AMDeviceCopyDeviceIdentifier)(
+    PIOS_DEVICE Device
+);
+
+
+/*  Connects to the iPhone. Pass in the am_device structure that the
+*  notification callback will give to you.
+*
+*  Returns:
+*      MDERR_OK                if successfully connected
+*      MDERR_SYSCALL           if setsockopt() failed
+*      MDERR_QUERY_FAILED      if the daemon query failed
+*      MDERR_INVALID_ARGUMENT  if USBMuxConnectByPort returned 0xffffffff
+*/
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceConnect)(
+    PIOS_DEVICE Device
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceDisconnect)(
+    PIOS_DEVICE Device
+);
+
+/*
+    Increments reference counter
+*/
+DECL_SELECTANY
+VOID
+(CDECL
+*AMDeviceRetain)(
+    PIOS_DEVICE Device
+);
+
+
+/*  Calls PairingRecordPath() on the given device, than tests whether the path
+*  which that function returns exists. During the initial connect, the path
+*  returned by that function is '/', and so this returns 1.
+*
+*  Returns:
+*      0   if the path did not exist
+*      1   if it did
+*/
+
+DECL_SELECTANY
+BOOL
+(CDECL
+*AMDevicePair)(
+    PIOS_DEVICE Device
+);
+
+DECL_SELECTANY
+BOOL
+(CDECL
+*AMDeviceIsPaired)(
+    PIOS_DEVICE Device
+);
+
+
+/*  iTunes calls this function immediately after testing whether the device is
+*  paired. It creates a pairing file and establishes a Lockdown connection.
+*
+*  Returns:
+*      MDERR_OK                if successful
+*      MDERR_INVALID_ARGUMENT  if the supplied device is null
+*      MDERR_DICT_NOT_LOADED   if the load_dict() call failed
+*/
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceValidatePairing)(
+    PIOS_DEVICE Device
+);
+
+
+/*  Creates a Lockdown session and adjusts the device structure appropriately
+*  to indicate that the session has been started. iTunes calls this function
+*  after validating pairing.
+*
+*  Returns:
+*      MDERR_OK                if successful
+*      MDERR_INVALID_ARGUMENT  if the Lockdown conn has not been established
+*      MDERR_DICT_NOT_LOADED   if the load_dict() call failed
+*/
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceStartSession)(
+    PIOS_DEVICE Device
+);
+
+
+/* Stops a session. You should do this before accessing services.
+*
+* Returns:
+*      MDERR_OK                if successful
+*      MDERR_INVALID_ARGUMENT  if the Lockdown conn has not been established
+*/
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceStopSession)(
+    PIOS_DEVICE Device
+);
+
+
+
+/* Reads various device settings. One of domain or cfstring arguments should be NULL.
+    *
+    * Possible values for cfstring:
+    * ActivationState
+    * ActivationStateAcknowledged
+    * BasebandBootloaderVersion
+    * BasebandVersion
+    * BluetoothAddress
+    * BuildVersion
+    * DeviceCertificate
+    * DeviceClass
+    * DeviceName
+    * DevicePublicKey
+    * FirmwareVersion
+    * HostAttached
+    * IntegratedCircuitCardIdentity
+    * InternationalMobileEquipmentIdentity
+    * InternationalMobileSubscriberIdentity
+    * ModelNumber
+    * PhoneNumber
+    * ProductType
+    * ProductVersion
+    * ProtocolVersion
+    * RegionInfo
+    * SBLockdownEverRegisteredKey
+    * SIMStatus
+    * SerialNumber
+    * SomebodySetTimeZone
+    * TimeIntervalSince1970
+    * TimeZone
+    * TimeZoneOffsetFromUTC
+    * TrustedHostAttached
+    * UniqueDeviceID
+    * Uses24HourClock
+    * WiFiAddress
+    * iTunesHasConnected
+    *
+    * Possible values for domain:
+    * com.apple.mobile.battery
+*/
+
+DECL_SELECTANY
+CFStringRef
+(CDECL
+*AMDeviceCopyValue)(
+    PIOS_DEVICE Device,
+    CFStringRef Domain,
+    CFStringRef Key
+);
 
 
 /*++
@@ -215,34 +458,95 @@ DECL_SELECTANY NTSTATUS (CDECL *AMDeviceDisconnect)(HANDLE Device);
 
 --*/
 
+  /* Starts a service and returns a socket file descriptor that can be used in order to further
+   * access the service. You should stop the session and disconnect before using
+   * the service. iTunes calls this function after starting a session. It starts
+   * the service and the SSL connection. service_name should be one of the AMSVC_*
+   * constants.
+   *
+   * Returns:
+   *      MDERR_OK                if successful
+   *      MDERR_SYSCALL           if the setsockopt() call failed
+   *      MDERR_INVALID_ARGUMENT  if the Lockdown conn has not been established
+   */
+
 DECL_SELECTANY
 NTSTATUS
 (CDECL
 *AMDeviceSecureStartService)(
-    HANDLE                  Device,
+    PIOS_DEVICE             Device,
     CFStringRef             ServiceName,
     LONG                    Option,
-    PCFServiceConnection    Connection
+    PCFServiceRef           Service
 );
 
-DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(CFServiceConnection Connection);
-DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(CFServiceConnection Connection);
+DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(CFServiceRef Service);
+DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(CFServiceRef Service);
 
-DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
-DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
+DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(CFServiceRef Service, PVOID Buffer, ULONG Length);
+DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(CFServiceRef Service, PVOID Buffer, ULONG Length);
 
-DECL_SELECTANY VOID (CDECL *AMDServiceConnectionInvalidate)(CFServiceConnection Connection);
+DECL_SELECTANY VOID (CDECL *AMDServiceConnectionInvalidate)(CFServiceRef Service);
+
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceActivate)(
+    PIOS_DEVICE     Device,
+    CFDictionaryRef dict
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceDeactivate)(
+    PIOS_DEVICE Device
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDeviceRemoveValue)(
+    PIOS_DEVICE Device,
+    CFStringRef Domain,
+    CFStringRef Key
+);
 
 inline NTSTATUS Initialize()
 {
     // SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
 
+#if USE_ITUNES_MOBILE_DEVICE_DLL
+
     PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
+
+    LOAD_INTERFACE(AMDeviceRetain);
+    LOAD_INTERFACE(AMDeviceRelease);
+
+#else
+
+    PVOID Module = LoadDll(L"MobileDevice.dll");
+
+    AMDeviceRelease = [] (PIOS_DEVICE Device)
+    {
+        if (Device != nullptr)
+            CF::CFRelease((CFObjectRef)Device);
+    };
+
+    AMDeviceRetain = [] (PIOS_DEVICE Device)
+    {
+        if (Device != nullptr)
+            CF::CFRetain((CFObjectRef)Device);
+    };
+
+#endif
 
     LOAD_INTERFACE(AMDeviceNotificationSubscribe);
     LOAD_INTERFACE(AMDeviceNotificationUnsubscribe);
+    LOAD_INTERFACE(AMDeviceGetConnectionID);
 
-    LOAD_INTERFACE(AMDeviceRetain);
+    LOAD_INTERFACE(AMDevicePair);
     LOAD_INTERFACE(AMDeviceIsPaired);
     LOAD_INTERFACE(AMDeviceValidatePairing);
     LOAD_INTERFACE(AMDeviceStartSession);
@@ -250,12 +554,18 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(AMDeviceConnect);
     LOAD_INTERFACE(AMDeviceDisconnect);
 
+    LOAD_INTERFACE(AMDeviceCopyValue);
+
     LOAD_INTERFACE(AMDeviceSecureStartService);
     LOAD_INTERFACE(AMDServiceConnectionGetSocket);
     LOAD_INTERFACE(AMDServiceConnectionGetSecureIOContext);
     LOAD_INTERFACE(AMDServiceConnectionSend);
     LOAD_INTERFACE(AMDServiceConnectionReceive);
     LOAD_INTERFACE(AMDServiceConnectionInvalidate);
+
+    LOAD_INTERFACE(AMDeviceDeactivate);
+    LOAD_INTERFACE(AMDeviceActivate);
+    LOAD_INTERFACE(AMDeviceRemoveValue);
 
     return STATUS_SUCCESS;
 }

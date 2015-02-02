@@ -1,5 +1,7 @@
 #include "ml.h"
 
+#define USE_ITUNES_MOBILE_DEVICE_DLL    0
+
 #define APPLE_APPLICATION_SUPPORT   L"C:\\Program Files (x86)\\Common Files\\Apple\\Apple Application Support"
 #define MOBILE_DEVICE_SUPPORT       L"C:\\Program Files (x86)\\Common Files\\Apple\\Mobile Device Support"
 
@@ -11,6 +13,9 @@
 
 DECLARE_HANDLE(CFObjectRef);
 
+DECLARE_HANDLE_CHILD(CFRunLoopRef,              CFObjectRef);
+DECLARE_HANDLE_CHILD(CFRunLoopSourceRef,        CFObjectRef);
+
 DECLARE_HANDLE_CHILD(CFAllocatorRef,            CFObjectRef);
 DECLARE_HANDLE_CHILD(CFDataRef,                 CFObjectRef);
 DECLARE_HANDLE_CHILD(CFStringRef,               CFObjectRef);
@@ -19,7 +24,7 @@ DECLARE_HANDLE_CHILD(CFArrayRef,                CFObjectRef);
 DECLARE_HANDLE_CHILD(CFMutableArrayRef,         CFObjectRef);
 DECLARE_HANDLE_CHILD(CFDictionaryRef,           CFObjectRef);
 DECLARE_HANDLE_CHILD(CFPropertyListRef,         CFDictionaryRef);
-DECLARE_HANDLE_CHILD(CFServiceConnection,       CFObjectRef);
+DECLARE_HANDLE_CHILD(CFServiceRef,              CFObjectRef);
 
 DECLARE_HANDLE_CHILD(AFCConnection,             CFObjectRef);
 DECLARE_HANDLE_CHILD(AFCDirectory,              CFObjectRef);
@@ -35,7 +40,7 @@ typedef CFArrayRef*                 PCFArrayRef;
 typedef CFMutableArrayRef*          PCFMutableArray;
 typedef CFDictionaryRef*            PCFDictionaryRef;
 typedef CFPropertyListRef*          PCFPropertyListRef;
-typedef CFServiceConnection*        PCFServiceConnection;
+typedef CFServiceRef*               PCFServiceRef;
 
 typedef LONG            CFTypeID;
 typedef LONG            CFIndex;
@@ -45,21 +50,21 @@ typedef PVOID           ATH_CONNECTION;
 
 enum CFStringBuiltInEncodings
 {
-   kCFStringEncodingMacRoman      = 0,
-   kCFStringEncodingWindowsLatin1 = 0x0500,
-   kCFStringEncodingISOLatin1     = 0x0201,
-   kCFStringEncodingNextStepLatin = 0x0B01,
-   kCFStringEncodingASCII         = 0x0600,
-   kCFStringEncodingUnicode       = 0x0100,
-   kCFStringEncodingUTF8          = 0x08000100,
-   kCFStringEncodingNonLossyASCII = 0x0BFF,
+    kCFStringEncodingMacRoman      = 0,
+    kCFStringEncodingWindowsLatin1 = 0x0500,
+    kCFStringEncodingISOLatin1     = 0x0201,
+    kCFStringEncodingNextStepLatin = 0x0B01,
+    kCFStringEncodingASCII         = 0x0600,
+    kCFStringEncodingUnicode       = 0x0100,
+    kCFStringEncodingUTF8          = 0x08000100,
+    kCFStringEncodingNonLossyASCII = 0x0BFF,
 
-   kCFStringEncodingUTF16         = 0x0100,
-   kCFStringEncodingUTF16BE       = 0x10000100,
-   kCFStringEncodingUTF16LE       = 0x14000100,
-   kCFStringEncodingUTF32         = 0x0c000100,
-   kCFStringEncodingUTF32BE       = 0x18000100,
-   kCFStringEncodingUTF32LE       = 0x1c000100,
+    kCFStringEncodingUTF16         = 0x0100,
+    kCFStringEncodingUTF16BE       = 0x10000100,
+    kCFStringEncodingUTF16LE       = 0x14000100,
+    kCFStringEncodingUTF32         = 0x0c000100,
+    kCFStringEncodingUTF32BE       = 0x18000100,
+    kCFStringEncodingUTF32LE       = 0x1c000100,
 };
 
 ML_NAMESPACE_BEGIN(iTunesApi)
