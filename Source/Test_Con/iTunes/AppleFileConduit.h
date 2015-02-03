@@ -1,5 +1,36 @@
 ML_NAMESPACE_BEGIN(AFC);
 
+
+#define AMDErrorMake(num) (0xe8000000 | (num))
+
+enum AFC_ERROR_CODE
+{
+    kAFCSuccess              = 0x00000000,
+    kAFCUndefinedError       = 0x00000001,
+    kAFCBadHeaderError       = 0x00000002,
+    kAFCNoResourcesError     = 0x00000003,
+    kAFCReadError            = 0x00000004,
+    kAFCWriteError           = 0x00000005,
+    kAFCUnknownPacketError   = 0x00000006,
+    kAFCInvalidArgumentError = 0x00000007,
+    kAFCNotFoundError        = 0x00000008,
+    kAFCIsDirectoryError     = 0x00000009,
+    kAFCPermissionError      = 0x0000000A,
+    kAFCNotConnectedError    = 0x0000000B,
+    kAFCTimeOutError         = 0x0000000C,
+    kAFCOverrunError         = 0x0000000D,
+    kAFCEOFError             = 0x0000000E,
+    kAFCUnsupportedError     = 0x0000000F,
+    kAFCFileExistsError      = 0x00000010,
+    kAFCBusyError            = 0x00000011,
+    kAFCNoSpaceError         = 0x00000012,
+    kAFCWouldBlockError      = 0x00000013,
+    kAFCInputOutputError     = 0x00000014,
+    kAFCInterruptedError     = 0x00000015,
+    kAFCInProgressError      = 0x00000016,
+    kAFCInternalError        = 0x00000017,
+};
+
 enum AFC_FILE_MODE
 {
     // Flags for afc_file_open
@@ -11,6 +42,12 @@ enum AFC_FILE_MODE
     AFC_FOPEN_RDAPPEND = 0x00000006,    // < a+  O_RDWR   | O_APPEND | O_CREAT
 };
 
+DECL_SELECTANY
+PCSTR
+(CDECL
+*AFCErrorString)(
+    LONG_PTR AfcErrorCode
+);
 
 /* Opens a directory on the iPhone. Pass in a pointer in dir to be filled in.
 * Note that this normally only accesses the iTunes sandbox/partition as the
@@ -96,6 +133,7 @@ enum
     AFC_LINK_SOFT_LINK  = 2,
 };
 
+DECL_SELECTANY
 NTSTATUS
 (CDECL
 *AFCLinkPath)(
@@ -172,8 +210,7 @@ NTSTATUS
 *AFCFileRefOpen)(
     AFCConnection   Connection,
     PCSTR           Path,
-    AFC_FILE_MODE   Mode,
-    ULONG           Timeout,
+    ULONG64         Mode,
     AFCFileRef*     Handle
 );
 
@@ -189,7 +226,7 @@ NTSTATUS
     AFCConnection   Connection,
     AFCFileRef      File,
     PVOID           Buffer,
-    PULONG          Length
+    PULONG_PTR      Length
 );
 
 /*
@@ -203,7 +240,7 @@ NTSTATUS
     AFCConnection   Connection,
     AFCFileRef      File,
     PVOID           Buffer,
-    ULONG           Length
+    ULONG64         Length
 );
 
 /*
@@ -231,7 +268,8 @@ NTSTATUS
 *AFCFileRefSeek)(
     AFCConnection   Connection,
     AFCFileRef      File,
-    PULONG64        Offset
+    ULONG64         Offset,
+    LONG            Origin
 );
 
 
@@ -248,12 +286,21 @@ NTSTATUS
 );
 
 
+/** Lock operation flags */
+enum AFC_LOCK_OPERATION
+{
+    AFC_LOCK_SHARED    = 1 | 4, /**< shared lock */
+    AFC_LOCK_EXCLUSIVE = 2 | 4, /**< exclusive lock */
+    AFC_LOCK_UNLOCK    = 8 | 4, /**< unlock */
+};
+
 DECL_SELECTANY
 NTSTATUS
 (CDECL
 *AFCFileRefLock)(
     AFCConnection   Connection,
-    AFCFileRef      Handle
+    AFCFileRef      Handle,
+    BOOLEAN         ExclusiveLock
 );
 
 DECL_SELECTANY
@@ -279,7 +326,7 @@ NTSTATUS
 *AFCSendData)(
     AFCConnection   Connection,
     PVOID           Buffer,
-    LONG            Length
+    ULONG_PTR       Length
 );
 
 DECL_SELECTANY
@@ -288,7 +335,7 @@ NTSTATUS
 *AFCReadData)(
     AFCConnection   Connection,
     PVOID           Buffer,
-    LONG            Length
+    ULONG_PTR       Length
 );
 
 DECL_SELECTANY
@@ -327,7 +374,7 @@ AFCConnection
     SOCKET          ServiceSocket,
     PVOID           Unknown1,
     PVOID           Unknown2,
-    ULONG           Timeout
+    ULONG_PTR       Timeout
 );
 
 
@@ -376,18 +423,9 @@ NTSTATUS
 
 inline NTSTATUS Initialize()
 {
-    // SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
+    PVOID Module = LoadDll(MOBILE_DEVICE_DLL);
 
-#if USE_ITUNES_MOBILE_DEVICE_DLL
-
-    PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
-
-#else
-
-    PVOID Module = LoadDll(L"MobileDevice.dll");
-
-#endif
-
+    LOAD_INTERFACE(AFCErrorString);
 
     LOAD_INTERFACE(AFCConnectionOpen);
     LOAD_INTERFACE(AFCConnectionCreate);

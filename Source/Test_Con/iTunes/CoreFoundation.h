@@ -26,8 +26,19 @@ VOID
     BOOL        ReturnAfterSourceHandled
 );
 
-DECL_SELECTANY CFRunLoopRef (CDECL *CFRunLoopGetCurrent)();
-DECL_SELECTANY VOID (CDECL *CFRunLoopSourceInvalidate)(CFRunLoopSourceRef RunLoopSource);
+DECL_SELECTANY
+CFRunLoopRef
+(CDECL
+*CFRunLoopGetCurrent)(
+    VOID
+);
+
+DECL_SELECTANY
+VOID
+(CDECL
+*CFRunLoopSourceInvalidate)(
+    CFRunLoopSourceRef RunLoopSource
+);
 
 DECL_SELECTANY
 VOID
@@ -76,6 +87,38 @@ CFDataRef
 DECL_SELECTANY CFIndex  (CDECL *CFDataGetLength)(CFDataRef Data);
 DECL_SELECTANY PBYTE    (CDECL *CFDataGetBytePtr)(CFDataRef Data);
 
+// dict
+
+DECL_SELECTANY
+CFDictionaryRef
+(CDECL
+*CFDictionaryCreate)(
+    CFAllocatorRef  Allocator,
+    CFObjectRef*    Keys,
+    CFObjectRef*    Values,
+    CFIndex         NumberofValues,
+    PVOID           KeyCallBacks,
+    PVOID           ValueCallBacks
+);
+
+DECL_SELECTANY
+CFMutableDictionaryRef
+(CDECL
+*CFDictionaryCreateMutable)(
+    CFAllocatorRef  Allocator,
+    CFIndex         Capacity,
+    PVOID           KeyCallBacks,
+    PVOID           ValueCallBacks
+);
+
+DECL_SELECTANY
+VOID
+(CDECL
+*CFDictionaryAddValue)(
+    CFMutableDictionaryRef  Dict,
+    CFObjectRef             Key,
+    CFObjectRef             Value
+);
 
 // array
 
@@ -110,7 +153,7 @@ CFStringRef
     CFStringEncoding    Encoding
 );
 
-#define CFSTR(s) CFStringMakeConstantString(s)
+#define CFSTR(s) ((s) ? iTunesApi::CF::CFStringMakeConstantString(s) : nullptr)
 
 DECL_SELECTANY CFStringRef (CDECL *CFStringMakeConstantString)(PCSTR String);
 DECL_SELECTANY CFIndex  (CDECL *CFStringGetLength)(CFStringRef String);
@@ -165,6 +208,10 @@ inline NTSTATUS Initialize()
 
     LOAD_INTERFACE(CFDataGetLength);
     LOAD_INTERFACE(CFDataGetBytePtr);
+
+    LOAD_INTERFACE(CFDictionaryCreate);
+    LOAD_INTERFACE(CFDictionaryCreateMutable);
+    LOAD_INTERFACE(CFDictionaryAddValue);
 
     LOAD_INTERFACE(CFArrayCreate);
     LOAD_INTERFACE(CFArrayCreateMutable);

@@ -190,7 +190,7 @@ typedef struct
     {
         STATE_CONNECT       = 1,
         STATE_DISCONNECT    = 2,
-        STATE_DETACH        = 3,
+        STATE_UNSUBSCRIBE   = 3,
     };
 
 } DEVICE_CONNECTION_INFO, *PDEVICE_CONNECTION_INFO;
@@ -199,11 +199,11 @@ typedef VOID (CDECL *ON_DEVICE_CONNECTION_CHANGED)(PDEVICE_CONNECTION_INFO, PVOI
 
 typedef struct NOTIFICATION_OBJECT
 {
-    LONG                            Mode;
+    ULONG                           Mode;
     CFArrayRef                      Array;
     CFObjectRef                     USBListener;
     CFRunLoopSourceRef              RunLoopSource;
-    ULONG                           Flags;
+    USHORT                          Flags;
     ON_DEVICE_CONNECTION_CHANGED    Callback;
     PVOID                           CallbackContext;
 
@@ -233,7 +233,7 @@ NTSTATUS
 *AMDeviceNotificationSubscribe)(
     ON_DEVICE_CONNECTION_CHANGED    OnDeviceConnectionChanged,
     LONG,
-    LONG,
+    ULONG                           Mode,
     PVOID                           UserData,
     PNOTIFICATION_OBJECT*           Notification
 );
@@ -360,6 +360,13 @@ NTSTATUS
     PIOS_DEVICE Device
 );
 
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*AMDevicePairWithOptions)(
+    PIOS_DEVICE     Device,
+    CFDictionaryRef Record
+);
 
 /*  Creates a Lockdown session and adjusts the device structure appropriately
 *  to indicate that the session has been started. iTunes calls this function
@@ -458,17 +465,24 @@ CFStringRef
 
 --*/
 
-  /* Starts a service and returns a socket file descriptor that can be used in order to further
-   * access the service. You should stop the session and disconnect before using
-   * the service. iTunes calls this function after starting a session. It starts
-   * the service and the SSL connection. service_name should be one of the AMSVC_*
-   * constants.
-   *
-   * Returns:
-   *      MDERR_OK                if successful
-   *      MDERR_SYSCALL           if the setsockopt() call failed
-   *      MDERR_INVALID_ARGUMENT  if the Lockdown conn has not been established
-   */
+/* Starts a service and returns a socket file descriptor that can be used in order to further
+* access the service. You should stop the session and disconnect before using
+* the service. iTunes calls this function after starting a session. It starts
+* the service and the SSL connection. service_name should be one of the AMSVC_*
+* constants.
+*
+* Returns:
+*      MDERR_OK                if successful
+*      MDERR_SYSCALL           if the setsockopt() call failed
+*      MDERR_INVALID_ARGUMENT  if the Lockdown conn has not been established
+*
+* Possible values for Options:
+*     CloseOnInvalidate:    Boolean
+*     TimeoutConnection:    Boolean
+*     UnlockEscrowBag:      Boolean
+*     DirectSocket:         Boolean
+*
+*/
 
 DECL_SELECTANY
 NTSTATUS
@@ -476,17 +490,49 @@ NTSTATUS
 *AMDeviceSecureStartService)(
     PIOS_DEVICE             Device,
     CFStringRef             ServiceName,
-    LONG                    Option,
+    CFDictionaryRef         Options,
     PCFServiceRef           Service
 );
 
-DECL_SELECTANY SOCKET (CDECL *AMDServiceConnectionGetSocket)(CFServiceRef Service);
-DECL_SELECTANY PVOID (CDECL *AMDServiceConnectionGetSecureIOContext)(CFServiceRef Service);
+DECL_SELECTANY
+SOCKET
+(CDECL
+*AMDServiceConnectionGetSocket)(
+    CFServiceRef Service
+);
 
-DECL_SELECTANY LONG (CDECL *AMDServiceConnectionSend)(CFServiceRef Service, PVOID Buffer, ULONG Length);
-DECL_SELECTANY LONG (CDECL *AMDServiceConnectionReceive)(CFServiceRef Service, PVOID Buffer, ULONG Length);
+DECL_SELECTANY
+PVOID
+(CDECL
+*AMDServiceConnectionGetSecureIOContext)(
+    CFServiceRef Service
+);
 
-DECL_SELECTANY VOID (CDECL *AMDServiceConnectionInvalidate)(CFServiceRef Service);
+DECL_SELECTANY
+LONG
+(CDECL
+*AMDServiceConnectionSend)(
+    CFServiceRef    Service,
+    PVOID           Buffer,
+    ULONG           Length
+);
+
+DECL_SELECTANY
+LONG
+(CDECL
+*AMDServiceConnectionReceive)(
+    CFServiceRef    Service,
+    PVOID           Buffer,
+    ULONG           Length
+);
+
+
+DECL_SELECTANY
+VOID
+(CDECL
+*AMDServiceConnectionInvalidate)(
+    CFServiceRef Service
+);
 
 
 DECL_SELECTANY
@@ -515,18 +561,14 @@ NTSTATUS
 
 inline NTSTATUS Initialize()
 {
-    // SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
+    PVOID Module = LoadDll(MOBILE_DEVICE_DLL);
 
 #if USE_ITUNES_MOBILE_DEVICE_DLL
-
-    PVOID Module = LoadDll(L"iTunesMobileDevice.dll");
 
     LOAD_INTERFACE(AMDeviceRetain);
     LOAD_INTERFACE(AMDeviceRelease);
 
 #else
-
-    PVOID Module = LoadDll(L"MobileDevice.dll");
 
     AMDeviceRelease = [] (PIOS_DEVICE Device)
     {
@@ -549,6 +591,7 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(AMDevicePair);
     LOAD_INTERFACE(AMDeviceIsPaired);
     LOAD_INTERFACE(AMDeviceValidatePairing);
+    LOAD_INTERFACE(AMDevicePairWithOptions);
     LOAD_INTERFACE(AMDeviceStartSession);
     LOAD_INTERFACE(AMDeviceStopSession);
     LOAD_INTERFACE(AMDeviceConnect);
