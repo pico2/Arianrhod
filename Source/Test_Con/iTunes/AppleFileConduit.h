@@ -436,11 +436,13 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(AFCConnectionClose);
 
     LOAD_INTERFACE(AFCDirectoryOpen);
+    LOAD_INTERFACE(AFCDirectoryCreate);
     LOAD_INTERFACE(AFCDirectoryRead);
     LOAD_INTERFACE(AFCDirectoryClose);
 
     LOAD_INTERFACE(AFCRemovePath);
     LOAD_INTERFACE(AFCRenamePath);
+    LOAD_INTERFACE(AFCLinkPath);
 
     LOAD_INTERFACE(AFCFileInfoOpen);
     LOAD_INTERFACE(AFCKeyValueRead);
