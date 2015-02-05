@@ -77,6 +77,38 @@ CFDataRef
 );
 
 DECL_SELECTANY
+CFMutableDataRef
+(CDECL
+*CFDataCreateMutable)(
+    CFAllocatorRef  Allocator,
+    CFIndex         Capacity
+);
+
+DECL_SELECTANY
+VOID
+(CDECL
+*CFDataAppendBytes)(
+    CFMutableDataRef    Data,
+    PBYTE               Buffer,
+    CFIndex             Length
+);
+
+DECL_SELECTANY CFIndex  (CDECL *CFDataGetLength)(CFDataRef Data);
+DECL_SELECTANY PBYTE    (CDECL *CFDataGetBytePtr)(CFDataRef Data);
+
+// dict
+
+enum
+{
+   kCFPropertyListOpenStepFormat    = 1,
+   kCFPropertyListXMLFormat_v1_0    = 100,
+   kCFPropertyListBinaryFormat_v1_0 = 200,
+};
+
+typedef ULONG CFOptionFlags;
+typedef ULONG CFPropertyListFormat;
+
+DECL_SELECTANY
 CFDataRef
 (CDECL
 *CFPropertyListCreateXMLData)(
@@ -84,10 +116,16 @@ CFDataRef
     CFPropertyListRef   PropertyList
 );
 
-DECL_SELECTANY CFIndex  (CDECL *CFDataGetLength)(CFDataRef Data);
-DECL_SELECTANY PBYTE    (CDECL *CFDataGetBytePtr)(CFDataRef Data);
-
-// dict
+DECL_SELECTANY
+CFDataRef
+(CDECL
+*CFPropertyListCreateData)(
+    CFAllocatorRef          Allocator,
+    CFPropertyListRef       PropertyList,
+    CFPropertyListFormat    Format,
+    CFOptionFlags           Options,
+    CFErrorRef*             Error
+);
 
 DECL_SELECTANY
 CFDictionaryRef
@@ -115,6 +153,15 @@ DECL_SELECTANY
 VOID
 (CDECL
 *CFDictionaryAddValue)(
+    CFMutableDictionaryRef  Dict,
+    CFObjectRef             Key,
+    CFObjectRef             Value
+);
+
+DECL_SELECTANY
+VOID
+(CDECL
+*CFDictionarySetValue)(
     CFMutableDictionaryRef  Dict,
     CFObjectRef             Key,
     CFObjectRef             Value
@@ -201,17 +248,22 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(CFRunLoopRemoveSource);
 
     LOAD_INTERFACE(CFPropertyListCreateXMLData);
+    LOAD_INTERFACE(CFPropertyListCreateData);
 
     LOAD_INTERFACE(CFGetTypeID);
     LOAD_INTERFACE(CFStringGetTypeID);
     LOAD_INTERFACE(CFDictionaryGetTypeID);
 
+    LOAD_INTERFACE(CFDataCreate);
+    LOAD_INTERFACE(CFDataCreateMutable);
+    LOAD_INTERFACE(CFDataAppendBytes);
     LOAD_INTERFACE(CFDataGetLength);
     LOAD_INTERFACE(CFDataGetBytePtr);
 
     LOAD_INTERFACE(CFDictionaryCreate);
     LOAD_INTERFACE(CFDictionaryCreateMutable);
     LOAD_INTERFACE(CFDictionaryAddValue);
+    LOAD_INTERFACE(CFDictionarySetValue);
 
     LOAD_INTERFACE(CFArrayCreate);
     LOAD_INTERFACE(CFArrayCreateMutable);

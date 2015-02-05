@@ -47,6 +47,7 @@ DECLARE_HANDLE_CHILD(CFRunLoopSourceRef,        CFObjectRef);
 
 DECLARE_HANDLE_CHILD(CFAllocatorRef,            CFObjectRef);
 DECLARE_HANDLE_CHILD(CFDataRef,                 CFObjectRef);
+DECLARE_HANDLE_CHILD(CFMutableDataRef,          CFDataRef);
 DECLARE_HANDLE_CHILD(CFStringRef,               CFObjectRef);
 DECLARE_HANDLE_CHILD(CFBooleanRef,              CFObjectRef);
 DECLARE_HANDLE_CHILD(CFArrayRef,                CFObjectRef);
@@ -55,6 +56,7 @@ DECLARE_HANDLE_CHILD(CFDictionaryRef,           CFObjectRef);
 DECLARE_HANDLE_CHILD(CFMutableDictionaryRef,    CFDictionaryRef);
 DECLARE_HANDLE_CHILD(CFPropertyListRef,         CFDictionaryRef);
 DECLARE_HANDLE_CHILD(CFServiceRef,              CFObjectRef);
+DECLARE_HANDLE_CHILD(CFErrorRef,                CFObjectRef);
 
 DECLARE_HANDLE_CHILD(AFCConnection,             CFObjectRef);
 DECLARE_HANDLE_CHILD(AFCDirectory,              CFObjectRef);
