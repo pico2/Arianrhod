@@ -1,8 +1,5 @@
 ML_NAMESPACE_BEGIN(AFC);
 
-
-#define AMDErrorMake(num) (0xe8000000 | (num))
-
 enum AFC_ERROR_CODE
 {
     kAFCSuccess              = 0x00000000,

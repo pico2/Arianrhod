@@ -42,10 +42,13 @@
 
 DECLARE_HANDLE(CFObjectRef);
 
+typedef CFObjectRef CFPropertyListRef;
+
 DECLARE_HANDLE_CHILD(CFRunLoopRef,              CFObjectRef);
 DECLARE_HANDLE_CHILD(CFRunLoopSourceRef,        CFObjectRef);
 
 DECLARE_HANDLE_CHILD(CFAllocatorRef,            CFObjectRef);
+DECLARE_HANDLE_CHILD(CFNumberRef,               CFObjectRef);
 DECLARE_HANDLE_CHILD(CFDataRef,                 CFObjectRef);
 DECLARE_HANDLE_CHILD(CFMutableDataRef,          CFDataRef);
 DECLARE_HANDLE_CHILD(CFStringRef,               CFObjectRef);
@@ -54,7 +57,6 @@ DECLARE_HANDLE_CHILD(CFArrayRef,                CFObjectRef);
 DECLARE_HANDLE_CHILD(CFMutableArrayRef,         CFObjectRef);
 DECLARE_HANDLE_CHILD(CFDictionaryRef,           CFObjectRef);
 DECLARE_HANDLE_CHILD(CFMutableDictionaryRef,    CFDictionaryRef);
-DECLARE_HANDLE_CHILD(CFPropertyListRef,         CFDictionaryRef);
 DECLARE_HANDLE_CHILD(CFServiceRef,              CFObjectRef);
 DECLARE_HANDLE_CHILD(CFErrorRef,                CFObjectRef);
 
@@ -77,6 +79,7 @@ typedef CFServiceRef*               PCFServiceRef;
 typedef LONG_PTR                    CFTypeID;
 typedef LONG_PTR                    CFIndex;
 typedef LONG                        CFStringEncoding;
+typedef ULONG                       CFHashCode;
 
 typedef PVOID                       ATH_CONNECTION;
 
