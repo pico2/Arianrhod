@@ -204,6 +204,17 @@ CFPropertyListRef
     CFStringRef*    ErrorString
 );
 
+DECL_SELECTANY
+CFPropertyListRef
+(CDECL
+*CFPropertyListCreateWithData)(
+    CFAllocatorRef          Allocator,
+    CFDataRef               XmlData,
+    CFOptionFlags           Options,
+    CFPropertyListFormat*   Format,
+    CFErrorRef*             Error
+);
+
 
 // dict
 
@@ -276,6 +287,14 @@ VOID
     CFObjectRef             Key,
     CFObjectRef             Value
 );
+
+DECL_SELECTANY
+PVOID
+(CDECL
+*CFDictionaryGetValue)(
+    CFDictionaryRef Dict,
+    PVOID           Key
+); 
 
 // array
 
@@ -463,6 +482,7 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(CFPropertyListCreateXMLData);
     LOAD_INTERFACE(CFPropertyListCreateData);
     LOAD_INTERFACE(CFPropertyListCreateFromXMLData);
+    LOAD_INTERFACE(CFPropertyListCreateWithData);
 
     LOAD_INTERFACE(CFGetTypeID);
     LOAD_INTERFACE(CFStringGetTypeID);
@@ -488,6 +508,7 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(CFDictionaryCreateMutable);
     LOAD_INTERFACE(CFDictionaryAddValue);
     LOAD_INTERFACE(CFDictionarySetValue);
+    LOAD_INTERFACE(CFDictionaryGetValue);
 
     LOAD_INTERFACE(kCFTypeArrayCallBacks);
     LOAD_INTERFACE(CFArrayCreate);
