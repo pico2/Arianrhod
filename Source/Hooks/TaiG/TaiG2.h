@@ -62,7 +62,7 @@ extern PVOID TaiGBase;
 
 LONG CDECL TGAFCSendData(AFCConnection Connection, PVOID Buffer, LONG Length);
 LONG CDECL TGAFCReadData(AFCConnection Connection, PVOID Buffer, LONG Length);
-LONG CDECL TGAMDServiceConnectionSend(CFServiceConnection Connection, PVOID Data, ULONG Length);
-LONG CDECL TGAMDServiceConnectionReceive(CFServiceConnection Connection, PVOID Buffer, ULONG Length);
+LONG CDECL TGAMDServiceConnectionSend(CFServiceRef Connection, PVOID Data, ULONG Length);
+LONG CDECL TGAMDServiceConnectionReceive(CFServiceRef Connection, PVOID Buffer, ULONG Length);
 
 #endif // _TAIG2_H_4ec3cd5a_8227_47ed_a9aa_256432b5034d_

@@ -56,7 +56,14 @@ VOID DumpData(ULONG_PTR State, PCWSTR Prefix, PVOID Buffer, ULONG_PTR Size, PCST
     NtFileDisk bin;
     WCHAR name[MAX_NTPATH];
 
-    Length = swprintf(name, L"dumps\\%05d_%s", Sequence, Prefix);
+    static SYSTEMTIME LastTime;
+
+    if (CreateNew)
+        GetLocalTime(&LastTime);
+
+    Length = swprintf(name, L"dumps\\[%02d-%02d-%02d.%04d] %05d_%s",
+                    LastTime.wHour, LastTime.wMinute, LastTime.wSecond, LastTime.wMilliseconds, Sequence, Prefix
+                );
     if (ServiceName != nullptr)
         swprintf(name + Length, L"_%S", ServiceName);
 
@@ -95,7 +102,7 @@ NTSTATUS CDECL TGAFCReadData(AFCConnection Connection, PVOID Buffer, LONG Length
     return st;
 }
 
-LONG CDECL TGAMDServiceConnectionSend(CFServiceConnection Connection, PVOID Buffer, ULONG Length)
+LONG CDECL TGAMDServiceConnectionSend(CFServiceRef Connection, PVOID Buffer, ULONG Length)
 {
     LONG ret = StubAMDServiceConnectionSend(Connection, Buffer, Length);
 
@@ -104,7 +111,7 @@ LONG CDECL TGAMDServiceConnectionSend(CFServiceConnection Connection, PVOID Buff
     return ret;
 }
 
-LONG CDECL TGAMDServiceConnectionReceive(CFServiceConnection Connection, PVOID Buffer, ULONG Length)
+LONG CDECL TGAMDServiceConnectionReceive(CFServiceRef Connection, PVOID Buffer, ULONG Length)
 {
     LONG ret = StubAMDServiceConnectionReceive(Connection, Buffer, Length);
 
@@ -116,10 +123,10 @@ LONG CDECL TGAMDServiceConnectionReceive(CFServiceConnection Connection, PVOID B
 NTSTATUS
 CDECL
 TGAMDeviceSecureStartService(
-    HANDLE                  Device,
-    CFStringRef             ServiceName,
-    LONG                    Option,
-    PCFServiceConnection    Connection
+    iTunesApi::AMD::PIOS_DEVICE     Device,
+    CFStringRef     ServiceName,
+    CFDictionaryRef Option,
+    PCFServiceRef   Connection
 )
 {
     NTSTATUS st = StubAMDeviceSecureStartService(Device, ServiceName, Option, Connection);
@@ -143,7 +150,7 @@ TGAMDeviceSecureStartService(
     return st;
 }
 
-VOID CDECL TGAMDServiceConnectionInvalidate(CFServiceConnection Connection)
+VOID CDECL TGAMDServiceConnectionInvalidate(CFServiceRef Connection)
 {
     SOCKET sock = iTunesApi::AMD::AMDServiceConnectionGetSocket(Connection);
 
@@ -300,7 +307,7 @@ NTSTATUS Record_Initialize(PVOID TaiGBase)
         FunctionJumpVa(iTunesApi::AMD::AMDeviceSecureStartService,      TGAMDeviceSecureStartService,       &StubAMDeviceSecureStartService),
         FunctionJumpVa(iTunesApi::AMD::AMDServiceConnectionInvalidate,  TGAMDServiceConnectionInvalidate,   &StubAMDServiceConnectionInvalidate),
 
-        FunctionJumpVa(GetRoutineAddress(mswsock, "WSPStartup"), WSPStartup, &StubWSPStartup),
+        // FunctionJumpVa(GetRoutineAddress(mswsock, "WSPStartup"), WSPStartup, &StubWSPStartup),
     };
 
     PatchMemory(p, countof(p), TaiGBase);
