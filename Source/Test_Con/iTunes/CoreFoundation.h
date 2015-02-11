@@ -154,6 +154,7 @@ VOID
     CFIndex             Length
 );
 
+
 DECL_SELECTANY CFIndex  (CDECL *CFDataGetLength)(CFDataRef Data);
 DECL_SELECTANY PBYTE    (CDECL *CFDataGetBytePtr)(CFDataRef Data);
 
