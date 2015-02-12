@@ -408,6 +408,7 @@ NTSTATUS
     * BasebandVersion
     * BluetoothAddress
     * BuildVersion
+    * CPUArchitecture
     * DeviceCertificate
     * DeviceClass
     * DeviceName
