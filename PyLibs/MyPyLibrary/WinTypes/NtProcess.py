@@ -1,6 +1,52 @@
 from .NtBase import *
 from .NtObject import *
 
+JobObjectExtendedLimitInformation = 9
+JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000
+
+class JOBOBJECT_BASIC_LIMIT_INFORMATION(Structure):
+    _fields_ = \
+    [
+        ('PerProcessUserTimeLimit', LARGE_INTEGER),
+        ('PerJobUserTimeLimit',     LARGE_INTEGER),
+        ('LimitFlags',              ULONG),
+        ('MinimumWorkingSetSize',   ULONG_PTR),
+        ('MaximumWorkingSetSize',   ULONG_PTR),
+        ('ActiveProcessLimit',      ULONG),
+        ('Affinity',                ULONG_PTR),
+        ('PriorityClass',           ULONG),
+        ('SchedulingClass',         ULONG),
+    ]
+
+PJOBOBJECT_BASIC_LIMIT_INFORMATION = ctypes.POINTER(JOBOBJECT_BASIC_LIMIT_INFORMATION)
+
+class IO_COUNTERS(Structure):
+    _fields_ = \
+    [
+        ('ReadOperationCount',      ULONG64),
+        ('WriteOperationCount',     ULONG64),
+        ('OtherOperationCount',     ULONG64),
+        ('ReadTransferCount',       ULONG64),
+        ('WriteTransferCount',      ULONG64),
+        ('OtherTransferCount',      ULONG64),
+    ]
+
+PIO_COUNTERS = ctypes.POINTER(IO_COUNTERS)
+
+class JOBOBJECT_EXTENDED_LIMIT_INFORMATION(Structure):
+    _fields_ = \
+    [
+        ('BasicLimitInformation',   JOBOBJECT_BASIC_LIMIT_INFORMATION),
+        ('IoInfo',                  IO_COUNTERS),
+        ('ProcessMemoryLimit',      ULONG_PTR),
+        ('JobMemoryLimit',          ULONG_PTR),
+        ('PeakProcessMemoryUsed',   ULONG_PTR),
+        ('PeakJobMemoryUsed',       ULONG_PTR),
+    ]
+
+PJOBOBJECT_EXTENDED_LIMIT_INFORMATION = ctypes.POINTER(JOBOBJECT_EXTENDED_LIMIT_INFORMATION)
+
+
 #
 # Process dwCreationFlag values
 #
