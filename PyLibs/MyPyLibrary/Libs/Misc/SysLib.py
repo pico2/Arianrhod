@@ -230,6 +230,10 @@ pair as the key's value (values become dictionaries)."""
     def __delitem__(self, key):
         return super().__delitem__(key.lower())
 
+    def setdefault(self, key, default):
+        if key not in self:
+            self[key] = default
+
     def get(self, key, default = None):
         try:
             v = dict.__getitem__(self, key.lower())

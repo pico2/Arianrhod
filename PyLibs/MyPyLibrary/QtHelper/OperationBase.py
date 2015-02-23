@@ -10,6 +10,14 @@ class OperationBase(object):
             self.PostEvent              = parent.PostEvent
             self.SendEvent              = parent.SendEvent
 
+    @property
+    def rootParent(self):
+        parent = self
+        while parent.parent:
+            parent = parent.parent
+
+        return parent
+
     def RegisterEventHandler(self, Event, Handler):
         raise NotImplementedError
 

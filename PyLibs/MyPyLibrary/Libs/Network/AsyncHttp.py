@@ -138,7 +138,7 @@ class AsyncHttp(object):
         def decode(self, encoding = None):
             return self.content.decode(self.response._get_encoding(encoding))
 
-    def __init__(self, *, loop = None, cookie_class = http.cookies.BaseCookie):
+    def __init__(self, *, loop = None, timeout = 30, cookie_class = http.cookies.BaseCookie):
         self.loop = loop or asyncio.get_event_loop()
         self.TCPConnector = aiohttp.connector.TCPConnector(verify_ssl = False, share_cookies = True, loop = self.loop)
         self.ProxyConnector = aiohttp.connector.ProxyConnector('http://localhost:80', verify_ssl = False, share_cookies = True, loop = self.loop)
@@ -147,6 +147,7 @@ class AsyncHttp(object):
         self.ProxyConnector.cookies = cookie_class()
 
         self.headers = {}
+        self.timeout = timeout
 
         self.connector = self.TCPConnector
 
@@ -185,7 +186,11 @@ class AsyncHttp(object):
         if 'headers' not in kwargs:
             kwargs['headers'] = self.headers
 
-        response = yield from aiohttp.request(method, url, **kwargs)
+        try:
+            response = yield from asyncio.wait_for(aiohttp.request(method, url, **kwargs), self.timeout)
+        except asyncio.TimeoutError:
+            raise asyncio.TimeoutError('%s %s timeout: %s' % (method, url, self.timeout))
+
         content = yield from response.read()
 
         return self.Response(response, content)

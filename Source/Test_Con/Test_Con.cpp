@@ -248,7 +248,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    iTunesApi::Initialize();
+    SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
+    PauseConsole(L"any key");
 
     return;
 

@@ -10,7 +10,7 @@ import urllib.parse
 from collections import namedtuple
 from wsgiref.handlers import format_date_time
 
-from . import multidict
+from . import hdrs, multidict
 
 
 class BasicAuth(namedtuple('BasicAuth', ['login', 'password', 'encoding'])):
@@ -68,7 +68,7 @@ class FormData:
         if isinstance(value, io.IOBase):
             self._is_multipart = True
 
-        type_options = multidict.MutableMultiDict({'name': name})
+        type_options = multidict.MultiDict({'name': name})
         if filename is None and isinstance(value, io.IOBase):
             filename = guess_filename(value, name)
         if filename is not None:
@@ -77,10 +77,10 @@ class FormData:
 
         headers = {}
         if content_type is not None:
-            headers['Content-Type'] = content_type
+            headers[hdrs.CONTENT_TYPE] = content_type
             self._is_multipart = True
         if content_transfer_encoding is not None:
-            headers['Content-Transfer-Encoding'] = content_transfer_encoding
+            headers[hdrs.CONTENT_TRANSFER_ENCODING] = content_transfer_encoding
             self._is_multipart = True
             supported_tranfer_encoding = {
                 'base64': binascii.b2a_base64,
@@ -102,8 +102,10 @@ class FormData:
                 k = guess_filename(rec, 'unknown')
                 self.add_field(k, rec)
 
-            elif isinstance(rec, multidict.MultiDict):
-                to_add.extend(rec.items(getall=True))
+            elif isinstance(rec,
+                            (multidict.MultiDictProxy,
+                             multidict.MultiDict)):
+                to_add.extend(rec.items())
 
             elif isinstance(rec, (list, tuple)) and len(rec) == 2:
                 k, fp = rec
@@ -117,13 +119,13 @@ class FormData:
     def _gen_form_urlencoded(self, encoding):
         # form data (x-www-form-urlencoded)
         data = []
-        for type_options, headers, value in self._fields:
+        for type_options, _, value in self._fields:
             data.append((type_options['name'], value))
 
         data = urllib.parse.urlencode(data, doseq=True)
         return data.encode(encoding)
 
-    def _gen_form_data(self, encoding='utf-8', chunk_size=8196):
+    def _gen_form_data(self, encoding='utf-8', chunk_size=8192):
         """Encode a list of fields using the multipart/form-data MIME format"""
         boundary = self._boundary.encode('latin1')
 
@@ -219,25 +221,58 @@ def guess_filename(obj, default=None):
     return default
 
 
-def atoms(message, environ, response, request_time):
+def parse_remote_addr(forward):
+    if isinstance(forward, str):
+        # we only took the last one
+        # http://en.wikipedia.org/wiki/X-Forwarded-For
+        if ',' in forward:
+            forward = forward.rsplit(',', 1)[-1].strip()
+
+        # find host and port on ipv6 address
+        if '[' in forward and ']' in forward:
+            host = forward.split(']')[0][1:].lower()
+        elif ':' in forward and forward.count(':') == 1:
+            host = forward.split(':')[0].lower()
+        else:
+            host = forward
+
+        forward = forward.split(']')[-1]
+        if ':' in forward and forward.count(':') == 1:
+            port = forward.split(':', 1)[1]
+        else:
+            port = 80
+
+        remote = (host, port)
+    else:
+        remote = forward
+
+    return remote[0], str(remote[1])
+
+
+def atoms(message, environ, response, transport, request_time):
     """Gets atoms for log formatting."""
     if message:
         r = '{} {} HTTP/{}.{}'.format(
             message.method, message.path,
             message.version[0], message.version[1])
+        headers = message.headers
     else:
         r = ''
+        headers = {}
+
+    remote_addr = parse_remote_addr(
+        transport.get_extra_info('addr', '127.0.0.1'))
 
     atoms = {
-        'h': environ.get('REMOTE_ADDR', '-'),
+        'h': remote_addr[0],
         'l': '-',
         'u': '-',
         't': format_date_time(None),
         'r': r,
-        's': str(response.status),
-        'b': str(response.output_length),
-        'f': environ.get('HTTP_REFERER', '-'),
-        'a': environ.get('HTTP_USER_AGENT', '-'),
+        's': str(getattr(response, 'status', '')),
+        'b': str(getattr(response, 'output_length', '')),
+        'f': headers.get(hdrs.REFERER, '-'),
+        'a': headers.get(hdrs.USER_AGENT, '-'),
         'T': str(int(request_time)),
         'D': str(request_time).split('.', 1)[-1][:5],
         'p': "<%s>" % os.getpid()
@@ -274,3 +309,25 @@ class SafeAtoms(dict):
             return super(SafeAtoms, self).__getitem__(k)
         else:
             return '-'
+
+
+class reify(object):
+    """ Use as a class method decorator.  It operates almost exactly like the
+    Python ``@property`` decorator, but it puts the result of the method it
+    decorates into the instance dict after the first call, effectively
+    replacing the function it decorates with an instance variable.  It is, in
+    Python parlance, a non-data descriptor. """
+
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+        try:
+            self.__doc__ = wrapped.__doc__
+        except:  # pragma: no cover
+            pass
+
+    def __get__(self, inst, objtype=None):
+        if inst is None:  # pragma: no cover
+            return self
+        val = self.wrapped(inst)
+        setattr(inst, self.wrapped.__name__, val)
+        return val
