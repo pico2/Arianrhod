@@ -250,6 +250,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
     PauseConsole(L"any key");
+    SetThreadExecutionState(ES_CONTINUOUS);
 
     return;
 
