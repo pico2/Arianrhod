@@ -9,6 +9,7 @@ class OperationBase(object):
             self.UnRegisterEventHandler = parent.UnRegisterEventHandler
             self.PostEvent              = parent.PostEvent
             self.SendEvent              = parent.SendEvent
+            self.AsyncSendEvent         = parent.AsyncSendEvent
 
     @property
     def rootParent(self):
@@ -28,6 +29,10 @@ class OperationBase(object):
         raise NotImplementedError
 
     def SendEvent(self, Event, *args, **kwargs):
+        raise NotImplementedError
+
+    @asyncio.coroutine
+    def AsyncSendEvent(self, Event, *args, **kwargs):
         raise NotImplementedError
 
     @asyncio.coroutine

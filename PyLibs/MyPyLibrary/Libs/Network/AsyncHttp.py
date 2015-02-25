@@ -8,6 +8,10 @@ class Request(aiohttp.Request):
         super().__init__(*args, **kwargs)
         self.headers = _CaseInsensitiveDict()
 
+    def _add_default_headers(self):
+        aiohttp.HttpMessage._add_default_headers(self)
+        # super()._add_default_headers()
+
     def add_header(self, name, value):
         """Analyze headers. Calculate content length,
         removes hop headers, etc."""
