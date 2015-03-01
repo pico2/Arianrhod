@@ -1,15 +1,7 @@
 """Test interact and interactive."""
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2014 The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
 
@@ -18,7 +10,7 @@ from collections import OrderedDict
 import nose.tools as nt
 import IPython.testing.tools as tt
 
-# from IPython.core.getipython import get_ipython
+from IPython.kernel.comm import Comm
 from IPython.html import widgets
 from IPython.html.widgets import interact, interactive, Widget, interaction
 from IPython.utils.py3compat import annotate
@@ -27,8 +19,12 @@ from IPython.utils.py3compat import annotate
 # Utility stuff
 #-----------------------------------------------------------------------------
 
-class DummyComm(object):
+class DummyComm(Comm):
     comm_id = 'a-b-c-d'
+    
+    def open(self, *args, **kwargs):
+        pass
+    
     def send(self, *args, **kwargs):
         pass
     
@@ -37,10 +33,11 @@ class DummyComm(object):
 
 _widget_attrs = {}
 displayed = []
+undefined = object()
 
 def setup():
-    _widget_attrs['comm'] = Widget.comm
-    Widget.comm = DummyComm()
+    _widget_attrs['_comm_default'] = getattr(Widget, '_comm_default', undefined)
+    Widget._comm_default = lambda self: DummyComm()
     _widget_attrs['_ipython_display_'] = Widget._ipython_display_
     def raise_not_implemented(*args, **kwargs):
         raise NotImplementedError()
@@ -48,7 +45,10 @@ def setup():
 
 def teardown():
     for attr, value in _widget_attrs.items():
-        setattr(Widget, attr, value)
+        if value is undefined:
+            delattr(Widget, attr)
+        else:
+            setattr(Widget, attr, value)
 
 def f(**kwargs):
     pass
@@ -92,7 +92,7 @@ def test_single_value_string():
     c = interactive(f, a=a)
     w = c.children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         description='a',
         value=a,
     )
@@ -102,7 +102,7 @@ def test_single_value_bool():
         c = interactive(f, a=a)
         w = c.children[0]
         check_widget(w,
-            cls=widgets.CheckboxWidget,
+            cls=widgets.Checkbox,
             description='a',
             value=a,
         )
@@ -115,9 +115,9 @@ def test_single_value_dict():
         c = interactive(f, d=d)
         w = c.children[0]
         check_widget(w,
-            cls=widgets.DropdownWidget,
+            cls=widgets.Dropdown,
             description='d',
-            values=d,
+            options=d,
             value=next(iter(d.values())),
         )
 
@@ -126,7 +126,7 @@ def test_single_value_float():
         c = interactive(f, a=a)
         w = c.children[0]
         check_widget(w,
-            cls=widgets.FloatSliderWidget,
+            cls=widgets.FloatSlider,
             description='a',
             value=a,
             min= -a if a > 0 else 3*a,
@@ -141,7 +141,7 @@ def test_single_value_int():
         nt.assert_equal(len(c.children), 1)
         w = c.children[0]
         check_widget(w,
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             description='a',
             value=a,
             min= -a if a > 0 else 3*a,
@@ -159,7 +159,7 @@ def test_list_tuple_2_int():
         c = interactive(f, tup=(min, max), lis=[min, max])
         nt.assert_equal(len(c.children), 2)
         d = dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             min=min,
             max=max,
             step=1,
@@ -176,7 +176,7 @@ def test_list_tuple_3_int():
         c = interactive(f, tup=(min, max, step), lis=[min, max, step])
         nt.assert_equal(len(c.children), 2)
         d = dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             min=min,
             max=max,
             step=step,
@@ -193,7 +193,7 @@ def test_list_tuple_2_float():
         c = interactive(f, tup=(min, max), lis=[min, max])
         nt.assert_equal(len(c.children), 2)
         d = dict(
-            cls=widgets.FloatSliderWidget,
+            cls=widgets.FloatSlider,
             min=min,
             max=max,
             step=.1,
@@ -212,7 +212,7 @@ def test_list_tuple_3_float():
         c = interactive(f, tup=(min, max, step), lis=[min, max, step])
         nt.assert_equal(len(c.children), 2)
         d = dict(
-            cls=widgets.FloatSliderWidget,
+            cls=widgets.FloatSlider,
             min=min,
             max=max,
             step=step,
@@ -223,13 +223,12 @@ def test_list_tuple_3_float():
 def test_list_tuple_str():
     values = ['hello', 'there', 'guy']
     first = values[0]
-    dvalues = OrderedDict((v,v) for v in values)
     c = interactive(f, tup=tuple(values), lis=list(values))
     nt.assert_equal(len(c.children), 2)
     d = dict(
-        cls=widgets.DropdownWidget,
+        cls=widgets.Dropdown,
         value=first,
-        values=dvalues
+        options=values
     )
     check_widgets(c, tup=d, lis=d)
 
@@ -253,15 +252,15 @@ def test_defaults():
     c = interactive(f)
     check_widgets(c,
         n=dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             value=10,
         ),
         f=dict(
-            cls=widgets.FloatSliderWidget,
+            cls=widgets.FloatSlider,
             value=4.5,
         ),
         g=dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             value=1,
         ),
     )
@@ -274,25 +273,25 @@ def test_default_values():
     c = interactive(f)
     check_widgets(c,
         n=dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             value=10,
         ),
         f=dict(
-            cls=widgets.FloatSliderWidget,
+            cls=widgets.FloatSlider,
             value=4.5,
         ),
         g=dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             value=5,
         ),
         h=dict(
-            cls=widgets.DropdownWidget,
-            values={'a': 1, 'b': 2},
+            cls=widgets.Dropdown,
+            options={'a': 1, 'b': 2},
             value=2
         ),
         j=dict(
-            cls=widgets.DropdownWidget,
-            values={'hi':'hi', 'there':'there'},
+            cls=widgets.Dropdown,
+            options=['hi', 'there'],
             value='there'
         ),
     )
@@ -305,34 +304,34 @@ def test_default_out_of_bounds():
     c = interactive(f)
     check_widgets(c,
         f=dict(
-            cls=widgets.FloatSliderWidget,
+            cls=widgets.FloatSlider,
             value=5.,
         ),
         h=dict(
-            cls=widgets.DropdownWidget,
-            values={'a': 1},
+            cls=widgets.Dropdown,
+            options={'a': 1},
             value=1,
         ),
         j=dict(
-            cls=widgets.DropdownWidget,
-            values={'hi':'hi', 'there':'there'},
+            cls=widgets.Dropdown,
+            options=['hi', 'there'],
             value='hi',
         ),
     )
 
 def test_annotations():
-    @annotate(n=10, f=widgets.FloatTextWidget())
+    @annotate(n=10, f=widgets.FloatText())
     def f(n, f):
         pass
     
     c = interactive(f)
     check_widgets(c,
         n=dict(
-            cls=widgets.IntSliderWidget,
+            cls=widgets.IntSlider,
             value=10,
         ),
         f=dict(
-            cls=widgets.FloatTextWidget,
+            cls=widgets.FloatText,
         ),
     )
 
@@ -344,11 +343,11 @@ def test_priority():
     c = interactive(f, kwarg='kwarg')
     check_widgets(c,
         kwarg=dict(
-            cls=widgets.TextWidget,
+            cls=widgets.Text,
             value='kwarg',
         ),
         annotate=dict(
-            cls=widgets.TextWidget,
+            cls=widgets.Text,
             value='annotate',
         ),
     )
@@ -362,7 +361,24 @@ def test_decorator_kwarg():
     nt.assert_equal(len(displayed), 1)
     w = displayed[0].children[0]
     check_widget(w,
-        cls=widgets.IntSliderWidget,
+        cls=widgets.IntSlider,
+        value=5,
+    )
+
+@nt.with_setup(clear_display)
+def test_interact_instancemethod():
+    class Foo(object):
+        def show(self, x):
+            print(x)
+
+    f = Foo()
+    
+    with tt.monkeypatch(interaction, 'display', record_display):
+        g = interact(f.show, x=(1,10))
+    nt.assert_equal(len(displayed), 1)
+    w = displayed[0].children[0]
+    check_widget(w,
+        cls=widgets.IntSlider,
         value=5,
     )
 
@@ -375,7 +391,7 @@ def test_decorator_no_call():
     nt.assert_equal(len(displayed), 1)
     w = displayed[0].children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='default',
     )
 
@@ -388,7 +404,7 @@ def test_call_interact():
     nt.assert_equal(len(displayed), 1)
     w = displayed[0].children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='default',
     )
 
@@ -401,7 +417,7 @@ def test_call_interact_kwargs():
     nt.assert_equal(len(displayed), 1)
     w = displayed[0].children[0]
     check_widget(w,
-        cls=widgets.IntSliderWidget,
+        cls=widgets.IntSlider,
         value=10,
     )
 
@@ -417,7 +433,7 @@ def test_call_decorated_on_trait_change():
     nt.assert_equal(len(displayed), 1)
     w = displayed[0].children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='default',
     )
     # test calling the function directly
@@ -441,7 +457,7 @@ def test_call_decorated_kwargs_on_trait_change():
     nt.assert_equal(len(displayed), 1)
     w = displayed[0].children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='kwarg',
     )
     # test calling the function directly
@@ -458,7 +474,7 @@ def test_fixed():
     nt.assert_equal(len(c.children), 1)
     w = c.children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='text',
         description='b',
     )
@@ -467,16 +483,209 @@ def test_default_description():
     c = interactive(f, b='text')
     w = c.children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='text',
         description='b',
     )
 
 def test_custom_description():
-    c = interactive(f, b=widgets.TextWidget(value='text', description='foo'))
+    d = {}
+    def record_kwargs(**kwargs):
+        d.clear()
+        d.update(kwargs)
+    
+    c = interactive(record_kwargs, b=widgets.Text(value='text', description='foo'))
     w = c.children[0]
     check_widget(w,
-        cls=widgets.TextWidget,
+        cls=widgets.Text,
         value='text',
         description='foo',
     )
+    w.value = 'different text'
+    nt.assert_equal(d, {'b': 'different text'})
+
+def test_interact_manual_button():
+    c = interactive(f, __manual=True)
+    w = c.children[0]
+    check_widget(w, cls=widgets.Button)
+
+def test_interact_manual_nocall():
+    callcount = 0
+    def calltest(testarg):
+        callcount += 1
+    c = interactive(calltest, testarg=5, __manual=True)
+    c.children[0].value = 10
+    nt.assert_equal(callcount, 0)
+
+def test_int_range_logic():
+    irsw = widgets.IntRangeSlider
+    w = irsw(value=(2, 4), min=0, max=6)
+    check_widget(w, cls=irsw, value=(2, 4), min=0, max=6)
+    w.value = (4, 2)
+    check_widget(w, cls=irsw, value=(2, 4), min=0, max=6)
+    w.value = (-1, 7)
+    check_widget(w, cls=irsw, value=(0, 6), min=0, max=6)
+    w.min = 3
+    check_widget(w, cls=irsw, value=(3, 6), min=3, max=6)
+    w.max = 3
+    check_widget(w, cls=irsw, value=(3, 3), min=3, max=3)
+    
+    w.min = 0
+    w.max = 6
+    w.lower = 2
+    w.upper = 4
+    check_widget(w, cls=irsw, value=(2, 4), min=0, max=6)
+    w.value = (0, 1) #lower non-overlapping range
+    check_widget(w, cls=irsw, value=(0, 1), min=0, max=6)
+    w.value = (5, 6) #upper non-overlapping range
+    check_widget(w, cls=irsw, value=(5, 6), min=0, max=6)
+    w.value = (-1, 4) #semi out-of-range
+    check_widget(w, cls=irsw, value=(0, 4), min=0, max=6)
+    w.lower = 2
+    check_widget(w, cls=irsw, value=(2, 4), min=0, max=6)
+    w.value = (-2, -1) #wholly out of range
+    check_widget(w, cls=irsw, value=(0, 0), min=0, max=6)
+    w.value = (7, 8)
+    check_widget(w, cls=irsw, value=(6, 6), min=0, max=6)
+    
+    with nt.assert_raises(ValueError):
+        w.min = 7
+    with nt.assert_raises(ValueError):
+        w.max = -1
+    with nt.assert_raises(ValueError):
+        w.lower = 5
+    with nt.assert_raises(ValueError):
+        w.upper = 1
+    
+    w = irsw(min=2, max=3)
+    check_widget(w, min=2, max=3)
+    w = irsw(min=100, max=200)
+    check_widget(w, lower=125, upper=175, value=(125, 175))
+    
+    with nt.assert_raises(ValueError):
+        irsw(value=(2, 4), lower=3)
+    with nt.assert_raises(ValueError):
+        irsw(value=(2, 4), upper=3)
+    with nt.assert_raises(ValueError):
+        irsw(value=(2, 4), lower=3, upper=3)
+    with nt.assert_raises(ValueError):
+        irsw(min=2, max=1)
+    with nt.assert_raises(ValueError):
+        irsw(lower=5)
+    with nt.assert_raises(ValueError):
+        irsw(upper=5)
+    
+
+def test_float_range_logic():
+    frsw = widgets.FloatRangeSlider
+    w = frsw(value=(.2, .4), min=0., max=.6)
+    check_widget(w, cls=frsw, value=(.2, .4), min=0., max=.6)
+    w.value = (.4, .2)
+    check_widget(w, cls=frsw, value=(.2, .4), min=0., max=.6)
+    w.value = (-.1, .7)
+    check_widget(w, cls=frsw, value=(0., .6), min=0., max=.6)
+    w.min = .3
+    check_widget(w, cls=frsw, value=(.3, .6), min=.3, max=.6)
+    w.max = .3
+    check_widget(w, cls=frsw, value=(.3, .3), min=.3, max=.3)
+    
+    w.min = 0.
+    w.max = .6
+    w.lower = .2
+    w.upper = .4
+    check_widget(w, cls=frsw, value=(.2, .4), min=0., max=.6)
+    w.value = (0., .1) #lower non-overlapping range
+    check_widget(w, cls=frsw, value=(0., .1), min=0., max=.6)
+    w.value = (.5, .6) #upper non-overlapping range
+    check_widget(w, cls=frsw, value=(.5, .6), min=0., max=.6)
+    w.value = (-.1, .4) #semi out-of-range
+    check_widget(w, cls=frsw, value=(0., .4), min=0., max=.6)
+    w.lower = .2
+    check_widget(w, cls=frsw, value=(.2, .4), min=0., max=.6)
+    w.value = (-.2, -.1) #wholly out of range
+    check_widget(w, cls=frsw, value=(0., 0.), min=0., max=.6)
+    w.value = (.7, .8)
+    check_widget(w, cls=frsw, value=(.6, .6), min=.0, max=.6)
+    
+    with nt.assert_raises(ValueError):
+        w.min = .7
+    with nt.assert_raises(ValueError):
+        w.max = -.1
+    with nt.assert_raises(ValueError):
+        w.lower = .5
+    with nt.assert_raises(ValueError):
+        w.upper = .1
+    
+    w = frsw(min=2, max=3)
+    check_widget(w, min=2, max=3)
+    w = frsw(min=1., max=2.)
+    check_widget(w, lower=1.25, upper=1.75, value=(1.25, 1.75))
+    
+    with nt.assert_raises(ValueError):
+        frsw(value=(2, 4), lower=3)
+    with nt.assert_raises(ValueError):
+        frsw(value=(2, 4), upper=3)
+    with nt.assert_raises(ValueError):
+        frsw(value=(2, 4), lower=3, upper=3)
+    with nt.assert_raises(ValueError):
+        frsw(min=.2, max=.1)
+    with nt.assert_raises(ValueError):
+        frsw(lower=5)
+    with nt.assert_raises(ValueError):
+        frsw(upper=5)
+
+
+def test_multiple_selection():
+    smw = widgets.SelectMultiple
+
+    # degenerate multiple select
+    w = smw()
+    check_widget(w, value=tuple(), options=None, selected_labels=tuple())
+
+    # don't accept random other value when no options
+    with nt.assert_raises(KeyError):
+        w.value = (2,)
+    check_widget(w, value=tuple(), selected_labels=tuple())
+
+    # basic multiple select
+    w = smw(options=[(1, 1)], value=[1])
+    check_widget(w, cls=smw, value=(1,), options=[(1, 1)])
+
+    # don't accept random other value
+    with nt.assert_raises(KeyError):
+        w.value = w.value + (2,)
+    check_widget(w, value=(1,), selected_labels=(1,))
+
+    # change options
+    w.options = w.options + [(2, 2)]
+    check_widget(w, options=[(1, 1), (2,2)])
+
+    # change value
+    w.value = w.value + (2,)
+    check_widget(w, value=(1, 2), selected_labels=(1, 2))
+
+    # change value name
+    w.selected_labels = (1,)
+    check_widget(w, value=(1,))
+
+    # don't accept random other names when no options
+    with nt.assert_raises(KeyError):
+        w.selected_labels = (3,)
+    check_widget(w, value=(1,))
+
+    # don't accept selected_label (from superclass)
+    with nt.assert_raises(AttributeError):
+        w.selected_label = 3
+
+    # don't return selected_label (from superclass)
+    with nt.assert_raises(AttributeError):
+        print(w.selected_label)
+
+    # dict style
+    w.options = {1: 1}
+    check_widget(w, options={1: 1})
+
+    # updating
+    with nt.assert_raises(KeyError):
+        w.value = (2,)
+    check_widget(w, options={1: 1})

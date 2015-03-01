@@ -1,23 +1,8 @@
 # encoding: utf-8
-"""
-Facilities for launching IPython processes asynchronously.
+"""Facilities for launching IPython processes asynchronously."""
 
-Authors:
-
-* Brian Granger
-* MinRK
-"""
-
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import copy
 import logging
@@ -62,7 +47,7 @@ from IPython.utils.traitlets import (
     Any, Integer, CFloat, List, Unicode, Dict, Instance, HasTraits, CRegExp
 )
 from IPython.utils.encoding import DEFAULT_ENCODING
-from IPython.utils.path import get_home_dir
+from IPython.utils.path import get_home_dir, ensure_dir_exists
 from IPython.utils.process import find_cmd, FindCmdError
 from IPython.utils.py3compat import iteritems, itervalues
 
@@ -83,10 +68,12 @@ ipengine_cmd_argv = [sys.executable, "-m", "IPython.parallel.engine"]
 ipcontroller_cmd_argv = [sys.executable, "-m", "IPython.parallel.controller"]
 
 if WINDOWS and sys.version_info < (3,):
-    # `python -m package` doesn't work on Windows Python 2,
-    # but `python -m module` does.
-    ipengine_cmd_argv = [sys.executable, "-m", "IPython.parallel.apps.ipengineapp"]
-    ipcontroller_cmd_argv = [sys.executable, "-m", "IPython.parallel.apps.ipcontrollerapp"]
+    # `python -m package` doesn't work on Windows Python 2
+    # due to weird multiprocessing bugs
+    # and python -m module puts classes in the `__main__` module,
+    # so instance checks get confused
+    ipengine_cmd_argv = [sys.executable, "-c", "from IPython.parallel.engine.__main__ import main; main()"]
+    ipcontroller_cmd_argv = [sys.executable, "-c", "from IPython.parallel.controller.__main__ import main; main()"]
 
 #-----------------------------------------------------------------------------
 # Base launchers and errors
@@ -309,8 +296,7 @@ class LocalProcessLauncher(BaseLauncher):
         except Exception:
             self.log.debug("interrupt failed")
             pass
-        self.killer  = ioloop.DelayedCallback(lambda : self.signal(SIGKILL), delay*1000, self.loop)
-        self.killer.start()
+        self.killer  = self.loop.add_timeout(self.loop.time() + delay, lambda : self.signal(SIGKILL))
 
     # callbacks, etc:
 
@@ -629,8 +615,7 @@ class SSHLauncher(LocalProcessLauncher):
             elif check == u'yes':
                 break
         local_dir = os.path.dirname(local)
-        if not os.path.exists(local_dir):
-            os.makedirs(local_dir, 775)
+        ensure_dir_exists(local_dir, 775)
         check_output(self.scp_cmd + [full_remote, local])
     
     def fetch_files(self):

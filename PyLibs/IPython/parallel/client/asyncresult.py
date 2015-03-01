@@ -1,19 +1,7 @@
-"""AsyncResult objects for the client
+"""AsyncResult objects for the client"""
 
-Authors:
-
-* MinRK
-"""
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
 
@@ -28,16 +16,10 @@ from IPython.external.decorator import decorator
 from IPython.parallel import error
 from IPython.utils.py3compat import string_types
 
-#-----------------------------------------------------------------------------
-# Functions
-#-----------------------------------------------------------------------------
 
 def _raw_text(s):
     display_pretty(s, raw=True)
 
-#-----------------------------------------------------------------------------
-# Classes
-#-----------------------------------------------------------------------------
 
 # global empty tracker that's always done:
 finished_tracker = MessageTracker()
@@ -60,8 +42,11 @@ class AsyncResult(object):
     _targets = None
     _tracker = None
     _single_result = False
+    owner = False,
 
-    def __init__(self, client, msg_ids, fname='unknown', targets=None, tracker=None):
+    def __init__(self, client, msg_ids, fname='unknown', targets=None, tracker=None,
+        owner=False,
+    ):
         if isinstance(msg_ids, string_types):
             # always a list
             msg_ids = [msg_ids]
@@ -76,6 +61,7 @@ class AsyncResult(object):
         self._fname=fname
         self._targets = targets
         self._tracker = tracker
+        self.owner = owner
         
         self._ready = False
         self._outputs_ready = False
@@ -162,6 +148,12 @@ class AsyncResult(object):
                     # cutoff infinite wait at 10s
                     timeout = 10
                 self._wait_for_outputs(timeout)
+                
+                if self.owner:
+                    
+                    self._metadata = [self._client.metadata.pop(mid) for mid in self.msg_ids]
+                    [self._client.results.pop(mid) for mid in self.msg_ids]
+                
 
 
     def successful(self):
@@ -407,7 +399,7 @@ class AsyncResult(object):
             return
         md = content['metadata'] or {}
         md['engine'] = eid
-        ip.display_pub.publish(content['source'], content['data'], md)
+        ip.display_pub.publish(data=content['data'], metadata=md)
     
     def _display_stream(self, text, prefix='', file=None):
         if not text:
@@ -436,7 +428,7 @@ class AsyncResult(object):
         for output in self.outputs:
             self._republish_displaypub(output, self.engine_id)
         
-        if self.pyout is not None:
+        if self.execute_result is not None:
             display(self.get())
     
     def _wait_for_outputs(self, timeout=-1):
@@ -495,15 +487,15 @@ class AsyncResult(object):
         
         stdouts = self.stdout
         stderrs = self.stderr
-        pyouts  = self.pyout
+        execute_results  = self.execute_result
         output_lists = self.outputs
         results = self.get()
         
         targets = self.engine_id
         
         if groupby == "engine":
-            for eid,stdout,stderr,outputs,r,pyout in zip(
-                    targets, stdouts, stderrs, output_lists, results, pyouts
+            for eid,stdout,stderr,outputs,r,execute_result in zip(
+                    targets, stdouts, stderrs, output_lists, results, execute_results
                 ):
                 self._display_stream(stdout, '[stdout:%i] ' % eid)
                 self._display_stream(stderr, '[stderr:%i] ' % eid, file=sys.stderr)
@@ -514,13 +506,13 @@ class AsyncResult(object):
                     # displaypub is meaningless outside IPython
                     return 
                 
-                if outputs or pyout is not None:
+                if outputs or execute_result is not None:
                     _raw_text('[output:%i]' % eid)
                 
                 for output in outputs:
                     self._republish_displaypub(output, eid)
                 
-                if pyout is not None:
+                if execute_result is not None:
                     display(r)
         
         elif groupby in ('type', 'order'):
@@ -555,9 +547,9 @@ class AsyncResult(object):
                     for output in outputs:
                         self._republish_displaypub(output, eid)
         
-            # finally, add pyout:
-            for eid,r,pyout in zip(targets, results, pyouts):
-                if pyout is not None:
+            # finally, add execute_result:
+            for eid,r,execute_result in zip(targets, results, execute_results):
+                if execute_result is not None:
                     display(r)
         
         else:
@@ -703,5 +695,9 @@ class AsyncHubResult(AsyncResult):
                 self._success = True
             finally:
                 self._metadata = [self._client.metadata[mid] for mid in self.msg_ids]
+                if self.owner:
+                    [self._client.metadata.pop(mid) for mid in self.msg_ids]
+                    [self._client.results.pop(mid) for mid in self.msg_ids]
+            
 
 __all__ = ['AsyncResult', 'AsyncMapResult', 'AsyncHubResult']

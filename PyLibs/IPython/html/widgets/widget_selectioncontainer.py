@@ -1,4 +1,4 @@
-"""SelectionContainerWidget class.  
+"""SelectionContainer class.  
 
 Represents a multipage container that can be used to group other widgets into
 pages.
@@ -14,13 +14,15 @@ pages.
 #-----------------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------------
-from .widget_container import ContainerWidget
+from .widget_box import Box, register
 from IPython.utils.traitlets import Unicode, Dict, CInt
+from IPython.utils.warn import DeprecatedClass
 
 #-----------------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------------
-class _SelectionContainerWidget(ContainerWidget):
+class _SelectionContainer(Box):
+    """Base class used to display multiple child widgets."""
     _titles = Dict(help="Titles of the pages", sync=True)
     selected_index = CInt(0, sync=True)
 
@@ -49,10 +51,18 @@ class _SelectionContainerWidget(ContainerWidget):
         else:
             return None
 
-
-class AccordionWidget(_SelectionContainerWidget):
+@register('IPython.Accordion')
+class Accordion(_SelectionContainer):
+    """Displays children each on a separate accordion page."""
     _view_name = Unicode('AccordionView', sync=True)
 
 
-class TabWidget(_SelectionContainerWidget):
+@register('IPython.Tab')
+class Tab(_SelectionContainer):
+    """Displays children each on a separate accordion tab."""
     _view_name = Unicode('TabView', sync=True)
+
+
+# Remove in IPython 4.0
+AccordionWidget = DeprecatedClass(Accordion, 'AccordionWidget')
+TabWidget = DeprecatedClass(Tab, 'TabWidget')

@@ -103,11 +103,6 @@ MAIN FEATURES
   If you just want to see an object's docstring, type '%pdoc object' (without
   quotes, and without % if you have automagic on).
 
-  Both %pdoc and ?/?? give you access to documentation even on things which are
-  not explicitely defined. Try for example typing {}.get? or after import os,
-  type os.path.abspath??. The magic functions %pdef, %source and %file operate
-  similarly.
-
 * Completion in the local namespace, by typing TAB at the prompt.
 
   At any time, hitting tab will complete any available python commands or
@@ -291,7 +286,7 @@ cd /usr/share    : Obvious. cd -<tab> to choose from visited dirs.
 %cd??            : See help AND source for magic %cd
 %timeit x=10     : time the 'x=10' statement with high precision.
 %%timeit x=2**100
-x**100           : time 'x*100' with a setup of 'x=2**100'; setup code is not
+x**100           : time 'x**100' with a setup of 'x=2**100'; setup code is not
                    counted.  This is an example of a cell magic.
 
 System commands:
@@ -566,5 +561,5 @@ default_gui_banner = ''.join(default_gui_banner_parts)
 def page_guiref(arg_s=None):
     """Show a basic reference about the GUI Console."""
     from IPython.core import page
-    page.page(gui_reference, auto_html=True)
+    page.page(gui_reference)
 

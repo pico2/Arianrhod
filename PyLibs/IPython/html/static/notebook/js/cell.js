@@ -1,53 +1,84 @@
-//----------------------------------------------------------------------------
-//  Copyright (C) 2008-2011  The IPython Development Team
-//
-//  Distributed under the terms of the BSD License.  The full license is in
-//  the file COPYING, distributed as part of this software.
-//----------------------------------------------------------------------------
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
 
-//============================================================================
-// Cell
-//============================================================================
 /**
- * An extendable module that provide base functionnality to create cell for notebook.
- * @module IPython
- * @namespace IPython
- * @submodule Cell
+ *
+ *
+ * @module cell
+ * @namespace cell
+ * @class Cell
  */
 
-var IPython = (function (IPython) {
+
+define([
+    'base/js/namespace',
+    'jquery',
+    'base/js/utils',
+    'codemirror/lib/codemirror',
+    'codemirror/addon/edit/matchbrackets',
+    'codemirror/addon/edit/closebrackets',
+    'codemirror/addon/comment/comment'
+], function(IPython, $, utils, CodeMirror, cm_match, cm_closeb, cm_comment) {
+    // TODO: remove IPython dependency here 
     "use strict";
-
-    var utils = IPython.utils;
-    var keycodes = IPython.keyboard.keycodes;
-
-    /**
-     * The Base `Cell` class from which to inherit
-     * @class Cell
-     **/
-
-    /*
-     * @constructor
-     *
-     * @param {object|undefined} [options]
-     *     @param [options.cm_config] {object} config to pass to CodeMirror, will extend default parameters
-     */
+    
+    var overlayHack = CodeMirror.scrollbarModel.native.prototype.overlayHack;
+    
+    CodeMirror.scrollbarModel.native.prototype.overlayHack = function () {
+        overlayHack.apply(this, arguments);
+        // Reverse `min-height: 18px` scrollbar hack on OS X
+        // which causes a dead area, making it impossible to click on the last line
+        // when there is horizontal scrolling to do and the "show scrollbar only when scrolling" behavior
+        // is enabled.
+        // This, in turn, has the undesirable behavior of never showing the horizontal scrollbar,
+        // even when it should, which is less problematic, at least.
+        if (/Mac/.test(navigator.platform)) {
+            this.horiz.style.minHeight = "";
+        }
+    };
+    
     var Cell = function (options) {
-
-        options = this.mergeopt(Cell, options);
+        /* Constructor
+         *
+         * The Base `Cell` class from which to inherit.
+         * @constructor
+         * @param:
+         *  options: dictionary
+         *      Dictionary of keyword arguments.
+         *          events: $(Events) instance
+         *          config: dictionary
+         *          keyboard_manager: KeyboardManager instance
+         */
+        options = options || {};
+        this.keyboard_manager = options.keyboard_manager;
+        this.events = options.events;
+        var config = utils.mergeopt(Cell, options.config);
         // superclass default overwrite our default
         
-        this.placeholder = options.placeholder || '';
-        this.read_only = options.cm_config.readOnly;
+        this.placeholder = config.placeholder || '';
+        this.read_only = config.cm_config.readOnly;
         this.selected = false;
         this.rendered = false;
         this.mode = 'command';
-        this.metadata = {};
+
+        // Metadata property
+        var that = this;
+        this._metadata = {};
+        Object.defineProperty(this, 'metadata', {
+            get: function() { return that._metadata; },
+            set: function(value) {
+                that._metadata = value;
+                if (that.celltoolbar) {
+                    that.celltoolbar.rebuild();
+                }
+            }
+        });
+
         // load this from metadata later ?
         this.user_highlight = 'auto';
-        this.cm_config = options.cm_config;
+        this.cm_config = config.cm_config;
         this.cell_id = utils.uuid();
-        this._options = options;
+        this._options = config;
 
         // For JS VM engines optimization, attributes should be all set (even
         // to null) in the constructor, and if possible, if different subclass
@@ -81,16 +112,10 @@ var IPython = (function (IPython) {
     
     // FIXME: Workaround CM Bug #332 (Safari segfault on drag)
     // by disabling drag/drop altogether on Safari
-    // https://github.com/marijnh/CodeMirror/issues/332    
+    // https://github.com/codemirror/CodeMirror/issues/332    
     if (utils.browser[0] == "Safari") {
         Cell.options_default.cm_config.dragDrop = false;
     }
-
-    Cell.prototype.mergeopt = function(_class, options, overwrite){
-        options = options || {};
-        overwrite = overwrite || {};
-        return $.extend(true, {}, _class.options_default, options, overwrite);
-    };
 
     /**
      * Empty. Subclasses must implement create_element.
@@ -102,8 +127,10 @@ var IPython = (function (IPython) {
     };
 
     Cell.prototype.init_classes = function () {
-        // Call after this.element exists to initialize the css classes
-        // related to selected, rendered and mode.
+        /**
+         * Call after this.element exists to initialize the css classes
+         * related to selected, rendered and mode.
+         */
         if (this.selected) {
             this.element.addClass('selected');
         } else {
@@ -113,11 +140,6 @@ var IPython = (function (IPython) {
             this.element.addClass('rendered');
         } else {
             this.element.addClass('unrendered');
-        }
-        if (this.mode === 'edit') {
-            this.element.addClass('edit_mode');
-        } else {
-            this.element.addClass('command_mode');
         }
     };
 
@@ -132,29 +154,39 @@ var IPython = (function (IPython) {
         // We trigger events so that Cell doesn't have to depend on Notebook.
         that.element.click(function (event) {
             if (!that.selected) {
-                $([IPython.events]).trigger('select.Cell', {'cell':that});
+                that.events.trigger('select.Cell', {'cell':that});
             }
         });
         that.element.focusin(function (event) {
             if (!that.selected) {
-                $([IPython.events]).trigger('select.Cell', {'cell':that});
+                that.events.trigger('select.Cell', {'cell':that});
             }
         });
         if (this.code_mirror) {
             this.code_mirror.on("change", function(cm, change) {
-                $([IPython.events]).trigger("set_dirty.Notebook", {value: true});
+                that.events.trigger("set_dirty.Notebook", {value: true});
             });
         }
         if (this.code_mirror) {
             this.code_mirror.on('focus', function(cm, change) {
-                $([IPython.events]).trigger('edit_mode.Cell', {cell: that});
+                that.events.trigger('edit_mode.Cell', {cell: that});
             });
         }
         if (this.code_mirror) {
             this.code_mirror.on('blur', function(cm, change) {
-                $([IPython.events]).trigger('command_mode.Cell', {cell: that});
+                that.events.trigger('command_mode.Cell', {cell: that});
             });
         }
+
+        this.element.dblclick(function () {
+            if (that.selected === false) {
+                this.events.trigger('select.Cell', {'cell':that});
+            }
+            var cont = that.unrender();
+            if (cont) {
+                that.focus_editor();
+            }
+        });
     };
     
     /**
@@ -170,12 +202,24 @@ var IPython = (function (IPython) {
      * @return {Boolean} `true` if CodeMirror should ignore the event, `false` Otherwise
      */
     Cell.prototype.handle_codemirror_keyevent = function (editor, event) {
-        var that = this;
-        var shortcuts = IPython.keyboard_manager.edit_shortcuts;
+        var shortcuts = this.keyboard_manager.edit_shortcuts;
 
+        var cur = editor.getCursor();
+        if((cur.line !== 0 || cur.ch !==0) && event.keyCode === 38){
+            event._ipkmIgnore = true;
+        }
+        var nLastLine = editor.lastLine();
+        if ((event.keyCode === 40) &&
+             ((cur.line !== nLastLine) ||
+               (cur.ch !== editor.getLineHandle(nLastLine).text.length))
+           ) {
+            event._ipkmIgnore = true;
+        }
         // if this is an edit_shortcuts shortcut, the global keyboard/shortcut
         // manager will handle it
-        if (shortcuts.handles(event)) { return true; }
+        if (shortcuts.handles(event)) {
+            return true;
+        }
         
         return false;
     };
@@ -186,10 +230,7 @@ var IPython = (function (IPython) {
      * @method typeset
      */
     Cell.prototype.typeset = function () {
-        if (window.MathJax) {
-            var cell_math = this.element.get(0);
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, cell_math]);
-        }
+        utils.typeset(this.element);
     };
 
     /**
@@ -222,6 +263,14 @@ var IPython = (function (IPython) {
         } else {
             return false;
         }
+    };
+
+    /**
+     * should be overritten by subclass
+     * @method execute
+     */
+    Cell.prototype.execute = function () {
+        return;
     };
 
     /**
@@ -266,9 +315,6 @@ var IPython = (function (IPython) {
      * @return {Boolean} `true` if CodeMirror should ignore the event, `false` Otherwise
      */
     Cell.prototype.handle_keyevent = function (editor, event) {
-
-        // console.log('CM', this.mode, event.which, event.type)
-
         if (this.mode === 'command') {
             return true;
         } else if (this.mode === 'edit') {
@@ -309,8 +355,6 @@ var IPython = (function (IPython) {
      */
     Cell.prototype.command_mode = function () {
         if (this.mode !== 'command') {
-            this.element.addClass('command_mode');
-            this.element.removeClass('edit_mode');
             this.mode = 'command';
             return true;
         } else {
@@ -325,8 +369,6 @@ var IPython = (function (IPython) {
      */
     Cell.prototype.edit_mode = function () {
         if (this.mode !== 'edit') {
-            this.element.addClass('edit_mode');
-            this.element.removeClass('command_mode');
             this.mode = 'edit';
             return true;
         } else {
@@ -359,7 +401,9 @@ var IPython = (function (IPython) {
      * @method refresh
      */
     Cell.prototype.refresh = function () {
-        this.code_mirror.refresh();
+        if (this.code_mirror) {
+            this.code_mirror.refresh();
+        }
     };
 
     /**
@@ -384,11 +428,11 @@ var IPython = (function (IPython) {
      **/
     Cell.prototype.toJSON = function () {
         var data = {};
-        data.metadata = this.metadata;
+        // deepcopy the metadata so copied cells don't share the same object
+        data.metadata = JSON.parse(JSON.stringify(this.metadata));
         data.cell_type = this.cell_type;
         return data;
     };
-
 
     /**
      * should be overritten by subclass
@@ -398,27 +442,39 @@ var IPython = (function (IPython) {
         if (data.metadata !== undefined) {
             this.metadata = data.metadata;
         }
-        this.celltoolbar.rebuild();
     };
 
 
     /**
-     * can the cell be split into two cells
+     * can the cell be split into two cells (false if not deletable)
      * @method is_splittable
      **/
     Cell.prototype.is_splittable = function () {
-        return true;
+        return this.is_deletable();
     };
 
 
     /**
-     * can the cell be merged with other cells
+     * can the cell be merged with other cells (false if not deletable)
      * @method is_mergeable
      **/
     Cell.prototype.is_mergeable = function () {
-        return true;
+        return this.is_deletable();
     };
 
+    /**
+     * is the cell deletable? only false (undeletable) if
+     * metadata.deletable is explicitly false -- everything else
+     * counts as true
+     *
+     * @method is_deletable
+     **/
+    Cell.prototype.is_deletable = function () {
+        if (this.metadata.deletable === false) {
+            return false;
+        }
+        return true;
+    };
 
     /**
      * @return {String} - the text before the cursor
@@ -475,7 +531,15 @@ var IPython = (function (IPython) {
         this.user_highlight = mode;
         this.auto_highlight();
     };
-
+    
+    /**
+     * Trigger autodetection of highlight scheme for current cell
+     * @method auto_highlight
+     */
+    Cell.prototype.auto_highlight = function () {
+        this._auto_highlight(this.class_config.get_sync('highlight_modes'));
+    };
+    
     /**
      * Try to autodetect cell highlight mode, or use selected mode
      * @methods _auto_highlight
@@ -483,7 +547,10 @@ var IPython = (function (IPython) {
      * @param {String|object|undefined} - CodeMirror mode | 'auto'
      **/
     Cell.prototype._auto_highlight = function (modes) {
-        //Here we handle manually selected modes
+        /**
+         *Here we handle manually selected modes
+         */
+        var that = this;
         var mode;
         if( this.user_highlight !== undefined &&  this.user_highlight != 'auto' )
         {
@@ -505,33 +572,34 @@ var IPython = (function (IPython) {
                         return;
                     }
                     if (mode.search('magic_') !== 0) {
-                        this.code_mirror.setOption('mode', mode);
-                        CodeMirror.autoLoadMode(this.code_mirror, mode);
+                        utils.requireCodeMirrorMode(mode, function (spec) {
+                            that.code_mirror.setOption('mode', spec);
+                        });
                         return;
                     }
                     var open = modes[mode].open || "%%";
                     var close = modes[mode].close || "%%end";
-                    var mmode = mode;
-                    mode = mmode.substr(6);
-                    if(current_mode == mode){
+                    var magic_mode = mode;
+                    mode = magic_mode.substr(6);
+                    if(current_mode == magic_mode){
                         return;
                     }
-                    CodeMirror.autoLoadMode(this.code_mirror, mode);
-                    // create on the fly a mode that swhitch between
-                    // plain/text and smth else otherwise `%%` is
-                    // source of some highlight issues.
-                    // we use patchedGetMode to circumvent a bug in CM
-                    CodeMirror.defineMode(mmode , function(config) {
-                        return CodeMirror.multiplexingMode(
-                        CodeMirror.patchedGetMode(config, 'text/plain'),
-                            // always set someting on close
-                            {open: open, close: close,
-                             mode: CodeMirror.patchedGetMode(config, mode),
-                             delimStyle: "delimit"
-                            }
-                        );
+                    utils.requireCodeMirrorMode(mode, function (spec) {
+                        // create on the fly a mode that switch between
+                        // plain/text and something else, otherwise `%%` is
+                        // source of some highlight issues.
+                        CodeMirror.defineMode(magic_mode, function(config) {
+                            return CodeMirror.multiplexingMode(
+                                CodeMirror.getMode(config, 'text/plain'),
+                                // always set something on close
+                                {open: open, close: close,
+                                 mode: CodeMirror.getMode(config, spec),
+                                 delimStyle: "delimit"
+                                }
+                            );
+                        });
+                        that.code_mirror.setOption('mode', magic_mode);
                     });
-                    this.code_mirror.setOption('mode', mmode);
                     return;
                 }
             }
@@ -549,9 +617,76 @@ var IPython = (function (IPython) {
         this.code_mirror.setOption('mode', default_mode);
     };
 
+    var UnrecognizedCell = function (options) {
+        /** Constructor for unrecognized cells */
+        Cell.apply(this, arguments);
+        this.cell_type = 'unrecognized';
+        this.celltoolbar = null;
+        this.data = {};
+        
+        Object.seal(this);
+    };
+
+    UnrecognizedCell.prototype = Object.create(Cell.prototype);
+    
+    
+    // cannot merge or split unrecognized cells
+    UnrecognizedCell.prototype.is_mergeable = function () {
+        return false;
+    };
+    
+    UnrecognizedCell.prototype.is_splittable = function () {
+        return false;
+    };
+    
+    UnrecognizedCell.prototype.toJSON = function () {
+        /**
+         * deepcopy the metadata so copied cells don't share the same object
+         */
+        return JSON.parse(JSON.stringify(this.data));
+    };
+
+    UnrecognizedCell.prototype.fromJSON = function (data) {
+        this.data = data;
+        if (data.metadata !== undefined) {
+            this.metadata = data.metadata;
+        } else {
+            data.metadata = this.metadata;
+        }
+        this.element.find('.inner_cell').find("a").text("Unrecognized cell type: " + data.cell_type);
+    };
+    
+    UnrecognizedCell.prototype.create_element = function () {
+        Cell.prototype.create_element.apply(this, arguments);
+        var cell = this.element = $("<div>").addClass('cell unrecognized_cell');
+        cell.attr('tabindex','2');
+
+        var prompt = $('<div/>').addClass('prompt input_prompt');
+        cell.append(prompt);
+        var inner_cell = $('<div/>').addClass('inner_cell');
+        inner_cell.append(
+            $("<a>")
+                .attr("href", "#")
+                .text("Unrecognized cell type")
+        );
+        cell.append(inner_cell);
+        this.element = cell;
+    };
+    
+    UnrecognizedCell.prototype.bind_events = function () {
+        Cell.prototype.bind_events.apply(this, arguments);
+        var cell = this;
+        
+        this.element.find('.inner_cell').find("a").click(function () {
+            cell.events.trigger('unrecognized_cell.Cell', {cell: cell});
+        });
+    };
+
+    // Backwards compatibility.
     IPython.Cell = Cell;
 
-    return IPython;
-
-}(IPython));
-
+    return {
+        Cell: Cell,
+        UnrecognizedCell: UnrecognizedCell
+    };
+});

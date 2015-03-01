@@ -27,15 +27,14 @@ except:
 import zmq
 from zmq.log import handlers
 
+from IPython.utils.log import get_logger
 from IPython.external.decorator import decorator
 
 from IPython.config.application import Application
 from IPython.utils.localinterfaces import localhost, is_public_ip, public_ips
 from IPython.utils.py3compat import string_types, iteritems, itervalues
 from IPython.kernel.zmq.log import EnginePUBHandler
-from IPython.kernel.zmq.serialize import (
-    unserialize_object, serialize_object, pack_apply_message, unpack_apply_message
-)
+
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -298,7 +297,7 @@ def select_random_ports(n):
 def signal_children(children):
     """Relay interupt/term signals to children, for more solid process cleanup."""
     def terminate_children(sig, frame):
-        log = Application.instance().log
+        log = get_logger()
         log.critical("Got signal %i, terminating children..."%sig)
         for child in children:
             child.terminate()

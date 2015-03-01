@@ -1,27 +1,8 @@
-"""A simple configuration system.
+# encoding: utf-8
+"""A simple configuration system."""
 
-Inheritance diagram:
-
-.. inheritance-diagram:: IPython.config.loader
-   :parts: 3
-
-Authors
--------
-* Brian Granger
-* Fernando Perez
-* Min RK
-"""
-
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import argparse
 import copy
@@ -35,7 +16,7 @@ from IPython.utils.path import filefind, get_ipython_dir
 from IPython.utils import py3compat
 from IPython.utils.encoding import DEFAULT_ENCODING
 from IPython.utils.py3compat import unicode_type, iteritems
-from IPython.utils.traitlets import HasTraits, List, Any, TraitError
+from IPython.utils.traitlets import HasTraits, List, Any
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -212,7 +193,27 @@ class Config(dict):
                     to_update[k] = copy.deepcopy(v)
 
         self.update(to_update)
-
+    
+    def collisions(self, other):
+        """Check for collisions between two config objects.
+        
+        Returns a dict of the form {"Class": {"trait": "collision message"}}`,
+        indicating which values have been ignored.
+        
+        An empty dict indicates no collisions.
+        """
+        collisions = {}
+        for section in self:
+            if section not in other:
+                continue
+            mine = self[section]
+            theirs = other[section]
+            for key in mine:
+                if key in theirs and mine[key] != theirs[key]:
+                    collisions.setdefault(section, {})
+                    collisions[section][key] = "%r ignored, using %r" % (mine[key], theirs[key])
+        return collisions
+    
     def __contains__(self, key):
         # allow nested contains of the form `"Section.key" in config`
         if '.' in key:
@@ -308,11 +309,8 @@ class ConfigLoader(object):
     """
 
     def _log_default(self):
-        from IPython.config.application import Application
-        if Application.initialized():
-            return Application.instance().log
-        else:
-            return logging.getLogger()
+        from IPython.utils.log import get_logger
+        return get_logger()
 
     def __init__(self, log=None):
         """A base class for config loaders.
@@ -378,7 +376,7 @@ class FileConfigLoader(ConfigLoader):
         self.full_filename = filefind(self.filename, self.path)
 
 class JSONFileConfigLoader(FileConfigLoader):
-    """A Json file loader for config"""
+    """A JSON file loader for config"""
 
     def load_config(self):
         """Load the config from a file and return it as a Config object."""
@@ -587,7 +585,7 @@ class KeyValueConfigLoader(CommandLineConfigLoader):
 
 
     def _decode_argv(self, argv, enc=None):
-        """decode argv if bytes, using stin.encoding, falling back on default enc"""
+        """decode argv if bytes, using stdin.encoding, falling back on default enc"""
         uargv = []
         if enc is None:
             enc = DEFAULT_ENCODING

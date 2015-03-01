@@ -1,21 +1,10 @@
 """Test help output of various IPython entry points"""
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2013 The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import IPython.testing.tools as tt
-
-#-----------------------------------------------------------------------------
-# Tests
-#-----------------------------------------------------------------------------
+from IPython.testing.decorators import skip_without
 
 
 def test_ipython_help():
@@ -36,5 +25,6 @@ def test_locate_help():
 def test_locate_profile_help():
     tt.help_all_output_test("locate profile")
 
+@skip_without('IPython.nbformat')  # Requires jsonschema to be installed
 def test_trust_help():
     tt.help_all_output_test("trust")

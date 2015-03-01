@@ -6,12 +6,14 @@ import os
 import json
 import requests
 import shutil
+import time
 
 pjoin = os.path.join
 
 from IPython.html.utils import url_path_join
 from IPython.html.tests.launchnotebook import NotebookTestBase, assert_http_error
-from IPython.nbformat.current import new_notebook, write
+from IPython.nbformat.v4 import new_notebook
+from IPython.nbformat import write
 
 class SessionAPI(object):
     """Wrapper for notebook API calls."""
@@ -37,12 +39,13 @@ class SessionAPI(object):
     def get(self, id):
         return self._req('GET', id)
 
-    def create(self, name, path):
-        body = json.dumps({'notebook': {'name':name, 'path':path}})
+    def create(self, path, kernel_name='python'):
+        body = json.dumps({'notebook': {'path':path},
+                           'kernel': {'name': kernel_name}})
         return self._req('POST', '', body)
 
-    def modify(self, id, name, path):
-        body = json.dumps({'notebook': {'name':name, 'path':path}})
+    def modify(self, id, path):
+        body = json.dumps({'notebook': {'path':path}})
         return self._req('PATCH', id, body)
 
     def delete(self, id):
@@ -61,14 +64,22 @@ class SessionAPITest(NotebookTestBase):
 
         with io.open(pjoin(nbdir, 'foo', 'nb1.ipynb'), 'w',
                      encoding='utf-8') as f:
-            nb = new_notebook(name='nb1')
-            write(nb, f, format='ipynb')
+            nb = new_notebook()
+            write(nb, f, version=4)
 
         self.sess_api = SessionAPI(self.base_url())
 
     def tearDown(self):
         for session in self.sess_api.list().json():
             self.sess_api.delete(session['id'])
+        # This is necessary in some situations on Windows: without it, it
+        # fails to delete the directory because something is still using it. I
+        # think there is a brief period after the kernel terminates where
+        # Windows still treats its working directory as in use. On my Windows
+        # VM, 0.01s is not long enough, but 0.1s appears to work reliably.
+        # -- TK, 15 December 2014
+        time.sleep(0.1)
+
         shutil.rmtree(pjoin(self.notebook_dir.name, 'foo'),
                       ignore_errors=True)
 
@@ -76,12 +87,11 @@ class SessionAPITest(NotebookTestBase):
         sessions = self.sess_api.list().json()
         self.assertEqual(len(sessions), 0)
 
-        resp = self.sess_api.create('nb1.ipynb', 'foo')
+        resp = self.sess_api.create('foo/nb1.ipynb')
         self.assertEqual(resp.status_code, 201)
         newsession = resp.json()
         self.assertIn('id', newsession)
-        self.assertEqual(newsession['notebook']['name'], 'nb1.ipynb')
-        self.assertEqual(newsession['notebook']['path'], 'foo')
+        self.assertEqual(newsession['notebook']['path'], 'foo/nb1.ipynb')
         self.assertEqual(resp.headers['Location'], '/api/sessions/{0}'.format(newsession['id']))
 
         sessions = self.sess_api.list().json()
@@ -93,7 +103,7 @@ class SessionAPITest(NotebookTestBase):
         self.assertEqual(got, newsession)
 
     def test_delete(self):
-        newsession = self.sess_api.create('nb1.ipynb', 'foo').json()
+        newsession = self.sess_api.create('foo/nb1.ipynb').json()
         sid = newsession['id']
 
         resp = self.sess_api.delete(sid)
@@ -106,10 +116,9 @@ class SessionAPITest(NotebookTestBase):
             self.sess_api.get(sid)
 
     def test_modify(self):
-        newsession = self.sess_api.create('nb1.ipynb', 'foo').json()
+        newsession = self.sess_api.create('foo/nb1.ipynb').json()
         sid = newsession['id']
 
-        changed = self.sess_api.modify(sid, 'nb2.ipynb', '').json()
+        changed = self.sess_api.modify(sid, 'nb2.ipynb').json()
         self.assertEqual(changed['id'], sid)
-        self.assertEqual(changed['notebook']['name'], 'nb2.ipynb')
-        self.assertEqual(changed['notebook']['path'], '')
+        self.assertEqual(changed['notebook']['path'], 'nb2.ipynb')

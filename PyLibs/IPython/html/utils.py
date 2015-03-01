@@ -1,16 +1,7 @@
-"""Notebook related utilities
+"""Notebook related utilities"""
 
-Authors:
-
-* Brian Granger
-"""
-
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
 
@@ -28,9 +19,6 @@ from IPython.utils import py3compat
 # It is used by BSD to indicate hidden files.
 UF_HIDDEN = getattr(stat, 'UF_HIDDEN', 32768)
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 
 def url_path_join(*pieces):
     """Join components of url into a relative url
@@ -67,7 +55,7 @@ def url_escape(path):
     
     Turns '/foo bar/' into '/foo%20bar/'
     """
-    parts = py3compat.unicode_to_str(path).split('/')
+    parts = py3compat.unicode_to_str(path, encoding='utf8').split('/')
     return u'/'.join([quote(p) for p in parts])
 
 def url_unescape(path):
@@ -76,8 +64,8 @@ def url_unescape(path):
     Turns '/foo%20bar/' into '/foo bar/'
     """
     return u'/'.join([
-        py3compat.str_to_unicode(unquote(p))
-        for p in py3compat.unicode_to_str(path).split('/')
+        py3compat.str_to_unicode(unquote(p), encoding='utf8')
+        for p in py3compat.unicode_to_str(path, encoding='utf8').split('/')
     ])
 
 def is_hidden(abs_path, abs_root=''):
@@ -113,6 +101,9 @@ def is_hidden(abs_path, abs_root=''):
     # check UF_HIDDEN on any location up to root
     path = abs_path
     while path and path.startswith(abs_root) and path != abs_root:
+        if not os.path.exists(path):
+            path = os.path.dirname(path)
+            continue
         try:
             # may fail on Windows junctions
             st = os.stat(path)
@@ -134,4 +125,17 @@ def to_os_path(path, root=''):
     parts = [p for p in parts if p != ''] # remove duplicate splits
     path = os.path.join(root, *parts)
     return path
+
+def to_api_path(os_path, root=''):
+    """Convert a filesystem path to an API path
     
+    If given, root will be removed from the path.
+    root must be a filesystem path already.
+    """
+    if os_path.startswith(root):
+        os_path = os_path[len(root):]
+    parts = os_path.strip(os.path.sep).split(os.path.sep)
+    parts = [p for p in parts if p != ''] # remove duplicate splits
+    path = '/'.join(parts)
+    return path
+

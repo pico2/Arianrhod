@@ -55,8 +55,8 @@ def test_closure():
     def foo():
         return i
     
-    # true closures are not supported
-    with nt.assert_raises(ValueError):
-        pfoo = dumps(foo)
+    pfoo = dumps(foo)
+    bar = loads(pfoo)
+    nt.assert_equal(foo(), bar())
 
     

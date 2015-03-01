@@ -12,31 +12,16 @@ The code to actually do these transformations is in :mod:`IPython.core.inputtran
 and stores the results.
 
 For more details, see the class docstrings below.
-
-Authors
--------
-
-* Fernando Perez
-* Brian Granger
-* Thomas Kluyver
 """
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-# stdlib
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 import ast
 import codeop
 import re
 import sys
+import warnings
 
-# IPython modules
 from IPython.utils.py3compat import cast_unicode
 from IPython.core.inputtransformer import (leading_indent,
                                            classic_prompt,
@@ -224,6 +209,8 @@ class InputSplitter(object):
     _full_dedent = False
     # Boolean indicating whether the current block is complete
     _is_complete = None
+    # Boolean indicating whether the current block has an unrecoverable syntax error
+    _is_invalid = False
 
     def __init__(self):
         """Create a new InputSplitter instance.
@@ -239,6 +226,7 @@ class InputSplitter(object):
         self.source = ''
         self.code = None
         self._is_complete = False
+        self._is_invalid = False
         self._full_dedent = False
 
     def source_reset(self):
@@ -247,6 +235,42 @@ class InputSplitter(object):
         out = self.source
         self.reset()
         return out
+
+    def check_complete(self, source):
+        """Return whether a block of code is ready to execute, or should be continued
+        
+        This is a non-stateful API, and will reset the state of this InputSplitter.
+        
+        Parameters
+        ----------
+        source : string
+          Python input code, which can be multiline.
+        
+        Returns
+        -------
+        status : str
+          One of 'complete', 'incomplete', or 'invalid' if source is not a
+          prefix of valid code.
+        indent_spaces : int or None
+          The number of spaces by which to indent the next line of code. If
+          status is not 'incomplete', this is None.
+        """
+        self.reset()
+        try:
+            self.push(source)
+        except SyntaxError:
+            # Transformers in IPythonInputSplitter can raise SyntaxError,
+            # which push() will not catch.
+            return 'invalid', None
+        else:
+            if self._is_invalid:
+                return 'invalid', None
+            elif self.push_accepts_more():
+                return 'incomplete', self.indent_spaces
+            else:
+                return 'complete', None
+        finally:
+            self.reset()
 
     def push(self, lines):
         """Push one or more lines of input.
@@ -277,6 +301,7 @@ class InputSplitter(object):
         # exception is raised in compilation, we don't mislead by having
         # inconsistent code/source attributes.
         self.code, self._is_complete = None, None
+        self._is_invalid = False
 
         # Honor termination lines properly
         if source.endswith('\\\n'):
@@ -284,15 +309,18 @@ class InputSplitter(object):
 
         self._update_indent(lines)
         try:
-            self.code = self._compile(source, symbol="exec")
+            with warnings.catch_warnings():
+                warnings.simplefilter('error', SyntaxWarning)
+                self.code = self._compile(source, symbol="exec")
         # Invalid syntax can produce any of a number of different errors from
         # inside the compiler, so we have to catch them all.  Syntax errors
         # immediately produce a 'ready' block, so the invalid Python can be
         # sent to the kernel for evaluation with possible ipython
         # special-syntax conversion.
         except (SyntaxError, OverflowError, ValueError, TypeError,
-                MemoryError):
+                MemoryError, SyntaxWarning):
             self._is_complete = True
+            self._is_invalid = True
         else:
             # Compilation didn't produce any exceptions (though it may not have
             # given a complete code object)
@@ -511,19 +539,35 @@ class IPythonInputSplitter(InputSplitter):
                 pass
     
     def flush_transformers(self):
-        def _flush(transform, out):
-            if out is not None:
-                tmp = transform.push(out)
-                return tmp or transform.reset() or None
-            else:
-                return transform.reset() or None
+        def _flush(transform, outs):
+            """yield transformed lines
+            
+            always strings, never None
+            
+            transform: the current transform
+            outs: an iterable of previously transformed inputs.
+                 Each may be multiline, which will be passed
+                 one line at a time to transform.
+            """
+            for out in outs:
+                for line in out.splitlines():
+                    # push one line at a time
+                    tmp = transform.push(line)
+                    if tmp is not None:
+                        yield tmp
+            
+            # reset the transform
+            tmp = transform.reset()
+            if tmp is not None:
+                yield tmp
         
-        out = None
+        out = []
         for t in self.transforms_in_use:
             out = _flush(t, out)
         
-        if out is not None:
-            self._store(out)
+        out = list(out)
+        if out:
+            self._store('\n'.join(out))
 
     def raw_reset(self):
         """Return raw input only and perform a full reset.

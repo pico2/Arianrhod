@@ -1,31 +1,18 @@
 # -*- coding: utf-8 -*-
-"""Tests for the inputsplitter module.
+"""Tests for the inputsplitter module."""
 
-Authors
--------
-* Fernando Perez
-* Robert Kern
-"""
 from __future__ import print_function
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-# stdlib
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 import unittest
 import sys
 
-# Third party
 import nose.tools as nt
 
-# Our own
 from IPython.core import inputsplitter as isp
+from IPython.core.inputtransformer import InputTransformer
 from IPython.core.tests.test_inputtransformer import syntax, syntax_ml
 from IPython.testing import tools as tt
 from IPython.utils import py3compat
@@ -355,6 +342,14 @@ class InputSplitterTestCase(unittest.TestCase):
         isp.push(r"(1 \ ")
         self.assertFalse(isp.push_accepts_more())
 
+    def test_check_complete(self):
+        isp = self.isp
+        self.assertEqual(isp.check_complete("a = 1"), ('complete', None))
+        self.assertEqual(isp.check_complete("for a in range(5):"), ('incomplete', 4))
+        self.assertEqual(isp.check_complete("raise = 2"), ('invalid', None))
+        self.assertEqual(isp.check_complete("a = [1,\n2,"), ('incomplete', 0))
+        self.assertEqual(isp.check_complete("def a():\n x=1\n global x"), ('invalid', None))
+
 class InteractiveLoopTestCase(unittest.TestCase):
     """Tests for an interactive loop like a python shell.
     """
@@ -455,9 +450,9 @@ class IPythonInputTestCase(InputSplitterTestCase):
         isp = self.isp
         for raw, name, line, cell in [
             ("%%cellm a\nIn[1]:", u'cellm', u'a', u'In[1]:'),
-            ("%%cellm \nline\n>>>hi", u'cellm', u'', u'line\n>>>hi'),
-            (">>>%%cellm \nline\n>>>hi", u'cellm', u'', u'line\nhi'),
-            ("%%cellm \n>>>hi", u'cellm', u'', u'hi'),
+            ("%%cellm \nline\n>>> hi", u'cellm', u'', u'line\n>>> hi'),
+            (">>> %%cellm \nline\n>>> hi", u'cellm', u'', u'line\nhi'),
+            ("%%cellm \n>>> hi", u'cellm', u'', u'hi'),
             ("%%cellm \nline1\nline2", u'cellm', u'', u'line1\nline2'),
             ("%%cellm \nline1\\\\\nline2", u'cellm', u'', u'line1\\\\\nline2'),
         ]:
@@ -466,8 +461,33 @@ class IPythonInputTestCase(InputSplitterTestCase):
             )
             out = isp.transform_cell(raw)
             self.assertEqual(out.rstrip(), expected.rstrip())
+
+    def test_multiline_passthrough(self):
+        isp = self.isp
+        class CommentTransformer(InputTransformer):
+            def __init__(self):
+                self._lines = []
+            
+            def push(self, line):
+                self._lines.append(line + '#')
+            
+            def reset(self):
+                text = '\n'.join(self._lines)
+                self._lines = []
+                return text
         
+        isp.physical_line_transforms.insert(0, CommentTransformer())
         
+        for raw, expected in [
+            ("a=5", "a=5#"),
+            ("%ls foo", "get_ipython().magic(%r)" % u'ls foo#'),
+            ("!ls foo\n%ls bar", "get_ipython().system(%r)\nget_ipython().magic(%r)" % (
+                u'ls foo#', u'ls bar#'
+            )),
+            ("1\n2\n3\n%ls foo\n4\n5", "1#\n2#\n3#\nget_ipython().magic(%r)\n4#\n5#" % u'ls foo#'),
+        ]:
+            out = isp.transform_cell(raw)
+            self.assertEqual(out.rstrip(), expected.rstrip())
 
 #-----------------------------------------------------------------------------
 # Main - use as a script, mostly for developer experiments

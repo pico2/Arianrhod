@@ -2,42 +2,33 @@
 Module containing filter functions that allow code to be highlighted
 from within Jinja templates.
 """
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 # pygments must not be imported at the module level
 # because errors should be raised at runtime if it's actually needed,
 # not import time, when it may not be needed.
 
-# Our own imports
 from IPython.nbconvert.utils.base import NbConvertBase
-
-#-----------------------------------------------------------------------------
-# Globals and constants
-#-----------------------------------------------------------------------------
+from warnings import warn
 
 MULTILINE_OUTPUTS = ['text', 'html', 'svg', 'latex', 'javascript', 'json']
-
-#-----------------------------------------------------------------------------
-# Utility functions
-#-----------------------------------------------------------------------------
 
 __all__ = [
     'Highlight2HTML',
     'Highlight2Latex'
 ]
 
-
 class Highlight2HTML(NbConvertBase):
+    def __init__(self, pygments_lexer=None, **kwargs):
+        self.pygments_lexer = pygments_lexer or 'ipython3'
+        super(Highlight2HTML, self).__init__(**kwargs)
+
+    def _default_language_changed(self, name, old, new):
+        warn('Setting default_language in config is deprecated, '
+             'please use language_info metadata instead.')
+        self.pygments_lexer = new
 
     def __call__(self, source, language=None, metadata=None):
         """
@@ -53,13 +44,25 @@ class Highlight2HTML(NbConvertBase):
             metadata of the cell to highlight
         """
         from pygments.formatters import HtmlFormatter
-        if not language:
-            language=self.default_language
 
-        return _pygments_highlight(source if len(source) > 0 else ' ', HtmlFormatter(), language, metadata)
+        if not language:
+            language=self.pygments_lexer
+
+        return _pygments_highlight(source if len(source) > 0 else ' ',
+                                   # needed to help post processors:
+                                   HtmlFormatter(cssclass=" highlight hl-"+language),
+                                   language, metadata)
 
 
 class Highlight2Latex(NbConvertBase):
+    def __init__(self, pygments_lexer=None, **kwargs):
+        self.pygments_lexer = pygments_lexer or 'ipython3'
+        super(Highlight2Latex, self).__init__(**kwargs)
+
+    def _default_language_changed(self, name, old, new):
+        warn('Setting default_language in config is deprecated, '
+             'please use language_info metadata instead.')
+        self.pygments_lexer = new
 
     def __call__(self, source, language=None, metadata=None, strip_verbatim=False):
         """
@@ -78,7 +81,7 @@ class Highlight2Latex(NbConvertBase):
         """
         from pygments.formatters import LatexFormatter
         if not language:
-            language=self.default_language
+            language=self.pygments_lexer
 
         latex = _pygments_highlight(source, LatexFormatter(), language, metadata)
         if strip_verbatim:
@@ -105,19 +108,28 @@ def _pygments_highlight(source, output_formatter, language='ipython', metadata=N
     """
     from pygments import highlight
     from pygments.lexers import get_lexer_by_name
-    from IPython.nbconvert.utils.lexers import IPythonLexer
+    from pygments.util import ClassNotFound
+    from IPython.nbconvert.utils.lexers import IPythonLexer, IPython3Lexer
 
     # If the cell uses a magic extension language,
     # use the magic language instead.
-    if language == 'ipython' \
+    if language.startswith('ipython') \
         and metadata \
         and 'magics_language' in metadata:
 
         language = metadata['magics_language']
 
-    if language == 'ipython':
+    if language == 'ipython2':
         lexer = IPythonLexer()
+    elif language == 'ipython3':
+        lexer = IPython3Lexer()
     else:
-        lexer = get_lexer_by_name(language, stripall=True)
+        try:
+            lexer = get_lexer_by_name(language, stripall=True)
+        except ClassNotFound:
+            warn("No lexer found for language %r. Treating as plain text." % language)
+            from pygments.lexers.special import TextLexer
+            lexer = TextLexer()
+
 
     return highlight(source, lexer, output_formatter)

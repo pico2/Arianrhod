@@ -1,27 +1,20 @@
 # -*- coding: utf-8 -*-
-"""terminal client to the IPython kernel
+"""terminal client to the IPython kernel"""
 
-"""
-#-----------------------------------------------------------------------------
-# Copyright (C) 2013 The IPython Development Team
-#
-# Distributed under the terms of the BSD License. The full license is in
-# the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 from __future__ import print_function
 
+import base64
 import bdb
 import signal
 import os
 import sys
 import time
 import subprocess
+from getpass import getpass
 from io import BytesIO
-import base64
 
 try:
     from queue import Empty  # Py 3
@@ -29,21 +22,23 @@ except ImportError:
     from Queue import Empty  # Py 2
 
 from IPython.core import page
+from IPython.core import release
+from IPython.terminal.console.zmqhistory import ZMQHistoryManager
 from IPython.utils.warn import warn, error
 from IPython.utils import io
 from IPython.utils.py3compat import string_types, input
-from IPython.utils.traitlets import List, Enum, Any, Instance, Unicode, Float
+from IPython.utils.traitlets import List, Enum, Any, Instance, Unicode, Float, Bool
 from IPython.utils.tempdir import NamedFileInTemporaryDirectory
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 from IPython.terminal.console.completer import ZMQCompleter
-
 
 class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
     """A subclass of TerminalInteractiveShell that uses the 0MQ kernel"""
     _executing = False
     _execution_state = Unicode('')
     _pending_clearoutput = False
+    kernel_banner = Unicode('')
     kernel_timeout = Float(60, config=True,
         help="""Timeout for giving up on a kernel (in seconds).
         
@@ -142,11 +137,6 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
         if self.has_readline:
             self.set_readline_completer()
     
-    def ask_exit(self):
-        super(ZMQTerminalInteractiveShell, self).ask_exit()
-        if self.exit_now and self.manager:
-            self.client.shutdown()
-    
     def run_cell(self, cell, store_history=True):
         """Run a complete IPython cell.
         
@@ -163,23 +153,19 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
             # pressing enter flushes any pending display
             self.handle_iopub()
             return
-
-        if cell.strip() == 'exit':
-            # explicitly handle 'exit' command
-            return self.ask_exit()
-
+        
         # flush stale replies, which could have been ignored, due to missed heartbeats
         while self.client.shell_channel.msg_ready():
             self.client.shell_channel.get_msg()
-        # shell_channel.execute takes 'hidden', which is the inverse of store_hist
-        msg_id = self.client.shell_channel.execute(cell, not store_history)
+        # execute takes 'hidden', which is the inverse of store_hist
+        msg_id = self.client.execute(cell, not store_history)
         
         # first thing is wait for any side effects (output, stdin, etc.)
         self._executing = True
         self._execution_state = "busy"
         while self._execution_state != 'idle' and self.client.is_alive():
             try:
-                self.handle_stdin_request(msg_id, timeout=0.05)
+                self.handle_input_request(msg_id, timeout=0.05)
             except Empty:
                 # display intermediate print statements, etc.
                 self.handle_iopub(msg_id)
@@ -211,24 +197,57 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
                 self.write('Aborted\n')
                 return
             elif status == 'ok':
-                # print execution payloads as well:
+                # handle payloads
                 for item in content["payload"]:
-                    text = item.get('text', None)
-                    if text:
-                        page.page(text)
+                    source = item['source']
+                    if source == 'page':
+                        page.page(item['data']['text/plain'])
+                    elif source == 'set_next_input':
+                        self.set_next_input(item['text'])
+                    elif source == 'ask_exit':
+                        self.ask_exit()
                
             elif status == 'error':
                 for frame in content["traceback"]:
                     print(frame, file=io.stderr)
             
             self.execution_count = int(content["execution_count"] + 1)
-
-
+    
+    include_other_output = Bool(False, config=True,
+        help="""Whether to include output from clients
+        other than this one sharing the same kernel.
+        
+        Outputs are not displayed until enter is pressed.
+        """
+    )
+    other_output_prefix = Unicode("[remote] ", config=True,
+        help="""Prefix to add to outputs coming from clients other than this one.
+        
+        Only relevant if include_other_output is True.
+        """
+    )
+    
+    def from_here(self, msg):
+        """Return whether a message is from this session"""
+        return msg['parent_header'].get("session", self.session_id) == self.session_id
+    
+    def include_output(self, msg):
+        """Return whether we should include a given output message"""
+        from_here = self.from_here(msg)
+        if msg['msg_type'] == 'execute_input':
+            # only echo inputs not from here
+            return self.include_other_output and not from_here
+        
+        if self.include_other_output:
+            return True
+        else:
+            return from_here
+    
     def handle_iopub(self, msg_id=''):
         """Process messages on the IOPub channel
 
            This method consumes and processes messages on the IOPub channel,
-           such as stdout, stderr, pyout and status.
+           such as stdout, stderr, execute_result and status.
            
            It only displays output that is caused by this session.
         """
@@ -237,7 +256,7 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
             msg_type = sub_msg['header']['msg_type']
             parent = sub_msg["parent_header"]
             
-            if parent.get("session", self.session_id) == self.session_id:
+            if self.include_output(sub_msg):
                 if msg_type == 'status':
                     self._execution_state = sub_msg["content"]["execution_state"]
                 elif msg_type == 'stream':
@@ -245,22 +264,25 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
                         if self._pending_clearoutput:
                             print("\r", file=io.stdout, end="")
                             self._pending_clearoutput = False
-                        print(sub_msg["content"]["data"], file=io.stdout, end="")
+                        print(sub_msg["content"]["text"], file=io.stdout, end="")
                         io.stdout.flush()
-                    elif sub_msg["content"]["name"] == "stderr" :
+                    elif sub_msg["content"]["name"] == "stderr":
                         if self._pending_clearoutput:
                             print("\r", file=io.stderr, end="")
                             self._pending_clearoutput = False
-                        print(sub_msg["content"]["data"], file=io.stderr, end="")
+                        print(sub_msg["content"]["text"], file=io.stderr, end="")
                         io.stderr.flush()
 
-                elif msg_type == 'pyout':
+                elif msg_type == 'execute_result':
                     if self._pending_clearoutput:
                         print("\r", file=io.stdout, end="")
                         self._pending_clearoutput = False
                     self.execution_count = int(sub_msg["content"]["execution_count"])
+                    if not self.from_here(sub_msg):
+                        sys.stdout.write(self.other_output_prefix)
                     format_dict = sub_msg["content"]["data"]
                     self.handle_rich_data(format_dict)
+                    
                     # taken from DisplayHook.__call__:
                     hook = self.displayhook
                     hook.start_displayhook()
@@ -273,10 +295,20 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
                     data = sub_msg["content"]["data"]
                     handled = self.handle_rich_data(data)
                     if not handled:
+                        if not self.from_here(sub_msg):
+                            sys.stdout.write(self.other_output_prefix)
                         # if it was an image, we handled it by now
                         if 'text/plain' in data:
                             print(data['text/plain'])
-
+                
+                elif msg_type == 'execute_input':
+                    content = sub_msg['content']
+                    self.execution_count = content['execution_count']
+                    if not self.from_here(sub_msg):
+                        sys.stdout.write(self.other_output_prefix)
+                    sys.stdout.write(self.prompt_manager.render('in'))
+                    sys.stdout.write(content['code'])
+                
                 elif msg_type == 'clear_output':
                     if sub_msg["content"]["wait"]:
                         self._pending_clearoutput = True
@@ -335,13 +367,13 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
     def handle_image_callable(self, data, mime):
         self.callable_image_handler(data)
 
-    def handle_stdin_request(self, msg_id, timeout=0.1):
+    def handle_input_request(self, msg_id, timeout=0.1):
         """ Method to capture raw_input
         """
-        msg_rep = self.client.stdin_channel.get_msg(timeout=timeout)
+        req = self.client.stdin_channel.get_msg(timeout=timeout)
         # in case any iopub came while we were waiting:
         self.handle_iopub(msg_id)
-        if msg_id == msg_rep["parent_header"].get("msg_id"):
+        if msg_id == req["parent_header"].get("msg_id"):
             # wrap SIGINT handler
             real_handler = signal.getsignal(signal.SIGINT)
             def double_int(sig,frame):
@@ -350,9 +382,10 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
                 real_handler(sig,frame)
                 raise KeyboardInterrupt
             signal.signal(signal.SIGINT, double_int)
-            
+            content = req['content']
+            read = getpass if content.get('password', False) else input
             try:
-                raw_data = input(msg_rep["content"]["prompt"])
+                raw_data = read(content["prompt"])
             except EOFError:
                 # turn EOFError into EOF character
                 raw_data = '\x04'
@@ -366,13 +399,13 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
             # only send stdin reply if there *was not* another request
             # or execution finished while we were reading.
             if not (self.client.stdin_channel.msg_ready() or self.client.shell_channel.msg_ready()):
-                self.client.stdin_channel.input(raw_data)
+                self.client.input(raw_data)
 
     def mainloop(self, display_banner=False):
         while True:
             try:
                 self.interact(display_banner=display_banner)
-                #self.interact_with_readline()                
+                #self.interact_with_readline()
                 # XXX for testing of a readline-decoupled repl loop, call
                 # interact_with_readline above
                 break
@@ -380,6 +413,26 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
                 # this should not be necessary, but KeyboardInterrupt
                 # handling seems rather unpredictable...
                 self.write("\nKeyboardInterrupt in interact()\n")
+
+        self.client.shutdown()
+    
+    def _banner1_default(self):
+        return "IPython Console {version}\n".format(version=release.version)
+    
+    def compute_banner(self):
+        super(ZMQTerminalInteractiveShell, self).compute_banner()
+        if self.client and not self.kernel_banner:
+            msg_id = self.client.kernel_info()
+            while True:
+                try:
+                    reply = self.client.get_shell_msg(timeout=1)
+                except Empty:
+                    break
+                else:
+                    if reply['parent_header'].get('msg_id') == msg_id:
+                        self.kernel_banner = reply['content'].get('banner', '')
+                        break
+        self.banner += self.kernel_banner
     
     def wait_for_kernel(self, timeout=None):
         """method to wait for a kernel to be ready"""
@@ -476,7 +529,7 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
             except KeyboardInterrupt:
                 #double-guard against keyboardinterrupts during kbdint handling
                 try:
-                    self.write('\nKeyboardInterrupt\n')
+                    self.write('\n' + self.get_exception_only())
                     source_raw = self.input_splitter.raw_reset()
                     hlen_b4_cell = self._replace_rlhist_multiline(source_raw, hlen_b4_cell)
                     more = False
@@ -517,3 +570,9 @@ class ZMQTerminalInteractiveShell(TerminalInteractiveShell):
 
         # Turn off the exit flag, so the mainloop can be restarted if desired
         self.exit_now = False
+
+    def init_history(self):
+        """Sets up the command history. """
+        self.history_manager = ZMQHistoryManager(client=self.client) 
+        self.configurables.append(self.history_manager)
+

@@ -8,17 +8,21 @@ casper.notebook_test(function () {
     // This causes no actual problems, but will break string comparison.
     var nbname = "has#hash and space and unicø∂e.ipynb";
     
-    this.evaluate(function (nbname) {
-        IPython.notebook.notebook_name = nbname;
-        IPython._save_success = IPython._save_failed = false;
-        $([IPython.events]).on('notebook_saved.Notebook', function () {
-            IPython._save_success = true;
+    this.append_cell("s = '??'", 'code');
+    
+    this.thenEvaluate(function (nbname) {
+        require(['base/js/events'], function (events) {
+            IPython.notebook.set_notebook_name(nbname);
+            IPython._save_success = IPython._save_failed = false;
+            events.on('notebook_saved.Notebook', function () {
+                IPython._save_success = true;
+            });
+            events.on('notebook_save_failed.Notebook',
+                function (event, error) {
+                    IPython._save_failed = "save failed with " + error;
+            });
+            IPython.notebook.save_notebook();
         });
-        $([IPython.events]).on('notebook_save_failed.Notebook',
-            function (event, xhr, status, error) {
-                IPython._save_failed = "save failed with " + xhr.status + xhr.responseText;
-        });
-        IPython.notebook.save_notebook();
     }, {nbname:nbname});
     
     this.waitFor(function () {
@@ -38,13 +42,19 @@ casper.notebook_test(function () {
             return IPython.notebook.notebook_name;
         });
         this.test.assertEquals(current_name, nbname, "Save with complicated name");
+        var current_path = this.evaluate(function(){
+            return IPython.notebook.notebook_path;
+        });
+        this.test.assertEquals(current_path, nbname, "path OK");
     });
     
     this.thenEvaluate(function(){
-        $([IPython.events]).on('checkpoint_created.Notebook', function (evt, data) {
-            IPython._checkpoint_created = true;
-        });
         IPython._checkpoint_created = false;
+        require(['base/js/events'], function (events) {
+            events.on('checkpoint_created.Notebook', function (evt, data) {
+                IPython._checkpoint_created = true;
+            });
+        });
         IPython.notebook.save_checkpoint();
     });
     
@@ -62,16 +72,13 @@ casper.notebook_test(function () {
     });
 
     this.then(function(){
-        var baseUrl = this.get_notebook_server();
-        this.open(baseUrl);
+        this.open_dashboard();
     });
-
-    this.waitForSelector('.list_item');
     
     this.then(function(){
         var notebook_url = this.evaluate(function(nbname){
             var escaped_name = encodeURIComponent(nbname);
-            var return_this_thing;
+            var return_this_thing = null;
             $("a.item_link").map(function (i,a) {
                 if (a.href.indexOf(escaped_name) >= 0) {
                     return_this_thing = a.href;
@@ -80,17 +87,17 @@ casper.notebook_test(function () {
             });
             return return_this_thing;
         }, {nbname:nbname});
-        this.test.assertEquals(notebook_url == null, false, "Escaped URL in notebook list");
+        this.test.assertNotEquals(notebook_url, null, "Escaped URL in notebook list");
         // open the notebook
         this.open(notebook_url);
     });
     
     // wait for the notebook
-    this.waitForSelector("#notebook");
+    this.waitFor(this.kernel_running);
     
-    this.waitFor(function(){
-        return this.evaluate(function(){
-            return IPython.notebook || false;
+    this.waitFor(function() {
+        return this.evaluate(function () {
+            return IPython && IPython.notebook && true;
         });
     });
     

@@ -1,17 +1,10 @@
 """A simple engine that talks to a controller over 0MQ.
 it handles registration, etc. and launches a kernel
 connected to the Controller's Schedulers.
-
-Authors:
-
-* Min RK
 """
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
 
@@ -22,11 +15,9 @@ from getpass import getpass
 import zmq
 from zmq.eventloop import ioloop, zmqstream
 
-from IPython.external.ssh import tunnel
-# internal
 from IPython.utils.localinterfaces import localhost
 from IPython.utils.traitlets import (
-    Instance, Dict, Integer, Type, Float, Integer, Unicode, CBytes, Bool
+    Instance, Dict, Integer, Type, Float, Unicode, CBytes, Bool
 )
 from IPython.utils.py3compat import cast_bytes
 
@@ -34,8 +25,7 @@ from IPython.parallel.controller.heartmonitor import Heart
 from IPython.parallel.factory import RegistrationFactory
 from IPython.parallel.util import disambiguate_url
 
-from IPython.kernel.zmq.session import Message
-from IPython.kernel.zmq.ipkernel import Kernel
+from IPython.kernel.zmq.ipkernel import IPythonKernel as Kernel
 from IPython.kernel.zmq.kernelapp import IPKernelApp
 
 class EngineFactory(RegistrationFactory):
@@ -66,6 +56,11 @@ class EngineFactory(RegistrationFactory):
         help="""The SSH private key file to use when tunneling connections to the Controller.""")
     paramiko=Bool(sys.platform == 'win32', config=True,
         help="""Whether to use paramiko instead of openssh for tunnels.""")
+    
+    @property
+    def tunnel_mod(self):
+        from zmq.ssh import tunnel
+        return tunnel
 
 
     # not configurable:
@@ -105,7 +100,7 @@ class EngineFactory(RegistrationFactory):
             self.sshserver = self.url.split('://')[1].split(':')[0]
 
         if self.using_ssh:
-            if tunnel.try_passwordless_ssh(self.sshserver, self.sshkey, self.paramiko):
+            if self.tunnel_mod.try_passwordless_ssh(self.sshserver, self.sshkey, self.paramiko):
                 password=False
             else:
                 password = getpass("SSH Password for %s: "%self.sshserver)
@@ -116,7 +111,7 @@ class EngineFactory(RegistrationFactory):
             url = disambiguate_url(url, self.location)
             if self.using_ssh:
                 self.log.debug("Tunneling connection to %s via %s", url, self.sshserver)
-                return tunnel.tunnel_connection(s, url, self.sshserver,
+                return self.tunnel_mod.tunnel_connection(s, url, self.sshserver,
                             keyfile=self.sshkey, paramiko=self.paramiko,
                             password=password,
                 )
@@ -128,7 +123,7 @@ class EngineFactory(RegistrationFactory):
             url = disambiguate_url(url, self.location)
             if self.using_ssh:
                 self.log.debug("Tunneling connection to %s via %s", url, self.sshserver)
-                url,tunnelobj = tunnel.open_tunnel(url, self.sshserver,
+                url, tunnelobj = self.tunnel_mod.open_tunnel(url, self.sshserver,
                             keyfile=self.sshkey, paramiko=self.paramiko,
                             password=password,
                 )
@@ -159,12 +154,12 @@ class EngineFactory(RegistrationFactory):
 
     def complete_registration(self, msg, connect, maybe_tunnel):
         # print msg
-        self._abort_dc.stop()
+        self.loop.remove_timeout(self._abort_timeout)
         ctx = self.context
         loop = self.loop
         identity = self.bident
         idents,msg = self.session.feed_identities(msg)
-        msg = self.session.unserialize(msg)
+        msg = self.session.deserialize(msg)
         content = msg['content']
         info = self.connection_info
         
@@ -228,7 +223,7 @@ class EngineFactory(RegistrationFactory):
                 sys.stderr.topic = cast_bytes('engine.%i.stderr' % self.id)
             if self.display_hook_factory:
                 sys.displayhook = self.display_hook_factory(self.session, iopub_socket)
-                sys.displayhook.topic = cast_bytes('engine.%i.pyout' % self.id)
+                sys.displayhook.topic = cast_bytes('engine.%i.execute_result' % self.id)
 
             self.kernel = Kernel(parent=self, int_id=self.id, ident=self.ident, session=self.session,
                     control_stream=control_stream, shell_streams=shell_streams, iopub_socket=iopub_socket,
@@ -297,9 +292,10 @@ class EngineFactory(RegistrationFactory):
             
         
     def start(self):
-        dc = ioloop.DelayedCallback(self.register, 0, self.loop)
-        dc.start()
-        self._abort_dc = ioloop.DelayedCallback(self.abort, self.timeout*1000, self.loop)
-        self._abort_dc.start()
+        loop = self.loop
+        def _start():
+            self.register()
+            self._abort_timeout = loop.add_timeout(loop.time() + self.timeout, self.abort)
+        self.loop.add_callback(_start)
 
 

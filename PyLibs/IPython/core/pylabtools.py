@@ -1,26 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Pylab (matplotlib) support utilities.
-
-Authors
--------
-
-* Fernando Perez.
-* Brian Granger
-"""
+"""Pylab (matplotlib) support utilities."""
 from __future__ import print_function
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2009  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-import sys
 from io import BytesIO
 
 from IPython.core.display import _pngxy
@@ -38,6 +22,7 @@ backends = {'tk': 'TkAgg',
             'qt5': 'Qt5Agg',
             'osx': 'MacOSX',
             'nbagg': 'nbAgg',
+            'notebook': 'nbAgg',
             'inline' : 'module://IPython.kernel.zmq.pylab.backend_inline'}
 
 # We also need a reverse backends2guis mapping that will properly choose which

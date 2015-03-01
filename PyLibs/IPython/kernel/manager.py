@@ -1,36 +1,33 @@
 """Base class to manage a running kernel"""
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2013  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import absolute_import
 
-# Standard library imports
+from contextlib import contextmanager
+import os
 import re
 import signal
 import sys
 import time
+import warnings
+try:
+    from queue import Empty  # Py 3
+except ImportError:
+    from Queue import Empty  # Py 2
 
 import zmq
 
-# Local imports
-from IPython.config.configurable import LoggingConfigurable
 from IPython.utils.importstring import import_item
 from IPython.utils.localinterfaces import is_local_ip, local_ips
+from IPython.utils.path import get_ipython_dir
 from IPython.utils.traitlets import (
     Any, Instance, Unicode, List, Bool, Type, DottedObjectName
 )
 from IPython.kernel import (
-    make_ipkernel_cmd,
     launch_kernel,
+    kernelspec,
 )
 from .connect import ConnectionFileMixin
 from .zmq.session import Session
@@ -38,11 +35,8 @@ from .managerabc import (
     KernelManagerABC
 )
 
-#-----------------------------------------------------------------------------
-# Main kernel manager class
-#-----------------------------------------------------------------------------
 
-class KernelManager(LoggingConfigurable, ConnectionFileMixin):
+class KernelManager(ConnectionFileMixin):
     """Manages a single kernel in a subprocess on this host.
 
     This version starts kernels with Popen.
@@ -53,11 +47,6 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
     def _context_default(self):
         return zmq.Context.instance()
 
-    # The Session to use for communication with the kernel.
-    session = Instance(Session)
-    def _session_default(self):
-        return Session(parent=self)
-
     # the class to create with our `client` method
     client_class = DottedObjectName('IPython.kernel.blocking.BlockingKernelClient')
     client_factory = Type()
@@ -67,9 +56,31 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
     # The kernel process with which the KernelManager is communicating.
     # generally a Popen instance
     kernel = Any()
+    
+    kernel_spec_manager = Instance(kernelspec.KernelSpecManager)
+    
+    def _kernel_spec_manager_default(self):
+        return kernelspec.KernelSpecManager(ipython_dir=self.ipython_dir)
+    
+    kernel_name = Unicode(kernelspec.NATIVE_KERNEL_NAME)
+    
+    kernel_spec = Instance(kernelspec.KernelSpec)
+    
+    def _kernel_spec_default(self):
+        return self.kernel_spec_manager.get_kernel_spec(self.kernel_name)
+    
+    def _kernel_name_changed(self, name, old, new):
+        if new == 'python':
+            self.kernel_name = kernelspec.NATIVE_KERNEL_NAME
+            # This triggered another run of this function, so we can exit now
+            return
+        self.kernel_spec = self.kernel_spec_manager.get_kernel_spec(new)
+        self.ipython_kernel = new in {'python', 'python2', 'python3'}
 
     kernel_cmd = List(Unicode, config=True,
-        help="""The Popen Command to launch the kernel.
+        help="""DEPRECATED: Use kernel_name instead.
+        
+        The Popen Command to launch the kernel.
         Override this if you have a custom kernel.
         If kernel_cmd is specified in a configuration file,
         IPython does not pass any arguments to the kernel,
@@ -81,9 +92,15 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
     )
 
     def _kernel_cmd_changed(self, name, old, new):
+        warnings.warn("Setting kernel_cmd is deprecated, use kernel_spec to "
+                      "start different kernels.")
         self.ipython_kernel = False
 
     ipython_kernel = Bool(True)
+    
+    ipython_dir = Unicode()
+    def _ipython_dir_default(self):
+        return get_ipython_dir()
 
     # Protected traits
     _launch_args = Any()
@@ -146,15 +163,14 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
     # Kernel management
     #--------------------------------------------------------------------------
 
-    def format_kernel_cmd(self, **kw):
+    def format_kernel_cmd(self, extra_arguments=None):
         """replace templated args (e.g. {connection_file})"""
+        extra_arguments = extra_arguments or []
         if self.kernel_cmd:
-            cmd = self.kernel_cmd
+            cmd = self.kernel_cmd + extra_arguments
         else:
-            cmd = make_ipkernel_cmd(
-                'from IPython.kernel.zmq.kernelapp import main; main()',
-                **kw
-            )
+            cmd = self.kernel_spec.argv + extra_arguments
+
         ns = dict(connection_file=self.connection_file)
         ns.update(self._launch_args)
         
@@ -210,19 +226,54 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
         # save kwargs for use in restart
         self._launch_args = kw.copy()
         # build the Popen cmd
-        kernel_cmd = self.format_kernel_cmd(**kw)
+        extra_arguments = kw.pop('extra_arguments', [])
+        kernel_cmd = self.format_kernel_cmd(extra_arguments=extra_arguments)
+        if self.kernel_cmd:
+            # If kernel_cmd has been set manually, don't refer to a kernel spec
+            env = os.environ
+        else:
+            # Environment variables from kernel spec are added to os.environ
+            env = os.environ.copy()
+            env.update(self.kernel_spec.env or {})
         # launch the kernel subprocess
-        self.kernel = self._launch_kernel(kernel_cmd,
-                                    ipython_kernel=self.ipython_kernel,
+        self.kernel = self._launch_kernel(kernel_cmd, env=env,
                                     **kw)
         self.start_restarter()
         self._connect_control_socket()
 
-    def _send_shutdown_request(self, restart=False):
-        """TODO: send a shutdown request via control channel"""
+    def request_shutdown(self, restart=False):
+        """Send a shutdown request via control channel
+        
+        On Windows, this just kills kernels instead, because the shutdown
+        messages don't work.
+        """
         content = dict(restart=restart)
         msg = self.session.msg("shutdown_request", content=content)
         self.session.send(self._control_socket, msg)
+
+    def finish_shutdown(self, waittime=1, pollinterval=0.1):
+        """Wait for kernel shutdown, then kill process if it doesn't shutdown.
+        
+        This does not send shutdown requests - use :meth:`request_shutdown`
+        first.
+        """
+        for i in range(int(waittime/pollinterval)):
+            if self.is_alive():
+                time.sleep(pollinterval)
+            else:
+                break
+        else:
+            # OK, we've waited long enough.
+            if self.has_kernel:
+                self._kill_kernel()
+
+    def cleanup(self, connection_file=True):
+        """Clean up resources when the kernel is shut down"""
+        if connection_file:
+            self.cleanup_connection_file()
+
+        self.cleanup_ipc_files()
+        self._close_control_socket()
 
     def shutdown_kernel(self, now=False, restart=False):
         """Attempts to the stop the kernel process cleanly.
@@ -245,32 +296,16 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
         # Stop monitoring for restarting while we shutdown.
         self.stop_restarter()
 
-        # FIXME: Shutdown does not work on Windows due to ZMQ errors!
-        if now or sys.platform == 'win32':
-            if self.has_kernel:
-                self._kill_kernel()
+        if now:
+            self._kill_kernel()
         else:
+            self.request_shutdown(restart=restart)
             # Don't send any additional kernel kill messages immediately, to give
             # the kernel a chance to properly execute shutdown actions. Wait for at
             # most 1s, checking every 0.1s.
-            self._send_shutdown_request(restart=restart)
-            for i in range(10):
-                if self.is_alive():
-                    time.sleep(0.1)
-                else:
-                    break
-            else:
-                # OK, we've waited long enough.
-                if self.has_kernel:
-                    self._kill_kernel()
+            self.finish_shutdown()
 
-        if not restart:
-            self.cleanup_connection_file()
-            self.cleanup_ipc_files()
-        else:
-            self.cleanup_ipc_files()
-        
-        self._close_control_socket()
+        self.cleanup(connection_file=not restart)
 
     def restart_kernel(self, now=False, **kw):
         """Restarts a kernel with the arguments that were used to launch it.
@@ -302,11 +337,6 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
             # Start new kernel.
             self._launch_args.update(kw)
             self.start_kernel(**self._launch_args)
-
-            # FIXME: Messages get dropped in Windows due to probable ZMQ bug
-            # unless there is some delay here.
-            if sys.platform == 'win32':
-                time.sleep(0.2)
 
     @property
     def has_kernel(self):
@@ -381,9 +411,32 @@ class KernelManager(LoggingConfigurable, ConnectionFileMixin):
             return False
 
 
-#-----------------------------------------------------------------------------
-# ABC Registration
-#-----------------------------------------------------------------------------
-
 KernelManagerABC.register(KernelManager)
 
+
+def start_new_kernel(startup_timeout=60, kernel_name='python', **kwargs):
+    """Start a new kernel, and return its Manager and Client"""
+    km = KernelManager(kernel_name=kernel_name)
+    km.start_kernel(**kwargs)
+    kc = km.client()
+    kc.start_channels()
+    kc.wait_for_ready()
+
+    return km, kc
+
+@contextmanager
+def run_kernel(**kwargs):
+    """Context manager to create a kernel in a subprocess.
+    
+    The kernel is shut down when the context exits.
+    
+    Returns
+    -------
+    kernel_client: connected KernelClient instance
+    """
+    km, kc = start_new_kernel(**kwargs)
+    try:
+        yield kc
+    finally:
+        kc.stop_channels()
+        km.shutdown_kernel(now=True)

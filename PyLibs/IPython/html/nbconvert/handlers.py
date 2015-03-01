@@ -1,16 +1,22 @@
+"""Tornado handlers for nbconvert."""
+
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 import io
 import os
 import zipfile
 
 from tornado import web
 
-from ..base.handlers import IPythonHandler, notebook_path_regex
-from IPython.nbformat.current import to_notebook_json
+from ..base.handlers import (
+    IPythonHandler, FilesRedirectHandler,
+    path_regex,
+)
+from IPython.nbformat import from_dict
 
-from IPython.utils import tz
 from IPython.utils.py3compat import cast_bytes
-
-import sys
+from IPython.utils import text
 
 def find_resource_files(output_files_dir):
     files = []
@@ -38,7 +44,7 @@ def respond_zip(handler, name, output, resources):
     # Prepare the zip file
     buffer = io.BytesIO()
     zipf = zipfile.ZipFile(buffer, mode='w', compression=zipfile.ZIP_DEFLATED)
-    output_filename = os.path.splitext(name)[0] + '.' + resources['output_extension']
+    output_filename = os.path.splitext(name)[0] + resources['output_extension']
     zipf.writestr(output_filename, cast_bytes(output, 'utf-8'))
     for filename, data in output_files.items():
         zipf.writestr(os.path.basename(filename), data)
@@ -71,17 +77,29 @@ class NbconvertFileHandler(IPythonHandler):
     SUPPORTED_METHODS = ('GET',)
     
     @web.authenticated
-    def get(self, format, path='', name=None):
+    def get(self, format, path):
         
-        exporter = get_exporter(format, config=self.config)
+        exporter = get_exporter(format, config=self.config, log=self.log)
         
         path = path.strip('/')
-        model = self.notebook_manager.get_notebook(name=name, path=path)
+        model = self.contents_manager.get(path=path)
+        name = model['name']
+        if model['type'] != 'notebook':
+            raise web.HTTPError(400, "Not a notebook: %s" % path)
 
         self.set_header('Last-Modified', model['last_modified'])
-        
+
         try:
-            output, resources = exporter.from_notebook_node(model['content'])
+            output, resources = exporter.from_notebook_node(
+                model['content'],
+                resources={
+                    "metadata": {
+                        "name": name[:name.rfind('.')],
+                        "modified_date": (model['last_modified']
+                            .strftime(text.date_format))
+                    }
+                }
+            )
         except Exception as e:
             raise web.HTTPError(500, "nbconvert failed: %s" % e)
 
@@ -90,7 +108,7 @@ class NbconvertFileHandler(IPythonHandler):
 
         # Force download if requested
         if self.get_argument('download', 'false').lower() == 'true':
-            filename = os.path.splitext(name)[0] + '.' + resources['output_extension']
+            filename = os.path.splitext(name)[0] + resources['output_extension']
             self.set_header('Content-Disposition',
                                'attachment; filename="%s"' % filename)
 
@@ -104,19 +122,20 @@ class NbconvertFileHandler(IPythonHandler):
 class NbconvertPostHandler(IPythonHandler):
     SUPPORTED_METHODS = ('POST',)
 
-    @web.authenticated 
+    @web.authenticated
     def post(self, format):
         exporter = get_exporter(format, config=self.config)
         
         model = self.get_json_body()
-        nbnode = to_notebook_json(model['content'])
+        name = model.get('name', 'notebook.ipynb')
+        nbnode = from_dict(model['content'])
         
         try:
             output, resources = exporter.from_notebook_node(nbnode)
         except Exception as e:
             raise web.HTTPError(500, "nbconvert failed: %s" % e)
 
-        if respond_zip(self, nbnode.metadata.name, output, resources):
+        if respond_zip(self, name, output, resources):
             return
 
         # MIME type
@@ -126,6 +145,7 @@ class NbconvertPostHandler(IPythonHandler):
 
         self.finish(output)
 
+
 #-----------------------------------------------------------------------------
 # URL to handler mappings
 #-----------------------------------------------------------------------------
@@ -134,7 +154,8 @@ _format_regex = r"(?P<format>\w+)"
 
 
 default_handlers = [
-    (r"/nbconvert/%s%s" % (_format_regex, notebook_path_regex),
-         NbconvertFileHandler),
     (r"/nbconvert/%s" % _format_regex, NbconvertPostHandler),
+    (r"/nbconvert/%s%s" % (_format_regex, path_regex),
+         NbconvertFileHandler),
+    (r"/nbconvert/html%s" % path_regex, FilesRedirectHandler),
 ]

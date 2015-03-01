@@ -5,14 +5,11 @@ Needs to be run by nose (to make ipython session available).
 """
 from __future__ import absolute_import
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
 import io
 import os
 import sys
-from unittest import TestCase
+import warnings
+from unittest import TestCase, skipIf
 
 try:
     from importlib import invalidate_caches   # Required from Python 3.3
@@ -22,14 +19,14 @@ except ImportError:
 
 import nose.tools as nt
 
+from IPython import get_ipython
 from IPython.core import magic
+from IPython.core.error import UsageError
 from IPython.core.magic import (Magics, magics_class, line_magic,
                                 cell_magic, line_cell_magic,
                                 register_line_magic, register_cell_magic,
                                 register_line_cell_magic)
 from IPython.core.magics import execution, script, code
-from IPython.nbformat.v3.tests.nbexamples import nb0
-from IPython.nbformat import current
 from IPython.testing import decorators as dec
 from IPython.testing import tools as tt
 from IPython.utils import py3compat
@@ -42,9 +39,6 @@ if py3compat.PY3:
 else:
     from StringIO import StringIO
 
-#-----------------------------------------------------------------------------
-# Test functions begin
-#-----------------------------------------------------------------------------
 
 @magic.magics_class
 class DummyMagics(magic.Magics): pass
@@ -383,6 +377,18 @@ def test_time3():
                     "run = 0\n"
                     "run += 1")
 
+@dec.skipif(sys.version_info[0] >= 3, "no differences with __future__ in py3")
+def test_time_futures():
+    "Test %time with __future__ environments"
+    ip = get_ipython()
+    ip.autocall = 0
+    ip.run_cell("from __future__ import division")
+    with tt.AssertPrints('0.25'):
+        ip.run_line_magic('time', 'print(1/4)')
+    ip.compile.reset_compiler_flags()
+    with tt.AssertNotPrints('0.25'):
+        ip.run_line_magic('time', 'print(1/4)')
+
 def test_doctest_mode():
     "Toggle doctest_mode twice, it should be a no-op and run without error"
     _ip.magic('doctest_mode')
@@ -562,6 +568,17 @@ def test_timeit_quiet():
     with tt.AssertNotPrints("loops"):
         _ip.run_cell("%timeit -n1 -r1 -q 1")
 
+@dec.skipif(sys.version_info[0] >= 3, "no differences with __future__ in py3")
+def test_timeit_futures():
+    "Test %timeit with __future__ environments"
+    ip = get_ipython()
+    ip.run_cell("from __future__ import division")
+    with tt.AssertPrints('0.25'):
+        ip.run_line_magic('timeit', '-n1 -r1 print(1/4)')
+    ip.compile.reset_compiler_flags()
+    with tt.AssertNotPrints('0.25'):
+        ip.run_line_magic('timeit', '-n1 -r1 print(1/4)')
+
 @dec.skipif(execution.profile is None)
 def test_prun_special_syntax():
     "Test %%prun with IPython special syntax"
@@ -600,41 +617,47 @@ def test_extension():
     finally:
         _ip.ipython_dir = orig_ipython_dir
         tmpdir.cleanup()
-        
-def test_notebook_export_json():
-    with TemporaryDirectory() as td:
-        outfile = os.path.join(td, "nb.ipynb")
-        _ip.ex(py3compat.u_format(u"u = {u}'héllo'"))
-        _ip.magic("notebook -e %s" % outfile)
 
-def test_notebook_export_py():
-    with TemporaryDirectory() as td:
-        outfile = os.path.join(td, "nb.py")
-        _ip.ex(py3compat.u_format(u"u = {u}'héllo'"))
-        _ip.magic("notebook -e %s" % outfile)
 
-def test_notebook_reformat_py():
-    with TemporaryDirectory() as td:
-        infile = os.path.join(td, "nb.ipynb")
-        with io.open(infile, 'w', encoding='utf-8') as f:
-            current.write(nb0, f, 'json')
-            
-        _ip.ex(py3compat.u_format(u"u = {u}'héllo'"))
-        _ip.magic("notebook -f py %s" % infile)
+# The nose skip decorator doesn't work on classes, so this uses unittest's skipIf
+@skipIf(dec.module_not_available('IPython.nbformat'), 'nbformat not importable')
+class NotebookExportMagicTests(TestCase):
+    def test_notebook_export_json(self):
+        with TemporaryDirectory() as td:
+            outfile = os.path.join(td, "nb.ipynb")
+            _ip.ex(py3compat.u_format(u"u = {u}'héllo'"))
+            _ip.magic("notebook -e %s" % outfile)
 
-def test_notebook_reformat_json():
-    with TemporaryDirectory() as td:
-        infile = os.path.join(td, "nb.py")
-        with io.open(infile, 'w', encoding='utf-8') as f:
-            current.write(nb0, f, 'py')
-            
-        _ip.ex(py3compat.u_format(u"u = {u}'héllo'"))
-        _ip.magic("notebook -f ipynb %s" % infile)
-        _ip.magic("notebook -f json %s" % infile)
 
-def test_env():
-    env = _ip.magic("env")
-    assert isinstance(env, dict), type(env)
+class TestEnv(TestCase):
+
+    def test_env(self):
+        env = _ip.magic("env")
+        self.assertTrue(isinstance(env, dict))
+
+    def test_env_get_set_simple(self):
+        env = _ip.magic("env var val1")
+        self.assertEqual(env, None)
+        self.assertEqual(os.environ['var'], 'val1')
+        self.assertEqual(_ip.magic("env var"), 'val1')
+        env = _ip.magic("env var=val2")
+        self.assertEqual(env, None)
+        self.assertEqual(os.environ['var'], 'val2')
+
+    def test_env_get_set_complex(self):
+        env = _ip.magic("env var 'val1 '' 'val2")
+        self.assertEqual(env, None)
+        self.assertEqual(os.environ['var'], "'val1 '' 'val2")
+        self.assertEqual(_ip.magic("env var"), "'val1 '' 'val2")
+        env = _ip.magic('env var=val2 val3="val4')
+        self.assertEqual(env, None)
+        self.assertEqual(os.environ['var'], 'val2 val3="val4')
+
+    def test_env_set_bad_input(self):
+        self.assertRaises(UsageError, lambda: _ip.magic("set_env var"))
+
+    def test_env_set_whitespace(self):
+        self.assertRaises(UsageError, lambda: _ip.magic("env var A=B"))
 
 
 class CellMagicTestCase(TestCase):
@@ -959,3 +982,13 @@ def test_bookmark():
     with tt.AssertPrints('bmname'):
         ip.run_line_magic('bookmark', '-l')
     ip.run_line_magic('bookmark', '-d bmname')
+
+def test_ls_magic():
+    ip = get_ipython()
+    json_formatter = ip.display_formatter.formatters['application/json']
+    json_formatter.enabled = True
+    lsmagic = ip.magic('lsmagic')
+    with warnings.catch_warnings(record=True) as w:
+        j = json_formatter(lsmagic)
+    nt.assert_equal(sorted(j), ['cell', 'line'])
+    nt.assert_equal(w, []) # no warnings

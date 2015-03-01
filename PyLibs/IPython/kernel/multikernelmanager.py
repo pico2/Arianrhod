@@ -1,20 +1,7 @@
-"""A kernel manager for multiple kernels
+"""A kernel manager for multiple kernels"""
 
-Authors:
-
-* Brian Granger
-"""
-
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2013  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import absolute_import
 
@@ -26,17 +13,14 @@ import zmq
 from IPython.config.configurable import LoggingConfigurable
 from IPython.utils.importstring import import_item
 from IPython.utils.traitlets import (
-    Instance, Dict, Unicode, Any, DottedObjectName
+    Instance, Dict, List, Unicode, Any, DottedObjectName
 )
 from IPython.utils.py3compat import unicode_type
 
-#-----------------------------------------------------------------------------
-# Classes
-#-----------------------------------------------------------------------------
+from .kernelspec import NATIVE_KERNEL_NAME
 
 class DuplicateKernelError(Exception):
     pass
-
 
 
 def kernel_method(f):
@@ -57,6 +41,12 @@ def kernel_method(f):
 
 class MultiKernelManager(LoggingConfigurable):
     """A class for managing multiple kernels."""
+    
+    ipython_kernel_argv = List(Unicode)
+
+    default_kernel_name = Unicode(NATIVE_KERNEL_NAME, config=True,
+        help="The name of the default kernel to start"
+    )
     
     kernel_manager_class = DottedObjectName(
         "IPython.kernel.ioloop.IOLoopKernelManager", config=True,
@@ -92,7 +82,7 @@ class MultiKernelManager(LoggingConfigurable):
     def __contains__(self, kernel_id):
         return kernel_id in self._kernels
 
-    def start_kernel(self, **kwargs):
+    def start_kernel(self, kernel_name=None, **kwargs):
         """Start a new kernel.
 
         The caller can pick a kernel_id by passing one in as a keyword arg,
@@ -106,19 +96,25 @@ class MultiKernelManager(LoggingConfigurable):
         kernel_id = kwargs.pop('kernel_id', unicode_type(uuid.uuid4()))
         if kernel_id in self:
             raise DuplicateKernelError('Kernel already exists: %s' % kernel_id)
+        
+        if kernel_name is None:
+            kernel_name = self.default_kernel_name
         # kernel_manager_factory is the constructor for the KernelManager
         # subclass we are using. It can be configured as any Configurable,
         # including things like its transport and ip.
         km = self.kernel_manager_factory(connection_file=os.path.join(
                     self.connection_dir, "kernel-%s.json" % kernel_id),
-                    parent=self, autorestart=True, log=self.log
+                    parent=self, autorestart=True, log=self.log, kernel_name=kernel_name,
         )
+        # FIXME: remove special treatment of IPython kernels
+        if km.ipython_kernel:
+            kwargs.setdefault('extra_arguments', self.ipython_kernel_argv)
         km.start_kernel(**kwargs)
         self._kernels[kernel_id] = km
         return kernel_id
 
     @kernel_method
-    def shutdown_kernel(self, kernel_id, now=False):
+    def shutdown_kernel(self, kernel_id, now=False, restart=False):
         """Shutdown a kernel by its kernel uuid.
 
         Parameters
@@ -127,9 +123,25 @@ class MultiKernelManager(LoggingConfigurable):
             The id of the kernel to shutdown.
         now : bool
             Should the kernel be shutdown forcibly using a signal.
+        restart : bool
+            Will the kernel be restarted?
         """
         self.log.info("Kernel shutdown: %s" % kernel_id)
         self.remove_kernel(kernel_id)
+
+    @kernel_method
+    def request_shutdown(self, kernel_id, restart=False):
+        """Ask a kernel to shut down by its kernel uuid"""
+
+    @kernel_method
+    def finish_shutdown(self, kernel_id, waittime=1, pollinterval=0.1):
+        """Wait for a kernel to finish shutting down, and kill it if it doesn't
+        """
+        self.log.info("Kernel shutdown: %s" % kernel_id)
+
+    @kernel_method
+    def cleanup(self, kernel_id, connection_file=True):
+        """Clean up a kernel's resources"""
 
     def remove_kernel(self, kernel_id):
         """remove a kernel from our mapping.
@@ -143,8 +155,12 @@ class MultiKernelManager(LoggingConfigurable):
 
     def shutdown_all(self, now=False):
         """Shutdown all kernels."""
-        for kid in self.list_kernel_ids():
-            self.shutdown_kernel(kid, now=now)
+        kids = self.list_kernel_ids()
+        for kid in kids:
+            self.request_shutdown(kid)
+        for kid in kids:
+            self.finish_shutdown(kid)
+            self.cleanup(kid)
 
     @kernel_method
     def interrupt_kernel(self, kernel_id):

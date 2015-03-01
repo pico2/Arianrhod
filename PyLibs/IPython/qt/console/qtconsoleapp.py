@@ -2,18 +2,10 @@
 
 This is not a complete console app, as subprocess will not be able to receive
 input, there is no real readline support, among other limitations.
-
-Authors:
-
-* Evan Patterson
-* Min RK
-* Erik Tollerud
-* Fernando Perez
-* Bussonnier Matthias
-* Thomas Kluyver
-* Paul Ivanov
-
 """
+
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License. 
 
 #-----------------------------------------------------------------------------
 # Imports
@@ -58,6 +50,7 @@ if os.name == 'nt':
 from IPython.external.qt import QtCore, QtGui
 
 # Local imports
+from IPython.config.application import boolean_flag
 from IPython.config.application import catch_config_error
 from IPython.core.application import BaseIPythonApplication
 from IPython.qt.console.ipython_widget import IPythonWidget
@@ -99,6 +92,11 @@ qt_flags = {
     'plain' : ({'IPythonQtConsoleApp' : {'plain' : True}},
             "Disable rich text support."),
 }
+qt_flags.update(boolean_flag(
+    'banner', 'IPythonQtConsoleApp.display_banner',
+    "Display a banner upon starting the QtConsole.",
+    "Don't display a banner upon starting the QtConsole."
+))
 
 # and app_flags from the Console Mixin
 qt_flags.update(app_flags)
@@ -176,6 +174,10 @@ class IPythonQtConsoleApp(BaseIPythonApplication, IPythonConsoleApp):
     plain = CBool(False, config=True,
         help="Use a plaintext widget instead of rich text (plain can't print/save).")
 
+    display_banner = CBool(True, config=True,
+        help="Whether to display a banner upon starting the QtConsole."
+    )
+
     def _plain_changed(self, name, old, new):
         kind = 'plain' if new else 'rich'
         self.config.ConsoleWidget.kind = kind
@@ -201,8 +203,10 @@ class IPythonQtConsoleApp(BaseIPythonApplication, IPythonConsoleApp):
                                 autorestart=True,
         )
         # start the kernel
-        kwargs = dict()
-        kwargs['extra_arguments'] = self.kernel_argv
+        kwargs = {}
+        # FIXME: remove special treatment of IPython kernels
+        if self.kernel_manager.ipython_kernel:
+            kwargs['extra_arguments'] = self.kernel_argv
         kernel_manager.start_kernel(**kwargs)
         kernel_manager.client_factory = self.kernel_client_class
         kernel_client = kernel_manager.client()
@@ -215,6 +219,7 @@ class IPythonQtConsoleApp(BaseIPythonApplication, IPythonConsoleApp):
         widget._existing = False
         widget._may_close = True
         widget._confirm_exit = self.confirm_exit
+        widget._display_banner = self.display_banner
         return widget
 
     def new_frontend_slave(self, current_widget):
@@ -237,6 +242,7 @@ class IPythonQtConsoleApp(BaseIPythonApplication, IPythonConsoleApp):
         widget._existing = True
         widget._may_close = False
         widget._confirm_exit = False
+        widget._display_banner = self.display_banner
         widget.kernel_client = kernel_client
         widget.kernel_manager = current_widget.kernel_manager
         return widget
@@ -261,6 +267,7 @@ class IPythonQtConsoleApp(BaseIPythonApplication, IPythonConsoleApp):
         self.widget._existing = self.existing
         self.widget._may_close = not self.existing
         self.widget._confirm_exit = self.confirm_exit
+        self.widget._display_banner = self.display_banner
 
         self.widget.kernel_manager = self.kernel_manager
         self.widget.kernel_client = self.kernel_client
@@ -271,6 +278,7 @@ class IPythonQtConsoleApp(BaseIPythonApplication, IPythonConsoleApp):
                                 )
         self.window.log = self.log
         self.window.add_tab_with_frontend(self.widget)
+        self.window.init_magic_helper()
         self.window.init_menu_bar()
 
         # Ignore on OSX, where there is always a menu bar

@@ -7,28 +7,12 @@ handling configuration and creating configurables.
 
 The job of an :class:`Application` is to create the master configuration
 object and then create the configurable objects, passing the config to them.
-
-Authors:
-
-* Brian Granger
-* Fernando Perez
-* Min RK
-
 """
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import atexit
-import errno
 import glob
 import logging
 import os
@@ -39,18 +23,22 @@ from IPython.config.application import Application, catch_config_error
 from IPython.config.loader import ConfigFileNotFound
 from IPython.core import release, crashhandler
 from IPython.core.profiledir import ProfileDir, ProfileDirError
-from IPython.utils.path import get_ipython_dir, get_ipython_package_dir
+from IPython.utils.path import get_ipython_dir, get_ipython_package_dir, ensure_dir_exists
 from IPython.utils import py3compat
 from IPython.utils.traitlets import List, Unicode, Type, Bool, Dict, Set, Instance
 
-#-----------------------------------------------------------------------------
-# Classes and functions
-#-----------------------------------------------------------------------------
+if os.name == 'nt':
+    programdata = os.environ.get('PROGRAMDATA', None)
+    if programdata:
+        SYSTEM_CONFIG_DIRS = [os.path.join(programdata, 'ipython')]
+    else:  # PROGRAMDATA is not defined by default on XP.
+        SYSTEM_CONFIG_DIRS = []
+else:
+    SYSTEM_CONFIG_DIRS = [
+        "/usr/local/etc/ipython",
+        "/etc/ipython",
+    ]
 
-
-#-----------------------------------------------------------------------------
-# Base Application Class
-#-----------------------------------------------------------------------------
 
 # aliases and flags
 
@@ -101,7 +89,7 @@ class BaseIPythonApplication(Application):
     builtin_profile_dir = Unicode(
         os.path.join(get_ipython_package_dir(), u'config', u'profile', u'default')
     )
-
+    
     config_file_paths = List(Unicode)
     def _config_file_paths_default(self):
         return [py3compat.getcwd()]
@@ -132,7 +120,7 @@ class BaseIPythonApplication(Application):
         help="""
         The name of the IPython directory. This directory is used for logging
         configuration (through profiles), history storage, etc. The default
-        is usually $HOME/.ipython. This options can also be specified through
+        is usually $HOME/.ipython. This option can also be specified through
         the environment variable IPYTHONDIR.
         """
     )
@@ -211,29 +199,28 @@ class BaseIPythonApplication(Application):
             return crashhandler.crash_handler_lite(etype, evalue, tb)
     
     def _ipython_dir_changed(self, name, old, new):
-        str_old = py3compat.cast_bytes_py2(os.path.abspath(old),
-            sys.getfilesystemencoding()
-        )
-        if str_old in sys.path:
-            sys.path.remove(str_old)
+        if old is not None:
+            str_old = py3compat.cast_bytes_py2(os.path.abspath(old),
+                sys.getfilesystemencoding()
+            )
+            if str_old in sys.path:
+                sys.path.remove(str_old)
         str_path = py3compat.cast_bytes_py2(os.path.abspath(new),
             sys.getfilesystemencoding()
         )
         sys.path.append(str_path)
-        if not os.path.isdir(new):
-            os.makedirs(new, mode=0o777)
+        ensure_dir_exists(new)
         readme = os.path.join(new, 'README')
         readme_src = os.path.join(get_ipython_package_dir(), u'config', u'profile', 'README')
         if not os.path.exists(readme) and os.path.exists(readme_src):
             shutil.copy(readme_src, readme)
         for d in ('extensions', 'nbextensions'):
             path = os.path.join(new, d)
-            if not os.path.exists(path):
-                try:
-                    os.mkdir(path)
-                except OSError as e:
-                    if e.errno != errno.EEXIST:
-                        self.log.error("couldn't create path %s: %s", path, e)
+            try:
+                ensure_dir_exists(path)
+            except OSError:
+                # this will not be EEXIST
+                self.log.error("couldn't create path %s: %s", path, e)
         self.log.debug("IPYTHONDIR set to: %s" % new)
 
     def load_config_file(self, suppress_errors=True):
@@ -339,6 +326,7 @@ class BaseIPythonApplication(Application):
 
     def init_config_files(self):
         """[optionally] copy default config files into profile dir."""
+        self.config_file_paths.extend(SYSTEM_CONFIG_DIRS)
         # copy config files
         path = self.builtin_profile_dir
         if self.copy_config_files:

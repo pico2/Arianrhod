@@ -66,7 +66,7 @@ casper.notebook_test(function () {
         IPython.notebook.select(0);
         cell.clear_output();
         cell.set_text('a=13; print(a)');
-        $('#run_b').click();
+        $("button[data-jupyter-action='ipython.run-select-next']")[0].click()
     });
     
     this.wait_for_output(0);
@@ -74,5 +74,42 @@ casper.notebook_test(function () {
     this.then(function () {
         var result = this.get_output_cell(0);
         this.test.assertEquals(result.text, '13\n', 'cell execute (using "play" toolbar button)')
+    });
+
+    // run code with skip_exception
+    this.thenEvaluate(function () {
+        var cell0 = IPython.notebook.get_cell(0);
+        cell0.set_text('raise IOError');
+        IPython.notebook.insert_cell_below('code',0);
+        var cell1 = IPython.notebook.get_cell(1);
+        cell1.set_text('a=14; print(a)');
+        cell0.execute(false);
+        cell1.execute();
+    });
+
+    this.wait_for_output(1);
+
+    this.then(function () {
+        var result = this.get_output_cell(1);
+        this.test.assertEquals(result.text, '14\n', "cell execute, don't stop on error");
+    });
+
+    this.thenEvaluate(function () {
+        var cell0 = IPython.notebook.get_cell(0);
+        cell0.set_text('raise IOError');
+        IPython.notebook.insert_cell_below('code',0);
+        var cell1 = IPython.notebook.get_cell(1);
+        cell1.set_text('a=14; print(a)');
+        cell0.execute();
+        cell1.execute();
+    });
+
+    this.wait_for_output(0);
+
+    this.then(function () {
+        var outputs = this.evaluate(function() {
+            return IPython.notebook.get_cell(1).output_area.outputs;
+        })
+        this.test.assertEquals(outputs.length, 0, 'cell execute, stop on error (default)');
     });
 });

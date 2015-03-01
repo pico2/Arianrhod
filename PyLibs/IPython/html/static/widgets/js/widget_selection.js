@@ -1,42 +1,36 @@
-//----------------------------------------------------------------------------
-//  Copyright (C) 2013 The IPython Development Team
-//
-//  Distributed under the terms of the BSD License.  The full license is in
-//  the file COPYING, distributed as part of this software.
-//----------------------------------------------------------------------------
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
 
-//============================================================================
-// SelectionWidget
-//============================================================================
+define([
+    "widgets/js/widget",
+    "base/js/utils",
+    "jquery",
+    "underscore",
+    "bootstrap",
+], function(widget, utils, $, _){
 
-/**
- * @module IPython
- * @namespace IPython
- **/
-
-define(["widgets/js/widget"], function(WidgetManager){
-
-    var DropdownView = IPython.DOMWidgetView.extend({
+    var DropdownView = widget.DOMWidgetView.extend({
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox-single');
+                .addClass('widget-hbox widget-dropdown');
             this.$label = $('<div />')
                 .appendTo(this.$el)
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .hide();
             this.$buttongroup = $('<div />')
                 .addClass('widget_item')
                 .addClass('btn-group')
                 .appendTo(this.$el);
-            this.$el_to_style = this.$buttongroup; // Set default element to style
             this.$droplabel = $('<button />')
-                .addClass('btn')
+                .addClass('btn btn-default')
                 .addClass('widget-combo-btn')
                 .html("&nbsp;")
                 .appendTo(this.$buttongroup);
             this.$dropbutton = $('<button />')
-                .addClass('btn')
+                .addClass('btn btn-default')
                 .addClass('dropdown-toggle')
                 .addClass('widget-combo-carrot-btn')
                 .attr('data-toggle', 'dropdown')
@@ -45,28 +39,37 @@ define(["widgets/js/widget"], function(WidgetManager){
             this.$droplist = $('<ul />')
                 .addClass('dropdown-menu')
                 .appendTo(this.$buttongroup);
+
+            this.model.on('change:button_style', function(model, value) {
+                this.update_button_style();
+            }, this);
+            this.update_button_style('');
             
             // Set defaults.
             this.update();
         },
         
         update : function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been
+             * changed by another view or by a state update from the back-end.
+             */
 
             if (options === undefined || options.updated_view != this) {
-                var selected_item_text = this.model.get('value_name');
+                var selected_item_text = this.model.get('selected_label');
                 if (selected_item_text.trim().length === 0) {
                     this.$droplabel.html("&nbsp;");
                 } else {
                     this.$droplabel.text(selected_item_text);
                 }
                 
-                var items = this.model.get('value_names');
+                var items = this.model.get('_options_labels');
                 var $replace_droplist = $('<ul />')
                     .addClass('dropdown-menu');
+                // Copy the style
+                $replace_droplist.attr('style', this.$droplist.attr('style'));
                 var that = this;
                 _.each(items, function(item, i) {
                     var item_button = $('<a href="#"/>')
@@ -95,54 +98,102 @@ define(["widgets/js/widget"], function(WidgetManager){
                 if (description.length === 0) {
                     this.$label.hide();
                 } else {
-                    this.$label.text(description);
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
             return DropdownView.__super__.update.apply(this);
         },
 
+        update_button_style: function(previous_trait_value) {
+            var class_map = {
+                primary: ['btn-primary'],
+                success: ['btn-success'],
+                info: ['btn-info'],
+                warning: ['btn-warning'],
+                danger: ['btn-danger']
+            };
+            this.update_mapped_classes(class_map, 'button_style', previous_trait_value, this.$droplabel);
+            this.update_mapped_classes(class_map, 'button_style', previous_trait_value, this.$dropbutton);
+        },
+
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name.substring(0, 6) == 'border' || name == 'background' || name == 'color') {
+                this.$droplabel.css(name, value);
+                this.$dropbutton.css(name, value);
+                this.$droplist.css(name, value);
+            } else if (name == 'width') {
+                this.$droplist.css(name, value);
+                this.$droplabel.css(name, value);
+            } else if (name == 'padding') {
+                this.$droplist.css(name, value);
+                this.$buttongroup.css(name, value);
+            } else if (name == 'margin') {
+                this.$buttongroup.css(name, value);
+            } else if (name == 'height') {
+                this.$droplabel.css(name, value);
+                this.$dropbutton.css(name, value);
+            } else if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this.$droplist.css(name, value);
+                this.$droplabel.css(name, value);
+            }
+        },
+
         handle_click: function (e) {
-            // Handle when a value is clicked.
-            
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
-            this.model.set('value_name', $(e.target).text(), {updated_view: this});
+            /**
+             * Handle when a value is clicked.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
+            this.model.set('selected_label', $(e.target).text(), {updated_view: this});
             this.touch();
+
+            // Manually hide the droplist.
+            e.stopPropagation();
+            e.preventDefault();
+            this.$buttongroup.removeClass('open');
         },
         
     });
-    WidgetManager.register_widget_view('DropdownView', DropdownView);
 
 
-    var RadioButtonsView = IPython.DOMWidgetView.extend({    
+    var RadioButtonsView = widget.DOMWidgetView.extend({    
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox');
+                .addClass('widget-hbox widget-radio');
             this.$label = $('<div />')
                 .appendTo(this.$el)
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .hide();
             this.$container = $('<div />')
                 .appendTo(this.$el)
                 .addClass('widget-radio-box');
-            this.$el_to_style = this.$container; // Set default element to style
             this.update();
         },
         
         update : function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             if (options === undefined || options.updated_view != this) {
                 // Add missing items to the DOM.
-                var items = this.model.get('value_names');
+                var items = this.model.get('_options_labels');
                 var disabled = this.model.get('disabled');
                 var that = this;
                 _.each(items, function(item, index) {
-                    var item_query = ' :input[value="' + item + '"]';
+                    var item_query = ' :input[data-value="' + encodeURIComponent(item) + '"]';
                     if (that.$el.find(item_query).length === 0) {
                         var $label = $('<label />')
                             .addClass('radio')
@@ -153,12 +204,13 @@ define(["widgets/js/widget"], function(WidgetManager){
                             .attr('type', 'radio')
                             .addClass(that.model)
                             .val(item)
+                            .attr('data-value', encodeURIComponent(item))
                             .prependTo($label)
                             .on('click', $.proxy(that.handle_click, that));
                     }
                     
                     var $item_element = that.$container.find(item_query);
-                    if (that.model.get('value_name') == item) {
+                    if (that.model.get('selected_label') == item) {
                         $item_element.prop('checked', true);
                     } else {
                         $item_element.prop('checked', false);
@@ -187,70 +239,97 @@ define(["widgets/js/widget"], function(WidgetManager){
                     this.$label.hide();
                 } else {
                     this.$label.text(description);
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
             return RadioButtonsView.__super__.update.apply(this);
         },
 
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this.$container.css(name, value);
+            }
+        },
+
         handle_click: function (e) {
-            // Handle when a value is clicked.
-            
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
-            this.model.set('value_name', $(e.target).val(), {updated_view: this});
+            /**
+             * Handle when a value is clicked.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
+            this.model.set('selected_label', $(e.target).val(), {updated_view: this});
             this.touch();
         },
     });
-    WidgetManager.register_widget_view('RadioButtonsView', RadioButtonsView);
+    
 
+    var ToggleButtonsView = widget.DOMWidgetView.extend({
+        initialize: function() {
+            this._css_state = {};
+            ToggleButtonsView.__super__.initialize.apply(this, arguments);
+        },
 
-    var ToggleButtonsView = IPython.DOMWidgetView.extend({
-        render : function(){
-            // Called when view is rendered.
+        render: function() {
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox-single');
+                .addClass('widget-hbox widget-toggle-buttons');
             this.$label = $('<div />')
                 .appendTo(this.$el)
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .hide();
             this.$buttongroup = $('<div />')
                 .addClass('btn-group')
-                .attr('data-toggle', 'buttons-radio')
                 .appendTo(this.$el);
-            this.$el_to_style = this.$buttongroup; // Set default element to style
+
+            this.model.on('change:button_style', function(model, value) {
+                this.update_button_style();
+            }, this);
+            this.update_button_style('');
             this.update();
         },
         
         update : function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             if (options === undefined || options.updated_view != this) {
                 // Add missing items to the DOM.
-                var items = this.model.get('value_names');
+                var items = this.model.get('_options_labels');
                 var disabled = this.model.get('disabled');
                 var that = this;
                 var item_html;
                 _.each(items, function(item, index) {
-                    if (item.trim().length == 0) {
+                    if (item.trim().length === 0) {
                         item_html = "&nbsp;";
                     } else {
-                        item_html = IPython.utils.escape_html(item);
+                        item_html = utils.escape_html(item);
                     }
-                    var item_query = '[data-value="' + item + '"]';
+                    var item_query = '[data-value="' + encodeURIComponent(item) + '"]';
                     var $item_element = that.$buttongroup.find(item_query);
                     if (!$item_element.length) {
                         $item_element = $('<button/>')
                             .attr('type', 'button')
-                            .addClass('btn')
+                            .addClass('btn btn-default')
                             .html(item_html)
                             .appendTo(that.$buttongroup)
-                            .attr('data-value', item)
+                            .attr('data-value', encodeURIComponent(item))
+                            .attr('value', item)
                             .on('click', $.proxy(that.handle_click, that));
+                        that.update_style_traits($item_element);
                     }
-                    if (that.model.get('value_name') == item) {
+                    if (that.model.get('selected_label') == item) {
                         $item_element.addClass('active');
                     } else {
                         $item_element.removeClass('active');
@@ -260,7 +339,7 @@ define(["widgets/js/widget"], function(WidgetManager){
                 
                 // Remove items that no longer exist.
                 this.$buttongroup.find('button').each(function(i, obj) {
-                    var value = $(obj).data('value');
+                    var value = $(obj).attr('value');
                     var found = false;
                     _.each(items, function(item, index) {
                         if (item == value) {
@@ -278,64 +357,110 @@ define(["widgets/js/widget"], function(WidgetManager){
                 if (description.length === 0) {
                     this.$label.hide();
                 } else {
-                    this.$label.text(description);
+                    this.$label.text();
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
             return ToggleButtonsView.__super__.update.apply(this);
         },
 
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this._css_state[name] = value;
+                this.update_style_traits();
+            }
+        },
+
+        update_style_traits: function(button) {
+            for (var name in this._css_state) {
+                if (this._css_state.hasOwnProperty(name)) {
+                    if (name == 'margin') {
+                        this.$buttongroup.css(name, this._css_state[name]);
+                    } else if (name != 'width') {
+                        if (button) {
+                            button.css(name, this._css_state[name]);
+                        } else {
+                            this.$buttongroup.find('button').css(name, this._css_state[name]);
+                        }
+                    }
+                }
+            }
+        },
+
+        update_button_style: function(previous_trait_value) {
+            var class_map = {
+                primary: ['btn-primary'],
+                success: ['btn-success'],
+                info: ['btn-info'],
+                warning: ['btn-warning'],
+                danger: ['btn-danger']
+            };
+            this.update_mapped_classes(class_map, 'button_style', previous_trait_value, this.$buttongroup.find('button'));
+        },
+
         handle_click: function (e) {
-            // Handle when a value is clicked.
-            
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
-            this.model.set('value_name', $(e.target).data('value'), {updated_view: this});
+            /**
+             * Handle when a value is clicked.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
+            this.model.set('selected_label', $(e.target).attr('value'), {updated_view: this});
             this.touch();
         },    
     });
-    WidgetManager.register_widget_view('ToggleButtonsView', ToggleButtonsView);
+    
 
-
-    var SelectView = IPython.DOMWidgetView.extend({    
+    var SelectView = widget.DOMWidgetView.extend({    
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox');
+                .addClass('widget-hbox widget-select');
             this.$label = $('<div />')
                 .appendTo(this.$el)
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .hide();
             this.$listbox = $('<select />')
-                .addClass('widget-listbox')
+                .addClass('widget-listbox form-control')
                 .attr('size', 6)
-                .appendTo(this.$el);
-            this.$el_to_style = this.$listbox; // Set default element to style
+                .appendTo(this.$el)
+                .on('change', $.proxy(this.handle_change, this));
             this.update();
         },
         
         update : function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             if (options === undefined || options.updated_view != this) {
                 // Add missing items to the DOM.
-                var items = this.model.get('value_names');
+                var items = this.model.get('_options_labels');
                 var that = this;
                 _.each(items, function(item, index) {
-                   var item_query = ' :contains("' + item + '")';
+                   var item_query = 'option[data-value="' + encodeURIComponent(item) + '"]';
                     if (that.$listbox.find(item_query).length === 0) {
                         $('<option />')
                             .text(item)
-                            .attr('value_name', item)
-                            .appendTo(that.$listbox)
-                            .on('click', $.proxy(that.handle_click, that));
+                            .attr('data-value', encodeURIComponent(item))
+                            .attr('selected_label', item)
+                            .on("click", $.proxy(that.handle_click, that))
+                            .appendTo(that.$listbox);
                     } 
                 });
 
                 // Select the correct element
-                this.$listbox.val(this.model.get('value_name'));
+                this.$listbox.val(this.model.get('selected_label'));
                 
                 // Disable listbox if needed
                 var disabled = this.model.get('disabled');
@@ -361,21 +486,88 @@ define(["widgets/js/widget"], function(WidgetManager){
                 if (description.length === 0) {
                     this.$label.hide();
                 } else {
-                    this.$label.text(description);
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
             return SelectView.__super__.update.apply(this);
         },
 
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this.$listbox.css(name, value);
+            }
+        },
+
         handle_click: function (e) {
-            // Handle when a value is clicked.
-            
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
-            this.model.set('value_name', $(e.target).text(), {updated_view: this});
+            /**
+             * Handle when a new value is clicked.
+             */
+            this.$listbox.val($(e.target).val()).change();
+        },
+
+        handle_change: function (e) {
+            /**
+             * Handle when a new value is selected.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
+            this.model.set('selected_label', this.$listbox.val(), {updated_view: this});
             this.touch();
-        },    
+        },
     });
-    WidgetManager.register_widget_view('SelectView', SelectView);
+
+
+    var SelectMultipleView = SelectView.extend({
+        render: function(){
+            /**
+             * Called when view is rendered.
+             */
+            SelectMultipleView.__super__.render.apply(this);
+            this.$el.removeClass('widget-select')
+              .addClass('widget-select-multiple');
+            this.$listbox.attr('multiple', true)
+              .on('change', $.proxy(this.handle_change, this));
+            return this;
+        },
+
+        update: function(){
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
+            SelectMultipleView.__super__.update.apply(this, arguments);
+            this.$listbox.val(this.model.get('selected_labels'));
+        },
+
+        handle_change: function (e) {
+            /**
+             * Handle when a new value is selected.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
+            this.model.set('selected_labels',
+                (this.$listbox.val() || []).slice(),
+                {updated_view: this});
+            this.touch();
+        },
+    });
+    
+
+    return {
+        'DropdownView': DropdownView,
+        'RadioButtonsView': RadioButtonsView,
+        'ToggleButtonsView': ToggleButtonsView,
+        'SelectView': SelectView,
+        'SelectMultipleView': SelectMultipleView,
+    };
 });

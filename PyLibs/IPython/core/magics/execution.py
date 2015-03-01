@@ -1,25 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Implementation of execution-related magic functions.
-"""
+"""Implementation of execution-related magic functions."""
+
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 from __future__ import print_function
-#-----------------------------------------------------------------------------
-#  Copyright (c) 2012 The IPython Development Team.
-#
-#  Distributed under the terms of the Modified BSD License.
-#
-#  The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-# Stdlib
 import ast
 import bdb
+import gc
+import itertools
 import os
 import sys
 import time
+import timeit
 from pdb import Restart
 
 # cProfile was added in Python2.5
@@ -33,7 +27,6 @@ except ImportError:
     except ImportError:
         profile = pstats = None
 
-# Our own packages
 from IPython.core import debugger, oinspect
 from IPython.core import magic_arguments
 from IPython.core import page
@@ -113,6 +106,34 @@ class TimeitTemplateFiller(ast.NodeTransformer):
         if getattr(getattr(node.body[0], 'value', None), 'id', None) == 'stmt':
             node.body = self.ast_stmt.body
         return node
+
+
+class Timer(timeit.Timer):
+    """Timer class that explicitly uses self.inner
+    
+    which is an undocumented implementation detail of CPython,
+    not shared by PyPy.
+    """
+    # Timer.timeit copied from CPython 3.4.2
+    def timeit(self, number=timeit.default_number):
+        """Time 'number' executions of the main statement.
+
+        To be precise, this executes the setup statement once, and
+        then returns the time it takes to execute the main statement
+        a number of times, as a float measured in seconds.  The
+        argument is the number of times through the loop, defaulting
+        to one million.  The main statement, the setup statement and
+        the timer function to be used are passed to the constructor.
+        """
+        it = itertools.repeat(None, number)
+        gcold = gc.isenabled()
+        gc.disable()
+        try:
+            timing = self.inner(it, self.timer)
+        finally:
+            if gcold:
+                gc.enable()
+        return timing
 
 
 @magics_class
@@ -945,8 +966,6 @@ python-profiler package from non-free.""")
         does not matter as long as results from timeit.py are not mixed with
         those from %timeit."""
 
-        import timeit
-
         opts, stmt = self.parse_options(line,'n:r:tcp:qo',
                                         posix=False, strict=False)
         if stmt == "" and cell is None:
@@ -963,7 +982,7 @@ python-profiler package from non-free.""")
         if hasattr(opts, "c"):
             timefunc = clock
 
-        timer = timeit.Timer(timer=timefunc)
+        timer = Timer(timer=timefunc)
         # this code has tight coupling to the inner workings of timeit.Timer,
         # but is there a better way to achieve that the code stmt has access
         # to the shell namespace?
@@ -971,11 +990,11 @@ python-profiler package from non-free.""")
 
         if cell is None:
             # called as line magic
-            ast_setup = ast.parse("pass")
-            ast_stmt = ast.parse(transform(stmt))
+            ast_setup = self.shell.compile.ast_parse("pass")
+            ast_stmt = self.shell.compile.ast_parse(transform(stmt))
         else:
-            ast_setup = ast.parse(transform(stmt))
-            ast_stmt = ast.parse(transform(cell))
+            ast_setup = self.shell.compile.ast_parse(transform(stmt))
+            ast_stmt = self.shell.compile.ast_parse(transform(cell))
 
         ast_setup = self.shell.transform_ast(ast_setup)
         ast_stmt = self.shell.transform_ast(ast_stmt)
@@ -999,23 +1018,41 @@ python-profiler package from non-free.""")
         tc_min = 0.1
 
         t0 = clock()
-        code = compile(timeit_ast, "<magic-timeit>", "exec")
+        code = self.shell.compile(timeit_ast, "<magic-timeit>", "exec")
         tc = clock()-t0
 
         ns = {}
         exec(code, self.shell.user_ns, ns)
         timer.inner = ns["inner"]
 
+        # This is used to check if there is a huge difference between the
+        # best and worst timings.
+        # Issue: https://github.com/ipython/ipython/issues/6471
+        worst_tuning = 0
         if number == 0:
             # determine number so that 0.2 <= total time < 2.0
             number = 1
             for _ in range(1, 10):
-                if timer.timeit(number) >= 0.2:
+                time_number = timer.timeit(number)
+                worst_tuning = max(worst_tuning, time_number / number)
+                if time_number >= 0.2:
                     break
                 number *= 10
         all_runs = timer.repeat(repeat, number)
         best = min(all_runs) / number
         if not quiet :
+            worst = max(all_runs) / number
+            if worst_tuning:
+                worst = max(worst, worst_tuning)
+            # Check best timing is greater than zero to avoid a
+            # ZeroDivisionError.
+            # In cases where the slowest timing is lesser than a micosecond
+            # we assume that it does not really matter if the fastest
+            # timing is 4 times faster than the slowest timing or not.
+            if worst > 4 * best and best > 0 and worst > 1e-6:
+                print("The slowest run took %0.2f times longer than the "
+                      "fastest. This could mean that an intermediate result "
+                      "is being cached " % (worst / best))
             print(u"%d loops, best of %d: %s per loop" % (number, repeat,
                                                               _format_time(best, precision)))
             if tc > tc_min:
@@ -1042,7 +1079,7 @@ python-profiler package from non-free.""")
           following statement raises an error).
 
         This function provides very basic timing functionality.  Use the timeit 
-        magic for more controll over the measurement.
+        magic for more control over the measurement.
 
         Examples
         --------
@@ -1095,7 +1132,7 @@ python-profiler package from non-free.""")
         tp_min = 0.1
 
         t0 = clock()
-        expr_ast = ast.parse(expr)
+        expr_ast = self.shell.compile.ast_parse(expr)
         tp = clock()-t0
 
         # Apply AST transformations
@@ -1112,7 +1149,7 @@ python-profiler package from non-free.""")
             mode = 'exec'
             source = '<timed exec>'
         t0 = clock()
-        code = compile(expr_ast, source, mode)
+        code = self.shell.compile(expr_ast, source, mode)
         tc = clock()-t0
 
         # skew measurement as little as possible

@@ -1,21 +1,11 @@
-"""
-Module containing single call export functions.
-"""
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+"""Module containing single call export functions."""
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from functools import wraps
 
-from IPython.nbformat.v3.nbbase import NotebookNode
+from IPython.nbformat import NotebookNode
 from IPython.utils.decorators import undoc
 from IPython.utils.py3compat import string_types
 
@@ -24,9 +14,12 @@ from .templateexporter import TemplateExporter
 from .html import HTMLExporter
 from .slides import SlidesExporter
 from .latex import LatexExporter
+from .pdf import PDFExporter
 from .markdown import MarkdownExporter
 from .python import PythonExporter
 from .rst import RSTExporter
+from .notebook import NotebookExporter
+from .script import ScriptExporter
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -37,7 +30,7 @@ def DocDecorator(f):
     
     #Set docstring of function
     f.__doc__ = f.__doc__ + """
-    nb : :class:`~{nbnode_mod}.NotebookNode`
+    nb : :class:`~IPython.nbformat.NotebookNode`
       The notebook to export.
     config : config (optional, keyword arg)
         User configuration instance.
@@ -60,7 +53,7 @@ def DocDecorator(f):
     Notes
     -----
     WARNING: API WILL CHANGE IN FUTURE RELEASES OF NBCONVERT
-    """.format(nbnode_mod=NotebookNode.__module__)
+    """
             
     @wraps(f)
     def decorator(*args, **kwargs):
@@ -79,8 +72,10 @@ __all__ = [
     'export_custom',
     'export_slides',
     'export_latex',
+    'export_pdf',
     'export_markdown',
     'export_python',
+    'export_script',
     'export_rst',
     'export_by_name',
     'get_export_names',
@@ -134,9 +129,12 @@ exporter_map = dict(
     html=HTMLExporter,
     slides=SlidesExporter,
     latex=LatexExporter,
+    pdf=PDFExporter,
     markdown=MarkdownExporter,
     python=PythonExporter,
     rst=RSTExporter,
+    notebook=NotebookExporter,
+    script=ScriptExporter,
 )
 
 def _make_exporter(name, E):

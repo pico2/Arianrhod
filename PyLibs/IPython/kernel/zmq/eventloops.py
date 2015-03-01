@@ -1,33 +1,17 @@
 # encoding: utf-8
-"""Event loop integration for the ZeroMQ-based kernels.
-"""
+"""Event loop integration for the ZeroMQ-based kernels."""
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2011  The IPython Development Team
-
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import os
 import sys
 
-# System library imports
 import zmq
 
-# Local imports
 from IPython.config.application import Application
 from IPython.utils import io
 
-
-#------------------------------------------------------------------------------
-# Eventloops for integrating the Kernel into different GUIs
-#------------------------------------------------------------------------------
 
 def _on_os_x_10_9():
     import platform
@@ -52,6 +36,36 @@ def _notify_stream_qt(kernel, stream):
     notifier = QtCore.QSocketNotifier(fd, QtCore.QSocketNotifier.Read, kernel.app)
     notifier.activated.connect(process_stream_events)
 
+# mapping of keys to loop functions
+loop_map = {
+    'inline': None,
+    'nbagg': None,
+    'notebook': None,
+    None : None,
+}
+
+def register_integration(*toolkitnames):
+    """Decorator to register an event loop to integrate with the IPython kernel
+    
+    The decorator takes names to register the event loop as for the %gui magic.
+    You can provide alternative names for the same toolkit.
+    
+    The decorated function should take a single argument, the IPython kernel
+    instance, arrange for the event loop to call ``kernel.do_one_iteration()``
+    at least every ``kernel._poll_interval`` seconds, and start the event loop.
+    
+    :mod:`IPython.kernel.zmq.eventloops` provides and registers such functions
+    for a few common event loops.
+    """
+    def decorator(func):
+        for name in toolkitnames:
+            loop_map[name] = func
+        return func
+    
+    return decorator
+
+
+@register_integration('qt', 'qt4')
 def loop_qt4(kernel):
     """Start a kernel with PyQt4 event loop integration."""
 
@@ -65,12 +79,14 @@ def loop_qt4(kernel):
     
     start_event_loop_qt4(kernel.app)
 
+@register_integration('qt5')
 def loop_qt5(kernel):
-    """Start a kernel with PyQt5 event loop integration"""
+    """Start a kernel with PyQt5 event loop integration."""
     os.environ['QT_API'] = 'pyqt5'
     return loop_qt4(kernel)
 
 
+@register_integration('wx')
 def loop_wx(kernel):
     """Start a kernel with wx event loop support."""
 
@@ -123,6 +139,7 @@ def loop_wx(kernel):
     start_event_loop_wx(kernel.app)
 
 
+@register_integration('tk')
 def loop_tk(kernel):
     """Start a kernel with the Tk event loop."""
 
@@ -152,6 +169,7 @@ def loop_tk(kernel):
     kernel.timer.start()
 
 
+@register_integration('gtk')
 def loop_gtk(kernel):
     """Start the kernel, coordinating with the GTK event loop"""
     from .gui.gtkembed import GTKEmbed
@@ -160,6 +178,16 @@ def loop_gtk(kernel):
     gtk_kernel.start()
 
 
+@register_integration('gtk3')
+def loop_gtk3(kernel):
+    """Start the kernel, coordinating with the GTK event loop"""
+    from .gui.gtk3embed import GTKEmbed
+
+    gtk_kernel = GTKEmbed(kernel)
+    gtk_kernel.start()
+
+
+@register_integration('osx')
 def loop_cocoa(kernel):
     """Start the kernel, coordinating with the Cocoa CFRunLoop event loop
     via the matplotlib MacOSX backend.
@@ -230,19 +258,6 @@ def loop_cocoa(kernel):
             # ensure excepthook is restored
             sys.excepthook = real_excepthook
 
-# mapping of keys to loop functions
-loop_map = {
-    'qt' : loop_qt4,
-    'qt4': loop_qt4,
-    'qt5': loop_qt5,
-    'inline': None,
-    'nbagg': None,
-    'osx': loop_cocoa,
-    'wx' : loop_wx,
-    'tk' : loop_tk,
-    'gtk': loop_gtk,
-    None : None,
-}
 
 
 def enable_gui(gui, kernel=None):

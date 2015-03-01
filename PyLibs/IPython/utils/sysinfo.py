@@ -61,8 +61,8 @@ def pkg_commit_hash(pkg_path):
                             cwd=pkg_path, shell=True)
     repo_commit, _ = proc.communicate()
     if repo_commit:
-        return 'repository', repo_commit.strip()
-    return '(none found)', '<not found>'
+        return 'repository', repo_commit.strip().decode('ascii')
+    return '(none found)', u'<not found>'
 
 
 def pkg_info(pkg_path):
@@ -95,7 +95,7 @@ def pkg_info(pkg_path):
 def get_sys_info():
     """Return useful information about IPython and the system, as a dict."""
     p = os.path
-    path = p.dirname(p.abspath(p.join(__file__, '..')))
+    path = p.realpath(p.dirname(p.abspath(p.join(__file__, '..'))))
     return pkg_info(path)
 
 @py3compat.doctest_refactor_print
@@ -152,10 +152,7 @@ def num_cpus():
 
    ncpufuncs = {'Linux':_num_cpus_unix,
                 'Darwin':_num_cpus_darwin,
-                'Windows':_num_cpus_windows,
-                # On Vista, python < 2.5.2 has a bug and returns 'Microsoft'
-                # See http://bugs.python.org/issue1082 for details.
-                'Microsoft':_num_cpus_windows,
+                'Windows':_num_cpus_windows
                 }
 
    ncpufunc = ncpufuncs.get(platform.system(),

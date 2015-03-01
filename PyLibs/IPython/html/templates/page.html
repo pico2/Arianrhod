@@ -5,8 +5,8 @@
     <meta charset="utf-8">
 
     <title>{% block title %}IPython Notebook{% endblock %}</title>
-    <link rel="shortcut icon" type="image/x-icon" href="{{static_url("base/images/favicon.ico") }}">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    {% block favicon %}<link rel="shortcut icon" type="image/x-icon" href="{{static_url("base/images/favicon.ico") }}">{% endblock %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" href="{{static_url("components/jquery-ui/themes/smoothness/jquery-ui.min.css") }}" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -14,14 +14,26 @@
     <link rel="stylesheet" href="{{ static_url("style/style.min.css") }}" type="text/css"/>
     {% endblock %}
     <link rel="stylesheet" href="{{ static_url("custom/custom.css") }}" type="text/css" />
+    <script src="{{static_url("components/es6-promise/promise.min.js")}}" type="text/javascript" charset="utf-8"></script>
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
     <script>
       require.config({
+          {% if version_hash %}
+          urlArgs: "v={{version_hash}}",
+          {% endif %}
           baseUrl: '{{static_url("", include_version=False)}}',
           paths: {
             nbextensions : '{{ base_url }}nbextensions',
-            underscore : '{{static_url("components/underscore/underscore-min.js")}}',
-            backbone : '{{static_url("components/backbone/backbone-min.js")}}',
+            kernelspecs : '{{ base_url }}kernelspecs',
+            underscore : 'components/underscore/underscore-min',
+            backbone : 'components/backbone/backbone-min',
+            jquery: 'components/jquery/jquery.min',
+            bootstrap: 'components/bootstrap/js/bootstrap.min',
+            bootstraptour: 'components/bootstrap-tour/build/js/bootstrap-tour.min',
+            jqueryui: 'components/jquery-ui/ui/minified/jquery-ui.min',
+            moment: 'components/moment/moment',
+            codemirror: 'components/codemirror',
+            termjs: 'components/term.js/src/term',
           },
           shim: {
             underscore: {
@@ -30,7 +42,27 @@
             backbone: {
               deps: ["underscore", "jquery"],
               exports: "Backbone"
+            },
+            bootstrap: {
+              deps: ["jquery"],
+              exports: "bootstrap"
+            },
+            bootstraptour: {
+              deps: ["bootstrap"],
+              exports: "Tour"
+            },
+            jqueryui: {
+              deps: ["jquery"],
+              exports: "$"
             }
+          }
+      });
+
+      require.config({
+          map: {
+              '*':{
+                'contents': '{{ contents_js_source }}',
+              }
           }
       });
     </script>
@@ -40,7 +72,7 @@
 
 </head>
 
-<body {% block params %}{% endblock %}>
+<body class="{% block bodyclasses %}{% endblock %}" {% block params %}{% endblock %}>
 
 <noscript>
     <div id='noscript'>
@@ -49,27 +81,29 @@
   </div>
 </noscript>
 
-<div id="header" class="navbar navbar-static-top">
-  <div class="navbar-inner navbar-nobg">
-    <div class="container">
-    <div id="ipython_notebook" class="nav brand pull-left"><a href="{{base_url}}tree/{{notebook_path}}" alt='dashboard'><img src='{{static_url("base/images/ipynblogo.png") }}' alt='IPython Notebook'/></a></div>
+<div id="header">
+  <div id="header-container" class="container">
+  <div id="ipython_notebook" class="nav navbar-brand pull-left"><a href="{{default_url}}" title='dashboard'>{% block logo %}<img src='{{static_url("base/images/logo.png") }}' alt='Jupyter Notebook'/>{% endblock %}</a></div>
 
-    {% block login_widget %}
+  {% block login_widget %}
 
-      <span id="login_widget">
-        {% if logged_in %}
-          <button id="logout">Logout</button>
-        {% elif login_available and not logged_in %}
-          <button id="login">Login</button>
-        {% endif %}
-      </span>
+    <span id="login_widget">
+      {% if logged_in %}
+        <button id="logout" class="btn btn-sm navbar-btn">Logout</button>
+      {% elif login_available and not logged_in %}
+        <button id="login" class="btn btn-sm navbar-btn">Login</button>
+      {% endif %}
+    </span>
 
-    {% endblock %}
+  {% endblock %}
 
-    {% block header %}
-    {% endblock %}
-    </div>
+  {% block headercontainer %}
+  {% endblock %}
   </div>
+  <div class="header-bar"></div>
+
+  {% block header %}
+  {% endblock %}
 </div>
 
 <div id="site">
@@ -77,17 +111,11 @@
 {% endblock %}
 </div>
 
-<script src="{{static_url("components/jquery/jquery.min.js") }}" type="text/javascript" charset="utf-8"></script>
-<script src="{{static_url("components/jquery-ui/ui/minified/jquery-ui.min.js") }}" type="text/javascript" charset="utf-8"></script>
-<script src="{{static_url("components/bootstrap/bootstrap/js/bootstrap.min.js") }}" type="text/javascript" charset="utf-8"></script>
-<script src="{{static_url("base/js/namespace.js") }}" type="text/javascript" charset="utf-8"></script>
-<script src="{{static_url("base/js/page.js") }}" type="text/javascript" charset="utf-8"></script>
-<script src="{{static_url("auth/js/loginwidget.js") }}" type="text/javascript" charset="utf-8"></script>
+{% block after_site %}
+{% endblock %}
 
 {% block script %}
 {% endblock %}
-
-<script src="{{static_url("custom/custom.js") }}" type="text/javascript" charset="utf-8"></script>
 
 </body>
 

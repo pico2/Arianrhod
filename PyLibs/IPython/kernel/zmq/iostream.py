@@ -74,6 +74,13 @@ class OutStream(object):
             return
         self._pipe_poller = zmq.Poller()
         self._pipe_poller.register(self._pipe_in, zmq.POLLIN)
+        if IOLoop.initialized():
+            # subprocess flush should trigger flush
+            # if kernel is idle
+            IOLoop.instance().add_handler(self._pipe_in,
+                lambda s, event: self.flush(),
+                IOLoop.READ,
+            )
     
     def _setup_pipe_out(self):
         # must be new context after fork
@@ -108,6 +115,10 @@ class OutStream(object):
 
     def close(self):
         self.pub_socket = None
+
+    @property
+    def closed(self):
+        return self.pub_socket is None
 
     def _flush_from_subprocesses(self):
         """flush possible pub data from subprocesses into my buffer"""
@@ -156,7 +167,7 @@ class OutStream(object):
             data = self._flush_buffer()
             
             if data:
-                content = {u'name':self.name, u'data':data}
+                content = {u'name':self.name, u'text':data}
                 msg = self.session.send(self.pub_socket, u'stream', content=content,
                                        parent=self.parent_header, ident=self.topic)
             

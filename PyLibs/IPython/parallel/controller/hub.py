@@ -1,21 +1,12 @@
 """The IPython Controller Hub with 0MQ
+
 This is the master object that handles connections from engines and clients,
 and monitors traffic through the various queues.
-
-Authors:
-
-* Min RK
 """
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 from __future__ import print_function
 
 import json
@@ -25,7 +16,6 @@ import time
 from datetime import datetime
 
 import zmq
-from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
 
 # internal:
@@ -34,7 +24,7 @@ from IPython.utils.jsonutil import extract_dates
 from IPython.utils.localinterfaces import localhost
 from IPython.utils.py3compat import cast_bytes, unicode_type, iteritems
 from IPython.utils.traitlets import (
-        HasTraits, Instance, Integer, Unicode, Dict, Set, Tuple, CBytes, DottedObjectName
+        HasTraits, Any, Instance, Integer, Unicode, Dict, Set, Tuple, DottedObjectName
         )
 
 from IPython.parallel import error, util
@@ -44,9 +34,6 @@ from IPython.kernel.zmq.session import SessionFactory
 
 from .heartmonitor import HeartMonitor
 
-#-----------------------------------------------------------------------------
-# Code
-#-----------------------------------------------------------------------------
 
 def _passer(*args, **kwargs):
     return
@@ -75,9 +62,9 @@ def empty_record():
         'result_content' : None,
         'result_buffers' : None,
         'queue' : None,
-        'pyin' : None,
-        'pyout': None,
-        'pyerr': None,
+        'execute_input' : None,
+        'execute_result': None,
+        'error': None,
         'stdout': '',
         'stderr': '',
     }
@@ -103,9 +90,9 @@ def init_record(msg):
         'result_content' : None,
         'result_buffers' : None,
         'queue' : None,
-        'pyin' : None,
-        'pyout': None,
-        'pyerr': None,
+        'execute_input' : None,
+        'execute_result': None,
+        'error': None,
         'stdout': '',
         'stderr': '',
     }
@@ -117,13 +104,13 @@ class EngineConnector(HasTraits):
     id (int): engine ID
     uuid (unicode): engine UUID
     pending: set of msg_ids
-    stallback: DelayedCallback for stalled registration
+    stallback: tornado timeout for stalled registration
     """
     
     id = Integer(0)
     uuid = Unicode()
     pending = Set()
-    stallback = Instance(ioloop.DelayedCallback)
+    stallback = Any()
 
 
 _db_shortcuts = {
@@ -348,13 +335,10 @@ class HubFactory(RegistrationFactory):
         url = util.disambiguate_url(self.client_url('task'))
         r.connect(url)
 
-        # convert seconds to msec
-        registration_timeout = 1000*self.registration_timeout
-
         self.hub = Hub(loop=loop, session=self.session, monitor=sub, heartmonitor=self.heartmonitor,
                 query=q, notifier=n, resubmit=r, db=self.db,
                 engine_info=self.engine_info, client_info=self.client_info,
-                log=self.log, registration_timeout=registration_timeout)
+                log=self.log, registration_timeout=self.registration_timeout)
 
 
 class Hub(SessionFactory):
@@ -539,7 +523,7 @@ class Hub(SessionFactory):
             return
         client_id = idents[0]
         try:
-            msg = self.session.unserialize(msg, content=True)
+            msg = self.session.deserialize(msg, content=True)
         except Exception:
             content = error.wrap_exception()
             self.log.error("Bad Query Message: %r", msg, exc_info=True)
@@ -604,7 +588,7 @@ class Hub(SessionFactory):
             return
         queue_id, client_id = idents[:2]
         try:
-            msg = self.session.unserialize(msg)
+            msg = self.session.deserialize(msg)
         except Exception:
             self.log.error("queue::client %r sent invalid message to %r: %r", client_id, queue_id, msg, exc_info=True)
             return
@@ -652,7 +636,7 @@ class Hub(SessionFactory):
 
         client_id, queue_id = idents[:2]
         try:
-            msg = self.session.unserialize(msg)
+            msg = self.session.deserialize(msg)
         except Exception:
             self.log.error("queue::engine %r sent invalid message to %r: %r",
                     queue_id, client_id, msg, exc_info=True)
@@ -706,7 +690,7 @@ class Hub(SessionFactory):
         client_id = idents[0]
 
         try:
-            msg = self.session.unserialize(msg)
+            msg = self.session.deserialize(msg)
         except Exception:
             self.log.error("task::client %r sent invalid task message: %r",
                     client_id, msg, exc_info=True)
@@ -756,7 +740,7 @@ class Hub(SessionFactory):
         """save the result of a completed task."""
         client_id = idents[0]
         try:
-            msg = self.session.unserialize(msg)
+            msg = self.session.deserialize(msg)
         except Exception:
             self.log.error("task::invalid task result message send to %r: %r",
                     client_id, msg, exc_info=True)
@@ -810,7 +794,7 @@ class Hub(SessionFactory):
 
     def save_task_destination(self, idents, msg):
         try:
-            msg = self.session.unserialize(msg, content=True)
+            msg = self.session.deserialize(msg, content=True)
         except Exception:
             self.log.error("task::invalid task tracking message", exc_info=True)
             return
@@ -847,38 +831,37 @@ class Hub(SessionFactory):
         """save an iopub message into the db"""
         # print (topics)
         try:
-            msg = self.session.unserialize(msg, content=True)
+            msg = self.session.deserialize(msg, content=True)
         except Exception:
             self.log.error("iopub::invalid IOPub message", exc_info=True)
             return
 
         parent = msg['parent_header']
         if not parent:
-            self.log.warn("iopub::IOPub message lacks parent: %r", msg)
+            self.log.debug("iopub::IOPub message lacks parent: %r", msg)
             return
         msg_id = parent['msg_id']
         msg_type = msg['header']['msg_type']
         content = msg['content']
-
+        
         # ensure msg_id is in db
         try:
             rec = self.db.get_record(msg_id)
         except KeyError:
-            rec = empty_record()
-            rec['msg_id'] = msg_id
-            self.db.add_record(msg_id, rec)
+            rec = None
+        
         # stream
         d = {}
         if msg_type == 'stream':
             name = content['name']
-            s = rec[name] or ''
-            d[name] = s + content['data']
+            s = '' if rec is None else rec[name]
+            d[name] = s + content['text']
 
-        elif msg_type == 'pyerr':
-            d['pyerr'] = content
-        elif msg_type == 'pyin':
-            d['pyin'] = content['code']
-        elif msg_type in ('display_data', 'pyout'):
+        elif msg_type == 'error':
+            d['error'] = content
+        elif msg_type == 'execute_input':
+            d['execute_input'] = content['code']
+        elif msg_type in ('display_data', 'execute_result'):
             d[msg_type] = content
         elif msg_type == 'status':
             pass
@@ -889,9 +872,19 @@ class Hub(SessionFactory):
 
         if not d:
             return
-
+        
+        if rec is None:
+            # new record
+            rec = empty_record()
+            rec['msg_id'] = msg_id
+            rec.update(d)
+            d = rec
+            update_record = self.db.add_record
+        else:
+            update_record = self.db.update_record
+        
         try:
-            self.db.update_record(msg_id, d)
+            update_record(msg_id, d)
         except Exception:
             self.log.error("DB Error saving iopub message %r", msg_id, exc_info=True)
 
@@ -963,9 +956,11 @@ class Hub(SessionFactory):
                 self.finish_registration(heart)
             else:
                 purge = lambda : self._purge_stalled_registration(heart)
-                dc = ioloop.DelayedCallback(purge, self.registration_timeout, self.loop)
-                dc.start()
-                self.incoming_registrations[heart] = EngineConnector(id=eid,uuid=uuid,stallback=dc)
+                t = self.loop.add_timeout(
+                    self.loop.time() + self.registration_timeout,
+                    purge,
+                )
+                self.incoming_registrations[heart] = EngineConnector(id=eid,uuid=uuid,stallback=t)
         else:
             self.log.error("registration::registration %i failed: %r", eid, content['evalue'])
         
@@ -979,20 +974,15 @@ class Hub(SessionFactory):
             self.log.error("registration::bad engine id for unregistration: %r", ident, exc_info=True)
             return
         self.log.info("registration::unregister_engine(%r)", eid)
-        # print (eid)
+        
         uuid = self.keytable[eid]
         content=dict(id=eid, uuid=uuid)
         self.dead_engines.add(uuid)
-        # self.ids.remove(eid)
-        # uuid = self.keytable.pop(eid)
-        #
-        # ec = self.engines.pop(eid)
-        # self.hearts.pop(ec.heartbeat)
-        # self.by_ident.pop(ec.queue)
-        # self.completed.pop(eid)
-        handleit = lambda : self._handle_stranded_msgs(eid, uuid)
-        dc = ioloop.DelayedCallback(handleit, self.registration_timeout, self.loop)
-        dc.start()
+        
+        self.loop.add_timeout(
+            self.loop.time() + self.registration_timeout,
+            lambda : self._handle_stranded_msgs(eid, uuid),
+        )
         ############## TODO: HANDLE IT ################
         
         self._save_engine_state()
@@ -1040,7 +1030,7 @@ class Hub(SessionFactory):
             return
         self.log.info("registration::finished registering engine %i:%s", ec.id, ec.uuid)
         if ec.stallback is not None:
-            ec.stallback.stop()
+            self.loop.remove_timeout(ec.stallback)
         eid = ec.id
         self.ids.add(eid)
         self.keytable[eid] = ec.uuid
@@ -1133,8 +1123,7 @@ class Hub(SessionFactory):
         self.session.send(self.query, 'shutdown_reply', content={'status': 'ok'}, ident=client_id)
         # also notify other clients of shutdown
         self.session.send(self.notifier, 'shutdown_notice', content={'status': 'ok'})
-        dc = ioloop.DelayedCallback(lambda : self._shutdown(), 1000, self.loop)
-        dc.start()
+        self.loop.add_timeout(self.loop.time() + 1, self._shutdown)
 
     def _shutdown(self):
         self.log.info("hub::hub shutting down.")
@@ -1325,7 +1314,7 @@ class Hub(SessionFactory):
     def _extract_record(self, rec):
         """decompose a TaskRecord dict into subsection of reply for get_result"""
         io_dict = {}
-        for key in ('pyin', 'pyout', 'pyerr', 'stdout', 'stderr'):
+        for key in ('execute_input', 'execute_result', 'error', 'stdout', 'stderr'):
                 io_dict[key] = rec[key]
         content = { 
             'header': rec['header'],

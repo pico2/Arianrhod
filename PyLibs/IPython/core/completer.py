@@ -1,3 +1,4 @@
+# encoding: utf-8
 """Word completion for IPython.
 
 This module is a fork of the rlcompleter module in the Python standard
@@ -46,25 +47,11 @@ Notes:
   used, and this module (and the readline module) are silently inactive.
 """
 
-#*****************************************************************************
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 #
-# Since this file is essentially a minimally modified copy of the rlcompleter
-# module which is part of the standard Python distribution, I assume that the
-# proper procedure is to maintain its copyright as belonging to the Python
-# Software Foundation (in addition to my own, for all new code).
-#
-#       Copyright (C) 2008 IPython Development Team
-#       Copyright (C) 2001 Fernando Perez. <fperez@colorado.edu>
-#       Copyright (C) 2001 Python Software Foundation, www.python.org
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#
-#*****************************************************************************
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Some of this code originated from rlcompleter in the Python standard library
+# Copyright (C) 2001 Python Software Foundation, www.python.org
 
 import __main__
 import glob
@@ -78,11 +65,13 @@ import sys
 from IPython.config.configurable import Configurable
 from IPython.core.error import TryNext
 from IPython.core.inputsplitter import ESC_MAGIC
+from IPython.core.latex_symbols import latex_symbols
 from IPython.utils import generics
 from IPython.utils import io
+from IPython.utils.decorators import undoc
 from IPython.utils.dir2 import dir2
 from IPython.utils.process import arg_split
-from IPython.utils.py3compat import builtin_mod, string_types
+from IPython.utils.py3compat import builtin_mod, string_types, PY3
 from IPython.utils.traitlets import CBool, Enum
 
 #-----------------------------------------------------------------------------
@@ -96,6 +85,7 @@ if sys.platform == 'win32':
     PROTECTABLES = ' '
 else:
     PROTECTABLES = ' ()[]{}?=\\|;:\'#*"^&'
+
 
 #-----------------------------------------------------------------------------
 # Main functions and classes
@@ -215,7 +205,7 @@ def penalize_magics_key(word):
     return word
 
 
-
+@undoc
 class Bunch(object): pass
 
 
@@ -426,6 +416,64 @@ def get__all__entries(obj):
     return [w for w in words if isinstance(w, string_types)]
 
 
+def match_dict_keys(keys, prefix):
+    """Used by dict_key_matches, matching the prefix to a list of keys"""
+    if not prefix:
+        return None, 0, [repr(k) for k in keys
+                      if isinstance(k, (string_types, bytes))]
+    quote_match = re.search('["\']', prefix)
+    quote = quote_match.group()
+    try:
+        prefix_str = eval(prefix + quote, {})
+    except Exception:
+        return None, 0, []
+    
+    token_match = re.search(r'\w*$', prefix, re.UNICODE)
+    token_start = token_match.start()
+    token_prefix = token_match.group()
+
+    # TODO: support bytes in Py3k
+    matched = []
+    for key in keys:
+        try:
+            if not key.startswith(prefix_str):
+                continue
+        except (AttributeError, TypeError, UnicodeError):
+            # Python 3+ TypeError on b'a'.startswith('a') or vice-versa
+            continue
+
+        # reformat remainder of key to begin with prefix
+        rem = key[len(prefix_str):]
+        # force repr wrapped in '
+        rem_repr = repr(rem + '"')
+        if rem_repr.startswith('u') and prefix[0] not in 'uU':
+            # Found key is unicode, but prefix is Py2 string.
+            # Therefore attempt to interpret key as string.
+            try:
+                rem_repr = repr(rem.encode('ascii') + '"')
+            except UnicodeEncodeError:
+                continue
+
+        rem_repr = rem_repr[1 + rem_repr.index("'"):-2]
+        if quote == '"':
+            # The entered prefix is quoted with ",
+            # but the match is quoted with '.
+            # A contained " hence needs escaping for comparison:
+            rem_repr = rem_repr.replace('"', '\\"')
+
+        # then reinsert prefix from start of token
+        matched.append('%s%s' % (token_prefix, rem_repr))
+    return quote, token_start, matched
+
+
+def _safe_isinstance(obj, module, class_name):
+    """Checks if obj is an instance of module.class_name if loaded
+    """
+    return (module in sys.modules and
+            isinstance(obj, getattr(__import__(module), class_name)))
+
+
+
 class IPCompleter(Completer):
     """Extension of the completer class with IPython-specific features"""
 
@@ -538,6 +586,7 @@ class IPCompleter(Completer):
                          self.file_matches,
                          self.magic_matches,
                          self.python_func_kw_matches,
+                         self.dict_key_matches,
                          ]
 
     def all_completions(self, text):
@@ -674,7 +723,7 @@ class IPCompleter(Completer):
                     else:
                         # true if txt is _not_ a _ name, false otherwise:
                         no__name = (lambda txt:
-                                    re.match(r'.*\._.*?',txt) is None)
+                                    re.match(r'\._.*?',txt[txt.rindex('.'):]) is None)
                     matches = filter(no__name, matches)
             except NameError:
                 # catches <undefined attributes>.<tab>
@@ -804,6 +853,129 @@ class IPCompleter(Completer):
                     argMatches.append("%s=" %namedArg)
         return argMatches
 
+    def dict_key_matches(self, text):
+        "Match string keys in a dictionary, after e.g. 'foo[' "
+        def get_keys(obj):
+            # Only allow completion for known in-memory dict-like types
+            if isinstance(obj, dict) or\
+               _safe_isinstance(obj, 'pandas', 'DataFrame'):
+                try:
+                    return list(obj.keys())
+                except Exception:
+                    return []
+            elif _safe_isinstance(obj, 'numpy', 'ndarray') or\
+                 _safe_isinstance(obj, 'numpy', 'void'):
+                return obj.dtype.names or []
+            return []
+
+        try:
+            regexps = self.__dict_key_regexps
+        except AttributeError:
+            dict_key_re_fmt = r'''(?x)
+            (  # match dict-referring expression wrt greedy setting
+                %s
+            )
+            \[   # open bracket
+            \s*  # and optional whitespace
+            ([uUbB]?  # string prefix (r not handled)
+                (?:   # unclosed string
+                    '(?:[^']|(?<!\\)\\')*
+                |
+                    "(?:[^"]|(?<!\\)\\")*
+                )
+            )?
+            $
+            '''
+            regexps = self.__dict_key_regexps = {
+                False: re.compile(dict_key_re_fmt % '''
+                                  # identifiers separated by .
+                                  (?!\d)\w+
+                                  (?:\.(?!\d)\w+)*
+                                  '''),
+                True: re.compile(dict_key_re_fmt % '''
+                                 .+
+                                 ''')
+            }
+
+        match = regexps[self.greedy].search(self.text_until_cursor)
+        if match is None:
+            return []
+
+        expr, prefix = match.groups()
+        try:
+            obj = eval(expr, self.namespace)
+        except Exception:
+            try:
+                obj = eval(expr, self.global_namespace)
+            except Exception:
+                return []
+
+        keys = get_keys(obj)
+        if not keys:
+            return keys
+        closing_quote, token_offset, matches = match_dict_keys(keys, prefix)
+        if not matches:
+            return matches
+        
+        # get the cursor position of
+        # - the text being completed
+        # - the start of the key text
+        # - the start of the completion
+        text_start = len(self.text_until_cursor) - len(text)
+        if prefix:
+            key_start = match.start(2)
+            completion_start = key_start + token_offset
+        else:
+            key_start = completion_start = match.end()
+        
+        # grab the leading prefix, to make sure all completions start with `text`
+        if text_start > key_start:
+            leading = ''
+        else:
+            leading = text[text_start:completion_start]
+        
+        # the index of the `[` character
+        bracket_idx = match.end(1)
+
+        # append closing quote and bracket as appropriate
+        # this is *not* appropriate if the opening quote or bracket is outside
+        # the text given to this method
+        suf = ''
+        continuation = self.line_buffer[len(self.text_until_cursor):]
+        if key_start > text_start and closing_quote:
+            # quotes were opened inside text, maybe close them
+            if continuation.startswith(closing_quote):
+                continuation = continuation[len(closing_quote):]
+            else:
+                suf += closing_quote
+        if bracket_idx > text_start:
+            # brackets were opened inside text, maybe close them
+            if not continuation.startswith(']'):
+                suf += ']'
+        
+        return [leading + k + suf for k in matches]
+
+    def latex_matches(self, text):
+        u"""Match Latex syntax for unicode characters.
+        
+        This does both \\alp -> \\alpha and \\alpha -> α
+        
+        Used on Python 3 only.
+        """
+        slashpos = text.rfind('\\')
+        if slashpos > -1:
+            s = text[slashpos:]
+            if s in latex_symbols:
+                # Try to complete a full latex symbol to unicode
+                # \\alpha -> α
+                return s, [latex_symbols[s]]
+            else:
+                # If a user has partially typed a latex symbol, give them
+                # a full list of options \al -> [\aleph, \alpha]
+                matches = [k for k in latex_symbols if k.startswith(s)]
+                return s, matches
+        return u'', []
+
     def dispatch_custom_completer(self, text):
         #io.rprint("Custom! '%s' %s" % (text, self.custom_completers)) # dbg
         line = self.line_buffer
@@ -850,9 +1022,6 @@ class IPCompleter(Completer):
     def complete(self, text=None, line_buffer=None, cursor_pos=None):
         """Find completions for the given text and line context.
 
-        This is called successively with state == 0, 1, 2, ... until it
-        returns None.  The completion should begin with 'text'.
-
         Note that both the text and the line_buffer are optional, but at least
         one of them must be given.
 
@@ -880,12 +1049,18 @@ class IPCompleter(Completer):
         matches : list
           A list of completion matches.
         """
-        #io.rprint('\nCOMP1 %r %r %r' % (text, line_buffer, cursor_pos))  # dbg
+        # io.rprint('\nCOMP1 %r %r %r' % (text, line_buffer, cursor_pos))  # dbg
 
         # if the cursor position isn't given, the only sane assumption we can
         # make is that it's at the end of the line (the common case)
         if cursor_pos is None:
             cursor_pos = len(line_buffer) if text is None else len(text)
+
+        if PY3:
+            latex_text = text if not line_buffer else line_buffer[:cursor_pos]
+            latex_text, latex_matches = self.latex_matches(latex_text)
+            if latex_matches:
+                return latex_text, latex_matches
 
         # if text is either None or an empty string, rely on the line buffer
         if not text:
@@ -897,7 +1072,7 @@ class IPCompleter(Completer):
 
         self.line_buffer = line_buffer
         self.text_until_cursor = self.line_buffer[:cursor_pos]
-        #io.rprint('COMP2 %r %r %r' % (text, line_buffer, cursor_pos))  # dbg
+        # io.rprint('COMP2 %r %r %r' % (text, line_buffer, cursor_pos))  # dbg
 
         # Start with a clean slate of completions
         self.matches[:] = []

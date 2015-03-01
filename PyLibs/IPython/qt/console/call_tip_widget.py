@@ -36,6 +36,7 @@ class CallTipWidget(QtGui.QLabel):
                 QtGui.QStyle.PM_ToolTipLabelFrameWidth, None, self))
         self.setWindowOpacity(self.style().styleHint(
                 QtGui.QStyle.SH_ToolTipLabel_Opacity, None, self, None) / 255.0)
+        self.setWordWrap(True)
 
     def eventFilter(self, obj, event):
         """ Reimplemented to hide on certain key presses and on text edit focus
@@ -122,21 +123,15 @@ class CallTipWidget(QtGui.QLabel):
     # 'CallTipWidget' interface
     #--------------------------------------------------------------------------
 
-    def show_call_info(self, call_line=None, doc=None, maxlines=20):
-        """ Attempts to show the specified call line and docstring at the
-            current cursor location. The docstring is possibly truncated for
-            length.
-        """
-        if doc:
-            match = re.match("(?:[^\n]*\n){%i}" % maxlines, doc)
-            if match:
-                doc = doc[:match.end()] + '\n[Documentation continues...]'
-        else:
-            doc = ''
+    def show_inspect_data(self, content, maxlines=20):
+        """Show inspection data as a tooltip"""
+        data = content.get('data', {})
+        text = data.get('text/plain', '')
+        match = re.match("(?:[^\n]*\n){%i}" % maxlines, text)
+        if match:
+            text = text[:match.end()] + '\n[Documentation continues...]'
 
-        if call_line:
-            doc = '\n\n'.join([call_line, doc])
-        return self.show_tip(self._format_tooltip(doc))
+        return self.show_tip(self._format_tooltip(text))
 
     def show_tip(self, tip):
         """ Attempts to show the specified tip at the current cursor location.
@@ -194,8 +189,9 @@ class CallTipWidget(QtGui.QLabel):
                 horizontal = 'Left'
         pos = getattr(cursor_rect, '%s%s' %(vertical, horizontal))
         point = text_edit.mapToGlobal(pos())
+        point.setY(point.y() + padding)
         if vertical == 'top':
-            point.setY(point.y() - tip_height - padding)
+            point.setY(point.y() - tip_height)
         if horizontal == 'Left':
             point.setX(point.x() - tip_width - padding)
 
@@ -247,18 +243,8 @@ class CallTipWidget(QtGui.QLabel):
             QtGui.qApp.topLevelAt(QtGui.QCursor.pos()) != self):
             self._hide_timer.start(300, self)
 
-    def _format_tooltip(self,doc):
-        import textwrap
-
-        # make sure a long argument list does not make
-        # the first row overflow the width of the actual tip body
-        rows = doc.split("\n")
-        # An object which is not a callable has '<no docstring>' as doc
-        if len(rows) == 1:
-            return doc
-        max_text_width = max(80, max([len(x) for x in rows[1:]]))
-        rows= textwrap.wrap(rows[0],max_text_width) + rows[1:]
-        doc = "\n".join(rows)
+    def _format_tooltip(self, doc):
+        doc = re.sub(r'\033\[(\d|;)+?m', '', doc)
         return doc
 
     #------ Signal handlers ----------------------------------------------------
