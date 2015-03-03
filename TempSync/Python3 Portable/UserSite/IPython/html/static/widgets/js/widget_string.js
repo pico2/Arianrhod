@@ -1,95 +1,109 @@
-//----------------------------------------------------------------------------
-//  Copyright (C) 2013 The IPython Development Team
-//
-//  Distributed under the terms of the BSD License.  The full license is in
-//  the file COPYING, distributed as part of this software.
-//----------------------------------------------------------------------------
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
 
-//============================================================================
-// StringWidget
-//============================================================================
+define([
+    "widgets/js/widget",
+    "jquery",
+    "bootstrap",
+], function(widget, $){
 
-/**
- * @module IPython
- * @namespace IPython
- **/
-
-define(["widgets/js/widget"], function(WidgetManager){
-
-    var HTMLView = IPython.DOMWidgetView.extend({  
+    var HTMLView = widget.DOMWidgetView.extend({  
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.update(); // Set defaults.
         },
         
         update : function(){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             this.$el.html(this.model.get('value')); // CAUTION! .html(...) CALL MANDITORY!!!
             return HTMLView.__super__.update.apply(this);
         },
     });
-    WidgetManager.register_widget_view('HTMLView', HTMLView);
 
 
-    var LatexView = IPython.DOMWidgetView.extend({  
+    var LatexView = widget.DOMWidgetView.extend({  
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.update(); // Set defaults.
         },
         
         update : function(){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
-            this.$el.text(this.model.get('value'));
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el.get(0)]);
-
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
+            this.typeset(this.$el, this.model.get('value'));
             return LatexView.__super__.update.apply(this);
         }, 
     });
-    WidgetManager.register_widget_view('LatexView', LatexView);
 
 
-    var TextareaView = IPython.DOMWidgetView.extend({  
+    var TextareaView = widget.DOMWidgetView.extend({  
         render: function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox');
+                .addClass('widget-hbox widget-textarea');
             this.$label = $('<div />')
                 .appendTo(this.$el)
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .hide();
             this.$textbox = $('<textarea />')
                 .attr('rows', 5)
-                .addClass('widget-text')
+                .addClass('widget-text form-control')
                 .appendTo(this.$el);
-            this.$el_to_style = this.$textbox; // Set default element to style
             this.update(); // Set defaults.
 
             this.model.on('msg:custom', $.proxy(this._handle_textarea_msg, this));
+            this.model.on('change:placeholder', function(model, value, options) {
+                this.update_placeholder(value);
+            }, this);
+
+            this.update_placeholder();
         },
 
         _handle_textarea_msg: function (content){
-            // Handle when a custom msg is recieved from the back-end.
+            /**
+             * Handle when a custom msg is recieved from the back-end.
+             */
             if (content.method == "scroll_to_bottom") {
                 this.scroll_to_bottom();                
             }
         },
 
+        update_placeholder: function(value) {
+            if (!value) {
+                value = this.model.get('placeholder');
+            }
+            this.$textbox.attr('placeholder', value);
+        },
+
         scroll_to_bottom: function (){
-            // Scroll the text-area view to the bottom.
+            /**
+             * Scroll the text-area view to the bottom.
+             */
             this.$textbox.scrollTop(this.$textbox[0].scrollHeight);
         },
 
         update: function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             if (options === undefined || options.updated_view != this) {
                 this.$textbox.val(this.model.get('value'));
 
@@ -100,11 +114,22 @@ define(["widgets/js/widget"], function(WidgetManager){
                 if (description.length === 0) {
                     this.$label.hide();
                 } else {
-                    this.$label.text(description);
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
             return TextareaView.__super__.update.apply(this);
+        },
+
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this.$textbox.css(name, value);
+            }
         },
         
         events: {
@@ -115,39 +140,55 @@ define(["widgets/js/widget"], function(WidgetManager){
         },
         
         handleChanging: function(e) { 
-            // Handles and validates user input.
-            
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
+            /**
+             * Handles and validates user input.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
             this.model.set('value', e.target.value, {updated_view: this});
             this.touch();
         },
     });
-    WidgetManager.register_widget_view('TextareaView', TextareaView);
 
 
-    var TextView = IPython.DOMWidgetView.extend({  
+    var TextView = widget.DOMWidgetView.extend({  
         render: function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox-single');
+                .addClass('widget-hbox widget-text');
             this.$label = $('<div />')
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .appendTo(this.$el)
                 .hide();
             this.$textbox = $('<input type="text" />')
                 .addClass('input')
-                .addClass('widget-text')
+                .addClass('widget-text form-control')
                 .appendTo(this.$el);
-            this.$el_to_style = this.$textbox; // Set default element to style
             this.update(); // Set defaults.
+            this.model.on('change:placeholder', function(model, value, options) {
+                this.update_placeholder(value);
+            }, this);
+
+            this.update_placeholder();
+        },
+
+        update_placeholder: function(value) {
+            if (!value) {
+                value = this.model.get('placeholder');
+            }
+            this.$textbox.attr('placeholder', value);
         },
         
         update: function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             if (options === undefined || options.updated_view != this) {
                 if (this.$textbox.val() != this.model.get('value')) {
                     this.$textbox.val(this.model.get('value'));
@@ -160,11 +201,22 @@ define(["widgets/js/widget"], function(WidgetManager){
                 if (description.length === 0) {
                     this.$label.hide();
                 } else {
-                    this.$label.text(description);
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
             return TextView.__super__.update.apply(this);
+        },
+
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this.$textbox.css(name, value);
+            }
         },
         
         events: {
@@ -178,45 +230,59 @@ define(["widgets/js/widget"], function(WidgetManager){
         },
         
         handleChanging: function(e) { 
-            // Handles user input.
-
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
+            /**
+             * Handles user input.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
             this.model.set('value', e.target.value, {updated_view: this});
             this.touch();
         },
         
         handleKeypress: function(e) { 
-            // Handles text submition
+            /**
+             * Handles text submition
+             */
             if (e.keyCode == 13) { // Return key
                 this.send({event: 'submit'});
-                event.stopPropagation();
-                event.preventDefault();
+                e.stopPropagation();
+                e.preventDefault();
                 return false;
             }
         },
 
         handleBlur: function(e) { 
-            // Prevent a blur from firing if the blur was not user intended.
-            // This is a workaround for the return-key focus loss bug.
-            // TODO: Is the original bug actually a fault of the keyboard
-            // manager?
+            /**
+             * Prevent a blur from firing if the blur was not user intended.
+             * This is a workaround for the return-key focus loss bug.
+             * TODO: Is the original bug actually a fault of the keyboard
+             * manager?
+             */
             if (e.relatedTarget === null) {
-                event.stopPropagation();
-                event.preventDefault();
+                e.stopPropagation();
+                e.preventDefault();
                 return false;
             }
         },
 
         handleFocusOut: function(e) { 
-            // Prevent a blur from firing if the blur was not user intended.
-            // This is a workaround for the return-key focus loss bug.
+            /**
+             * Prevent a blur from firing if the blur was not user intended.
+             * This is a workaround for the return-key focus loss bug.
+             */
             if (e.relatedTarget === null) {
-                event.stopPropagation();
-                event.preventDefault();
+                e.stopPropagation();
+                e.preventDefault();
                 return false;
             }
         },
     });
-    WidgetManager.register_widget_view('TextView', TextView);
+
+    return {
+        'HTMLView': HTMLView,
+        'LatexView': LatexView,
+        'TextareaView': TextareaView,
+        'TextView': TextView,
+    };
 });

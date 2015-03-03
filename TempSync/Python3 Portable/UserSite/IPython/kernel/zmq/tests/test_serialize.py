@@ -1,15 +1,7 @@
 """test serialization tools"""
 
-#-------------------------------------------------------------------------------
-#  Copyright (C) 2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
-# Imports
-#-------------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import pickle
 from collections import namedtuple
@@ -17,7 +9,7 @@ from collections import namedtuple
 import nose.tools as nt
 
 # from unittest import TestCaes
-from IPython.kernel.zmq.serialize import serialize_object, unserialize_object
+from IPython.kernel.zmq.serialize import serialize_object, deserialize_object
 from IPython.testing import decorators as dec
 from IPython.utils.pickleutil import CannedArray, CannedClass
 from IPython.utils.py3compat import iteritems
@@ -30,7 +22,7 @@ from IPython.parallel import interactive
 def roundtrip(obj):
     """roundtrip an object through serialization"""
     bufs = serialize_object(obj)
-    obj2, remainder = unserialize_object(bufs)
+    obj2, remainder = deserialize_object(bufs)
     nt.assert_equals(remainder, [])
     return obj2
 
@@ -43,9 +35,14 @@ class C(object):
 
 SHAPES = ((100,), (1024,10), (10,8,6,5), (), (0,))
 DTYPES = ('uint8', 'float64', 'int32', [('g', 'float32')], '|S10')
+
 #-------------------------------------------------------------------------------
 # Tests
 #-------------------------------------------------------------------------------
+
+def new_array(shape, dtype):
+    import numpy
+    return numpy.random.random(shape).astype(dtype)
 
 def test_roundtrip_simple():
     for obj in [
@@ -73,23 +70,9 @@ def test_roundtrip_buffered():
     ]:
         bufs = serialize_object(obj)
         nt.assert_equal(len(bufs), 2)
-        obj2, remainder = unserialize_object(bufs)
+        obj2, remainder = deserialize_object(bufs)
         nt.assert_equal(remainder, [])
         nt.assert_equal(obj, obj2)
-
-def _scrub_nan(A):
-    """scrub nans out of empty arrays
-    
-    since nan != nan
-    """
-    import numpy
-    if A.dtype.fields and A.shape:
-        for field in A.dtype.fields.keys():
-            try:
-                A[field][numpy.isnan(A[field])] = 0
-            except (TypeError, NotImplementedError):
-                # e.g. str dtype
-                pass
 
 @dec.skip_without('numpy')
 def test_numpy():
@@ -97,10 +80,9 @@ def test_numpy():
     from numpy.testing.utils import assert_array_equal
     for shape in SHAPES:
         for dtype in DTYPES:
-            A = numpy.empty(shape, dtype=dtype)
-            _scrub_nan(A)
+            A = new_array(shape, dtype=dtype)
             bufs = serialize_object(A)
-            B, r = unserialize_object(bufs)
+            B, r = deserialize_object(bufs)
             nt.assert_equal(r, [])
             nt.assert_equal(A.shape, B.shape)
             nt.assert_equal(A.dtype, B.dtype)
@@ -115,11 +97,10 @@ def test_recarray():
             [('f', float), ('s', '|S10')],
             [('n', int), ('s', '|S1'), ('u', 'uint32')],
         ]:
-            A = numpy.empty(shape, dtype=dtype)
-            _scrub_nan(A)
+            A = new_array(shape, dtype=dtype)
             
             bufs = serialize_object(A)
-            B, r = unserialize_object(bufs)
+            B, r = deserialize_object(bufs)
             nt.assert_equal(r, [])
             nt.assert_equal(A.shape, B.shape)
             nt.assert_equal(A.dtype, B.dtype)
@@ -131,12 +112,11 @@ def test_numpy_in_seq():
     from numpy.testing.utils import assert_array_equal
     for shape in SHAPES:
         for dtype in DTYPES:
-            A = numpy.empty(shape, dtype=dtype)
-            _scrub_nan(A)
+            A = new_array(shape, dtype=dtype)
             bufs = serialize_object((A,1,2,b'hello'))
             canned = pickle.loads(bufs[0])
             nt.assert_is_instance(canned[0], CannedArray)
-            tup, r = unserialize_object(bufs)
+            tup, r = deserialize_object(bufs)
             B = tup[0]
             nt.assert_equal(r, [])
             nt.assert_equal(A.shape, B.shape)
@@ -149,12 +129,11 @@ def test_numpy_in_dict():
     from numpy.testing.utils import assert_array_equal
     for shape in SHAPES:
         for dtype in DTYPES:
-            A = numpy.empty(shape, dtype=dtype)
-            _scrub_nan(A)
+            A = new_array(shape, dtype=dtype)
             bufs = serialize_object(dict(a=A,b=1,c=range(20)))
             canned = pickle.loads(bufs[0])
             nt.assert_is_instance(canned['a'], CannedArray)
-            d, r = unserialize_object(bufs)
+            d, r = deserialize_object(bufs)
             B = d['a']
             nt.assert_equal(r, [])
             nt.assert_equal(A.shape, B.shape)
@@ -168,7 +147,7 @@ def test_class():
     bufs = serialize_object(dict(C=C))
     canned = pickle.loads(bufs[0])
     nt.assert_is_instance(canned['C'], CannedClass)
-    d, r = unserialize_object(bufs)
+    d, r = deserialize_object(bufs)
     C2 = d['C']
     nt.assert_equal(C2.a, C.a)
 
@@ -180,7 +159,7 @@ def test_class_oldstyle():
     bufs = serialize_object(dict(C=C))
     canned = pickle.loads(bufs[0])
     nt.assert_is_instance(canned['C'], CannedClass)
-    d, r = unserialize_object(bufs)
+    d, r = deserialize_object(bufs)
     C2 = d['C']
     nt.assert_equal(C2.a, C.a)
 
@@ -189,7 +168,7 @@ def test_tuple():
     bufs = serialize_object(tup)
     canned = pickle.loads(bufs[0])
     nt.assert_is_instance(canned, tuple)
-    t2, r = unserialize_object(bufs)
+    t2, r = deserialize_object(bufs)
     nt.assert_equal(t2[0](t2[1]), tup[0](tup[1]))
 
 point = namedtuple('point', 'x y')
@@ -199,7 +178,7 @@ def test_namedtuple():
     bufs = serialize_object(p)
     canned = pickle.loads(bufs[0])
     nt.assert_is_instance(canned, point)
-    p2, r = unserialize_object(bufs, globals())
+    p2, r = deserialize_object(bufs, globals())
     nt.assert_equal(p2.x, p.x)
     nt.assert_equal(p2.y, p.y)
 
@@ -208,7 +187,7 @@ def test_list():
     bufs = serialize_object(lis)
     canned = pickle.loads(bufs[0])
     nt.assert_is_instance(canned, list)
-    l2, r = unserialize_object(bufs)
+    l2, r = deserialize_object(bufs)
     nt.assert_equal(l2[0](l2[1]), lis[0](lis[1]))
 
 def test_class_inheritance():
@@ -223,7 +202,7 @@ def test_class_inheritance():
     bufs = serialize_object(dict(D=D))
     canned = pickle.loads(bufs[0])
     nt.assert_is_instance(canned['D'], CannedClass)
-    d, r = unserialize_object(bufs)
+    d, r = deserialize_object(bufs)
     D2 = d['D']
     nt.assert_equal(D2.a, D.a)
     nt.assert_equal(D2.b, D.b)

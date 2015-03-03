@@ -1,23 +1,15 @@
-#-------------------------------------------------------------------------------
-#  Copyright (C) 2012  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-------------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 from __future__ import print_function
 
-# Standard library imports
 import sys
 import unittest
 
-# Local imports
 from IPython.kernel.inprocess.blocking import BlockingInProcessKernelClient
 from IPython.kernel.inprocess.manager import InProcessKernelManager
 from IPython.kernel.inprocess.ipkernel import InProcessKernel
+from IPython.kernel.tests.utils import assemble_output
 from IPython.testing.decorators import skipif_not_matplotlib
 from IPython.utils.io import capture_output
 from IPython.utils import py3compat
@@ -27,9 +19,6 @@ if py3compat.PY3:
 else:
     from StringIO import StringIO
 
-#-----------------------------------------------------------------------------
-# Test case
-#-----------------------------------------------------------------------------
 
 class InProcessKernelTestCase(unittest.TestCase):
 
@@ -38,15 +27,15 @@ class InProcessKernelTestCase(unittest.TestCase):
         self.km.start_kernel()
         self.kc = BlockingInProcessKernelClient(kernel=self.km.kernel)
         self.kc.start_channels()
+        self.kc.wait_for_ready()
 
     @skipif_not_matplotlib
     def test_pylab(self):
-        """ Does pylab work in the in-process kernel?
-        """
+        """Does %pylab work in the in-process kernel?"""
         kc = self.kc
         kc.execute('%pylab')
-        msg = get_stream_message(kc)
-        self.assertIn('matplotlib', msg['content']['data'])
+        out, err = assemble_output(kc.iopub_channel)
+        self.assertIn('matplotlib', out)
 
     def test_raw_input(self):
         """ Does the in-process kernel handle raw_input correctly?
@@ -74,22 +63,7 @@ class InProcessKernelTestCase(unittest.TestCase):
 
         kc = BlockingInProcessKernelClient(kernel=kernel)
         kernel.frontends.append(kc)
-        kc.shell_channel.execute('print("bar")')
-        msg = get_stream_message(kc)
-        self.assertEqual(msg['content']['data'], 'bar\n')
+        kc.execute('print("bar")')
+        out, err = assemble_output(kc.iopub_channel)
+        self.assertEqual(out, 'bar\n')
 
-#-----------------------------------------------------------------------------
-# Utility functions
-#-----------------------------------------------------------------------------
-
-def get_stream_message(kernel_client, timeout=5):
-    """ Gets a single stream message synchronously from the sub channel.
-    """
-    while True:
-        msg = kernel_client.get_iopub_msg(timeout=timeout)
-        if msg['header']['msg_type'] == 'stream':
-            return msg
-
-
-if __name__ == '__main__':
-    unittest.main()

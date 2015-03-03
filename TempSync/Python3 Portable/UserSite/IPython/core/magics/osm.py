@@ -165,7 +165,6 @@ class OSMagics(Magics):
 
         path = [os.path.abspath(os.path.expanduser(p)) for p in
             os.environ.get('PATH','').split(os.pathsep)]
-        path = filter(os.path.isdir,path)
 
         syscmdlist = []
         # Now define isexec in a cross platform manner.
@@ -189,8 +188,12 @@ class OSMagics(Magics):
             # the innermost part
             if os.name == 'posix':
                 for pdir in path:
-                    os.chdir(pdir)
-                    for ff in os.listdir(pdir):
+                    try:
+                        os.chdir(pdir)
+                        dirlist = os.listdir(pdir)
+                    except OSError:
+                        continue
+                    for ff in dirlist:
                         if isexec(ff):
                             try:
                                 # Removes dots from the name since ipython
@@ -205,8 +208,12 @@ class OSMagics(Magics):
             else:
                 no_alias = Alias.blacklist
                 for pdir in path:
-                    os.chdir(pdir)
-                    for ff in os.listdir(pdir):
+                    try:
+                        os.chdir(pdir)
+                        dirlist = os.listdir(pdir)
+                    except OSError:
+                        continue
+                    for ff in dirlist:
                         base, ext = os.path.splitext(ff)
                         if isexec(ff) and base.lower() not in no_alias:
                             if ext.lower() == '.exe':
@@ -371,12 +378,61 @@ class OSMagics(Magics):
         if not 'q' in opts and self.shell.user_ns['_dh']:
             print(self.shell.user_ns['_dh'][-1])
 
-
     @line_magic
     def env(self, parameter_s=''):
-        """List environment variables."""
+        """Get, set, or list environment variables.
 
+        Usage:\\
+
+          %env: lists all environment variables/values
+          %env var: get value for var
+          %env var val: set value for var
+          %env var=val: set value for var
+          %env var=$val: set value for var, using python expansion if possible
+        """
+        if parameter_s.strip():
+            split = '=' if '=' in parameter_s else ' '
+            bits = parameter_s.split(split)
+            if len(bits) == 1:
+                key = parameter_s.strip()
+                if key in os.environ:
+                    return os.environ[key]
+                else:
+                    err = "Environment does not have key: {0}".format(key)
+                    raise UsageError(err)
+            if len(bits) > 1:
+                return self.set_env(parameter_s)
         return dict(os.environ)
+
+    @line_magic
+    def set_env(self, parameter_s):
+        """Set environment variables.  Assumptions are that either "val" is a
+        name in the user namespace, or val is something that evaluates to a
+        string.
+
+        Usage:\\
+          %set_env var val: set value for var
+          %set_env var=val: set value for var
+          %set_env var=$val: set value for var, using python expansion if possible
+        """
+        split = '=' if '=' in parameter_s else ' '
+        bits = parameter_s.split(split, 1)
+        if not parameter_s.strip() or len(bits)<2:
+            raise UsageError("usage is 'set_env var=val'")
+        var = bits[0].strip()
+        val = bits[1].strip()
+        if re.match(r'.*\s.*', var):
+            # an environment variable with whitespace is almost certainly
+            # not what the user intended.  what's more likely is the wrong
+            # split was chosen, ie for "set_env cmd_args A=B", we chose
+            # '=' for the split and should have chosen ' '.  to get around
+            # this, users should just assign directly to os.environ or use
+            # standard magic {var} expansion.
+            err = "refusing to set env var with whitespace: '{0}'"
+            err = err.format(val)
+            raise UsageError(err)
+        os.environ[py3compat.cast_bytes_py2(var)] = py3compat.cast_bytes_py2(val)
+        print('env: {0}={1}'.format(var,val))
 
     @line_magic
     def pushd(self, parameter_s=''):

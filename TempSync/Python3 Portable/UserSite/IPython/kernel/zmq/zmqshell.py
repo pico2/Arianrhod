@@ -10,20 +10,18 @@ implementation that doesn't rely on so much monkeypatching.
 But this lets us maintain a fully working IPython as we develop the new
 machinery.  This should thus be thought of as scaffolding.
 """
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 from __future__ import print_function
 
-# Stdlib
 import os
 import sys
 import time
 
-# System library imports
 from zmq.eventloop import ioloop
 
-# Our own
 from IPython.core.interactiveshell import (
     InteractiveShell, InteractiveShellABC
 )
@@ -33,7 +31,8 @@ from IPython.core.displaypub import DisplayPublisher
 from IPython.core.error import UsageError
 from IPython.core.magics import MacroToEdit, CodeMagics
 from IPython.core.magic import magics_class, line_magic, Magics
-from IPython.core.payloadpage import install_payload_page
+from IPython.core import payloadpage
+from IPython.core.usage import default_gui_banner
 from IPython.display import display, Javascript
 from IPython.kernel.inprocess.socket import SocketABC
 from IPython.kernel import (
@@ -50,7 +49,6 @@ from IPython.utils.warn import error
 from IPython.kernel.zmq.displayhook import ZMQShellDisplayHook
 from IPython.kernel.zmq.datapub import ZMQDataPublisher
 from IPython.kernel.zmq.session import extract_header
-from IPython.kernel.comm import CommManager
 from .session import Session
 
 #-----------------------------------------------------------------------------
@@ -74,13 +72,12 @@ class ZMQDisplayPublisher(DisplayPublisher):
         sys.stdout.flush()
         sys.stderr.flush()
 
-    def publish(self, source, data, metadata=None):
+    def publish(self, data, metadata=None, source=None):
         self._flush_streams()
         if metadata is None:
             metadata = {}
-        self._validate_data(source, data, metadata)
+        self._validate_data(data, metadata)
         content = {}
-        content['source'] = source
         content['data'] = encode_images(data)
         content['metadata'] = metadata
         self.session.send(
@@ -105,72 +102,6 @@ class KernelMagics(Magics):
     # moved into a separate machinery as well.  For now, at least isolate here
     # the magics which this class needs to implement differently from the base
     # class, or that are unique to it.
-
-    @line_magic
-    def doctest_mode(self, parameter_s=''):
-        """Toggle doctest mode on and off.
-
-        This mode is intended to make IPython behave as much as possible like a
-        plain Python shell, from the perspective of how its prompts, exceptions
-        and output look.  This makes it easy to copy and paste parts of a
-        session into doctests.  It does so by:
-
-        - Changing the prompts to the classic ``>>>`` ones.
-        - Changing the exception reporting mode to 'Plain'.
-        - Disabling pretty-printing of output.
-
-        Note that IPython also supports the pasting of code snippets that have
-        leading '>>>' and '...' prompts in them.  This means that you can paste
-        doctests from files or docstrings (even if they have leading
-        whitespace), and the code will execute correctly.  You can then use
-        '%history -t' to see the translated history; this will give you the
-        input after removal of all the leading prompts and whitespace, which
-        can be pasted back into an editor.
-
-        With these features, you can switch into this mode easily whenever you
-        need to do testing and changes to doctests, without having to leave
-        your existing IPython session.
-        """
-
-        from IPython.utils.ipstruct import Struct
-
-        # Shorthands
-        shell = self.shell
-        disp_formatter = self.shell.display_formatter
-        ptformatter = disp_formatter.formatters['text/plain']
-        # dstore is a data store kept in the instance metadata bag to track any
-        # changes we make, so we can undo them later.
-        dstore = shell.meta.setdefault('doctest_mode', Struct())
-        save_dstore = dstore.setdefault
-
-        # save a few values we'll need to recover later
-        mode = save_dstore('mode', False)
-        save_dstore('rc_pprint', ptformatter.pprint)
-        save_dstore('rc_active_types',disp_formatter.active_types)
-        save_dstore('xmode', shell.InteractiveTB.mode)
-
-        if mode == False:
-            # turn on
-            ptformatter.pprint = False
-            disp_formatter.active_types = ['text/plain']
-            shell.magic('xmode Plain')
-        else:
-            # turn off
-            ptformatter.pprint = dstore.rc_pprint
-            disp_formatter.active_types = dstore.rc_active_types
-            shell.magic("xmode " + dstore.xmode)
-
-        # Store new mode and inform on console
-        dstore.mode = bool(1-int(mode))
-        mode_label = ['OFF','ON'][dstore.mode]
-        print('Doctest mode is:', mode_label)
-
-        # Send the payload back so that clients can modify their prompt display
-        payload = dict(
-            source='doctest_mode',
-            mode=dstore.mode)
-        shell.payload_manager.write_payload(payload)
-        
     
     _find_edit_target = CodeMagics._find_edit_target
 
@@ -298,7 +229,6 @@ class KernelMagics(Magics):
         if not arg_s:
             raise UsageError('Missing filename.')
 
-        cont = open(arg_s).read()
         if arg_s.endswith('.py'):
             cont = self.shell.pycolorize(openpy.read_py_file(arg_s, skip_encoding_cookie=False))
         else:
@@ -424,6 +354,9 @@ class ZMQInteractiveShell(InteractiveShell):
     data_pub_class = Type(ZMQDataPublisher)
     kernel = Any()
     parent_header = Any()
+    
+    def _banner1_default(self):
+        return default_gui_banner
 
     # Override the traitlet in the parent class, because there's no point using
     # readline for the kernel. Can be removed when the readline code is moved
@@ -457,9 +390,7 @@ class ZMQInteractiveShell(InteractiveShell):
             raise UsageError("%s" % e)
 
     def init_environment(self):
-        """Configure the user's environment.
-
-        """
+        """Configure the user's environment."""
         env = os.environ
         # These two ensure 'ls' produces nice coloring on BSD-derived systems
         env['TERM'] = 'xterm-color'
@@ -469,29 +400,16 @@ class ZMQInteractiveShell(InteractiveShell):
         # subprocesses as much as possible.
         env['PAGER'] = 'cat'
         env['GIT_PAGER'] = 'cat'
-        
-        # And install the payload version of page.
-        install_payload_page()
-
-    def auto_rewrite_input(self, cmd):
-        """Called to show the auto-rewritten input for autocall and friends.
-
-        FIXME: this payload is currently not correctly processed by the
-        frontend.
-        """
-        new = self.prompt_manager.render('rewrite') + cmd
-        payload = dict(
-            source='auto_rewrite_input',
-            transformed_input=new,
-            )
-        self.payload_manager.write_payload(payload)
-
+    
+    def init_hooks(self):
+        super(ZMQInteractiveShell, self).init_hooks()
+        self.set_hook('show_in_pager', page.as_hook(payloadpage.page), 99)
+    
     def ask_exit(self):
         """Engage the exit actions."""
-        self.exit_now = True
+        self.exit_now = (not self.keepkernel_on_exit)
         payload = dict(
             source='ask_exit',
-            exit=True,
             keepkernel=self.keepkernel_on_exit,
             )
         self.payload_manager.write_payload(payload)
@@ -512,9 +430,9 @@ class ZMQInteractiveShell(InteractiveShell):
         # to pick up
         topic = None
         if dh.topic:
-            topic = dh.topic.replace(b'pyout', b'pyerr')
+            topic = dh.topic.replace(b'execute_result', b'error')
         
-        exc_msg = dh.session.send(dh.pub_socket, u'pyerr', json_clean(exc_content), dh.parent_header, ident=topic)
+        exc_msg = dh.session.send(dh.pub_socket, u'error', json_clean(exc_content), dh.parent_header, ident=topic)
 
         # FIXME - Hack: store exception info in shell object.  Right now, the
         # caller is reading this info after the fact, we need to fix this logic
@@ -527,12 +445,13 @@ class ZMQInteractiveShell(InteractiveShell):
 
         return exc_content
 
-    def set_next_input(self, text):
+    def set_next_input(self, text, replace=False):
         """Send the specified text to the frontend to be presented at the next
         input cell."""
         payload = dict(
             source='set_next_input',
-            text=text
+            text=text,
+            replace=replace,
         )
         self.payload_manager.write_payload(payload)
     
@@ -562,10 +481,6 @@ class ZMQInteractiveShell(InteractiveShell):
         super(ZMQInteractiveShell, self).init_magics()
         self.register_magics(KernelMagics)
         self.magics_manager.register_alias('ed', 'edit')
-    
-    def init_comms(self):
-        self.comm_manager = CommManager(shell=self, parent=self)
-        self.configurables.append(self.comm_manager)
 
 
 InteractiveShellABC.register(ZMQInteractiveShell)

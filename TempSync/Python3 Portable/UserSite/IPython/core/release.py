@@ -19,10 +19,10 @@ name = 'ipython'
 # IPython version information.  An empty _version_extra corresponds to a full
 # release.  'dev' as a _version_extra string means this is a development
 # version
-_version_major = 2
-_version_minor = 3
-_version_patch = 1
-# _version_extra = 'maint'
+_version_major = 3
+_version_minor = 0
+_version_patch = 0
+_version_extra = 'dev'
 # _version_extra = 'rc1'
 _version_extra = ''  # Uncomment this for full releases
 
@@ -40,7 +40,8 @@ version = __version__  # backwards compatibility name
 version_info = (_version_major, _version_minor, _version_patch, _version_extra)
 
 # Change this when incrementing the kernel protocol version
-kernel_protocol_version_info = (4, 1)
+kernel_protocol_version_info = (5, 0)
+kernel_protocol_version = "%i.%i" % kernel_protocol_version_info
 
 description = "IPython: Productive Interactive Computing"
 

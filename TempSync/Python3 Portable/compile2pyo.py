@@ -26,6 +26,8 @@ def main():
         'site-packages\\werkzeug',
         'site-packages\\Jinja2',
         'site-packages\\itsdangerous',
+        'site-packages\\markupsafe',
+        'site-packages\\cffi',
         # 'site-packages\\ipdb',
         # 'site-packages\\pyreadline',
         # 'site-packages\\readline.py',

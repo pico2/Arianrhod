@@ -453,15 +453,15 @@ def _strip_prompts(prompt_re, initial_re=None):
 def classic_prompt():
     """Strip the >>>/... prompts of the Python interactive shell."""
     # FIXME: non-capturing version (?:...) usable?
-    prompt_re = re.compile(r'^(>>> ?|\.\.\. ?)')
-    initial_re = re.compile(r'^(>>> ?)')
+    prompt_re = re.compile(r'^(>>>|\.\.\.)( |$)')
+    initial_re = re.compile(r'^>>>( |$)')
     return _strip_prompts(prompt_re, initial_re)
 
 @CoroutineInputTransformer.wrap
 def ipy_prompt():
     """Strip IPython's In [1]:/...: prompts."""
     # FIXME: non-capturing version (?:...) usable?
-    prompt_re = re.compile(r'^(In \[\d+\]: |\ {3,}\.{3,}: )')
+    prompt_re = re.compile(r'^(In \[\d+\]: |\s*\.{3,}: ?)')
     return _strip_prompts(prompt_re)
 
 

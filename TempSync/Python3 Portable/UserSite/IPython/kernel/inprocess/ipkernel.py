@@ -1,26 +1,16 @@
 """An in-process kernel"""
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2012  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-# Standard library imports
 from contextlib import contextmanager
 import logging
 import sys
 
-# Local imports
 from IPython.core.interactiveshell import InteractiveShellABC
 from IPython.utils.jsonutil import json_clean
 from IPython.utils.traitlets import Any, Enum, Instance, List, Type
-from IPython.kernel.zmq.ipkernel import Kernel
+from IPython.kernel.zmq.ipkernel import IPythonKernel
 from IPython.kernel.zmq.zmqshell import ZMQInteractiveShell
 
 from .socket import DummySocket
@@ -29,7 +19,7 @@ from .socket import DummySocket
 # Main kernel class
 #-----------------------------------------------------------------------------
 
-class InProcessKernel(Kernel):
+class InProcessKernel(IPythonKernel):
 
     #-------------------------------------------------------------------------
     # InProcessKernel interface
@@ -83,14 +73,14 @@ class InProcessKernel(Kernel):
         """ The in-process kernel doesn't abort requests. """
         pass
 
-    def _raw_input(self, prompt, ident, parent):
+    def _input_request(self, prompt, ident, parent, password=False):
         # Flush output before making the request.
         self.raw_input_str = None
         sys.stderr.flush()
         sys.stdout.flush()
 
         # Send the input request.
-        content = json_clean(dict(prompt=prompt))
+        content = json_clean(dict(prompt=prompt, password=password))
         msg = self.session.msg(u'input_request', content, parent)
         for frontend in self.frontends:
             if frontend.session.session == parent['header']['session']:

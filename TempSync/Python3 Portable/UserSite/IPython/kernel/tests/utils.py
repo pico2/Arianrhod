@@ -1,15 +1,7 @@
 """utilities for testing IPython kernels"""
 
-#-------------------------------------------------------------------------------
-#  Copyright (C) 2013  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
-# Imports
-#-------------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import atexit
 
@@ -23,7 +15,7 @@ except ImportError:
 import nose
 import nose.tools as nt
 
-from IPython.kernel import KernelManager
+from IPython.kernel import manager
 
 #-------------------------------------------------------------------------------
 # Globals
@@ -38,22 +30,13 @@ KC = None
 #-------------------------------------------------------------------------------
 # code
 #-------------------------------------------------------------------------------
-
-
-def start_new_kernel(argv=None):
-    """start a new kernel, and return its Manager and Client"""
-    km = KernelManager()
-    kwargs = dict(stdout=nose.iptest_stdstreams_fileno(), stderr=STDOUT)
-    if argv:
-        kwargs['extra_arguments'] = argv
-    km.start_kernel(**kwargs)
-    kc = km.client()
-    kc.start_channels()
+def start_new_kernel(**kwargs):
+    """start a new kernel, and return its Manager and Client
     
-    msg_id = kc.kernel_info()
-    kc.get_shell_msg(block=True, timeout=STARTUP_TIMEOUT)
-    flush_channels(kc)
-    return km, kc
+    Integrates with our output capturing for tests.
+    """
+    kwargs.update(dict(stdout=nose.iptest_stdstreams_fileno(), stderr=STDOUT))
+    return manager.start_new_kernel(startup_timeout=STARTUP_TIMEOUT, **kwargs)
 
 def flush_channels(kc=None):
     """flush any messages waiting on the queue"""
@@ -84,9 +67,9 @@ def execute(code='', kc=None, **kwargs):
     nt.assert_equal(busy['content']['execution_state'], 'busy')
     
     if not kwargs.get('silent'):
-        pyin = kc.get_iopub_msg(timeout=TIMEOUT)
-        validate_message(pyin, 'pyin', msg_id)
-        nt.assert_equal(pyin['content']['code'], code)
+        execute_input = kc.get_iopub_msg(timeout=TIMEOUT)
+        validate_message(execute_input, 'execute_input', msg_id)
+        nt.assert_equal(execute_input['content']['code'], code)
     
     return msg_id, reply['content']
 
@@ -96,6 +79,8 @@ def start_global_kernel():
     if KM is None:
         KM, KC = start_new_kernel()
         atexit.register(stop_global_kernel)
+    else:
+        flush_channels(KC)
     return KC
 
 @contextmanager
@@ -129,7 +114,6 @@ def stop_global_kernel():
     KM.shutdown_kernel(now=True)
     KM = None
 
-@contextmanager
 def new_kernel(argv=None):
     """Context manager for a new kernel in a subprocess
     
@@ -139,13 +123,11 @@ def new_kernel(argv=None):
     -------
     kernel_client: connected KernelClient instance
     """
-    km, kc = start_new_kernel(argv)
-    try:
-        yield kc
-    finally:
-        kc.stop_channels()
-        km.shutdown_kernel(now=True)
-
+    kwargs = dict(stdout=nose.iptest_stdstreams_fileno(), stderr=STDOUT,
+                  startup_timeout=STARTUP_TIMEOUT)
+    if argv is not None:
+        kwargs['extra_arguments'] = argv
+    return manager.run_kernel(**kwargs)
 
 def assemble_output(iopub):
     """assemble stdout/err from an execution"""
@@ -160,9 +142,9 @@ def assemble_output(iopub):
             break
         elif msg['msg_type'] == 'stream':
             if content['name'] == 'stdout':
-                stdout += content['data']
+                stdout += content['text']
             elif content['name'] == 'stderr':
-                stderr += content['data']
+                stderr += content['text']
             else:
                 raise KeyError("bad stream: %r" % content['name'])
         else:

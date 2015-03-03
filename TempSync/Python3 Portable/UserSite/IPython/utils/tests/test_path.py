@@ -1,18 +1,8 @@
 # encoding: utf-8
 """Tests for IPython.utils.path.py"""
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-from __future__ import with_statement
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import errno
 import os
@@ -29,6 +19,7 @@ except ImportError:
 
 from os.path import join, abspath, split
 
+from nose import SkipTest
 import nose.tools as nt
 
 from nose import with_setup
@@ -471,8 +462,15 @@ def test_not_writable_ipdir():
     env.pop('XDG_CONFIG_HOME', None)
     env['HOME'] = tmpdir
     ipdir = os.path.join(tmpdir, '.ipython')
-    os.mkdir(ipdir)
-    os.chmod(ipdir, 600)
+    os.mkdir(ipdir, 0o555)
+    try:
+        open(os.path.join(ipdir, "_foo_"), 'w').close()
+    except IOError:
+        pass
+    else:
+        # I can still write to an unwritable dir,
+        # assume I'm root and skip the test
+        raise SkipTest("I can't create directories that I can't write to")
     with AssertPrints('is not a writable location', channel='stderr'):
         ipdir = path.get_ipython_dir()
     env.pop('IPYTHON_DIR', None)
@@ -603,6 +601,17 @@ def test_unescape_glob():
     nt.assert_equals(path.unescape_glob(r'\a'), r'\a')
 
 
+def test_ensure_dir_exists():
+    with TemporaryDirectory() as td:
+        d = os.path.join(td, u'∂ir')
+        path.ensure_dir_exists(d) # create it
+        assert os.path.isdir(d)
+        path.ensure_dir_exists(d) # no-op
+        f = os.path.join(td, u'ƒile')
+        open(f, 'w').close() # touch
+        with nt.assert_raises(IOError):
+            path.ensure_dir_exists(f)
+
 class TestLinkOrCopy(object):
     def setUp(self):
         self.tempdir = TemporaryDirectory()
@@ -667,3 +676,12 @@ class TestLinkOrCopy(object):
         dst = self.dst("target")
         path.link_or_copy(self.src, dst)
         self.assert_content_equal(self.src, dst)
+
+    def test_link_twice(self):
+        # Linking the same file twice shouldn't leave duplicates around.
+        # See https://github.com/ipython/ipython/issues/6450
+        dst = self.dst('target')
+        path.link_or_copy(self.src, dst)
+        path.link_or_copy(self.src, dst)
+        self.assert_inode_equal(self.src, dst)
+        nt.assert_equal(sorted(os.listdir(self.tempdir.name)), ['src', 'target'])

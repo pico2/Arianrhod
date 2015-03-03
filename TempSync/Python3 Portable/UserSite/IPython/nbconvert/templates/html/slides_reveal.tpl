@@ -10,7 +10,13 @@
     <section>
     {{ super() }}
 {%- elif cell.metadata.slide_type in ['-'] -%}
-    {{ super() }}
+    {%- if cell.metadata.frag_helper in ['fragment_end'] -%}
+        <div class="fragment" data-fragment-index="{{ cell.metadata.frag_number }}">
+        {{ super() }}
+        </div>
+    {%- else -%}
+        {{ super() }}
+    {%- endif -%}
 {%- elif cell.metadata.slide_type in ['skip'] -%}
     <div style=display:none>
     {{ super() }}
@@ -20,7 +26,7 @@
     {{ super() }}
     </aside>
 {%- elif cell.metadata.slide_type in ['fragment'] -%}
-    <div class="fragment">
+    <div class="fragment" data-fragment-index="{{ cell.metadata.frag_number }}">
     {{ super() }}
     </div>
 {%- endif -%}
@@ -52,9 +58,6 @@
 <link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/reveal.css">
 <link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/theme/simple.css" id="theme">
 
-<!-- For syntax highlighting -->
-<link rel="stylesheet" href="{{resources.reveal.url_prefix}}/lib/css/zenburn.css">
-
 <!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
 if( window.location.search.match( /print-pdf/gi ) ) {
@@ -72,7 +75,7 @@ if( window.location.search.match( /print-pdf/gi ) ) {
 <![endif]-->
 
 <!-- Get Font-awesome from cdn -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
 
 {% for css in resources.inlining.css -%}
     <style type="text/css">
@@ -95,6 +98,9 @@ html {
   font-family: monospace, sans-serif;
   font-size: 80%;
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+}
+.reveal pre code {
+  padding: 0px;
 }
 .reveal section img {
   border: 0px solid black;
@@ -174,7 +180,6 @@ transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/c
 // Optional libraries used to extend on reveal.js
 dependencies: [
 { src: "{{resources.reveal.url_prefix}}/lib/js/classList.js", condition: function() { return !document.body.classList; } },
-{ src: "{{resources.reveal.url_prefix}}/plugin/highlight/highlight.js", async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
 { src: "{{resources.reveal.url_prefix}}/plugin/notes/notes.js", async: true, condition: function() { return !!document.body.classList; } }
 ]
 });

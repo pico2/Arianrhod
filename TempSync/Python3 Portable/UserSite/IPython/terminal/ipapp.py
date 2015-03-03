@@ -30,9 +30,7 @@ import logging
 import os
 import sys
 
-from IPython.config.loader import (
-    Config, PyFileConfigLoader, ConfigFileNotFound
-)
+from IPython.config.loader import Config
 from IPython.config.application import boolean_flag, catch_config_error, Application
 from IPython.core import release
 from IPython.core import usage
@@ -173,8 +171,7 @@ frontend_flags['quick']=(
 
 frontend_flags['i'] = (
     {'TerminalIPythonApp' : {'force_interact' : True}},
-    """If running code from the command line, become interactive afterwards.
-    Note: can also be given simply as '-i'."""
+    """If running code from the command line, become interactive afterwards."""
 )
 flags.update(frontend_flags)
 
@@ -251,6 +248,9 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         ),
         trust=('IPython.nbformat.sign.TrustNotebookApp',
             "Sign notebooks to trust their potentially unsafe contents at load."
+        ),
+        kernelspec=('IPython.kernel.kernelspecapp.KernelSpecApp',
+            "Manage IPython kernel specifications."
         ),
     )
     subcommands['install-nbextension'] = (

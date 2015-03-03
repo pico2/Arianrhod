@@ -1,17 +1,10 @@
 """Utilities for connecting to kernels
 
-Authors:
-
-* Min Ragan-Kelley
-
+The :class:`ConnectionFileMixin` class in this module encapsulates the logic
+related to writing and reading connections files.
 """
-
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2013  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 #-----------------------------------------------------------------------------
 # Imports
@@ -30,18 +23,15 @@ import tempfile
 
 import zmq
 
-# external imports
-from IPython.external.ssh import tunnel
-
 # IPython imports
-from IPython.config import Configurable
+from IPython.config import LoggingConfigurable
 from IPython.core.profiledir import ProfileDir
 from IPython.utils.localinterfaces import localhost
 from IPython.utils.path import filefind, get_ipython_dir
 from IPython.utils.py3compat import (str_to_bytes, bytes_to_str, cast_bytes_py2,
                                      string_types)
 from IPython.utils.traitlets import (
-    Bool, Integer, Unicode, CaselessStrEnum,
+    Bool, Integer, Unicode, CaselessStrEnum, Instance,
 )
 
 
@@ -169,7 +159,7 @@ def get_connection_file(app=None):
     return filefind(app.connection_file, ['.', app.profile_dir.security_dir])
 
 
-def find_connection_file(filename, profile=None):
+def find_connection_file(filename='kernel-*.json', profile=None):
     """find a connection file, and return its absolute path.
     
     The current working directory and the profile's security
@@ -305,7 +295,7 @@ def connect_qtconsole(connection_file=None, argv=None, profile=None):
     
     Returns
     -------
-    subprocess.Popen instance running the qtconsole frontend
+    :class:`subprocess.Popen` instance running the qtconsole frontend
     """
     argv = [] if argv is None else argv
     
@@ -351,6 +341,7 @@ def tunnel_to_kernel(connection_info, sshserver, sshkey=None):
     (shell, iopub, stdin, hb) : ints
         The four ports on localhost that have been forwarded to the kernel.
     """
+    from zmq.ssh import tunnel
     if isinstance(connection_info, string_types):
         # it's a path, unpack it
         with open(connection_info) as f:
@@ -388,11 +379,17 @@ channel_socket_types = {
 
 port_names = [ "%s_port" % channel for channel in ('shell', 'stdin', 'iopub', 'hb', 'control')]
 
-class ConnectionFileMixin(Configurable):
+class ConnectionFileMixin(LoggingConfigurable):
     """Mixin for configurable classes that work with connection files"""
 
     # The addresses for the communication channels
-    connection_file = Unicode('')
+    connection_file = Unicode('', config=True, 
+    help="""JSON file in which to store connection info [default: kernel-<pid>.json]
+    
+    This file will contain the IP, ports, and authentication key needed to connect
+    clients to this kernel. By default, this file will be created in the security dir
+    of the current profile, but can be specified by absolute path.
+    """)
     _connection_file_written = Bool(False)
 
     transport = CaselessStrEnum(['tcp', 'ipc'], default_value='tcp', config=True)
@@ -419,15 +416,26 @@ class ConnectionFileMixin(Configurable):
 
     # protected traits
 
-    shell_port = Integer(0)
-    iopub_port = Integer(0)
-    stdin_port = Integer(0)
-    control_port = Integer(0)
-    hb_port = Integer(0)
+    hb_port = Integer(0, config=True,
+            help="set the heartbeat port [default: random]")
+    shell_port = Integer(0, config=True,
+            help="set the shell (ROUTER) port [default: random]")
+    iopub_port = Integer(0, config=True,
+            help="set the iopub (PUB) port [default: random]")
+    stdin_port = Integer(0, config=True,
+            help="set the stdin (ROUTER) port [default: random]")
+    control_port = Integer(0, config=True,
+            help="set the control (ROUTER) port [default: random]")
 
     @property
     def ports(self):
         return [ getattr(self, name) for name in port_names ]
+
+    # The Session to use for communication with the kernel.
+    session = Instance('IPython.kernel.zmq.session.Session')
+    def _session_default(self):
+        from IPython.kernel.zmq.session import Session
+        return Session(parent=self)
 
     #--------------------------------------------------------------------------
     # Connection and ipc file management
@@ -491,16 +499,20 @@ class ConnectionFileMixin(Configurable):
 
     def load_connection_file(self):
         """Load connection info from JSON dict in self.connection_file."""
+        self.log.debug(u"Loading connection file %s", self.connection_file)
         with open(self.connection_file) as f:
-            cfg = json.loads(f.read())
-
-        self.transport = cfg.get('transport', 'tcp')
-        self.ip = cfg['ip']
+            cfg = json.load(f)
+        self.transport = cfg.get('transport', self.transport)
+        self.ip = cfg.get('ip', self._ip_default())
+        
         for name in port_names:
-            setattr(self, name, cfg[name])
+            if getattr(self, name) == 0 and name in cfg:
+                # not overridden by config or cl_args
+                setattr(self, name, cfg[name])
+        
         if 'key' in cfg:
             self.session.key = str_to_bytes(cfg['key'])
-        if cfg.get('signature_scheme'):
+        if 'signature_scheme' in cfg:
             self.session.signature_scheme = cfg['signature_scheme']
 
     #--------------------------------------------------------------------------
@@ -524,6 +536,8 @@ class ConnectionFileMixin(Configurable):
         socket_type = channel_socket_types[channel]
         self.log.debug("Connecting to: %s" % url)
         sock = self.context.socket(socket_type)
+        # set linger to 1s to prevent hangs at exit
+        sock.linger = 1000
         if identity:
             sock.identity = identity
         sock.connect(url)
@@ -548,7 +562,7 @@ class ConnectionFileMixin(Configurable):
         return self._create_connected_socket('hb', identity=identity)
 
     def connect_control(self, identity=None):
-        """return zmq Socket connected to the Heartbeat channel"""
+        """return zmq Socket connected to the Control channel"""
         return self._create_connected_socket('control', identity=identity)
 
 

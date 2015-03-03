@@ -1,20 +1,14 @@
-#-----------------------------------------------------------------------------
-# Copyright (c) 2010, IPython Development Team.
-#
+# Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-# Standard libary imports.
 from base64 import decodestring
 import os
 import re
 
-# System libary imports.
 from IPython.external.qt import QtCore, QtGui
 
-# Local imports
+from IPython.lib.latextools import latex_to_png
+from IPython.utils.path import ensure_dir_exists
 from IPython.utils.traitlets import Bool
 from IPython.qt.svg import save_svg, svg_to_clipboard, svg_to_image
 from .ipython_widget import IPythonWidget
@@ -101,19 +95,18 @@ class RichIPythonWidget(IPythonWidget):
     # 'BaseFrontendMixin' abstract interface
     #---------------------------------------------------------------------------
     def _pre_image_append(self, msg, prompt_number):
-        """ Append the Out[] prompt  and make the output nicer
+        """Append the Out[] prompt  and make the output nicer
 
         Shared code for some the following if statement
         """
-        self.log.debug("pyout: %s", msg.get('content', ''))
         self._append_plain_text(self.output_sep, True)
         self._append_html(self._make_out_prompt(prompt_number), True)
         self._append_plain_text('\n', True)
 
-    def _handle_pyout(self, msg):
-        """ Overridden to handle rich data types, like SVG.
-        """
-        if not self._hidden and self._is_from_this_session(msg):
+    def _handle_execute_result(self, msg):
+        """Overridden to handle rich data types, like SVG."""
+        self.log.debug("execute_result: %s", msg.get('content', ''))
+        if self.include_output(msg):
             self.flush_clearoutput()
             content = msg['content']
             prompt_number = content.get('execution_count', 0)
@@ -133,34 +126,37 @@ class RichIPythonWidget(IPythonWidget):
                 jpg = decodestring(data['image/jpeg'].encode('ascii'))
                 self._append_jpg(jpg, True, metadata=metadata.get('image/jpeg', None))
                 self._append_html(self.output_sep2, True)
+            elif 'text/latex' in data:
+                self._pre_image_append(msg, prompt_number)
+                self._append_latex(data['text/latex'], True)
+                self._append_html(self.output_sep2, True)
             else:
                 # Default back to the plain text representation.
-                return super(RichIPythonWidget, self)._handle_pyout(msg)
+                return super(RichIPythonWidget, self)._handle_execute_result(msg)
 
     def _handle_display_data(self, msg):
-        """ Overridden to handle rich data types, like SVG.
-        """
-        if not self._hidden and self._is_from_this_session(msg):
+        """Overridden to handle rich data types, like SVG."""
+        self.log.debug("display_data: %s", msg.get('content', ''))
+        if self.include_output(msg):
             self.flush_clearoutput()
-            source = msg['content']['source']
             data = msg['content']['data']
             metadata = msg['content']['metadata']
             # Try to use the svg or html representations.
             # FIXME: Is this the right ordering of things to try?
+            self.log.debug("display: %s", msg.get('content', ''))
             if 'image/svg+xml' in data:
-                self.log.debug("display: %s", msg.get('content', ''))
                 svg = data['image/svg+xml']
                 self._append_svg(svg, True)
             elif 'image/png' in data:
-                self.log.debug("display: %s", msg.get('content', ''))
                 # PNG data is base64 encoded as it passes over the network
                 # in a JSON structure so we decode it.
                 png = decodestring(data['image/png'].encode('ascii'))
                 self._append_png(png, True, metadata=metadata.get('image/png', None))
             elif 'image/jpeg' in data and self._jpg_supported:
-                self.log.debug("display: %s", msg.get('content', ''))
                 jpg = decodestring(data['image/jpeg'].encode('ascii'))
                 self._append_jpg(jpg, True, metadata=metadata.get('image/jpeg', None))
+            elif 'text/latex' in data:
+                self._append_latex(data['text/latex'], True)
             else:
                 # Default back to the plain text representation.
                 return super(RichIPythonWidget, self)._handle_display_data(msg)
@@ -168,6 +164,16 @@ class RichIPythonWidget(IPythonWidget):
     #---------------------------------------------------------------------------
     # 'RichIPythonWidget' protected interface
     #---------------------------------------------------------------------------
+
+    def _append_latex(self, latex, before_prompt=False, metadata=None):
+        """ Append latex data to the widget."""
+        try:
+            png = latex_to_png(latex, wrap=False)
+        except Exception as e:
+            self.log.error("Failed to render latex: '%s'", latex, exc_info=True)
+            self._append_plain_text("Failed to render latex: %s" % e, before_prompt)
+        else:
+            self._append_png(png, before_prompt, metadata)
 
     def _append_jpg(self, jpg, before_prompt=False, metadata=None):
         """ Append raw JPG data to the widget."""
@@ -233,8 +239,7 @@ class RichIPythonWidget(IPythonWidget):
                 return "<b>Couldn't find image %s</b>" % match.group("name")
 
             if path is not None:
-                if not os.path.exists(path):
-                    os.mkdir(path)
+                ensure_dir_exists(path)
                 relpath = os.path.basename(path)
                 if image.save("%s/qt_img%s.%s" % (path, match.group("name"), format),
                               "PNG"):

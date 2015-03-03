@@ -7,6 +7,9 @@ from os import walk, sep
 
 from IPython.core.display import DisplayObject
 
+__all__ = ['Audio', 'IFrame', 'YouTubeVideo', 'VimeoVideo', 'ScribdDocument',
+           'FileLink', 'FileLinks']
+
 
 class Audio(DisplayObject):
     """Create an audio object.
@@ -14,28 +17,32 @@ class Audio(DisplayObject):
     When this object is returned by an input cell or passed to the
     display function, it will result in Audio controls being displayed
     in the frontend (only works in the notebook).
-    
+
     Parameters
     ----------
     data : numpy array, list, unicode, str or bytes
-        Can be a
-        * Numpy 1d array containing the desired waveform (mono)
-        * List of float or integer representing the waveform (mono)
-        * String containing the filename
-        * Bytestring containing raw PCM data or
-        * URL pointing to a file on the web. 
-        
+        Can be one of
+
+          * Numpy 1d array containing the desired waveform (mono)
+          * Numpy 2d array containing waveforms for each channel.
+            Shape=(NCHAN, NSAMPLES). For the standard channel order, see
+            http://msdn.microsoft.com/en-us/library/windows/hardware/dn653308(v=vs.85).aspx
+          * List of float or integer representing the waveform (mono)
+          * String containing the filename
+          * Bytestring containing raw PCM data or
+          * URL pointing to a file on the web.
+
         If the array option is used the waveform will be normalized.
-        
-        If a filename or url is used the format support will be browser 
-        dependent. 
+
+        If a filename or url is used the format support will be browser
+        dependent.
     url : unicode
         A URL to download the data from.
     filename : unicode
         Path to a local file to load the data from.
     embed : boolean
         Should the image data be embedded using a data URI (True) or should
-        the original source be referenced. Set this to True if you want the 
+        the original source be referenced. Set this to True if you want the
         audio to playable later with no internet connection in the notebook.
 
         Default is `True`, unless the keyword argument `url` is set, then
@@ -58,6 +65,11 @@ class Audio(DisplayObject):
         data = np.sin(2*np.pi*220*t) + np.sin(2*np.pi*224*t))
         Audio(data,rate=framerate)
 
+        # Can also do stereo or more channels
+        dataleft = np.sin(2*np.pi*220*t)
+        dataright = np.sin(2*np.pi*224*t)
+        Audio([dataleft, dataright],rate=framerate)
+
         Audio("http://www.nch.com.au/acm/8k16bitpcm.wav")  # From URL
         Audio(url="http://www.w3schools.com/html/horse.ogg")
 
@@ -75,17 +87,17 @@ class Audio(DisplayObject):
             raise ValueError("No image data found. Expecting filename, url, or data.")
         if embed is False and url is None:
             raise ValueError("No url found. Expecting url when embed=False")
-            
+
         if url is not None and embed is not True:
             self.embed = False
         else:
             self.embed = True
         self.autoplay = autoplay
         super(Audio, self).__init__(data=data, url=url, filename=filename)
-            
+
         if self.data is not None and not isinstance(self.data, bytes):
             self.data = self._make_wav(data,rate)
-            
+
     def reload(self):
         """Reload the raw data from file or URL."""
         import mimetypes
@@ -98,32 +110,55 @@ class Audio(DisplayObject):
             self.mimetype = mimetypes.guess_type(self.url)[0]
         else:
             self.mimetype = "audio/wav"
-           
+
     def _make_wav(self, data, rate):
         """ Transform a numpy array to a PCM bytestring """
         import struct
         from io import BytesIO
         import wave
+
         try:
             import numpy as np
-            data = np.array(data,dtype=float)
-            if len(data.shape) > 1:
-                raise ValueError("encoding of stereo PCM signals are unsupported")  
+
+            data = np.array(data, dtype=float)
+            if len(data.shape) == 1:
+                nchan = 1
+            elif len(data.shape) == 2:
+                # In wave files,channels are interleaved. E.g.,
+                # "L1R1L2R2..." for stereo. See
+                # http://msdn.microsoft.com/en-us/library/windows/hardware/dn653308(v=vs.85).aspx
+                # for channel ordering
+                nchan = data.shape[0]
+                data = data.T.ravel()
+            else:
+                raise ValueError('Array audio input must be a 1D or 2D array')
             scaled = np.int16(data/np.max(np.abs(data))*32767).tolist()
         except ImportError:
+            # check that it is a "1D" list
+            idata = iter(data)  # fails if not an iterable
+            try:
+                iter(idata.next())
+                raise TypeError('Only lists of mono audio are '
+                    'supported if numpy is not installed')
+            except TypeError:
+                # this means it's not a nested list, which is what we want
+                pass
             maxabsvalue = float(max([abs(x) for x in data]))
-            scaled = [int(x/maxabsvalue*32767) for x in data] 
+            scaled = [int(x/maxabsvalue*32767) for x in data]
+            nchan = 1
+
         fp = BytesIO()
         waveobj = wave.open(fp,mode='wb')
-        waveobj.setnchannels(1)
+        waveobj.setnchannels(nchan)
         waveobj.setframerate(rate)
         waveobj.setsampwidth(2)
         waveobj.setcomptype('NONE','NONE')
         waveobj.writeframes(b''.join([struct.pack('<h',x) for x in scaled]))
         val = fp.getvalue()
         waveobj.close()
-        return val 
-    
+
+        return val
+
     def _data_and_metadata(self):
         """shortcut for returning metadata with url information, if defined"""
         md = {}
@@ -133,7 +168,7 @@ class Audio(DisplayObject):
             return self.data, md
         else:
             return self.data
-        
+
     def _repr_html_(self):
         src = """
                 <audio controls="controls" {autoplay}>
@@ -168,7 +203,7 @@ class IFrame(object):
     iframe = """
         <iframe
             width="{width}"
-            height={height}"
+            height="{height}"
             src="{src}{params}"
             frameborder="0"
             allowfullscreen
@@ -333,7 +368,8 @@ class FileLinks(FileLink):
                  result_html_prefix='',
                  result_html_suffix='<br>',
                  notebook_display_formatter=None,
-                 terminal_display_formatter=None):
+                 terminal_display_formatter=None,
+                 recursive=True):
         """
         See :class:`FileLink` for the ``path``, ``url_prefix``,
         ``result_html_prefix`` and ``result_html_suffix`` parameters.
@@ -361,6 +397,8 @@ class FileLinks(FileLink):
         included_suffixes : list
           The file suffixes that should be included in the output (passing None
           meansto include all suffixes in the output in the built-in formatters)
+        recursive : boolean
+          Whether to recurse into subdirectories. Default is True.
 
         The function should return a list of lines that will be printed in the
         notebook (if passing notebook_display_formatter) or the terminal (if
@@ -385,6 +423,8 @@ class FileLinks(FileLink):
              notebook_display_formatter or self._get_notebook_display_formatter()
         self.terminal_display_formatter = \
              terminal_display_formatter or self._get_terminal_display_formatter()
+
+        self.recursive = recursive
 
     def _get_display_formatter(self,
                                dirname_output_format,
@@ -415,7 +455,7 @@ class FileLinks(FileLink):
             display_fnames = []
             for fname in fnames:
                 if (isfile(join(dirname,fname)) and
-                       (included_suffixes == None or
+                       (included_suffixes is None or
                         splitext(fname)[1] in included_suffixes)):
                       display_fnames.append(fname)
 
@@ -481,7 +521,10 @@ class FileLinks(FileLink):
 
     def _format_path(self):
         result_lines = []
-        walked_dir = list(walk(self.path))
+        if self.recursive:
+            walked_dir = list(walk(self.path))
+        else:
+            walked_dir = [next(walk(self.path))]
         walked_dir.sort()
         for dirname, subdirs, fnames in walked_dir:
             result_lines += self.notebook_display_formatter(dirname, fnames, self.included_suffixes)
@@ -491,7 +534,10 @@ class FileLinks(FileLink):
         """return newline-separated absolute paths
         """
         result_lines = []
-        walked_dir = list(walk(self.path))
+        if self.recursive:
+            walked_dir = list(walk(self.path))
+        else:
+            walked_dir = [next(walk(self.path))]
         walked_dir.sort()
         for dirname, subdirs, fnames in walked_dir:
             result_lines += self.terminal_display_formatter(dirname, fnames, self.included_suffixes)

@@ -1,21 +1,27 @@
-// function completer.
-//
-// completer should be a class that takes an cell instance
-var IPython = (function (IPython) {
-    // that will prevent us from misspelling
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
+
+define([
+    'base/js/namespace',
+    'jquery',
+    'base/js/utils',
+    'base/js/keyboard',
+    'notebook/js/contexthint',
+    'codemirror/lib/codemirror',
+], function(IPython, $, utils, keyboard, CodeMirror) {
     "use strict";
 
     // easier key mapping
-    var keycodes = IPython.keyboard.keycodes;
+    var keycodes = keyboard.keycodes;
 
-    function prepend_n_prc(str, n) {
+    var prepend_n_prc = function(str, n) {
         for( var i =0 ; i< n ; i++){
             str = '%'+str ;
         }
         return str;
     };
 
-    function _existing_completion(item, completion_array){
+    var _existing_completion = function(item, completion_array){
         for( var i=0; i < completion_array.length; i++) {
             if (completion_array[i].trim().substr(-item.length) == item) {
                 return true;
@@ -73,22 +79,24 @@ var IPython = (function (IPython) {
     }
 
 
-    var Completer = function (cell) {
+    var Completer = function (cell, events) {
         this.cell = cell;
         this.editor = cell.code_mirror;
         var that = this;
-        $([IPython.events]).on('status_busy.Kernel', function () {
+        events.on('kernel_busy.Kernel', function () {
             that.skip_kernel_completion = true;
         });
-        $([IPython.events]).on('status_idle.Kernel', function () {
+        events.on('kernel_idle.Kernel', function () {
             that.skip_kernel_completion = false;
         });
     };
 
     Completer.prototype.startCompletion = function () {
-        // call for a 'first' completion, that will set the editor and do some
-        // special behavior like autopicking if only one completion available.
-        if (this.editor.somethingSelected()) return;
+        /**
+         * call for a 'first' completion, that will set the editor and do some
+         * special behavior like autopicking if only one completion available.
+         */
+        if (this.editor.somethingSelected()|| this.editor.getSelections().length > 1) return;
         this.done = false;
         // use to get focus back on opera
         this.carry_on_completion(true);
@@ -113,9 +121,11 @@ var IPython = (function (IPython) {
      * shared start
      **/
     Completer.prototype.carry_on_completion = function (first_invocation) {
-        // Pass true as parameter if you want the completer to autopick when
-        // only one completion. This function is automatically reinvoked at
-        // each keystroke with first_invocation = false
+        /**
+         * Pass true as parameter if you want the completer to autopick when
+         * only one completion. This function is automatically reinvoked at
+         * each keystroke with first_invocation = false
+         */
         var cur = this.editor.getCursor();
         var line = this.editor.getLine(cur.line);
         var pre_cursor = this.editor.getRange({
@@ -137,35 +147,54 @@ var IPython = (function (IPython) {
         }
 
         // We want a single cursor position.
-        if (this.editor.somethingSelected()) {
+        if (this.editor.somethingSelected()|| this.editor.getSelections().length > 1) {
             return;
         }
 
         // one kernel completion came back, finish_completing will be called with the results
         // we fork here and directly call finish completing if kernel is busy
+        var cursor_pos = utils.to_absolute_cursor_pos(this.editor, cur);
         if (this.skip_kernel_completion) {
-            this.finish_completing({
-                'matches': [],
-                matched_text: ""
-            });
+            this.finish_completing({ content: {
+                matches: [],
+                cursor_start: cursor_pos,
+                cursor_end: cursor_pos,
+            }});
         } else {
-            this.cell.kernel.complete(line, cur.ch, $.proxy(this.finish_completing, this));
+            this.cell.kernel.complete(this.editor.getValue(), cursor_pos,
+                $.proxy(this.finish_completing, this)
+            );
         }
     };
 
     Completer.prototype.finish_completing = function (msg) {
-        // let's build a function that wrap all that stuff into what is needed
-        // for the new completer:
+        /**
+         * let's build a function that wrap all that stuff into what is needed
+         * for the new completer:
+         */
         var content = msg.content;
-        var matched_text = content.matched_text;
+        var start = content.cursor_start;
+        var end = content.cursor_end;
         var matches = content.matches;
 
         var cur = this.editor.getCursor();
+        if (end === null) {
+            // adapted message spec replies don't have cursor position info,
+            // interpret end=null as current position,
+            // and negative start relative to that
+            end = utils.to_absolute_cursor_pos(this.editor, cur);
+            if (start === null) {
+                start = end;
+            } else if (start < 0) {
+                start = end + start;
+            }
+        }
         var results = CodeMirror.contextHint(this.editor);
         var filtered_results = [];
         //remove results from context completion
         //that are already in kernel completion
-        for (var i=0; i < results.length; i++) {
+        var i;
+        for (i=0; i < results.length; i++) {
             if (!_existing_completion(results[i].str, matches)) {
                 filtered_results.push(results[i]);
             }
@@ -174,18 +203,12 @@ var IPython = (function (IPython) {
         // append the introspection result, in order, at at the beginning of
         // the table and compute the replacement range from current cursor
         // positon and matched_text length.
-        for (var i = matches.length - 1; i >= 0; --i) {
+        for (i = matches.length - 1; i >= 0; --i) {
             filtered_results.unshift({
                 str: matches[i],
                 type: "introspection",
-                from: {
-                    line: cur.line,
-                    ch: cur.ch - matched_text.length
-                },
-                to: {
-                    line: cur.line,
-                    ch: cur.ch
-                }
+                from: utils.from_absolute_cursor_pos(this.editor, start),
+                to: utils.from_absolute_cursor_pos(this.editor, end)
             });
         }
 
@@ -249,8 +272,9 @@ var IPython = (function (IPython) {
 
         // After everything is on the page, compute the postion.
         // We put it above the code if it is too close to the bottom of the page.
-        cur.ch = cur.ch-matched_text.length;
-        var pos = this.editor.cursorCoords(cur);
+        var pos = this.editor.cursorCoords(
+            utils.from_absolute_cursor_pos(this.editor, start)
+        );
         var left = pos.left-3;
         var top;
         var cheight = this.complete.height();
@@ -301,11 +325,15 @@ var IPython = (function (IPython) {
 
         // Enter
         if (code == keycodes.enter) {
-            CodeMirror.e_stop(event);
+            event.codemirrorIgnore = true;
+            event._ipkmIgnore = true;
+            event.preventDefault();
             this.pick();
         // Escape or backspace
         } else if (code == keycodes.esc || code == keycodes.backspace) {
-            CodeMirror.e_stop(event);
+            event.codemirrorIgnore = true;
+            event._ipkmIgnore = true;
+            event.preventDefault();
             this.close();
         } else if (code == keycodes.tab) {
             //all the fastforwarding operation,
@@ -324,7 +352,9 @@ var IPython = (function (IPython) {
         } else if (code == keycodes.up || code == keycodes.down) {
             // need to do that to be able to move the arrow
             // when on the first or last line ofo a code cell
-            CodeMirror.e_stop(event);
+            event.codemirrorIgnore = true;
+            event._ipkmIgnore = true;
+            event.preventDefault();
 
             var options = this.sel.find('option');
             var index = this.sel[0].selectedIndex;
@@ -336,17 +366,31 @@ var IPython = (function (IPython) {
             }
             index = Math.min(Math.max(index, 0), options.length-1);
             this.sel[0].selectedIndex = index;
+        } else if (code == keycodes.pageup || code == keycodes.pagedown) {
+            event._ipkmIgnore = true;
+
+            var options = this.sel.find('option');
+            var index = this.sel[0].selectedIndex;
+            if (code == keycodes.pageup) {
+                index -= 10; // As 10 is the hard coded size of the drop down menu
+            } else {
+                index += 10;
+            }
+            index = Math.min(Math.max(index, 0), options.length-1);
+            this.sel[0].selectedIndex = index;
         } else if (code == keycodes.left || code == keycodes.right) {
             this.close();
         }
     };
 
     Completer.prototype.keypress = function (event) {
-        // FIXME: This is a band-aid.
-        // on keypress, trigger insertion of a single character.
-        // This simulates the old behavior of completion as you type,
-        // before events were disconnected and CodeMirror stopped
-        // receiving events while the completer is focused.
+        /**
+         * FIXME: This is a band-aid.
+         * on keypress, trigger insertion of a single character.
+         * This simulates the old behavior of completion as you type,
+         * before events were disconnected and CodeMirror stopped
+         * receiving events while the completer is focused.
+         */
         
         var that = this;
         var code = event.keyCode;
@@ -364,7 +408,9 @@ var IPython = (function (IPython) {
             that.carry_on_completion();
         }, 50);
     };
+
+    // For backwards compatability.
     IPython.Completer = Completer;
 
-    return IPython;
-}(IPython));
+    return {'Completer': Completer};
+});

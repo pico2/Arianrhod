@@ -1,28 +1,21 @@
-//----------------------------------------------------------------------------
-//  Copyright (C) 2013 The IPython Development Team
-//
-//  Distributed under the terms of the BSD License.  The full license is in
-//  the file COPYING, distributed as part of this software.
-//----------------------------------------------------------------------------
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
 
-//============================================================================
-// BoolWidget
-//============================================================================
+define([
+    "widgets/js/widget",
+    "jquery",
+    "bootstrap",
+], function(widget, $){
 
-/**
- * @module IPython
- * @namespace IPython
- **/
-
-define(["widgets/js/widget"], function(WidgetManager){
-
-    var CheckboxView = IPython.DOMWidgetView.extend({
+    var CheckboxView = widget.DOMWidgetView.extend({
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.$el
-                .addClass('widget-hbox-single');
+                .addClass('widget-hbox widget-checkbox');
             this.$label = $('<div />')
-                .addClass('widget-hlabel')
+                .addClass('widget-label')
                 .appendTo(this.$el)
                 .hide();
             this.$checkbox = $('<input />')
@@ -30,25 +23,39 @@ define(["widgets/js/widget"], function(WidgetManager){
                 .appendTo(this.$el)
                 .click($.proxy(this.handle_click, this));
 
-            this.$el_to_style = this.$checkbox; // Set default element to style
             this.update(); // Set defaults.
         },
 
-        handle_click: function() {
-            // Handles when the checkbox is clicked.
+        update_attr: function(name, value) {
+            /**
+             * Set a css attr of the widget view.
+             */
+            if (name == 'padding' || name == 'margin') {
+                this.$el.css(name, value);
+            } else {
+                this.$checkbox.css(name, value);
+            }
+        },
 
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
+        handle_click: function() {
+            /**
+             * Handles when the checkbox is clicked.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
             var value = this.model.get('value');
             this.model.set('value', ! value, {updated_view: this});
             this.touch();
         },
         
         update : function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             this.$checkbox.prop('checked', this.model.get('value'));
 
             if (options === undefined || options.updated_view != this) {
@@ -59,7 +66,7 @@ define(["widgets/js/widget"], function(WidgetManager){
                 if (description.trim().length === 0) {
                     this.$label.hide();
                 } else {
-                    this.$label.text(description);
+                    this.typeset(this.$label, description);
                     this.$label.show();
                 }
             }
@@ -67,29 +74,48 @@ define(["widgets/js/widget"], function(WidgetManager){
         },
         
     });
-    WidgetManager.register_widget_view('CheckboxView', CheckboxView);
 
 
-    var ToggleButtonView = IPython.DOMWidgetView.extend({
+    var ToggleButtonView = widget.DOMWidgetView.extend({
         render : function() {
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             var that = this;
             this.setElement($('<button />')
-                .addClass('btn')
+                .addClass('btn btn-default')
                 .attr('type', 'button')
                 .on('click', function (e) {
                     e.preventDefault();
                     that.handle_click();
                 }));
+            this.$el.attr("data-toggle", "tooltip");
+            this.model.on('change:button_style', function(model, value) {
+                this.update_button_style();
+            }, this);
+            this.update_button_style('');
 
             this.update(); // Set defaults.
         },
+
+        update_button_style: function(previous_trait_value) {
+            var class_map = {
+                primary: ['btn-primary'],
+                success: ['btn-success'],
+                info: ['btn-info'],
+                warning: ['btn-warning'],
+                danger: ['btn-danger']
+            };
+            this.update_mapped_classes(class_map, 'button_style', previous_trait_value);
+        },
         
         update : function(options){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             if (this.model.get('value')) {
                 this.$el.addClass('active');
             } else {
@@ -102,6 +128,7 @@ define(["widgets/js/widget"], function(WidgetManager){
                 this.$el.prop('disabled', disabled);
 
                 var description = this.model.get('description');
+                this.$el.attr("title", this.model.get("tooltip"));
                 if (description.trim().length === 0) {
                     this.$el.html("&nbsp;"); // Preserve button height
                 } else {
@@ -112,14 +139,20 @@ define(["widgets/js/widget"], function(WidgetManager){
         },
         
         handle_click: function(e) { 
-            // Handles and validates user input.
-
-            // Calling model.set will trigger all of the other views of the 
-            // model to update.
+            /**
+             * Handles and validates user input.
+             *
+             * Calling model.set will trigger all of the other views of the 
+             * model to update.
+             */
             var value = this.model.get('value');
             this.model.set('value', ! value, {updated_view: this});
             this.touch();
         },
     });
-    WidgetManager.register_widget_view('ToggleButtonView', ToggleButtonView);
+
+    return {
+        'CheckboxView': CheckboxView,
+        'ToggleButtonView': ToggleButtonView,
+    };
 });

@@ -6,6 +6,7 @@
 #-----------------------------------------------------------------------------
 
 # stdlib
+import io
 import os
 import sys
 import tempfile
@@ -124,7 +125,7 @@ def test_history():
             # Cross testing: check that magic %save can get previous session.
             testfilename = os.path.realpath(os.path.join(tmpdir, "test.py"))
             ip.magic("save " + testfilename + " ~1/1-3")
-            with py3compat.open(testfilename, encoding='utf-8') as testfile:
+            with io.open(testfilename, encoding='utf-8') as testfile:
                 nt.assert_equal(testfile.read(),
                                         u"# coding: utf-8\n" + u"\n".join(hist)+u"\n")
 
@@ -134,6 +135,10 @@ def test_history():
             ip.history_manager.writeout_cache()
             nt.assert_equal(ip.history_manager.session_number, 3)
         finally:
+            # Ensure saving thread is shut down before we try to clean up the files
+            ip.history_manager.save_thread.stop()
+            # Forcibly close database rather than relying on garbage collection
+            ip.history_manager.db.close()
             # Restore history manager
             ip.history_manager = hist_manager_ori
 

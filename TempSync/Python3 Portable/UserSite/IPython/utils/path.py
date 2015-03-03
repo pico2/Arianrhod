@@ -3,16 +3,8 @@
 Utilities for path handling.
 """
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import os
 import sys
@@ -20,9 +12,9 @@ import errno
 import shutil
 import random
 import tempfile
-import warnings
-from hashlib import md5
 import glob
+from warnings import warn
+from hashlib import md5
 
 import IPython
 from IPython.testing.skipdoctest import skip_doctest
@@ -34,10 +26,6 @@ from IPython.utils import py3compat
 #-----------------------------------------------------------------------------
 
 fs_encoding = sys.getfilesystemencoding()
-
-def _get_long_path_name(path):
-    """Dummy no-op."""
-    return path
 
 def _writable_dir(path):
     """Whether `path` is a directory, to which the user has write access."""
@@ -69,6 +57,11 @@ if sys.platform == 'win32':
             return path
         else:
             return buf.value
+else:
+    def _get_long_path_name(path):
+        """Dummy no-op."""
+        return path
+
 
 
 def get_long_path_name(path):
@@ -279,8 +272,8 @@ def get_ipython_dir():
     
     # import pdb; pdb.set_trace()  # dbg
     if 'IPYTHON_DIR' in env:
-        warnings.warn('The environment variable IPYTHON_DIR is deprecated. '
-                      'Please use IPYTHONDIR instead.')
+        warn('The environment variable IPYTHON_DIR is deprecated. '
+                'Please use IPYTHONDIR instead.')
     ipdir = env.get('IPYTHONDIR', env.get('IPYTHON_DIR', None))
     if ipdir is None:
         # not set explicitly, use ~/.ipython
@@ -293,28 +286,28 @@ def get_ipython_dir():
             if _writable_dir(xdg_ipdir):
                 cu = compress_user
                 if os.path.exists(ipdir):
-                    warnings.warn(('Ignoring {0} in favour of {1}. Remove {0} '
-                    'to get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
+                    warn(('Ignoring {0} in favour of {1}. Remove {0} to '
+                        'get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
                 elif os.path.islink(xdg_ipdir):
-                    warnings.warn(('{0} is deprecated. Move link to {1} '
-                    'to get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
+                    warn(('{0} is deprecated. Move link to {1} to '
+                        'get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
                 else:
-                    warnings.warn('Moving {0} to {1}'.format(cu(xdg_ipdir), cu(ipdir)))
+                    warn('Moving {0} to {1}'.format(cu(xdg_ipdir), cu(ipdir)))
                     shutil.move(xdg_ipdir, ipdir)
 
     ipdir = os.path.normpath(os.path.expanduser(ipdir))
 
     if os.path.exists(ipdir) and not _writable_dir(ipdir):
         # ipdir exists, but is not writable
-        warnings.warn("IPython dir '%s' is not a writable location,"
-                        " using a temp directory."%ipdir)
+        warn("IPython dir '{0}' is not a writable location,"
+                " using a temp directory.".format(ipdir))
         ipdir = tempfile.mkdtemp()
     elif not os.path.exists(ipdir):
         parent = os.path.dirname(ipdir)
         if not _writable_dir(parent):
             # ipdir does not exist and parent isn't writable
-            warnings.warn("IPython parent '%s' is not a writable location,"
-                        " using a temp directory."%parent)
+            warn("IPython parent '{0}' is not a writable location,"
+                    " using a temp directory.".format(parent))
             ipdir = tempfile.mkdtemp()
 
     return py3compat.cast_unicode(ipdir, fs_encoding)
@@ -327,7 +320,7 @@ def get_ipython_cache_dir():
         return get_ipython_dir()
     ipdir = os.path.join(xdgdir, "ipython")
     if not os.path.exists(ipdir) and _writable_dir(xdgdir):
-        os.makedirs(ipdir)
+        ensure_dir_exists(ipdir)
     elif not _writable_dir(xdgdir):
         return get_ipython_dir()
 
@@ -481,11 +474,11 @@ def check_for_old_config(ipython_dir=None):
             if filehash(f) == old_config_md5.get(cfg, ''):
                 os.unlink(f)
             else:
-                warnings.warn("Found old IPython config file %r (modified by user)"%f)
+                warn("Found old IPython config file {!r} (modified by user)".format(f))
                 warned = True
 
     if warned:
-        warnings.warn("""
+        warn("""
   The IPython configuration system has changed as of 0.11, and these files will
   be ignored. See http://ipython.github.com/ipython-doc/dev/config for details
   of the new config system.
@@ -561,6 +554,12 @@ def link_or_copy(src, dst):
 
     link_errno = link(src, dst)
     if link_errno == errno.EEXIST:
+        if os.stat(src).st_ino == os.stat(dst).st_ino:
+            # dst is already a hard link to the correct file, so we don't need
+            # to do anything else. If we try to link and rename the file
+            # anyway, we get duplicate files - see http://bugs.python.org/issue21876
+            return
+
         new_dst = dst + "-temp-%04X" %(random.randint(1, 16**4), )
         try:
             link_or_copy(src, new_dst)
@@ -575,3 +574,20 @@ def link_or_copy(src, dst):
         # Either link isn't supported, or the filesystem doesn't support
         # linking, or 'src' and 'dst' are on different filesystems.
         shutil.copy(src, dst)
+
+def ensure_dir_exists(path, mode=0o755):
+    """ensure that a directory exists
+    
+    If it doesn't exist, try to create it and protect against a race condition
+    if another process is doing the same.
+    
+    The default permissions are 755, which differ from os.makedirs default of 777.
+    """
+    if not os.path.exists(path):
+        try:
+            os.makedirs(path, mode=mode)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+    elif not os.path.isdir(path):
+        raise IOError("%r exists but is not a directory" % path)

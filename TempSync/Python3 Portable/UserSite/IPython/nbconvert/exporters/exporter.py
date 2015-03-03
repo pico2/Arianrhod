@@ -2,43 +2,44 @@
 see templateexporter.py.
 """
 
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 
 from __future__ import print_function, absolute_import
 
-# Stdlib imports
 import io
 import os
 import copy
 import collections
 import datetime
 
-
-# IPython imports
 from IPython.config.configurable import LoggingConfigurable
 from IPython.config import Config
-from IPython.nbformat import current as nbformat
-from IPython.utils.traitlets import MetaHasTraits, Unicode, List
+from IPython import nbformat
+from IPython.utils.traitlets import MetaHasTraits, Unicode, List, TraitError
 from IPython.utils.importstring import import_item
 from IPython.utils import text, py3compat
 
-#-----------------------------------------------------------------------------
-# Class
-#-----------------------------------------------------------------------------
 
 class ResourcesDict(collections.defaultdict):
     def __missing__(self, key):
         return ''
+
+
+class FilenameExtension(Unicode):
+    """A trait for filename extensions."""
+
+    default_value = u''
+    info_text = 'a filename extension, beginning with a dot'
+
+    def validate(self, obj, value):
+        # cast to proper unicode
+        value = super(FilenameExtension, self).validate(obj, value)
+
+        # check that it starts with a dot
+        if value and not value.startswith('.'):
+            msg = "FileExtension trait '{}' does not begin with a dot: {!r}"
+            raise TraitError(msg.format(self.name, value))
+
+        return value
 
 
 class Exporter(LoggingConfigurable):
@@ -48,8 +49,8 @@ class Exporter(LoggingConfigurable):
     accompanying resources dict.
     """
 
-    file_extension = Unicode(
-        'txt', config=True,
+    file_extension = FilenameExtension(
+        '.txt', config=True,
         help="Extension of the file that should be written to disk"
         )
 
@@ -70,6 +71,8 @@ class Exporter(LoggingConfigurable):
                                   'IPython.nbconvert.preprocessors.CSSHTMLHeaderPreprocessor',
                                   'IPython.nbconvert.preprocessors.RevealHelpPreprocessor',
                                   'IPython.nbconvert.preprocessors.LatexPreprocessor',
+                                  'IPython.nbconvert.preprocessors.ClearOutputPreprocessor',
+                                  'IPython.nbconvert.preprocessors.ExecutePreprocessor',
                                   'IPython.nbconvert.preprocessors.HighlightMagicsPreprocessor'],
         config=True,
         help="""List of preprocessors available by default, by name, namespace, 
@@ -98,15 +101,14 @@ class Exporter(LoggingConfigurable):
     def default_config(self):
         return Config()
 
-    @nbformat.docstring_nbformat_mod
     def from_notebook_node(self, nb, resources=None, **kw):
         """
         Convert a notebook from a notebook node instance.
 
         Parameters
         ----------
-        nb : :class:`~{nbformat_mod}.nbbase.NotebookNode`
-          Notebook node
+        nb : :class:`~IPython.nbformat.NotebookNode`
+          Notebook node (dict-like with attr-access)
         resources : dict
           Additional resources that can be accessed read/write by
           preprocessors and filters.
@@ -148,7 +150,7 @@ class Exporter(LoggingConfigurable):
         resources['metadata']['modified_date'] = modified_date.strftime(text.date_format)
 
         with io.open(filename, encoding='utf-8') as f:
-            return self.from_notebook_node(nbformat.read(f, 'json'), resources=resources, **kw)
+            return self.from_notebook_node(nbformat.read(f, as_version=4), resources=resources, **kw)
 
 
     def from_file(self, file_stream, resources=None, **kw):
@@ -160,7 +162,7 @@ class Exporter(LoggingConfigurable):
         file_stream : file-like object
             Notebook file-like object to convert.
         """
-        return self.from_notebook_node(nbformat.read(file_stream, 'json'), resources=resources, **kw)
+        return self.from_notebook_node(nbformat.read(file_stream, as_version=4), resources=resources, **kw)
 
 
     def register_preprocessor(self, preprocessor, enabled=False):
@@ -239,7 +241,9 @@ class Exporter(LoggingConfigurable):
         #Make sure the metadata extension exists in resources
         if 'metadata' in resources:
             if not isinstance(resources['metadata'], ResourcesDict):
-                resources['metadata'] = ResourcesDict(resources['metadata'])
+                new_metadata = ResourcesDict()
+                new_metadata.update(resources['metadata'])
+                resources['metadata'] = new_metadata
         else:
             resources['metadata'] = ResourcesDict()
             if not resources['metadata']['name']:

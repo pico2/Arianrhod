@@ -1,9 +1,15 @@
 var xor = function (a, b) {return !a ^ !b;}; 
-var isArray = function (a) {return toString.call(a) === "[object Array]" || toString.call(a) === "[object RuntimeArray]";};
+var isArray = function (a) {
+    try {
+        return Object.toString.call(a) === "[object Array]" || Object.toString.call(a) === "[object RuntimeArray]";
+    } catch (e) {
+        return Array.isArray(a);
+    }
+};
 var recursive_compare = function(a, b) {
     // Recursively compare two objects.
     var same = true;
-    same = same && !xor(a instanceof Object, b instanceof Object);
+    same = same && !xor(a instanceof Object || typeof a == 'object', b instanceof Object || typeof b == 'object');
     same = same && !xor(isArray(a), isArray(b));
 
     if (same) {
@@ -32,14 +38,6 @@ var recursive_compare = function(a, b) {
 // Test the widget framework.
 casper.notebook_test(function () {
     var index;
-    
-    this.then(function () {
-    
-        // Check if the WidgetManager class is defined.
-        this.test.assert(this.evaluate(function() {
-            return IPython.WidgetManager !== undefined; 
-        }), 'WidgetManager class is defined');
-    });
 
     index = this.append_cell(
         'from IPython.html import widgets\n' + 
@@ -48,10 +46,6 @@ casper.notebook_test(function () {
     this.execute_cell_then(index);
 
     this.then(function () {
-        // Check if the widget manager has been instantiated.
-        this.test.assert(this.evaluate(function() {
-            return IPython.notebook.kernel.widget_manager !== undefined; 
-        }), 'Notebook widget manager instantiated');
 
         // Functions that can be used to test the packing and unpacking APIs
         var that = this;
@@ -65,13 +59,27 @@ casper.notebook_test(function () {
                 JSON.stringify(input) + ' passed through Model._pack_model unchanged');
         };
         var test_unpack = function (input) {
-            var output = that.evaluate(function(input) {
+            that.thenEvaluate(function(input) {
+                window.results = undefined;
                 var model = new IPython.WidgetModel(IPython.notebook.kernel.widget_manager, undefined);
-                var results = model._unpack_models(input);
-                return results;
+                model._unpack_models(input).then(function(results) { 
+                    window.results = results; 
+                });    
             }, {input: input});
-            that.test.assert(recursive_compare(input, output), 
-                JSON.stringify(input) + ' passed through Model._unpack_model unchanged');
+            
+            that.waitFor(function check() {
+                return that.evaluate(function() { 
+                    return window.results; 
+                }); 
+            });
+            
+            that.then(function() {
+                var results = that.evaluate(function() { 
+                    return window.results; 
+                });
+                that.test.assert(recursive_compare(input, results), 
+                    JSON.stringify(input) + ' passed through Model._unpack_model unchanged');
+            });
         };
         var test_packing = function(input) {
             test_pack(input);
@@ -87,9 +95,10 @@ casper.notebook_test(function () {
         test_packing([1, false]);
         test_packing([1, false, {a: 'hi'}]);
         test_packing([1, false, ['hi']]);
+        test_packing([String('hi'), Date("Thu Nov 13 2014 13:46:21 GMT-0500")])
 
         // Test multi-set, single touch code.  First create a custom widget.
-        this.evaluate(function() {
+        this.thenEvaluate(function() {
             var MultiSetView = IPython.DOMWidgetView.extend({
                 render: function(){
                     this.model.set('a', 1);
@@ -112,8 +121,8 @@ casper.notebook_test(function () {
         '    b = CInt(0, sync=True)\n' +
         '    c = CInt(0, sync=True)\n' +
         '    d = CInt(-1, sync=True)\n' + // See if it sends a full state.
-        '    def _handle_receive_state(self, sync_data):\n' +
-        '        widgets.Widget._handle_receive_state(self, sync_data)\n'+
+        '    def set_state(self, sync_data):\n' +
+        '        widgets.Widget.set_state(self, sync_data)\n'+
         '        self.d = len(sync_data)\n' +
         'multiset = MultiSetWidget()\n' +
         'display(multiset)\n' +
@@ -141,11 +150,11 @@ casper.notebook_test(function () {
     var textbox = {};
     throttle_index = this.append_cell(
         'import time\n' +
-        'textbox = widgets.TextWidget()\n' +
+        'textbox = widgets.Text()\n' +
         'display(textbox)\n' +
-        'textbox.add_class("my-throttle-textbox")\n' +
+        'textbox._dom_classes = ["my-throttle-textbox"]\n' +
         'def handle_change(name, old, new):\n' +
-        '    print(len(new))\n' +
+        '    display(len(new))\n' +
         '    time.sleep(0.5)\n' +
         'textbox.on_trait_change(handle_change, "value")\n' +
         'print(textbox.model_id)');
@@ -160,7 +169,7 @@ casper.notebook_test(function () {
             '.my-throttle-textbox'), 'Textbox exists.');
 
         // Send 20 characters
-        this.sendKeys('.my-throttle-textbox', '....................');
+        this.sendKeys('.my-throttle-textbox input', '....................');
     });
 
     this.wait_for_widget(textbox);
@@ -176,7 +185,7 @@ casper.notebook_test(function () {
         this.test.assert(outputs.length <= 5, 'Messages throttled.');
 
         // We also need to verify that the last state sent was correct.
-        var last_state = outputs[outputs.length-1].text;
-        this.test.assertEquals(last_state, "20\n", "Last state sent when throttling.");
+        var last_state = outputs[outputs.length-1].data['text/plain'];
+        this.test.assertEquals(last_state, "20", "Last state sent when throttling.");
     });
 });

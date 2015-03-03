@@ -1,19 +1,12 @@
-//----------------------------------------------------------------------------
-//  Copyright (C) 2014  The IPython Development Team
-//
-//  Distributed under the terms of the BSD License.  The full license is in
-//  the file COPYING, distributed as part of this software.
-//----------------------------------------------------------------------------
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
 
-//============================================================================
-// Utilities
-//============================================================================
-IPython.namespace('IPython.security');
-
-IPython.security = (function (IPython) {
+define([
+    'base/js/namespace',
+    'jquery',
+    'components/google-caja/html-css-sanitizer-minified',
+], function(IPython, $) {
     "use strict";
-
-    var utils = IPython.utils;
     
     var noop = function (x) { return x; };
     
@@ -25,8 +18,10 @@ IPython.security = (function (IPython) {
     }
     
     var sanitizeAttribs = function (tagName, attribs, opt_naiveUriRewriter, opt_nmTokenPolicy, opt_logger) {
-        // add trusting data-attributes to the default sanitizeAttribs from caja
-        // this function is mostly copied from the caja source
+        /**
+         * add trusting data-attributes to the default sanitizeAttribs from caja
+         * this function is mostly copied from the caja source
+         */
         var ATTRIBS = caja.html4.ATTRIBS;
         for (var i = 0; i < attribs.length; i += 2) {
             var attribName = attribs[i];
@@ -41,9 +36,11 @@ IPython.security = (function (IPython) {
     };
     
     var sanitize_css = function (css, tagPolicy) {
-        // sanitize CSS
-        // like sanitize_html, but for CSS
-        // called by sanitize_stylesheets
+        /**
+         * sanitize CSS
+         * like sanitize_html, but for CSS
+         * called by sanitize_stylesheets
+         */
         return caja.sanitizeStylesheet(
             window.location.pathname,
             css,
@@ -58,8 +55,10 @@ IPython.security = (function (IPython) {
     };
     
     var sanitize_stylesheets = function (html, tagPolicy) {
-        // sanitize just the css in style tags in a block of html
-        // called by sanitize_html, if allow_css is true
+        /**
+         * sanitize just the css in style tags in a block of html
+         * called by sanitize_html, if allow_css is true
+         */
         var h = $("<div/>").append(html);
         var style_tags = h.find("style");
         if (!style_tags.length) {
@@ -73,9 +72,11 @@ IPython.security = (function (IPython) {
     };
     
     var sanitize_html = function (html, allow_css) {
-        // sanitize HTML
-        // if allow_css is true (default: false), CSS is sanitized as well.
-        // otherwise, CSS elements and attributes are simply removed.
+        /**
+         * sanitize HTML
+         * if allow_css is true (default: false), CSS is sanitized as well.
+         * otherwise, CSS elements and attributes are simply removed.
+         */
         var html4 = caja.html4;
 
         if (allow_css) {
@@ -117,10 +118,12 @@ IPython.security = (function (IPython) {
         return sanitized;
     };
     
-    return {
+    var security = {
         caja: caja,
         sanitize_html: sanitize_html
     };
 
-}(IPython));
+    IPython.security = security;
 
+    return security;
+});

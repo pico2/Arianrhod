@@ -142,11 +142,12 @@ class TestView(ClusterTestCase):
         ar = v.apply_async(wait, 1)
         # give the monitor time to notice the message
         time.sleep(.25)
-        ahr = v2.get_result(ar.msg_ids[0])
-        self.assertTrue(isinstance(ahr, AsyncHubResult))
+        ahr = v2.get_result(ar.msg_ids[0], owner=False)
+        self.assertIsInstance(ahr, AsyncHubResult)
         self.assertEqual(ahr.get(), ar.get())
         ar2 = v2.get_result(ar.msg_ids[0])
-        self.assertFalse(isinstance(ar2, AsyncHubResult))
+        self.assertNotIsInstance(ar2, AsyncHubResult)
+        self.assertEqual(ahr.get(), ar2.get())
         c.spin()
         c.close()
     
@@ -537,7 +538,7 @@ class TestView(ClusterTestCase):
         ar = e0.execute("5", silent=False)
         er = ar.get()
         self.assertEqual(str(er), "<ExecuteReply[%i]: 5>" % er.execution_count)
-        self.assertEqual(er.pyout['data']['text/plain'], '5')
+        self.assertEqual(er.execute_result['data']['text/plain'], '5')
 
     def test_execute_reply_rich(self):
         e0 = self.client[self.client.ids[0]]
@@ -558,21 +559,21 @@ class TestView(ClusterTestCase):
         er = ar.get()
         self.assertEqual(er.stdout.strip(), '5')
         
-    def test_execute_pyout(self):
-        """execute triggers pyout with silent=False"""
+    def test_execute_result(self):
+        """execute triggers execute_result with silent=False"""
         view = self.client[:]
         ar = view.execute("5", silent=False, block=True)
         
         expected = [{'text/plain' : '5'}] * len(view)
-        mimes = [ out['data'] for out in ar.pyout ]
+        mimes = [ out['data'] for out in ar.execute_result ]
         self.assertEqual(mimes, expected)
     
     def test_execute_silent(self):
-        """execute does not trigger pyout with silent=True"""
+        """execute does not trigger execute_result with silent=True"""
         view = self.client[:]
         ar = view.execute("5", block=True)
         expected = [None] * len(view)
-        self.assertEqual(ar.pyout, expected)
+        self.assertEqual(ar.execute_result, expected)
     
     def test_execute_magic(self):
         """execute accepts IPython commands"""

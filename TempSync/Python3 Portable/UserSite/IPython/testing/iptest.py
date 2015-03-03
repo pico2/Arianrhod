@@ -14,19 +14,11 @@ itself from the command line. There are two ways of running this script:
 
 """
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2009-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 from __future__ import print_function
 
-# Stdlib
 import glob
 from io import BytesIO
 import os
@@ -35,7 +27,6 @@ import sys
 from threading import Thread, Lock, Event
 import warnings
 
-# Now, proceed to import nose itself
 import nose.plugins.builtin
 from nose.plugins.xunit import Xunit
 from nose import SkipTest
@@ -43,8 +34,8 @@ from nose.core import TestProgram
 from nose.plugins import Plugin
 from nose.util import safe_str
 
-# Our own imports
 from IPython.utils.process import is_cmd_found
+from IPython.utils.py3compat import bytes_to_str
 from IPython.utils.importstring import import_item
 from IPython.testing.plugin.ipdoctest import IPythonDoctest
 from IPython.external.decorators import KnownFailure, knownfailureif
@@ -140,17 +131,19 @@ have['pexpect'] = test_for('IPython.external.pexpect')
 have['pymongo'] = test_for('pymongo')
 have['pygments'] = test_for('pygments')
 have['qt'] = test_for('IPython.external.qt')
-have['rpy2'] = test_for('rpy2')
 have['sqlite3'] = test_for('sqlite3')
-have['cython'] = test_for('Cython')
-have['oct2py'] = test_for('oct2py')
-have['tornado'] = test_for('tornado.version_info', (3,1,0), callback=None)
+have['tornado'] = test_for('tornado.version_info', (4,0), callback=None)
 have['jinja2'] = test_for('jinja2')
+have['mistune'] = test_for('mistune')
 have['requests'] = test_for('requests')
 have['sphinx'] = test_for('sphinx')
+have['jsonschema'] = test_for('jsonschema')
+have['terminado'] = test_for('terminado')
 have['casperjs'] = is_cmd_found('casperjs')
+have['phantomjs'] = is_cmd_found('phantomjs')
+have['slimerjs'] = is_cmd_found('slimerjs')
 
-min_zmq = (2,1,11)
+min_zmq = (13,)
 
 have['zmq'] = test_for('zmq.pyzmq_version_info', min_zmq, callback=lambda x: x())
 
@@ -239,6 +232,7 @@ sec.requires('zmq')
 sec.exclude('inprocess')
 # importing gtk sets the default encoding, which we want to avoid
 sec.exclude('zmq.gui.gtkembed')
+sec.exclude('zmq.gui.gtk3embed')
 if not have['matplotlib']:
     sec.exclude('zmq.pylab')
 
@@ -247,15 +241,8 @@ test_sections['kernel.inprocess'].requires('zmq')
 
 # extensions:
 sec = test_sections['extensions']
-if not have['cython']:
-    sec.exclude('cythonmagic')
-    sec.exclude('tests.test_cythonmagic')
-if not have['oct2py']:
-    sec.exclude('octavemagic')
-    sec.exclude('tests.test_octavemagic')
-if not have['rpy2'] or not have['numpy']:
-    sec.exclude('rmagic')
-    sec.exclude('tests.test_rmagic')
+# This is deprecated in favour of rpy2
+sec.exclude('rmagic')
 # autoreload does some strange stuff, so move it to its own test section
 sec.exclude('autoreload')
 sec.exclude('tests.test_autoreload')
@@ -268,17 +255,19 @@ test_sections['qt'].requires('zmq', 'qt', 'pygments')
 
 # html:
 sec = test_sections['html']
-sec.requires('zmq', 'tornado', 'requests', 'sqlite3')
+sec.requires('zmq', 'tornado', 'requests', 'sqlite3', 'jsonschema')
 # The notebook 'static' directory contains JS, css and other
 # files for web serving.  Occasionally projects may put a .py
 # file in there (MathJax ships a conf.py), so we might as
 # well play it safe and skip the whole thing.
 sec.exclude('static')
-sec.exclude('fabfile')
+sec.exclude('tasks')
 if not have['jinja2']:
     sec.exclude('notebookapp')
 if not have['pygments'] or not have['jinja2']:
     sec.exclude('nbconvert')
+if not have['terminado']:
+    sec.exclude('terminal')
 
 # config:
 # Config files aren't really importable stand-alone
@@ -286,7 +275,7 @@ test_sections['config'].exclude('profile')
 
 # nbconvert:
 sec = test_sections['nbconvert']
-sec.requires('pygments', 'jinja2')
+sec.requires('pygments', 'jinja2', 'jsonschema', 'mistune')
 # Exclude nbconvert directories containing config files used to test.
 # Executing the config files with iptest would cause an exception.
 sec.exclude('tests.files')
@@ -294,6 +283,9 @@ sec.exclude('exporters.tests.files')
 if not have['tornado']:
     sec.exclude('nbconvert.post_processors.serve')
     sec.exclude('nbconvert.post_processors.tests.test_serve')
+
+# nbformat:
+test_sections['nbformat'].requires('jsonschema')
 
 #-----------------------------------------------------------------------------
 # Functions and classes
@@ -354,8 +346,9 @@ class ExclusionPlugin(Plugin):
 class StreamCapturer(Thread):
     daemon = True  # Don't hang if main thread crashes
     started = False
-    def __init__(self):
+    def __init__(self, echo=False):
         super(StreamCapturer, self).__init__()
+        self.echo = echo
         self.streams = []
         self.buffer = BytesIO()
         self.readfd, self.writefd = os.pipe()
@@ -370,6 +363,8 @@ class StreamCapturer(Thread):
 
             with self.buffer_lock:
                 self.buffer.write(chunk)
+            if self.echo:
+                sys.stdout.write(bytes_to_str(chunk))
     
         os.close(self.readfd)
         os.close(self.writefd)
@@ -393,7 +388,7 @@ class StreamCapturer(Thread):
             return
 
         self.stop.set()
-        os.write(self.writefd, b'wake up')  # Ensure we're not locked in a read()
+        os.write(self.writefd, b'\0')  # Ensure we're not locked in a read()
         self.join()
 
 class SubprocessStreamCapturePlugin(Plugin):

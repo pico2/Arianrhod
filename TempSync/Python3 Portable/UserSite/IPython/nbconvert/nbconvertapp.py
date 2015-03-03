@@ -1,21 +1,12 @@
 #!/usr/bin/env python
-"""NBConvert is a utility for conversion of .ipynb files.
+"""NbConvert is a utility for conversion of .ipynb files.
 
 Command-line interface for the NbConvert conversion utility.
 """
-#-----------------------------------------------------------------------------
-#Copyright (c) 2013, the IPython Development Team.
-#
-#Distributed under the terms of the Modified BSD License.
-#
-#The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-#Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-# Stdlib imports
 from __future__ import print_function
 
 import logging
@@ -23,7 +14,6 @@ import sys
 import os
 import glob
 
-# From IPython
 from IPython.core.application import BaseIPythonApplication, base_aliases, base_flags
 from IPython.core.profiledir import ProfileDir
 from IPython.config import catch_config_error, Configurable
@@ -31,7 +21,6 @@ from IPython.utils.traitlets import (
     Unicode, List, Instance, DottedObjectName, Type, CaselessStrEnum,
 )
 from IPython.utils.importstring import import_item
-from IPython.utils.text import dedent
 
 from .exporters.export import get_export_names, exporter_map
 from IPython.nbconvert import exporters, preprocessors, writers, postprocessors
@@ -64,11 +53,16 @@ nbconvert_aliases.update({
     'post': 'NbConvertApp.postprocessor_class',
     'output': 'NbConvertApp.output_base',
     'reveal-prefix': 'RevealHelpPreprocessor.url_prefix',
+    'nbformat': 'NotebookExporter.nbformat_version',
 })
 
 nbconvert_flags = {}
 nbconvert_flags.update(base_flags)
 nbconvert_flags.update({
+    'execute' : (
+        {'ExecutePreprocessor' : {'enabled' : True}},
+        "Execute the notebook prior to export."
+        ),
     'stdout' : (
         {'NbConvertApp' : {'writer_class' : "StdoutWriter"}},
         "Write notebook output to stdout instead of files."
@@ -103,7 +97,7 @@ class NbConvertApp(BaseIPythonApplication):
         WARNING: THE COMMANDLINE INTERFACE MAY CHANGE IN FUTURE RELEASES.""")
 
     output_base = Unicode('', config=True, help='''overwrite base name use for output files.
-            can only  be use when converting one notebook at a time.
+            can only be used when converting one notebook at a time.
             ''')
 
     examples = Unicode(u"""
@@ -128,9 +122,9 @@ class NbConvertApp(BaseIPythonApplication):
         
         > ipython nbconvert mynotebook.ipynb --stdout
 
-        A post-processor can be used to compile a PDF
+        PDF is generated via latex
 
-        > ipython nbconvert mynotebook.ipynb --to latex --post PDF
+        > ipython nbconvert mynotebook.ipynb --to pdf
         
         You can get (and serve) a Reveal.js-powered slideshow
         
@@ -174,8 +168,7 @@ class NbConvertApp(BaseIPythonApplication):
     postprocessor_class = DottedOrNone(config=True, 
                                     help="""PostProcessor class used to write the 
                                     results of the conversion""")
-    postprocessor_aliases = {'pdf': 'IPython.nbconvert.postprocessors.pdf.PDFPostProcessor',
-                              'serve': 'IPython.nbconvert.postprocessors.serve.ServePostProcessor'}
+    postprocessor_aliases = {'serve': 'IPython.nbconvert.postprocessors.serve.ServePostProcessor'}
     postprocessor_factory = Type()
 
     def _postprocessor_class_changed(self, name, old, new):
@@ -290,8 +283,14 @@ class NbConvertApp(BaseIPythonApplication):
             basename = os.path.basename(notebook_filename)
             notebook_name = basename[:basename.rfind('.')]
             if self.output_base:
+                # strip duplicate extension from output_base, to avoid Basname.ext.ext
+                if getattr(exporter, 'file_extension', False):
+                    base, ext = os.path.splitext(self.output_base)
+                    if ext == exporter.file_extension:
+                        self.output_base = base
                 notebook_name = self.output_base
             resources = {}
+            resources['profile_dir'] = self.profile_dir.location
             resources['unique_key'] = notebook_name
             resources['output_files_dir'] = '%s_files' % notebook_name
             self.log.info("Support files will be in %s", os.path.join(resources['output_files_dir'], ''))
@@ -304,11 +303,13 @@ class NbConvertApp(BaseIPythonApplication):
                       exc_info=True)
                 self.exit(1)
             else:
-                write_resultes = self.writer.write(output, resources, notebook_name=notebook_name)
+                if 'output_suffix' in resources and not self.output_base:
+                    notebook_name += resources['output_suffix']
+                write_results = self.writer.write(output, resources, notebook_name=notebook_name)
 
                 #Post-process if post processor has been defined.
                 if hasattr(self, 'postprocessor') and self.postprocessor:
-                    self.postprocessor(write_resultes)
+                    self.postprocessor(write_results)
                 conversion_success += 1
 
         # If nothing was converted successfully, help the user.

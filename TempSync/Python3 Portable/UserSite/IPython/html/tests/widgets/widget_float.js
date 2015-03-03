@@ -1,26 +1,28 @@
 // Test widget float class
 casper.notebook_test(function () {
-    index = this.append_cell(
+    var float_text = {};
+    float_text.query = '.widget-area .widget-subarea .my-second-float-text input';
+    float_text.index = this.append_cell(
         'from IPython.html import widgets\n' + 
         'from IPython.display import display, clear_output\n' +
-        'print("Success")');
-    this.execute_cell_then(index);
-
-    var float_text = {};
-    float_text.query = '.widget-area .widget-subarea .widget-hbox-single .my-second-float-text';
-    float_text.index = this.append_cell(
-        'float_widget = widgets.FloatTextWidget()\n' +
+        'float_widget = widgets.FloatText()\n' +
         'display(float_widget)\n' + 
-        'float_widget.add_class("my-second-float-text")\n' + 
+        'float_widget._dom_classes = ["my-second-float-text"]\n' + 
         'print(float_widget.model_id)\n');
     this.execute_cell_then(float_text.index, function(index){
         float_text.model_id = this.get_output_cell(index).text.trim();
-        
-        this.test.assert(this.cell_element_exists(index, 
+    });
+
+    // Wait for the widget to actually display.
+    this.wait_for_element(float_text.index, float_text.query);
+
+    // Continue with the tests
+    this.then(function(){        
+        this.test.assert(this.cell_element_exists(float_text.index, 
             '.widget-area .widget-subarea'),
             'Widget subarea exists.');
 
-        this.test.assert(this.cell_element_exists(index, float_text.query),
+        this.test.assert(this.cell_element_exists(float_text.index, float_text.query),
             'Widget float textbox exists.');
 
         this.cell_element_function(float_text.index, float_text.query, 'val', ['']);
@@ -55,27 +57,32 @@ casper.notebook_test(function () {
             'Invald float textbox value caught and filtered.');
     });
 
-    var float_text_query = '.widget-area .widget-subarea .widget-hbox-single .widget-numeric-text';
+    var float_text_query = '.widget-area .widget-subarea .widget-numeric-text';
     var slider = {};
-    slider.query = '.widget-area .widget-subarea .widget-hbox-single .slider';
+    slider.query = '.widget-area .widget-subarea .slider';
     slider.index = this.append_cell(
-        'floatrange = [widgets.BoundedFloatTextWidget(), \n' +
-        '    widgets.FloatSliderWidget()]\n' +
+        'floatrange = [widgets.BoundedFloatText(), \n' +
+        '    widgets.FloatSlider()]\n' +
         '[display(floatrange[i]) for i in range(2)]\n' + 
         'print("Success")\n');
     this.execute_cell_then(slider.index, function(index){
-
         this.test.assertEquals(this.get_output_cell(index).text, 'Success\n', 
             'Create float range cell executed with correct output.');
+    });
 
-        this.test.assert(this.cell_element_exists(index, 
+    // Wait for the widgets to actually display.
+    this.wait_for_element(slider.index, slider.query);
+    this.wait_for_element(slider.index, float_text_query);
+
+    this.then(function(){
+        this.test.assert(this.cell_element_exists(slider.index, 
             '.widget-area .widget-subarea'),
             'Widget subarea exists.');
 
-        this.test.assert(this.cell_element_exists(index, slider.query),
+        this.test.assert(this.cell_element_exists(slider.index, slider.query),
             'Widget slider exists.');
 
-        this.test.assert(this.cell_element_exists(index, float_text_query),
+        this.test.assert(this.cell_element_exists(slider.index, float_text_query),
             'Widget float textbox exists.');
     });
 

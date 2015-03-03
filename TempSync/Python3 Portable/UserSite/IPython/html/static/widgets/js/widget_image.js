@@ -1,33 +1,27 @@
-//----------------------------------------------------------------------------
-//  Copyright (C) 2013 The IPython Development Team
-//
-//  Distributed under the terms of the BSD License.  The full license is in
-//  the file COPYING, distributed as part of this software.
-//----------------------------------------------------------------------------
+// Copyright (c) IPython Development Team.
+// Distributed under the terms of the Modified BSD License.
 
-//============================================================================
-// ImageWidget
-//============================================================================
-
-/**
- * @module IPython
- * @namespace IPython
- **/
-
-define(["widgets/js/widget"], function(WidgetManager){
-
-    var ImageView = IPython.DOMWidgetView.extend({  
+define([
+    "widgets/js/widget",
+    "jquery",
+], function(widget, $){
+    
+    var ImageView = widget.DOMWidgetView.extend({  
         render : function(){
-            // Called when view is rendered.
+            /**
+             * Called when view is rendered.
+             */
             this.setElement($("<img />"));
             this.update(); // Set defaults.
         },
         
         update : function(){
-            // Update the contents of this view
-            //
-            // Called when the model is changed.  The model may have been 
-            // changed by another view or by a state update from the back-end.
+            /**
+             * Update the contents of this view
+             *
+             * Called when the model is changed.  The model may have been 
+             * changed by another view or by a state update from the back-end.
+             */
             var image_src = 'data:image/' + this.model.get('format') + ';base64,' + this.model.get('_b64value');
             this.$el.attr('src', image_src);
             
@@ -47,5 +41,8 @@ define(["widgets/js/widget"], function(WidgetManager){
             return ImageView.__super__.update.apply(this);
         },
     });
-    WidgetManager.register_widget_view('ImageView', ImageView);
+
+    return {
+        'ImageView': ImageView,
+    };
 });

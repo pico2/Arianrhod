@@ -13,6 +13,7 @@ This module does not import anything from matplotlib.
 # Imports
 #-----------------------------------------------------------------------------
 
+from IPython.config import Config
 from IPython.config.configurable import SingletonConfigurable
 from IPython.utils.traitlets import (
     Dict, Instance, CaselessStrEnum, Set, Bool, Int, TraitError, Unicode
@@ -42,7 +43,7 @@ class InlineBackend(InlineBackendConfig):
 
     def _config_changed(self, name, old, new):
         # warn on change of renamed config section
-        if new.InlineBackendConfig != old.InlineBackendConfig:
+        if new.InlineBackendConfig != getattr(old, 'InlineBackendConfig', Config()):
             warn("InlineBackendConfig has been renamed to InlineBackend")
         super(InlineBackend, self)._config_changed(name, old, new)
 
@@ -53,6 +54,7 @@ class InlineBackend(InlineBackendConfig):
         # play nicely with white background in the Qt and notebook frontend
         'figure.facecolor': (1,1,1,0),
         'figure.edgecolor': (1,1,1,0),
+        'axes.facecolor': (1,1,1,0),
         # 12pt labels get cutoff on 6x4 logplots, so use 10pt.
         'font.size': 10,
         # 72 dpi matches SVG/qtconsole

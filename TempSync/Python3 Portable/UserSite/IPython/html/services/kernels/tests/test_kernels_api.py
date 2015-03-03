@@ -1,10 +1,6 @@
 """Test the kernels service API."""
 
-
-import os
-import sys
 import json
-
 import requests
 
 from IPython.html.utils import url_path_join
@@ -34,8 +30,9 @@ class KernelAPI(object):
     def get(self, id):
         return self._req('GET', id)
 
-    def start(self):
-        return self._req('POST', '')
+    def start(self, name='python'):
+        body = json.dumps({'name': name})
+        return self._req('POST', '', body)
 
     def shutdown(self, id):
         return self._req('DELETE', id)
@@ -60,6 +57,19 @@ class KernelAPITest(NotebookTestBase):
         kernels = self.kern_api.list().json()
         self.assertEqual(kernels, [])
 
+    def test_default_kernel(self):
+        # POST request
+        r = self.kern_api._req('POST', '')
+        kern1 = r.json()
+        self.assertEqual(r.headers['location'], '/api/kernels/' + kern1['id'])
+        self.assertEqual(r.status_code, 201)
+        self.assertIsInstance(kern1, dict)
+
+        self.assertEqual(r.headers['Content-Security-Policy'], (
+                            "frame-ancestors 'self'; "
+                            "report-uri /api/security/csp-report;"
+        ))
+
     def test_main_kernel_handler(self):
         # POST request
         r = self.kern_api.start()
@@ -68,13 +78,17 @@ class KernelAPITest(NotebookTestBase):
         self.assertEqual(r.status_code, 201)
         self.assertIsInstance(kern1, dict)
 
-        self.assertEqual(r.headers['x-frame-options'], "SAMEORIGIN")
+        self.assertEqual(r.headers['Content-Security-Policy'], (
+                            "frame-ancestors 'self'; "
+                            "report-uri /api/security/csp-report;"
+        ))
 
         # GET request
         r = self.kern_api.list()
         self.assertEqual(r.status_code, 200)
         assert isinstance(r.json(), list)
         self.assertEqual(r.json()[0]['id'], kern1['id'])
+        self.assertEqual(r.json()[0]['name'], kern1['name'])
 
         # create another kernel and check that they both are added to the
         # list of kernels from a GET request
@@ -95,6 +109,7 @@ class KernelAPITest(NotebookTestBase):
         self.assertEqual(r.headers['Location'], '/api/kernels/'+kern2['id'])
         rekern = r.json()
         self.assertEqual(rekern['id'], kern2['id'])
+        self.assertEqual(rekern['name'], kern2['name'])
 
     def test_kernel_handler(self):
         # GET kernel with given id

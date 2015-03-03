@@ -3,42 +3,26 @@
 This is not a complete console app, as subprocess will not be able to receive
 input, there is no real readline support, among other limitations. This is a
 refactoring of what used to be the IPython/qt/console/qtconsoleapp.py
-
-Authors:
-
-* Evan Patterson
-* Min RK
-* Erik Tollerud
-* Fernando Perez
-* Bussonnier Matthias
-* Thomas Kluyver
-* Paul Ivanov
-
 """
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-# stdlib imports
 import atexit
-import json
 import os
 import signal
 import sys
 import uuid
 
 
-# Local imports
 from IPython.config.application import boolean_flag
 from IPython.core.profiledir import ProfileDir
 from IPython.kernel.blocking import BlockingKernelClient
 from IPython.kernel import KernelManager
 from IPython.kernel import tunnel_to_kernel, find_connection_file, swallow_argv
+from IPython.kernel.kernelspec import NoSuchKernel
 from IPython.utils.path import filefind
-from IPython.utils.py3compat import str_to_bytes
 from IPython.utils.traitlets import (
-    Dict, List, Unicode, CUnicode, Int, CBool, Any
+    Dict, List, Unicode, CUnicode, CBool, Any
 )
 from IPython.kernel.zmq.kernelapp import (
     kernel_flags,
@@ -50,16 +34,7 @@ from IPython.kernel.zmq.session import Session, default_secure
 from IPython.kernel.zmq.zmqshell import ZMQInteractiveShell
 from IPython.kernel.connect import ConnectionFileMixin
 
-#-----------------------------------------------------------------------------
-# Network Constants
-#-----------------------------------------------------------------------------
-
 from IPython.utils.localinterfaces import localhost
-
-#-----------------------------------------------------------------------------
-# Globals
-#-----------------------------------------------------------------------------
-
 
 #-----------------------------------------------------------------------------
 # Aliases and Flags
@@ -98,6 +73,7 @@ app_aliases = dict(
     existing = 'IPythonConsoleApp.existing',
     f = 'IPythonConsoleApp.connection_file',
 
+    kernel = 'IPythonConsoleApp.kernel_name',
 
     ssh = 'IPythonConsoleApp.sshserver',
 )
@@ -107,11 +83,7 @@ aliases.update(app_aliases)
 # Classes
 #-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# IPythonConsole
-#-----------------------------------------------------------------------------
-
-classes = [IPKernelApp, ZMQInteractiveShell, KernelManager, ProfileDir, Session, InlineBackend]
+classes = [KernelManager, ProfileDir, Session]
 
 class IPythonConsoleApp(ConnectionFileMixin):
     name = 'ipython-console-mixin'
@@ -153,41 +125,34 @@ class IPythonConsoleApp(ConnectionFileMixin):
     sshkey = Unicode('', config=True,
         help="""Path to the ssh key to use for logging in to the ssh server.""")
     
-    hb_port = Int(0, config=True,
-        help="set the heartbeat port [default: random]")
-    shell_port = Int(0, config=True,
-        help="set the shell (ROUTER) port [default: random]")
-    iopub_port = Int(0, config=True,
-        help="set the iopub (PUB) port [default: random]")
-    stdin_port = Int(0, config=True,
-        help="set the stdin (DEALER) port [default: random]")
-    connection_file = Unicode('', config=True,
-        help="""JSON file in which to store connection info [default: kernel-<pid>.json]
-
-        This file will contain the IP, ports, and authentication key needed to connect
-        clients to this kernel. By default, this file will be created in the security-dir
-        of the current profile, but can be specified by absolute path.
-        """)
     def _connection_file_default(self):
         return 'kernel-%i.json' % os.getpid()
 
     existing = CUnicode('', config=True,
         help="""Connect to an already running kernel""")
 
+    kernel_name = Unicode('python', config=True,
+        help="""The name of the default kernel to start.""")
+
     confirm_exit = CBool(True, config=True,
         help="""
         Set to display confirmation dialog on exit. You can always use 'exit' or 'quit',
         to force a direct exit without any confirmation.""",
     )
-
-
+    
+    @property
+    def help_classes(self):
+        """ConsoleApps can configure kernels on the command-line
+        
+        But this shouldn't be written to a file
+        """
+        return self.classes + [IPKernelApp] + IPKernelApp.classes
+    
     def build_kernel_argv(self, argv=None):
         """build argv to be passed to kernel subprocess"""
         if argv is None:
             argv = sys.argv[1:]
         self.kernel_argv = swallow_argv(argv, self.frontend_aliases, self.frontend_flags)
-        # kernel should inherit default config file from frontend
-        self.kernel_argv.append("--IPKernelApp.parent_appname='%s'" % self.name)
     
     def init_connection_file(self):
         """find the connection file, and load the info if found.
@@ -225,6 +190,11 @@ class IPythonConsoleApp(ConnectionFileMixin):
                 else:
                     cf = self.connection_file
                 self.connection_file = cf
+        try:
+            self.connection_file = filefind(self.connection_file, ['.', self.profile_dir.security_dir])
+        except IOError:
+            self.log.debug("Connection File not found: %s", self.connection_file)
+            return
         
         # should load_connection_file only be used for existing?
         # as it is now, this allows reusing ports if an existing
@@ -234,31 +204,6 @@ class IPythonConsoleApp(ConnectionFileMixin):
         except Exception:
             self.log.error("Failed to load connection file: %r", self.connection_file, exc_info=True)
             self.exit(1)
-    
-    def load_connection_file(self):
-        """load ip/port/hmac config from JSON connection file"""
-        # this is identical to IPKernelApp.load_connection_file
-        # perhaps it can be centralized somewhere?
-        try:
-            fname = filefind(self.connection_file, ['.', self.profile_dir.security_dir])
-        except IOError:
-            self.log.debug("Connection File not found: %s", self.connection_file)
-            return
-        self.log.debug(u"Loading connection file %s", fname)
-        with open(fname) as f:
-            cfg = json.load(f)
-        self.transport = cfg.get('transport', 'tcp')
-        self.ip = cfg.get('ip', localhost())
-        
-        for channel in ('hb', 'shell', 'iopub', 'stdin', 'control'):
-            name = channel + '_port'
-            if getattr(self, name) == 0 and name in cfg:
-                # not overridden by config or cl_args
-                setattr(self, name, cfg[name])
-        if 'key' in cfg:
-            self.config.Session.key = str_to_bytes(cfg['key'])
-        if 'signature_scheme' in cfg:
-            self.config.Session.signature_scheme = cfg['signature_scheme']
     
     def init_ssh(self):
         """set up ssh tunnels, if needed."""
@@ -327,18 +272,30 @@ class IPythonConsoleApp(ConnectionFileMixin):
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         # Create a KernelManager and start a kernel.
-        self.kernel_manager = self.kernel_manager_class(
-                                ip=self.ip,
-                                transport=self.transport,
-                                shell_port=self.shell_port,
-                                iopub_port=self.iopub_port,
-                                stdin_port=self.stdin_port,
-                                hb_port=self.hb_port,
-                                connection_file=self.connection_file,
-                                parent=self,
-        )
+        try:
+            self.kernel_manager = self.kernel_manager_class(
+                                    ip=self.ip,
+                                    session=self.session,
+                                    transport=self.transport,
+                                    shell_port=self.shell_port,
+                                    iopub_port=self.iopub_port,
+                                    stdin_port=self.stdin_port,
+                                    hb_port=self.hb_port,
+                                    connection_file=self.connection_file,
+                                    kernel_name=self.kernel_name,
+                                    parent=self,
+                                    ipython_dir=self.ipython_dir,
+            )
+        except NoSuchKernel:
+            self.log.critical("Could not find kernel %s", self.kernel_name)
+            self.exit(1)
+
         self.kernel_manager.client_factory = self.kernel_client_class
-        self.kernel_manager.start_kernel(extra_arguments=self.kernel_argv)
+        # FIXME: remove special treatment of IPython kernels
+        kwargs = {}
+        if self.kernel_manager.ipython_kernel:
+            kwargs['extra_arguments'] = self.kernel_argv
+        self.kernel_manager.start_kernel(**kwargs)
         atexit.register(self.kernel_manager.cleanup_ipc_files)
 
         if self.sshserver:
@@ -360,6 +317,7 @@ class IPythonConsoleApp(ConnectionFileMixin):
             self.kernel_client = self.kernel_manager.client()
         else:
             self.kernel_client = self.kernel_client_class(
+                                session=self.session,
                                 ip=self.ip,
                                 transport=self.transport,
                                 shell_port=self.shell_port,

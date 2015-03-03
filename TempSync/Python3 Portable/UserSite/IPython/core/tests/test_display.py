@@ -1,11 +1,9 @@
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010-2011 The IPython Development Team.
-#
-#  Distributed under the terms of the BSD License.
-#
-#  The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+import json
 import os
+import warnings
 
 import nose.tools as nt
 
@@ -52,9 +50,9 @@ def test_image_filename_defaults():
     nt.assert_raises(ValueError, display.Image, data='this is not an image', format='badformat', embed=True)
     from IPython.html import DEFAULT_STATIC_FILES_PATH
     # check boths paths to allow packages to test at build and install time
-    imgfile = os.path.join(tpath, 'html/static/base/images/ipynblogo.png')
+    imgfile = os.path.join(tpath, 'html/static/base/images/logo.png')
     if not os.path.exists(imgfile):
-        imgfile = os.path.join(DEFAULT_STATIC_FILES_PATH, 'base/images/ipynblogo.png')
+        imgfile = os.path.join(DEFAULT_STATIC_FILES_PATH, 'base/images/logo.png')
     img = display.Image(filename=imgfile)
     nt.assert_equal('png', img.format)
     nt.assert_is_not_none(img._repr_png_())
@@ -116,3 +114,40 @@ def test_set_matplotlib_formats_kwargs():
     expected.update(cfg.print_figure_kwargs)
     nt.assert_equal(cell, expected)
 
+def test_displayobject_repr():
+    h = display.HTML('<br />')
+    nt.assert_equal(repr(h), '<IPython.core.display.HTML object>')
+    h._show_mem_addr = True
+    nt.assert_equal(repr(h), object.__repr__(h))
+    h._show_mem_addr = False
+    nt.assert_equal(repr(h), '<IPython.core.display.HTML object>')
+
+    j = display.Javascript('')
+    nt.assert_equal(repr(j), '<IPython.core.display.Javascript object>')
+    j._show_mem_addr = True
+    nt.assert_equal(repr(j), object.__repr__(j))
+    j._show_mem_addr = False
+    nt.assert_equal(repr(j), '<IPython.core.display.Javascript object>')
+
+def test_json():
+    d = {'a': 5}
+    lis = [d]
+    j = display.JSON(d)
+    nt.assert_equal(j._repr_json_(), d)
+    
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        j = display.JSON(json.dumps(d))
+        nt.assert_equal(len(w), 1)
+        nt.assert_equal(j._repr_json_(), d)
+    
+    j = display.JSON(lis)
+    nt.assert_equal(j._repr_json_(), lis)
+    
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        j = display.JSON(json.dumps(lis))
+        nt.assert_equal(len(w), 1)
+        nt.assert_equal(j._repr_json_(), lis)
+    
+    
