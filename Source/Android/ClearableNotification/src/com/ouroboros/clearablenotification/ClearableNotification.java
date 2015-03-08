@@ -76,6 +76,18 @@ public class ClearableNotification implements IXposedHookLoadPackage {
         this.AudioEncodHelper = XposedHelpers.findClass("com.tencent.mm.plugin.sight.encode.a.d", pkg.classLoader);
         //log(this.AudioEncodHelper.toString());
 
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                mm_log((String)param.args[1], (Object[])param.args[2]);
+            }
+        };
+
+        for (String method : new String[] {"c", "d", "e", "f", "g", "i", "v", "w"})
+        {
+            XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, method, String.class, String.class, Object[].class, hook);
+        }
+
 //        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "i", String.class, String.class, Object[].class, new XC_MethodHook() {
 //            @Override
 //            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
