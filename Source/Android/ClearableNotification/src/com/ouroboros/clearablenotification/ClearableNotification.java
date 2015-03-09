@@ -1,6 +1,10 @@
 package com.ouroboros.clearablenotification;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.Integer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.app.Notification;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XposedHelpers;
@@ -11,6 +15,18 @@ import android.os.Looper;
 import android.util.Log;
 
 public class ClearableNotification implements IXposedHookLoadPackage {
+
+    final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
 
     @Override
     public void handleLoadPackage(LoadPackageParam pkg) throws Throwable {
@@ -48,17 +64,25 @@ public class ClearableNotification implements IXposedHookLoadPackage {
         notify.flags |= Notification.FLAG_AUTO_CANCEL;
     }
 
+    public String currentTime() {
+        Date date=new Date();
+        return new String(new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(date));
+    }
+
     public void log(Object obj) {
-        XposedBridge.log(obj.toString());
+        log(String.format("%s", obj));
     }
 
     public void log(String text) {
-        XposedBridge.log(text);
+        log("%s", String.format("%s", text));
+    }
+
+    public void log(String format, Object... args) {
+        XposedBridge.log(String.format("[%s][%d] %s", currentTime(), Thread.currentThread().getId(), String.format(format, args)));
     }
 
     public void log(Throwable e) {
-        e.getStackTrace();
-        XposedBridge.log(Log.getStackTraceString(e));
+        log("%s", Log.getStackTraceString(e));
     }
 
     public void mm_log(String format, Object[] objs) {
@@ -67,14 +91,103 @@ public class ClearableNotification implements IXposedHookLoadPackage {
 
     Class<?> SlightEncodeH = null;
     Class<?> AudioEncodHelper = null;
+    Class<?> PByteArray = null;
+    Class<?> ClientRequestPacket = null;
+    Class<?> MMProtocalJni = null;
 
-    private void hookWeChat(LoadPackageParam pkg) {
+    boolean packHooked = false;
+
+    public class ClientRequest {
+
+        Object encoder;
+
+        public ClientRequest(Object encoder) {
+            this.encoder = encoder;
+        }
+
+        public byte[] getBuffer() {
+            return (byte[])XposedHelpers.getObjectField(this.encoder, "eKO");
+        }
+
+        public ClientRequestPacketWrap getPacket() {
+            return new ClientRequestPacketWrap(XposedHelpers.getObjectField(this.encoder, "eJQ"));
+        }
+    }
+
+    public class ClientRequestPacketWrap {
+        Object packet;
+
+        ClientRequestPacketWrap(Object packet) {
+            this.packet = packet;
+        }
+
+        public byte[] toBinary() {
+            return (byte[])XposedHelpers.callMethod(this.packet, "Dh");
+        }
+    }
+
+    private void initClasses(LoadPackageParam pkg) {
 
         this.SlightEncodeH = XposedHelpers.findClass("com.tencent.mm.plugin.sight.encode.a.h", pkg.classLoader);
         //log(this.SlightEncodeH.toString());
 
         this.AudioEncodHelper = XposedHelpers.findClass("com.tencent.mm.plugin.sight.encode.a.d", pkg.classLoader);
         //log(this.AudioEncodHelper.toString());
+
+        this.PByteArray = XposedHelpers.findClass("com.tencent.mm.pointers.PByteArray", pkg.classLoader);
+//        log(this.PByteArray);
+
+        this.ClientRequestPacket = XposedHelpers.findClass("com.tencent.mm.protocal.i.c", pkg.classLoader);
+//        log(this.ClientRequest);
+
+        this.MMProtocalJni = XposedHelpers.findClass("com.tencent.mm.protocal.MMProtocalJni", pkg.classLoader);
+//        log(this.MMProtocalJni);
+    }
+
+    private void hookWeChat(final LoadPackageParam pkg) {
+
+        XposedHelpers.findAndHookMethod("java.lang.System", pkg.classLoader, "load", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                log(param.args[0]);
+            }
+        });
+
+        initClasses(pkg);
+
+//        XposedHelpers.findAndHookMethod("com.tencent.mm.q.z", pkg.classLoader, "a", String.class, byte[].class, this.ClientRequest, ByteArrayOutputStream.class, new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                log("pack 1");
+//                log(param.args[0]);
+//                log(bytesToHex((byte[])param.args[1]));
+//                log(" ");
+//            }
+//        });
+//
+        XposedHelpers.findAndHookConstructor("com.tencent.mm.q.z", pkg.classLoader, ClientRequestPacket, int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                log("ClientRequest ctor");
+                log(new Exception());
+                log("ClientRequest ctor end");
+            }
+        });
+
+        XposedHelpers.findAndHookMethod("com.tencent.mm.q.z", pkg.classLoader, "a", int.class, String.class, byte[].class, int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                ClientRequest request = new ClientRequest(param.thisObject);
+//
+//                log("pack 2");
+//                log("type:%s", param.args[0]);
+//
+//                log("buf: %s", bytesToHex(encoder.getBuffer()));
+//                log("packet: %s", bytesToHex(request.getPacket().toBinary()));
+//
+//                log("pack 2 end");
+            }
+        });
 
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
@@ -85,22 +198,10 @@ public class ClearableNotification implements IXposedHookLoadPackage {
 
         for (String method : new String[] {"c", "d", "e", "f", "g", "i", "v", "w"})
         {
+//            if (method.equals("d") == false) continue;
+
             XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, method, String.class, String.class, Object[].class, hook);
         }
-
-//        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "i", String.class, String.class, Object[].class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                mm_log((String)param.args[1], (Object[])param.args[2]);
-//            }
-//        });
-//
-//        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "w", String.class, String.class, Object[].class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                mm_log((String)param.args[1], (Object[])param.args[2]);
-//            }
-//        });
 
         // "error pcm duration %d"
 
