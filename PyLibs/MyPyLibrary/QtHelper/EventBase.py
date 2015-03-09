@@ -2,7 +2,7 @@ from mlqt import *
 from .GEvents import *
 
 class EventDispatcher(QObject):
-    SyncEventReceiver = pyqtSignal(GEvent)
+    # SyncEventReceiver = pyqtSignal(GEvent)
     AutoEventReceiver = pyqtSignal(GEvent)
 
     def __init__(self, DefaultDispatcher = None):
@@ -12,37 +12,37 @@ class EventDispatcher(QObject):
 
         self.DefaultDispatcher = DefaultDispatcher
         Dispatcher = DefaultDispatcher and self.DispatcherWrap or self.Dispatcher
-        self.SyncEventReceiver.connect(Dispatcher, type = Qt.BlockingQueuedConnection)
+        # self.SyncEventReceiver.connect(Dispatcher, type = Qt.BlockingQueuedConnection)
         self.AutoEventReceiver.connect(Dispatcher, type = Qt.AutoConnection)
 
     def RegisterEventHandler(self, EventType, Handler):
         self.DispatchTable[EventType] = Handler
 
-    def PostEvent(self, Event, *args, **kwargs):
-        if not isinstance(Event, GEvent):
-            Event = GEvent(Event, *args, **kwargs)
+    def PostEvent(self, event, *args, **kwargs):
+        if not isinstance(event, GEvent):
+            event = GEvent(event, *args, **kwargs)
 
-        self.AutoEventReceiver.emit(Event)
+        self.AutoEventReceiver.emit(event)
 
-    def SendEvent(self, Event, *args, **kwargs):
-        if not isinstance(Event, GEvent):
-            Event = GEvent(Event, *args, **kwargs)
+    def SendEvent(self, event, *args, **kwargs):
+        if not isinstance(event, GEvent):
+            event = GEvent(event, *args, **kwargs)
 
         if self.thread() == QThread.currentThread():
-            self.AutoEventReceiver.emit(Event)
+            self.AutoEventReceiver.emit(event)
 
         else:
-            Event.__EventLoop__ = QEventLoop()
-            self.AutoEventReceiver.emit(Event)
-            Event.__EventLoop__.exec_()
+            event.createWaitEvent()
+            self.AutoEventReceiver.emit(event)
+            event.wait()
 
-        return Event.ReturnValue
+        return event.ReturnValue
 
-    def Dispatcher(self, Event):
-        handler = self.DispatchTable.get(Event.Event)
-        Event.ReturnValue = handler and handler(Event, *Event.args, **Event.kwargs)
-        Event.__EventLoop__ and Event.__EventLoop__.quit()
+    def Dispatcher(self, event):
+        handler = self.DispatchTable.get(event.Event)
+        event.ReturnValue = handler and handler(event, *event.args, **event.kwargs)
+        event.set()
 
-    def DispatcherWrap(self, Event):
-        self.DefaultDispatcher(Event)
-        Event.__EventLoop__ and Event.__EventLoop__.quit()
+    def DispatcherWrap(self, event):
+        self.DefaultDispatcher(event)
+        event.set()

@@ -1,4 +1,5 @@
 from ml import *
+import threading
 
 def InitializeEvents(EventList):
     Events = OrderedDictEx()
@@ -25,15 +26,25 @@ def InitializeEvents(EventList):
     return Events
 
 class GEvent(object):
-    # __slots__ = ['Event', 'args', 'kwargs', 'Handled', 'ReturnValue', '__EventLoop__']
-
     def __init__(self, Event, *args, **kwargs):
-        self.Event         = Event
-        self.args          = args
-        self.kwargs        = kwargs
-        self.Handled       = False
-        self.ReturnValue   = None
-        self.__EventLoop__ = None
+        self.Event       = Event
+        self.args        = args
+        self.kwargs      = kwargs
+        self.Handled     = False
+        self.ReturnValue = None
+        self.waitEvent   = None
+
+    def wait(self):
+        self.waitEvent and self.waitEvent.wait()
+
+    def set(self):
+        self.waitEvent and self.waitEvent.set()
+
+    def createWaitEvent(self):
+        if self.waitEvent is not None:
+            return
+
+        self.waitEvent = threading.Event()
 
     def __str__(self):
         return _GEventList[self.Event]
