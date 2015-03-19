@@ -214,7 +214,7 @@ pair as the key's value (values become dictionaries)."""
             for key, value in initval.items():
                 self.__setitem__(key, value)
 
-        elif isinstance(initval, list):
+        elif isinstance(initval, Iterable):
             for (key, value) in initval:
                 self.__setitem__(key, value)
 
