@@ -9,6 +9,7 @@ class AsyncSocket(object):
             SSL             = kwargs.pop('ssl')
         except KeyError:
             SSL = False
+            self.sslContext = None
 
         self.loop = kwargs.get('loop') or asyncio.get_event_loop()
         self.sock = socket.socket(*args, **kwargs)
