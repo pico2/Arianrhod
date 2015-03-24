@@ -1,10 +1,24 @@
-import asyncio, socket, struct
+import asyncio, socket, struct, ssl
 
 class AsyncSocket(object):
     def __init__(self, *args, **kwargs):
+        try:
+            self.sslContext = kwargs.pop('sslContext')
+            keyfile         = kwargs.pop('keyfile')
+            certfile        = kwargs.pop('certfile')
+            SSL             = kwargs.pop('ssl')
+        except KeyError:
+            SSL = False
+
         self.loop = kwargs.get('loop') or asyncio.get_event_loop()
         self.sock = socket.socket(*args, **kwargs)
         self.sock.setblocking(False)
+
+        if not SSL:
+            return
+
+        if self.sslContext is None:
+            self.sslContext = ssl._create_stdlib_context(certfile = certfile, keyfile = keyfile)
 
     def setsockopt(self, *args, **kwargs):
         return self.sock.setsockopt(*args, **kwargs)
@@ -15,6 +29,9 @@ class AsyncSocket(object):
     @asyncio.coroutine
     def connect(self, host, port):
         addrs = yield from self.loop.getaddrinfo(host, port, family = self.sock.family, type = self.sock.type, proto = self.sock.proto)
+
+        if self.sslContext is not None and not isinstance(self.sock, ssl.SSLSocket):
+            self.sock = self.sslContext.wrap_socket(self.sock, server_hostname = host)
 
         exceptions = []
         for family, type, proto, cname, address in addrs:
