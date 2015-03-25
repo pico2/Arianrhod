@@ -93,7 +93,7 @@
       <AdditionalLibraryDirectories>E:\Desktop\freetype-2.1.10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ltcg</AdditionalOptions>
       <AdditionalDependencies>mylib_nt.lib;ntdll.lib;undoc_k32.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>D:\Desktop\iTunes\x86\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(TargetName)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>

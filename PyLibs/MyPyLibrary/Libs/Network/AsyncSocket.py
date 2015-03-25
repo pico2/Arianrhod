@@ -3,10 +3,10 @@ import asyncio, socket, struct, ssl
 class AsyncSocket(object):
     def __init__(self, *args, **kwargs):
         try:
-            self.sslContext = kwargs.pop('sslContext')
             keyfile         = kwargs.pop('keyfile')
             certfile        = kwargs.pop('certfile')
             SSL             = kwargs.pop('ssl')
+            self.sslContext = kwargs.pop('sslContext')
         except KeyError:
             SSL = False
             self.sslContext = None

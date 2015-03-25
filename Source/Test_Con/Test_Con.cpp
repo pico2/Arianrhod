@@ -248,6 +248,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    printf("%llu\n", 0x8234567887654321ll);
+    PauseConsole();
+
     SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
     PauseConsole(L"any key");
     SetThreadExecutionState(ES_CONTINUOUS);

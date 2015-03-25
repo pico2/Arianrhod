@@ -139,8 +139,8 @@ class AsyncHttp(object):
         def text(self, encoding = None):
             return self.decode(encoding)
 
-        def decode(self, encoding = None):
-            return self.content.decode(self.response._get_encoding(encoding))
+        def decode(self, encoding = None, **kwargs):
+            return self.content.decode(self.response._get_encoding(encoding), **kwargs)
 
     def __init__(self, *, loop = None, timeout = 30, cookie_class = http.cookies.BaseCookie):
         self.loop = loop or asyncio.get_event_loop()

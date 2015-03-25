@@ -5,7 +5,7 @@ ATH_CONNECTION
 (CDECL
 *ATHostConnectionCreateWithLibrary)(
     CFStringRef LibraryID,
-    CFStringRef Uuid,
+    CFStringRef Udid,
     CFStringRef ATHPath
 );
 
