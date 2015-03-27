@@ -193,6 +193,12 @@ class AsyncHttp(object):
 
         if 'headers' not in kwargs:
             kwargs['headers'] = self.headers
+        else:
+            hdr = self.headers.copy()
+            for k, v in kwargs['headers'].items():
+                hdr[k] = v
+
+            kwargs['headers'] = hdr
 
         try:
             response = yield from asyncio.wait_for(aiohttp.request(method, url, **kwargs), self.timeout)
