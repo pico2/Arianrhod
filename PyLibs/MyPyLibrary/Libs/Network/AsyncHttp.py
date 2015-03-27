@@ -133,6 +133,10 @@ class AsyncHttp(object):
         def status(self):
             return self.response.status
 
+        def plist(self):
+            import plistlib
+            return plistlib.loads(self.content)
+
         def json(self, encoding = None):
             return dict2(json.loads(self.decode(encoding)))
 
