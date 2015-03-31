@@ -89,7 +89,7 @@ class _ClientRequest(aiohttp.client.ClientRequest):
                 c[name] = value
 
         # ibp()
-        self.headers['Cookie'] = c.output(header='', sep=';').strip()
+        self.headers['Cookie'] = c.output(header='', sep=';', attrs = {}).strip()
 
     def update_headers(self, headers):
         """Update request headers."""
