@@ -136,83 +136,6 @@ StReplaceFile(
     return NT_SUCCESS(Status);
 }
 
-PVOID SearchStringReference(PLDR_MODULE Module, PVOID String, ULONG_PTR SizeInBytes, ULONG_PTR BeginOffset = 0)
-{
-    PVOID StringValue, StringReference;
-
-    SEARCH_PATTERN_DATA Str[] =
-    {
-        ADD_PATTERN_(String, SizeInBytes),
-    };
-
-    StringValue = SearchPattern(Str, countof(Str), Module->DllBase, Module->SizeOfImage);
-    if (StringValue == nullptr)
-        return nullptr;
-
-    SEARCH_PATTERN_DATA Stub[] =
-    {
-        ADD_PATTERN(&StringValue),
-    };
-
-    StringReference = SearchPattern(Stub, countof(Stub), PtrAdd(Module->DllBase, BeginOffset), PtrSub(Module->SizeOfImage, BeginOffset));
-    if (StringReference == nullptr)
-        return nullptr;
-
-    return StringReference;
-}
-
-PVOID ReverseSearchFunctionHeader(PVOID Start, ULONG_PTR Length)
-{
-    PBYTE Buffer;
-
-    Buffer = (PBYTE)Start;
-
-    for (; Length != 0; --Buffer, --Length)
-    {
-        switch (Buffer[0])
-        {
-            case CALL:
-                // push    local_var_size
-                // mov     eax, exception_handler
-                // call    _SEH_prolog
-
-                if (Buffer[-5] != 0xB8)
-                    continue;
-
-                if (Buffer[-7] == 0x6A)
-                {
-                    Buffer -= 7;
-                }
-                else if (Buffer[-10] == 0x68)
-                {
-                    Buffer -= 10;
-                }
-                else
-                {
-                    continue;
-                }
-
-                break;
-
-            case 0x55:
-                if (Buffer[1] != 0x8B || Buffer[2] != 0xEC)
-                    continue;
-
-                // push ebp
-                // mov ebp, esp
-
-                break;
-
-            default:
-                continue;
-        }
-
-        return Buffer;
-    }
-
-    return nullptr;
-}
-
 PVOID
 SearchStringAndReverseSearchHeader(
     PVOID       ImageBase,
@@ -242,23 +165,14 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    using namespace Mp;
+
     LdrDisableThreadCalloutsForDll(BaseAddress);
-
-    static BYTE DefaultEncodingStub1[] =
-    {
-        0x8b, 0x06, 0x8a, 0x08, 0x40, 0x89, 0x06, 0x8b, 0x02, 0x0f, 0xb6, 0xd1
-    };
-
-    static BYTE DefaultEncodingStub2[] =
-    {
-        0x8b, 0x0f, 0x66, 0x8b, 0x04, 0x50, 0x8b, 0x55, 0x08, 0x66, 0x89, 0x01, 0x83, 0x07, 0x02, 0x39,
-        0x1e, 0x72, 0xda
-    };
+    ml::MlInitialize();
 
     //static CHAR RegisterKey[] = "30819D300D06092A864886F70D010101050003818B0030818702818100D87BA24562F7C5D14A0CFB12B9740C195C6BDC7E6D6EC92BAC0EB29D59E1D9AE67890C2B88C3ABDCAFFE7D4A33DCC1BFBE531A251CEF0C923F06BE79B2328559ACFEE986D5E15E4D1766EA56C4E10657FA74DB0977C3FB7582B78CD47BB2C7F9B252B4A9463D15F6AE6EE9237D54C5481BF3E0B09920190BCFB31E5BE509C33B020111";
     static CHAR RegisterKey[] = "EA7E";
     static CHAR CheckEncodingWhenSave[] = "Not all characters are representable in ";
-    static CHAR WithEncodingString[] = " with encoding ";
 
     PVOID ACPToUnicodeStub, UnicodeToACPStub, WithEncodingStub;
     PVOID CalcRegKey;
@@ -274,103 +188,77 @@ BOOL Initialize(PVOID BaseAddress)
     CalcRegKey = SearchStringAndReverseSearchHeader(module->DllBase, RegisterKey, sizeof(RegisterKey), 0xC0);
 
     {
+        /*++
 
-        SEARCH_PATTERN_DATA Pattern[] =
-        {
-            ADD_PATTERN(DefaultEncodingStub1, 0, sizeof(DefaultEncodingStub1) + 7),
-            ADD_PATTERN(DefaultEncodingStub2),
-        };
+          0028189F   |> /8B06               /mov     eax, dword ptr [esi]
+          002818A1   |. |8A08               |mov     cl, byte ptr [eax]
+          002818A3   |. |40                 |inc     eax
+          002818A4   |. |8906               |mov     dword ptr [esi], eax
+          002818A6   |. |8B02               |mov     eax, dword ptr [edx]
+          002818A8   |. |0FB6D1             |movzx   edx, cl
+          002818AB   |. |8B0485 00F45A00    |mov     eax, dword ptr [eax*4+0x5AF400]    ?? ?? ?? ?? ?? ?? ??
+          002818B2   |. |8B0F               |mov     ecx, dword ptr [edi]
+          002818B4   |. |66:8B0450          |mov     ax, word ptr [eax+edx*2]
+          002818B8   |. |8B55 08            |mov     edx, [arg.1]
+          002818BB   |. |66:8901            |mov     word ptr [ecx], ax
+          002818BE   |. |8307 02            |add     dword ptr [edi], 0x2
+          002818C1   |> |391E                cmp     dword ptr [esi], ebx
+          002818C3   |.^\72 DA              \jb      short 0x28189F
 
-        ACPToUnicodeStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
+        --*/
+
+        ACPToUnicodeStub = SearchPatternSafe(
+                                L"8B 06 8A 08 40 89 06 8B 02 0F B6 D1 ?? ?? ?? ?? ?? ?? ?? 8B 0F 66 8B 04 50 8B 55 08 66 89 01 83 07 02 39 1E 72 DA",
+                                module->DllBase,
+                                module->SizeOfImage
+                            );
+
         if (ACPToUnicodeStub == nullptr)
             return FALSE;
     }
 
     {
-        SEARCH_PATTERN_DATA Pattern[] =
-        {
-            ADD_PATTERN(WithEncodingString),
-        };
 
-        WithEncodingStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
-        if (WithEncodingStub == nullptr)
+        /*++
+          00281CE9   |.  83FE 22            cmp     esi, 0x22
+          00281CEC   |.  74 7E              je      short 0x281D6C
+          00281CEE   |.  83FE 23            cmp     esi, 0x23
+          00281CF1   |.  74 79              je      short 0x281D6C
+          00281CF3   |.  83FE 1D            cmp     esi, 0x1D
+          00281CF6   |.  75 6D              jnz     short 0x281D65
+          00281CF8   |.  8B4D 0C            mov     ecx, [arg.2]
+        --*/
+
+        UnicodeToACPStub = SearchPatternSafe(L"83 ?? 22 74 ?? 83 ?? 23 74 ?? 83 ?? 1D 75 ??", module->DllBase, module->SizeOfImage);
+        if (UnicodeToACPStub == nullptr)
+            return FALSE;
+
+        UnicodeToACPStub = ReverseSearchFunctionHeader(UnicodeToACPStub, 0x90);
+        if (UnicodeToACPStub == nullptr)
             return FALSE;
     }
 
     {
-        SEARCH_PATTERN_DATA Pattern[] =
-        {
-            ADD_PATTERN(&WithEncodingStub),
-        };
-
-        WithEncodingStub = SearchPattern(Pattern, countof(Pattern), module->DllBase, module->SizeOfImage);
-        if (WithEncodingStub == nullptr)
-            return FALSE;
-    }
-
-    BOOL MagicFound = FALSE;
-
-    WithEncodingStub = PtrAdd(WithEncodingStub, 4);
-    for (LONG_PTR Size = 0x200; Size > 0; )
-    {
-        ULONG_PTR Len;
-
-        if (*(PULONG)PtrAdd(WithEncodingStub, 2) == 0x40000)
-        {
-            MagicFound = TRUE;
-        }
-        else if (MagicFound) switch (*(PBYTE)WithEncodingStub)
-        {
-            case CALL:
-                Size = 0;
-                UnicodeToACPStub = GetCallDestination(WithEncodingStub);
-                continue;
-        }
-
-        Len = GetOpCodeSize(WithEncodingStub);
-        WithEncodingStub = PtrAdd(WithEncodingStub, Len);
-        Size -= Len;
-        if (Size <= 0)
-            return FALSE;
-    }
-
-    {
-        NotAllCharactersRepresentable = SearchStringAndReverseSearchHeader(module->DllBase, CheckEncodingWhenSave, sizeof(CheckEncodingWhenSave), 0x120);
-        if (NotAllCharactersRepresentable == nullptr)
-            return FALSE;
-
-        ULONG_PTR NumberOfCall = 0;
-
-        IsUnicodeEncodingAddress = nullptr;
-        WalkOpCodeT(NotAllCharactersRepresentable, 0x70,
-            WalkOpCodeM(Buffer, OpLength, Ret)
-            {
-                if (Buffer[0] == CALL && ++NumberOfCall == 2)
-                {
-                    IsUnicodeEncodingAddress = GetCallDestination(Buffer);
-                    return STATUS_SUCCESS;
-                }
-
-                return STATUS_NOT_FOUND;
-            }
-        );
+        IsUnicodeEncodingAddress = SearchPatternSafe(L"83 ?? 1B 76 ?? 83 ?? 1D 74 ?? 33 C0", module->DllBase, module->SizeOfImage);
+        if (IsUnicodeEncodingAddress != nullptr)
+            IsUnicodeEncodingAddress = ReverseSearchFunctionHeader(IsUnicodeEncodingAddress, 0x10);
 
         if (IsUnicodeEncodingAddress == nullptr)
             return FALSE;
     }
 
-    MEMORY_FUNCTION_PATCH f[] =
+    PATCH_MEMORY_DATA f[] =
     {
-        INLINE_HOOK_CALL_NULL(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
-        INLINE_HOOK_JUMP(UnicodeToACPStub, UnicodeToACP, StubUnicodeToACP),
-        INLINE_HOOK_JUMP_NULL(CalcRegKey, StCalcRegKey),
-        INLINE_HOOK_JUMP(IsUnicodeEncodingAddress, IsUnicodeEncoding, StubIsUnicodeEncoding)
+        FunctionCallVa(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
+        FunctionJumpVa(UnicodeToACPStub, UnicodeToACP, &StubUnicodeToACP),
+        FunctionJumpVa(CalcRegKey, StCalcRegKey),
+        FunctionJumpVa(IsUnicodeEncodingAddress, IsUnicodeEncoding, &StubIsUnicodeEncoding)
     };
 
     PVOID addr = StReplaceFile;
     WriteProtectMemory(CurrentProcess, PtrAdd(module->DllBase, IATLookupRoutineRVAByHashNoFix(module->DllBase, KERNEL32_ReplaceFileW)), &addr, sizeof(addr));
 
-    Nt_PatchMemory(0, 0, f, countof(f));
+    PatchMemory(f, countof(f), nullptr);
 
     return TRUE;
 }
