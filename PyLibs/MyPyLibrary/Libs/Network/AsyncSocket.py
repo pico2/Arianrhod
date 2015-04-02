@@ -80,11 +80,11 @@ class AsyncSocket(object):
 
 class QueuedAsyncSocket(AsyncSocket):
     class Task(asyncio.Future):
-        def __init__(self, data, build_packet = None, read_packet = None):
+        def __init__(self, data, buildPacket = None, readPacket = None):
             super().__init__()
             self.data = data
-            self.build_packet = build_packet or QueuedAsyncSocket.build_packet
-            self.read_packet = read_packet or QueuedAsyncSocket.read_packet
+            self.buildPacket = buildPacket or QueuedAsyncSocket.buildPacket
+            self.readPacket = readPacket or QueuedAsyncSocket.readPacket
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,25 +103,26 @@ class QueuedAsyncSocket(AsyncSocket):
         while not self.Exit:
             yield from self.PendingTasks.acquire()
             task = self.Tasks.pop(0)
-            packet = task.build_packet(task.data)
+            packet = task.buildPacket(task.data)
             yield from self.send(packet)
-            ret = yield from task.read_packet(self)
+            ret = yield from task.readPacket(self)
 
             task.set_result(ret)
 
     @asyncio.coroutine
-    def request(self, data, *, build_packet = None, read_packet = None):
-        self.Tasks.append(self.Task(data, build_packet, read_packet))
+    def request(self, data, *, buildPacket = None, readPacket = None):
+        task = self.Task(data, buildPacket, readPacket)
+        self.Tasks.append(task)
         self.PendingTasks.release()
-        return (yield from self.Tasks[-1])
+        return (yield from task)
 
     @staticmethod
-    def build_packet(data):
+    def buildPacket(data):
         return struct.pack('>I', len(data)) + data
 
     @staticmethod
     @asyncio.coroutine
-    def read_packet(sock):
+    def readPacket(sock):
         length = yield from sock.recv(4)
         length = int.from_bytes(length, 'big')
         if length == 0:
