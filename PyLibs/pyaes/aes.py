@@ -484,7 +484,7 @@ class AESModeOfOperationOFB(AESStreamModeOfOperation):
         elif len(iv) != 16:
             raise ValueError('initialization vector must be 16 bytes')
         else:
-          self._last_precipherblock = _string_to_bytes(iv)
+          self._last_precipherblock = iv
 
         self._remaining_block = bytearray()
 
@@ -501,7 +501,7 @@ class AESModeOfOperationOFB(AESStreamModeOfOperation):
             cipherbyte = c ^ precipherbyte
             encrypted.append(cipherbyte)
 
-        return _bytes_to_string(encrypted)
+        return encrypted
 
     def decrypt(self, ciphertext):
         # AES-OFB is symetric
