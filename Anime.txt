@@ -6,7 +6,8 @@
 星期六	妖精的尾巴							219
 	琴浦小姐							08
 	Date A Live II							01
-星期天	Fate/Stay Night UBW						12
+	圣斗士星矢 黄金魂						01
+星期天	Fate/Stay Night UBW						14
 
 
 《心理学》
@@ -39,6 +40,9 @@ sola
 最终兵器彼女
 机械女仆
 娇蛮之吻
+
+
+2015-04
 
 
 2014-10
