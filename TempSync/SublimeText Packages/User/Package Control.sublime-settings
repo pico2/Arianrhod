@@ -5,6 +5,7 @@
 	"installed_packages":
 	[
 		"Alignment",
+		"Anaconda",
 		"AutoHotkey",
 		"Origami",
 		"Package Control",
@@ -14,6 +15,8 @@
 		"Sublime Text 3 Snippets",
 		"sublime-jsdocs",
 		"SublimeFileDiffs",
+		"Theme - Brogrammer",
+		"Theme - Flatland",
 		"VBScript"
 	],
 	"repositories":

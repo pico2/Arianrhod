@@ -4,6 +4,7 @@ import asyncio
 import http.cookies
 import socket
 import re
+import ssl
 
 error_proto = poplib.error_proto
 
@@ -70,6 +71,7 @@ class ASYNC_POP3(asyncio.Protocol):
         self.host = host
         self.port = port
         self.timeout = timeout
+        self._debugging = 0
 
         self.loop = loop or asyncio.get_event_loop()
 
@@ -451,12 +453,19 @@ if poplib.HAVE_SSL:
         See the methods of the parent class POP3 for more documentation.
         """
 
-        def __init__(self, host, port = POP3_SSL_PORT, timeout = socket._GLOBAL_DEFAULT_TIMEOUT, loop = None):
+        def __init__(
+                self,
+                host,
+                port    = POP3_SSL_PORT,
+                timeout = socket._GLOBAL_DEFAULT_TIMEOUT,
+                loop    = None
+            ):
+
             super().__init__(host, port, timeout, loop)
 
         @asyncio.coroutine
         def create_connection(self):
-            yield from self.loop.create_connection(lambda : self, self.host, self.port, ssl = True)
+            yield from self.loop.create_connection(lambda : self, self.host, self.port, ssl = ssl._create_stdlib_context())
 
         def stls(self, *args, **kwargs):
             """The method unconditionally raises an exception since the
