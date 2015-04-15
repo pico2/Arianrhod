@@ -191,7 +191,7 @@ class ASYNC_POP3(asyncio.Protocol):
                 line = line[1:]
             octets = octets + o
             list.append(line)
-            line, o = self._getline()
+            line, o = yield from self._getline()
         return resp, list, octets
 
 
@@ -199,7 +199,7 @@ class ASYNC_POP3(asyncio.Protocol):
 
     @asyncio.coroutine
     def _shortcmd(self, line):
-        self._putcmd(line)
+        yield from self._putcmd(line)
         return (yield from self._getresp())
 
 
@@ -207,7 +207,7 @@ class ASYNC_POP3(asyncio.Protocol):
 
     @asyncio.coroutine
     def _longcmd(self, line):
-        self._putcmd(line)
+        yield from self._putcmd(line)
         return (yield from self._getlongresp())
 
 

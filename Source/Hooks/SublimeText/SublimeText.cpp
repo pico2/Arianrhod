@@ -260,6 +260,17 @@ BOOL Initialize(PVOID BaseAddress)
 
     PatchMemory(f, countof(f), nullptr);
 
+    SetExeDirectoryAsCurrent();
+    EnumDirectoryFiles(nullptr, L"*.*", 0, L"Fonts", nullptr, 
+        [](PVOID, PWIN32_FIND_DATAW FindData, ULONG_PTR) -> LONG
+        {
+            AddFontResourceExW(FindData->cFileName, FR_PRIVATE, nullptr);
+            return 0;
+        },
+        0,
+        0
+    );
+
     return TRUE;
 }
 

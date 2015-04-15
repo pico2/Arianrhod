@@ -1,0 +1,11 @@
+{
+    "auto_python_builder_enabled": false,
+    "python_interpreter": "D:/Dev/Python/python.exe",
+    "suppress_word_completions": false,
+    "suppress_explicit_completions": false,
+    "complete_parameters": false,
+    "complete_all_parameters": false,
+    "anaconda_linting": false,
+    "use_pylint": false,
+    "pep8": false
+}
