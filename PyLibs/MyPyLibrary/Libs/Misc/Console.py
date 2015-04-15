@@ -13,9 +13,6 @@ def SetConsoleTitle(text):
 def cls2():
     os.system('cls')
 
-def PrintLog(value, *args, sep=' ', end='\n', file=sys.stdout, flush=False):
-    pass
-
 if isinstance(sys.stdout, TextIOWrapper):
     class _flushstdout(type(sys.stdout)):
         def __init__(self, *args, **kwargs):
