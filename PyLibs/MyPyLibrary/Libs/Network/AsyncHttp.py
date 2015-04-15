@@ -16,13 +16,9 @@ class Request(aiohttp.Request):
         """Analyze headers. Calculate content length,
         removes hop headers, etc."""
         assert not self.headers_sent, 'headers have been sent already'
-        assert isinstance(name, str), \
-            'Header name should be a string, got {!r}'.format(name)
-        assert set(name).issubset(aiohttp.protocol.ASCIISET), \
-            'Header name should contain ASCII chars, got {!r}'.format(name)
-        assert isinstance(value, str), \
-            'Header {!r} should have string value, got {!r}'.format(
-                name, value)
+        assert isinstance(name, str), 'Header name should be a string, got {!r}'.format(name)
+        assert set(name).issubset(aiohttp.protocol.ASCIISET), 'Header name should contain ASCII chars, got {!r}'.format(name)
+        assert isinstance(value, str), 'Header {!r} should have string value, got {!r}'.format(name, value)
 
         name = name.strip()
         value = value.strip()

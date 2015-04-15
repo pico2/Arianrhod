@@ -131,8 +131,7 @@ class UnpackerBase:
         if Result != None:
             return Result
 
-        TypeExtension = \
-        {
+        TypeExtension = {
             UnpackerFileType.UnpackerFileBitmap : '.bmp',
             UnpackerFileType.UnpackerFilePNG    : '.png',
             UnpackerFileType.UnpackerFileWave   : '.wav',

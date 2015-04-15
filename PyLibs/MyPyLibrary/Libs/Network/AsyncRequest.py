@@ -27,16 +27,14 @@ class AsyncHttpRequest(object):
 
     def __init__(self):
         self.session = requests.sessions.Session()
-        self.DefaultHeaders = \
-        {
+        self.DefaultHeaders = {
             'User-agent' : 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.8 Safari/537.36',
             #'Connection' : 'Keep-Alive',
         }
 
         self.session.headers = self.DefaultHeaders
 
-        self.Proxies = \
-        {
+        self.Proxies = {
             #'http' : 'http://127.0.0.1:6789',
             #'https' : 'https://127.0.0.1:6789',
         }
