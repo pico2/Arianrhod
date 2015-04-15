@@ -19,5 +19,5 @@
     { "keys": ["ctrl+shift+a"], "command": "alignment" },
 
     { "keys": ["ctrl+alt+r"], "command": "anaconda_rename" },
-    { "keys": ["alt+g"], "command": "anaconda_goto"}
+    { "keys": ["alt+g"], "command": "goto_definition"}
 ]
