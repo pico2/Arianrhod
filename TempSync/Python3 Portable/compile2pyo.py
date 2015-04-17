@@ -28,6 +28,7 @@ def main():
         'site-packages\\itsdangerous',
         'site-packages\\markupsafe',
         'site-packages\\cffi',
+        'site-packages\\pymysql\\tests',
         # 'site-packages\\ipdb',
         # 'site-packages\\pyreadline',
         # 'site-packages\\readline.py',

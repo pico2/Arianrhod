@@ -1,0 +1,27 @@
+Metadata-Version: 2.0
+Name: PyMySQL
+Version: 0.6.6
+Summary: Pure-Python MySQL Driver
+Home-page: https://github.com/PyMySQL/PyMySQL/
+Author: INADA Naoki
+Author-email: songofacandy@gmail.com
+License: MIT
+Download-URL: https://github.com/PyMySQL/PyMySQL/tarball/pymysql-0.6.6
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: IronPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Database
+
+UNKNOWN
+
+
