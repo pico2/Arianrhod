@@ -5,6 +5,7 @@ import http.cookies
 
 class Request(aiohttp.Request):
     def __init__(self, *args, **kwargs):
+        ibp()
         super().__init__(*args, **kwargs)
         self.headers = _CaseInsensitiveDict()
 
