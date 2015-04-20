@@ -93,7 +93,7 @@ class _ClientRequest(aiohttp.client.ClientRequest):
         if headers:
             if isinstance(headers, dict):
                 headers = headers.items()
-            elif isinstance(headers, MultiDict):
+            elif isinstance(headers, aiohttp.MultiDict):
                 headers = headers.items()
 
             for key, value in headers:
