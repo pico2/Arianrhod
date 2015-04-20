@@ -441,7 +441,7 @@ struct __pyx_defaults {
   PyObject *__pyx_arg_encoding;
 };
 
-/* "aiohttp/_multidict.pyx":27
+/* "aiohttp/_multidict.pyx":28
  * 
  * 
  * cdef class _Base:             # <<<<<<<<<<<<<<
@@ -456,7 +456,7 @@ struct __pyx_obj_7aiohttp_10_multidict__Base {
 };
 
 
-/* "aiohttp/_multidict.pyx":142
+/* "aiohttp/_multidict.pyx":146
  * 
  * 
  * cdef class MultiDictProxy(_Base):             # <<<<<<<<<<<<<<
@@ -468,7 +468,7 @@ struct __pyx_obj_7aiohttp_10_multidict_MultiDictProxy {
 };
 
 
-/* "aiohttp/_multidict.pyx":160
+/* "aiohttp/_multidict.pyx":165
  * 
  * 
  * cdef class CIMultiDictProxy(MultiDictProxy):             # <<<<<<<<<<<<<<
@@ -480,7 +480,7 @@ struct __pyx_obj_7aiohttp_10_multidict_CIMultiDictProxy {
 };
 
 
-/* "aiohttp/_multidict.pyx":184
+/* "aiohttp/_multidict.pyx":190
  * 
  * 
  * cdef class MultiDict(_Base):             # <<<<<<<<<<<<<<
@@ -492,7 +492,7 @@ struct __pyx_obj_7aiohttp_10_multidict_MultiDict {
 };
 
 
-/* "aiohttp/_multidict.pyx":328
+/* "aiohttp/_multidict.pyx":341
  * 
  * 
  * cdef class CIMultiDict(MultiDict):             # <<<<<<<<<<<<<<
@@ -504,7 +504,7 @@ struct __pyx_obj_7aiohttp_10_multidict_CIMultiDict {
 };
 
 
-/* "aiohttp/_multidict.pyx":341
+/* "aiohttp/_multidict.pyx":354
  * 
  * 
  * cdef class _ViewBase:             # <<<<<<<<<<<<<<
@@ -518,7 +518,7 @@ struct __pyx_obj_7aiohttp_10_multidict__ViewBase {
 };
 
 
-/* "aiohttp/_multidict.pyx":353
+/* "aiohttp/_multidict.pyx":366
  * 
  * 
  * cdef class _ViewBaseSet(_ViewBase):             # <<<<<<<<<<<<<<
@@ -530,7 +530,7 @@ struct __pyx_obj_7aiohttp_10_multidict__ViewBaseSet {
 };
 
 
-/* "aiohttp/_multidict.pyx":415
+/* "aiohttp/_multidict.pyx":428
  * 
  * 
  * cdef class _ItemsView(_ViewBaseSet):             # <<<<<<<<<<<<<<
@@ -542,7 +542,7 @@ struct __pyx_obj_7aiohttp_10_multidict__ItemsView {
 };
 
 
-/* "aiohttp/_multidict.pyx":437
+/* "aiohttp/_multidict.pyx":450
  * 
  * 
  * cdef class _ValuesView(_ViewBase):             # <<<<<<<<<<<<<<
@@ -554,7 +554,7 @@ struct __pyx_obj_7aiohttp_10_multidict__ValuesView {
 };
 
 
-/* "aiohttp/_multidict.pyx":455
+/* "aiohttp/_multidict.pyx":468
  * 
  * 
  * cdef class _KeysView(_ViewBaseSet):             # <<<<<<<<<<<<<<
@@ -566,7 +566,7 @@ struct __pyx_obj_7aiohttp_10_multidict__KeysView {
 };
 
 
-/* "aiohttp/_multidict.pyx":106
+/* "aiohttp/_multidict.pyx":110
  *         return _ValuesView.__new__(_ValuesView, self._items)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -579,7 +579,7 @@ struct __pyx_obj_7aiohttp_10_multidict___pyx_scope_struct____repr__ {
 };
 
 
-/* "aiohttp/_multidict.pyx":107
+/* "aiohttp/_multidict.pyx":111
  * 
  *     def __repr__(self):
  *         body = ', '.join("'{}': {!r}".format(k, v) for k, v in self.items())             # <<<<<<<<<<<<<<
@@ -597,7 +597,7 @@ struct __pyx_obj_7aiohttp_10_multidict___pyx_scope_struct_1_genexpr {
 };
 
 
-/* "aiohttp/_multidict.pyx":389
+/* "aiohttp/_multidict.pyx":402
  *             return True
  * 
  *     def __and__(self, other):             # <<<<<<<<<<<<<<
@@ -611,7 +611,7 @@ struct __pyx_obj_7aiohttp_10_multidict___pyx_scope_struct_2___and__ {
 };
 
 
-/* "aiohttp/_multidict.pyx":392
+/* "aiohttp/_multidict.pyx":405
  *         if not isinstance(other, Iterable):
  *             return NotImplemented
  *         return set(value for value in other if value in self)             # <<<<<<<<<<<<<<
@@ -628,7 +628,7 @@ struct __pyx_obj_7aiohttp_10_multidict___pyx_scope_struct_3_genexpr {
 };
 
 
-/* "aiohttp/_multidict.pyx":446
+/* "aiohttp/_multidict.pyx":459
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -644,7 +644,7 @@ struct __pyx_obj_7aiohttp_10_multidict___pyx_scope_struct_4___iter__ {
 };
 
 
-/* "aiohttp/_multidict.pyx":472
+/* "aiohttp/_multidict.pyx":485
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -661,7 +661,7 @@ struct __pyx_obj_7aiohttp_10_multidict___pyx_scope_struct_5___iter__ {
 
 
 
-/* "aiohttp/_multidict.pyx":27
+/* "aiohttp/_multidict.pyx":28
  * 
  * 
  * cdef class _Base:             # <<<<<<<<<<<<<<
@@ -679,7 +679,7 @@ struct __pyx_vtabstruct_7aiohttp_10_multidict__Base {
 static struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *__pyx_vtabptr_7aiohttp_10_multidict__Base;
 
 
-/* "aiohttp/_multidict.pyx":142
+/* "aiohttp/_multidict.pyx":146
  * 
  * 
  * cdef class MultiDictProxy(_Base):             # <<<<<<<<<<<<<<
@@ -693,7 +693,7 @@ struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDictProxy {
 static struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDictProxy *__pyx_vtabptr_7aiohttp_10_multidict_MultiDictProxy;
 
 
-/* "aiohttp/_multidict.pyx":160
+/* "aiohttp/_multidict.pyx":165
  * 
  * 
  * cdef class CIMultiDictProxy(MultiDictProxy):             # <<<<<<<<<<<<<<
@@ -707,7 +707,7 @@ struct __pyx_vtabstruct_7aiohttp_10_multidict_CIMultiDictProxy {
 static struct __pyx_vtabstruct_7aiohttp_10_multidict_CIMultiDictProxy *__pyx_vtabptr_7aiohttp_10_multidict_CIMultiDictProxy;
 
 
-/* "aiohttp/_multidict.pyx":184
+/* "aiohttp/_multidict.pyx":190
  * 
  * 
  * cdef class MultiDict(_Base):             # <<<<<<<<<<<<<<
@@ -725,7 +725,7 @@ struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict {
 static struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *__pyx_vtabptr_7aiohttp_10_multidict_MultiDict;
 
 
-/* "aiohttp/_multidict.pyx":328
+/* "aiohttp/_multidict.pyx":341
  * 
  * 
  * cdef class CIMultiDict(MultiDict):             # <<<<<<<<<<<<<<
@@ -1277,10 +1277,10 @@ static char __pyx_k_empty_multidict[] = "empty multidict";
 static char __pyx_k_ValuesView___iter[] = "_ValuesView.__iter__";
 static char __pyx_k_aiohttp__multidict[] = "aiohttp._multidict";
 static char __pyx_k_getdefaultencoding[] = "getdefaultencoding";
-static char __pyx_k_Case_insensitive_str[] = "Case insensitive str";
+static char __pyx_k_Case_insensitive_str[] = "Case insensitive str.";
 static char __pyx_k_and___locals_genexpr[] = "__and__.<locals>.genexpr";
 static char __pyx_k_repr___locals_genexpr[] = "__repr__.<locals>.genexpr";
-static char __pyx_k_home_andrew_projects_aiohttp_ai[] = "/home/andrew/projects/aiohttp/aiohttp/_multidict.pyx";
+static char __pyx_k_Users_nikolay_dev_account_api_v[] = "/Users/nikolay/dev/account-api/venv/src/aiohttp/aiohttp/_multidict.pyx";
 static char __pyx_k_takes_at_most_1_positional_argu[] = "{} takes at most 1 positional argument ({} given)";
 static char __pyx_k_takes_either_dict_or_list_of_ke[] = "{} takes either dict or list of (key, value) tuples";
 static char __pyx_k_CIMultiDictProxy_requires_CIMult[] = "CIMultiDictProxy requires CIMultiDict instance, not {}";
@@ -1300,6 +1300,7 @@ static PyObject *__pyx_n_s_MutableMapping;
 static PyObject *__pyx_n_s_NotImplemented;
 static PyObject *__pyx_n_s_Set;
 static PyObject *__pyx_n_s_TypeError;
+static PyObject *__pyx_kp_s_Users_nikolay_dev_account_api_v;
 static PyObject *__pyx_n_s_ValuesView;
 static PyObject *__pyx_n_s_ValuesView___iter;
 static PyObject *__pyx_kp_s__4;
@@ -1325,7 +1326,6 @@ static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_genexpr;
 static PyObject *__pyx_n_s_get;
 static PyObject *__pyx_n_s_getdefaultencoding;
-static PyObject *__pyx_kp_s_home_andrew_projects_aiohttp_ai;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_items;
 static PyObject *__pyx_n_s_iter;
@@ -1378,8 +1378,8 @@ static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_codeobj__9;
 static PyObject *__pyx_codeobj__11;
 
-/* "aiohttp/_multidict.pyx":12
- *     """Case insensitive str"""
+/* "aiohttp/_multidict.pyx":13
+ *     """Case insensitive str."""
  * 
  *     def __new__(cls, val='',             # <<<<<<<<<<<<<<
  *                 encoding=sys.getdefaultencoding(), errors='strict'):
@@ -1396,7 +1396,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr_4__defaults__(CYTHON_UNUS
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(((PyObject*)__pyx_kp_s_));
   PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject*)__pyx_kp_s_));
@@ -1407,7 +1407,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr_4__defaults__(CYTHON_UNUS
   __Pyx_INCREF(((PyObject*)__pyx_n_s_strict));
   PyTuple_SET_ITEM(__pyx_t_1, 2, ((PyObject*)__pyx_n_s_strict));
   __Pyx_GIVEREF(((PyObject*)__pyx_n_s_strict));
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -1485,7 +1485,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5upstr_1__new__(PyObject *__pyx_
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__new__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__new__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1504,7 +1504,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5upstr_1__new__(PyObject *__pyx_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__new__", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__new__", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict.upstr.__new__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1534,7 +1534,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   __Pyx_RefNannySetupContext("__new__", 0);
   __Pyx_INCREF(__pyx_v_val);
 
-  /* "aiohttp/_multidict.pyx":14
+  /* "aiohttp/_multidict.pyx":15
  *     def __new__(cls, val='',
  *                 encoding=sys.getdefaultencoding(), errors='strict'):
  *         if isinstance(val, (bytes, bytearray, memoryview)):             # <<<<<<<<<<<<<<
@@ -1565,14 +1565,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   __pyx_t_4 = (__pyx_t_2 != 0);
   if (__pyx_t_4) {
 
-    /* "aiohttp/_multidict.pyx":15
+    /* "aiohttp/_multidict.pyx":16
  *                 encoding=sys.getdefaultencoding(), errors='strict'):
  *         if isinstance(val, (bytes, bytearray, memoryview)):
  *             val = str(val, encoding, errors)             # <<<<<<<<<<<<<<
  *         elif isinstance(val, str):
  *             pass
  */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_val);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_val);
@@ -1583,7 +1583,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
     __Pyx_INCREF(__pyx_v_errors);
     PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_v_errors);
     __Pyx_GIVEREF(__pyx_v_errors);
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)(&PyString_Type))), __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)(&PyString_Type))), __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF_SET(__pyx_v_val, __pyx_t_5);
@@ -1591,7 +1591,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
     goto __pyx_L3;
   }
 
-  /* "aiohttp/_multidict.pyx":16
+  /* "aiohttp/_multidict.pyx":17
  *         if isinstance(val, (bytes, bytearray, memoryview)):
  *             val = str(val, encoding, errors)
  *         elif isinstance(val, str):             # <<<<<<<<<<<<<<
@@ -1605,19 +1605,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   }
   /*else*/ {
 
-    /* "aiohttp/_multidict.pyx":19
+    /* "aiohttp/_multidict.pyx":20
  *             pass
  *         else:
  *             val = str(val)             # <<<<<<<<<<<<<<
  *         val = val.upper()
  *         return str.__new__(cls, val)
  */
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_v_val);
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_val);
     __Pyx_GIVEREF(__pyx_v_val);
-    __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)(&PyString_Type))), __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)(&PyString_Type))), __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF_SET(__pyx_v_val, __pyx_t_1);
@@ -1625,14 +1625,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   }
   __pyx_L3:;
 
-  /* "aiohttp/_multidict.pyx":20
+  /* "aiohttp/_multidict.pyx":21
  *         else:
  *             val = str(val)
  *         val = val.upper()             # <<<<<<<<<<<<<<
  *         return str.__new__(cls, val)
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_val, __pyx_n_s_upper); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_val, __pyx_n_s_upper); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -1645,17 +1645,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
     }
   }
   if (__pyx_t_6) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF_SET(__pyx_v_val, __pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":21
+  /* "aiohttp/_multidict.pyx":22
  *             val = str(val)
  *         val = val.upper()
  *         return str.__new__(cls, val)             # <<<<<<<<<<<<<<
@@ -1663,7 +1663,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
  *     def upper(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)(&PyString_Type))), __pyx_n_s_new); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)((PyObject*)(&PyString_Type))), __pyx_n_s_new); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 22; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_7 = 0;
@@ -1677,7 +1677,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 22; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   if (__pyx_t_6) {
     PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
@@ -1688,7 +1688,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   __Pyx_INCREF(__pyx_v_val);
   PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_v_val);
   __Pyx_GIVEREF(__pyx_v_val);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 22; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -1696,8 +1696,8 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":12
- *     """Case insensitive str"""
+  /* "aiohttp/_multidict.pyx":13
+ *     """Case insensitive str."""
  * 
  *     def __new__(cls, val='',             # <<<<<<<<<<<<<<
  *                 encoding=sys.getdefaultencoding(), errors='strict'):
@@ -1719,7 +1719,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr___new__(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":23
+/* "aiohttp/_multidict.pyx":24
  *         return str.__new__(cls, val)
  * 
  *     def upper(self):             # <<<<<<<<<<<<<<
@@ -1746,7 +1746,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr_2upper(CYTHON_UNUSED PyOb
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("upper", 0);
 
-  /* "aiohttp/_multidict.pyx":24
+  /* "aiohttp/_multidict.pyx":25
  * 
  *     def upper(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -1758,7 +1758,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr_2upper(CYTHON_UNUSED PyOb
   __pyx_r = __pyx_v_self;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":23
+  /* "aiohttp/_multidict.pyx":24
  *         return str.__new__(cls, val)
  * 
  *     def upper(self):             # <<<<<<<<<<<<<<
@@ -1773,7 +1773,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5upstr_2upper(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":32
+/* "aiohttp/_multidict.pyx":33
  *     cdef object _upstr
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -1806,14 +1806,14 @@ static int __pyx_pf_7aiohttp_10_multidict_5_Base___cinit__(struct __pyx_obj_7aio
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "aiohttp/_multidict.pyx":33
+  /* "aiohttp/_multidict.pyx":34
  * 
  *     def __cinit__(self):
  *         self._upstr = upstr             # <<<<<<<<<<<<<<
  * 
  *     cdef str _upper(self, s):
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_upstr); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_upstr); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_upstr);
@@ -1821,7 +1821,7 @@ static int __pyx_pf_7aiohttp_10_multidict_5_Base___cinit__(struct __pyx_obj_7aio
   __pyx_v_self->_upstr = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":32
+  /* "aiohttp/_multidict.pyx":33
  *     cdef object _upstr
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -1841,7 +1841,7 @@ static int __pyx_pf_7aiohttp_10_multidict_5_Base___cinit__(struct __pyx_obj_7aio
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":35
+/* "aiohttp/_multidict.pyx":36
  *         self._upstr = upstr
  * 
  *     cdef str _upper(self, s):             # <<<<<<<<<<<<<<
@@ -1859,7 +1859,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__upper(struct __pyx_obj_7a
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_upper", 0);
 
-  /* "aiohttp/_multidict.pyx":36
+  /* "aiohttp/_multidict.pyx":37
  * 
  *     cdef str _upper(self, s):
  *         if type(s) is self._upstr:             # <<<<<<<<<<<<<<
@@ -1870,7 +1870,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__upper(struct __pyx_obj_7a
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":37
+    /* "aiohttp/_multidict.pyx":38
  *     cdef str _upper(self, s):
  *         if type(s) is self._upstr:
  *             return <str>s             # <<<<<<<<<<<<<<
@@ -1883,7 +1883,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__upper(struct __pyx_obj_7a
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":38
+  /* "aiohttp/_multidict.pyx":39
  *         if type(s) is self._upstr:
  *             return <str>s
  *         return s             # <<<<<<<<<<<<<<
@@ -1891,12 +1891,12 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__upper(struct __pyx_obj_7a
  *     def getall(self, key, default=_marker):
  */
   __Pyx_XDECREF(__pyx_r);
-  if (!(likely(PyString_CheckExact(__pyx_v_s))||((__pyx_v_s) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_v_s)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyString_CheckExact(__pyx_v_s))||((__pyx_v_s) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_v_s)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_INCREF(__pyx_v_s);
   __pyx_r = ((PyObject*)__pyx_v_s);
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":35
+  /* "aiohttp/_multidict.pyx":36
  *         self._upstr = upstr
  * 
  *     cdef str _upper(self, s):             # <<<<<<<<<<<<<<
@@ -1914,17 +1914,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__upper(struct __pyx_obj_7a
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":40
+/* "aiohttp/_multidict.pyx":41
  *         return s
  * 
  *     def getall(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         """
- *         Return a list of all values matching the key (may be an empty list)
+ *         """Return a list of all values matching the key."""
+ *         return self._getall(self._upper(key), default)
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_3getall(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7aiohttp_10_multidict_5_Base_2getall[] = "\n        Return a list of all values matching the key (may be an empty list)\n        ";
+static char __pyx_doc_7aiohttp_10_multidict_5_Base_2getall[] = "Return a list of all values matching the key.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_3getall(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_default = 0;
@@ -1959,7 +1959,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_3getall(PyObject *__pyx_v
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getall") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getall") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1974,7 +1974,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_3getall(PyObject *__pyx_v
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getall", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("getall", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict._Base.getall", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1997,29 +1997,29 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_2getall(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("getall", 0);
 
-  /* "aiohttp/_multidict.pyx":44
- *         Return a list of all values matching the key (may be an empty list)
- *         """
+  /* "aiohttp/_multidict.pyx":43
+ *     def getall(self, key, default=_marker):
+ *         """Return a list of all values matching the key."""
  *         return self._getall(self._upper(key), default)             # <<<<<<<<<<<<<<
  * 
  *     cdef _getall(self, str key, default):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getall(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_default); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getall(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_default); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":40
+  /* "aiohttp/_multidict.pyx":41
  *         return s
  * 
  *     def getall(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         """
- *         Return a list of all values matching the key (may be an empty list)
+ *         """Return a list of all values matching the key."""
+ *         return self._getall(self._upper(key), default)
  */
 
   /* function exit code */
@@ -2034,7 +2034,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_2getall(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":46
+/* "aiohttp/_multidict.pyx":45
  *         return self._getall(self._upper(key), default)
  * 
  *     cdef _getall(self, str key, default):             # <<<<<<<<<<<<<<
@@ -2065,38 +2065,38 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
   __Pyx_RefNannySetupContext("_getall", 0);
   __Pyx_INCREF(__pyx_v_key);
 
-  /* "aiohttp/_multidict.pyx":48
+  /* "aiohttp/_multidict.pyx":47
  *     cdef _getall(self, str key, default):
  *         cdef list res
  *         key = self._upper(key)             # <<<<<<<<<<<<<<
  *         res = [v for k, v in self._items if k == key]
  *         if res:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_1));
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":49
+  /* "aiohttp/_multidict.pyx":48
  *         cdef list res
  *         key = self._upper(key)
  *         res = [v for k, v in self._items if k == key]             # <<<<<<<<<<<<<<
  *         if res:
  *             return res
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_self->_items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_2 = __pyx_v_self->_items; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
   for (;;) {
     if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_2)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_4); __pyx_t_3++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
     if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
       PyObject* sequence = __pyx_t_4;
@@ -2108,7 +2108,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -2121,15 +2121,15 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
       __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_t_6);
       #else
-      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       #endif
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_8 = Py_TYPE(__pyx_t_7)->tp_iternext;
@@ -2137,7 +2137,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
       __Pyx_GOTREF(__pyx_t_5);
       index = 1; __pyx_t_6 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_6)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_8 = NULL;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L6_unpacking_done;
@@ -2145,16 +2145,16 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_k, __pyx_t_5);
     __pyx_t_5 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_6);
     __pyx_t_6 = 0;
-    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_v_k, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_v_k, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (__pyx_t_9) {
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_v_v))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_v_v))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       goto __pyx_L7;
     }
     __pyx_L7:;
@@ -2163,7 +2163,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
   __pyx_v_res = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":50
+  /* "aiohttp/_multidict.pyx":49
  *         key = self._upper(key)
  *         res = [v for k, v in self._items if k == key]
  *         if res:             # <<<<<<<<<<<<<<
@@ -2173,7 +2173,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
   __pyx_t_9 = (__pyx_v_res != Py_None) && (PyList_GET_SIZE(__pyx_v_res) != 0);
   if (__pyx_t_9) {
 
-    /* "aiohttp/_multidict.pyx":51
+    /* "aiohttp/_multidict.pyx":50
  *         res = [v for k, v in self._items if k == key]
  *         if res:
  *             return res             # <<<<<<<<<<<<<<
@@ -2186,7 +2186,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":52
+  /* "aiohttp/_multidict.pyx":51
  *         if res:
  *             return res
  *         if not res and default is not _marker:             # <<<<<<<<<<<<<<
@@ -2200,7 +2200,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
     __pyx_t_9 = __pyx_t_11;
     goto __pyx_L10_bool_binop_done;
   }
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_11 = (__pyx_v_default != __pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2209,7 +2209,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
   __pyx_L10_bool_binop_done:;
   if (__pyx_t_9) {
 
-    /* "aiohttp/_multidict.pyx":53
+    /* "aiohttp/_multidict.pyx":52
  *             return res
  *         if not res and default is not _marker:
  *             return default             # <<<<<<<<<<<<<<
@@ -2222,28 +2222,28 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":54
+  /* "aiohttp/_multidict.pyx":53
  *         if not res and default is not _marker:
  *             return default
  *         raise KeyError('Key not found: %r' % key)             # <<<<<<<<<<<<<<
  * 
  *     def getone(self, key, default=_marker):
  */
-  __pyx_t_1 = __Pyx_PyString_Format(__pyx_kp_s_Key_not_found_r, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyString_Format(__pyx_kp_s_Key_not_found_r, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "aiohttp/_multidict.pyx":46
+  /* "aiohttp/_multidict.pyx":45
  *         return self._getall(self._upper(key), default)
  * 
  *     cdef _getall(self, str key, default):             # <<<<<<<<<<<<<<
@@ -2271,17 +2271,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getall(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":56
+/* "aiohttp/_multidict.pyx":55
  *         raise KeyError('Key not found: %r' % key)
  * 
  *     def getone(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         """
- *         Get first value matching the key
+ *         """Get first value matching the key."""
+ *         return self._getone(self._upper(key), default)
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_5getone(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7aiohttp_10_multidict_5_Base_4getone[] = "\n        Get first value matching the key\n        ";
+static char __pyx_doc_7aiohttp_10_multidict_5_Base_4getone[] = "Get first value matching the key.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_5getone(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_default = 0;
@@ -2316,7 +2316,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_5getone(PyObject *__pyx_v
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getone") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getone") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2331,7 +2331,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_5getone(PyObject *__pyx_v
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getone", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("getone", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict._Base.getone", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2354,29 +2354,29 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_4getone(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("getone", 0);
 
-  /* "aiohttp/_multidict.pyx":60
- *         Get first value matching the key
- *         """
+  /* "aiohttp/_multidict.pyx":57
+ *     def getone(self, key, default=_marker):
+ *         """Get first value matching the key."""
  *         return self._getone(self._upper(key), default)             # <<<<<<<<<<<<<<
  * 
  *     cdef _getone(self, str key, default):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 60; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getone(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_default); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 60; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getone(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_default); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":56
+  /* "aiohttp/_multidict.pyx":55
  *         raise KeyError('Key not found: %r' % key)
  * 
  *     def getone(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         """
- *         Get first value matching the key
+ *         """Get first value matching the key."""
+ *         return self._getone(self._upper(key), default)
  */
 
   /* function exit code */
@@ -2391,7 +2391,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_4getone(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":62
+/* "aiohttp/_multidict.pyx":59
  *         return self._getone(self._upper(key), default)
  * 
  *     cdef _getone(self, str key, default):             # <<<<<<<<<<<<<<
@@ -2414,19 +2414,19 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
   __Pyx_RefNannySetupContext("_getone", 0);
   __Pyx_INCREF(__pyx_v_key);
 
-  /* "aiohttp/_multidict.pyx":64
+  /* "aiohttp/_multidict.pyx":61
  *     cdef _getone(self, str key, default):
  *         cdef tuple item
  *         key = self._upper(key)             # <<<<<<<<<<<<<<
  *         for item in self._items:
  *             if <str>item[0] == key:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 61; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_1));
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":65
+  /* "aiohttp/_multidict.pyx":62
  *         cdef tuple item
  *         key = self._upper(key)
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -2435,21 +2435,21 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
  */
   if (unlikely(__pyx_v_self->_items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->_items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":66
+    /* "aiohttp/_multidict.pyx":63
  *         key = self._upper(key)
  *         for item in self._items:
  *             if <str>item[0] == key:             # <<<<<<<<<<<<<<
@@ -2458,16 +2458,16 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
  */
     if (unlikely(__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_5 = (__pyx_t_4 != 0);
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":67
+      /* "aiohttp/_multidict.pyx":64
  *         for item in self._items:
  *             if <str>item[0] == key:
  *                 return item[1]             # <<<<<<<<<<<<<<
@@ -2477,9 +2477,9 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
       __Pyx_XDECREF(__pyx_r);
       if (unlikely(__pyx_v_item == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_r = __pyx_t_3;
       __pyx_t_3 = 0;
@@ -2487,7 +2487,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":65
+    /* "aiohttp/_multidict.pyx":62
  *         cdef tuple item
  *         key = self._upper(key)
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -2497,21 +2497,21 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":68
+  /* "aiohttp/_multidict.pyx":65
  *             if <str>item[0] == key:
  *                 return item[1]
  *         if default is not _marker:             # <<<<<<<<<<<<<<
  *             return default
  *         raise KeyError('Key not found: %r' % key)
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 68; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 65; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = (__pyx_v_default != __pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "aiohttp/_multidict.pyx":69
+    /* "aiohttp/_multidict.pyx":66
  *                 return item[1]
  *         if default is not _marker:
  *             return default             # <<<<<<<<<<<<<<
@@ -2524,28 +2524,28 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":70
+  /* "aiohttp/_multidict.pyx":67
  *         if default is not _marker:
  *             return default
  *         raise KeyError('Key not found: %r' % key)             # <<<<<<<<<<<<<<
  * 
  *     # Mapping interface #
  */
-  __pyx_t_1 = __Pyx_PyString_Format(__pyx_kp_s_Key_not_found_r, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyString_Format(__pyx_kp_s_Key_not_found_r, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 67; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "aiohttp/_multidict.pyx":62
+  /* "aiohttp/_multidict.pyx":59
  *         return self._getone(self._upper(key), default)
  * 
  *     cdef _getone(self, str key, default):             # <<<<<<<<<<<<<<
@@ -2567,7 +2567,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__getone(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":74
+/* "aiohttp/_multidict.pyx":71
  *     # Mapping interface #
  * 
  *     def __getitem__(self, key):             # <<<<<<<<<<<<<<
@@ -2599,7 +2599,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_6__getitem__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__getitem__", 0);
 
-  /* "aiohttp/_multidict.pyx":75
+  /* "aiohttp/_multidict.pyx":72
  * 
  *     def __getitem__(self, key):
  *         return self._getone(self._upper(key), _marker)             # <<<<<<<<<<<<<<
@@ -2607,11 +2607,11 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_6__getitem__(struct __pyx
  *     def get(self, key, default=None):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getone(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getone(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -2619,7 +2619,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_6__getitem__(struct __pyx
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":74
+  /* "aiohttp/_multidict.pyx":71
  *     # Mapping interface #
  * 
  *     def __getitem__(self, key):             # <<<<<<<<<<<<<<
@@ -2640,16 +2640,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_6__getitem__(struct __pyx
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":77
+/* "aiohttp/_multidict.pyx":74
  *         return self._getone(self._upper(key), _marker)
  * 
  *     def get(self, key, default=None):             # <<<<<<<<<<<<<<
- *         return self._getone(self._upper(key), default)
+ *         """Get first value matching the key.
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_9get(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_5_Base_8get[] = "Get first value matching the key.\n\n        The method is alias for .getone().\n        ";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_9get(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_default = 0;
@@ -2684,7 +2685,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_9get(PyObject *__pyx_v_se
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2699,7 +2700,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_9get(PyObject *__pyx_v_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("get", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict._Base.get", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2722,28 +2723,28 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_8get(struct __pyx_obj_7ai
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get", 0);
 
-  /* "aiohttp/_multidict.pyx":78
- * 
- *     def get(self, key, default=None):
+  /* "aiohttp/_multidict.pyx":79
+ *         The method is alias for .getone().
+ *         """
  *         return self._getone(self._upper(key), default)             # <<<<<<<<<<<<<<
  * 
  *     def __contains__(self, key):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getone(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_default); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_getone(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_default); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":77
+  /* "aiohttp/_multidict.pyx":74
  *         return self._getone(self._upper(key), _marker)
  * 
  *     def get(self, key, default=None):             # <<<<<<<<<<<<<<
- *         return self._getone(self._upper(key), default)
+ *         """Get first value matching the key.
  * 
  */
 
@@ -2759,7 +2760,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_8get(struct __pyx_obj_7ai
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":80
+/* "aiohttp/_multidict.pyx":81
  *         return self._getone(self._upper(key), default)
  * 
  *     def __contains__(self, key):             # <<<<<<<<<<<<<<
@@ -2791,24 +2792,24 @@ static int __pyx_pf_7aiohttp_10_multidict_5_Base_10__contains__(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__contains__", 0);
 
-  /* "aiohttp/_multidict.pyx":81
+  /* "aiohttp/_multidict.pyx":82
  * 
  *     def __contains__(self, key):
  *         return self._contains(self._upper(key))             # <<<<<<<<<<<<<<
  * 
  *     cdef _contains(self, str key):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_contains(__pyx_v_self, ((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_contains(__pyx_v_self, ((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_3;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":80
+  /* "aiohttp/_multidict.pyx":81
  *         return self._getone(self._upper(key), default)
  * 
  *     def __contains__(self, key):             # <<<<<<<<<<<<<<
@@ -2827,7 +2828,7 @@ static int __pyx_pf_7aiohttp_10_multidict_5_Base_10__contains__(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":83
+/* "aiohttp/_multidict.pyx":84
  *         return self._contains(self._upper(key))
  * 
  *     cdef _contains(self, str key):             # <<<<<<<<<<<<<<
@@ -2850,19 +2851,19 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
   __Pyx_RefNannySetupContext("_contains", 0);
   __Pyx_INCREF(__pyx_v_key);
 
-  /* "aiohttp/_multidict.pyx":85
+  /* "aiohttp/_multidict.pyx":86
  *     cdef _contains(self, str key):
  *         cdef tuple item
  *         key = self._upper(key)             # <<<<<<<<<<<<<<
  *         for item in self._items:
  *             if <str>item[0] == key:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->_upper(__pyx_v_self, __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_1));
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":86
+  /* "aiohttp/_multidict.pyx":87
  *         cdef tuple item
  *         key = self._upper(key)
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -2871,21 +2872,21 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
  */
   if (unlikely(__pyx_v_self->_items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->_items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":87
+    /* "aiohttp/_multidict.pyx":88
  *         key = self._upper(key)
  *         for item in self._items:
  *             if <str>item[0] == key:             # <<<<<<<<<<<<<<
@@ -2894,16 +2895,16 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
  */
     if (unlikely(__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_5 = (__pyx_t_4 != 0);
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":88
+      /* "aiohttp/_multidict.pyx":89
  *         for item in self._items:
  *             if <str>item[0] == key:
  *                 return True             # <<<<<<<<<<<<<<
@@ -2917,7 +2918,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":86
+    /* "aiohttp/_multidict.pyx":87
  *         cdef tuple item
  *         key = self._upper(key)
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -2927,7 +2928,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":89
+  /* "aiohttp/_multidict.pyx":90
  *             if <str>item[0] == key:
  *                 return True
  *         return False             # <<<<<<<<<<<<<<
@@ -2939,7 +2940,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":83
+  /* "aiohttp/_multidict.pyx":84
  *         return self._contains(self._upper(key))
  * 
  *     cdef _contains(self, str key):             # <<<<<<<<<<<<<<
@@ -2961,7 +2962,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base__contains(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":91
+/* "aiohttp/_multidict.pyx":92
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -2992,7 +2993,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_12__iter__(struct __pyx_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__iter__", 0);
 
-  /* "aiohttp/_multidict.pyx":92
+  /* "aiohttp/_multidict.pyx":93
  * 
  *     def __iter__(self):
  *         return iter(self.keys())             # <<<<<<<<<<<<<<
@@ -3000,16 +3001,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_12__iter__(struct __pyx_o
  *     def __len__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->keys(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict__Base *)__pyx_v_self->__pyx_vtab)->keys(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":91
+  /* "aiohttp/_multidict.pyx":92
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -3029,7 +3030,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_12__iter__(struct __pyx_o
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":94
+/* "aiohttp/_multidict.pyx":95
  *         return iter(self.keys())
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -3060,7 +3061,7 @@ static Py_ssize_t __pyx_pf_7aiohttp_10_multidict_5_Base_14__len__(struct __pyx_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__len__", 0);
 
-  /* "aiohttp/_multidict.pyx":95
+  /* "aiohttp/_multidict.pyx":96
  * 
  *     def __len__(self):
  *         return len(self._items)             # <<<<<<<<<<<<<<
@@ -3071,14 +3072,14 @@ static Py_ssize_t __pyx_pf_7aiohttp_10_multidict_5_Base_14__len__(struct __pyx_o
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":94
+  /* "aiohttp/_multidict.pyx":95
  *         return iter(self.keys())
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -3096,12 +3097,12 @@ static Py_ssize_t __pyx_pf_7aiohttp_10_multidict_5_Base_14__len__(struct __pyx_o
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":97
+/* "aiohttp/_multidict.pyx":98
  *         return len(self._items)
  * 
  *     cpdef keys(self):             # <<<<<<<<<<<<<<
+ *         """Return a new view of the dictionary's keys."""
  *         return _KeysView.__new__(_KeysView, self._items)
- * 
  */
 
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_17keys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
@@ -3120,7 +3121,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base_keys(struct __pyx_obj_7aio
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_keys); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_keys); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_17keys)) {
       __Pyx_XDECREF(__pyx_r);
@@ -3136,10 +3137,10 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base_keys(struct __pyx_obj_7aio
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3151,32 +3152,32 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base_keys(struct __pyx_obj_7aio
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "aiohttp/_multidict.pyx":98
- * 
+  /* "aiohttp/_multidict.pyx":100
  *     cpdef keys(self):
+ *         """Return a new view of the dictionary's keys."""
  *         return _KeysView.__new__(_KeysView, self._items)             # <<<<<<<<<<<<<<
  * 
  *     def items(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_self->_items);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_self->_items);
   __Pyx_GIVEREF(__pyx_v_self->_items);
-  __pyx_t_2 = __pyx_tp_new_7aiohttp_10_multidict__KeysView(((PyTypeObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_tp_new_7aiohttp_10_multidict__KeysView(((PyTypeObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":97
+  /* "aiohttp/_multidict.pyx":98
  *         return len(self._items)
  * 
  *     cpdef keys(self):             # <<<<<<<<<<<<<<
+ *         """Return a new view of the dictionary's keys."""
  *         return _KeysView.__new__(_KeysView, self._items)
- * 
  */
 
   /* function exit code */
@@ -3195,6 +3196,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_5_Base_keys(struct __pyx_obj_7aio
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_17keys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_5_Base_16keys[] = "Return a new view of the dictionary's keys.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_17keys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -3215,7 +3217,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_16keys(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("keys", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7aiohttp_10_multidict_5_Base_keys(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 97; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_7aiohttp_10_multidict_5_Base_keys(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3232,16 +3234,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_16keys(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":100
+/* "aiohttp/_multidict.pyx":102
  *         return _KeysView.__new__(_KeysView, self._items)
  * 
  *     def items(self):             # <<<<<<<<<<<<<<
+ *         """Return a new view of the dictionary's items *(key, value) pairs)."""
  *         return _ItemsView.__new__(_ItemsView, self._items)
- * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_19items(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_5_Base_18items[] = "Return a new view of the dictionary's items *(key, value) pairs).";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_19items(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -3263,32 +3266,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_18items(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("items", 0);
 
-  /* "aiohttp/_multidict.pyx":101
- * 
+  /* "aiohttp/_multidict.pyx":104
  *     def items(self):
+ *         """Return a new view of the dictionary's items *(key, value) pairs)."""
  *         return _ItemsView.__new__(_ItemsView, self._items)             # <<<<<<<<<<<<<<
  * 
  *     def values(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 101; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_self->_items);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_self->_items);
   __Pyx_GIVEREF(__pyx_v_self->_items);
-  __pyx_t_2 = __pyx_tp_new_7aiohttp_10_multidict__ItemsView(((PyTypeObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 101; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_tp_new_7aiohttp_10_multidict__ItemsView(((PyTypeObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":100
+  /* "aiohttp/_multidict.pyx":102
  *         return _KeysView.__new__(_KeysView, self._items)
  * 
  *     def items(self):             # <<<<<<<<<<<<<<
+ *         """Return a new view of the dictionary's items *(key, value) pairs)."""
  *         return _ItemsView.__new__(_ItemsView, self._items)
- * 
  */
 
   /* function exit code */
@@ -3303,16 +3306,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_18items(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":103
+/* "aiohttp/_multidict.pyx":106
  *         return _ItemsView.__new__(_ItemsView, self._items)
  * 
  *     def values(self):             # <<<<<<<<<<<<<<
+ *         """Return a new view of the dictionary's values."""
  *         return _ValuesView.__new__(_ValuesView, self._items)
- * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_21values(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_5_Base_20values[] = "Return a new view of the dictionary's values.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_21values(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -3334,32 +3338,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_20values(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("values", 0);
 
-  /* "aiohttp/_multidict.pyx":104
- * 
+  /* "aiohttp/_multidict.pyx":108
  *     def values(self):
+ *         """Return a new view of the dictionary's values."""
  *         return _ValuesView.__new__(_ValuesView, self._items)             # <<<<<<<<<<<<<<
  * 
  *     def __repr__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_self->_items);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_self->_items);
   __Pyx_GIVEREF(__pyx_v_self->_items);
-  __pyx_t_2 = __pyx_tp_new_7aiohttp_10_multidict__ValuesView(((PyTypeObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_tp_new_7aiohttp_10_multidict__ValuesView(((PyTypeObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":103
+  /* "aiohttp/_multidict.pyx":106
  *         return _ItemsView.__new__(_ItemsView, self._items)
  * 
  *     def values(self):             # <<<<<<<<<<<<<<
+ *         """Return a new view of the dictionary's values."""
  *         return _ValuesView.__new__(_ValuesView, self._items)
- * 
  */
 
   /* function exit code */
@@ -3374,7 +3378,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_20values(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":106
+/* "aiohttp/_multidict.pyx":110
  *         return _ValuesView.__new__(_ValuesView, self._items)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -3396,7 +3400,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_23__repr__(PyObject *__py
 }
 static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "aiohttp/_multidict.pyx":107
+/* "aiohttp/_multidict.pyx":111
  * 
  *     def __repr__(self):
  *         body = ', '.join("'{}': {!r}".format(k, v) for k, v in self.items())             # <<<<<<<<<<<<<<
@@ -3422,7 +3426,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_8__repr___genexpr(PyObjec
   __Pyx_INCREF(((PyObject *)__pyx_cur_scope->__pyx_outer_scope));
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_outer_scope);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2, (PyObject *) __pyx_cur_scope, __pyx_n_s_genexpr, __pyx_n_s_repr___locals_genexpr); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2, (PyObject *) __pyx_cur_scope, __pyx_n_s_genexpr, __pyx_n_s_repr___locals_genexpr); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -3464,9 +3468,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_outer_scope->__pyx_v_self), __pyx_n_s_items); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_outer_scope->__pyx_v_self), __pyx_n_s_items); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3479,10 +3483,10 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3490,9 +3494,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
     __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -3500,16 +3504,16 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       }
     } else {
@@ -3518,7 +3522,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -3534,7 +3538,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -3547,15 +3551,15 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_6);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       #endif
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_8 = Py_TYPE(__pyx_t_7)->tp_iternext;
@@ -3563,7 +3567,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_6 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_6)) goto __pyx_L6_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_8 = NULL;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L7_unpacking_done;
@@ -3571,7 +3575,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L7_unpacking_done:;
     }
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_k);
@@ -3582,7 +3586,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_v, __pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_6);
     __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_r, __pyx_n_s_format); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_r, __pyx_n_s_format); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_3 = NULL;
     __pyx_t_9 = 0;
@@ -3596,7 +3600,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
         __pyx_t_9 = 1;
       }
     }
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_3) {
       PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
@@ -3607,7 +3611,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
     __Pyx_INCREF(__pyx_cur_scope->__pyx_v_v);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_9, __pyx_cur_scope->__pyx_v_v);
     __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_v);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -3628,7 +3632,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
     __Pyx_XGOTREF(__pyx_t_2);
     __pyx_t_4 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_5 = __pyx_cur_scope->__pyx_t_2;
-    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
@@ -3650,7 +3654,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_5_Base_8__repr___2generator2(__p
   return NULL;
 }
 
-/* "aiohttp/_multidict.pyx":106
+/* "aiohttp/_multidict.pyx":110
  *         return _ValuesView.__new__(_ValuesView, self._items)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -3683,22 +3687,22 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_22__repr__(struct __pyx_o
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
 
-  /* "aiohttp/_multidict.pyx":107
+  /* "aiohttp/_multidict.pyx":111
  * 
  *     def __repr__(self):
  *         body = ', '.join("'{}': {!r}".format(k, v) for k, v in self.items())             # <<<<<<<<<<<<<<
  *         return '<{} {{{}}}>'.format(self.__class__.__name__, body)
  * 
  */
-  __pyx_t_1 = __pyx_pf_7aiohttp_10_multidict_5_Base_8__repr___genexpr(((PyObject*)__pyx_cur_scope)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_pf_7aiohttp_10_multidict_5_Base_8__repr___genexpr(((PyObject*)__pyx_cur_scope)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyString_Join(__pyx_kp_s__4, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyString_Join(__pyx_kp_s__4, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_body = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "aiohttp/_multidict.pyx":108
+  /* "aiohttp/_multidict.pyx":112
  *     def __repr__(self):
  *         body = ', '.join("'{}': {!r}".format(k, v) for k, v in self.items())
  *         return '<{} {{{}}}>'.format(self.__class__.__name__, body)             # <<<<<<<<<<<<<<
@@ -3706,11 +3710,11 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_22__repr__(struct __pyx_o
  *     def __richcmp__(self, other, op):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s__5, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s__5, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_n_s_class); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_n_s_class); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_name); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_name); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -3725,7 +3729,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_22__repr__(struct __pyx_o
       __pyx_t_5 = 1;
     }
   }
-  __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   if (__pyx_t_3) {
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
@@ -3736,7 +3740,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_22__repr__(struct __pyx_o
   PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_v_body);
   __Pyx_GIVEREF(__pyx_v_body);
   __pyx_t_4 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3744,7 +3748,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_22__repr__(struct __pyx_o
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":106
+  /* "aiohttp/_multidict.pyx":110
  *         return _ValuesView.__new__(_ValuesView, self._items)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -3769,7 +3773,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_22__repr__(struct __pyx_o
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":110
+/* "aiohttp/_multidict.pyx":114
  *         return '<{} {{{}}}>'.format(self.__class__.__name__, body)
  * 
  *     def __richcmp__(self, other, op):             # <<<<<<<<<<<<<<
@@ -3787,7 +3791,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_5_Base_25__richcmp__(PyObject *_
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__richcmp__ (wrapper)", 0);
-  __pyx_v_op = __Pyx_PyInt_From_int(__pyx_arg_op); if (unlikely(!__pyx_v_op)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __pyx_v_op = __Pyx_PyInt_From_int(__pyx_arg_op); if (unlikely(!__pyx_v_op)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __Pyx_GOTREF(__pyx_v_op);
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3828,19 +3832,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__richcmp__", 0);
 
-  /* "aiohttp/_multidict.pyx":114
+  /* "aiohttp/_multidict.pyx":118
  *         cdef _Base typed_other
  *         cdef tuple item
  *         if op == 2:             # <<<<<<<<<<<<<<
  *             if isinstance(self, _Base) and isinstance(other, _Base):
  *                 typed_self = self
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":115
+    /* "aiohttp/_multidict.pyx":119
  *         cdef tuple item
  *         if op == 2:
  *             if isinstance(self, _Base) and isinstance(other, _Base):             # <<<<<<<<<<<<<<
@@ -3860,33 +3864,33 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
     __pyx_L5_bool_binop_done:;
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":116
+      /* "aiohttp/_multidict.pyx":120
  *         if op == 2:
  *             if isinstance(self, _Base) and isinstance(other, _Base):
  *                 typed_self = self             # <<<<<<<<<<<<<<
  *                 typed_other = other
  *                 return typed_self._items == typed_other._items
  */
-      if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_1 = __pyx_v_self;
       __Pyx_INCREF(__pyx_t_1);
       __pyx_v_typed_self = ((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "aiohttp/_multidict.pyx":117
+      /* "aiohttp/_multidict.pyx":121
  *             if isinstance(self, _Base) and isinstance(other, _Base):
  *                 typed_self = self
  *                 typed_other = other             # <<<<<<<<<<<<<<
  *                 return typed_self._items == typed_other._items
  *             elif not isinstance(other, abc.Mapping):
  */
-      if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_1 = __pyx_v_other;
       __Pyx_INCREF(__pyx_t_1);
       __pyx_v_typed_other = ((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "aiohttp/_multidict.pyx":118
+      /* "aiohttp/_multidict.pyx":122
  *                 typed_self = self
  *                 typed_other = other
  *                 return typed_self._items == typed_other._items             # <<<<<<<<<<<<<<
@@ -3894,30 +3898,30 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
  *                 return NotImplemented
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = PyObject_RichCompare(__pyx_v_typed_self->_items, __pyx_v_typed_other->_items, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = PyObject_RichCompare(__pyx_v_typed_self->_items, __pyx_v_typed_other->_items, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = __pyx_t_1;
       __pyx_t_1 = 0;
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":119
+    /* "aiohttp/_multidict.pyx":123
  *                 typed_other = other
  *                 return typed_self._items == typed_other._items
  *             elif not isinstance(other, abc.Mapping):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             for item in self.items():
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_5); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_5); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
     if (__pyx_t_3) {
 
-      /* "aiohttp/_multidict.pyx":120
+      /* "aiohttp/_multidict.pyx":124
  *                 return typed_self._items == typed_other._items
  *             elif not isinstance(other, abc.Mapping):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -3930,14 +3934,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":121
+    /* "aiohttp/_multidict.pyx":125
  *             elif not isinstance(other, abc.Mapping):
  *                 return NotImplemented
  *             for item in self.items():             # <<<<<<<<<<<<<<
  *                 nv = other.get(item[0], _marker)
  *                 if item[1] != nv:
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_items); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_items); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_1))) {
@@ -3950,10 +3954,10 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       }
     }
     if (__pyx_t_6) {
-      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
-      __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3961,9 +3965,9 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       __pyx_t_1 = __pyx_t_5; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
     } else {
-      __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     for (;;) {
@@ -3971,16 +3975,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
         if (likely(PyList_CheckExact(__pyx_t_1))) {
           if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_5); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_5); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         } else {
           if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_5); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_5); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         }
       } else {
@@ -3989,32 +3993,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           }
           break;
         }
         __Pyx_GOTREF(__pyx_t_5);
       }
-      if (!(likely(PyTuple_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_5)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(PyTuple_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_5)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_5));
       __pyx_t_5 = 0;
 
-      /* "aiohttp/_multidict.pyx":122
+      /* "aiohttp/_multidict.pyx":126
  *                 return NotImplemented
  *             for item in self.items():
  *                 nv = other.get(item[0], _marker)             # <<<<<<<<<<<<<<
  *                 if item[1] != nv:
  *                     return False
  */
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_get); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_get); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       if (unlikely(__pyx_v_item == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      __pyx_t_9 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_9 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_9 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_9 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_10 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_10 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_11 = NULL;
       __pyx_t_12 = 0;
@@ -4028,7 +4032,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
           __pyx_t_12 = 1;
         }
       }
-      __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_13);
       if (__pyx_t_11) {
         PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_11); __Pyx_GIVEREF(__pyx_t_11); __pyx_t_11 = NULL;
@@ -4039,14 +4043,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       __Pyx_GIVEREF(__pyx_t_10);
       __pyx_t_9 = 0;
       __pyx_t_10 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_13, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 122; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_13, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_XDECREF_SET(__pyx_v_nv, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "aiohttp/_multidict.pyx":123
+      /* "aiohttp/_multidict.pyx":127
  *             for item in self.items():
  *                 nv = other.get(item[0], _marker)
  *                 if item[1] != nv:             # <<<<<<<<<<<<<<
@@ -4055,17 +4059,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
  */
       if (unlikely(__pyx_v_item == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      __pyx_t_5 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_5 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PyObject_RichCompare(__pyx_t_5, __pyx_v_nv, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyObject_RichCompare(__pyx_t_5, __pyx_v_nv, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       if (__pyx_t_3) {
 
-        /* "aiohttp/_multidict.pyx":124
+        /* "aiohttp/_multidict.pyx":128
  *                 nv = other.get(item[0], _marker)
  *                 if item[1] != nv:
  *                     return False             # <<<<<<<<<<<<<<
@@ -4079,7 +4083,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
         goto __pyx_L0;
       }
 
-      /* "aiohttp/_multidict.pyx":121
+      /* "aiohttp/_multidict.pyx":125
  *             elif not isinstance(other, abc.Mapping):
  *                 return NotImplemented
  *             for item in self.items():             # <<<<<<<<<<<<<<
@@ -4089,7 +4093,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "aiohttp/_multidict.pyx":125
+    /* "aiohttp/_multidict.pyx":129
  *                 if item[1] != nv:
  *                     return False
  *             return True             # <<<<<<<<<<<<<<
@@ -4102,19 +4106,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":126
+  /* "aiohttp/_multidict.pyx":130
  *                     return False
  *             return True
  *         elif op != 2:             # <<<<<<<<<<<<<<
  *             if isinstance(self, _Base) and isinstance(other, _Base):
  *                 typed_self = self
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_2, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_2, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":127
+    /* "aiohttp/_multidict.pyx":131
  *             return True
  *         elif op != 2:
  *             if isinstance(self, _Base) and isinstance(other, _Base):             # <<<<<<<<<<<<<<
@@ -4134,33 +4138,33 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
     __pyx_L11_bool_binop_done:;
     if (__pyx_t_3) {
 
-      /* "aiohttp/_multidict.pyx":128
+      /* "aiohttp/_multidict.pyx":132
  *         elif op != 2:
  *             if isinstance(self, _Base) and isinstance(other, _Base):
  *                 typed_self = self             # <<<<<<<<<<<<<<
  *                 typed_other = other
  *                 return typed_self._items != typed_other._items
  */
-      if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_1 = __pyx_v_self;
       __Pyx_INCREF(__pyx_t_1);
       __pyx_v_typed_self = ((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "aiohttp/_multidict.pyx":129
+      /* "aiohttp/_multidict.pyx":133
  *             if isinstance(self, _Base) and isinstance(other, _Base):
  *                 typed_self = self
  *                 typed_other = other             # <<<<<<<<<<<<<<
  *                 return typed_self._items != typed_other._items
  *             elif not isinstance(other, abc.Mapping):
  */
-      if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_7aiohttp_10_multidict__Base))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_1 = __pyx_v_other;
       __Pyx_INCREF(__pyx_t_1);
       __pyx_v_typed_other = ((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "aiohttp/_multidict.pyx":130
+      /* "aiohttp/_multidict.pyx":134
  *                 typed_self = self
  *                 typed_other = other
  *                 return typed_self._items != typed_other._items             # <<<<<<<<<<<<<<
@@ -4168,30 +4172,30 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
  *                 return NotImplemented
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = PyObject_RichCompare(__pyx_v_typed_self->_items, __pyx_v_typed_other->_items, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = PyObject_RichCompare(__pyx_v_typed_self->_items, __pyx_v_typed_other->_items, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = __pyx_t_1;
       __pyx_t_1 = 0;
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":131
+    /* "aiohttp/_multidict.pyx":135
  *                 typed_other = other
  *                 return typed_self._items != typed_other._items
  *             elif not isinstance(other, abc.Mapping):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             for item in self.items():
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_6); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_6); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":132
+      /* "aiohttp/_multidict.pyx":136
  *                 return typed_self._items != typed_other._items
  *             elif not isinstance(other, abc.Mapping):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -4204,14 +4208,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":133
+    /* "aiohttp/_multidict.pyx":137
  *             elif not isinstance(other, abc.Mapping):
  *                 return NotImplemented
  *             for item in self.items():             # <<<<<<<<<<<<<<
  *                 nv = other.get(item[0], _marker)
  *                 if item[1] == nv:
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_items); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_items); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_5 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_1))) {
@@ -4224,10 +4228,10 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       }
     }
     if (__pyx_t_5) {
-      __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
-      __pyx_t_6 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4235,9 +4239,9 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       __pyx_t_1 = __pyx_t_6; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
     } else {
-      __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     for (;;) {
@@ -4245,16 +4249,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
         if (likely(PyList_CheckExact(__pyx_t_1))) {
           if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_6); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_6); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         } else {
           if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_6); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_6); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         }
       } else {
@@ -4263,32 +4267,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           }
           break;
         }
         __Pyx_GOTREF(__pyx_t_6);
       }
-      if (!(likely(PyTuple_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_6)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(PyTuple_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_6)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_6));
       __pyx_t_6 = 0;
 
-      /* "aiohttp/_multidict.pyx":134
+      /* "aiohttp/_multidict.pyx":138
  *                 return NotImplemented
  *             for item in self.items():
  *                 nv = other.get(item[0], _marker)             # <<<<<<<<<<<<<<
  *                 if item[1] == nv:
  *                     return True
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_get); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_get); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       if (unlikely(__pyx_v_item == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      __pyx_t_13 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_13 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_13 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_13 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_13);
-      __pyx_t_10 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_10 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_9 = NULL;
       __pyx_t_12 = 0;
@@ -4302,7 +4306,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
           __pyx_t_12 = 1;
         }
       }
-      __pyx_t_11 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_11 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_11);
       if (__pyx_t_9) {
         PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __Pyx_GIVEREF(__pyx_t_9); __pyx_t_9 = NULL;
@@ -4313,14 +4317,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
       __Pyx_GIVEREF(__pyx_t_10);
       __pyx_t_13 = 0;
       __pyx_t_10 = 0;
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF_SET(__pyx_v_nv, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "aiohttp/_multidict.pyx":135
+      /* "aiohttp/_multidict.pyx":139
  *             for item in self.items():
  *                 nv = other.get(item[0], _marker)
  *                 if item[1] == nv:             # <<<<<<<<<<<<<<
@@ -4329,17 +4333,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
  */
       if (unlikely(__pyx_v_item == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      __pyx_t_6 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_6 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_6 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_6 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_v_nv, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_v_nv, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       if (__pyx_t_2) {
 
-        /* "aiohttp/_multidict.pyx":136
+        /* "aiohttp/_multidict.pyx":140
  *                 nv = other.get(item[0], _marker)
  *                 if item[1] == nv:
  *                     return True             # <<<<<<<<<<<<<<
@@ -4353,7 +4357,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
         goto __pyx_L0;
       }
 
-      /* "aiohttp/_multidict.pyx":133
+      /* "aiohttp/_multidict.pyx":137
  *             elif not isinstance(other, abc.Mapping):
  *                 return NotImplemented
  *             for item in self.items():             # <<<<<<<<<<<<<<
@@ -4363,7 +4367,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "aiohttp/_multidict.pyx":137
+    /* "aiohttp/_multidict.pyx":141
  *                 if item[1] == nv:
  *                     return True
  *             return False             # <<<<<<<<<<<<<<
@@ -4377,7 +4381,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
   }
   /*else*/ {
 
-    /* "aiohttp/_multidict.pyx":139
+    /* "aiohttp/_multidict.pyx":143
  *             return False
  *         else:
  *             return NotImplemented             # <<<<<<<<<<<<<<
@@ -4390,7 +4394,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":110
+  /* "aiohttp/_multidict.pyx":114
  *         return '<{} {{{}}}>'.format(self.__class__.__name__, body)
  * 
  *     def __richcmp__(self, other, op):             # <<<<<<<<<<<<<<
@@ -4419,7 +4423,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_5_Base_24__richcmp__(PyObject *_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":144
+/* "aiohttp/_multidict.pyx":148
  * cdef class MultiDictProxy(_Base):
  * 
  *     def __init__(self, arg):             # <<<<<<<<<<<<<<
@@ -4455,7 +4459,7 @@ static int __pyx_pw_7aiohttp_10_multidict_14MultiDictProxy_1__init__(PyObject *_
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 144; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -4466,7 +4470,7 @@ static int __pyx_pw_7aiohttp_10_multidict_14MultiDictProxy_1__init__(PyObject *_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 144; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict.MultiDictProxy.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4494,7 +4498,7 @@ static int __pyx_pf_7aiohttp_10_multidict_14MultiDictProxy___init__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "aiohttp/_multidict.pyx":146
+  /* "aiohttp/_multidict.pyx":150
  *     def __init__(self, arg):
  *         cdef MultiDict mdict
  *         if not isinstance(arg, MultiDict):             # <<<<<<<<<<<<<<
@@ -4505,17 +4509,17 @@ static int __pyx_pf_7aiohttp_10_multidict_14MultiDictProxy___init__(struct __pyx
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":148
+    /* "aiohttp/_multidict.pyx":152
  *         if not isinstance(arg, MultiDict):
  *             raise TypeError(
  *                 'MultiDictProxy requires MultiDict instance, not {}'.format(             # <<<<<<<<<<<<<<
  *                     type(arg)))
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_MultiDictProxy_requires_MultiDic, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_MultiDictProxy_requires_MultiDic, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 152; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "aiohttp/_multidict.pyx":149
+    /* "aiohttp/_multidict.pyx":153
  *             raise TypeError(
  *                 'MultiDictProxy requires MultiDict instance, not {}'.format(
  *                     type(arg)))             # <<<<<<<<<<<<<<
@@ -4533,55 +4537,55 @@ static int __pyx_pf_7aiohttp_10_multidict_14MultiDictProxy___init__(struct __pyx
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)Py_TYPE(__pyx_v_arg))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)Py_TYPE(__pyx_v_arg))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 152; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 152; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __Pyx_GIVEREF(__pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_INCREF(((PyObject *)Py_TYPE(__pyx_v_arg)));
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, ((PyObject *)Py_TYPE(__pyx_v_arg)));
       __Pyx_GIVEREF(((PyObject *)Py_TYPE(__pyx_v_arg)));
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 152; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "aiohttp/_multidict.pyx":147
+    /* "aiohttp/_multidict.pyx":151
  *         cdef MultiDict mdict
  *         if not isinstance(arg, MultiDict):
  *             raise TypeError(             # <<<<<<<<<<<<<<
  *                 'MultiDictProxy requires MultiDict instance, not {}'.format(
  *                     type(arg)))
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "aiohttp/_multidict.pyx":151
+  /* "aiohttp/_multidict.pyx":155
  *                     type(arg)))
  * 
  *         mdict = arg             # <<<<<<<<<<<<<<
  *         self._items = mdict._items
  * 
  */
-  if (!(likely(((__pyx_v_arg) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_arg, __pyx_ptype_7aiohttp_10_multidict_MultiDict))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_v_arg) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_arg, __pyx_ptype_7aiohttp_10_multidict_MultiDict))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 155; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_3 = __pyx_v_arg;
   __Pyx_INCREF(__pyx_t_3);
   __pyx_v_mdict = ((struct __pyx_obj_7aiohttp_10_multidict_MultiDict *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "aiohttp/_multidict.pyx":152
+  /* "aiohttp/_multidict.pyx":156
  * 
  *         mdict = arg
  *         self._items = mdict._items             # <<<<<<<<<<<<<<
@@ -4596,7 +4600,7 @@ static int __pyx_pf_7aiohttp_10_multidict_14MultiDictProxy___init__(struct __pyx
   __pyx_v_self->__pyx_base._items = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "aiohttp/_multidict.pyx":144
+  /* "aiohttp/_multidict.pyx":148
  * cdef class MultiDictProxy(_Base):
  * 
  *     def __init__(self, arg):             # <<<<<<<<<<<<<<
@@ -4620,16 +4624,17 @@ static int __pyx_pf_7aiohttp_10_multidict_14MultiDictProxy___init__(struct __pyx
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":154
+/* "aiohttp/_multidict.pyx":158
  *         self._items = mdict._items
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
+ *         """Return a copy of itself."""
  *         return MultiDict(self._items)
- * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_14MultiDictProxy_3copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_14MultiDictProxy_2copy[] = "Return a copy of itself.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_14MultiDictProxy_3copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -4651,32 +4656,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_14MultiDictProxy_2copy(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("copy", 0);
 
-  /* "aiohttp/_multidict.pyx":155
- * 
+  /* "aiohttp/_multidict.pyx":160
  *     def copy(self):
+ *         """Return a copy of itself."""
  *         return MultiDict(self._items)             # <<<<<<<<<<<<<<
  * 
  * abc.Mapping.register(MultiDictProxy)
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 155; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._items);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_self->__pyx_base._items);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._items);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 155; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":154
+  /* "aiohttp/_multidict.pyx":158
  *         self._items = mdict._items
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
+ *         """Return a copy of itself."""
  *         return MultiDict(self._items)
- * 
  */
 
   /* function exit code */
@@ -4691,7 +4696,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_14MultiDictProxy_2copy(struct __
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":162
+/* "aiohttp/_multidict.pyx":167
  * cdef class CIMultiDictProxy(MultiDictProxy):
  * 
  *     def __init__(self, arg):             # <<<<<<<<<<<<<<
@@ -4727,7 +4732,7 @@ static int __pyx_pw_7aiohttp_10_multidict_16CIMultiDictProxy_1__init__(PyObject 
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 167; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -4738,7 +4743,7 @@ static int __pyx_pw_7aiohttp_10_multidict_16CIMultiDictProxy_1__init__(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 167; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict.CIMultiDictProxy.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4766,7 +4771,7 @@ static int __pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy___init__(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "aiohttp/_multidict.pyx":164
+  /* "aiohttp/_multidict.pyx":169
  *     def __init__(self, arg):
  *         cdef CIMultiDict mdict
  *         if not isinstance(arg, CIMultiDict):             # <<<<<<<<<<<<<<
@@ -4777,17 +4782,17 @@ static int __pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy___init__(struct __p
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":166
+    /* "aiohttp/_multidict.pyx":171
  *         if not isinstance(arg, CIMultiDict):
  *             raise TypeError(
  *                 'CIMultiDictProxy requires CIMultiDict instance, not {}'.format(             # <<<<<<<<<<<<<<
  *                     type(arg)))
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_CIMultiDictProxy_requires_CIMult, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_CIMultiDictProxy_requires_CIMult, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "aiohttp/_multidict.pyx":167
+    /* "aiohttp/_multidict.pyx":172
  *             raise TypeError(
  *                 'CIMultiDictProxy requires CIMultiDict instance, not {}'.format(
  *                     type(arg)))             # <<<<<<<<<<<<<<
@@ -4805,55 +4810,55 @@ static int __pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy___init__(struct __p
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)Py_TYPE(__pyx_v_arg))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)Py_TYPE(__pyx_v_arg))); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __Pyx_GIVEREF(__pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_INCREF(((PyObject *)Py_TYPE(__pyx_v_arg)));
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, ((PyObject *)Py_TYPE(__pyx_v_arg)));
       __Pyx_GIVEREF(((PyObject *)Py_TYPE(__pyx_v_arg)));
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "aiohttp/_multidict.pyx":165
+    /* "aiohttp/_multidict.pyx":170
  *         cdef CIMultiDict mdict
  *         if not isinstance(arg, CIMultiDict):
  *             raise TypeError(             # <<<<<<<<<<<<<<
  *                 'CIMultiDictProxy requires CIMultiDict instance, not {}'.format(
  *                     type(arg)))
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "aiohttp/_multidict.pyx":169
+  /* "aiohttp/_multidict.pyx":174
  *                     type(arg)))
  * 
  *         mdict = arg             # <<<<<<<<<<<<<<
  *         self._items = mdict._items
  * 
  */
-  if (!(likely(((__pyx_v_arg) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_arg, __pyx_ptype_7aiohttp_10_multidict_CIMultiDict))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 169; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_v_arg) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_arg, __pyx_ptype_7aiohttp_10_multidict_CIMultiDict))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_3 = __pyx_v_arg;
   __Pyx_INCREF(__pyx_t_3);
   __pyx_v_mdict = ((struct __pyx_obj_7aiohttp_10_multidict_CIMultiDict *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "aiohttp/_multidict.pyx":170
+  /* "aiohttp/_multidict.pyx":175
  * 
  *         mdict = arg
  *         self._items = mdict._items             # <<<<<<<<<<<<<<
@@ -4868,7 +4873,7 @@ static int __pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy___init__(struct __p
   __pyx_v_self->__pyx_base.__pyx_base._items = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "aiohttp/_multidict.pyx":162
+  /* "aiohttp/_multidict.pyx":167
  * cdef class CIMultiDictProxy(MultiDictProxy):
  * 
  *     def __init__(self, arg):             # <<<<<<<<<<<<<<
@@ -4892,7 +4897,7 @@ static int __pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy___init__(struct __p
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":172
+/* "aiohttp/_multidict.pyx":177
  *         self._items = mdict._items
  * 
  *     cdef str _upper(self, s):             # <<<<<<<<<<<<<<
@@ -4913,7 +4918,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_upper", 0);
 
-  /* "aiohttp/_multidict.pyx":173
+  /* "aiohttp/_multidict.pyx":178
  * 
  *     cdef str _upper(self, s):
  *         if type(s) is self._upstr:             # <<<<<<<<<<<<<<
@@ -4924,7 +4929,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper(struct 
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":174
+    /* "aiohttp/_multidict.pyx":179
  *     cdef str _upper(self, s):
  *         if type(s) is self._upstr:
  *             return <str>s             # <<<<<<<<<<<<<<
@@ -4937,7 +4942,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper(struct 
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":175
+  /* "aiohttp/_multidict.pyx":180
  *         if type(s) is self._upstr:
  *             return <str>s
  *         return s.upper()             # <<<<<<<<<<<<<<
@@ -4945,7 +4950,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper(struct 
  *     def copy(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_upper); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_upper); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -4958,19 +4963,19 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper(struct 
     }
   }
   if (__pyx_t_5) {
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else {
-    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(PyString_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyString_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":172
+  /* "aiohttp/_multidict.pyx":177
  *         self._items = mdict._items
  * 
  *     cdef str _upper(self, s):             # <<<<<<<<<<<<<<
@@ -4991,16 +4996,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper(struct 
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":177
+/* "aiohttp/_multidict.pyx":182
  *         return s.upper()
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
+ *         """Return a copy of itself."""
  *         return CIMultiDict(self._items)
- * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_16CIMultiDictProxy_3copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_16CIMultiDictProxy_2copy[] = "Return a copy of itself.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_16CIMultiDictProxy_3copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -5022,32 +5028,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy_2copy(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("copy", 0);
 
-  /* "aiohttp/_multidict.pyx":178
- * 
+  /* "aiohttp/_multidict.pyx":184
  *     def copy(self):
+ *         """Return a copy of itself."""
  *         return CIMultiDict(self._items)             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base._items);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_self->__pyx_base.__pyx_base._items);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base._items);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":177
+  /* "aiohttp/_multidict.pyx":182
  *         return s.upper()
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
+ *         """Return a copy of itself."""
  *         return CIMultiDict(self._items)
- * 
  */
 
   /* function exit code */
@@ -5062,7 +5068,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_16CIMultiDictProxy_2copy(struct 
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":187
+/* "aiohttp/_multidict.pyx":193
  *     """An ordered dictionary that can have multiple values for each key."""
  * 
  *     def __init__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -5103,14 +5109,14 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict___init__(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "aiohttp/_multidict.pyx":188
+  /* "aiohttp/_multidict.pyx":194
  * 
  *     def __init__(self, *args, **kwargs):
  *         self._items = []             # <<<<<<<<<<<<<<
  * 
  *         self._extend(args, kwargs, self.__class__.__name__, 1)
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 194; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->__pyx_base._items);
@@ -5118,24 +5124,24 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict___init__(struct __pyx_obj_7
   __pyx_v_self->__pyx_base._items = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":190
+  /* "aiohttp/_multidict.pyx":196
  *         self._items = []
  * 
  *         self._extend(args, kwargs, self.__class__.__name__, 1)             # <<<<<<<<<<<<<<
  * 
  *     cdef _extend(self, tuple args, dict kwargs, name, int do_add):
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_class); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_class); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 196; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_name); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_name); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 196; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_extend(__pyx_v_self, __pyx_v_args, __pyx_v_kwargs, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_extend(__pyx_v_self, __pyx_v_args, __pyx_v_kwargs, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 196; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":187
+  /* "aiohttp/_multidict.pyx":193
  *     """An ordered dictionary that can have multiple values for each key."""
  * 
  *     def __init__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -5156,7 +5162,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict___init__(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":192
+/* "aiohttp/_multidict.pyx":198
  *         self._extend(args, kwargs, self.__class__.__name__, 1)
  * 
  *     cdef _extend(self, tuple args, dict kwargs, name, int do_add):             # <<<<<<<<<<<<<<
@@ -5188,7 +5194,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_extend", 0);
 
-  /* "aiohttp/_multidict.pyx":196
+  /* "aiohttp/_multidict.pyx":202
  *         cdef str key
  * 
  *         if len(args) > 1:             # <<<<<<<<<<<<<<
@@ -5197,27 +5203,27 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
   if (unlikely(__pyx_v_args == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 196; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 202; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 196; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 202; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_2 = ((__pyx_t_1 > 1) != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":198
+    /* "aiohttp/_multidict.pyx":204
  *         if len(args) > 1:
  *             raise TypeError("{} takes at most 1 positional argument"
  *                             " ({} given)".format(name, len(args)))             # <<<<<<<<<<<<<<
  * 
  *         if args:
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_takes_at_most_1_positional_argu, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_takes_at_most_1_positional_argu, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     if (unlikely(__pyx_v_args == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_1 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     __pyx_t_1 = 0;
@@ -5231,7 +5237,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __pyx_t_1 = 1;
       }
     }
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_6) {
       PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
@@ -5242,32 +5248,32 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_1, __pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "aiohttp/_multidict.pyx":197
+    /* "aiohttp/_multidict.pyx":203
  * 
  *         if len(args) > 1:
  *             raise TypeError("{} takes at most 1 positional argument"             # <<<<<<<<<<<<<<
  *                             " ({} given)".format(name, len(args)))
  * 
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "aiohttp/_multidict.pyx":200
+  /* "aiohttp/_multidict.pyx":206
  *                             " ({} given)".format(name, len(args)))
  * 
  *         if args:             # <<<<<<<<<<<<<<
@@ -5277,7 +5283,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
   __pyx_t_2 = (__pyx_v_args != Py_None) && (PyTuple_GET_SIZE(__pyx_v_args) != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":201
+    /* "aiohttp/_multidict.pyx":207
  * 
  *         if args:
  *             arg = args[0]             # <<<<<<<<<<<<<<
@@ -5286,14 +5292,14 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
     if (unlikely(__pyx_v_args == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 207; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_args, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_args, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 207; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_v_arg = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":202
+    /* "aiohttp/_multidict.pyx":208
  *         if args:
  *             arg = args[0]
  *             if isinstance(arg, _Base):             # <<<<<<<<<<<<<<
@@ -5304,7 +5310,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
     __pyx_t_8 = (__pyx_t_2 != 0);
     if (__pyx_t_8) {
 
-      /* "aiohttp/_multidict.pyx":203
+      /* "aiohttp/_multidict.pyx":209
  *             arg = args[0]
  *             if isinstance(arg, _Base):
  *                 for item in (<_Base>arg)._items:             # <<<<<<<<<<<<<<
@@ -5313,21 +5319,21 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
       if (unlikely(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_arg)->_items == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __pyx_t_3 = ((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_arg)->_items; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
       for (;;) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
-        if (!(likely(PyTuple_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_4)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        if (!(likely(PyTuple_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_4)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_4));
         __pyx_t_4 = 0;
 
-        /* "aiohttp/_multidict.pyx":204
+        /* "aiohttp/_multidict.pyx":210
  *             if isinstance(arg, _Base):
  *                 for item in (<_Base>arg)._items:
  *                     key = self._upper(item[0])             # <<<<<<<<<<<<<<
@@ -5336,17 +5342,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
         if (unlikely(__pyx_v_item == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
-        __pyx_t_4 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+        __pyx_t_4 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_t_4); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_t_4); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_7));
         __pyx_t_7 = 0;
 
-        /* "aiohttp/_multidict.pyx":205
+        /* "aiohttp/_multidict.pyx":211
  *                 for item in (<_Base>arg)._items:
  *                     key = self._upper(item[0])
  *                     value = item[1]             # <<<<<<<<<<<<<<
@@ -5355,14 +5361,14 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
         if (unlikely(__pyx_v_item == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 205; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
-        __pyx_t_7 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_7 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 205; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+        __pyx_t_7 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_7 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_7);
         __pyx_t_7 = 0;
 
-        /* "aiohttp/_multidict.pyx":206
+        /* "aiohttp/_multidict.pyx":212
  *                     key = self._upper(item[0])
  *                     value = item[1]
  *                     if do_add:             # <<<<<<<<<<<<<<
@@ -5372,34 +5378,34 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __pyx_t_8 = (__pyx_v_do_add != 0);
         if (__pyx_t_8) {
 
-          /* "aiohttp/_multidict.pyx":207
+          /* "aiohttp/_multidict.pyx":213
  *                     value = item[1]
  *                     if do_add:
  *                         self._add(key, value)             # <<<<<<<<<<<<<<
  *                     else:
  *                         self._replace(key, value)
  */
-          __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 207; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 213; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           goto __pyx_L8;
         }
         /*else*/ {
 
-          /* "aiohttp/_multidict.pyx":209
+          /* "aiohttp/_multidict.pyx":215
  *                         self._add(key, value)
  *                     else:
  *                         self._replace(key, value)             # <<<<<<<<<<<<<<
  *             elif hasattr(arg, 'items'):
  *                 for item in arg.items():
  */
-          __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 215; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
         __pyx_L8:;
 
-        /* "aiohttp/_multidict.pyx":203
+        /* "aiohttp/_multidict.pyx":209
  *             arg = args[0]
  *             if isinstance(arg, _Base):
  *                 for item in (<_Base>arg)._items:             # <<<<<<<<<<<<<<
@@ -5411,25 +5417,25 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
       goto __pyx_L5;
     }
 
-    /* "aiohttp/_multidict.pyx":210
+    /* "aiohttp/_multidict.pyx":216
  *                     else:
  *                         self._replace(key, value)
  *             elif hasattr(arg, 'items'):             # <<<<<<<<<<<<<<
  *                 for item in arg.items():
  *                     key = self._upper(item[0])
  */
-    __pyx_t_8 = PyObject_HasAttr(__pyx_v_arg, __pyx_n_s_items); if (unlikely(__pyx_t_8 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = PyObject_HasAttr(__pyx_v_arg, __pyx_n_s_items); if (unlikely(__pyx_t_8 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 216; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_2 = (__pyx_t_8 != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":211
+      /* "aiohttp/_multidict.pyx":217
  *                         self._replace(key, value)
  *             elif hasattr(arg, 'items'):
  *                 for item in arg.items():             # <<<<<<<<<<<<<<
  *                     key = self._upper(item[0])
  *                     value = item[1]
  */
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_arg, __pyx_n_s_items); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_arg, __pyx_n_s_items); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_4 = NULL;
       if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_7))) {
@@ -5442,10 +5448,10 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         }
       }
       if (__pyx_t_4) {
-        __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
-        __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -5453,9 +5459,9 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __pyx_t_7 = __pyx_t_3; __Pyx_INCREF(__pyx_t_7); __pyx_t_1 = 0;
         __pyx_t_9 = NULL;
       } else {
-        __pyx_t_1 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_9 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_9 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       for (;;) {
@@ -5463,16 +5469,16 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
           if (likely(PyList_CheckExact(__pyx_t_7))) {
             if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_7)) break;
             #if CYTHON_COMPILING_IN_CPYTHON
-            __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_3); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_3); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #else
-            __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #endif
           } else {
             if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_7)) break;
             #if CYTHON_COMPILING_IN_CPYTHON
-            __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_3); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_3); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #else
-            __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #endif
           }
         } else {
@@ -5481,17 +5487,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             }
             break;
           }
           __Pyx_GOTREF(__pyx_t_3);
         }
-        if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_3));
         __pyx_t_3 = 0;
 
-        /* "aiohttp/_multidict.pyx":212
+        /* "aiohttp/_multidict.pyx":218
  *             elif hasattr(arg, 'items'):
  *                 for item in arg.items():
  *                     key = self._upper(item[0])             # <<<<<<<<<<<<<<
@@ -5500,17 +5506,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
         if (unlikely(__pyx_v_item == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 212; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
-        __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 212; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+        __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 212; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_4));
         __pyx_t_4 = 0;
 
-        /* "aiohttp/_multidict.pyx":213
+        /* "aiohttp/_multidict.pyx":219
  *                 for item in arg.items():
  *                     key = self._upper(item[0])
  *                     value = item[1]             # <<<<<<<<<<<<<<
@@ -5519,14 +5525,14 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
         if (unlikely(__pyx_v_item == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 213; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
-        __pyx_t_4 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 213; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+        __pyx_t_4 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_4);
         __pyx_t_4 = 0;
 
-        /* "aiohttp/_multidict.pyx":214
+        /* "aiohttp/_multidict.pyx":220
  *                     key = self._upper(item[0])
  *                     value = item[1]
  *                     if do_add:             # <<<<<<<<<<<<<<
@@ -5536,34 +5542,34 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __pyx_t_2 = (__pyx_v_do_add != 0);
         if (__pyx_t_2) {
 
-          /* "aiohttp/_multidict.pyx":215
+          /* "aiohttp/_multidict.pyx":221
  *                     value = item[1]
  *                     if do_add:
  *                         self._add(key, value)             # <<<<<<<<<<<<<<
  *                     else:
  *                         self._replace(key, value)
  */
-          __pyx_t_4 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 215; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_4 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           goto __pyx_L11;
         }
         /*else*/ {
 
-          /* "aiohttp/_multidict.pyx":217
+          /* "aiohttp/_multidict.pyx":223
  *                         self._add(key, value)
  *                     else:
  *                         self._replace(key, value)             # <<<<<<<<<<<<<<
  *             else:
  *                 for i in arg:
  */
-          __pyx_t_4 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_4 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         }
         __pyx_L11:;
 
-        /* "aiohttp/_multidict.pyx":211
+        /* "aiohttp/_multidict.pyx":217
  *                         self._replace(key, value)
  *             elif hasattr(arg, 'items'):
  *                 for item in arg.items():             # <<<<<<<<<<<<<<
@@ -5576,7 +5582,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
     }
     /*else*/ {
 
-      /* "aiohttp/_multidict.pyx":219
+      /* "aiohttp/_multidict.pyx":225
  *                         self._replace(key, value)
  *             else:
  *                 for i in arg:             # <<<<<<<<<<<<<<
@@ -5587,25 +5593,25 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __pyx_t_7 = __pyx_v_arg; __Pyx_INCREF(__pyx_t_7); __pyx_t_1 = 0;
         __pyx_t_9 = NULL;
       } else {
-        __pyx_t_1 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_arg); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_1 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_arg); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_9 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_9 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       for (;;) {
         if (likely(!__pyx_t_9)) {
           if (likely(PyList_CheckExact(__pyx_t_7))) {
             if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_7)) break;
             #if CYTHON_COMPILING_IN_CPYTHON
-            __pyx_t_4 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_4 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #else
-            __pyx_t_4 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_4 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #endif
           } else {
             if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_7)) break;
             #if CYTHON_COMPILING_IN_CPYTHON
-            __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #else
-            __pyx_t_4 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_4 = PySequence_ITEM(__pyx_t_7, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             #endif
           }
         } else {
@@ -5614,7 +5620,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             }
             break;
           }
@@ -5623,25 +5629,25 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_4);
         __pyx_t_4 = 0;
 
-        /* "aiohttp/_multidict.pyx":220
+        /* "aiohttp/_multidict.pyx":226
  *             else:
  *                 for i in arg:
  *                     if not len(i) == 2:             # <<<<<<<<<<<<<<
  *                         raise TypeError(
  *                             "{} takes either dict or list of (key, value) "
  */
-        __pyx_t_10 = PyObject_Length(__pyx_v_i); if (unlikely(__pyx_t_10 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_10 = PyObject_Length(__pyx_v_i); if (unlikely(__pyx_t_10 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __pyx_t_2 = ((!((__pyx_t_10 == 2) != 0)) != 0);
         if (__pyx_t_2) {
 
-          /* "aiohttp/_multidict.pyx":223
+          /* "aiohttp/_multidict.pyx":229
  *                         raise TypeError(
  *                             "{} takes either dict or list of (key, value) "
  *                             "tuples".format(name))             # <<<<<<<<<<<<<<
  *                     key = self._upper(i[0])
  *                     value = i[1]
  */
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_takes_either_dict_or_list_of_ke, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_takes_either_dict_or_list_of_ke, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_3);
           __pyx_t_5 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
@@ -5654,69 +5660,69 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
             }
           }
           if (!__pyx_t_5) {
-            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             __Pyx_GOTREF(__pyx_t_4);
           } else {
-            __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             __Pyx_GOTREF(__pyx_t_6);
             PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __Pyx_GIVEREF(__pyx_t_5); __pyx_t_5 = NULL;
             __Pyx_INCREF(__pyx_v_name);
             PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_v_name);
             __Pyx_GIVEREF(__pyx_v_name);
-            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "aiohttp/_multidict.pyx":221
+          /* "aiohttp/_multidict.pyx":227
  *                 for i in arg:
  *                     if not len(i) == 2:
  *                         raise TypeError(             # <<<<<<<<<<<<<<
  *                             "{} takes either dict or list of (key, value) "
  *                             "tuples".format(name))
  */
-          __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_3);
           PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
           __Pyx_GIVEREF(__pyx_t_4);
           __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_Raise(__pyx_t_4, 0, 0, 0);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
 
-        /* "aiohttp/_multidict.pyx":224
+        /* "aiohttp/_multidict.pyx":230
  *                             "{} takes either dict or list of (key, value) "
  *                             "tuples".format(name))
  *                     key = self._upper(i[0])             # <<<<<<<<<<<<<<
  *                     value = i[1]
  *                     if do_add:
  */
-        __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_i, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+        __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_i, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_3));
         __pyx_t_3 = 0;
 
-        /* "aiohttp/_multidict.pyx":225
+        /* "aiohttp/_multidict.pyx":231
  *                             "tuples".format(name))
  *                     key = self._upper(i[0])
  *                     value = i[1]             # <<<<<<<<<<<<<<
  *                     if do_add:
  *                         self._add(key, value)
  */
-        __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_i, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+        __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_i, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 231; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "aiohttp/_multidict.pyx":226
+        /* "aiohttp/_multidict.pyx":232
  *                     key = self._upper(i[0])
  *                     value = i[1]
  *                     if do_add:             # <<<<<<<<<<<<<<
@@ -5726,34 +5732,34 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         __pyx_t_2 = (__pyx_v_do_add != 0);
         if (__pyx_t_2) {
 
-          /* "aiohttp/_multidict.pyx":227
+          /* "aiohttp/_multidict.pyx":233
  *                     value = i[1]
  *                     if do_add:
  *                         self._add(key, value)             # <<<<<<<<<<<<<<
  *                     else:
  *                         self._replace(key, value)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           goto __pyx_L15;
         }
         /*else*/ {
 
-          /* "aiohttp/_multidict.pyx":229
+          /* "aiohttp/_multidict.pyx":235
  *                         self._add(key, value)
  *                     else:
  *                         self._replace(key, value)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_3 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
         __pyx_L15:;
 
-        /* "aiohttp/_multidict.pyx":219
+        /* "aiohttp/_multidict.pyx":225
  *                         self._replace(key, value)
  *             else:
  *                 for i in arg:             # <<<<<<<<<<<<<<
@@ -5768,7 +5774,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
   }
   __pyx_L4:;
 
-  /* "aiohttp/_multidict.pyx":232
+  /* "aiohttp/_multidict.pyx":238
  * 
  * 
  *         for key, value in kwargs.items():             # <<<<<<<<<<<<<<
@@ -5777,17 +5783,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
  */
   if (unlikely(__pyx_v_kwargs == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "items");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_7 = __Pyx_PyDict_Items(__pyx_v_kwargs); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyDict_Items(__pyx_v_kwargs); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   if (likely(PyList_CheckExact(__pyx_t_7)) || PyTuple_CheckExact(__pyx_t_7)) {
     __pyx_t_3 = __pyx_t_7; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_9 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   for (;;) {
@@ -5795,16 +5801,16 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_7); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_7); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_7 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_7 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_7); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_7); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_7 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_7 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       }
     } else {
@@ -5813,7 +5819,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -5829,7 +5835,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -5842,15 +5848,15 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_6);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       #endif
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_5 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_11 = Py_TYPE(__pyx_t_5)->tp_iternext;
@@ -5858,7 +5864,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_6 = __pyx_t_11(__pyx_t_5); if (unlikely(!__pyx_t_6)) goto __pyx_L18_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_11 = NULL;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       goto __pyx_L19_unpacking_done;
@@ -5866,28 +5872,28 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_11 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L19_unpacking_done:;
     }
-    if (!(likely(PyString_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_4)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyString_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_4)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_4));
     __pyx_t_4 = 0;
     __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "aiohttp/_multidict.pyx":233
+    /* "aiohttp/_multidict.pyx":239
  * 
  *         for key, value in kwargs.items():
  *             key = self._upper(key)             # <<<<<<<<<<<<<<
  *             if do_add:
  *                 self._add(key, value)
  */
-    __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF_SET(__pyx_v_key, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "aiohttp/_multidict.pyx":234
+    /* "aiohttp/_multidict.pyx":240
  *         for key, value in kwargs.items():
  *             key = self._upper(key)
  *             if do_add:             # <<<<<<<<<<<<<<
@@ -5897,34 +5903,34 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
     __pyx_t_2 = (__pyx_v_do_add != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":235
+      /* "aiohttp/_multidict.pyx":241
  *             key = self._upper(key)
  *             if do_add:
  *                 self._add(key, value)             # <<<<<<<<<<<<<<
  *             else:
  *                 self._replace(key, value)
  */
-      __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 241; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L20;
     }
     /*else*/ {
 
-      /* "aiohttp/_multidict.pyx":237
+      /* "aiohttp/_multidict.pyx":243
  *                 self._add(key, value)
  *             else:
  *                 self._replace(key, value)             # <<<<<<<<<<<<<<
  * 
  *     cdef _add(self, str key, value):
  */
-      __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, __pyx_v_key, __pyx_v_value); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __pyx_L20:;
 
-    /* "aiohttp/_multidict.pyx":232
+    /* "aiohttp/_multidict.pyx":238
  * 
  * 
  *         for key, value in kwargs.items():             # <<<<<<<<<<<<<<
@@ -5934,7 +5940,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "aiohttp/_multidict.pyx":192
+  /* "aiohttp/_multidict.pyx":198
  *         self._extend(args, kwargs, self.__class__.__name__, 1)
  * 
  *     cdef _extend(self, tuple args, dict kwargs, name, int do_add):             # <<<<<<<<<<<<<<
@@ -5964,7 +5970,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__extend(struct __pyx_o
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":239
+/* "aiohttp/_multidict.pyx":245
  *                 self._replace(key, value)
  * 
  *     cdef _add(self, str key, value):             # <<<<<<<<<<<<<<
@@ -5982,7 +5988,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__add(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_add", 0);
 
-  /* "aiohttp/_multidict.pyx":240
+  /* "aiohttp/_multidict.pyx":246
  * 
  *     cdef _add(self, str key, value):
  *         self._items.append((key, value))             # <<<<<<<<<<<<<<
@@ -5991,9 +5997,9 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__add(struct __pyx_obj_
  */
   if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "append");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_key);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_key);
@@ -6001,10 +6007,10 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__add(struct __pyx_obj_
   __Pyx_INCREF(__pyx_v_value);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_value);
   __Pyx_GIVEREF(__pyx_v_value);
-  __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_self->__pyx_base._items, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_self->__pyx_base._items, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":239
+  /* "aiohttp/_multidict.pyx":245
  *                 self._replace(key, value)
  * 
  *     cdef _add(self, str key, value):             # <<<<<<<<<<<<<<
@@ -6025,7 +6031,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__add(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":242
+/* "aiohttp/_multidict.pyx":248
  *         self._items.append((key, value))
  * 
  *     cdef _replace(self, str key, value):             # <<<<<<<<<<<<<<
@@ -6043,18 +6049,18 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__replace(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_replace", 0);
 
-  /* "aiohttp/_multidict.pyx":243
+  /* "aiohttp/_multidict.pyx":249
  * 
  *     cdef _replace(self, str key, value):
  *         self._remove(key, 0)             # <<<<<<<<<<<<<<
  *         self._items.append((key, value))
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_remove(__pyx_v_self, __pyx_v_key, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_remove(__pyx_v_self, __pyx_v_key, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":244
+  /* "aiohttp/_multidict.pyx":250
  *     cdef _replace(self, str key, value):
  *         self._remove(key, 0)
  *         self._items.append((key, value))             # <<<<<<<<<<<<<<
@@ -6063,9 +6069,9 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__replace(struct __pyx_
  */
   if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "append");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 244; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 244; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_key);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_key);
@@ -6073,10 +6079,10 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__replace(struct __pyx_
   __Pyx_INCREF(__pyx_v_value);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_value);
   __Pyx_GIVEREF(__pyx_v_value);
-  __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_self->__pyx_base._items, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 244; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyList_Append(__pyx_v_self->__pyx_base._items, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":242
+  /* "aiohttp/_multidict.pyx":248
  *         self._items.append((key, value))
  * 
  *     cdef _replace(self, str key, value):             # <<<<<<<<<<<<<<
@@ -6097,17 +6103,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__replace(struct __pyx_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":246
+/* "aiohttp/_multidict.pyx":252
  *         self._items.append((key, value))
  * 
  *     def add(self, key, value):             # <<<<<<<<<<<<<<
- *         """
- *         Add the key and value, not overwriting any previous value.
+ *         """Add the key and value, not overwriting any previous value."""
+ *         self._add(self._upper(key), value)
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_3add(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_2add[] = "\n        Add the key and value, not overwriting any previous value.\n        ";
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_2add[] = "Add the key and value, not overwriting any previous value.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_3add(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_value = 0;
@@ -6137,11 +6143,11 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_3add(PyObject *__pyx_
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("add", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6154,7 +6160,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_3add(PyObject *__pyx_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("add", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict.MultiDict.add", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6177,26 +6183,26 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_2add(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add", 0);
 
-  /* "aiohttp/_multidict.pyx":250
- *         Add the key and value, not overwriting any previous value.
- *         """
+  /* "aiohttp/_multidict.pyx":254
+ *     def add(self, key, value):
+ *         """Add the key and value, not overwriting any previous value."""
  *         self._add(self._upper(key), value)             # <<<<<<<<<<<<<<
  * 
  *     def copy(self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_value); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_value); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "aiohttp/_multidict.pyx":246
+  /* "aiohttp/_multidict.pyx":252
  *         self._items.append((key, value))
  * 
  *     def add(self, key, value):             # <<<<<<<<<<<<<<
- *         """
- *         Add the key and value, not overwriting any previous value.
+ *         """Add the key and value, not overwriting any previous value."""
+ *         self._add(self._upper(key), value)
  */
 
   /* function exit code */
@@ -6213,17 +6219,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_2add(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":252
+/* "aiohttp/_multidict.pyx":256
  *         self._add(self._upper(key), value)
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
- *         """Returns a copy itself."""
+ *         """Return a copy of itself."""
  *         cls = self.__class__
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_5copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_4copy[] = "Returns a copy itself.";
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_4copy[] = "Return a copy of itself.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_5copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -6248,20 +6254,20 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_4copy(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("copy", 0);
 
-  /* "aiohttp/_multidict.pyx":254
+  /* "aiohttp/_multidict.pyx":258
  *     def copy(self):
- *         """Returns a copy itself."""
+ *         """Return a copy of itself."""
  *         cls = self.__class__             # <<<<<<<<<<<<<<
  *         return cls(self._items)
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_class); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_class); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_cls = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":255
- *         """Returns a copy itself."""
+  /* "aiohttp/_multidict.pyx":259
+ *         """Return a copy of itself."""
  *         cls = self.__class__
  *         return cls(self._items)             # <<<<<<<<<<<<<<
  * 
@@ -6280,16 +6286,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_4copy(struct __pyx_ob
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_self->__pyx_base._items); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_self->__pyx_base._items); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 259; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 259; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(__pyx_v_self->__pyx_base._items);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_self->__pyx_base._items);
     __Pyx_GIVEREF(__pyx_v_self->__pyx_base._items);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 259; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -6298,11 +6304,11 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_4copy(struct __pyx_ob
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":252
+  /* "aiohttp/_multidict.pyx":256
  *         self._add(self._upper(key), value)
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
- *         """Returns a copy itself."""
+ *         """Return a copy of itself."""
  *         cls = self.__class__
  */
 
@@ -6321,17 +6327,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_4copy(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":257
+/* "aiohttp/_multidict.pyx":261
  *         return cls(self._items)
  * 
  *     def extend(self, *args, **kwargs):             # <<<<<<<<<<<<<<
- *         """Extends current MultiDict with more values.
+ *         """Extend current MultiDict with more values.
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_7extend(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_6extend[] = "Extends current MultiDict with more values.\n\n        This method must be used instead of update.\n        ";
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_6extend[] = "Extend current MultiDict with more values.\n\n        This method must be used instead of update.\n        ";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_7extend(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_v_kwargs = 0;
@@ -6362,22 +6368,22 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_6extend(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("extend", 0);
 
-  /* "aiohttp/_multidict.pyx":262
+  /* "aiohttp/_multidict.pyx":266
  *         This method must be used instead of update.
  *         """
  *         self._extend(args, kwargs, "extend", 1)             # <<<<<<<<<<<<<<
  * 
  *     def clear(self):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_extend(__pyx_v_self, __pyx_v_args, __pyx_v_kwargs, __pyx_n_s_extend, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_extend(__pyx_v_self, __pyx_v_args, __pyx_v_kwargs, __pyx_n_s_extend, 1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":257
+  /* "aiohttp/_multidict.pyx":261
  *         return cls(self._items)
  * 
  *     def extend(self, *args, **kwargs):             # <<<<<<<<<<<<<<
- *         """Extends current MultiDict with more values.
+ *         """Extend current MultiDict with more values.
  * 
  */
 
@@ -6394,7 +6400,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_6extend(struct __pyx_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":264
+/* "aiohttp/_multidict.pyx":268
  *         self._extend(args, kwargs, "extend", 1)
  * 
  *     def clear(self):             # <<<<<<<<<<<<<<
@@ -6427,14 +6433,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_8clear(struct __pyx_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("clear", 0);
 
-  /* "aiohttp/_multidict.pyx":266
+  /* "aiohttp/_multidict.pyx":270
  *     def clear(self):
  *         """Remove all items from MultiDict"""
  *         self._items.clear()             # <<<<<<<<<<<<<<
  * 
  *     # MutableMapping interface #
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base._items, __pyx_n_s_clear); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base._items, __pyx_n_s_clear); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6447,16 +6453,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_8clear(struct __pyx_o
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":264
+  /* "aiohttp/_multidict.pyx":268
  *         self._extend(args, kwargs, "extend", 1)
  * 
  *     def clear(self):             # <<<<<<<<<<<<<<
@@ -6479,7 +6485,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_8clear(struct __pyx_o
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":270
+/* "aiohttp/_multidict.pyx":274
  *     # MutableMapping interface #
  * 
  *     def __setitem__(self, key, value):             # <<<<<<<<<<<<<<
@@ -6510,21 +6516,21 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict_10__setitem__(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__setitem__", 0);
 
-  /* "aiohttp/_multidict.pyx":271
+  /* "aiohttp/_multidict.pyx":275
  * 
  *     def __setitem__(self, key, value):
  *         self._replace(self._upper(key), value)             # <<<<<<<<<<<<<<
  * 
  *     def __delitem__(self, key):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_value); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_replace(__pyx_v_self, ((PyObject*)__pyx_t_1), __pyx_v_value); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "aiohttp/_multidict.pyx":270
+  /* "aiohttp/_multidict.pyx":274
  *     # MutableMapping interface #
  * 
  *     def __setitem__(self, key, value):             # <<<<<<<<<<<<<<
@@ -6545,7 +6551,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict_10__setitem__(struct __pyx_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":273
+/* "aiohttp/_multidict.pyx":277
  *         self._replace(self._upper(key), value)
  * 
  *     def __delitem__(self, key):             # <<<<<<<<<<<<<<
@@ -6576,21 +6582,21 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict_12__delitem__(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__delitem__", 0);
 
-  /* "aiohttp/_multidict.pyx":274
+  /* "aiohttp/_multidict.pyx":278
  * 
  *     def __delitem__(self, key):
  *         self._remove(self._upper(key), True)             # <<<<<<<<<<<<<<
  * 
  *     cdef _remove(self, str key, int raise_key_error):
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_remove(__pyx_v_self, ((PyObject*)__pyx_t_1), 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_remove(__pyx_v_self, ((PyObject*)__pyx_t_1), 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "aiohttp/_multidict.pyx":273
+  /* "aiohttp/_multidict.pyx":277
  *         self._replace(self._upper(key), value)
  * 
  *     def __delitem__(self, key):             # <<<<<<<<<<<<<<
@@ -6611,7 +6617,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9MultiDict_12__delitem__(struct __pyx_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":276
+/* "aiohttp/_multidict.pyx":280
  *         self._remove(self._upper(key), True)
  * 
  *     cdef _remove(self, str key, int raise_key_error):             # <<<<<<<<<<<<<<
@@ -6635,7 +6641,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_remove", 0);
 
-  /* "aiohttp/_multidict.pyx":278
+  /* "aiohttp/_multidict.pyx":282
  *     cdef _remove(self, str key, int raise_key_error):
  *         cdef int found
  *         found = False             # <<<<<<<<<<<<<<
@@ -6644,7 +6650,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
  */
   __pyx_v_found = 0;
 
-  /* "aiohttp/_multidict.pyx":279
+  /* "aiohttp/_multidict.pyx":283
  *         cdef int found
  *         found = False
  *         for i in range(len(self._items) - 1, -1, -1):             # <<<<<<<<<<<<<<
@@ -6655,14 +6661,14 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 283; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 283; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (__pyx_t_3 = (__pyx_t_2 - 1); __pyx_t_3 > -1; __pyx_t_3-=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "aiohttp/_multidict.pyx":280
+    /* "aiohttp/_multidict.pyx":284
  *         found = False
  *         for i in range(len(self._items) - 1, -1, -1):
  *             if self._items[i][0] == key:             # <<<<<<<<<<<<<<
@@ -6671,18 +6677,18 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
  */
     if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 280; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 280; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 280; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_t_4, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 280; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_t_4, __pyx_v_key, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":281
+      /* "aiohttp/_multidict.pyx":285
  *         for i in range(len(self._items) - 1, -1, -1):
  *             if self._items[i][0] == key:
  *                 del self._items[i]             # <<<<<<<<<<<<<<
@@ -6691,11 +6697,11 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
  */
       if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      if (__Pyx_DelItemInt(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_DelItemInt(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "aiohttp/_multidict.pyx":282
+      /* "aiohttp/_multidict.pyx":286
  *             if self._items[i][0] == key:
  *                 del self._items[i]
  *                 found = True             # <<<<<<<<<<<<<<
@@ -6708,7 +6714,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
     __pyx_L5:;
   }
 
-  /* "aiohttp/_multidict.pyx":283
+  /* "aiohttp/_multidict.pyx":287
  *                 del self._items[i]
  *                 found = True
  *         if not found and raise_key_error:             # <<<<<<<<<<<<<<
@@ -6726,27 +6732,27 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
   __pyx_L7_bool_binop_done:;
   if (__pyx_t_5) {
 
-    /* "aiohttp/_multidict.pyx":284
+    /* "aiohttp/_multidict.pyx":288
  *                 found = True
  *         if not found and raise_key_error:
  *             raise KeyError(key)             # <<<<<<<<<<<<<<
  * 
  *     def setdefault(self, key, default=None):
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_key);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_key);
     __Pyx_GIVEREF(__pyx_v_key);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "aiohttp/_multidict.pyx":276
+  /* "aiohttp/_multidict.pyx":280
  *         self._remove(self._upper(key), True)
  * 
  *     cdef _remove(self, str key, int raise_key_error):             # <<<<<<<<<<<<<<
@@ -6768,16 +6774,17 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_9MultiDict__remove(struct __pyx_o
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":286
+/* "aiohttp/_multidict.pyx":290
  *             raise KeyError(key)
  * 
  *     def setdefault(self, key, default=None):             # <<<<<<<<<<<<<<
+ *         """Return value for key, set value to default if key is not present."""
  *         cdef str skey
- *         skey = self._upper(key)
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_15setdefault(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_14setdefault[] = "Return value for key, set value to default if key is not present.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_15setdefault(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_default = 0;
@@ -6812,7 +6819,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_15setdefault(PyObject
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setdefault") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "setdefault") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 290; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -6827,7 +6834,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_15setdefault(PyObject
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("setdefault", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("setdefault", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 290; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict.MultiDict.setdefault", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6859,19 +6866,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("setdefault", 0);
 
-  /* "aiohttp/_multidict.pyx":288
- *     def setdefault(self, key, default=None):
+  /* "aiohttp/_multidict.pyx":293
+ *         """Return value for key, set value to default if key is not present."""
  *         cdef str skey
  *         skey = self._upper(key)             # <<<<<<<<<<<<<<
  *         for k, v in self._items:
  *             if k == skey:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 293; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_skey = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":289
+  /* "aiohttp/_multidict.pyx":294
  *         cdef str skey
  *         skey = self._upper(key)
  *         for k, v in self._items:             # <<<<<<<<<<<<<<
@@ -6880,15 +6887,15 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
  */
   if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
     if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
       PyObject* sequence = __pyx_t_3;
@@ -6900,7 +6907,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -6913,15 +6920,15 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_5);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_6 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
@@ -6929,7 +6936,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_5 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_5)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_7 = NULL;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       goto __pyx_L6_unpacking_done;
@@ -6937,7 +6944,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_k, __pyx_t_4);
@@ -6945,17 +6952,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "aiohttp/_multidict.pyx":290
+    /* "aiohttp/_multidict.pyx":295
  *         skey = self._upper(key)
  *         for k, v in self._items:
  *             if k == skey:             # <<<<<<<<<<<<<<
  *                 return v
  *         self._add(skey, default)
  */
-    __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_k, __pyx_v_skey, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 290; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_k, __pyx_v_skey, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (__pyx_t_8) {
 
-      /* "aiohttp/_multidict.pyx":291
+      /* "aiohttp/_multidict.pyx":296
  *         for k, v in self._items:
  *             if k == skey:
  *                 return v             # <<<<<<<<<<<<<<
@@ -6969,7 +6976,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":289
+    /* "aiohttp/_multidict.pyx":294
  *         cdef str skey
  *         skey = self._upper(key)
  *         for k, v in self._items:             # <<<<<<<<<<<<<<
@@ -6979,18 +6986,18 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":292
+  /* "aiohttp/_multidict.pyx":297
  *             if k == skey:
  *                 return v
  *         self._add(skey, default)             # <<<<<<<<<<<<<<
  *         return default
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_skey, __pyx_v_default); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 292; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_add(__pyx_v_self, __pyx_v_skey, __pyx_v_default); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 297; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":293
+  /* "aiohttp/_multidict.pyx":298
  *                 return v
  *         self._add(skey, default)
  *         return default             # <<<<<<<<<<<<<<
@@ -7002,12 +7009,12 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
   __pyx_r = __pyx_v_default;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":286
+  /* "aiohttp/_multidict.pyx":290
  *             raise KeyError(key)
  * 
  *     def setdefault(self, key, default=None):             # <<<<<<<<<<<<<<
+ *         """Return value for key, set value to default if key is not present."""
  *         cdef str skey
- *         skey = self._upper(key)
  */
 
   /* function exit code */
@@ -7028,16 +7035,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_14setdefault(struct _
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":295
+/* "aiohttp/_multidict.pyx":300
  *         return default
  * 
  *     def pop(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         cdef int found
- *         cdef str skey
+ *         """Remove specified key and return the corresponding value.
+ * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_17pop(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_16pop[] = "Remove specified key and return the corresponding value.\n\n        If key is not found, d is returned if given, otherwise\n        KeyError is raised.\n\n        ";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_17pop(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_default = 0;
@@ -7072,7 +7080,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_17pop(PyObject *__pyx
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "pop") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "pop") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 300; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -7087,7 +7095,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_17pop(PyObject *__pyx
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("pop", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("pop", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 300; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict.MultiDict.pop", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7118,19 +7126,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("pop", 0);
 
-  /* "aiohttp/_multidict.pyx":299
+  /* "aiohttp/_multidict.pyx":310
  *         cdef str skey
  *         cdef object value
  *         skey = self._upper(key)             # <<<<<<<<<<<<<<
  *         value = None
  *         found = False
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->__pyx_base._upper(((struct __pyx_obj_7aiohttp_10_multidict__Base *)__pyx_v_self), __pyx_v_key); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_skey = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":300
+  /* "aiohttp/_multidict.pyx":311
  *         cdef object value
  *         skey = self._upper(key)
  *         value = None             # <<<<<<<<<<<<<<
@@ -7140,7 +7148,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
   __Pyx_INCREF(Py_None);
   __pyx_v_value = Py_None;
 
-  /* "aiohttp/_multidict.pyx":301
+  /* "aiohttp/_multidict.pyx":312
  *         skey = self._upper(key)
  *         value = None
  *         found = False             # <<<<<<<<<<<<<<
@@ -7149,7 +7157,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
  */
   __pyx_v_found = 0;
 
-  /* "aiohttp/_multidict.pyx":302
+  /* "aiohttp/_multidict.pyx":313
  *         value = None
  *         found = False
  *         for i in range(len(self._items) - 1, -1, -1):             # <<<<<<<<<<<<<<
@@ -7160,14 +7168,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 313; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 313; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (__pyx_t_3 = (__pyx_t_2 - 1); __pyx_t_3 > -1; __pyx_t_3-=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "aiohttp/_multidict.pyx":303
+    /* "aiohttp/_multidict.pyx":314
  *         found = False
  *         for i in range(len(self._items) - 1, -1, -1):
  *             if self._items[i][0] == key:             # <<<<<<<<<<<<<<
@@ -7176,20 +7184,20 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
  */
     if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyObject_RichCompare(__pyx_t_4, __pyx_v_key, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyObject_RichCompare(__pyx_t_4, __pyx_v_key, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":304
+      /* "aiohttp/_multidict.pyx":315
  *         for i in range(len(self._items) - 1, -1, -1):
  *             if self._items[i][0] == key:
  *                 value = self._items[i][1]             # <<<<<<<<<<<<<<
@@ -7198,17 +7206,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
  */
       if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF_SET(__pyx_v_value, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "aiohttp/_multidict.pyx":305
+      /* "aiohttp/_multidict.pyx":316
  *             if self._items[i][0] == key:
  *                 value = self._items[i][1]
  *                 del self._items[i]             # <<<<<<<<<<<<<<
@@ -7217,11 +7225,11 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
  */
       if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
-      if (__Pyx_DelItemInt(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_DelItemInt(__pyx_v_self->__pyx_base._items, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "aiohttp/_multidict.pyx":306
+      /* "aiohttp/_multidict.pyx":317
  *                 value = self._items[i][1]
  *                 del self._items[i]
  *                 found = True             # <<<<<<<<<<<<<<
@@ -7234,7 +7242,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
     __pyx_L5:;
   }
 
-  /* "aiohttp/_multidict.pyx":307
+  /* "aiohttp/_multidict.pyx":318
  *                 del self._items[i]
  *                 found = True
  *         if not found:             # <<<<<<<<<<<<<<
@@ -7244,42 +7252,42 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
   __pyx_t_5 = ((!(__pyx_v_found != 0)) != 0);
   if (__pyx_t_5) {
 
-    /* "aiohttp/_multidict.pyx":308
+    /* "aiohttp/_multidict.pyx":319
  *                 found = True
  *         if not found:
  *             if default is _marker:             # <<<<<<<<<<<<<<
  *                 raise KeyError(key)
  *             else:
  */
-    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 308; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = (__pyx_v_default == __pyx_t_4);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_6 = (__pyx_t_5 != 0);
     if (__pyx_t_6) {
 
-      /* "aiohttp/_multidict.pyx":309
+      /* "aiohttp/_multidict.pyx":320
  *         if not found:
  *             if default is _marker:
  *                 raise KeyError(key)             # <<<<<<<<<<<<<<
  *             else:
  *                 return default
  */
-      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 320; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_v_key);
       PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_key);
       __Pyx_GIVEREF(__pyx_v_key);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 320; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_Raise(__pyx_t_1, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 320; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     /*else*/ {
 
-      /* "aiohttp/_multidict.pyx":311
+      /* "aiohttp/_multidict.pyx":322
  *                 raise KeyError(key)
  *             else:
  *                 return default             # <<<<<<<<<<<<<<
@@ -7294,7 +7302,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
   }
   /*else*/ {
 
-    /* "aiohttp/_multidict.pyx":313
+    /* "aiohttp/_multidict.pyx":324
  *                 return default
  *         else:
  *             return value             # <<<<<<<<<<<<<<
@@ -7307,12 +7315,12 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":295
+  /* "aiohttp/_multidict.pyx":300
  *         return default
  * 
  *     def pop(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         cdef int found
- *         cdef str skey
+ *         """Remove specified key and return the corresponding value.
+ * 
  */
 
   /* function exit code */
@@ -7329,16 +7337,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_16pop(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":315
+/* "aiohttp/_multidict.pyx":326
  *             return value
  * 
  *     def popitem(self):             # <<<<<<<<<<<<<<
+ *         """Remove and return an arbitrary (key, value) pair."""
  *         if self._items:
- *             return self._items.pop(0)
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_19popitem(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_18popitem[] = "Remove and return an arbitrary (key, value) pair.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_19popitem(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -7360,9 +7369,9 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_18popitem(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("popitem", 0);
 
-  /* "aiohttp/_multidict.pyx":316
- * 
+  /* "aiohttp/_multidict.pyx":328
  *     def popitem(self):
+ *         """Remove and return an arbitrary (key, value) pair."""
  *         if self._items:             # <<<<<<<<<<<<<<
  *             return self._items.pop(0)
  *         else:
@@ -7370,8 +7379,8 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_18popitem(struct __py
   __pyx_t_1 = (__pyx_v_self->__pyx_base._items != Py_None) && (PyList_GET_SIZE(__pyx_v_self->__pyx_base._items) != 0);
   if (__pyx_t_1) {
 
-    /* "aiohttp/_multidict.pyx":317
- *     def popitem(self):
+    /* "aiohttp/_multidict.pyx":329
+ *         """Remove and return an arbitrary (key, value) pair."""
  *         if self._items:
  *             return self._items.pop(0)             # <<<<<<<<<<<<<<
  *         else:
@@ -7380,9 +7389,9 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_18popitem(struct __py
     __Pyx_XDECREF(__pyx_r);
     if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "pop");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_2 = __Pyx_PyList_PopIndex(__pyx_v_self->__pyx_base._items, 0, 1, Py_ssize_t, PyInt_FromSsize_t); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyList_PopIndex(__pyx_v_self->__pyx_base._items, 0, 1, Py_ssize_t, PyInt_FromSsize_t); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
@@ -7390,26 +7399,26 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_18popitem(struct __py
   }
   /*else*/ {
 
-    /* "aiohttp/_multidict.pyx":319
+    /* "aiohttp/_multidict.pyx":331
  *             return self._items.pop(0)
  *         else:
  *             raise KeyError("empty multidict")             # <<<<<<<<<<<<<<
  * 
  *     def update(self, *args, **kwargs):
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "aiohttp/_multidict.pyx":315
+  /* "aiohttp/_multidict.pyx":326
  *             return value
  * 
  *     def popitem(self):             # <<<<<<<<<<<<<<
+ *         """Remove and return an arbitrary (key, value) pair."""
  *         if self._items:
- *             return self._items.pop(0)
  */
 
   /* function exit code */
@@ -7423,16 +7432,17 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_18popitem(struct __py
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":321
+/* "aiohttp/_multidict.pyx":333
  *             raise KeyError("empty multidict")
  * 
  *     def update(self, *args, **kwargs):             # <<<<<<<<<<<<<<
+ *         """Update the dictionary from *other*, overwriting existing keys."""
  *         self._extend(args, kwargs, "update", 0)
- * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_21update(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7aiohttp_10_multidict_9MultiDict_20update[] = "Update the dictionary from *other*, overwriting existing keys.";
 static PyObject *__pyx_pw_7aiohttp_10_multidict_9MultiDict_21update(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_v_kwargs = 0;
@@ -7463,23 +7473,23 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_20update(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("update", 0);
 
-  /* "aiohttp/_multidict.pyx":322
- * 
+  /* "aiohttp/_multidict.pyx":335
  *     def update(self, *args, **kwargs):
+ *         """Update the dictionary from *other*, overwriting existing keys."""
  *         self._extend(args, kwargs, "update", 0)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_extend(__pyx_v_self, __pyx_v_args, __pyx_v_kwargs, __pyx_n_s_update, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 322; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((struct __pyx_vtabstruct_7aiohttp_10_multidict_MultiDict *)__pyx_v_self->__pyx_base.__pyx_vtab)->_extend(__pyx_v_self, __pyx_v_args, __pyx_v_kwargs, __pyx_n_s_update, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 335; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":321
+  /* "aiohttp/_multidict.pyx":333
  *             raise KeyError("empty multidict")
  * 
  *     def update(self, *args, **kwargs):             # <<<<<<<<<<<<<<
+ *         """Update the dictionary from *other*, overwriting existing keys."""
  *         self._extend(args, kwargs, "update", 0)
- * 
  */
 
   /* function exit code */
@@ -7495,7 +7505,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9MultiDict_20update(struct __pyx
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":331
+/* "aiohttp/_multidict.pyx":344
  *     """An ordered dictionary that can have multiple values for each key."""
  * 
  *     cdef str _upper(self, s):             # <<<<<<<<<<<<<<
@@ -7516,7 +7526,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_upper", 0);
 
-  /* "aiohttp/_multidict.pyx":332
+  /* "aiohttp/_multidict.pyx":345
  * 
  *     cdef str _upper(self, s):
  *         if type(s) is self._upstr:             # <<<<<<<<<<<<<<
@@ -7527,7 +7537,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper(struct __pyx
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":333
+    /* "aiohttp/_multidict.pyx":346
  *     cdef str _upper(self, s):
  *         if type(s) is self._upstr:
  *             return <str>s             # <<<<<<<<<<<<<<
@@ -7540,7 +7550,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper(struct __pyx
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":334
+  /* "aiohttp/_multidict.pyx":347
  *         if type(s) is self._upstr:
  *             return <str>s
  *         return s.upper()             # <<<<<<<<<<<<<<
@@ -7548,7 +7558,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper(struct __pyx
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_upper); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_upper); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -7561,19 +7571,19 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper(struct __pyx
     }
   }
   if (__pyx_t_5) {
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else {
-    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(PyString_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(PyString_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":331
+  /* "aiohttp/_multidict.pyx":344
  *     """An ordered dictionary that can have multiple values for each key."""
  * 
  *     cdef str _upper(self, s):             # <<<<<<<<<<<<<<
@@ -7594,7 +7604,7 @@ static PyObject *__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper(struct __pyx
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":346
+/* "aiohttp/_multidict.pyx":359
  *     cdef list _items
  * 
  *     def __cinit__(self, list items):             # <<<<<<<<<<<<<<
@@ -7630,7 +7640,7 @@ static int __pyx_pw_7aiohttp_10_multidict_9_ViewBase_1__cinit__(PyObject *__pyx_
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -7641,13 +7651,13 @@ static int __pyx_pw_7aiohttp_10_multidict_9_ViewBase_1__cinit__(PyObject *__pyx_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._multidict._ViewBase.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_items), (&PyList_Type), 1, "items", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_items), (&PyList_Type), 1, "items", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7aiohttp_10_multidict_9_ViewBase___cinit__(((struct __pyx_obj_7aiohttp_10_multidict__ViewBase *)__pyx_v_self), __pyx_v_items);
 
   /* function exit code */
@@ -7664,7 +7674,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_ViewBase___cinit__(struct __pyx_obj_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "aiohttp/_multidict.pyx":347
+  /* "aiohttp/_multidict.pyx":360
  * 
  *     def __cinit__(self, list items):
  *         self._items = items             # <<<<<<<<<<<<<<
@@ -7677,7 +7687,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_ViewBase___cinit__(struct __pyx_obj_
   __Pyx_DECREF(__pyx_v_self->_items);
   __pyx_v_self->_items = __pyx_v_items;
 
-  /* "aiohttp/_multidict.pyx":346
+  /* "aiohttp/_multidict.pyx":359
  *     cdef list _items
  * 
  *     def __cinit__(self, list items):             # <<<<<<<<<<<<<<
@@ -7691,7 +7701,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_ViewBase___cinit__(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":349
+/* "aiohttp/_multidict.pyx":362
  *         self._items = items
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -7722,7 +7732,7 @@ static Py_ssize_t __pyx_pf_7aiohttp_10_multidict_9_ViewBase_2__len__(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__len__", 0);
 
-  /* "aiohttp/_multidict.pyx":350
+  /* "aiohttp/_multidict.pyx":363
  * 
  *     def __len__(self):
  *         return len(self._items)             # <<<<<<<<<<<<<<
@@ -7733,14 +7743,14 @@ static Py_ssize_t __pyx_pf_7aiohttp_10_multidict_9_ViewBase_2__len__(struct __py
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":349
+  /* "aiohttp/_multidict.pyx":362
  *         self._items = items
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -7758,7 +7768,7 @@ static Py_ssize_t __pyx_pf_7aiohttp_10_multidict_9_ViewBase_2__len__(struct __py
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":355
+/* "aiohttp/_multidict.pyx":368
  * cdef class _ViewBaseSet(_ViewBase):
  * 
  *     def __richcmp__(self, other, op):             # <<<<<<<<<<<<<<
@@ -7776,7 +7786,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_12_ViewBaseSet_1__richcmp__(PyOb
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__richcmp__ (wrapper)", 0);
-  __pyx_v_op = __Pyx_PyInt_From_int(__pyx_arg_op); if (unlikely(!__pyx_v_op)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __pyx_v_op = __Pyx_PyInt_From_int(__pyx_arg_op); if (unlikely(!__pyx_v_op)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __Pyx_GOTREF(__pyx_v_op);
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7808,33 +7818,33 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__richcmp__", 0);
 
-  /* "aiohttp/_multidict.pyx":356
+  /* "aiohttp/_multidict.pyx":369
  * 
  *     def __richcmp__(self, other, op):
  *         if op == 0:  # <             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_0, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_0, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 369; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 369; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":357
+    /* "aiohttp/_multidict.pyx":370
  *     def __richcmp__(self, other, op):
  *         if op == 0:  # <
  *             if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             return len(self) < len(other) and self <= other
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
     if (__pyx_t_3) {
 
-      /* "aiohttp/_multidict.pyx":358
+      /* "aiohttp/_multidict.pyx":371
  *         if op == 0:  # <
  *             if not isinstance(other, Set):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -7847,7 +7857,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":359
+    /* "aiohttp/_multidict.pyx":372
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  *             return len(self) < len(other) and self <= other             # <<<<<<<<<<<<<<
@@ -7855,18 +7865,18 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
  *             if not isinstance(other, Set):
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_3 = (__pyx_t_4 < __pyx_t_5);
     if (__pyx_t_3) {
     } else {
-      __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_t_3); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_t_3); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_1 = __pyx_t_6;
       __pyx_t_6 = 0;
       goto __pyx_L5_bool_binop_done;
     }
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_INCREF(__pyx_t_6);
     __pyx_t_1 = __pyx_t_6;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -7876,33 +7886,33 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":360
+  /* "aiohttp/_multidict.pyx":373
  *                 return NotImplemented
  *             return len(self) < len(other) and self <= other
  *         elif op == 1:  # <=             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 360; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 360; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":361
+    /* "aiohttp/_multidict.pyx":374
  *             return len(self) < len(other) and self <= other
  *         elif op == 1:  # <=
  *             if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             if len(self) > len(other):
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 361; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 361; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":362
+      /* "aiohttp/_multidict.pyx":375
  *         elif op == 1:  # <=
  *             if not isinstance(other, Set):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -7915,19 +7925,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":363
+    /* "aiohttp/_multidict.pyx":376
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  *             if len(self) > len(other):             # <<<<<<<<<<<<<<
  *                 return False
  *             for elem in self:
  */
-    __pyx_t_5 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_4 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_2 = ((__pyx_t_5 > __pyx_t_4) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":364
+      /* "aiohttp/_multidict.pyx":377
  *                 return NotImplemented
  *             if len(self) > len(other):
  *                 return False             # <<<<<<<<<<<<<<
@@ -7940,7 +7950,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":365
+    /* "aiohttp/_multidict.pyx":378
  *             if len(self) > len(other):
  *                 return False
  *             for elem in self:             # <<<<<<<<<<<<<<
@@ -7951,25 +7961,25 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       __pyx_t_1 = __pyx_v_self; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
       __pyx_t_7 = NULL;
     } else {
-      __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     for (;;) {
       if (likely(!__pyx_t_7)) {
         if (likely(PyList_CheckExact(__pyx_t_1))) {
           if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         } else {
           if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         }
       } else {
@@ -7978,7 +7988,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           }
           break;
         }
@@ -7987,18 +7997,18 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       __Pyx_XDECREF_SET(__pyx_v_elem, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "aiohttp/_multidict.pyx":366
+      /* "aiohttp/_multidict.pyx":379
  *                 return False
  *             for elem in self:
  *                 if elem not in other:             # <<<<<<<<<<<<<<
  *                     return False
  *             return True
  */
-      __pyx_t_2 = (__Pyx_PySequence_Contains(__pyx_v_elem, __pyx_v_other, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = (__Pyx_PySequence_Contains(__pyx_v_elem, __pyx_v_other, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_3 = (__pyx_t_2 != 0);
       if (__pyx_t_3) {
 
-        /* "aiohttp/_multidict.pyx":367
+        /* "aiohttp/_multidict.pyx":380
  *             for elem in self:
  *                 if elem not in other:
  *                     return False             # <<<<<<<<<<<<<<
@@ -8012,7 +8022,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
         goto __pyx_L0;
       }
 
-      /* "aiohttp/_multidict.pyx":365
+      /* "aiohttp/_multidict.pyx":378
  *             if len(self) > len(other):
  *                 return False
  *             for elem in self:             # <<<<<<<<<<<<<<
@@ -8022,7 +8032,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "aiohttp/_multidict.pyx":368
+    /* "aiohttp/_multidict.pyx":381
  *                 if elem not in other:
  *                     return False
  *             return True             # <<<<<<<<<<<<<<
@@ -8035,33 +8045,33 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":369
+  /* "aiohttp/_multidict.pyx":382
  *                     return False
  *             return True
  *         elif op == 2:  # ==             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 369; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 369; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":370
+    /* "aiohttp/_multidict.pyx":383
  *             return True
  *         elif op == 2:  # ==
  *             if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             return len(self) == len(other) and self <= other
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":371
+      /* "aiohttp/_multidict.pyx":384
  *         elif op == 2:  # ==
  *             if not isinstance(other, Set):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -8074,7 +8084,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":372
+    /* "aiohttp/_multidict.pyx":385
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  *             return len(self) == len(other) and self <= other             # <<<<<<<<<<<<<<
@@ -8082,18 +8092,18 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
  *             return not self == other
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_2 = (__pyx_t_4 == __pyx_t_5);
     if (__pyx_t_2) {
     } else {
-      __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_1 = __pyx_t_6;
       __pyx_t_6 = 0;
       goto __pyx_L13_bool_binop_done;
     }
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_INCREF(__pyx_t_6);
     __pyx_t_1 = __pyx_t_6;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -8103,19 +8113,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":373
+  /* "aiohttp/_multidict.pyx":386
  *                 return NotImplemented
  *             return len(self) == len(other) and self <= other
  *         elif op == 3:  # !=             # <<<<<<<<<<<<<<
  *             return not self == other
  *         elif op == 4:  #  >
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":374
+    /* "aiohttp/_multidict.pyx":387
  *             return len(self) == len(other) and self <= other
  *         elif op == 3:  # !=
  *             return not self == other             # <<<<<<<<<<<<<<
@@ -8123,43 +8133,43 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
  *             if not isinstance(other, Set):
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 387; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 387; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyBool_FromLong((!__pyx_t_2)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyBool_FromLong((!__pyx_t_2)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 387; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":375
+  /* "aiohttp/_multidict.pyx":388
  *         elif op == 3:  # !=
  *             return not self == other
  *         elif op == 4:  #  >             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 375; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 375; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "aiohttp/_multidict.pyx":376
+    /* "aiohttp/_multidict.pyx":389
  *             return not self == other
  *         elif op == 4:  #  >
  *             if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             return len(self) > len(other) and self >= other
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
     if (__pyx_t_3) {
 
-      /* "aiohttp/_multidict.pyx":377
+      /* "aiohttp/_multidict.pyx":390
  *         elif op == 4:  #  >
  *             if not isinstance(other, Set):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -8172,7 +8182,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":378
+    /* "aiohttp/_multidict.pyx":391
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  *             return len(self) > len(other) and self >= other             # <<<<<<<<<<<<<<
@@ -8180,18 +8190,18 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
  *             if not isinstance(other, Set):
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_5 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_4 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 391; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 391; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_3 = (__pyx_t_5 > __pyx_t_4);
     if (__pyx_t_3) {
     } else {
-      __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_t_3); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_t_3); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 391; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_1 = __pyx_t_6;
       __pyx_t_6 = 0;
       goto __pyx_L16_bool_binop_done;
     }
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_self, __pyx_v_other, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 391; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_INCREF(__pyx_t_6);
     __pyx_t_1 = __pyx_t_6;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -8201,33 +8211,33 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":379
+  /* "aiohttp/_multidict.pyx":392
  *                 return NotImplemented
  *             return len(self) > len(other) and self >= other
  *         elif op == 5:  # >=             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_op, __pyx_int_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":380
+    /* "aiohttp/_multidict.pyx":393
  *             return len(self) > len(other) and self >= other
  *         elif op == 5:  # >=
  *             if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             if len(self) < len(other):
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":381
+      /* "aiohttp/_multidict.pyx":394
  *         elif op == 5:  # >=
  *             if not isinstance(other, Set):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -8240,19 +8250,19 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":382
+    /* "aiohttp/_multidict.pyx":395
  *             if not isinstance(other, Set):
  *                 return NotImplemented
  *             if len(self) < len(other):             # <<<<<<<<<<<<<<
  *                 return False
  *             for elem in other:
  */
-    __pyx_t_4 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 395; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyObject_Length(__pyx_v_other); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 395; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_2 = ((__pyx_t_4 < __pyx_t_5) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":383
+      /* "aiohttp/_multidict.pyx":396
  *                 return NotImplemented
  *             if len(self) < len(other):
  *                 return False             # <<<<<<<<<<<<<<
@@ -8265,7 +8275,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":384
+    /* "aiohttp/_multidict.pyx":397
  *             if len(self) < len(other):
  *                 return False
  *             for elem in other:             # <<<<<<<<<<<<<<
@@ -8276,25 +8286,25 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       __pyx_t_1 = __pyx_v_other; __Pyx_INCREF(__pyx_t_1); __pyx_t_5 = 0;
       __pyx_t_7 = NULL;
     } else {
-      __pyx_t_5 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     for (;;) {
       if (likely(!__pyx_t_7)) {
         if (likely(PyList_CheckExact(__pyx_t_1))) {
           if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_6); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_6); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         } else {
           if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_6); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_6); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           #endif
         }
       } else {
@@ -8303,7 +8313,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           }
           break;
         }
@@ -8312,18 +8322,18 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
       __Pyx_XDECREF_SET(__pyx_v_elem, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "aiohttp/_multidict.pyx":385
+      /* "aiohttp/_multidict.pyx":398
  *                 return False
  *             for elem in other:
  *                 if elem not in self:             # <<<<<<<<<<<<<<
  *                     return False
  *             return True
  */
-      __pyx_t_2 = (__Pyx_PySequence_Contains(__pyx_v_elem, __pyx_v_self, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = (__Pyx_PySequence_Contains(__pyx_v_elem, __pyx_v_self, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_3 = (__pyx_t_2 != 0);
       if (__pyx_t_3) {
 
-        /* "aiohttp/_multidict.pyx":386
+        /* "aiohttp/_multidict.pyx":399
  *             for elem in other:
  *                 if elem not in self:
  *                     return False             # <<<<<<<<<<<<<<
@@ -8337,7 +8347,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
         goto __pyx_L0;
       }
 
-      /* "aiohttp/_multidict.pyx":384
+      /* "aiohttp/_multidict.pyx":397
  *             if len(self) < len(other):
  *                 return False
  *             for elem in other:             # <<<<<<<<<<<<<<
@@ -8347,7 +8357,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "aiohttp/_multidict.pyx":387
+    /* "aiohttp/_multidict.pyx":400
  *                 if elem not in self:
  *                     return False
  *             return True             # <<<<<<<<<<<<<<
@@ -8360,7 +8370,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":355
+  /* "aiohttp/_multidict.pyx":368
  * cdef class _ViewBaseSet(_ViewBase):
  * 
  *     def __richcmp__(self, other, op):             # <<<<<<<<<<<<<<
@@ -8383,7 +8393,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet___richcmp__(PyObj
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":389
+/* "aiohttp/_multidict.pyx":402
  *             return True
  * 
  *     def __and__(self, other):             # <<<<<<<<<<<<<<
@@ -8405,7 +8415,7 @@ static PyObject *__pyx_pw_7aiohttp_10_multidict_12_ViewBaseSet_3__and__(PyObject
 }
 static PyObject *__pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generator3(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "aiohttp/_multidict.pyx":392
+/* "aiohttp/_multidict.pyx":405
  *         if not isinstance(other, Iterable):
  *             return NotImplemented
  *         return set(value for value in other if value in self)             # <<<<<<<<<<<<<<
@@ -8431,7 +8441,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_7__and___genexpr(
   __Pyx_INCREF(((PyObject *)__pyx_cur_scope->__pyx_outer_scope));
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_outer_scope);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generator3, (PyObject *) __pyx_cur_scope, __pyx_n_s_genexpr, __pyx_n_s_and___locals_genexpr); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generator3, (PyObject *) __pyx_cur_scope, __pyx_n_s_genexpr, __pyx_n_s_and___locals_genexpr); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -8470,31 +8480,31 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generat
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_other)) { __Pyx_RaiseClosureNameError("other"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_other)) { __Pyx_RaiseClosureNameError("other"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
   if (likely(PyList_CheckExact(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_other)) || PyTuple_CheckExact(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_other)) {
     __pyx_t_1 = __pyx_cur_scope->__pyx_outer_scope->__pyx_v_other; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       }
     } else {
@@ -8503,7 +8513,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generat
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -8513,8 +8523,8 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generat
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_value, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
-    __pyx_t_5 = (__Pyx_PySequence_Contains(__pyx_cur_scope->__pyx_v_value, __pyx_cur_scope->__pyx_outer_scope->__pyx_v_self, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_self)) { __Pyx_RaiseClosureNameError("self"); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;} }
+    __pyx_t_5 = (__Pyx_PySequence_Contains(__pyx_cur_scope->__pyx_v_value, __pyx_cur_scope->__pyx_outer_scope->__pyx_v_self, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_6 = (__pyx_t_5 != 0);
     if (__pyx_t_6) {
       __Pyx_INCREF(__pyx_cur_scope->__pyx_v_value);
@@ -8534,7 +8544,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generat
       __Pyx_XGOTREF(__pyx_t_1);
       __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
       __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
-      if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       goto __pyx_L6;
     }
     __pyx_L6:;
@@ -8556,7 +8566,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_12_ViewBaseSet_7__and___2generat
   return NULL;
 }
 
-/* "aiohttp/_multidict.pyx":389
+/* "aiohttp/_multidict.pyx":402
  *             return True
  * 
  *     def __and__(self, other):             # <<<<<<<<<<<<<<
@@ -8589,7 +8599,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_2__and__(PyObject
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_other);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_other);
 
-  /* "aiohttp/_multidict.pyx":390
+  /* "aiohttp/_multidict.pyx":403
  * 
  *     def __and__(self, other):
  *         if not isinstance(other, Iterable):             # <<<<<<<<<<<<<<
@@ -8598,15 +8608,15 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_2__and__(PyObject
  */
   __pyx_t_1 = __pyx_cur_scope->__pyx_v_other;
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyObject_IsInstance(__pyx_t_1, __pyx_t_2); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyObject_IsInstance(__pyx_t_1, __pyx_t_2); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = ((!(__pyx_t_3 != 0)) != 0);
   if (__pyx_t_4) {
 
-    /* "aiohttp/_multidict.pyx":391
+    /* "aiohttp/_multidict.pyx":404
  *     def __and__(self, other):
  *         if not isinstance(other, Iterable):
  *             return NotImplemented             # <<<<<<<<<<<<<<
@@ -8619,7 +8629,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_2__and__(PyObject
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":392
+  /* "aiohttp/_multidict.pyx":405
  *         if not isinstance(other, Iterable):
  *             return NotImplemented
  *         return set(value for value in other if value in self)             # <<<<<<<<<<<<<<
@@ -8627,16 +8637,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_2__and__(PyObject
  *     def __or__(self, other):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_7__and___genexpr(((PyObject*)__pyx_cur_scope)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_7__and___genexpr(((PyObject*)__pyx_cur_scope)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PySet_New(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PySet_New(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":389
+  /* "aiohttp/_multidict.pyx":402
  *             return True
  * 
  *     def __and__(self, other):             # <<<<<<<<<<<<<<
@@ -8657,7 +8667,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_2__and__(PyObject
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":394
+/* "aiohttp/_multidict.pyx":407
  *         return set(value for value in other if value in self)
  * 
  *     def __or__(self, other):             # <<<<<<<<<<<<<<
@@ -8695,21 +8705,21 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__or__", 0);
 
-  /* "aiohttp/_multidict.pyx":395
+  /* "aiohttp/_multidict.pyx":408
  * 
  *     def __or__(self, other):
  *         if not isinstance(other, Iterable):             # <<<<<<<<<<<<<<
  *             return NotImplemented
  *         return {e for s in (self, other) for e in s}
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 395; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 408; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 395; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 408; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":396
+    /* "aiohttp/_multidict.pyx":409
  *     def __or__(self, other):
  *         if not isinstance(other, Iterable):
  *             return NotImplemented             # <<<<<<<<<<<<<<
@@ -8722,7 +8732,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
     goto __pyx_L0;
   }
 
-  /* "aiohttp/_multidict.pyx":397
+  /* "aiohttp/_multidict.pyx":410
  *         if not isinstance(other, Iterable):
  *             return NotImplemented
  *         return {e for s in (self, other) for e in s}             # <<<<<<<<<<<<<<
@@ -8733,9 +8743,9 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
   { /* enter inner scope */
     PyObject *__pyx_7genexpr__pyx_v_s = NULL;
     PyObject *__pyx_7genexpr__pyx_v_e = NULL;
-    __pyx_t_1 = PySet_New(NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+    __pyx_t_1 = PySet_New(NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_self);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_self);
@@ -8748,9 +8758,9 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
     for (;;) {
       if (__pyx_t_6 >= 2) break;
       #if CYTHON_COMPILING_IN_CPYTHON
-      __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_6); __Pyx_INCREF(__pyx_t_4); __pyx_t_6++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+      __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_6); __Pyx_INCREF(__pyx_t_4); __pyx_t_6++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
       #else
-      __pyx_t_4 = PySequence_ITEM(__pyx_t_5, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+      __pyx_t_4 = PySequence_ITEM(__pyx_t_5, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
       #endif
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_s, __pyx_t_4);
       __pyx_t_4 = 0;
@@ -8758,25 +8768,25 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
         __pyx_t_4 = __pyx_7genexpr__pyx_v_s; __Pyx_INCREF(__pyx_t_4); __pyx_t_7 = 0;
         __pyx_t_8 = NULL;
       } else {
-        __pyx_t_7 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_7genexpr__pyx_v_s); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+        __pyx_t_7 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_7genexpr__pyx_v_s); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_8 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+        __pyx_t_8 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
       }
       for (;;) {
         if (likely(!__pyx_t_8)) {
           if (likely(PyList_CheckExact(__pyx_t_4))) {
             if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_4)) break;
             #if CYTHON_COMPILING_IN_CPYTHON
-            __pyx_t_9 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_9); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+            __pyx_t_9 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_9); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
             #else
-            __pyx_t_9 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+            __pyx_t_9 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
             #endif
           } else {
             if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
             #if CYTHON_COMPILING_IN_CPYTHON
-            __pyx_t_9 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_9); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+            __pyx_t_9 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_7); __Pyx_INCREF(__pyx_t_9); __pyx_t_7++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
             #else
-            __pyx_t_9 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+            __pyx_t_9 = PySequence_ITEM(__pyx_t_4, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
             #endif
           }
         } else {
@@ -8785,7 +8795,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+              else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
             }
             break;
           }
@@ -8793,7 +8803,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
         }
         __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_e, __pyx_t_9);
         __pyx_t_9 = 0;
-        if (unlikely(PySet_Add(__pyx_t_1, (PyObject*)__pyx_7genexpr__pyx_v_e))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
+        if (unlikely(PySet_Add(__pyx_t_1, (PyObject*)__pyx_7genexpr__pyx_v_e))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L6_error;}
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -8811,7 +8821,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":394
+  /* "aiohttp/_multidict.pyx":407
  *         return set(value for value in other if value in self)
  * 
  *     def __or__(self, other):             # <<<<<<<<<<<<<<
@@ -8833,7 +8843,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_4__or__(PyObject 
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":399
+/* "aiohttp/_multidict.pyx":412
  *         return {e for s in (self, other) for e in s}
  * 
  *     def __sub__(self, other):             # <<<<<<<<<<<<<<
@@ -8870,35 +8880,35 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
   __Pyx_RefNannySetupContext("__sub__", 0);
   __Pyx_INCREF(__pyx_v_other);
 
-  /* "aiohttp/_multidict.pyx":400
+  /* "aiohttp/_multidict.pyx":413
  * 
  *     def __sub__(self, other):
  *         if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Iterable):
  *                 return NotImplemented
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 413; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 413; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":401
+    /* "aiohttp/_multidict.pyx":414
  *     def __sub__(self, other):
  *         if not isinstance(other, Set):
  *             if not isinstance(other, Iterable):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             other = set(other)
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 401; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 401; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":402
+      /* "aiohttp/_multidict.pyx":415
  *         if not isinstance(other, Set):
  *             if not isinstance(other, Iterable):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -8911,14 +8921,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":403
+    /* "aiohttp/_multidict.pyx":416
  *             if not isinstance(other, Iterable):
  *                 return NotImplemented
  *             other = set(other)             # <<<<<<<<<<<<<<
  *         return {value for value in self
  *                 if value not in other}
  */
-    __pyx_t_1 = PySet_New(__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PySet_New(__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 416; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_other, __pyx_t_1);
     __pyx_t_1 = 0;
@@ -8926,7 +8936,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
   }
   __pyx_L3:;
 
-  /* "aiohttp/_multidict.pyx":404
+  /* "aiohttp/_multidict.pyx":417
  *                 return NotImplemented
  *             other = set(other)
  *         return {value for value in self             # <<<<<<<<<<<<<<
@@ -8936,10 +8946,10 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
   __Pyx_XDECREF(__pyx_r);
   { /* enter inner scope */
     PyObject *__pyx_8genexpr1__pyx_v_value = NULL;
-    __pyx_t_1 = PySet_New(NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+    __pyx_t_1 = PySet_New(NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "aiohttp/_multidict.pyx":405
+    /* "aiohttp/_multidict.pyx":418
  *             other = set(other)
  *         return {value for value in self
  *                 if value not in other}             # <<<<<<<<<<<<<<
@@ -8950,13 +8960,13 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
       __pyx_t_4 = __pyx_v_self; __Pyx_INCREF(__pyx_t_4); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
     } else {
-      __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+      __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+      __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
     }
     for (;;) {
 
-      /* "aiohttp/_multidict.pyx":404
+      /* "aiohttp/_multidict.pyx":417
  *                 return NotImplemented
  *             other = set(other)
  *         return {value for value in self             # <<<<<<<<<<<<<<
@@ -8967,16 +8977,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
         if (likely(PyList_CheckExact(__pyx_t_4))) {
           if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           #else
-          __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           #endif
         } else {
           if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           #else
-          __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           #endif
         }
       } else {
@@ -8985,7 +8995,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           }
           break;
         }
@@ -8994,25 +9004,25 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
       __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_value, __pyx_t_7);
       __pyx_t_7 = 0;
 
-      /* "aiohttp/_multidict.pyx":405
+      /* "aiohttp/_multidict.pyx":418
  *             other = set(other)
  *         return {value for value in self
  *                 if value not in other}             # <<<<<<<<<<<<<<
  * 
  *     def __xor__(self, other):
  */
-      __pyx_t_2 = (__Pyx_PySequence_Contains(__pyx_8genexpr1__pyx_v_value, __pyx_v_other, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+      __pyx_t_2 = (__Pyx_PySequence_Contains(__pyx_8genexpr1__pyx_v_value, __pyx_v_other, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 418; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
       __pyx_t_3 = (__pyx_t_2 != 0);
       if (__pyx_t_3) {
 
-        /* "aiohttp/_multidict.pyx":404
+        /* "aiohttp/_multidict.pyx":417
  *                 return NotImplemented
  *             other = set(other)
  *         return {value for value in self             # <<<<<<<<<<<<<<
  *                 if value not in other}
  * 
  */
-        if (unlikely(PySet_Add(__pyx_t_1, (PyObject*)__pyx_8genexpr1__pyx_v_value))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+        if (unlikely(PySet_Add(__pyx_t_1, (PyObject*)__pyx_8genexpr1__pyx_v_value))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
         goto __pyx_L10;
       }
       __pyx_L10:;
@@ -9029,7 +9039,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":399
+  /* "aiohttp/_multidict.pyx":412
  *         return {e for s in (self, other) for e in s}
  * 
  *     def __sub__(self, other):             # <<<<<<<<<<<<<<
@@ -9051,7 +9061,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_6__sub__(PyObject
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":407
+/* "aiohttp/_multidict.pyx":420
  *                 if value not in other}
  * 
  *     def __xor__(self, other):             # <<<<<<<<<<<<<<
@@ -9086,35 +9096,35 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_8__xor__(PyObject
   __Pyx_RefNannySetupContext("__xor__", 0);
   __Pyx_INCREF(__pyx_v_other);
 
-  /* "aiohttp/_multidict.pyx":408
+  /* "aiohttp/_multidict.pyx":421
  * 
  *     def __xor__(self, other):
  *         if not isinstance(other, Set):             # <<<<<<<<<<<<<<
  *             if not isinstance(other, Iterable):
  *                 return NotImplemented
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 408; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Set); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 408; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
   if (__pyx_t_3) {
 
-    /* "aiohttp/_multidict.pyx":409
+    /* "aiohttp/_multidict.pyx":422
  *     def __xor__(self, other):
  *         if not isinstance(other, Set):
  *             if not isinstance(other, Iterable):             # <<<<<<<<<<<<<<
  *                 return NotImplemented
  *             other = set(other)
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 409; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Iterable); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 409; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_IsInstance(__pyx_v_other, __pyx_t_1); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_2 = ((!(__pyx_t_3 != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "aiohttp/_multidict.pyx":410
+      /* "aiohttp/_multidict.pyx":423
  *         if not isinstance(other, Set):
  *             if not isinstance(other, Iterable):
  *                 return NotImplemented             # <<<<<<<<<<<<<<
@@ -9127,14 +9137,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_8__xor__(PyObject
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":411
+    /* "aiohttp/_multidict.pyx":424
  *             if not isinstance(other, Iterable):
  *                 return NotImplemented
  *             other = set(other)             # <<<<<<<<<<<<<<
  *         return (self - other) | (other - self)
  * 
  */
-    __pyx_t_1 = PySet_New(__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PySet_New(__pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 424; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_other, __pyx_t_1);
     __pyx_t_1 = 0;
@@ -9142,7 +9152,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_8__xor__(PyObject
   }
   __pyx_L3:;
 
-  /* "aiohttp/_multidict.pyx":412
+  /* "aiohttp/_multidict.pyx":425
  *                 return NotImplemented
  *             other = set(other)
  *         return (self - other) | (other - self)             # <<<<<<<<<<<<<<
@@ -9150,11 +9160,11 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_8__xor__(PyObject
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyNumber_Subtract(__pyx_v_self, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Subtract(__pyx_v_self, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyNumber_Subtract(__pyx_v_other, __pyx_v_self); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyNumber_Subtract(__pyx_v_other, __pyx_v_self); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyNumber_Or(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyNumber_Or(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9162,7 +9172,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_8__xor__(PyObject
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":407
+  /* "aiohttp/_multidict.pyx":420
  *                 if value not in other}
  * 
  *     def __xor__(self, other):             # <<<<<<<<<<<<<<
@@ -9184,7 +9194,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_12_ViewBaseSet_8__xor__(PyObject
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":417
+/* "aiohttp/_multidict.pyx":430
  * cdef class _ItemsView(_ViewBaseSet):
  * 
  *     def isdisjoint(self, other):             # <<<<<<<<<<<<<<
@@ -9220,7 +9230,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_isdisjoint(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("isdisjoint", 0);
 
-  /* "aiohttp/_multidict.pyx":420
+  /* "aiohttp/_multidict.pyx":433
  *         'Return True if two sets have a null intersection.'
  *         cdef tuple value
  *         for value in self._items:             # <<<<<<<<<<<<<<
@@ -9229,32 +9239,32 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_isdisjoint(struct _
  */
   if (unlikely(__pyx_v_self->__pyx_base.__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 420; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->__pyx_base.__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 420; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 420; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 420; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 433; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_value, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":421
+    /* "aiohttp/_multidict.pyx":434
  *         cdef tuple value
  *         for value in self._items:
  *             if value in other:             # <<<<<<<<<<<<<<
  *                 return False
  *         return True
  */
-    __pyx_t_4 = (__Pyx_PySequence_Contains(__pyx_v_value, __pyx_v_other, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = (__Pyx_PySequence_Contains(__pyx_v_value, __pyx_v_other, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_5 = (__pyx_t_4 != 0);
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":422
+      /* "aiohttp/_multidict.pyx":435
  *         for value in self._items:
  *             if value in other:
  *                 return False             # <<<<<<<<<<<<<<
@@ -9268,7 +9278,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_isdisjoint(struct _
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":420
+    /* "aiohttp/_multidict.pyx":433
  *         'Return True if two sets have a null intersection.'
  *         cdef tuple value
  *         for value in self._items:             # <<<<<<<<<<<<<<
@@ -9278,7 +9288,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_isdisjoint(struct _
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":423
+  /* "aiohttp/_multidict.pyx":436
  *             if value in other:
  *                 return False
  *         return True             # <<<<<<<<<<<<<<
@@ -9290,7 +9300,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_isdisjoint(struct _
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":417
+  /* "aiohttp/_multidict.pyx":430
  * cdef class _ItemsView(_ViewBaseSet):
  * 
  *     def isdisjoint(self, other):             # <<<<<<<<<<<<<<
@@ -9311,7 +9321,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_isdisjoint(struct _
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":425
+/* "aiohttp/_multidict.pyx":438
  *         return True
  * 
  *     def __contains__(self, item):             # <<<<<<<<<<<<<<
@@ -9344,7 +9354,7 @@ static int __pyx_pf_7aiohttp_10_multidict_10_ItemsView_2__contains__(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__contains__", 0);
 
-  /* "aiohttp/_multidict.pyx":426
+  /* "aiohttp/_multidict.pyx":439
  * 
  *     def __contains__(self, item):
  *         assert isinstance(item, tuple) or isinstance(item, list)             # <<<<<<<<<<<<<<
@@ -9366,12 +9376,12 @@ static int __pyx_pf_7aiohttp_10_multidict_10_ItemsView_2__contains__(struct __py
     __pyx_L3_bool_binop_done:;
     if (unlikely(!__pyx_t_1)) {
       PyErr_SetNone(PyExc_AssertionError);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 439; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "aiohttp/_multidict.pyx":427
+  /* "aiohttp/_multidict.pyx":440
  *     def __contains__(self, item):
  *         assert isinstance(item, tuple) or isinstance(item, list)
  *         assert len(item) == 2             # <<<<<<<<<<<<<<
@@ -9380,26 +9390,26 @@ static int __pyx_pf_7aiohttp_10_multidict_10_ItemsView_2__contains__(struct __py
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_4 = PyObject_Length(__pyx_v_item); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_Length(__pyx_v_item); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (unlikely(!((__pyx_t_4 == 2) != 0))) {
       PyErr_SetNone(PyExc_AssertionError);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "aiohttp/_multidict.pyx":428
+  /* "aiohttp/_multidict.pyx":441
  *         assert isinstance(item, tuple) or isinstance(item, list)
  *         assert len(item) == 2
  *         return item in self._items             # <<<<<<<<<<<<<<
  * 
  *     def __iter__(self):
  */
-  __pyx_t_1 = (__Pyx_PySequence_Contains(__pyx_v_item, __pyx_v_self->__pyx_base.__pyx_base._items, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = (__Pyx_PySequence_Contains(__pyx_v_item, __pyx_v_self->__pyx_base.__pyx_base._items, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_t_1;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":425
+  /* "aiohttp/_multidict.pyx":438
  *         return True
  * 
  *     def __contains__(self, item):             # <<<<<<<<<<<<<<
@@ -9416,7 +9426,7 @@ static int __pyx_pf_7aiohttp_10_multidict_10_ItemsView_2__contains__(struct __py
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":430
+/* "aiohttp/_multidict.pyx":443
  *         return item in self._items
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -9447,7 +9457,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_4__iter__(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__iter__", 0);
 
-  /* "aiohttp/_multidict.pyx":431
+  /* "aiohttp/_multidict.pyx":444
  * 
  *     def __iter__(self):
  *         return iter(self._items)             # <<<<<<<<<<<<<<
@@ -9457,14 +9467,14 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_4__iter__(struct __
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __pyx_v_self->__pyx_base.__pyx_base._items;
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 431; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 444; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":430
+  /* "aiohttp/_multidict.pyx":443
  *         return item in self._items
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -9484,7 +9494,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_10_ItemsView_4__iter__(struct __
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":439
+/* "aiohttp/_multidict.pyx":452
  * cdef class _ValuesView(_ViewBase):
  * 
  *     def __contains__(self, value):             # <<<<<<<<<<<<<<
@@ -9519,7 +9529,7 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__contains__", 0);
 
-  /* "aiohttp/_multidict.pyx":441
+  /* "aiohttp/_multidict.pyx":454
  *     def __contains__(self, value):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9528,21 +9538,21 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
  */
   if (unlikely(__pyx_v_self->__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":442
+    /* "aiohttp/_multidict.pyx":455
  *         cdef tuple item
  *         for item in self._items:
  *             if item[1] == value:             # <<<<<<<<<<<<<<
@@ -9551,17 +9561,17 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
  */
     if (unlikely(__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_3, __pyx_v_value, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_3, __pyx_v_value, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":443
+      /* "aiohttp/_multidict.pyx":456
  *         for item in self._items:
  *             if item[1] == value:
  *                 return True             # <<<<<<<<<<<<<<
@@ -9573,7 +9583,7 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":441
+    /* "aiohttp/_multidict.pyx":454
  *     def __contains__(self, value):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9583,7 +9593,7 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":444
+  /* "aiohttp/_multidict.pyx":457
  *             if item[1] == value:
  *                 return True
  *         return False             # <<<<<<<<<<<<<<
@@ -9593,7 +9603,7 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":439
+  /* "aiohttp/_multidict.pyx":452
  * cdef class _ValuesView(_ViewBase):
  * 
  *     def __contains__(self, value):             # <<<<<<<<<<<<<<
@@ -9615,7 +9625,7 @@ static int __pyx_pf_7aiohttp_10_multidict_11_ValuesView___contains__(struct __py
 }
 static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "aiohttp/_multidict.pyx":446
+/* "aiohttp/_multidict.pyx":459
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -9654,7 +9664,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_11_ValuesView_2__iter__(struct _
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_ValuesView___iter); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 446; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_ValuesView___iter); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -9690,9 +9700,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_G
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 446; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "aiohttp/_multidict.pyx":448
+  /* "aiohttp/_multidict.pyx":461
  *     def __iter__(self):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9701,23 +9711,23 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_G
  */
   if (unlikely(__pyx_cur_scope->__pyx_v_self->__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_cur_scope->__pyx_v_self->__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_item);
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_item, ((PyObject*)__pyx_t_3));
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":449
+    /* "aiohttp/_multidict.pyx":462
  *         cdef tuple item
  *         for item in self._items:
  *             yield item[1]             # <<<<<<<<<<<<<<
@@ -9726,9 +9736,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_G
  */
     if (unlikely(__pyx_cur_scope->__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_cur_scope->__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_cur_scope->__pyx_v_item, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
@@ -9745,9 +9755,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_G
     __pyx_cur_scope->__pyx_t_0 = 0;
     __Pyx_XGOTREF(__pyx_t_1);
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
-    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "aiohttp/_multidict.pyx":448
+    /* "aiohttp/_multidict.pyx":461
  *     def __iter__(self):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9757,7 +9767,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_G
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":446
+  /* "aiohttp/_multidict.pyx":459
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -9780,7 +9790,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_11_ValuesView_4generator(__pyx_G
   return NULL;
 }
 
-/* "aiohttp/_multidict.pyx":457
+/* "aiohttp/_multidict.pyx":470
  * cdef class _KeysView(_ViewBaseSet):
  * 
  *     def isdisjoint(self, other):             # <<<<<<<<<<<<<<
@@ -9816,7 +9826,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("isdisjoint", 0);
 
-  /* "aiohttp/_multidict.pyx":460
+  /* "aiohttp/_multidict.pyx":473
  *         'Return True if two sets have a null intersection.'
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9825,21 +9835,21 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
  */
   if (unlikely(__pyx_v_self->__pyx_base.__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 473; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->__pyx_base.__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 473; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 473; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 473; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":461
+    /* "aiohttp/_multidict.pyx":474
  *         cdef tuple item
  *         for item in self._items:
  *             if item[0] in other:             # <<<<<<<<<<<<<<
@@ -9848,16 +9858,16 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
  */
     if (unlikely(__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = (__Pyx_PySequence_Contains(__pyx_t_3, __pyx_v_other, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = (__Pyx_PySequence_Contains(__pyx_t_3, __pyx_v_other, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_5 = (__pyx_t_4 != 0);
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":462
+      /* "aiohttp/_multidict.pyx":475
  *         for item in self._items:
  *             if item[0] in other:
  *                 return False             # <<<<<<<<<<<<<<
@@ -9871,7 +9881,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":460
+    /* "aiohttp/_multidict.pyx":473
  *         'Return True if two sets have a null intersection.'
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9881,7 +9891,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":463
+  /* "aiohttp/_multidict.pyx":476
  *             if item[0] in other:
  *                 return False
  *         return True             # <<<<<<<<<<<<<<
@@ -9893,7 +9903,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":457
+  /* "aiohttp/_multidict.pyx":470
  * cdef class _KeysView(_ViewBaseSet):
  * 
  *     def isdisjoint(self, other):             # <<<<<<<<<<<<<<
@@ -9914,7 +9924,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_isdisjoint(struct __p
   return __pyx_r;
 }
 
-/* "aiohttp/_multidict.pyx":465
+/* "aiohttp/_multidict.pyx":478
  *         return True
  * 
  *     def __contains__(self, value):             # <<<<<<<<<<<<<<
@@ -9949,7 +9959,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__contains__", 0);
 
-  /* "aiohttp/_multidict.pyx":467
+  /* "aiohttp/_multidict.pyx":480
  *     def __contains__(self, value):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -9958,21 +9968,21 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
  */
   if (unlikely(__pyx_v_self->__pyx_base.__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_v_self->__pyx_base.__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XDECREF_SET(__pyx_v_item, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":468
+    /* "aiohttp/_multidict.pyx":481
  *         cdef tuple item
  *         for item in self._items:
  *             if item[0] == value:             # <<<<<<<<<<<<<<
@@ -9981,17 +9991,17 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
  */
     if (unlikely(__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_3, __pyx_v_value, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_3, __pyx_v_value, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_5) {
 
-      /* "aiohttp/_multidict.pyx":469
+      /* "aiohttp/_multidict.pyx":482
  *         for item in self._items:
  *             if item[0] == value:
  *                 return True             # <<<<<<<<<<<<<<
@@ -10003,7 +10013,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
       goto __pyx_L0;
     }
 
-    /* "aiohttp/_multidict.pyx":467
+    /* "aiohttp/_multidict.pyx":480
  *     def __contains__(self, value):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -10013,7 +10023,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":470
+  /* "aiohttp/_multidict.pyx":483
  *             if item[0] == value:
  *                 return True
  *         return False             # <<<<<<<<<<<<<<
@@ -10023,7 +10033,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "aiohttp/_multidict.pyx":465
+  /* "aiohttp/_multidict.pyx":478
  *         return True
  * 
  *     def __contains__(self, value):             # <<<<<<<<<<<<<<
@@ -10045,7 +10055,7 @@ static int __pyx_pf_7aiohttp_10_multidict_9_KeysView_2__contains__(struct __pyx_
 }
 static PyObject *__pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "aiohttp/_multidict.pyx":472
+/* "aiohttp/_multidict.pyx":485
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -10084,7 +10094,7 @@ static PyObject *__pyx_pf_7aiohttp_10_multidict_9_KeysView_4__iter__(struct __py
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_KeysView___iter); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_KeysView___iter); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 485; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -10120,9 +10130,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1(__pyx_Gen
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 485; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "aiohttp/_multidict.pyx":474
+  /* "aiohttp/_multidict.pyx":487
  *     def __iter__(self):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -10131,23 +10141,23 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1(__pyx_Gen
  */
   if (unlikely(__pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._items == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_1 = __pyx_cur_scope->__pyx_v_self->__pyx_base.__pyx_base._items; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     #endif
-    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(PyTuple_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_3)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_item);
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_item, ((PyObject*)__pyx_t_3));
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "aiohttp/_multidict.pyx":475
+    /* "aiohttp/_multidict.pyx":488
  *         cdef tuple item
  *         for item in self._items:
  *             yield item[0]             # <<<<<<<<<<<<<<
@@ -10156,9 +10166,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1(__pyx_Gen
  */
     if (unlikely(__pyx_cur_scope->__pyx_v_item == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 488; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_cur_scope->__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_3 = __Pyx_GetItemInt_Tuple(__pyx_cur_scope->__pyx_v_item, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 488; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
@@ -10175,9 +10185,9 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1(__pyx_Gen
     __pyx_cur_scope->__pyx_t_0 = 0;
     __Pyx_XGOTREF(__pyx_t_1);
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
-    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 475; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 488; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "aiohttp/_multidict.pyx":474
+    /* "aiohttp/_multidict.pyx":487
  *     def __iter__(self):
  *         cdef tuple item
  *         for item in self._items:             # <<<<<<<<<<<<<<
@@ -10187,7 +10197,7 @@ static PyObject *__pyx_gb_7aiohttp_10_multidict_9_KeysView_6generator1(__pyx_Gen
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":472
+  /* "aiohttp/_multidict.pyx":485
  *         return False
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -10277,10 +10287,10 @@ static PyObject *__pyx_sq_item_7aiohttp_10_multidict__Base(PyObject *o, Py_ssize
 static PyMethodDef __pyx_methods_7aiohttp_10_multidict__Base[] = {
   {"getall", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_3getall, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_5_Base_2getall},
   {"getone", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_5getone, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_5_Base_4getone},
-  {"get", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_9get, METH_VARARGS|METH_KEYWORDS, 0},
-  {"keys", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_17keys, METH_NOARGS, 0},
-  {"items", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_19items, METH_NOARGS, 0},
-  {"values", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_21values, METH_NOARGS, 0},
+  {"get", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_9get, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_5_Base_8get},
+  {"keys", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_17keys, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_5_Base_16keys},
+  {"items", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_19items, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_5_Base_18items},
+  {"values", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_5_Base_21values, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_5_Base_20values},
   {0, 0, 0, 0}
 };
 
@@ -10371,7 +10381,7 @@ static PyObject *__pyx_tp_new_7aiohttp_10_multidict_MultiDictProxy(PyTypeObject 
 }
 
 static PyMethodDef __pyx_methods_7aiohttp_10_multidict_MultiDictProxy[] = {
-  {"copy", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_14MultiDictProxy_3copy, METH_NOARGS, 0},
+  {"copy", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_14MultiDictProxy_3copy, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_14MultiDictProxy_2copy},
   {0, 0, 0, 0}
 };
 
@@ -10451,7 +10461,7 @@ static PyObject *__pyx_tp_new_7aiohttp_10_multidict_CIMultiDictProxy(PyTypeObjec
 }
 
 static PyMethodDef __pyx_methods_7aiohttp_10_multidict_CIMultiDictProxy[] = {
-  {"copy", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_16CIMultiDictProxy_3copy, METH_NOARGS, 0},
+  {"copy", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_16CIMultiDictProxy_3copy, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_16CIMultiDictProxy_2copy},
   {0, 0, 0, 0}
 };
 
@@ -10544,10 +10554,10 @@ static PyMethodDef __pyx_methods_7aiohttp_10_multidict_MultiDict[] = {
   {"copy", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_5copy, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_4copy},
   {"extend", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_7extend, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_6extend},
   {"clear", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_9clear, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_8clear},
-  {"setdefault", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_15setdefault, METH_VARARGS|METH_KEYWORDS, 0},
-  {"pop", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_17pop, METH_VARARGS|METH_KEYWORDS, 0},
-  {"popitem", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_19popitem, METH_NOARGS, 0},
-  {"update", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_21update, METH_VARARGS|METH_KEYWORDS, 0},
+  {"setdefault", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_15setdefault, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_14setdefault},
+  {"pop", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_17pop, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_16pop},
+  {"popitem", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_19popitem, METH_NOARGS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_18popitem},
+  {"update", (PyCFunction)__pyx_pw_7aiohttp_10_multidict_9MultiDict_21update, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_multidict_9MultiDict_20update},
   {0, 0, 0, 0}
 };
 
@@ -11953,6 +11963,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_NotImplemented, __pyx_k_NotImplemented, sizeof(__pyx_k_NotImplemented), 0, 0, 1, 1},
   {&__pyx_n_s_Set, __pyx_k_Set, sizeof(__pyx_k_Set), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
+  {&__pyx_kp_s_Users_nikolay_dev_account_api_v, __pyx_k_Users_nikolay_dev_account_api_v, sizeof(__pyx_k_Users_nikolay_dev_account_api_v), 0, 0, 1, 0},
   {&__pyx_n_s_ValuesView, __pyx_k_ValuesView, sizeof(__pyx_k_ValuesView), 0, 0, 1, 1},
   {&__pyx_n_s_ValuesView___iter, __pyx_k_ValuesView___iter, sizeof(__pyx_k_ValuesView___iter), 0, 0, 1, 1},
   {&__pyx_kp_s__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 0, 1, 0},
@@ -11978,7 +11989,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_genexpr, __pyx_k_genexpr, sizeof(__pyx_k_genexpr), 0, 0, 1, 1},
   {&__pyx_n_s_get, __pyx_k_get, sizeof(__pyx_k_get), 0, 0, 1, 1},
   {&__pyx_n_s_getdefaultencoding, __pyx_k_getdefaultencoding, sizeof(__pyx_k_getdefaultencoding), 0, 0, 1, 1},
-  {&__pyx_kp_s_home_andrew_projects_aiohttp_ai, __pyx_k_home_andrew_projects_aiohttp_ai, sizeof(__pyx_k_home_andrew_projects_aiohttp_ai), 0, 0, 1, 0},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_items, __pyx_k_items, sizeof(__pyx_k_items), 0, 0, 1, 1},
   {&__pyx_n_s_iter, __pyx_k_iter, sizeof(__pyx_k_iter), 0, 0, 1, 1},
@@ -12020,11 +12030,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 static int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_object = __Pyx_GetBuiltinName(__pyx_n_s_object); if (!__pyx_builtin_object) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_memoryview = __Pyx_GetBuiltinName(__pyx_n_s_memoryview); if (!__pyx_builtin_memoryview) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_NotImplemented = __Pyx_GetBuiltinName(__pyx_n_s_NotImplemented); if (!__pyx_builtin_NotImplemented) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_memoryview = __Pyx_GetBuiltinName(__pyx_n_s_memoryview); if (!__pyx_builtin_memoryview) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_NotImplemented = __Pyx_GetBuiltinName(__pyx_n_s_NotImplemented); if (!__pyx_builtin_NotImplemented) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 283; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -12034,40 +12044,40 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "aiohttp/_multidict.pyx":319
+  /* "aiohttp/_multidict.pyx":331
  *             return self._items.pop(0)
  *         else:
  *             raise KeyError("empty multidict")             # <<<<<<<<<<<<<<
  * 
  *     def update(self, *args, **kwargs):
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_empty_multidict); if (unlikely(!__pyx_tuple__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_empty_multidict); if (unlikely(!__pyx_tuple__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "aiohttp/_multidict.pyx":12
- *     """Case insensitive str"""
+  /* "aiohttp/_multidict.pyx":13
+ *     """Case insensitive str."""
  * 
  *     def __new__(cls, val='',             # <<<<<<<<<<<<<<
  *                 encoding=sys.getdefaultencoding(), errors='strict'):
  *         if isinstance(val, (bytes, bytearray, memoryview)):
  */
-  __pyx_tuple__8 = PyTuple_Pack(4, __pyx_n_s_cls, __pyx_n_s_val, __pyx_n_s_encoding, __pyx_n_s_errors); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__8 = PyTuple_Pack(4, __pyx_n_s_cls, __pyx_n_s_val, __pyx_n_s_encoding, __pyx_n_s_errors); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_andrew_projects_aiohttp_ai, __pyx_n_s_new, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_nikolay_dev_account_api_v, __pyx_n_s_new, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "aiohttp/_multidict.pyx":23
+  /* "aiohttp/_multidict.pyx":24
  *         return str.__new__(cls, val)
  * 
  *     def upper(self):             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_andrew_projects_aiohttp_ai, __pyx_n_s_upper, 23, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_nikolay_dev_account_api_v, __pyx_n_s_upper, 24, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -12180,27 +12190,27 @@ PyMODINIT_FUNC PyInit__multidict(void)
   __pyx_vtable_7aiohttp_10_multidict__Base._getone = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict__Base *, PyObject *, PyObject *))__pyx_f_7aiohttp_10_multidict_5_Base__getone;
   __pyx_vtable_7aiohttp_10_multidict__Base._contains = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict__Base *, PyObject *))__pyx_f_7aiohttp_10_multidict_5_Base__contains;
   __pyx_vtable_7aiohttp_10_multidict__Base.keys = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict__Base *, int __pyx_skip_dispatch))__pyx_f_7aiohttp_10_multidict_5_Base_keys;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__Base) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__Base) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict__Base.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict__Base.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict__Base) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "_Base", (PyObject *)&__pyx_type_7aiohttp_10_multidict__Base) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict__Base.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict__Base) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "_Base", (PyObject *)&__pyx_type_7aiohttp_10_multidict__Base) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict__Base = &__pyx_type_7aiohttp_10_multidict__Base;
   __pyx_vtabptr_7aiohttp_10_multidict_MultiDictProxy = &__pyx_vtable_7aiohttp_10_multidict_MultiDictProxy;
   __pyx_vtable_7aiohttp_10_multidict_MultiDictProxy.__pyx_base = *__pyx_vtabptr_7aiohttp_10_multidict__Base;
   __pyx_type_7aiohttp_10_multidict_MultiDictProxy.tp_base = __pyx_ptype_7aiohttp_10_multidict__Base;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_MultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_MultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 146; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict_MultiDictProxy.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_MultiDictProxy.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_MultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "MultiDictProxy", (PyObject *)&__pyx_type_7aiohttp_10_multidict_MultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_MultiDictProxy.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_MultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 146; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "MultiDictProxy", (PyObject *)&__pyx_type_7aiohttp_10_multidict_MultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 146; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict_MultiDictProxy = &__pyx_type_7aiohttp_10_multidict_MultiDictProxy;
   __pyx_vtabptr_7aiohttp_10_multidict_CIMultiDictProxy = &__pyx_vtable_7aiohttp_10_multidict_CIMultiDictProxy;
   __pyx_vtable_7aiohttp_10_multidict_CIMultiDictProxy.__pyx_base = *__pyx_vtabptr_7aiohttp_10_multidict_MultiDictProxy;
   __pyx_vtable_7aiohttp_10_multidict_CIMultiDictProxy.__pyx_base.__pyx_base._upper = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict__Base *, PyObject *))__pyx_f_7aiohttp_10_multidict_16CIMultiDictProxy__upper;
   __pyx_type_7aiohttp_10_multidict_CIMultiDictProxy.tp_base = __pyx_ptype_7aiohttp_10_multidict_MultiDictProxy;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict_CIMultiDictProxy.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_CIMultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "CIMultiDictProxy", (PyObject *)&__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_CIMultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "CIMultiDictProxy", (PyObject *)&__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict_CIMultiDictProxy = &__pyx_type_7aiohttp_10_multidict_CIMultiDictProxy;
   __pyx_vtabptr_7aiohttp_10_multidict_MultiDict = &__pyx_vtable_7aiohttp_10_multidict_MultiDict;
   __pyx_vtable_7aiohttp_10_multidict_MultiDict.__pyx_base = *__pyx_vtabptr_7aiohttp_10_multidict__Base;
@@ -12209,60 +12219,60 @@ PyMODINIT_FUNC PyInit__multidict(void)
   __pyx_vtable_7aiohttp_10_multidict_MultiDict._replace = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict_MultiDict *, PyObject *, PyObject *))__pyx_f_7aiohttp_10_multidict_9MultiDict__replace;
   __pyx_vtable_7aiohttp_10_multidict_MultiDict._remove = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict_MultiDict *, PyObject *, int))__pyx_f_7aiohttp_10_multidict_9MultiDict__remove;
   __pyx_type_7aiohttp_10_multidict_MultiDict.tp_base = __pyx_ptype_7aiohttp_10_multidict__Base;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_MultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_MultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict_MultiDict.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_MultiDict.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_MultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "MultiDict", (PyObject *)&__pyx_type_7aiohttp_10_multidict_MultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_MultiDict.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_MultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "MultiDict", (PyObject *)&__pyx_type_7aiohttp_10_multidict_MultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict_MultiDict = &__pyx_type_7aiohttp_10_multidict_MultiDict;
   __pyx_vtabptr_7aiohttp_10_multidict_CIMultiDict = &__pyx_vtable_7aiohttp_10_multidict_CIMultiDict;
   __pyx_vtable_7aiohttp_10_multidict_CIMultiDict.__pyx_base = *__pyx_vtabptr_7aiohttp_10_multidict_MultiDict;
   __pyx_vtable_7aiohttp_10_multidict_CIMultiDict.__pyx_base.__pyx_base._upper = (PyObject *(*)(struct __pyx_obj_7aiohttp_10_multidict__Base *, PyObject *))__pyx_f_7aiohttp_10_multidict_11CIMultiDict__upper;
   __pyx_type_7aiohttp_10_multidict_CIMultiDict.tp_base = __pyx_ptype_7aiohttp_10_multidict_MultiDict;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_CIMultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict_CIMultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict_CIMultiDict.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_CIMultiDict.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_CIMultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "CIMultiDict", (PyObject *)&__pyx_type_7aiohttp_10_multidict_CIMultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_7aiohttp_10_multidict_CIMultiDict.tp_dict, __pyx_vtabptr_7aiohttp_10_multidict_CIMultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "CIMultiDict", (PyObject *)&__pyx_type_7aiohttp_10_multidict_CIMultiDict) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict_CIMultiDict = &__pyx_type_7aiohttp_10_multidict_CIMultiDict;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ViewBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ViewBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict__ViewBase.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "_ViewBase", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ViewBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "_ViewBase", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ViewBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict__ViewBase = &__pyx_type_7aiohttp_10_multidict__ViewBase;
   __pyx_type_7aiohttp_10_multidict__ViewBaseSet.tp_base = __pyx_ptype_7aiohttp_10_multidict__ViewBase;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ViewBaseSet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ViewBaseSet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict__ViewBaseSet.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "_ViewBaseSet", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ViewBaseSet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "_ViewBaseSet", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ViewBaseSet) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict__ViewBaseSet = &__pyx_type_7aiohttp_10_multidict__ViewBaseSet;
   __pyx_type_7aiohttp_10_multidict__ItemsView.tp_base = __pyx_ptype_7aiohttp_10_multidict__ViewBaseSet;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ItemsView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ItemsView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict__ItemsView.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "_ItemsView", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ItemsView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "_ItemsView", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ItemsView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict__ItemsView = &__pyx_type_7aiohttp_10_multidict__ItemsView;
   __pyx_type_7aiohttp_10_multidict__ValuesView.tp_base = __pyx_ptype_7aiohttp_10_multidict__ViewBase;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ValuesView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__ValuesView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict__ValuesView.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "_ValuesView", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ValuesView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "_ValuesView", (PyObject *)&__pyx_type_7aiohttp_10_multidict__ValuesView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict__ValuesView = &__pyx_type_7aiohttp_10_multidict__ValuesView;
   __pyx_type_7aiohttp_10_multidict__KeysView.tp_base = __pyx_ptype_7aiohttp_10_multidict__ViewBaseSet;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__KeysView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict__KeysView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict__KeysView.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "_KeysView", (PyObject *)&__pyx_type_7aiohttp_10_multidict__KeysView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "_KeysView", (PyObject *)&__pyx_type_7aiohttp_10_multidict__KeysView) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7aiohttp_10_multidict__KeysView = &__pyx_type_7aiohttp_10_multidict__KeysView;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct____repr__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 106; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct____repr__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict___pyx_scope_struct____repr__.tp_print = 0;
   __pyx_ptype_7aiohttp_10_multidict___pyx_scope_struct____repr__ = &__pyx_type_7aiohttp_10_multidict___pyx_scope_struct____repr__;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_1_genexpr) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_1_genexpr) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict___pyx_scope_struct_1_genexpr.tp_print = 0;
   __pyx_ptype_7aiohttp_10_multidict___pyx_scope_struct_1_genexpr = &__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_1_genexpr;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_2___and__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_2___and__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 402; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict___pyx_scope_struct_2___and__.tp_print = 0;
   __pyx_ptype_7aiohttp_10_multidict___pyx_scope_struct_2___and__ = &__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_2___and__;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_3_genexpr) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_3_genexpr) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict___pyx_scope_struct_3_genexpr.tp_print = 0;
   __pyx_ptype_7aiohttp_10_multidict___pyx_scope_struct_3_genexpr = &__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_3_genexpr;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_4___iter__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 446; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_4___iter__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict___pyx_scope_struct_4___iter__.tp_print = 0;
   __pyx_ptype_7aiohttp_10_multidict___pyx_scope_struct_4___iter__ = &__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_4___iter__;
-  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_5___iter__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_5___iter__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 485; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7aiohttp_10_multidict___pyx_scope_struct_5___iter__.tp_print = 0;
   __pyx_ptype_7aiohttp_10_multidict___pyx_scope_struct_5___iter__ = &__pyx_type_7aiohttp_10_multidict___pyx_scope_struct_5___iter__;
   /*--- Type import code ---*/
@@ -12344,8 +12354,8 @@ PyMODINIT_FUNC PyInit__multidict(void)
  * 
  * 
  * class upstr(str):             # <<<<<<<<<<<<<<
- *     """Case insensitive str"""
  * 
+ *     """Case insensitive str."""
  */
   __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -12357,27 +12367,27 @@ PyMODINIT_FUNC PyInit__multidict(void)
   __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_upstr, __pyx_n_s_upstr, (PyObject *) NULL, __pyx_n_s_aiohttp__multidict, __pyx_kp_s_Case_insensitive_str); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "aiohttp/_multidict.pyx":12
- *     """Case insensitive str"""
+  /* "aiohttp/_multidict.pyx":13
+ *     """Case insensitive str."""
  * 
  *     def __new__(cls, val='',             # <<<<<<<<<<<<<<
  *                 encoding=sys.getdefaultencoding(), errors='strict'):
  *         if isinstance(val, (bytes, bytearray, memoryview)):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7aiohttp_10_multidict_5upstr_1__new__, __Pyx_CYFUNCTION_STATICMETHOD, __pyx_n_s_upstr___new, NULL, __pyx_n_s_aiohttp__multidict, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7aiohttp_10_multidict_5upstr_1__new__, __Pyx_CYFUNCTION_STATICMETHOD, __pyx_n_s_upstr___new, NULL, __pyx_n_s_aiohttp__multidict, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_4, sizeof(__pyx_defaults), 1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_4, sizeof(__pyx_defaults), 1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "aiohttp/_multidict.pyx":13
+  /* "aiohttp/_multidict.pyx":14
  * 
  *     def __new__(cls, val='',
  *                 encoding=sys.getdefaultencoding(), errors='strict'):             # <<<<<<<<<<<<<<
  *         if isinstance(val, (bytes, bytearray, memoryview)):
  *             val = str(val, encoding, errors)
  */
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_sys); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_sys); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_getdefaultencoding); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_getdefaultencoding); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_6 = NULL;
@@ -12391,10 +12401,10 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (__pyx_t_6) {
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else {
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -12402,27 +12412,27 @@ PyMODINIT_FUNC PyInit__multidict(void)
   __Pyx_GIVEREF(__pyx_t_5);
   __pyx_t_5 = 0;
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_4, __pyx_pf_7aiohttp_10_multidict_5upstr_4__defaults__);
-  if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_new, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 12; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_new, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "aiohttp/_multidict.pyx":23
+  /* "aiohttp/_multidict.pyx":24
  *         return str.__new__(cls, val)
  * 
  *     def upper(self):             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7aiohttp_10_multidict_5upstr_3upper, 0, __pyx_n_s_upstr_upper, NULL, __pyx_n_s_aiohttp__multidict, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7aiohttp_10_multidict_5upstr_3upper, 0, __pyx_n_s_upstr_upper, NULL, __pyx_n_s_aiohttp__multidict, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_upper, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_upper, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "aiohttp/_multidict.pyx":9
  * 
  * 
  * class upstr(str):             # <<<<<<<<<<<<<<
- *     """Case insensitive str"""
  * 
+ *     """Case insensitive str."""
  */
   __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_upstr, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
@@ -12432,45 +12442,45 @@ PyMODINIT_FUNC PyInit__multidict(void)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":40
+  /* "aiohttp/_multidict.pyx":41
  *         return s
  * 
  *     def getall(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         """
- *         Return a list of all values matching the key (may be an empty list)
+ *         """Return a list of all values matching the key."""
+ *         return self._getall(self._upper(key), default)
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_k__2 = __pyx_t_1;
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":56
+  /* "aiohttp/_multidict.pyx":55
  *         raise KeyError('Key not found: %r' % key)
  * 
  *     def getone(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         """
- *         Get first value matching the key
+ *         """Get first value matching the key."""
+ *         return self._getone(self._upper(key), default)
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 56; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_k__3 = __pyx_t_1;
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":157
+  /* "aiohttp/_multidict.pyx":162
  *         return MultiDict(self._items)
  * 
  * abc.Mapping.register(MultiDictProxy)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -12484,35 +12494,35 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDictProxy))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDictProxy))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDictProxy)));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDictProxy)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDictProxy)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":181
+  /* "aiohttp/_multidict.pyx":187
  * 
  * 
  * abc.Mapping.register(CIMultiDictProxy)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Mapping); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -12526,48 +12536,48 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDictProxy))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDictProxy))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDictProxy)));
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDictProxy)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDictProxy)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":295
+  /* "aiohttp/_multidict.pyx":300
  *         return default
  * 
  *     def pop(self, key, default=_marker):             # <<<<<<<<<<<<<<
- *         cdef int found
- *         cdef str skey
+ *         """Remove specified key and return the corresponding value.
+ * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_marker); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 300; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_k__6 = __pyx_t_1;
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":325
+  /* "aiohttp/_multidict.pyx":338
  * 
  * 
  * abc.MutableMapping.register(MultiDict)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_MutableMapping); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_MutableMapping); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -12581,35 +12591,35 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict)));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_MultiDict)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":338
+  /* "aiohttp/_multidict.pyx":351
  * 
  * 
  * abc.MutableMapping.register(CIMultiDict)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_MutableMapping); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_MutableMapping); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -12623,35 +12633,35 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict)));
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict_CIMultiDict)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":434
+  /* "aiohttp/_multidict.pyx":447
  * 
  * 
  * abc.ItemsView.register(_ItemsView)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ItemsView); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ItemsView); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -12665,35 +12675,35 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView)));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ItemsView)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":452
+  /* "aiohttp/_multidict.pyx":465
  * 
  * 
  * abc.ValuesView.register(_ValuesView)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ValuesView); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ValuesView); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -12707,33 +12717,33 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView)));
     PyTuple_SET_ITEM(__pyx_t_3, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__ValuesView)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "aiohttp/_multidict.pyx":478
+  /* "aiohttp/_multidict.pyx":491
  * 
  * 
  * abc.KeysView.register(_KeysView)             # <<<<<<<<<<<<<<
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_abc); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_KeysView); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_KeysView); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_register); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -12747,16 +12757,16 @@ PyMODINIT_FUNC PyInit__multidict(void)
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView))); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView)));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView)));
     __Pyx_GIVEREF(((PyObject *)((PyObject*)__pyx_ptype_7aiohttp_10_multidict__KeysView)));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }

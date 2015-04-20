@@ -21,6 +21,9 @@ class AsyncSocket(object):
         if self.sslContext is None:
             self.sslContext = ssl._create_stdlib_context(certfile = certfile, keyfile = keyfile)
 
+    def __del__(self):
+        self.close()
+
     def setsockopt(self, *args, **kwargs):
         return self.sock.setsockopt(*args, **kwargs)
 

@@ -1,6 +1,9 @@
 """http related errors."""
 
-__all__ = [
+from asyncio import TimeoutError
+
+
+__all__ = (
     'DisconnectedError', 'ClientDisconnectedError', 'ServerDisconnectedError',
 
     'HttpProcessingError', 'BadHttpMessage',
@@ -9,13 +12,13 @@ __all__ = [
 
     'ClientError', 'ClientHttpProcessingError', 'ClientConnectionError',
     'ClientOSError', 'ClientTimeoutError', 'ProxyConnectionError',
-    'ClientRequestError', 'ClientResponseError', 'WSClientDisconnectedError']
+    'ClientRequestError', 'ClientResponseError',
 
-from asyncio import TimeoutError
+    'WSServerHandshakeError', 'WSClientDisconnectedError')
 
 
 class DisconnectedError(Exception):
-    """disconnected."""
+    """Disconnected."""
 
 
 class ClientDisconnectedError(DisconnectedError):
@@ -27,20 +30,7 @@ class ServerDisconnectedError(DisconnectedError):
 
 
 class WSClientDisconnectedError(ClientDisconnectedError):
-    """Raised on closing server websocket."""
-
-    def __init__(self, code=None, message=None):
-        super().__init__(code, message)
-
-    @property
-    def code(self):
-        """Code from websocket closing frame."""
-        return self.args[0]
-
-    @property
-    def message(self):
-        """Message from websocket closing frame."""
-        return self.args[1]
+    """Deprecated."""
 
 
 class ClientError(Exception):
@@ -100,6 +90,13 @@ class HttpProcessingError(Exception):
         self.message = message
 
         super().__init__("%s, message='%s'" % (self.code, message))
+
+
+class WSServerHandshakeError(HttpProcessingError):
+    """websocket server handshake error."""
+
+    def __init__(self, message, *, headers=None):
+        super().__init__(message=message, headers=headers)
 
 
 class HttpProxyError(HttpProcessingError):

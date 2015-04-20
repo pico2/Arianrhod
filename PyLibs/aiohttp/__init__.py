@@ -1,6 +1,6 @@
 # This relies on each of the submodules having an __all__ variable.
 
-__version__ = '0.14.4'
+__version__ = '0.15.2'
 
 
 from . import hdrs  # noqa
@@ -12,6 +12,8 @@ from .helpers import *  # noqa
 from .parsers import *  # noqa
 from .streams import *  # noqa
 from .multidict import *  # noqa
+from .multipart import *  # noqa
+from .websocket_client import *  # noqa
 
 
 __all__ = (client.__all__ +
@@ -22,4 +24,6 @@ __all__ = (client.__all__ +
            connector.__all__ +
            streams.__all__ +
            multidict.__all__ +
-           ['hdrs', '__version__'])
+           multipart.__all__ +
+           websocket_client.__all__ +
+           ('hdrs', '__version__'))

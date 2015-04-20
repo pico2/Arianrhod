@@ -84,7 +84,6 @@ class _ClientRequest(aiohttp.client.ClientRequest):
             else:
                 c[name] = value
 
-        # ibp()
         self.headers['Cookie'] = c.output(header='', sep=';', attrs = {}).strip()
 
     def update_headers(self, headers):
@@ -112,6 +111,90 @@ class _ClientRequest(aiohttp.client.ClientRequest):
         # add host
         if 'HOST' not in self.headers:
             self.headers['Host'] = self.netloc
+
+class ProxyConnector(aiohttp.connector.ProxyConnector):
+    def setProxy(self, host, port, login = None, password = None, encoding = 'latin1'):
+        self._proxy = 'http://%s:%d' % (host, port)
+        if login is not None and password is not None:
+            self._proxy_auth = aiohttp.helpers.BasicAuth(login, password, encoding)
+
+    @asyncio.coroutine
+    def _create_connection(self, req, **kwargs):
+        import aiohttp.hdrs as hdrs
+
+        proxy_req = _ClientRequest(
+                        hdrs.METH_GET,
+                        self._proxy,
+                        headers = {hdrs.HOST: req.host},
+                        auth    = self._proxy_auth,
+                        loop    = self._loop
+                    )
+
+        try:
+            transport, proto = yield from super()._create_connection(proxy_req)
+        except OSError as exc:
+            raise aiohttp.ProxyConnectionError(*exc.args) from exc
+
+        if not req.ssl:
+            req.path = '{scheme}://{host}{path}'.format(
+                            scheme = req.scheme,
+                            host   = req.netloc,
+                            path   = req.path
+                        )
+
+        if hdrs.AUTHORIZATION in proxy_req.headers:
+            auth = proxy_req.headers[hdrs.AUTHORIZATION]
+            del proxy_req.headers[hdrs.AUTHORIZATION]
+            req.headers[hdrs.PROXY_AUTHORIZATION] = auth
+            proxy_req.headers[hdrs.PROXY_AUTHORIZATION] = auth
+
+        if req.ssl:
+            # For HTTPS requests over HTTP proxy
+            # we must notify proxy to tunnel connection
+            # so we send CONNECT command:
+            #   CONNECT www.python.org:443 HTTP/1.1
+            #   Host: www.python.org
+            #
+            # next we must do TLS handshake and so on
+            # to do this we must wrap raw socket into secure one
+            # asyncio handles this perfectly
+            proxy_req.method = hdrs.METH_CONNECT
+            proxy_req.path = '{}:{}'.format(req.host, req.port)
+            key = (req.host, req.port, req.ssl)
+            conn = aiohttp.connector.Connection(
+                        self,
+                        key,
+                        proxy_req,
+                        transport,
+                        proto,
+                        self._loop
+                    )
+
+            proxy_resp = proxy_req.send(conn.writer, conn.reader)
+            try:
+                resp = yield from proxy_resp.start(conn, True)
+            except:
+                proxy_resp.close()
+                conn.close()
+                raise
+            else:
+                if resp.status != 200:
+                    raise aiohttp.HttpProxyError(code=resp.status, message=resp.reason)
+                rawsock = transport.get_extra_info('socket', default=None)
+                if rawsock is None:
+                    raise RuntimeError("Transport does not expose socket instance")
+
+                transport.pause_reading()
+                transport, proto = yield from self._loop.create_connection(
+                                        self._factory,
+                                        ssl             = True,
+                                        sock            = rawsock,
+                                        server_hostname = req.host,
+                                        **kwargs
+                                    )
+
+        return transport, proto
+
 
 class AsyncHttp(object):
     class Response(object):
@@ -145,7 +228,7 @@ class AsyncHttp(object):
     def __init__(self, *, loop = None, timeout = 30, cookie_class = http.cookies.BaseCookie):
         self.loop = loop or asyncio.get_event_loop()
         self.TCPConnector = aiohttp.connector.TCPConnector(verify_ssl = False, share_cookies = True, loop = self.loop)
-        self.ProxyConnector = aiohttp.connector.ProxyConnector('http://localhost:80', verify_ssl = False, share_cookies = True, loop = self.loop)
+        self.ProxyConnector = ProxyConnector('http://localhost:80', verify_ssl = False, share_cookies = True, loop = self.loop)
 
         self.TCPConnector.cookies = cookie_class()
         self.ProxyConnector.cookies = cookie_class()
@@ -173,10 +256,7 @@ class AsyncHttp(object):
             self.connector = self.ProxyConnector
             self.SetCookies(self.TCPConnector.cookies)
 
-        self.ProxyConnector._proxy = 'http://%s:%d' % (host, port)
-
-        if login is not None and password is not None:
-            self.ProxyConnector._proxy_auth = aiohttp.helpers.BasicAuth(login, password, encoding)
+        self.ProxyConnector.setProxy(host, port, login, password, encoding)
 
     def ClearProxy(self):
         if self.connector is not self.ProxyConnector:

@@ -1,11 +1,5 @@
 """Http related parsers and protocol."""
 
-__all__ = ['HttpMessage', 'Request', 'Response',
-           'HttpVersion', 'HttpVersion10', 'HttpVersion11',
-           'RawRequestMessage', 'RawResponseMessage',
-           'HttpPrefixParser', 'HttpRequestParser', 'HttpResponseParser',
-           'HttpPayloadParser']
-
 import collections
 import functools
 import http.server
@@ -20,6 +14,12 @@ import aiohttp
 from . import errors, hdrs
 from .multidict import CIMultiDict
 from .log import internal_logger
+
+__all__ = ('HttpMessage', 'Request', 'Response',
+           'HttpVersion', 'HttpVersion10', 'HttpVersion11',
+           'RawRequestMessage', 'RawResponseMessage',
+           'HttpPrefixParser', 'HttpRequestParser', 'HttpResponseParser',
+           'HttpPayloadParser')
 
 ASCIISET = set(string.printable)
 METHRE = re.compile('[A-Z0-9$-_.]+')
@@ -145,7 +145,7 @@ class HttpPrefixParser:
         if self.allowed_methods and method not in self.allowed_methods:
             raise errors.HttpMethodNotAllowed(message=method)
 
-        out.feed_data(method)
+        out.feed_data(method, len(method))
         out.feed_eof()
 
 
@@ -179,21 +179,27 @@ class HttpRequestParser(HttpParser):
             raise errors.BadStatusLine(method)
 
         # version
-        match = VERSRE.match(version)
-        if match is None:
+        try:
+            if version.startswith('HTTP/'):
+                n1, n2 = version[5:].split('.', 1)
+                version = HttpVersion(int(n1), int(n2))
+            else:
+                raise errors.BadStatusLine(version)
+        except:
             raise errors.BadStatusLine(version)
-        version = HttpVersion(int(match.group(1)), int(match.group(2)))
 
         # read headers
         headers, close, compression = self.parse_headers(lines)
-        if version <= HttpVersion10:
-            close = True
-        elif close is None:
-            close = False
+        if close is None:  # then the headers weren't set in the request
+            if version <= HttpVersion10:  # HTTP 1.0 must asks to not close
+                close = True
+            else:  # HTTP 1.1 must ask to close.
+                close = False
 
         out.feed_data(
             RawRequestMessage(
-                method, path, version, headers, close, compression))
+                method, path, version, headers, close, compression),
+            len(raw_data))
         out.feed_eof()
 
 
@@ -249,7 +255,8 @@ class HttpResponseParser(HttpParser):
         out.feed_data(
             RawResponseMessage(
                 version, status, reason.strip(),
-                headers, close, compression))
+                headers, close, compression),
+            len(raw_data))
         out.feed_eof()
 
 
@@ -323,7 +330,7 @@ class HttpPayloadParser:
             # read chunk and feed buffer
             while size:
                 chunk = yield from buf.readsome(size)
-                out.feed_data(chunk)
+                out.feed_data(chunk, len(chunk))
                 size = size - len(chunk)
 
             # toss the CRLF at the end of the chunk
@@ -337,14 +344,15 @@ class HttpPayloadParser:
         required = length
         while required:
             chunk = yield from buf.readsome(required)
-            out.feed_data(chunk)
+            out.feed_data(chunk, len(chunk))
             required -= len(chunk)
 
     def parse_eof_payload(self, out, buf):
         """Read all bytes until eof."""
         try:
             while True:
-                out.feed_data((yield from buf.readsome()))
+                chunk = yield from buf.readsome()
+                out.feed_data(chunk, len(chunk))
         except aiohttp.EofStream:
             pass
 
@@ -359,17 +367,18 @@ class DeflateBuffer:
 
         self.zlib = zlib.decompressobj(wbits=zlib_mode)
 
-    def feed_data(self, chunk):
+    def feed_data(self, chunk, size):
         try:
             chunk = self.zlib.decompress(chunk)
         except Exception:
             raise errors.ContentEncodingError('deflate')
 
         if chunk:
-            self.out.feed_data(chunk)
+            self.out.feed_data(chunk, len(chunk))
 
     def feed_eof(self):
-        self.out.feed_data(self.zlib.flush())
+        chunk = self.zlib.flush()
+        self.out.feed_data(chunk, len(chunk))
         if not self.zlib.eof:
             raise errors.ContentEncodingError('deflate')
 
@@ -528,13 +537,7 @@ class HttpMessage:
         self.transport = transport
         self.version = version
         self.closing = close
-
-        # disable keep-alive for http/1.0
-        if version <= HttpVersion10:
-            self.keepalive = False
-        else:
-            self.keepalive = None
-
+        self.keepalive = None
         self.chunked = False
         self.length = None
         self.headers = CIMultiDict()
@@ -551,7 +554,16 @@ class HttpMessage:
 
     def keep_alive(self):
         if self.keepalive is None:
-            return not self.closing
+            if self.version < HttpVersion10:
+                # keep alive not supported at all
+                return False
+            if self.version == HttpVersion10:
+                if self.headers.get(hdrs.CONNECTION) == 'keep-alive':
+                    return True
+                else:  # no headers means we close for Http 1.0
+                    return False
+            else:
+                return not self.closing
         else:
             return self.keepalive
 
@@ -587,7 +599,7 @@ class HttpMessage:
             # connection keep-alive
             elif 'close' in val:
                 self.keepalive = False
-            elif 'keep-alive' in val and self.version >= HttpVersion11:
+            elif 'keep-alive' in val:
                 self.keepalive = True
 
         elif name == hdrs.UPGRADE:
@@ -604,7 +616,7 @@ class HttpMessage:
         for name, value in headers:
             self.add_header(name, value)
 
-    def send_headers(self):
+    def send_headers(self, _sep=': ', _end='\r\n'):
         """Writes headers to a stream. Constructs payload writer."""
         # Chunked response is only for HTTP/1.1 clients or newer
         # and there is no Content-Length header is set.
@@ -632,9 +644,7 @@ class HttpMessage:
         # status + headers
         headers = ''.join(itertools.chain(
             (self.status_line,),
-            *((k, ': ', v, '\r\n')
-              for k, v in ((k, value)
-                           for k, value in self.headers.items()))))
+            *((k, _sep, v, _end) for k, v in self.headers.items())))
         headers = headers.encode('utf-8') + b'\r\n'
 
         self.output_length += len(headers)
@@ -651,7 +661,8 @@ class HttpMessage:
 
         self.headers[hdrs.CONNECTION] = connection
 
-    def write(self, chunk, *, EOF_MARKER=EOF_MARKER, EOL_MARKER=EOL_MARKER):
+    def write(self, chunk, *,
+              drain=False, EOF_MARKER=EOF_MARKER, EOL_MARKER=EOL_MARKER):
         """Writes chunk of data to a stream by using different writers.
 
         writer uses filter to modify chunk of data.
@@ -681,10 +692,11 @@ class HttpMessage:
         self._output_size += self.output_length - size
 
         if self._output_size > 64 * 1024:
-            self._output_size = 0
-            return self.transport.drain()
-        else:
-            return ()
+            if drain:
+                self._output_size = 0
+                return self.transport.drain()
+
+        return ()
 
     def write_eof(self):
         self.write(EOF_MARKER)
@@ -724,12 +736,12 @@ class HttpMessage:
                 l = len(chunk)
                 if length >= l:
                     self.transport.write(chunk)
-                    self.output_length += len(chunk)
+                    self.output_length += l
+                    length = length-l
                 else:
                     self.transport.write(chunk[:length])
                     self.output_length += length
-
-                length = max(0, length-l)
+                    length = 0
 
     def _write_eof_payload(self):
         while True:
@@ -830,6 +842,11 @@ class Request(HttpMessage):
 
     def __init__(self, transport, method, path,
                  http_version=HttpVersion11, close=False):
+        # set the default for HTTP 1.0 to be different
+        # will only be overwritten with keep-alive header
+        if http_version < HttpVersion11:
+            close = True
+
         super().__init__(transport, http_version, close)
 
         self.method = method
