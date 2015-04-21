@@ -1,5 +1,14 @@
 from ml import *
-import py_compile, zipfile, shutil
+import py_compile, zipfile, shutil, zlib
+
+def _get_compressor(compress_type):
+    if compress_type == zipfile.ZIP_DEFLATED:
+        return zlib.compressobj(zlib.Z_BEST_COMPRESSION, zlib.DEFLATED, -15)
+    else:
+        return old_get_compressor(compress_type)
+
+old_get_compressor = zipfile._get_compressor
+zipfile._get_compressor = _get_compressor
 
 def main():
 
@@ -17,8 +26,7 @@ def main():
 
     pythonzip = zipfile.ZipFile(selfpath + 'python.zip', 'w')
 
-    ignores = \
-    [
+    ignores = [
         'test',
         'site-packages\\PyQt',
         'site-packages\\IPython-',
@@ -34,8 +42,7 @@ def main():
         # 'site-packages\\readline.py',
     ]
 
-    copytrees = \
-    [
+    copytrees = [
         (False, 'site-packages\\MyPyLibrary\\PyOcrHelper'),
         (False, 'site-packages\\PIL'),
         (False, 'site-packages\\Crypto'),
@@ -55,7 +62,12 @@ def main():
     for do_not_compile, x in copytrees:
         src = pylib + '\\' + x + '\\'
         dst = selfpath + 'UserSite\\' + os.path.basename(x) + '\\'
-        ignore_patterns = ['__pycache__']
+
+        ignore_patterns = [
+            '__pycache__',
+            'crypto\\selftest',
+        ]
+
         for f in EnumDirectoryFiles(src):
             found = False
             for ignore in ignore_patterns:
