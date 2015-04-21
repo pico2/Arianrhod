@@ -1,11 +1,26 @@
 @echo off
+
+if not exist "Files\" goto:eof
+
 cd/d "%~dp0\Files\Bin"
 
-copy ..\..\QQ2013\Bin\Amano.dll .
+copy ..\..\QQ\Bin\netapi32.dll .
 
 set DEBUG=
 
-for %%f in (auclt.exe QQApp.exe QQExternal.exe QQPI.exe QQSafeUD.exe StorageTool.exe Tencentdl.exe Timwp.exe TXPlatform.exe QScanEngine.dll) do (
+for %%f in (^
+    auclt.exe ^
+    QQApp.exe ^
+    QQPI.exe ^
+    QQSafeUD.exe ^
+    StorageTool.exe ^
+    Tencentdl.exe ^
+    maLauncher.exe ^
+    maUpdat.exe ^
+    QPerfHelper.exe ^
+    QScanEngine.dll
+) do (
+
     %DEBUG% ren %%f %%~nf2%%~xf
 )
 
@@ -13,15 +28,17 @@ cd..
 
 rd/s/q QQProtect
 
-echo D|xcopy /y /e ..\QQ2013\Misc\Sound .\Misc\Sound
+echo D|xcopy /y /e ..\QQ\Misc\Sound .\Misc\Sound
+echo D|xcopy /y /e ..\QQ\QQProtect .\QQProtect
 
 del QQUninst.exe txupd.exe
 
 cd Plugin
 
+md Disabled
+
 for %%p in (^
     Com.Tencent.Advertisement ^
-    Com.Tencent.CRM ^
     Com.Tencent.GameLife ^
     Com.Tencent.Graffito ^
     Com.Tencent.HRTX ^
@@ -48,5 +65,15 @@ for %%p in (^
     Com.Tencent.Winks
 ) do (
 
-    %DEBUG% rd/s/q %%p
+    rem %DEBUG% rd/s/q %%p
+    rem %DEBUG% move %%p Disabled
+    echo. > %%p\Disabled
 )
+
+echo on
+
+:rename
+
+cd/d "%~dp0"
+ren QQ QQ2
+ren Files QQ
