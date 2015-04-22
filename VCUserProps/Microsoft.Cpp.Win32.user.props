@@ -23,7 +23,7 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>USE_NT_VER=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <CallingConvention>FastCall</CallingConvention>
+      <!-- <CallingConvention>FastCall</CallingConvention> -->
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
