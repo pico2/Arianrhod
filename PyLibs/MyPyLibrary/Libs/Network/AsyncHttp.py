@@ -2,6 +2,7 @@ from Libs.Misc.SysLib import *
 import aiohttp
 import asyncio
 import http.cookies
+import urllib
 
 class Request(aiohttp.Request):
     def __init__(self, *args, **kwargs):
@@ -64,6 +65,42 @@ class _CaseInsensitiveDict(CaseInsensitiveDict):
         return super().items()
 
 class _ClientRequest(aiohttp.client.ClientRequest):
+    def __init__(self, *args, noQuotoPath = False, **kwargs):
+        self.noQuotoPath = noQuotoPath
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def factory(cls, **customArgs):
+        def wrapper(*args, **kwargs):
+            kwargs.update(customArgs)
+            return cls(*args, **kwargs)
+
+        return wrapper
+
+    def update_path(self, params):
+        """Build path."""
+        # extract path
+        scheme, netloc, path, query, fragment = urllib.parse.urlsplit(self.url)
+        if not path:
+            path = '/'
+
+        if isinstance(params, dict):
+            params = list(params.items())
+        elif isinstance(params, (aiohttp.MultiDictProxy, aiohttp.MultiDict)):
+            params = list(params.items())
+
+        if params:
+            params = urllib.parse.urlencode(params)
+            if query:
+                query = '%s&%s' % (query, params)
+            else:
+                query = params
+
+        if not self.noQuotoPath:
+            path = urllib.parse.quote(path, safe='/%:')
+
+        self.path = urllib.parse.urlunsplit(('', '', path, query, fragment))
+
     def update_cookies(self, cookies):
         """Update request cookies header."""
         if not cookies:
@@ -122,7 +159,7 @@ class ProxyConnector(aiohttp.connector.ProxyConnector):
     def _create_connection(self, req, **kwargs):
         import aiohttp.hdrs as hdrs
 
-        proxy_req = _ClientRequest(
+        proxy_req = _ClientRequest.factory()(
                         hdrs.METH_GET,
                         self._proxy,
                         headers = {hdrs.HOST: req.host},
@@ -267,8 +304,16 @@ class AsyncHttp(object):
 
     @asyncio.coroutine
     def request(self, method, url, **kwargs):
+        params = {}
+
+        for key in ['noQuotoPath']:
+            try:
+                params[key] = kwargs.pop(key)
+            except KeyError:
+                pass
+
         kwargs['connector'] = self.connector
-        kwargs['request_class'] = _ClientRequest
+        kwargs['request_class'] = _ClientRequest.factory(**params)
 
         if 'headers' not in kwargs:
             kwargs['headers'] = self.headers
