@@ -136,7 +136,7 @@ class ASYNC_POP3(asyncio.Protocol):
         index = self.buffer.find(b'\n')
 
         while index == -1:
-            yield from asyncio.sleep(0.01)
+            yield from asyncio.sleep(0.1)
             index = self.buffer.find(b'\n')
 
         line = self.buffer[:index + 1]
