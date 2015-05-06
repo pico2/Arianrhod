@@ -326,10 +326,9 @@ class AsyncHttp(object):
 
         try:
             response = yield from asyncio.wait_for(aiohttp.request(method, url, **kwargs), self.timeout)
+            content = yield from asyncio.wait_for(response.read(), self.timeout)
         except asyncio.TimeoutError:
             raise asyncio.TimeoutError('%s %s timeout: %s' % (method, url, self.timeout))
-
-        content = yield from response.read()
 
         return self.Response(response, content)
 
