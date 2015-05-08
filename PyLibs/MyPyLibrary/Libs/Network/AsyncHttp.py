@@ -275,6 +275,13 @@ class AsyncHttp(object):
 
         self.connector = self.TCPConnector
 
+    def __del__(self):
+        self.close()
+
+    def close(self):
+        self.TCPConnector.close()
+        self.ProxyConnector.close()
+
     @property
     def cookies(self):
         return self.connector.cookies

@@ -79,6 +79,9 @@ class ASYNC_POP3(asyncio.Protocol):
         self.buffer = bytearray()
         self.transport = None
 
+    def __del__(self):
+        self.close()
+
     @asyncio.coroutine
     def init(self):
         yield from self.create_connection()
@@ -313,20 +316,9 @@ class ASYNC_POP3(asyncio.Protocol):
         return resp
 
     def close(self):
-        """Close the connection without assuming anything about it."""
-        if self.sock is not None:
-            try:
-                self.sock.shutdown(socket.SHUT_RDWR)
-            except OSError as e:
-                # The server might already have closed the connection
-                if e.errno != errno.ENOTCONN:
-                    raise
-            finally:
-                self.sock.close()
+        self.transport and self.transport.close()
 
-        self.sock = None
-
-    #__del__ = quit
+    # __del__ = quit
 
 
     # optional commands:
