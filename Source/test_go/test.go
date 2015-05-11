@@ -9,7 +9,7 @@ import (
 func testString() (r int) {
     s := Str("fuck")
 
-    s = "ffa fuck2 " + "fuck"
+    s = `ffa fuck2 ` + `fuck`
 
     Printf("%+v\n", s)
     Println((&s).Replace("f", "fuck you f"))
@@ -44,10 +44,20 @@ func testArray() {
     }
 }
 
+func testNamedReturn() (i int, s string) {
+    i, s = 1, "2"
+    return
+    return 0, "1"
+}
+
 func main() {
     testString()
     Println()
     testArray()
+    testNamedReturn()
+
+    defer print("defer\n")
+    panic("fuck you")
 
     console.Pause()
 }
