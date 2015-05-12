@@ -700,7 +700,7 @@ def _AddEqualsMethod(message_descriptor, cls):
 def _AddStrMethod(message_descriptor, cls):
   """Helper for _AddMessageMethods()."""
   def __str__(self):
-    return bytestr_to_string(text_format.MessageToString(self, as_utf8 = True))
+    return bytestr_to_string(text_format.MessageToString(self))
   cls.__str__ = __str__
 
 

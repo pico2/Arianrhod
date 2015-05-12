@@ -149,7 +149,7 @@ def PrintFieldValue(field, value, out, indent=0,
   elif field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_STRING:
     out.write(b('\"'))
     if type(value) is unicode:
-      out.write(_CEscape(value.encode('utf-8'), as_utf8))
+      out.write(_CEscape(value.encode('utf-8'), True))
     else:
       out.write(_CEscape(value, as_utf8))
     out.write(b('\"'))
