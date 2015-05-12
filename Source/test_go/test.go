@@ -4,6 +4,7 @@ import (
     . "ml"
     . "fmt"
     . "ml/dict"
+    "os"
 )
 
 func testString() (r int) {
@@ -59,11 +60,19 @@ func testDict() {
 func main() {
     testString()
     Println()
+
     testArray()
     Println()
+
     testNamedReturn()
     Println()
+
     testDict()
+    Println()
+
+    for _, v := range os.Args {
+        Println(v)
+    }
 
     Console.Pause()
 }
