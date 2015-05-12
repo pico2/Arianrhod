@@ -2,14 +2,15 @@ package main
 
 import (
     . "ml"
-    "ml/console"
     . "fmt"
+    . "ml/dict"
 )
 
 func testString() (r int) {
     s := Str("fuck")
 
-    s = `ffa fuck2 ` + `fuck`
+    s = `ffa fuck2 `
+    s += `fuck`
 
     Printf("%+v\n", s)
     Println((&s).Replace("f", "fuck you f"))
@@ -30,7 +31,6 @@ func testArray() {
     arr := Array(1, 2, 3, 4)
 
     arr.Append(1, 5, 432, "fuck", 1.555, 73.88)
-
     arr.Remove("fuck")
 
     for _, v := range arr {
@@ -50,14 +50,20 @@ func testNamedReturn() (i int, s string) {
     return 0, "1"
 }
 
+func testDict() {
+    x := Dict{1 : 2, "fuck" : 3.33}
+    Println(x)
+    _ = x
+}
+
 func main() {
     testString()
     Println()
     testArray()
+    Println()
     testNamedReturn()
+    Println()
+    testDict()
 
-    defer print("defer\n")
-    panic("fuck you")
-
-    console.Pause()
+    Console.Pause()
 }
