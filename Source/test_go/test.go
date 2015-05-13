@@ -62,9 +62,9 @@ func testLogger() {
     logger := logger.New("fuck")
     _ = logger
 
-    logger.SetLevel(20)
+    // logger.SetLevel(20)
 
-    logger.Debug("fuck")
+    logger.Debug("fuck中文")
 }
 
 func main() {

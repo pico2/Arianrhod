@@ -16,7 +16,7 @@ type Logger struct {
     level       int
     callDepth   int
     tag         str.String
-    out         io.Writer
+    out         []io.Writer
 }
 
 const (
@@ -67,6 +67,7 @@ func (self *Logger) output(level int, format str.String, args ...interface{}) {
     if !ok {
         file = "???"
         line = -1
+        pc = 0
     }
 
     text := fmt.Sprintf(string(format), args...)
@@ -107,7 +108,9 @@ func (self *Logger) output(level int, format str.String, args ...interface{}) {
 
     buf := []byte(format + str.String(text) + "\n")
 
-    self.out.Write(buf)
+    for _, out := range self.out {
+        out.Write(buf)
+    }
 }
 
 func (self *Logger) Debug(format str.String, args ...interface{}) {
@@ -153,7 +156,7 @@ func New(tag str.String) Logger {
                level        : DEBUG,
                tag          : tag,
                callDepth    : 10,
-               out          : os.Stdout,
+               out          : []io.Writer{os.Stdout},
             }
 }
 
