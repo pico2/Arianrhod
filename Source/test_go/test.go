@@ -5,6 +5,7 @@ import (
     . "fmt"
     . "ml/dict"
     "os"
+    "ml/logger"
 )
 
 func testString() (r int) {
@@ -57,6 +58,15 @@ func testDict() {
     _ = x
 }
 
+func testLogger() {
+    logger := logger.New("fuck")
+    _ = logger
+
+    logger.SetLevel(20)
+
+    logger.Debug("fuck")
+}
+
 func main() {
     testString()
     Println()
@@ -68,6 +78,9 @@ func main() {
     Println()
 
     testDict()
+    Println()
+
+    testLogger()
     Println()
 
     for _, v := range os.Args {

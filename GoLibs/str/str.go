@@ -40,6 +40,10 @@ func (self *String) Count(sep String) int {
     return strings.Count(string(*self), string(sep))
 }
 
+func (self *String) Find(sub String) int {
+    return self.Index(sub)
+}
+
 func (self *String) Index(sep String) int {
     return strings.Index(string(*self), string(sep))
 }
