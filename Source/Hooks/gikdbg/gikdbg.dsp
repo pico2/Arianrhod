@@ -62,5 +62,13 @@ SOURCE=.\gikdbg.cpp
 
 SOURCE=.\gikdbg.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\Menu.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Menu.h
+# End Source File
 # End Target
 # End Project
