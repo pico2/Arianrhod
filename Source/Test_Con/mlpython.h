@@ -254,7 +254,7 @@ struct PyTypeConverter<ml::String>
 {
     static PyObject* FromNative(const ml::String &object)
     {
-        return PyUnicode_FromUnicode(object, object.GetCount());
+        return PyUnicode_FromUnicode(object, (Py_ssize_t)object.GetCount());
     }
 
     static ml::String ToNative(PyObject *object)
@@ -528,7 +528,7 @@ public:
 
     MlPyObject(const ml::String& str)
     {
-        this->object = PyUnicode_FromUnicode(str, str.GetCount());
+        this->object = PyUnicode_FromUnicode(str, (Py_ssize_t)str.GetCount());
     }
 
     NoInline ~MlPyObject()
@@ -993,7 +993,7 @@ public:
         PYSTATUS    status;
         PyObject*   Module;
 
-        Module = PyImport_AddModuleObject(MlPyObject(PyUnicode_FromUnicode(ModuleName, ModuleName.GetCount())));
+        Module = PyImport_AddModuleObject(MlPyObject(PyUnicode_FromUnicode(ModuleName, (Py_ssize_t)ModuleName.GetCount())));
         if (Module == nullptr)
             return PYSTATUS_CREATE_MODULE_FAILED;
 
@@ -1010,7 +1010,7 @@ public:
     {
         PyObject *name, *module;
 
-        name = PyUnicode_FromUnicode(ModuleName, ModuleName.GetCount());
+        name = PyUnicode_FromUnicode(ModuleName, (Py_ssize_t)ModuleName.GetCount());
         if (name == nullptr)
             return nullptr;
 
@@ -1029,7 +1029,7 @@ public:
             return nullptr;
 
         attr = nullptr;
-        name = PyUnicode_FromUnicode(AttrName, AttrName.GetCount());
+        name = PyUnicode_FromUnicode(AttrName, (Py_ssize_t)AttrName.GetCount());
         if (name != nullptr)
         {
             attr = PyObject_GetAttr(module, name);
@@ -1297,7 +1297,7 @@ protected:
                 if (obj == nullptr)
                     break;
 
-                MlPyObject name = PyUnicode_FromUnicode(func.Name, func.Name.GetCount());
+                MlPyObject name = PyUnicode_FromUnicode(func.Name, (Py_ssize_t)func.Name.GetCount());
 
                 method = PyObject_GetAttr(obj, name);
                 if (method == nullptr)

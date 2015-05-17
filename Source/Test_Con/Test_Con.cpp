@@ -20,8 +20,7 @@
 
 #define  _DECL_DLLMAIN
 
-#include <ws2spi.h>
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 
 ML_OVERLOAD_NEW
 
@@ -242,18 +241,32 @@ void quick_sort(int *array, int count)
     quick_sort(left, &array[count] - left);
 }
 
+//#define IMPORT_LIBLLDB 1
+
 #include "iTunes/iTunes.h"
+#include "lldb/API/LLDB.h"
+
+#pragma comment(lib, "liblldb.lib")
+
+using namespace lldb;
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    printf("%-3d\n", 3000);
-    printf("%3d\n", 3000);
+    SBDebugger::Initialize();
 
-    SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
-    PauseConsole(L"any key");
-    SetThreadExecutionState(ES_CONTINUOUS);
+    {
+        SBDebugger dbg;
+
+        dbg.SetCurrentPlatform("remote-ios");
+
+        dbg.GetCommandInterpreter().GetProcess().IsValid();
+    }
+
+    SBDebugger::Terminate();
+
+    Ps::ExitProcess(0);
 
     return;
 

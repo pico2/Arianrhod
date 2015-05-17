@@ -44,8 +44,8 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Test_Con</TargetName>
     <TargetExt>.exe</TargetExt>
-    <IncludePath>D:\Desktop\Python3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Desktop\Python3\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Desktop\Python3\include;$(VC_IncludePath);$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);D:\Desktop\Python3\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -54,7 +54,7 @@
     <LibraryPath>D:\Dev\Python\libs;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <OutDir>$(SolutionDir)</OutDir>
-    <IncludePath>D:\Desktop\Python3\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Desktop\Python3\include;$(VC_IncludePath);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -66,8 +66,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <AdditionalIncludeDirectories>E:\Desktop\Source\sources\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_AFXDLL=1;USE_NT_VER=1;WIN32;UNICODE;_CRT_NON_CONFORMING_SWPRINT=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Desktop\xx\llvm\tools\lldb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_AFXDLL=1;USE_NT_VER=1;WIN32;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Release\Test_Con.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Release\</ObjectFileName>
@@ -90,7 +90,7 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>E:\Desktop\freetype-2.1.10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Desktop\xx\release\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ltcg</AdditionalOptions>
       <AdditionalDependencies>mylib_nt.lib;ntdll.lib;undoc_k32.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetName)$(TargetExt)</OutputFile>
