@@ -2,7 +2,6 @@ from mlqt import *
 from .GEvents import *
 
 class EventDispatcher(QObject):
-    # SyncEventReceiver = pyqtSignal(GEvent)
     AutoEventReceiver = pyqtSignal(GEvent)
 
     def __init__(self, DefaultDispatcher = None):
@@ -12,7 +11,6 @@ class EventDispatcher(QObject):
 
         self.DefaultDispatcher = DefaultDispatcher
         Dispatcher = DefaultDispatcher and self.DispatcherWrap or self.Dispatcher
-        # self.SyncEventReceiver.connect(Dispatcher, type = Qt.BlockingQueuedConnection)
         self.AutoEventReceiver.connect(Dispatcher, type = Qt.AutoConnection)
 
     def RegisterEventHandler(self, EventType, Handler):

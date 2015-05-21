@@ -1,6 +1,4 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from .QCommon import *
 
 class QGraphicsGlowEffect(QGraphicsEffect):
     def __init__(self, *, extent = 1, strength = 2, blurRadius = 3.5, color = QColor(38, 41, 44)):
