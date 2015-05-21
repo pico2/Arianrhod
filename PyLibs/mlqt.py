@@ -8,6 +8,7 @@ from PyQt5.QtNetwork import *
 from PyQt5.QtWebKit import *
 
 from MyPyLibrary import QtHelper
+from QtHelper.Extension import *
 
 QEvent.EmbeddingControl = 79
 
