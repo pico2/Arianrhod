@@ -1,6 +1,6 @@
 #############################################################################
 ##
-## Copyright (C) 2014 Riverbank Computing Limited.
+## Copyright (C) 2015 Riverbank Computing Limited.
 ## Copyright (C) 2006 Thorsten Marek.
 ## All right reserved.
 ##
@@ -194,17 +194,22 @@ class UIParser(object):
         self.button_groups = {}
         self.layout_widget = False
 
-    def setupObject(self, clsname, parent, branch, is_attribute = True):
-        name = self.uniqueName(branch.attrib.get("name") or clsname[1:].lower())
+    def setupObject(self, clsname, parent, branch, is_attribute=True):
+        name = self.uniqueName(branch.attrib.get('name') or clsname[1:].lower())
+
         if parent is None:
             args = ()
         else:
             args = (parent, )
-        obj =  self.factory.createQObject(clsname, name, args, is_attribute)
+
+        obj = self.factory.createQObject(clsname, name, args, is_attribute)
+
         self.wprops.setProperties(obj, branch)
         obj.setObjectName(name)
+
         if is_attribute:
             setattr(self.toplevelWidget, name, obj)
+
         return obj
 
     def getProperty(self, elem, name):
@@ -748,6 +753,9 @@ class UIParser(object):
                     w.setVerticalHeaderItem(self.row_counter, item)
                     self.row_counter += 1
 
+    def setZOrder(self, elem):
+        getattr(self.toplevelWidget, elem.text).raise_()
+
     def createAction(self, elem):
         self.setupObject("QAction", self.currentActionGroup or self.toplevelWidget,
                          elem)
@@ -768,6 +776,7 @@ class UIParser(object):
         "actiongroup": createActionGroup,
         "column"    : addHeader,
         "row"       : addHeader,
+        "zorder"    : setZOrder,
         }
 
     def traverseWidgetTree(self, elem):

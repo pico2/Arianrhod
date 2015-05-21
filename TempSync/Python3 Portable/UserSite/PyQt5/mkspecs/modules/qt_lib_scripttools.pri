@@ -1,7 +1,7 @@
-QT.scripttools.VERSION = 5.4.0
+QT.scripttools.VERSION = 5.4.1
 QT.scripttools.MAJOR_VERSION = 5
 QT.scripttools.MINOR_VERSION = 4
-QT.scripttools.PATCH_VERSION = 0
+QT.scripttools.PATCH_VERSION = 1
 QT.scripttools.name = QtScriptTools
 QT.scripttools.libs = $$QT_MODULE_LIB_BASE
 QT.scripttools.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtScriptTools

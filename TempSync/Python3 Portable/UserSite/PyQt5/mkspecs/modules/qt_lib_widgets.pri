@@ -1,7 +1,7 @@
-QT.widgets.VERSION = 5.4.0
+QT.widgets.VERSION = 5.4.1
 QT.widgets.MAJOR_VERSION = 5
 QT.widgets.MINOR_VERSION = 4
-QT.widgets.PATCH_VERSION = 0
+QT.widgets.PATCH_VERSION = 1
 QT.widgets.name = QtWidgets
 QT.widgets.libs = $$QT_MODULE_LIB_BASE
 QT.widgets.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtWidgets

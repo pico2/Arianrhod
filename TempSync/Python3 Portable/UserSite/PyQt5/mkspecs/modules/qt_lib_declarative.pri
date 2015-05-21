@@ -1,7 +1,7 @@
-QT.declarative.VERSION = 5.4.0
+QT.declarative.VERSION = 5.4.1
 QT.declarative.MAJOR_VERSION = 5
 QT.declarative.MINOR_VERSION = 4
-QT.declarative.PATCH_VERSION = 0
+QT.declarative.PATCH_VERSION = 1
 QT.declarative.name = QtDeclarative
 QT.declarative.libs = $$QT_MODULE_LIB_BASE
 QT.declarative.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtDeclarative

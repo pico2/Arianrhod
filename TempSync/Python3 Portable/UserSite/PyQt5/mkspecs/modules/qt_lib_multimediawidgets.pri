@@ -1,7 +1,7 @@
-QT.multimediawidgets.VERSION = 5.4.0
+QT.multimediawidgets.VERSION = 5.4.1
 QT.multimediawidgets.MAJOR_VERSION = 5
 QT.multimediawidgets.MINOR_VERSION = 4
-QT.multimediawidgets.PATCH_VERSION = 0
+QT.multimediawidgets.PATCH_VERSION = 1
 QT.multimediawidgets.name = QtMultimediaWidgets
 QT.multimediawidgets.libs = $$QT_MODULE_LIB_BASE
 QT.multimediawidgets.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtMultimediaWidgets

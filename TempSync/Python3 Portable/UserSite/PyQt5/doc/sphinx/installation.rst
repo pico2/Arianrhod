@@ -30,7 +30,8 @@ depending on your platform) you should then check for any :file:`README` files
 that relate to your platform.
 
 If you are using the commercial version of PyQt5 then you must copy your
-license file to the :file:`sip` directory.
+license file to the :file:`sip` directory, or to the directory specified by the
+:option:`--license-dir` option of :program:`configure.py`.
 
 You need to make sure your environment variables are set properly for your
 development environment.
@@ -120,6 +121,11 @@ The full set of command line options is:
 .. cmdoption:: --help, -h
 
     Display a help message.
+
+.. cmdoption:: --license-dir <DIR>
+
+    The license files needed by the commercial version of PyQt5 can be found in
+    the directory ``<DIR>``.
 
 .. cmdoption:: --no-designer-plugin
 

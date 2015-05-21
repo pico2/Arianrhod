@@ -1,7 +1,7 @@
-QT.webkitwidgets.VERSION = 5.4.0
+QT.webkitwidgets.VERSION = 5.4.1
 QT.webkitwidgets.MAJOR_VERSION = 5
 QT.webkitwidgets.MINOR_VERSION = 4
-QT.webkitwidgets.PATCH_VERSION = 0
+QT.webkitwidgets.PATCH_VERSION = 1
 QT.webkitwidgets.name = QtWebKitWidgets
 QT.webkitwidgets.libs = $$QT_MODULE_LIB_BASE
 QT.webkitwidgets.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtWebKitWidgets

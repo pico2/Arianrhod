@@ -1,7 +1,7 @@
-QT.designer.VERSION = 5.4.0
+QT.designer.VERSION = 5.4.1
 QT.designer.MAJOR_VERSION = 5
 QT.designer.MINOR_VERSION = 4
-QT.designer.PATCH_VERSION = 0
+QT.designer.PATCH_VERSION = 1
 QT.designer.name = QtDesigner
 QT.designer.libs = $$QT_MODULE_LIB_BASE
 QT.designer.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtDesigner

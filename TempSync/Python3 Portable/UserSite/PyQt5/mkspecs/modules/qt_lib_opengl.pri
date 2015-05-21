@@ -1,7 +1,7 @@
-QT.opengl.VERSION = 5.4.0
+QT.opengl.VERSION = 5.4.1
 QT.opengl.MAJOR_VERSION = 5
 QT.opengl.MINOR_VERSION = 4
-QT.opengl.PATCH_VERSION = 0
+QT.opengl.PATCH_VERSION = 1
 QT.opengl.name = QtOpenGL
 QT.opengl.libs = $$QT_MODULE_LIB_BASE
 QT.opengl.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtOpenGL

@@ -133,7 +133,6 @@
     <example filename="hellogl" name="Hello GL" />
     <example filename="openglwindow" name="OpenGL Window" />
     <example filename="overpainting" name="Overpainting" />
-    <example filename="samplebuffers" name="Sample Buffers" />
     <example filename="textures" name="Textures" />
   </category>
   <category dirname="painting" name="Painting">

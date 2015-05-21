@@ -1,7 +1,7 @@
-QT.axcontainer.VERSION = 5.4.0
+QT.axcontainer.VERSION = 5.4.1
 QT.axcontainer.MAJOR_VERSION = 5
 QT.axcontainer.MINOR_VERSION = 4
-QT.axcontainer.PATCH_VERSION = 0
+QT.axcontainer.PATCH_VERSION = 1
 QT.axcontainer.name = QtAxContainer
 QT.axcontainer.libs = $$QT_MODULE_LIB_BASE
 QT.axcontainer.master_header = ActiveQt

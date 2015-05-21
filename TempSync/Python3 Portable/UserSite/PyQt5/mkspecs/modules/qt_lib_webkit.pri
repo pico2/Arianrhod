@@ -1,7 +1,7 @@
-QT.webkit.VERSION = 5.4.0
+QT.webkit.VERSION = 5.4.1
 QT.webkit.MAJOR_VERSION = 5
 QT.webkit.MINOR_VERSION = 4
-QT.webkit.PATCH_VERSION = 0
+QT.webkit.PATCH_VERSION = 1
 QT.webkit.name = QtWebKit
 QT.webkit.libs = $$QT_MODULE_LIB_BASE
 QT.webkit.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtWebKit
