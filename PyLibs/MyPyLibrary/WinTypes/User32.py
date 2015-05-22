@@ -450,7 +450,41 @@ LB_ITEMFROMPOINT                        = 0x01A9
 LB_MULTIPLEADDSTRING                    = 0x01B1
 LB_GETLISTBOXINFO                       = 0x01B2
 
-HTCAPTION                               = 0x0002
+
+#
+# WM_NCHITTEST and MOUSEHOOKSTRUCT Mouse Position Codes
+#
+
+HTERROR                                 = (-2)
+HTTRANSPARENT                           = (-1)
+HTNOWHERE                               = 0
+HTCLIENT                                = 1
+HTCAPTION                               = 2
+HTSYSMENU                               = 3
+HTGROWBOX                               = 4
+HTSIZE                                  = HTGROWBOX
+HTMENU                                  = 5
+HTHSCROLL                               = 6
+HTVSCROLL                               = 7
+HTMINBUTTON                             = 8
+HTMAXBUTTON                             = 9
+HTLEFT                                  = 10
+HTRIGHT                                 = 11
+HTTOP                                   = 12
+HTTOPLEFT                               = 13
+HTTOPRIGHT                              = 14
+HTBOTTOM                                = 15
+HTBOTTOMLEFT                            = 16
+HTBOTTOMRIGHT                           = 17
+HTBORDER                                = 18
+HTREDUCE                                = HTMINBUTTON
+HTZOOM                                  = HTMAXBUTTON
+HTSIZEFIRST                             = HTLEFT
+HTSIZELAST                              = HTBOTTOMRIGHT
+HTOBJECT                                = 19
+HTCLOSE                                 = 20
+HTHELP                                  = 21
+
 
 #
 # SetWindowPos Flags
@@ -1471,6 +1505,9 @@ def SetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, Flags):
 
 def SetParent(child, parent):
     return HWND(windll.user32.SetParent(HWND(child), HWND(parent))).value
+
+def GetWindowRect(hWnd, rect):
+    return __BOOL(windll.user32.GetWindowRect(HWND(hWnd), PRECT(rect)))
 
 def LoadCursorW(hInstance, cursorName):
     if isinstance(cursorName, str):

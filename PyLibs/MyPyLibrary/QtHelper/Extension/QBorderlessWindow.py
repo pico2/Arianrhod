@@ -2,14 +2,14 @@ from .QCommon import *
 from WinTypes import *
 
 class QBorderlessWindow(QObject):
-    def __init__(self, childWindow, hWndParent = 0):
+    def __init__(self, childWindow, title = '', hWndParent = 0):
         super().__init__()
 
         self.childWindow = childWindow
 
         self.windowProc = WNDPROC(self.WindowProc)
-        self.className  = PWSTR('QBorderlessWindow')
-        self.windowName = PWSTR(GlobalData.Lang.WindowTitle)
+        self.className  = PWSTR('QBorderlessWindow_Wrapper')
+        self.windowName = PWSTR(title)
 
         wndcls = WNDCLASSEXW()
 
@@ -97,6 +97,53 @@ class QBorderlessWindow(QObject):
         ReleaseCapture()
         SendMessageW(self.hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0)
 
+    def handleNcHitText(self, hwnd, x, y):
+        print('WM_NCHITTEST')
+
+        borderWidth = 8
+
+        rc = RECT()
+        GetWindowRect(hwnd, rc)
+
+        touchLeft   = rc.left - borderWidth <= x <= rc.left
+        touchTop    = rc.top - borderWidth <= y <= rc.top
+        touchRight  = rc.right <= x <= rc.right + borderWidth
+        touchBottom = rc.bottom <= y <= rc.bottom + borderWidth
+
+        # top left corner
+        if touchTop and touchLeft:
+            return HTTOPLEFT
+
+        # bottom left corner
+        if touchBottom and touchLeft:
+            return HTBOTTOMLEFT
+
+        # bottom right corner
+        if touchBottom and touchRight:
+            return HTBOTTOMRIGHT
+
+        # top right corner
+        if touchTop and touchRight:
+            return HTTOPRIGHT
+
+        # left border
+        if touchLeft:
+            return HTLEFT
+
+        # right border
+        if touchRight:
+            return HTRIGHT
+
+        # bottom border
+        if touchBottom:
+            return HTBOTTOM
+
+        # top border
+        if touchTop:
+            return HTTOP
+
+        return HTCAPTION
+
     def WindowProc(self, hwnd, message, wParam, lParam):
         if message == WM_CLOSE:
             qApp.quit()
@@ -105,6 +152,7 @@ class QBorderlessWindow(QObject):
             return 0
 
         elif message == WM_NCHITTEST:
+            return self.handleNcHitText(hwnd, lParam & 0xFFFF, (lParam >> 16))
             return HTCAPTION
 
         elif message == WM_SIZE:

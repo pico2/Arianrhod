@@ -5,6 +5,8 @@
 
 ***/
 
+#define DECL_STATIC_CTOR(cls, ...) static cls& (FASTCALL *ctor)(cls&)
+#define DECL_STATIC_DTOR(cls, ...) static cls& (FASTCALL *dtor)(cls&)
 #define DECL_STATIC_METHOD_POINTER(cls, method) static TYPE_OF(&cls::method) Stub##method
 #define INIT_STATIC_MEMBER(x) DECL_SELECTANY TYPE_OF(x) x = NULL
 #define DETOUR_METHOD(cls, method, addr, ...) TYPE_OF(&cls::method) (method); *(PULONG_PTR)&(method) = addr; return (this->*method)(__VA_ARGS__)
@@ -13,6 +15,16 @@
 struct CTXStringW
 {
     PCWSTR Buffer;
+
+    CTXStringW()
+    {
+        //this->ctor(*this);
+    }
+
+    ~CTXStringW()
+    {
+        //this->dtor(*this);
+    }
 
     VOID Empty()
     {
@@ -24,10 +36,14 @@ struct CTXStringW
         return (this->*StubIsEmpty)();
     }
 
+    //DECL_STATIC_CTOR(CTXStringW);
+    //DECL_STATIC_DTOR(CTXStringW);
     DECL_STATIC_METHOD_POINTER(CTXStringW, Empty);
     DECL_STATIC_METHOD_POINTER(CTXStringW, IsEmpty);
 };
 
+//INIT_STATIC_MEMBER(CTXStringW::ctor);
+//INIT_STATIC_MEMBER(CTXStringW::dtor);
 INIT_STATIC_MEMBER(CTXStringW::StubEmpty);
 INIT_STATIC_MEMBER(CTXStringW::StubIsEmpty);
 
@@ -178,6 +194,8 @@ inline NTSTATUS InitializeQqFunctionTable()
 
     static FUNCTION_TABLE_INIT_ENTRY InitEnties[] =
     {
+        //{ L"Common.dll",        "?IsEmpty@CTXStringW@@QBE_NXZ",                                         &CTXStringW::ctor },
+        //{ L"Common.dll",        "?IsEmpty@CTXStringW@@QBE_NXZ",                                         &CTXStringW::dtor },
         { L"Common.dll",        "?Empty@CTXStringW@@QAEXXZ",                                            &CTXStringW::StubEmpty },
         { L"Common.dll",        "?IsEmpty@CTXStringW@@QBE_NXZ",                                         &CTXStringW::StubIsEmpty },
         { L"Common.dll",        "?CreateTXData@Data@Util@@YAHPAPAUITXData@@@Z",                         &Util::Data::CreateTXData },

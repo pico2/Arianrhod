@@ -1,11 +1,6 @@
 from Libs.Misc.SysLib import *
 import json
 
-DefaultPreferences = '''\
-{
-}
-'''
-
 def MergeDict(dict1, dict2):
     for key in sorted(dict2.keys()):
         value1 = dict1.get(key)

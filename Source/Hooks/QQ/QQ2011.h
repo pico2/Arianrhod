@@ -3,6 +3,8 @@
 
 #include "MyLibrary.h"
 
+using ml::String;
+
 typedef struct
 {
     PCWSTR                  DllName;

@@ -40,6 +40,8 @@ API_POINTER(::CreateThread)             HummerCreateThread;
 API_POINTER(NtOpenFile)                 StubNtOpenFile;
 API_POINTER(NtCreateFile)               StubNtCreateFile;
 API_POINTER(NtQueryAttributesFile)      StubNtQueryAttributesFile;
+API_POINTER(RegOpenKeyExW)              StubRegOpenKeyExW;
+API_POINTER(RegQueryValueExW)           StubRegQueryValueExW;
 
 API_POINTER(Netbios)                    StubNetbios;
 API_POINTER(NetApiBufferFree)           StubNetApiBufferFree;
@@ -92,7 +94,7 @@ BOOL InitializeNetapi32()
     if (NT_FAILED(Status))
         return 0;
 
-    module = Ldr::LoadDll(ml::String(SystemRoot) + L"netapi32.dll");
+    module = Ldr::LoadDll(String(SystemRoot) + L"netapi32.dll");
     RtlFreeUnicodeString(&SystemRoot);
 
     LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
@@ -477,6 +479,68 @@ QqCreateWaitQQProtectThread(
     }
 
     return HummerCreateThread(ThreadAttributes, StackSize, StartAddress, Parameter, CreationFlags, ThreadId);
+}
+
+LSTATUS
+NTAPI
+QqRegOpenKeyExW(
+    HKEY    hKey,
+    PCWSTR  SubKey,
+    DWORD   Options,
+    REGSAM  Desired,
+    PHKEY   Result
+)
+{
+    LSTATUS ret;
+
+    ret = StubRegOpenKeyExW(hKey, SubKey, Options, Desired, Result);
+    if (ret == NO_ERROR)
+        return ret;
+
+    if (hKey == HKEY_LOCAL_MACHINE && StrICompareW(SubKey, L"SYSTEM\\CurrentControlSet\\Services\\QPCore") == 0)
+    {
+        *Result = nullptr;
+        ret = NO_ERROR;
+    }
+
+    return ret;
+}
+
+LSTATUS
+NTAPI
+QqRegQueryValueExW(
+    HKEY    hKey,
+    PCWSTR  ValueName,
+    PULONG  Reserved,
+    PULONG  Type,
+    PBYTE   Data,
+    PULONG  DataSize
+)
+{
+    if (hKey != nullptr)
+        return StubRegQueryValueExW(hKey, ValueName, Reserved, Type, Data, DataSize);
+
+    if (StrICompareW(ValueName, L"QQProtectDir") == 0)
+    {
+        String qqpath;
+        ULONG_PTR Length;
+
+        Rtl::GetModuleDirectory(qqpath, nullptr);
+
+        qqpath += L"..\\";
+
+        Length = (ULONG_PTR)(qqpath.GetSize() + 2);
+        Length = ML_MIN(Length, *DataSize);
+        CopyMemory(Data, (PWSTR)qqpath, Length);
+        *DataSize = Length;
+
+        if (Type != nullptr)
+            *Type = REG_SZ;
+
+        return NO_ERROR;
+    }
+
+    return ERROR_INVALID_HANDLE;
 }
 
 HRESULT
@@ -1293,6 +1357,13 @@ PVOID SearchGroupApp_GroupBanSpeech(PVOID ImageBase)
     return CallGetBanSpeechTimeStamp;
 }
 
+PVOID Search_QQProtectDir(PVOID ImageBase)
+{
+    static WCHAR String[] = L"QQProtectDir";
+
+    return SearchStringAndReverseSearchHeader(ImageBase, String, sizeof(String) - sizeof(String[0]), 0x80);
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -1372,6 +1443,9 @@ BOOL Initialize2(PVOID BaseAddress)
         Mp::FunctionJumpVa(QQUINSpecified ? NtQueryAttributesFile : IMAGE_INVALID_VA, QqNtQueryAttributesFile,    &StubNtQueryAttributesFile),
         //Mp::FunctionJumpVa(NtQueryInformationProcess,                                 QqNtQueryInformationProcess,&StubNtQueryInformationProcess),
         //Mp::FunctionJumpVa(NtFreeVirtualMemory,                                       QqNtFreeVirtualMemory,      &StubNtFreeVirtualMemory),
+
+        Mp::FunctionJumpVa(RegOpenKeyExW, QqRegOpenKeyExW, &StubRegOpenKeyExW),
+        Mp::FunctionJumpVa(RegQueryValueExW, QqRegQueryValueExW, &StubRegQueryValueExW),
     };
 
 
@@ -1537,6 +1611,9 @@ BOOL Initialize2(PVOID BaseAddress)
         Mp::FunctionJumpVa(SearchPreLogin_OnSysDataCome(module), OnSysDataCome, &StubOnSysDataCome),
     };
 
+    UNREFERENCED_PARAMETER(Function_PreLogin);
+    UNREFERENCED_PARAMETER(Patch_HummerEngine);
+    UNREFERENCED_PARAMETER(Function_psapi);
 
     /************************************************************************
       end

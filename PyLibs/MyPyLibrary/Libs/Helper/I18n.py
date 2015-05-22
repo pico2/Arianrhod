@@ -1,4 +1,4 @@
-from ml import *
+from Libs.Misc.SysLib import *
 
 def LoadLanguageFile(file):
     root = ET.parse(file).getroot()
@@ -24,11 +24,3 @@ def LoadNode(lang, node):
         lang['%s:%s' % (node.tag, attr)] = value
 
     return lang
-
-def main():
-    lang = LoadLanguageFile(r"..\Lang\DefaultLanguage.xml")
-    print(lang)
-    PauseConsole()
-
-if __name__ == '__main__':
-    TryInvoke(main)
