@@ -94,21 +94,20 @@ class QBorderlessWindow(QObject):
         qApp.quit()
 
     def mousePressEvent(self, event):
+        print('mousePressEvent')
         ReleaseCapture()
         SendMessageW(self.hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0)
 
     def handleNcHitText(self, hwnd, x, y):
-        print('WM_NCHITTEST')
-
         borderWidth = 8
 
         rc = RECT()
         GetWindowRect(hwnd, rc)
 
-        touchLeft   = rc.left - borderWidth <= x <= rc.left
-        touchTop    = rc.top - borderWidth <= y <= rc.top
-        touchRight  = rc.right <= x <= rc.right + borderWidth
-        touchBottom = rc.bottom <= y <= rc.bottom + borderWidth
+        touchLeft   = rc.left <= x <= rc.left + borderWidth
+        touchTop    = rc.top <= y <= rc.top + borderWidth
+        touchRight  = rc.right - borderWidth <= x <= rc.right
+        touchBottom = rc.bottom - borderWidth <= y <= rc.bottom
 
         # top left corner
         if touchTop and touchLeft:
@@ -153,7 +152,6 @@ class QBorderlessWindow(QObject):
 
         elif message == WM_NCHITTEST:
             return self.handleNcHitText(hwnd, lParam & 0xFFFF, (lParam >> 16))
-            return HTCAPTION
 
         elif message == WM_SIZE:
             client = RECT()
