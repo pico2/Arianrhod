@@ -16,6 +16,10 @@ class QBorderlessWindow(QObject):
 
             msg = MSG.from_address(int(message))
             if msg.message == WM_NCHITTEST:
+                ret = self.handleNcHitText(self.hwnd, msg.lParam & 0xFFFF, (msg.lParam >> 16))
+                if ret == HTCAPTION:
+                    return False, 0
+
                 return True, HTTRANSPARENT
 
             return False, 0
@@ -39,7 +43,7 @@ class QBorderlessWindow(QObject):
         wndcls.hCursor = LoadCursorW(0, IDC_ARROW)
 
         ret = windll.user32.RegisterClassExW(PWNDCLASSEXW(wndcls))
-        if ret == 0:
+        if ret == 0 and RtlGetLastWin32Error() != 183:  # ERROR_ALREADY_EXISTS
             raise Exception('RegisterClassExW failed')
 
         desktop = QApplication.desktop()
@@ -111,7 +115,6 @@ class QBorderlessWindow(QObject):
         qApp.quit()
 
     def mousePressEvent(self, event):
-        print('mousePressEvent')
         ReleaseCapture()
         SendMessageW(self.hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0)
 
