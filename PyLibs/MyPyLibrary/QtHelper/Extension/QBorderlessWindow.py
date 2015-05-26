@@ -1,11 +1,28 @@
 from .QCommon import *
 from WinTypes import *
+import types
 
 class QBorderlessWindow(QObject):
     def __init__(self, childWindow, title = '', hWndParent = 0):
         super().__init__()
 
+        def childNativeEvent(child, eventType, message):
+            handled, result = self.originalChildNativeEvent(eventType, message)
+            if handled:
+                return handled, result
+
+            if eventType != b'windows_generic_MSG':
+                return False, 0
+
+            msg = MSG.from_address(int(message))
+            if msg.message == WM_NCHITTEST:
+                return True, HTTRANSPARENT
+
+            return False, 0
+
         self.childWindow = childWindow
+        self.originalChildNativeEvent = self.childWindow.nativeEvent
+        self.childWindow.nativeEvent = types.MethodType(childNativeEvent, self.childWindow)
 
         self.windowProc = WNDPROC(self.WindowProc)
         self.className  = PWSTR('QBorderlessWindow_Wrapper')
@@ -109,35 +126,27 @@ class QBorderlessWindow(QObject):
         touchRight  = rc.right - borderWidth <= x <= rc.right
         touchBottom = rc.bottom - borderWidth <= y <= rc.bottom
 
-        # top left corner
         if touchTop and touchLeft:
             return HTTOPLEFT
 
-        # bottom left corner
         if touchBottom and touchLeft:
             return HTBOTTOMLEFT
 
-        # bottom right corner
         if touchBottom and touchRight:
             return HTBOTTOMRIGHT
 
-        # top right corner
         if touchTop and touchRight:
             return HTTOPRIGHT
 
-        # left border
         if touchLeft:
             return HTLEFT
 
-        # right border
         if touchRight:
             return HTRIGHT
 
-        # bottom border
         if touchBottom:
             return HTBOTTOM
 
-        # top border
         if touchTop:
             return HTTOP
 
