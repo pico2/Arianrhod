@@ -8,6 +8,7 @@ from PyQt5.QtNetwork import *
 from PyQt5.QtWebKit import *
 from PyQt5.QtQml import *
 from PyQt5.QtQuick import *
+from PyQt5.QtQuickWidgets import *
 
 from MyPyLibrary import QtHelper
 from QtHelper.Extension import *
