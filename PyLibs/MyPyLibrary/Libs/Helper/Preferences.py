@@ -35,7 +35,7 @@ def LoadPreferences(Preferences, defaultPreferences = None):
     else:
         try:
             overwrite = json.loads(open(Preferences, 'rb').read().decode('UTF8'))
-        except:
+        except (FileNotFoundError, PermissionError):
             overwrite = dict()
 
     MergeDict(default, overwrite)
