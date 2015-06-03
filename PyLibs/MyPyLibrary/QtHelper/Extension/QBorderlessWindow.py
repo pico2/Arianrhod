@@ -166,16 +166,22 @@ class QBorderlessWindow(QObject):
             return self.handleNcHitText(hwnd, lParam & 0xFFFF, (lParam >> 16))
 
         elif message == WM_SIZE:
-            client = RECT()
-            GetClientRect(hwnd, PRECT(client))
-
-            cxframe   = GetSystemMetrics(SM_CXFRAME)
-            cyframe   = GetSystemMetrics(SM_CYFRAME)
-            cycaption = GetSystemMetrics(SM_CYCAPTION)
-
-            rc = QRect(cxframe, cyframe + cycaption, client.right - client.left, client.bottom - client.top)
             if wParam not in [SIZE_MINIMIZED]:
+                client = RECT()
+                GetClientRect(hwnd, PRECT(client))
+
+                cxframe   = GetSystemMetrics(SM_CXFRAME)
+                cyframe   = GetSystemMetrics(SM_CYFRAME)
+                cycaption = GetSystemMetrics(SM_CYCAPTION)
+
+                rc = QRect(
+                        cxframe,
+                        cyframe + cycaption,
+                        client.right - client.left,
+                        client.bottom - client.top
+                    )
                 self.childWindow.setGeometry(rc)
+                # self.childWindow.setGeometry(QRect(0, 0, 100, 100))
 
         elif message == WM_SETFOCUS:
             self.childWindow.setFocus()
