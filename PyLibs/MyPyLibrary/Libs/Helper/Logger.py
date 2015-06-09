@@ -11,7 +11,7 @@ logging.basicConfig(
     datefmt     = '%Y-%m-%d %H:%M:%S'
 )
 
-def getLogger(name):
+def getLogger(name, *, logPath = None):
     def init(self, *, level = logging.DEBUG, handlerClass = logging.FileHandler):
         logFormatter = logging.Formatter(__FORMAT__)
         fileHandler = handlerClass(filename = self.getLogFileName(), mode = 'w', encoding = 'UTF8')
@@ -24,10 +24,12 @@ def getLogger(name):
         self.setLevel(level)
 
     def getLogFileName(self):
-        path = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'logs')
+        import threading
+
+        path = logPath or os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'logs')
         os.makedirs(path, exist_ok = True)
         t = datetime.datetime.now()
-        return os.path.join(path, '[%s][%s] %04d-%02d-%02d %02d.%02d.%02d.txt' % (os.path.basename(sys.argv[0]).rsplit('.', maxsplit = 1)[0], self.name, t.year, t.month, t.day, t.hour, t.minute, t.second))
+        return os.path.join(path, '[%s][%s][%d][%d] %04d-%02d-%02d %02d.%02d.%02d.txt' % (os.path.basename(sys.argv[0]).rsplit('.', maxsplit = 1)[0], self.name, os.getpid(), threading.currentThread().ident, t.year, t.month, t.day, t.hour, t.minute, t.second))
 
     def findCaller(stack_info = False):
         """
