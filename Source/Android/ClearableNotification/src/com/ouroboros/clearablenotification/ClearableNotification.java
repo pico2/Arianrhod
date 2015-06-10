@@ -163,39 +163,47 @@ public class ClearableNotification implements IXposedHookLoadPackage {
 
         // "error pcm duration %d"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.e", pkg.classLoader, "g", AudioEncodHelper, new XC_MethodHook() {
-           @Override
-           protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.e", pkg.classLoader, "g", AudioEncodHelper, new XC_MethodHook() {
+//           @Override
+//           protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//
+//               //I/Xposed  ( 7423):      at beforeHookedMethod
+//               //I/Xposed  ( 7423):      at handleHookedMethod
+//               //I/Xposed  ( 7423):      at g
+//               //I/Xposed  ( 7423):      at c
+//
+//               Exception e = new Exception();
+//               StackTraceElement[] elements = e.getStackTrace();
+//
+//               // log(elements[3].getClassName());
+//               // log(elements[3].getMethodName());
+//
+//               if (elements[3].getClassName().equals("com.tencent.mm.plugin.sight.encode.a.h") == false) {
+//                   return;
+//               }
+//
+//               if (elements[3].getMethodName().equals("c") == false) {
+//                   return;
+//               }
+//
+//               param.setResult(0);
+//           }
+//       });
 
-               //I/Xposed  ( 7423):      at beforeHookedMethod
-               //I/Xposed  ( 7423):      at handleHookedMethod
-               //I/Xposed  ( 7423):      at g
-               //I/Xposed  ( 7423):      at c
 
-               Exception e = new Exception();
-               StackTraceElement[] elements = e.getStackTrace();
-
-               // log(elements[3].getClassName());
-               // log(elements[3].getMethodName());
-
-               if (elements[3].getClassName().equals("com.tencent.mm.plugin.sight.encode.a.h") == false) {
-                   return;
-               }
-
-               if (elements[3].getMethodName().equals("c") == false) {
-                   return;
-               }
-
-               param.setResult(0);
-           }
-       });
+      XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.h", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
+         @Override
+         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+             XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fjq"), "fjj", 0);
+         }
+     });
 
        // "ERROR record duration, %dms !!!"
 
-       XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.as", pkg.classLoader, "rC", new XC_MethodHook() {
+       XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.bi", pkg.classLoader, "lO", new XC_MethodHook() {
            @Override
            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-               XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, "iuO"), "C", 0.f);
+               XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, "fnu"), "s", 0.f);
                param.setResult(true);
                //log("updateProgress");
                //log(new Exception());
@@ -205,7 +213,7 @@ public class ClearableNotification implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.o", pkg.classLoader, "B", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.p", pkg.classLoader, "z", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //                log("what the fuck");
