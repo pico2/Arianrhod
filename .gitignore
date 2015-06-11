@@ -105,3 +105,12 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Project/WeChat
 /Source/Project/AppleIdRegister
 /Source/Project/Glorius2
+
+/*/.gradle
+/*/local.properties
+/*/.idea/workspace.xml
+/*/.idea/libraries
+/*/.DS_Store
+/*/build
+/*/captures
+.gitignore
