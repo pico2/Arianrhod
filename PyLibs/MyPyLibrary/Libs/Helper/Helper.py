@@ -120,15 +120,18 @@ def TryInvokeDbg(method, *values):
     return None
 
 def ReadTextToList(filename, cp = '936'):
-    stm = open(filename,'rb').read()
-    if stm[0:2] == b'\xff\xfe':
-        stm = stm.decode('U16')
-    elif stm[0:3] == b'\xef\xbb\xbf':
-        stm = stm.decode('utf-8-sig')
+    buf = open(filename,'rb').read()
+
+    if buf[0:2] == b'\xff\xfe':
+        buf = buf.decode('U16')
+    elif buf[0:3] == b'\xef\xbb\xbf':
+        buf = buf.decode('utf-8-sig')
     else:
         try:
-            stm = stm.decode('UTF8')
+            buf = buf.decode('UTF8')
         except UnicodeDecodeError:
-            stm = stm.decode(cp)
+            buf = buf.decode(cp)
 
-    return stm.replace('\r\n','\n').replace('\r','\n').split('\n')
+    return buf.splitlines()
+
+    return buf.replace('\r\n','\n').replace('\r','\n').split('\n')
