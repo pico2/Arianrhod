@@ -106,11 +106,11 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Project/AppleIdRegister
 /Source/Project/Glorius2
 
-/*/.gradle
+/*/.gradle/
 /*/local.properties
 /*/.idea/workspace.xml
 /*/.idea/libraries
 /*/.DS_Store
-/*/build
+/*/build/
 /*/captures
 .gitignore
