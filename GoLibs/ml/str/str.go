@@ -2,12 +2,21 @@ package str
 
 import (
     "strings"
+    "unicode/utf8"
 )
 
 type String string
 
 func (self String) String() string {
     return string(self)
+}
+
+func (self *String) SizeInBytes() (int) {
+    return len(*self)
+}
+
+func (self *String) Length() (int) {
+    return utf8.RuneCountInString(string(*self))
 }
 
 func (self *String) Replace(old, new String, count ...int) String {

@@ -13,7 +13,7 @@ import (
 func testString() (r int) {
     s := Str("fuck")
 
-    s = `ffa fuck2 `
+    s = `中文`
     s += `fuck`
 
     Printf("%+v\n", s)
@@ -23,6 +23,15 @@ func testString() (r int) {
     Println(s.ToUpper())
     Println(s.ToLower())
     Println(s == "Fuck2")
+
+    str := s
+    Println(str, "bytes =", len(str))
+    Println(str, "runes =", str.Length())
+
+    for c := range str {
+        Println(c)
+    }
+
     Printf("%c\n", s[0])
     Printf("'%+v'\n", s.Trim("f"))
 
@@ -56,7 +65,11 @@ func testNamedReturn() (i int, s string) {
 
 func testDict() {
     x := Dict{1 : 2, "fuck" : 3.33}
+    x[2] = 3
+
     Println(x)
+    Println(x["fuck"])
+    // Println(x.Get)
     _ = x
 }
 
@@ -71,18 +84,27 @@ func testLogger() {
 
 func testMisc(a interface{}) {
     xx := uintptr(a.(int))
-    print(xx)
+    Println(xx)
 
     _ = syscall.Call
     // syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 }
 
 func testNet() {
-    session, _ := http.New()
+    session, _ := http.NewSession()
 
-    print(session)
+    resp, err := session.Get(
+                    "https://www.baidu.com/",
+                    Dict{
+                        "params": Dict{
+                            "中": "文",
+                        },
+                    },
+                )
 
-    _ = session
+    Println(err, resp)
+
+    _ = resp
 }
 
 func main() {

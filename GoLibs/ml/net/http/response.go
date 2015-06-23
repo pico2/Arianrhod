@@ -1,6 +1,8 @@
 package http
 
 import (
+    "io/ioutil"
+    "net/url"
     "ml/str"
     gohttp "net/http"
 )
@@ -14,4 +16,37 @@ type Response struct {
     Header      gohttp.Header
     Content     []byte
     Request     *gohttp.Request
+
+    resp        *gohttp.Response
+}
+
+func (self *Response) Cookies() []*gohttp.Cookie {
+    return self.resp.Cookies()
+}
+
+func (self *Response) Location() (*url.URL, error) {
+    return self.resp.Location()
+}
+
+func NewResponse(resp *gohttp.Response) (*Response, error) {
+    defer resp.Body.Close()
+
+    content, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return nil, err
+    }
+
+    return &Response{
+        Status      : str.String(resp.Status),
+        StatusCode  : resp.StatusCode,
+        Proto       : str.String(resp.Proto),
+        ProtoMajor  : resp.ProtoMajor,
+        ProtoMinor  : resp.ProtoMinor,
+        Header      : resp.Header,
+        Content     : content,
+        Request     : resp.Request,
+
+        resp        : resp,
+
+    }, nil
 }
