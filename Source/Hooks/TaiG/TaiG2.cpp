@@ -28,6 +28,7 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 NTSTATUS FuckAnti_Initialize(PVOID TaiGBase);
 NTSTATUS Remove3K_Initialize(PVOID TaiGBase);
+NTSTATUS Remove3K2_Initialize(PVOID TaiGBase);
 NTSTATUS Record_Initialize(PVOID TaiGBase);
 
 BOOL Initialize(PVOID BaseAddress)
@@ -37,12 +38,13 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    BaseAddress = LoadDll(L"TaiG.dll");
-    TaiGBase = BaseAddress;
+    //BaseAddress = LoadDll(L"TaiG.dll");
+    //TaiGBase = BaseAddress;
 
-    Remove3K_Initialize(BaseAddress);
-    FuckAnti_Initialize(BaseAddress);
-    Record_Initialize(BaseAddress);
+    Remove3K2_Initialize(BaseAddress);
+    //Remove3K_Initialize(BaseAddress);
+    //FuckAnti_Initialize(BaseAddress);
+    //Record_Initialize(BaseAddress);
 
     PATCH_MEMORY_DATA p[] =
     {
