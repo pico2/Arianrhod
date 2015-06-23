@@ -244,110 +244,21 @@ void quick_sort(int *array, int count)
 //#define IMPORT_LIBLLDB 1
 
 #include "iTunes/iTunes.h"
-#include <Wia.h>
-#include <atlbase.h>
-#include <atlcom.h>
 
-#pragma comment(lib, "wiaguid.lib")
-
-HRESULT DeleteItems(IWiaItem* root)
+class F
 {
-    HRESULT                 hr;
-    ULONG                   n;
-    CComPtr<IWiaItem>       item;
-    CComPtr<IEnumWiaItem>   enumItem;
-
-    root->EnumChildItems(&enumItem);
-
-    while (enumItem->Next(1, &item, &n) == NOERROR)
-    {
-        CComPtr<IWiaDataTransfer>       dataTransfer;
-        CComPtr<IWiaPropertyStorage>    propertyStorage;
-
-        PROPSPEC spec[] =
-        {
-            { PRSPEC_PROPID, WIA_IPA_ITEM_NAME },
-            { PRSPEC_PROPID, WIA_IPA_FILENAME_EXTENSION },
-            { PRSPEC_PROPID, WIA_IPA_ITEM_SIZE },
-        };
-
-        PROPVARIANT variant[countof(spec)];
-
-        item->QueryInterface(IID_IWiaPropertyStorage, (PVOID *)&propertyStorage);
-        item->QueryInterface(IID_IWiaDataTransfer, (PVOID *)&dataTransfer);
-
-        hr = propertyStorage->ReadMultiple(countof(spec), spec, variant);
-        FAIL_CONTINUE(hr);
-
-        PrintConsole(L"%s.%s %d\n", variant[0].bstrVal, variant[1].bstrVal, variant[2].intVal);
-
-        // if (wcscmp(file1, file2) == 0)
-        //     delete
-
-        SysFreeString(variant[0].bstrVal);
-        SysFreeString(variant[1].bstrVal);
-
-        item->DeleteItem(0);
-    }
-
-    return 0;
-}
+public:
+    int i;
+    int j;
+};
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    CoInitialize(0);
+    PVOID o = &F::j;
 
-    LOOP_ONCE
-    {
-        HRESULT                         hr;
-        CComPtr<IWiaDevMgr>             devMgr;
-        CComPtr<IEnumWIA_DEV_INFO>      devInfo;
-        CComPtr<IWiaPropertyStorage>    propertyStorage;
-        CComPtr<IWiaItem>               root;
-        ULONG                           n;
-
-        //XP or earlier:
-        hr = CoCreateInstance(CLSID_WiaDevMgr, NULL, CLSCTX_LOCAL_SERVER, IID_IWiaDevMgr, (PVOID *)&devMgr);
-        FAIL_BREAK(hr);
-
-        //Vista or later:
-        //hr = CoCreateInstance( CLSID_WiaDevMgr2, NULL, CLSCTX_LOCAL_SERVER, IID_IWiaDevMgr2, (PVOID *)&wiaDevMgr);
-
-        hr = devMgr->EnumDeviceInfo(WIA_DEVINFO_ENUM_LOCAL, &devInfo);
-        FAIL_BREAK(hr);
-
-        while (devInfo->Next(1, &propertyStorage, &n) == NOERROR)
-        {
-            CComPtr<IEnumWiaItem> enumWiaItem;
-
-            PROPSPEC spec[] =
-            {
-                { PRSPEC_PROPID, WIA_DIP_DEV_ID },
-                { PRSPEC_PROPID, WIA_DIP_DEV_DESC },
-            };
-
-            PROPVARIANT variant[countof(spec)];
-
-            hr = propertyStorage->ReadMultiple(countof(spec), spec, variant);
-            FAIL_CONTINUE(hr);
-
-            PrintConsole(L"%s\n", variant[0].bstrVal);
-            PrintConsole(L"%s\n", variant[1].bstrVal);
-
-            devMgr->CreateDevice(variant[0].bstrVal, &root);
-
-            SysFreeString(variant[0].bstrVal);
-            SysFreeString(variant[1].bstrVal);
-
-            DeleteItems(root);
-        }
-    }
-
-    CoUninitialize();
-    PauseConsole(L"done");
-    Ps::ExitProcess(0);
+    PrintConsole(L"%d\n", &F::j);
 
     return;
 

@@ -1,12 +1,14 @@
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
-#pragma comment(linker, "/EXPORT:GetSaveFileNameW=COMDLG32.GetSaveFileNameW")
-#pragma comment(linker, "/EXPORT:CommDlgExtendedError=COMDLG32.CommDlgExtendedError")
-#pragma comment(linker, "/EXPORT:GetOpenFileNameW=COMDLG32.GetOpenFileNameW")
+//#pragma comment(linker, "/EXPORT:GetSaveFileNameW=COMDLG32.GetSaveFileNameW")
+//#pragma comment(linker, "/EXPORT:CommDlgExtendedError=COMDLG32.CommDlgExtendedError")
+//#pragma comment(linker, "/EXPORT:GetOpenFileNameW=COMDLG32.GetOpenFileNameW")
+#pragma comment(linker, "/EXPORT:MiniDumpWriteDump=_StMiniDumpWriteDump@28")
 
-#include "MyLibrary.cpp"
-#include "mlns.h"
+#include "ml.cpp"
+
+ML_OVERLOAD_NEW
 
 typedef struct
 {
@@ -32,6 +34,56 @@ enum
 
     STCP_ACP            = 1,
 };
+
+API_POINTER(MiniDumpWriteDump) DbghlpMiniDumpWriteDump;
+
+VOID InitializeDbghelp()
+{
+    if (DbghlpMiniDumpWriteDump != nullptr)
+        return;
+
+    PVOID module;
+    PLDR_MODULE self, dbghlp;
+    ml::String path;
+
+    Rtl::GetModuleDirectory(path, GetNtdllHandle());
+
+    path += L"dbghelp.dll";
+
+    module = Ldr::LoadDll(path);
+    if (module == nullptr)
+        return;
+
+    *(PVOID *)&DbghlpMiniDumpWriteDump = GetRoutineAddress(module, "MiniDumpWriteDump");
+
+    self = FindLdrModuleByHandle(&__ImageBase);
+    dbghlp = FindLdrModuleByHandle(module);
+
+    self->DllBase = dbghlp->DllBase;
+    self->EntryPoint = dbghlp->EntryPoint;
+    self->SizeOfImage = dbghlp->SizeOfImage;
+}
+
+EXTC
+BOOL
+NTAPI
+StMiniDumpWriteDump(
+    HANDLE                              hProcess,
+    DWORD                               ProcessId,
+    HANDLE                              hFile,
+    MINIDUMP_TYPE                       DumpType,
+    PMINIDUMP_EXCEPTION_INFORMATION     ExceptionParam,
+    PMINIDUMP_USER_STREAM_INFORMATION   UserStreamParam,
+    PMINIDUMP_CALLBACK_INFORMATION      CallbackParam
+)
+{
+    InitializeDbghelp();
+
+    if (DbghlpMiniDumpWriteDump != nullptr)
+        return DbghlpMiniDumpWriteDump(hProcess, ProcessId, hFile, DumpType, ExceptionParam, UserStreamParam, CallbackParam);
+
+    return FALSE;
+}
 
 ULONG (CDECL *StubUnicodeToACP)(ULONG CpIndex, PSUBLIME_TEXT_WSTRING Unicode, PSTR Ansi, LONG AnsiSize);
 
