@@ -9,12 +9,6 @@ import (
 
 /* ++
 
-  syscall
-
--- */
-
-/* ++
-
   console
 
 -- */

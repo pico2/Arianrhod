@@ -7,6 +7,7 @@ import (
     "os"
     "ml/logging"
     "ml/syscall"
+    "ml/net/http"
 )
 
 func testString() (r int) {
@@ -76,6 +77,14 @@ func testMisc(a interface{}) {
     // syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 }
 
+func testNet() {
+    session, _ := http.New()
+
+    print(session)
+
+    _ = session
+}
+
 func main() {
     testString()
     Println()
@@ -98,6 +107,9 @@ func main() {
     Println()
 
     testMisc(1)
+    Println()
+
+    testNet()
     Println()
 
     Console.Pause()
