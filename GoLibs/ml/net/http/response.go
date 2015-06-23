@@ -1,6 +1,7 @@
 package http
 
 import (
+    "ml/str"
     gohttp "net/http"
 )
 
@@ -11,4 +12,6 @@ type Response struct {
     ProtoMajor  int    // e.g. 1
     ProtoMinor  int    // e.g. 0
     Header      gohttp.Header
+    Content     []byte
+    Request     *gohttp.Request
 }

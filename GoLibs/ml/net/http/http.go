@@ -11,8 +11,16 @@ type Session struct {
     client  *gohttp.Client
 }
 
-func (self *Session) Get(url str.String) (resp *) {
+func (self *Session) Request(method str.String, url str.String) (resp *Response, err error) {
+    return nil, nil
+}
 
+func (self *Session) Get(url str.String) (resp *Response, err error) {
+    return self.Request("GET", url)
+}
+
+func (self *Session) Post(url str.String) (resp *Response, err error) {
+    return self.Request("Post", url)
 }
 
 func New() (*Session, error) {
@@ -21,7 +29,7 @@ func New() (*Session, error) {
         return nil, err
     }
 
-    client := &http.Client{
+    client := &gohttp.Client{
         CheckRedirect: nil,
         Jar:           jar,
     }
