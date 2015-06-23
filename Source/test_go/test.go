@@ -68,8 +68,12 @@ func testLogger() {
     logger.Debug("fuck中文")
 }
 
-func testMisc() {
-    syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+func testMisc(a interface{}) {
+    xx := uintptr(a.(int))
+    print(xx)
+
+    _ = syscall.Call
+    // syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 }
 
 func main() {
@@ -93,7 +97,7 @@ func main() {
     }
     Println()
 
-    testMisc()
+    testMisc(1)
     Println()
 
     Console.Pause()

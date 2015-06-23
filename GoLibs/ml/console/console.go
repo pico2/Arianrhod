@@ -12,7 +12,7 @@ func Pause(text ...string) {
         print(text[0])
     }
 
-    syscall2.Call(uintptr(getch), uintptr(0), 0, 0, 0)
+    syscall2.Call(getch)
 }
 
 func init() {
