@@ -5,7 +5,7 @@ import (
     . "fmt"
     . "ml/dict"
     "os"
-    "ml/logger"
+    "ml/logging"
 )
 
 func testString() (r int) {
@@ -59,9 +59,9 @@ func testDict() {
 }
 
 func testLogger() {
-    logger := logger.New("fuck")
-    _ = logger
+    logger := logging.New("fuck")
 
+    // _ = logger
     // logger.SetLevel(20)
 
     logger.Debug("fuck中文")
