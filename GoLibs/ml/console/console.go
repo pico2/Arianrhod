@@ -2,6 +2,7 @@ package console
 
 import (
     "syscall"
+    syscall2 "ml/syscall"
 )
 
 var getch = uintptr(0)
@@ -11,7 +12,7 @@ func Pause(text ...string) {
         print(text[0])
     }
 
-    syscall.Syscall(uintptr(getch), uintptr(0), 0, 0, 0)
+    syscall2.Call(uintptr(getch), uintptr(0), 0, 0, 0)
 }
 
 func init() {

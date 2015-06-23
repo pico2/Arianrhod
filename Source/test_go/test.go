@@ -6,6 +6,7 @@ import (
     . "ml/dict"
     "os"
     "ml/logging"
+    "ml/syscall"
 )
 
 func testString() (r int) {
@@ -67,6 +68,10 @@ func testLogger() {
     logger.Debug("fuck中文")
 }
 
+func testMisc() {
+    syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+}
+
 func main() {
     testString()
     Println()
@@ -86,6 +91,10 @@ func main() {
     for _, v := range os.Args {
         Println(v)
     }
+    Println()
+
+    testMisc()
+    Println()
 
     Console.Pause()
 }
