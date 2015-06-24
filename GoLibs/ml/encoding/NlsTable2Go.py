@@ -21,10 +21,10 @@ class CPTABLEINFO(Structure):
         ('TransUniDefaultChar',     USHORT),
         ('DBCSCodePage',            USHORT),
         ('LeadByte',                BYTE * MAXIMUM_LEADBYTES),
-        ('MultiByteTable',          PUSHORT),
-        ('WideCharTable',           PUSHORT),
-        ('DBCSRanges',              PUSHORT),
-        ('DBCSOffsets',             PUSHORT),
+        ('MultiByteTable',          ULONG_PTR),
+        ('WideCharTable',           ULONG_PTR),
+        ('DBCSRanges',              ULONG_PTR),
+        ('DBCSOffsets',             ULONG_PTR),
     ]
 
 PCPTABLEINFO = ctypes.POINTER(CPTABLEINFO)
@@ -54,10 +54,10 @@ def main():
         print('TransUniDefaultChar  = %X' % info.TransUniDefaultChar)
         print('DBCSCodePage         = %s' % info.DBCSCodePage)
         print('LeadByte             = %s' % bytes(info.LeadByte))
-        print('MultiByteTable       = %s' % (info.MultiByteTable.contents))
-        print('WideCharTable        = %s' % (info.WideCharTable.contents))
-        print('DBCSRanges           = %s' % (info.DBCSRanges.contents))
-        print('DBCSOffsets          = %s' % (info.DBCSOffsets.contents))
+        print('MultiByteTable       = %s' % (info.MultiByteTable))
+        print('WideCharTable        = %s' % (info.WideCharTable))
+        print('DBCSRanges           = %s' % (info.DBCSRanges))
+        print('DBCSOffsets          = %s' % (info.DBCSOffsets))
 
         cp = info.CodePage
 
@@ -79,6 +79,9 @@ def main():
 
         LeadByte = '[]byte[]{%s},' % ','.join(['0x%X' % ch for ch in bytes(info.LeadByte)])
         src.append(padding + LeadByte)
+
+        MultiByteTable = bytes((BYTE * MB_TBL_SIZE).from_address(int(info.MultiByteTable)))
+        ibp()
 
         src.extend([
             '                    }',
