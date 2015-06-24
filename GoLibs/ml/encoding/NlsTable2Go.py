@@ -57,7 +57,9 @@ def EncodeVarint(value):
 
 def main():
     if len(sys.argv) == 1:
-        sys.argv.append(r"D:\Dev\go\pkgs\src\ml\encoding\C_932.NLS")
+        files = EnumDirectoryFiles(os.path.dirname(sys.argv[0]), '*.nls')
+        print(files)
+        sys.argv.extend(files)
 
     for f in sys.argv[1:]:
         table = bytearray(open(f, 'rb').read())
