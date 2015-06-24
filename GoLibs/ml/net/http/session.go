@@ -5,7 +5,7 @@ import (
     "errors"
     gourl "net/url"
     "net/http/cookiejar"
-    "ml/str"
+    . "ml/str"
     . "ml/dict"
     gohttp "net/http"
 )
@@ -20,7 +20,7 @@ type Session struct {
     header  gohttp.Header
 }
 
-func (self *Session) Request(method, url str.String, params_ ...Dict) (*Response, error) {
+func (self *Session) Request(method, url String, params_ ...Dict) (*Response, error) {
     request, err := gohttp.NewRequest(string(method), string(url), nil)
     if err != nil {
         return nil, err
@@ -66,11 +66,11 @@ func (self *Session) Request(method, url str.String, params_ ...Dict) (*Response
     return NewResponse(resp)
 }
 
-func (self *Session) Get(url str.String, params ...Dict) (resp *Response, err error) {
+func (self *Session) Get(url String, params ...Dict) (resp *Response, err error) {
     return self.Request("GET", url, params...)
 }
 
-func (self *Session) Post(url str.String, params ...Dict) (resp *Response, err error) {
+func (self *Session) Post(url String, params ...Dict) (resp *Response, err error) {
     return self.Request("POST", url, params...)
 }
 

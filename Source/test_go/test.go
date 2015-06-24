@@ -7,7 +7,9 @@ import (
     "os"
     "ml/logging"
     "ml/syscall"
-    "ml/net/http"
+    // "ml/net/http"
+    "ml/encoding"
+    "unicode/utf8"
 )
 
 func testString() (r int) {
@@ -88,23 +90,45 @@ func testMisc(a interface{}) {
 
     _ = syscall.Call
     // syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+    Ucs16String := []uint16{}
+    UnicodeString := "中文"
+
+    for len(UnicodeString) > 0 {
+        r, size := utf8.DecodeRuneInString(UnicodeString)
+        UnicodeString = UnicodeString[size:]
+
+        Ucs16String = append(Ucs16String, uint16(r))
+    }
+
+    Println(Ucs16String)
 }
 
 func testNet() {
-    session, _ := http.NewSession()
+    // session, _ := http.NewSession()
 
-    resp, err := session.Get(
-                    "https://www.baidu.com/",
-                    Dict{
-                        "params": Dict{
-                            "中": "文",
-                        },
-                    },
-                )
+    // resp, err := session.Get(
+    //                 "https://www.baidu.com/",
+    //                 Dict{
+    //                     "params": Dict{
+    //                         "中": "文",
+    //                     },
+    //                 },
+    //             )
 
-    Println(err, resp)
+    // Println(err, resp)
 
-    _ = resp
+    // _ = session
+}
+
+func testEncoding() {
+    gbk := encoding.GetEncoder(encoding.CP_GBK)
+
+    text := gbk.Encode("中文")
+    Println(text)
+
+    gg := gbk.Decode(text)
+    Println(gg)
 }
 
 func main() {
@@ -132,6 +156,9 @@ func main() {
     Println()
 
     testNet()
+    Println()
+
+    testEncoding()
     Println()
 
     Console.Pause()

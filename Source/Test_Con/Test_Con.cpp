@@ -5,7 +5,7 @@
 
 #define _WIN32_WINNT 0x601
 
-#pragma comment(linker,"/ENTRY:main2")
+#pragma comment(linker,"/ENTRY:main")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:"SECTION_NAME",ERW /MERGE:.text="SECTION_NAME)
 #pragma warning(disable:4995 4273)
@@ -23,6 +23,8 @@
 #include "ml.cpp"
 
 ML_OVERLOAD_NEW
+
+using ml::String;
 
 #if defined(UNICODE)
     #define __WSTRING(str) L##str
@@ -245,20 +247,117 @@ void quick_sort(int *array, int count)
 
 #include "iTunes/iTunes.h"
 
-class F
+WCHAR format[] = LR"(package encoding
+
+func init() {
+    cptable[%d] = codePageTableInfo{
+                        CodePage                : %d,
+                        MaximumCharacterSize    : 0x%X,
+                        DefaultChar             : 0x%X,
+                        UniDefaultChar          : 0x%X,
+                        TransDefaultChar        : 0x%X,
+                        TransUniDefaultChar     : 0x%X,
+                        DBCSCodePage            : %s,
+                        LeadByte                : %s,
+                        MultiByteTable          : %s,
+                        WideCharTable           : %s,
+                        DBCSRanges              : 0x%04X,
+                        TranslateTable          : %s,
+                    }
+}
+)";
+
+VOID DumpNlsTable(PWSTR NlsTable)
 {
-public:
-    int i;
-    int j;
-};
+    NtFileMemory file;
+    CPTABLEINFO cptable;
+
+    file.Open(NlsTable);
+
+    ZeroMemory(&cptable, sizeof(cptable));
+    RtlInitCodePageTable((PUSHORT)file.GetBuffer(), &cptable);
+
+    String LeadByte = L"[MAXIMUM_LEADBYTES]byte{";
+
+    for (ULONG_PTR i = 0; i != sizeof(cptable.LeadByte); ++i)
+    {
+        LeadByte += String::Format(L"0x%02X,", cptable.LeadByte[i]);
+    }
+
+    LeadByte += L"}";
+
+    String MultiByteTable = L"[]uint16{";
+
+    for (ULONG_PTR i = 0; i != MB_TBL_SIZE; ++i)
+    {
+        MultiByteTable += String::Format(L"0x%02X,", cptable.MultiByteTable[i]);
+    }
+
+    MultiByteTable += L"}";
+
+    String TranslateTable = L"[]uint16{";
+
+    ULONG_PTR MultiByteTableSize = cptable.MultiByteTable[-1] * 2 - 2;
+    ULONG_PTR TranslateTableSize = MultiByteTableSize - PtrOffset(cptable.DBCSOffsets, cptable.MultiByteTable);
+
+    for (ULONG_PTR i = 0; i != TranslateTableSize / 2; ++i)
+    {
+        TranslateTable += String::Format(L"0x%04X,", cptable.DBCSOffsets[i]);
+    }
+
+    TranslateTable += L"}";
+
+    String WideCharTable = L"[]uint16{";
+
+    for (ULONG_PTR i = 0; i != 0x10000; ++i)
+    {
+        WideCharTable += String::Format(L"0x%04X,", ((PUSHORT)cptable.WideCharTable)[i]);
+    }
+
+    WideCharTable += L"}";
+
+    String go = String::Format(
+                        format,
+                        cptable.CodePage,
+
+                        cptable.CodePage,
+                        cptable.MaximumCharacterSize,
+                        cptable.DefaultChar,
+                        cptable.UniDefaultChar,
+                        cptable.TransDefaultChar,
+                        cptable.TransUniDefaultChar,
+                        cptable.DBCSCodePage ? L"true" : L"false",
+
+                        LeadByte,
+                        MultiByteTable,
+                        WideCharTable,
+                        cptable.DBCSRanges[0],
+                        TranslateTable
+                    );
+
+    NtFileDisk src;
+    String path = NlsTable;
+
+    path = path.SubString(0, path.LastIndexOf(L"\\") + 1);
+    path += String::Format(L"%d.go", cptable.CodePage);
+
+    src.Create(path);
+
+    auto utf8 = go.Encode(CP_UTF8);
+
+    src.Write(utf8.GetData(), utf8.GetSize() - 1);
+}
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PVOID o = &F::j;
+    while (--argc)
+    {
+        DumpNlsTable(*++argv);
+    }
 
-    PrintConsole(L"%d\n", &F::j);
+    PauseConsole(L"done");
 
     return;
 

@@ -7,10 +7,9 @@ import (
 type Dict map[interface{}]interface{};
 
 func (self Dict) toString(depth int) string {
-
     space := ""
 
-    for ; depth > 0; depth-- {
+    for i := depth; i > 0; i-- {
         space += "  "
     }
 
