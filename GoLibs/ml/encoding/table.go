@@ -1,9 +1,10 @@
 package encoding
 
 import (
-    // "io/ioutil"
-    // "compress/zlib"
-    // "bytes"
+    "io/ioutil"
+    "compress/zlib"
+    "bytes"
+    "encoding/binary"
 )
 
 const (
@@ -24,26 +25,53 @@ const (
 )
 
 type codePageTableInfo struct {
-    data []byte
-    initialized bool
-
-    CodePage                uint                           // code page number
-    MaximumCharacterSize    uint                           // max length (bytes) of a char
-    DefaultChar             uint                           // default character (MB)
-    UniDefaultChar          uint                           // default character (Unicode)
-    TransDefaultChar        uint                           // translation of default char (Unicode)
-    TransUniDefaultChar     uint                           // translation of Unic default char (MB)
+    CodePage                uint                            // code page number
+    MaximumCharacterSize    uint                            // max length (bytes) of a char
+    DefaultChar             uint                            // default character (MB)
+    UniDefaultChar          uint                            // default character (Unicode)
+    TransDefaultChar        uint                            // translation of default char (Unicode)
+    TransUniDefaultChar     uint                            // translation of Unic default char (MB)
     DBCSCodePage            bool                            // Non 0 for DBCS code pages
-    LeadByte                [MAXIMUM_LEADBYTES]byte         // lead byte ranges
+    // LeadByte                [MAXIMUM_LEADBYTES]byte         // lead byte ranges
     MultiByteTable          []uint16                        // pointer to MB translation table
     WideCharTable           []uint16                        // pointer to WC translation table
-    DBCSRanges              uint                            // pointer to DBCS ranges
+    // DBCSRanges              uint                            // pointer to DBCS ranges
     TranslateTable          []uint16                        // pointer to DBCS offsets
 
-    // MultiByteTableAddress   uintptr
-    // WideCharTableAddress    uintptr
-    // DBCSRangesAddress       uintptr
-    // DBCSOffsetsAddress      uintptr
+    data []byte
+    initialized bool
+}
+
+func byteToUInt16Array(bytes []byte) []uint16 {
+    arr := make([]uint16, len(bytes) / 2)
+
+    for i := range(arr) {
+        arr[i] = uint16(bytes[i * 2]) | (uint16(bytes[i * 2 + 1]) << 8)
+        // arr[i] = binary.LittleEndian.Uint16(bytes[i*2 : (i+1)*2])
+    }
+
+    return arr
+}
+
+func decompressData(compressed []byte) []byte {
+    reader, err := zlib.NewReader(bytes.NewReader(compressed))
+    if err != nil {
+        panic(err)
+    }
+
+    defer reader.Close()
+    compressed, err = ioutil.ReadAll(reader)
+    if err != nil {
+        panic(err)
+    }
+
+    return compressed
+}
+
+func extractTable(bytes []byte) ([]uint16, int) {
+    tableSize, offset := binary.Uvarint(bytes)
+    table := bytes[offset:offset + int(tableSize)]
+    return byteToUInt16Array(table), offset + int(tableSize)
 }
 
 func (self *codePageTableInfo) initialize() {
@@ -51,20 +79,20 @@ func (self *codePageTableInfo) initialize() {
         return
     }
 
-    // b := bytes.NewReader(self.data)
-    // r, err := zlib.NewReader(b)
-    // if err != nil {
-    //     panic(err)
-    // }
+    uncompressed := decompressData(self.data)
+    self.data = nil
 
-    // self.data, err = ioutil.ReadAll(r)
-    // r.Close()
+    offset := 0
+    size := 0
 
-    // if err != nil {
-    //     panic(err)
-    // }
+    self.MultiByteTable, size = extractTable(uncompressed)
+    offset += size
 
-    // self.initCodePageTable()
+    self.TranslateTable, size = extractTable(uncompressed[offset:])
+    offset += size
+
+    self.WideCharTable, size = extractTable(uncompressed[offset:])
+    offset += size
 
     self.initialized = true
 }

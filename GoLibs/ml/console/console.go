@@ -10,6 +10,7 @@ var getch = uintptr(0)
 func Pause(text ...string) {
     if len(text) != 0 {
         print(text[0])
+        print("\n")
     }
 
     syscall2.Call(getch)

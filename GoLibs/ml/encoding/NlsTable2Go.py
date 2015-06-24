@@ -37,6 +37,24 @@ def RtlInitCodePageTable(table):
 
     return info
 
+def EncodeVarint(value):
+    o = value
+    varint = b''
+
+    bits = value & 0x7f
+    value >>= 7
+
+    while value:
+        varint += int.to_bytes(0x80 | bits, 1, 'little')
+        bits = value & 0x7f
+        value >>= 7
+
+    varint += int.to_bytes(bits, 1, 'little')
+
+    print('%X' % o, varint)
+
+    return varint
+
 def main():
     if len(sys.argv) == 1:
         sys.argv.append(r"D:\Dev\go\pkgs\src\ml\encoding\C_932.NLS")
@@ -46,24 +64,55 @@ def main():
 
         info = RtlInitCodePageTable(table)
 
-        print('CodePage             = %s' % info.CodePage)
-        print('MaximumCharacterSize = %X' % info.MaximumCharacterSize)
-        print('DefaultChar          = %X' % info.DefaultChar)
-        print('UniDefaultChar       = %X' % info.UniDefaultChar)
-        print('TransDefaultChar     = %X' % info.TransDefaultChar)
-        print('TransUniDefaultChar  = %X' % info.TransUniDefaultChar)
-        print('DBCSCodePage         = %s' % info.DBCSCodePage)
-        print('LeadByte             = %s' % bytes(info.LeadByte))
-        print('MultiByteTable       = %s' % (info.MultiByteTable))
-        print('WideCharTable        = %s' % (info.WideCharTable))
-        print('DBCSRanges           = %s' % (info.DBCSRanges))
-        print('DBCSOffsets          = %s' % (info.DBCSOffsets))
+        # print('CodePage             = %s' % info.CodePage)
+        # print('MaximumCharacterSize = %X' % info.MaximumCharacterSize)
+        # print('DefaultChar          = %X' % info.DefaultChar)
+        # print('UniDefaultChar       = %X' % info.UniDefaultChar)
+        # print('TransDefaultChar     = %X' % info.TransDefaultChar)
+        # print('TransUniDefaultChar  = %X' % info.TransUniDefaultChar)
+        # print('DBCSCodePage         = %s' % info.DBCSCodePage)
+        # print('LeadByte             = %s' % bytes(info.LeadByte))
+        # print('MultiByteTable       = %s' % (info.MultiByteTable))
+        # print('WideCharTable        = %s' % (info.WideCharTable))
+        # print('DBCSRanges           = %s' % (info.DBCSRanges))
+        # print('DBCSOffsets          = %s' % (info.DBCSOffsets))
 
         cp = info.CodePage
+
+        MultiByteTable = bytes((BYTE * MB_TBL_SIZE).from_address(info.MultiByteTable))
+
+        TranslateTableSize = info.WideCharTable - info.DBCSOffsets - 2
+        TranslateTable = bytes((USHORT * (TranslateTableSize // 2)).from_address(info.DBCSOffsets))
+        WideCharTable = bytes((USHORT * 0x10000).from_address(info.WideCharTable))
+
+        compressed = bytearray()
+
+        # MultiByteTable = zlib.compress(MultiByteTable, 9)
+        compressed.extend(EncodeVarint(len(MultiByteTable)))
+        compressed.extend(MultiByteTable)
+
+        # TranslateTable = zlib.compress(TranslateTable, 9)
+        compressed.extend(EncodeVarint(len(TranslateTable)))
+        compressed.extend(TranslateTable)
+
+        # WideCharTable = zlib.compress(WideCharTable, 9)
+        compressed.extend(EncodeVarint(len(WideCharTable)))
+        compressed.extend(WideCharTable)
+
+        compressed = zlib.compress(compressed, 9)
+
+        data = []
+        for i in range(0, len(compressed), 16):
+            data.append(''.join(['0x%02X,' % ch for ch in compressed[i:i + 16]]).rstrip())
 
         src = [
             'package encoding',
             '',
+            'var compressedData%d = []byte{\n    %s\n}' % (cp, '\n    '.join(data)),
+            '',
+        ]
+
+        src.extend([
             'func init() {',
             '    cptable[%d] = codePageTableInfo{' % cp,
             '                        CodePage                : %d,' % cp,
@@ -73,22 +122,21 @@ def main():
             '                        TransDefaultChar        : 0x%X,' % info.TransDefaultChar,
             '                        TransUniDefaultChar     : 0x%X,' % info.TransUniDefaultChar,
             '                        DBCSCodePage            : %s,' % (info.DBCSCodePage and 'true' or 'false'),
-        ]
+            '                        data                    : compressedData%d,' % cp,
+            '                        initialized             : false,',
+        ])
 
         padding = '                        '
 
-        LeadByte = '[]byte[]{%s},' % ','.join(['0x%X' % ch for ch in bytes(info.LeadByte)])
-        src.append(padding + LeadByte)
-
-        MultiByteTable = bytes((BYTE * MB_TBL_SIZE).from_address(int(info.MultiByteTable)))
-        ibp()
+        # LeadByte = 'LeadByte                : []byte[]{%s},' % ','.join(['0x%X' % ch for ch in bytes(info.LeadByte)])
+        # src.append(padding + LeadByte)
 
         src.extend([
             '                    }',
             '}',
         ])
 
-        f = os.path.dirname(f) + '\\%d.go' % cp
+        f = os.path.join(os.path.dirname(f), '%d.go' % cp)
         print(f)
         open(f, 'wb').write('\n'.join(src).encode('UTF8'))
 
