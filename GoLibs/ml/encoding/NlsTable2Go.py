@@ -110,12 +110,14 @@ def main():
         src = [
             'package encoding',
             '',
-            'var compressedData%d = []byte{\n    %s\n}' % (cp, '\n    '.join(data)),
-            '',
         ]
 
         src.extend([
             'func init() {',
+            '    var compressedData = []byte{\n        %s' % ('\n        '.join(data)),
+            '    }'
+            '',
+            '',
             '    cptable[%d] = codePageTableInfo{' % cp,
             '                        CodePage                : %d,' % cp,
             '                        MaximumCharacterSize    : 0x%X,' % info.MaximumCharacterSize,
@@ -124,7 +126,7 @@ def main():
             '                        TransDefaultChar        : 0x%X,' % info.TransDefaultChar,
             '                        TransUniDefaultChar     : 0x%X,' % info.TransUniDefaultChar,
             '                        DBCSCodePage            : %s,' % (info.DBCSCodePage and 'true' or 'false'),
-            '                        data                    : compressedData%d,' % cp,
+            '                        data                    : compressedData,',
             '                        initialized             : false,',
         ])
 
