@@ -122,10 +122,14 @@ func testNet() {
 }
 
 func testEncoding() {
-    gbk := encoding.GetEncoder(encoding.CP_GBK)
+    gbk := encoding.GetEncoder(encoding.CP_SHIFT_JIS)
 
-    text := gbk.Encode("中文")
-    Println(text)
+    text := gbk.Encode("身喰らう蛇")
+    for _, ch := range text {
+        Printf("%02X ", ch)
+    }
+
+    Println()
 
     gg := gbk.Decode(text)
     Println(gg)
