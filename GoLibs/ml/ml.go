@@ -2,6 +2,7 @@ package ml
 
 import (
     "runtime"
+    "syscall"
     "ml/str"
     "ml/array"
     "ml/console"
@@ -48,6 +49,20 @@ func Array(values ...interface{}) array.Array {
 
 -- */
 
+/* ++
+
+    init
+
+-- */
+
+func fixTimePeriod() {
+    syscall.MustLoadDLL("winmm.dll").MustFindProc("timeEndPeriod").Call(uintptr(1))
+}
+
 func init() {
     runtime.GOMAXPROCS(runtime.NumCPU())
+
+    if runtime.GOOS == "windows" {
+        fixTimePeriod()
+    }
 }
