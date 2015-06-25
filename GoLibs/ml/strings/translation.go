@@ -14,11 +14,13 @@ CustomCPToUnicodeN(
 
     BytesInCustomCPString := uint(len(CustomCPString))
 
+    runes := []rune{}
+
     if CustomCP.DBCSCodePage == false {
         TranslateTable := CustomCP.MultiByteTable
 
         for i := uint(0); i != BytesInCustomCPString; i++ {
-            UnicodeString += String(string(rune(TranslateTable[CustomCPString[i]])))
+            runes = append(runes, rune(TranslateTable[CustomCPString[i]]))
         }
 
     } else {
@@ -29,27 +31,29 @@ CustomCPToUnicodeN(
         for BytesInCustomCPString != 0 {
             BytesInCustomCPString--
 
-            if NlsCustomLeadByteInfo[CustomCPString[index]] != 0 {
+            Entry := uint(NlsCustomLeadByteInfo[CustomCPString[index]])
+
+            if Entry != 0 {
                 if BytesInCustomCPString == 0 {
                     break
                 }
 
-                Entry := uint(NlsCustomLeadByteInfo[CustomCPString[index]])
-                UnicodeString += String(string(rune(TranslateTable[Entry + uint(CustomCPString[index + 1])])))
+                TailByte := uint(CustomCPString[index + 1])
+                runes = append(runes, rune(TranslateTable[Entry + TailByte]))
 
                 index += 2
                 BytesInCustomCPString--
 
             } else {
 
-                UnicodeString += String(string(rune(CustomCP.MultiByteTable[CustomCPString[index]])))
+                runes = append(runes, rune(CustomCP.MultiByteTable[CustomCPString[index]]))
                 index++
             }
 
         }
     }
 
-    return
+    return String(string(runes))
 }
 
 func

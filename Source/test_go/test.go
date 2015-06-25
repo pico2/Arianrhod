@@ -185,6 +185,9 @@ func testEncoding() {
 
     gg := strings.Decode(text, strings.CP_GBK)
     Println(gg)
+
+    gg = strings.Decode(text, strings.CP_SHIFT_JIS)
+    Println(gg)
 }
 
 func main() {
