@@ -131,6 +131,8 @@ func testEncoding() {
 
     Println()
 
+    gbk = encoding.GetEncoder(encoding.CP_GBK)
+
     gg := gbk.Decode(text)
     Println(gg)
 }

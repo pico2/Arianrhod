@@ -5,6 +5,7 @@ import (
     "compress/zlib"
     "bytes"
     "encoding/binary"
+    "sync"
 )
 
 const (
@@ -42,12 +43,13 @@ type codePageTableInfo struct {
     initialized bool
 }
 
+var lock = &sync.Mutex{}
+
 func byteToUInt16Array(bytes []byte) []uint16 {
     arr := make([]uint16, len(bytes) / 2)
 
     for i := range(arr) {
         arr[i] = uint16(bytes[i * 2]) | (uint16(bytes[i * 2 + 1]) << 8)
-        // arr[i] = binary.LittleEndian.Uint16(bytes[i*2 : (i+1)*2])
     }
 
     return arr
@@ -75,6 +77,13 @@ func extractTable(bytes []byte) ([]uint16, int) {
 }
 
 func (self *codePageTableInfo) initialize() {
+    if self.initialized {
+        return
+    }
+
+    lock.Lock()
+    defer lock.Unlock()
+
     if self.initialized {
         return
     }
