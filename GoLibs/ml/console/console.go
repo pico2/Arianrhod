@@ -2,10 +2,10 @@ package console
 
 import (
     "syscall"
-    syscall2 "ml/syscall"
+    "runtime"
 )
 
-var getch = uintptr(0)
+var getch *syscall.Proc
 
 func Pause(text ...string) {
     if len(text) != 0 {
@@ -13,12 +13,15 @@ func Pause(text ...string) {
         print("\n")
     }
 
-    syscall2.Call(getch)
+    getch.Call()
+}
+
+func initWindows() {
+    getch = syscall.MustLoadDLL("msvcrt.dll").MustFindProc("_getch")
 }
 
 func init() {
-    msvcrt, _ := syscall.LoadLibrary("msvcrt.dll")
-    getch1, _ := syscall.GetProcAddress(msvcrt, "_getch")
-
-    getch = getch1
+    if runtime.GOOS == "windows" {
+        initWindows()
+    }
 }
