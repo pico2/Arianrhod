@@ -3,7 +3,7 @@ package ml
 import (
     "runtime"
     "syscall"
-    "ml/str"
+    "ml/strings"
     "ml/array"
     "ml/console"
 )
@@ -23,12 +23,12 @@ var Console = _Console{Pause : console.Pause}
 
 /* ++
 
-  str
+  strings
 
 -- */
 
-func Str(s string) str.String {
-    return str.String(s)
+func Str(s string) strings.String {
+    return strings.String(s)
 }
 
 

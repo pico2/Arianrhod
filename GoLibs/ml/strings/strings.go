@@ -1,4 +1,4 @@
-package str
+package strings
 
 import (
     "strings"
@@ -17,6 +17,14 @@ func (self *String) SizeInBytes() (int) {
 
 func (self *String) Length() (int) {
     return utf8.RuneCountInString(string(*self))
+}
+
+func (self *String) Encode(encoding int) []byte {
+    return GetEncoder(encoding).Encode(*self)
+}
+
+func Decode(bytes []byte, encoding int) String {
+    return GetEncoder(encoding).Decode(bytes)
 }
 
 func (self *String) Replace(old, new String, count ...int) String {
@@ -81,10 +89,6 @@ func (self *String) Trim(cutset ...String) String {
     }
 
     return String(strings.Trim(string(*self), s))
-}
-
-func New(str string) String {
-    return String(str)
 }
 
 func init() {

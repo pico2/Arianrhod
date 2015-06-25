@@ -1,13 +1,13 @@
 package http
 
 import (
-    // "fmt"
     "errors"
     gourl "net/url"
     "net/http/cookiejar"
-    . "ml/str"
+    . "ml/strings"
     . "ml/dict"
     gohttp "net/http"
+    "fmt"
 )
 
 type Header struct {
@@ -20,43 +20,83 @@ type Session struct {
     header  gohttp.Header
 }
 
+func toString(value interface{}) String {
+    switch v := value.(type) {
+        case string:
+            return String(v)
+
+        case String:
+            return v
+
+        case int:
+            return String(fmt.Sprintf("%v", v))
+
+        default:
+            return String(v.(string))
+    }
+}
+
 func (self *Session) Request(method, url String, params_ ...Dict) (*Response, error) {
     request, err := gohttp.NewRequest(string(method), string(url), nil)
     if err != nil {
         return nil, err
     }
 
-    params := Dict{}
+    var params Dict
     switch (len(params_)) {
         case 1:
             params = params_[0]
 
         case 0:
-            break
+            params = Dict{}
 
         default:
             return nil, errors.New("invalid params number")
     }
 
-    data := params["data"]
-    query := params["params"]
+    var encoding int
+    var queryString string
 
-    switch (method.ToUpper()) {
-        case "GET":
-            if query == nil {
+    switch v := params["encoding"].(type) {
+        case int:
+            encoding = v
+            if encoding == CP_UTF8 {
+                encoding = 0
+            }
+
+        default:
+            encoding = 0
+    }
+
+    switch query := params["params"].(type) {
+        case Dict:
+            if method.ToUpper() != "GET" {
                 break
             }
 
             values := gourl.Values{}
-            for k, v := range query.(Dict) {
-                values.Set(k.(string), v.(string))
+            for k, v := range query {
+
+                key := toString(k)
+                value := toString(v)
+
+                if encoding != 0 {
+                    key = String(string(key.Encode(encoding)))
+                    value = String(string(value.Encode(encoding)))
+                }
+
+                values.Set(string(key), string(value))
             }
 
-        case "POST":
-            if data == nil {
-                break
-            }
+            queryString = values.Encode()
     }
+
+    if len(queryString) != 0 {
+        request.URL.RawQuery = queryString
+    }
+
+    fmt.Printf("query string = %v\n", queryString)
+    fmt.Printf("uri = %v\n", request.URL.String())
 
     resp, err := self.client.Do(request)
     if err != nil {

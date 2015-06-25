@@ -4,12 +4,14 @@ import (
     . "ml"
     . "fmt"
     . "ml/dict"
-    "os"
     "ml/logging"
     "ml/syscall"
-    // "ml/net/http"
-    "ml/encoding"
+    "ml/strings"
+    "ml/net/http"
     "unicode/utf8"
+    "net/url"
+    "os"
+    "strconv"
 )
 
 func testString() (r int) {
@@ -36,6 +38,10 @@ func testString() (r int) {
 
     Printf("%c\n", s[0])
     Printf("'%+v'\n", s.Trim("f"))
+
+    var emptyString string
+
+    Println(emptyString, len(emptyString))
 
     r = 123
 
@@ -65,9 +71,26 @@ func testNamedReturn() (i int, s string) {
     return 0, "1"
 }
 
+type PARAMS map[string]interface{}
+
+func testDict2(params PARAMS) {
+    v := 2
+    switch 1 {
+        case 1:
+            Println("is 1")
+            fallthrough
+        case 2:
+            Println("is ", v)
+    }
+
+    Println(params)
+}
+
 func testDict() {
     x := Dict{1 : 2, "fuck" : 3.33}
     x[2] = 3
+
+    testDict2(PARAMS{"1": 2})
 
     Println(x)
     Println(x["fuck"])
@@ -101,39 +124,66 @@ func testMisc(a interface{}) {
         Ucs16String = append(Ucs16String, uint16(r))
     }
 
+    var i64 uint64
+    var i interface{}
+
+    i64 = 12345678901234567890
+    i = i64
+    switch t := i.(type) {
+        case int32:
+            Println(Sprintf("%v", t))
+    }
+
     Println(Ucs16String)
+    Println(strconv.FormatUint(i64, 10))
 }
 
 func testNet() {
-    // session, _ := http.NewSession()
+    session, _ := http.NewSession()
 
-    // resp, err := session.Get(
-    //                 "https://www.baidu.com/",
-    //                 Dict{
-    //                     "params": Dict{
-    //                         "中": "文",
-    //                     },
-    //                 },
-    //             )
+    resp, err := session.Get(
+                    "https://www.baidu.com/fuck",
+                    Dict{
+                        "params": Dict{
+                            "a1": "中文",
+                            "a2": "测试",
+                        },
+                        // "encoding": strings.CP_GBK,
+                    },
+                )
 
-    // Println(err, resp)
+    Println(err)
 
-    // _ = session
+    _ = resp
 }
 
 func testEncoding() {
-    gbk := encoding.GetEncoder(encoding.CP_SHIFT_JIS)
+    ss := Str("身喰らう蛇")
 
-    text := gbk.Encode("身喰らう蛇")
+    Println("orig", ss)
+
+    text := ss.Encode(strings.CP_SHIFT_JIS)
     for _, ch := range text {
         Printf("%02X ", ch)
     }
 
+    s := string(text)
+
     Println()
 
-    gbk = encoding.GetEncoder(encoding.CP_GBK)
+    v := url.Values{}
 
-    gg := gbk.Decode(text)
+    v.Set("fuck", s)
+
+    for i := 0; i != len(s); i++ {
+        Printf("%02X ", s[i])
+    }
+
+    Println()
+    Println(v.Encode())
+    Println()
+
+    gg := strings.Decode(text, strings.CP_GBK)
     Println(gg)
 }
 

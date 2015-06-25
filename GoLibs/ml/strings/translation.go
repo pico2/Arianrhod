@@ -1,7 +1,6 @@
-package encoding
+package strings
 
 import (
-    . "ml/str"
     "unicode/utf8"
 )
 

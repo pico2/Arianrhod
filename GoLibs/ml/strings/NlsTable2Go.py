@@ -108,7 +108,7 @@ def main():
             data.append(''.join(['0x%02X,' % ch for ch in compressed[i:i + 16]]).rstrip())
 
         src = [
-            'package encoding',
+            'package strings',
             '',
         ]
 

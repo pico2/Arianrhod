@@ -1,4 +1,4 @@
-package encoding
+package strings
 
 import (
     "io/ioutil"

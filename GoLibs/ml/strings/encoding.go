@@ -1,7 +1,7 @@
-package encoding
+package strings
 
 import (
-    . "ml/str"
+    "fmt"
 )
 
 var cptable = map[int]codePageTableInfo {}
@@ -27,7 +27,7 @@ func GetEncoder(codepage int) (*Encoder) {
     table, ok := cptable[codepage]
 
     if !ok {
-        return nil
+        panic(fmt.Sprintf("can't find encoder for codepage %v", codepage))
     }
 
     table.initialize()

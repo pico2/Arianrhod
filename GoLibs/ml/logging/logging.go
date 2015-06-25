@@ -7,15 +7,15 @@ import (
     "sync"
     "time"
     "runtime"
-    "ml/str"
+    . "ml/strings"
     "path/filepath"
 )
 
 type Logger struct {
-    formatter   str.String
+    formatter   String
     level       int
     callDepth   int
-    tag         str.String
+    tag         String
     out         []io.Writer
 }
 
@@ -51,9 +51,9 @@ var nameToLevel = map[string]int {
 
 var lock = sync.Mutex{}
 
-var defaultFormatter = str.String("[%date %time][%tag][%file][%func:%line]")
+var defaultFormatter = String("[%date %time][%tag][%file][%func:%line]")
 
-func (self *Logger) output(level int, format str.String, args ...interface{}) {
+func (self *Logger) output(level int, format String, args ...interface{}) {
     if level < self.level {
         return
     }
@@ -79,57 +79,57 @@ func (self *Logger) output(level int, format str.String, args ...interface{}) {
     }
 
     if format.Find("%file") != -1 {
-        format = format.Replace("%file", str.String(filepath.Base(file)))
+        format = format.Replace("%file", String(filepath.Base(file)))
     }
 
     if format.Find("%func") != -1 {
-        format = format.Replace("%func", str.String(runtime.FuncForPC(pc).Name()))
+        format = format.Replace("%func", String(runtime.FuncForPC(pc).Name()))
     }
 
     if format.Find("%line") != -1 {
-        format = format.Replace("%line", str.String(fmt.Sprintf("%d", line)))
+        format = format.Replace("%line", String(fmt.Sprintf("%d", line)))
     }
 
     if format.Find("%date") != -1 {
         year, month, day := t.Date()
         date := fmt.Sprintf("%04d-%02d-%02d", year, month, day)
 
-        format = format.Replace("%date", str.String(date))
+        format = format.Replace("%date", String(date))
     }
 
     if format.Find("%time") != -1 {
         hour, min, sec := t.Clock()
         time := fmt.Sprintf("%02d:%02d:%02d", hour, min, sec)
 
-        format = format.Replace("%time", str.String(time))
+        format = format.Replace("%time", String(time))
     }
 
-    format += "[" + str.String(levelToName[level]) + "] "
+    format += "[" + String(levelToName[level]) + "] "
 
-    buf := []byte(format + str.String(text) + "\n")
+    buf := []byte(format + String(text) + "\n")
 
     for _, out := range self.out {
         out.Write(buf)
     }
 }
 
-func (self *Logger) Debug(format str.String, args ...interface{}) {
+func (self *Logger) Debug(format String, args ...interface{}) {
     self.output(DEBUG, format, args...)
 }
 
-func (self *Logger) Fatal(format str.String, args ...interface{}) {
+func (self *Logger) Fatal(format String, args ...interface{}) {
     self.output(FATAL, format, args...)
 }
 
-func (self *Logger) Error(format str.String, args ...interface{}) {
+func (self *Logger) Error(format String, args ...interface{}) {
     self.output(ERROR, format, args...)
 }
 
-func (self *Logger) Warning(format str.String, args ...interface{}) {
+func (self *Logger) Warning(format String, args ...interface{}) {
     self.output(WARNING, format, args...)
 }
 
-func (self *Logger) Info(format str.String, args ...interface{}) {
+func (self *Logger) Info(format String, args ...interface{}) {
     self.output(INFO, format, args...)
 }
 
@@ -141,7 +141,7 @@ func (self *Logger) Level() int {
     return self.level
 }
 
-func (self *Logger) SetFormater(formatter ...str.String) {
+func (self *Logger) SetFormater(formatter ...String) {
     switch len(formatter) {
         case 0:
             self.formatter = defaultFormatter
@@ -150,8 +150,8 @@ func (self *Logger) SetFormater(formatter ...str.String) {
     }
 }
 
-func New(tag str.String) Logger {
-    return Logger{
+func New(tag String) *Logger {
+    return &Logger{
                formatter    : defaultFormatter,
                level        : DEBUG,
                tag          : tag,

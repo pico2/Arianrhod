@@ -1,4 +1,4 @@
-package encoding
+package strings
 
 func init() {
     var compressedData = []byte{

@@ -3,14 +3,14 @@ package http
 import (
     "io/ioutil"
     "net/url"
-    "ml/str"
+    . "ml/strings"
     gohttp "net/http"
 )
 
 type Response struct {
-    Status      str.String // e.g. "200 OK"
+    Status      String // e.g. "200 OK"
     StatusCode  int    // e.g. 200
-    Proto       str.String // e.g. "HTTP/1.0"
+    Proto       String // e.g. "HTTP/1.0"
     ProtoMajor  int    // e.g. 1
     ProtoMinor  int    // e.g. 0
     Header      gohttp.Header
@@ -37,9 +37,9 @@ func NewResponse(resp *gohttp.Response) (*Response, error) {
     }
 
     return &Response{
-        Status      : str.String(resp.Status),
+        Status      : String(resp.Status),
         StatusCode  : resp.StatusCode,
-        Proto       : str.String(resp.Proto),
+        Proto       : String(resp.Proto),
         ProtoMajor  : resp.ProtoMajor,
         ProtoMinor  : resp.ProtoMinor,
         Header      : resp.Header,
