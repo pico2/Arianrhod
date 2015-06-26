@@ -17,7 +17,7 @@ type Header struct {
 type Session struct {
     cookie  *cookiejar.Jar
     client  *gohttp.Client
-    header  gohttp.Header
+    headers gohttp.Header
 }
 
 func toString(value interface{}) String {
@@ -91,6 +91,19 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
             queryString = values.Encode()
     }
 
+    for k, vs := range self.headers {
+        for _, v := range vs {
+            request.Header.Add(k, v)
+        }
+    }
+
+    switch headers := params["headers"].(type) {
+        case Dict:
+            for k, v := range headers {
+                request.Header.Set(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+            }
+    }
+
     if len(queryString) != 0 {
         request.URL.RawQuery = queryString
     }
@@ -114,8 +127,11 @@ func (self *Session) Post(url String, params ...Dict) (resp *Response, err error
     return self.Request("POST", url, params...)
 }
 
-func (self *Session) SetHeaders(headers *Header) {
-
+func (self *Session) SetHeaders(headers Dict) {
+    self.headers = gohttp.Header{}
+    for k, v := range headers {
+        self.headers.Set(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+    }
 }
 
 func NewSession() (*Session, error) {
@@ -130,8 +146,8 @@ func NewSession() (*Session, error) {
     }
 
     return &Session{
-                cookie: jar,
-                client: client,
-                header: make(gohttp.Header),
+                cookie  : jar,
+                client  : client,
+                headers : make(gohttp.Header),
             }, nil
 }
