@@ -1,7 +1,7 @@
 #include "TaiG2.h"
 #include <DbgHelp.h>
 
-#pragma comment(linker, "/EXPORT:MiniDumpWriteDump=_StMiniDumpWriteDump@28")
+//#pragma comment(linker, "/EXPORT:MiniDumpWriteDump=_StMiniDumpWriteDump@28")
 
 NAKED VOID SetDebEntry()
 {
@@ -74,30 +74,45 @@ VOID InitializeDbghelp()
     self->SizeOfImage = dbghlp->SizeOfImage;
 }
 
-EXTC
-BOOL
-NTAPI
-StMiniDumpWriteDump(
-    HANDLE                              hProcess,
-    DWORD                               ProcessId,
-    HANDLE                              hFile,
-    MINIDUMP_TYPE                       DumpType,
-    PMINIDUMP_EXCEPTION_INFORMATION     ExceptionParam,
-    PMINIDUMP_USER_STREAM_INFORMATION   UserStreamParam,
-    PMINIDUMP_CALLBACK_INFORMATION      CallbackParam
+API_POINTER(CreateFileW) StubCreateFileW;
+
+HANDLE
+WINAPI
+TgCreateFileW(
+    PCWSTR                  FileName,
+    ULONG                   DesiredAccess,
+    ULONG                   ShareMode,
+    LPSECURITY_ATTRIBUTES   SecurityAttributes,
+    ULONG                   CreationDisposition,
+    ULONG                   FlagsAndAttributes,
+    HANDLE                  TemplateFile
 )
 {
-    InitializeDbghelp();
+    if (_ReturnAddress() == PtrAdd(GetExeModuleHandle(), 0x92FED74))
+    {
+        RtlSetLastWin32Error(ERROR_ACCESS_DENIED);
+        return INVALID_HANDLE_VALUE;
+    }
 
-    if (DbghlpMiniDumpWriteDump != nullptr)
-        return DbghlpMiniDumpWriteDump(hProcess, ProcessId, hFile, DumpType, ExceptionParam, UserStreamParam, CallbackParam);
-
-    return FALSE;
+    return StubCreateFileW(FileName, DesiredAccess, ShareMode, SecurityAttributes, CreationDisposition, FlagsAndAttributes, TemplateFile);
 }
 
 static NTSTATUS Initialize2()
 {
     using namespace Mp;
+/*
+
+    PBYTE buf;
+
+    buf = (PBYTE)AllocateMemory(0x100);
+    AllocConsole();
+    for (int i = 0; i != 0x100; ++i)
+    {
+        PrintConsole(L"%02X ", buf[i]);
+    }
+
+    FreeMemory(buf);
+*/
 
     {
         PATCH_MEMORY_DATA p[] =
@@ -143,6 +158,10 @@ NTSTATUS Remove3K2_Initialize(PVOID TaiGBase)
 {
     using namespace Mp;
 
+    static CHAR VersionDll[] = "VERSION.dll";
+
+    PVOID Kernel32 = GetKernel32Handle();
+
     {
         PATCH_MEMORY_DATA p[] =
         {
@@ -150,7 +169,9 @@ NTSTATUS Remove3K2_Initialize(PVOID TaiGBase)
             //FunctionCallRva(0x1533B, TgLoadLibrary),
             //FunctionCallRva(0x15E71, SetDebEntry),  // 2.0 2.1
             //MemoryPatchRva(0x80, 1, 0x1A423),       // jo
-            FunctionJumpVa(LookupExportTable(GetKernel32Handle(), KERNEL32_CreateMutexW), TgCreateMutexW, &StubCreateMutexW),
+            MemoryPatchRva(VersionDll, sizeof(VersionDll), 0x475DC9D),
+            FunctionJumpVa(LookupExportTable(Kernel32, KERNEL32_CreateFileW), TgCreateFileW, &StubCreateFileW),
+            FunctionJumpVa(LookupExportTable(Kernel32, KERNEL32_CreateMutexW), TgCreateMutexW, &StubCreateMutexW),
         };
 
         PatchMemory(p, countof(p), GetExeModuleHandle());

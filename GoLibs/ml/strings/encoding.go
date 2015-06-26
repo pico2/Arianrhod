@@ -8,15 +8,27 @@ var cptable = map[int]codePageTableInfo {}
 
 type Encoder struct {
     codepage int
-    table codePageTableInfo
+    table *codePageTableInfo
 }
 
 func (self *Encoder) Encode(str String) []byte {
-    return UnicodeToCustomCPN(&self.table, str)
+    switch self.table.encode != nil {
+        case true:
+            return self.table.encode(self.table, str)
+
+        default:
+            return UnicodeToCustomCPN(self.table, str)
+    }
 }
 
 func (self *Encoder) Decode(bytes []byte) String {
-    return CustomCPToUnicodeN(&self.table, bytes)
+    switch self.table.decode != nil {
+        case true:
+            return self.table.decode(self.table, bytes)
+
+        default:
+            return CustomCPToUnicodeN(self.table, bytes)
+    }
 }
 
 func (self *Encoder) String() string {
@@ -34,7 +46,7 @@ func GetEncoder(codepage int) (*Encoder) {
 
     return &Encoder{
                 codepage: codepage,
-                table: table,
+                table: &table,
             }
 }
 

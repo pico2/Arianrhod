@@ -1,6 +1,6 @@
 #pragma comment(linker, "/ENTRY:DllMain")
-#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
-#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
+//#pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
+//#pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 #pragma comment(linker, "/EXPORT:GetFileVersionInfoW=VERSION.GetFileVersionInfoW")
 #pragma comment(linker, "/EXPORT:GetFileVersionInfoSizeW=VERSION.GetFileVersionInfoSizeW")
 #pragma comment(linker, "/EXPORT:VerQueryValueW=VERSION.VerQueryValueW")

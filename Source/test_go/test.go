@@ -162,7 +162,16 @@ func testEncoding() {
 
     Println("orig", ss)
 
-    text := ss.Encode(strings.CP_SHIFT_JIS)
+    text := ss.Encode(strings.CP_UTF8)
+    for _, ch := range text {
+        Printf("%02X ", ch)
+    }
+
+    Println()
+    Println(strings.Decode(text, strings.CP_UTF8))
+    Println()
+
+    text = ss.Encode(strings.CP_SHIFT_JIS)
     for _, ch := range text {
         Printf("%02X ", ch)
     }

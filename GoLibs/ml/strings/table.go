@@ -26,12 +26,12 @@ const (
 )
 
 type codePageTableInfo struct {
-    CodePage                uint                            // code page number
-    MaximumCharacterSize    uint                            // max length (bytes) of a char
-    DefaultChar             uint                            // default character (MB)
-    UniDefaultChar          uint                            // default character (Unicode)
-    TransDefaultChar        uint                            // translation of default char (Unicode)
-    TransUniDefaultChar     uint                            // translation of Unic default char (MB)
+    CodePage                uint16                          // code page number
+    MaximumCharacterSize    uint16                          // max length (bytes) of a char
+    DefaultChar             uint16                          // default character (MB)
+    UniDefaultChar          uint16                          // default character (Unicode)
+    TransDefaultChar        uint16                          // translation of default char (Unicode)
+    TransUniDefaultChar     uint16                          // translation of Unic default char (MB)
     DBCSCodePage            bool                            // Non 0 for DBCS code pages
     // LeadByte                [MAXIMUM_LEADBYTES]byte         // lead byte ranges
     MultiByteTable          []uint16                        // pointer to MB translation table
@@ -41,6 +41,9 @@ type codePageTableInfo struct {
 
     data []byte
     initialized bool
+
+    encode func(table *codePageTableInfo, str String) []byte
+    decode func(table *codePageTableInfo, bytes []byte) String
 }
 
 var lock = &sync.Mutex{}
