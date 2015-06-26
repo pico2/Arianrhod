@@ -90,9 +90,11 @@ func testDict() {
     x := Dict{1 : 2, "fuck" : 3.33}
     x[2] = 3
 
-    mm := map[int]int
+    mm := map[int][]int{}
 
-    mm = append(mm)
+    Println("fuck mm", mm[1])
+    mm[1] = append(mm[1], 1)
+    Println("fuck mm", mm)
 
     testDict2(PARAMS{"1": 2})
 

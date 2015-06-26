@@ -127,10 +127,22 @@ func (self *Session) Post(url String, params ...Dict) (resp *Response, err error
     return self.Request("POST", url, params...)
 }
 
-func (self *Session) SetHeaders(headers Dict) {
+func (self *Session) ClearHeaders() {
     self.headers = gohttp.Header{}
+}
+
+func (self *Session) SetHeaders(headers Dict) {
     for k, v := range headers {
-        self.headers.Set(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+        self.headers.Add(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+    }
+}
+
+func (self *Session) SetProxy(host String, port int) {
+    if len(host) == 0 {
+        self.client.Transport = nil
+    } else {
+        proxyUrl := fmt.Sprintf("http://%s:%d", host, port)
+        self.client.Transport = &gohttp.Transport{Proxy: gohttp.ProxyURL(proxyUrl)}
     }
 }
 
