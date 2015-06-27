@@ -36,6 +36,18 @@ func toString(value interface{}) String {
     }
 }
 
+func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Header, extraHeaders Dict) {
+    for k, vs := range *defaultHeaders {
+        for _, v := range vs {
+            request.Header.Add(k, v)
+        }
+    }
+
+    for k, v := range extraHeaders {
+        request.Header.Add(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+    }
+}
+
 func (self *Session) Request(method, url String, params_ ...Dict) (*Response, error) {
     request, err := gohttp.NewRequest(string(method), string(url), nil)
     if err != nil {
@@ -91,18 +103,14 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
             queryString = values.Encode()
     }
 
-    for k, vs := range self.headers {
-        for _, v := range vs {
-            request.Header.Add(k, v)
-        }
-    }
+    extraHeaders := Dict{}
 
     switch headers := params["headers"].(type) {
         case Dict:
-            for k, v := range headers {
-                request.Header.Set(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
-            }
+            extraHeaders = headers
     }
+
+    applyHeadersToRequest(request, &self.headers, extraHeaders)
 
     if len(queryString) != 0 {
         request.URL.RawQuery = queryString
@@ -110,6 +118,15 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
 
     fmt.Printf("query string = %v\n", queryString)
     fmt.Printf("uri = %v\n", request.URL.String())
+
+    self.client.CheckRedirect = func(request *gohttp.Request, via []*gohttp.Request) error {
+        if len(via) >= 10 {
+            return errors.New("stopped after 10 redirects")
+        }
+
+        applyHeadersToRequest(request, &self.headers, extraHeaders)
+        return nil
+    }
 
     resp, err := self.client.Do(request)
     if err != nil {
@@ -141,7 +158,11 @@ func (self *Session) SetProxy(host String, port int) {
     if len(host) == 0 {
         self.client.Transport = nil
     } else {
-        proxyUrl := fmt.Sprintf("http://%s:%d", host, port)
+        proxyUrl, err := gourl.Parse(fmt.Sprintf("http://%s:%d", host, port))
+        if err != nil {
+            return
+        }
+
         self.client.Transport = &gohttp.Transport{Proxy: gohttp.ProxyURL(proxyUrl)}
     }
 }

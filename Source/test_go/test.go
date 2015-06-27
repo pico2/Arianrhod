@@ -147,12 +147,18 @@ func testMisc(a interface{}) {
 func testNet() {
     session, _ := http.NewSession()
 
+    session.SetProxy("localhost", 6789)
+
     resp, err := session.Get(
                     "https://www.baidu.com/fuck",
                     Dict{
                         "params": Dict{
                             "a1": "中文",
                             "a2": "测试",
+                        },
+                        "headers": Dict{
+                            "User-Agent": "Go 2.1 package http",
+                            "stupid"    : "go http package",
                         },
                         // "encoding": strings.CP_GBK,
                     },
