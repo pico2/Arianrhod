@@ -19,6 +19,10 @@ func (self *String) Length() (int) {
     return utf8.RuneCountInString(string(*self))
 }
 
+func (self *String) IsEmpty() bool {
+    return len(*self) == 0
+}
+
 func (self *String) Encode(encoding int) []byte {
     return GetEncoder(encoding).Encode(*self)
 }

@@ -12,6 +12,8 @@ import (
     "net/url"
     "os"
     "strconv"
+    "bytes"
+    "io"
 )
 
 func testString() (r int) {
@@ -94,7 +96,7 @@ func testDict() {
 
     Println("fuck mm", mm[1])
     mm[1] = append(mm[1], 1)
-    Println("fuck mm", mm)
+    Println("fuck mm", mm, len(mm))
 
     testDict2(PARAMS{"1": 2})
 
@@ -142,6 +144,23 @@ func testMisc(a interface{}) {
 
     Println(Ucs16String)
     Println(strconv.FormatUint(i64, 10))
+
+    conv := func (r io.Reader) {
+        // rc, ok := r.(io.ReadCloser)
+        Println("io.Reader", r)
+        if r != nil {
+            Println("r is not nil", r)
+        }
+    }
+
+    var b *bytes.Buffer
+    var r io.Reader
+    b = nil
+    r = b
+
+    _ = b
+
+    conv(r)
 }
 
 func testNet() {
@@ -149,20 +168,36 @@ func testNet() {
 
     session.SetProxy("localhost", 6789)
 
-    resp, err := session.Get(
-                    "https://www.baidu.com/fuck",
+    session.SetHeaders(Dict{
+        "Accept"            : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding"   : "gzip, deflate",
+        "Accept-Language"   : "zh-CN,en-US;q=0.8,en;q=0.5,zh-HK;q=0.3",
+        "User-Agent"        : "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:39.0) Gecko/20100101 Firefox/39.0",
+        "Content-Type"      : "application/x-www-form-urlencoded",
+        "Connection"        : "keep-alive",
+    })
+
+    resp, err := session.Post(
+                    "http://bbs.saraba1st.com/2b/member.php",
                     Dict{
                         "params": Dict{
-                            "a1": "中文",
-                            "a2": "测试",
+                            "mod"           : "logging",
+                            "action"        : "login",
+                            "loginsubmit"   : "yes",
+                            "infloat"       : "yes",
+                            "lssubmit"      : "yes",
+                            "inajax"        : "1",
                         },
-                        "headers": Dict{
-                            "User-Agent": "Go 2.1 package http",
-                            "stupid"    : "go http package",
+                        "body": Dict{
+                            "fastloginfield"    : "username",
+                            "quickforward"      : "yes",
+                            "handlekey"         : "ls",
                         },
-                        // "encoding": strings.CP_GBK,
+                        // "encoding": strings.CP_UTF8,
                     },
                 )
+
+    resp, err = session.Get("http://bbs.saraba1st.com/2b/forum-75-1.html")
 
     Println(err)
 

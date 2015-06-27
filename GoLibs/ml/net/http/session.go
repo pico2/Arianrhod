@@ -1,13 +1,17 @@
 package http
 
 import (
-    "errors"
     gourl "net/url"
+    gohttp "net/http"
+    "errors"
+    "fmt"
+    "bytes"
+    "io"
+
     "net/http/cookiejar"
+
     . "ml/strings"
     . "ml/dict"
-    gohttp "net/http"
-    "fmt"
 )
 
 type Header struct {
@@ -36,6 +40,19 @@ func toString(value interface{}) String {
     }
 }
 
+func dictToValues(d Dict, encoding int) gourl.Values {
+    values := gourl.Values{}
+    for k, v := range d {
+
+        key := toString(k)
+        value := toString(v)
+
+        values.Set(string(key.Encode(encoding)), string(value.Encode(encoding)))
+    }
+
+    return values
+}
+
 func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Header, extraHeaders Dict) {
     for k, vs := range *defaultHeaders {
         for _, v := range vs {
@@ -49,12 +66,11 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
 }
 
 func (self *Session) Request(method, url String, params_ ...Dict) (*Response, error) {
-    request, err := gohttp.NewRequest(string(method), string(url), nil)
-    if err != nil {
-        return nil, err
-    }
+    var bodyReader  io.Reader
+    var params      Dict
+    var encoding    int
+    var queryString string
 
-    var params Dict
     switch (len(params_)) {
         case 1:
             params = params_[0]
@@ -66,40 +82,40 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
             return nil, errors.New("invalid params number")
     }
 
-    var encoding int
-    var queryString string
-
     switch v := params["encoding"].(type) {
         case int:
             encoding = v
-            if encoding == CP_UTF8 {
-                encoding = 0
-            }
 
         default:
-            encoding = 0
+            encoding = CP_UTF8
+    }
+
+    switch body := params["body"].(type) {
+        case string:
+            b := String(body)
+            bodyReader = bytes.NewBuffer(b.Encode(encoding))
+
+        case String:
+            bodyReader = bytes.NewBuffer(body.Encode(encoding))
+
+        case []byte:
+            bodyReader = bytes.NewBuffer(body)
+
+        case Dict:
+            bodyReader = bytes.NewBufferString(dictToValues(body, encoding).Encode())
+
+        default:
+            bodyReader = nil
+    }
+
+    request, err := gohttp.NewRequest(string(method), string(url), bodyReader)
+    if err != nil {
+        return nil, err
     }
 
     switch query := params["params"].(type) {
         case Dict:
-            if method.ToUpper() != "GET" {
-                break
-            }
-
-            values := gourl.Values{}
-            for k, v := range query {
-
-                key := toString(k)
-                value := toString(v)
-
-                if encoding != 0 {
-                    key = String(string(key.Encode(encoding)))
-                    value = String(string(value.Encode(encoding)))
-                }
-
-                values.Set(string(key), string(value))
-            }
-
+            values := dictToValues(query, encoding)
             queryString = values.Encode()
     }
 
@@ -149,6 +165,11 @@ func (self *Session) ClearHeaders() {
 }
 
 func (self *Session) SetHeaders(headers Dict) {
+    if len(headers) == 0 {
+        self.ClearHeaders()
+        return
+    }
+
     for k, v := range headers {
         self.headers.Add(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
     }
