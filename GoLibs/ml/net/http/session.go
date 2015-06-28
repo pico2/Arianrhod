@@ -3,16 +3,21 @@ package http
 import (
     gourl "net/url"
     gohttp "net/http"
+    "net/http/cookiejar"
     "errors"
     "fmt"
     "bytes"
     "io"
-
-    "net/http/cookiejar"
-
+    "time"
     . "ml/strings"
     . "ml/dict"
 )
+
+type TimeoutError struct {
+    Op  string
+    URL string
+    Err error
+}
 
 type Header struct {
     *gohttp.Header
@@ -144,8 +149,24 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
         return nil
     }
 
+    var timer *time.Timer
+    timeout := false
+
+    if self.client.Timeout > 0 {
+        timer = time.AfterFunc(self.client.Timeout, func() {
+            timeout = true
+        })
+    }
+
     resp, err := self.client.Do(request)
+    if timer != nil {
+        timer.Stop()
+    }
+
     if err != nil {
+        // uerr := err.(*gourl.Error)
+        // timeout := uerr.Err.Error() == "net/http: request canceled while waiting for connection"
+        fmt.Println("timeout", timeout)
         return nil, err
     }
 
@@ -188,6 +209,10 @@ func (self *Session) SetProxy(host String, port int) {
     }
 }
 
+func (self *Session) SetTimeout(second float64) {
+    self.client.Timeout = time.Duration(second * 1000) * time.Millisecond
+}
+
 func NewSession() (*Session, error) {
     jar, err := cookiejar.New(nil)
     if err != nil {
@@ -195,8 +220,9 @@ func NewSession() (*Session, error) {
     }
 
     client := &gohttp.Client{
-        CheckRedirect: nil,
-        Jar:           jar,
+        CheckRedirect   : nil,
+        Jar             : jar,
+        Timeout         : 30 * time.Second,
     }
 
     return &Session{
