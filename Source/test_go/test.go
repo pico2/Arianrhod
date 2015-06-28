@@ -107,7 +107,27 @@ func testDict() {
 }
 
 func testLogger() {
-    logger := logging.New("fuck")
+    var w io.WriteCloser
+
+    w = os.Stdout
+
+    Println("w == os.Stdout", w == os.Stdout)
+
+    Println("ModeDir = ", os.ModeDir)
+    Println("ModeAppend = ", os.ModeAppend)
+    Println("ModeExclusive = ", os.ModeExclusive)
+    Println("ModeTemporary = ", os.ModeTemporary)
+    Println("ModeSymlink = ", os.ModeSymlink)
+    Println("ModeDevice = ", os.ModeDevice)
+    Println("ModeNamedPipe = ", os.ModeNamedPipe)
+    Println("ModeSocket = ", os.ModeSocket)
+    Println("ModeSetuid = ", os.ModeSetuid)
+    Println("ModeSetgid = ", os.ModeSetgid)
+    Println("ModeCharDevice = ", os.ModeCharDevice)
+    Println("ModeSticky = ", os.ModeSticky)
+
+    logger := logging.NewLogger("fuck")
+    logger.LogToFile()
 
     // _ = logger
     // logger.SetLevel(20)

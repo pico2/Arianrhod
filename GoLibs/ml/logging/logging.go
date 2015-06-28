@@ -8,6 +8,7 @@ import (
     "time"
     "runtime"
     . "ml/strings"
+    "ml/os2"
     "path/filepath"
 )
 
@@ -16,7 +17,8 @@ type Logger struct {
     level       int
     callDepth   int
     tag         String
-    out         []io.Writer
+    lock        sync.Mutex
+    out         []io.WriteCloser
 }
 
 const (
@@ -53,7 +55,7 @@ var lock = sync.Mutex{}
 
 var defaultFormatter = String("[%date %time][%tag][%file][%func:%line]")
 
-func (self *Logger) output(level int, format String, args ...interface{}) {
+func (self *Logger) output(level int, format interface{}, args ...interface{}) {
     if level < self.level {
         return
     }
@@ -70,43 +72,43 @@ func (self *Logger) output(level int, format String, args ...interface{}) {
         pc = 0
     }
 
-    text := fmt.Sprintf(string(format), args...)
+    text := fmt.Sprintf(fmt.Sprintf("%v", format), args...)
 
-    format = self.formatter
+    formatter := self.formatter
 
-    if format.Find("%tag") != -1 {
-        format = format.Replace("%tag", self.tag)
+    if formatter.Find("%tag") != -1 {
+        formatter = formatter.Replace("%tag", self.tag)
     }
 
-    if format.Find("%file") != -1 {
-        format = format.Replace("%file", String(filepath.Base(file)))
+    if formatter.Find("%file") != -1 {
+        formatter = formatter.Replace("%file", String(filepath.Base(file)))
     }
 
-    if format.Find("%func") != -1 {
-        format = format.Replace("%func", String(runtime.FuncForPC(pc).Name()))
+    if formatter.Find("%func") != -1 {
+        formatter = formatter.Replace("%func", String(runtime.FuncForPC(pc).Name()))
     }
 
-    if format.Find("%line") != -1 {
-        format = format.Replace("%line", String(fmt.Sprintf("%d", line)))
+    if formatter.Find("%line") != -1 {
+        formatter = formatter.Replace("%line", String(fmt.Sprintf("%d", line)))
     }
 
-    if format.Find("%date") != -1 {
+    if formatter.Find("%date") != -1 {
         year, month, day := t.Date()
         date := fmt.Sprintf("%04d-%02d-%02d", year, month, day)
 
-        format = format.Replace("%date", String(date))
+        formatter = formatter.Replace("%date", String(date))
     }
 
-    if format.Find("%time") != -1 {
+    if formatter.Find("%time") != -1 {
         hour, min, sec := t.Clock()
         time := fmt.Sprintf("%02d:%02d:%02d", hour, min, sec)
 
-        format = format.Replace("%time", String(time))
+        formatter = formatter.Replace("%time", String(time))
     }
 
-    format += "[" + String(levelToName[level]) + "] "
+    formatter += "[" + String(levelToName[level]) + "] "
 
-    buf := []byte(format + String(text) + "\n")
+    buf := []byte(string(formatter) + text + "\n")
 
     for _, out := range self.out {
         out.Write(buf)
@@ -117,20 +119,20 @@ func (self *Logger) Debug(format String, args ...interface{}) {
     self.output(DEBUG, format, args...)
 }
 
-func (self *Logger) Fatal(format String, args ...interface{}) {
-    self.output(FATAL, format, args...)
-}
-
-func (self *Logger) Error(format String, args ...interface{}) {
-    self.output(ERROR, format, args...)
+func (self *Logger) Info(format String, args ...interface{}) {
+    self.output(INFO, format, args...)
 }
 
 func (self *Logger) Warning(format String, args ...interface{}) {
     self.output(WARNING, format, args...)
 }
 
-func (self *Logger) Info(format String, args ...interface{}) {
-    self.output(INFO, format, args...)
+func (self *Logger) Error(format String, args ...interface{}) {
+    self.output(ERROR, format, args...)
+}
+
+func (self *Logger) Fatal(format String, args ...interface{}) {
+    self.output(FATAL, format, args...)
 }
 
 func (self *Logger) SetLevel(level int) {
@@ -150,13 +152,81 @@ func (self *Logger) SetFormater(formatter ...String) {
     }
 }
 
-func New(tag String) *Logger {
+func (self *Logger) LogToFile(path ...String) error {
+    var filename string
+    var output io.WriteCloser = nil
+
+    self.lock.Lock()
+    defer self.lock.Unlock()
+
+    switch len(path) {
+        case 0:
+            filename = self.getDefaultFileName()
+        default:
+            filename = string(path[0])
+    }
+
+    if len(self.out) == 2 {
+        self.removeOutput(self.out[1])
+    }
+
+    fmt.Println(filename)
+
+    output, err := os.OpenFile(filename, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0666)
+    if err != nil {
+        return err
+    }
+
+    self.out = append(self.out, output)
+
+    return nil
+}
+
+func (self *Logger) getDefaultFileName() string {
+    now := time.Now()
+    year, month, day := now.Date()
+    hour, minute, second := now.Clock()
+    exe := os2.Executable()
+    exeName := filepath.Base(exe)
+
+    baseName := fmt.Sprintf("[%s][%s][%04d-%02d-%02d %02d.%02d.%02d][%d].txt", exeName[:len(filepath.Ext(exeName))], self.tag, year, month, day, hour, minute, second, os.Getpid())
+
+    logPath := filepath.Join(filepath.Dir(exe), "logs")
+    err := os.MkdirAll(logPath, 0666)
+    if err != nil {
+        return ""
+    }
+
+    return filepath.Join(logPath, baseName)
+}
+
+func (self *Logger) removeOutput(output io.WriteCloser) {
+    for i := range self.out {
+        if self.out[i] != output {
+            continue
+        }
+
+        switch output {
+            case os.Stdin:
+            case os.Stdout:
+            case os.Stderr:
+
+            default:
+                output.Close()
+        }
+
+        self.out = append(self.out[:i], self.out[i + 1:]...)
+        break
+    }
+}
+
+func NewLogger(tag String) *Logger {
     return &Logger{
                formatter    : defaultFormatter,
                level        : DEBUG,
                tag          : tag,
                callDepth    : 10,
-               out          : []io.Writer{os.Stdout},
+               out          : []io.WriteCloser{os.Stdout},
             }
 }
 

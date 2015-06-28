@@ -29,7 +29,7 @@ def getLogger(name, *, logPath = None):
         path = logPath or os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'logs')
         os.makedirs(path, exist_ok = True)
         t = datetime.datetime.now()
-        return os.path.join(path, '[%s][%s][%d][%d] %04d-%02d-%02d %02d.%02d.%02d.txt' % (os.path.basename(sys.argv[0]).rsplit('.', maxsplit = 1)[0], self.name, os.getpid(), threading.currentThread().ident, t.year, t.month, t.day, t.hour, t.minute, t.second))
+        return os.path.join(path, '[%s][%s][%04d-%02d-%02d %02d.%02d.%02d][%d][%d].txt' % (os.path.basename(sys.argv[0]).rsplit('.', maxsplit = 1)[0], self.name, t.year, t.month, t.day, t.hour, t.minute, t.second, os.getpid(), threading.currentThread().ident))
 
     def findCaller(stack_info = False):
         """
