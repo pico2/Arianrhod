@@ -9,6 +9,6 @@
     "gslint_enabled": false,
     "lint_enabled": false,
     "fmt_enabled": false,
-    "autoinst": false,
+    "autoinst": true,
     "": ""
 }

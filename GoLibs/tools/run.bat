@@ -31,6 +31,9 @@ goto:eof
 
 :BUILD
 del "%~dpn1.exe" >NUL 2>NUL
+
+call:DELETE_ML_PKG
+
 go.exe build -ldflags "-s" "%~f1"
 goto:eof
 
@@ -39,4 +42,17 @@ call "%~f1"
 goto:eof
 
 :EXIT
+goto:eof
+
+:DELETE_ML_PKG
+if [%1] == [] (
+    for /f %%i in ('dir/s/b "%GOPATH%\pkg\ml.a"') do (
+        call:DELETE_ML_PKG "%%~fi"
+        goto:eof
+    )
+) else (
+    del/q "%~f1" >NUL 2>NUL
+    rd/s/q "%~dp1" >NUL 2>NUL
+)
+
 goto:eof

@@ -1,5 +1,11 @@
 package strings
 
+var (
+    BOM_UTF8        = []byte{0xEF, 0xBB, 0xBF}
+    BOM_UTF16_LE    = []byte{0xFF, 0xFE}
+    BOM_UTF16_BE    = []byte{0xFE, 0xFF}
+)
+
 const (
     CP_GBK          = 936
     CP_SHIFT_JIS    = 932

@@ -1,7 +1,10 @@
 package http
 
 import (
+    "io"
     "io/ioutil"
+    "compress/gzip"
+    "compress/zlib"
     "net/url"
     . "ml/strings"
     gohttp "net/http"
@@ -28,10 +31,40 @@ func (self *Response) Location() (*url.URL, error) {
     return self.resp.Location()
 }
 
+func readBody(resp *gohttp.Response) ([]byte, error) {
+    var reader io.ReadCloser
+    var err error
+
+    switch String(resp.Header.Get("Content-Encoding")).ToLower() {
+        case "gzip":
+            reader, err = gzip.NewReader(resp.Body)
+            if err != nil {
+                return nil, err
+            }
+
+        case "deflate":
+            reader, err = zlib.NewReader(resp.Body)
+            if err != nil {
+                return nil, err
+            }
+
+        default:
+            reader = resp.Body
+    }
+
+    defer func() {
+        if reader != resp.Body{
+            reader.Close()
+        }
+    }()
+
+    return ioutil.ReadAll(reader)
+}
+
 func NewResponse(resp *gohttp.Response) (*Response, error) {
     defer resp.Body.Close()
 
-    content, err := ioutil.ReadAll(resp.Body)
+    content, err := readBody(resp)
     if err != nil {
         return nil, err
     }

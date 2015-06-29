@@ -138,8 +138,8 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
         request.URL.RawQuery = queryString
     }
 
-    fmt.Printf("query string = %v\n", queryString)
-    fmt.Printf("uri = %v\n", request.URL.String())
+    // fmt.Printf("query string = %v\n", queryString)
+    // fmt.Printf("uri = %v\n", request.URL.String())
 
     self.client.CheckRedirect = func(request *gohttp.Request, via []*gohttp.Request) error {
         if len(via) >= 10 {
@@ -163,6 +163,8 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
     if timer != nil {
         timer.Stop()
     }
+
+    self.client.CheckRedirect = nil
 
     if err != nil {
         uerr := err.(*gourl.Error)
