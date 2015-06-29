@@ -48,7 +48,7 @@ type codePageTableInfo struct {
 
 var lock = &sync.Mutex{}
 
-func byteToUInt16Array(bytes []byte) []uint16 {
+func bytesToUInt16Array(bytes []byte) []uint16 {
     arr := make([]uint16, len(bytes) / 2)
 
     for i := range(arr) {
@@ -76,7 +76,7 @@ func decompressData(compressed []byte) []byte {
 func extractTable(bytes []byte) ([]uint16, int) {
     tableSize, offset := binary.Uvarint(bytes)
     table := bytes[offset:offset + int(tableSize)]
-    return byteToUInt16Array(table), offset + int(tableSize)
+    return bytesToUInt16Array(table), offset + int(tableSize)
 }
 
 func (self *codePageTableInfo) initialize() {

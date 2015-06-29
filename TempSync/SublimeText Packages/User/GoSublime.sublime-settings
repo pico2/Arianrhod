@@ -7,5 +7,8 @@
     "fmt_tab_indent": false,
     "fmt_tab_width": 4,
     "gslint_enabled": false,
+    "lint_enabled": false,
+    "fmt_enabled": false,
+    "autoinst": false,
     "": ""
 }

@@ -4,25 +4,29 @@ import (
     . "fmt"
     . "ml"
     "ml/net/http"
-    // "net/url"
+    "ml/strings"
 )
-
-func do() {
-
-}
 
 func main() {
     ss := Str("fuck your mother")
 
-    for _, s := range ss.RSplit(" ") {
-        Println(s)
+    le := ss.Encode(strings.CP_UTF16_LE)
+    for _, ch := range le {
+        Printf("%02X ", ch)
     }
+    Println()
+    Println(strings.Decode(le, strings.CP_UTF16_LE))
 
-    Println(ss.EndsWith("fuck"))
+    be := ss.Encode(strings.CP_UTF16_BE)
+    for _, ch := range be {
+        Printf("%02X ", ch)
+    }
+    Println()
+    Println(strings.Decode(be, strings.CP_UTF16_BE))
 
     session, _ := http.NewSession()
     session.SetProxy("localhost", 6789)
-    session.SetTimeout(1)
+    session.SetTimeout(0.1)
 
     resp, err2 := session.Get("https://www.google.com/")
 
@@ -30,7 +34,9 @@ func main() {
         Println("timeout", err.Timeout, err)
     }
 
-    Println("resp", len(resp.Content))
+    if resp != nil {
+        Println("resp", len(resp.Content))
+    }
 
     Console.Pause("fuck")
 }

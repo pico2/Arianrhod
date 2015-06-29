@@ -11,11 +11,11 @@ func (self String) String() string {
     return string(self)
 }
 
-func (self *String) SizeInBytes() (int) {
+func (self *String) SizeInBytes() int {
     return len(*self)
 }
 
-func (self *String) Length() (int) {
+func (self *String) Length() int {
     return utf8.RuneCountInString(string(*self))
 }
 
@@ -31,18 +31,18 @@ func Decode(bytes []byte, encoding int) String {
     return GetEncoder(encoding).Decode(bytes)
 }
 
-func (self *String) Replace(old, new String, count ...int) String {
+func (self String) Replace(old, new String, count ...int) String {
     var n = 0
 
     switch len(count) {
-        case 0:
-            n = -1
+    case 0:
+        n = -1
 
-        default:
-            n = count[0]
+    default:
+        n = count[0]
     }
 
-    return String(strings.Replace(string(*self), string(old), string(new), n))
+    return String(strings.Replace(string(self), string(old), string(new), n))
 }
 
 func (self *String) Contains(substr String) bool {
@@ -115,28 +115,41 @@ func (self *String) Join(a interface{}) String {
     return String(strings.Join(ss, string(*self)))
 }
 
-func (self *String) Split(sep String, maxSplit ...int) []String {
+func (self String) SplitLines(separator ...String) []String {
+    var sep String
+    switch len(separator) {
+        case 1:
+            sep = separator[0]
+
+        default:
+            sep = "\n"
+    }
+
+    return self.Replace("\r\n", "\n").Replace("\r", "\n").Split(sep)
+}
+
+func (self String) Split(sep String, maxSplit ...int) []String {
     var max int = 0
 
     switch len(maxSplit) {
-        case 1:
-            max = maxSplit[0]
+    case 1:
+        max = maxSplit[0]
 
-        default:
-            max = -1
+    default:
+        max = -1
     }
 
     switch {
-        case max < 0:
-            fallthrough
-        case max == 0:
-            max = -1
+    case max < 0:
+        fallthrough
+    case max == 0:
+        max = -1
 
-        case max > 0:
-            max++
+    case max > 0:
+        max++
     }
 
-    subs := strings.SplitN(string(*self), string(sep), max)
+    subs := strings.SplitN(string(self), string(sep), max)
     ss := make([]String, len(subs))
 
     for i := range subs {
@@ -150,21 +163,21 @@ func (self *String) RSplit(sep String, maxSplit ...int) []String {
     var max int = 0
 
     switch len(maxSplit) {
-        case 1:
-            max = maxSplit[0]
+    case 1:
+        max = maxSplit[0]
 
-        default:
-            max = -1
+    default:
+        max = -1
     }
 
     switch {
-        case max < 0:
-            fallthrough
-        case max == 0:
-            max = -1
+    case max < 0:
+        fallthrough
+    case max == 0:
+        max = -1
 
-        case max > 0:
-            max++
+    case max > 0:
+        max++
     }
 
     subs := self.Split(sep, -1)
@@ -174,11 +187,11 @@ func (self *String) RSplit(sep String, maxSplit ...int) []String {
 
     max--
 
-    ss := make([]String, max + 1)
-    ss[0] = sep.Join(subs[:len(subs) - max])
+    ss := make([]String, max+1)
+    ss[0] = sep.Join(subs[:len(subs)-max])
 
-    for i, v := range subs[len(subs) - max:] {
-        ss[i + 1] = v
+    for i, v := range subs[len(subs)-max:] {
+        ss[i+1] = v
     }
 
     return ss
