@@ -1,0 +1,11 @@
+{
+    "env": {
+        "GOPATH": "D:/Dev/go/pkgs",
+        "GOROOT": "D:/Dev/go",
+        "PATH": "$GOROOT/bin;$PATH"
+    },
+    "fmt_tab_indent": false,
+    "fmt_tab_width": 4,
+    "gslint_enabled": false,
+    "": ""
+}

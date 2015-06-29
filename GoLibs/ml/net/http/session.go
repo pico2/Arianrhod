@@ -13,14 +13,15 @@ import (
     . "ml/dict"
 )
 
-type TimeoutError struct {
-    Op  string
-    URL string
-    Err error
+type HttpError struct {
+    Op          string
+    URL         string
+    Err         error
+    Timeout     bool
 }
 
-type Header struct {
-    *gohttp.Header
+func (self *HttpError) Error() string {
+    return self.Op + " " + self.URL + ": " + self.Err.Error()
 }
 
 type Session struct {
@@ -164,10 +165,19 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
     }
 
     if err != nil {
-        // uerr := err.(*gourl.Error)
-        // timeout := uerr.Err.Error() == "net/http: request canceled while waiting for connection"
-        fmt.Println("timeout", timeout)
-        return nil, err
+        uerr := err.(*gourl.Error)
+        herr := &HttpError{
+                    Op      : uerr.Op,
+                    URL     : uerr.URL,
+                    Err     : uerr.Err,
+                    Timeout : timeout,
+                }
+
+        // if timeout {
+        //     herr.Timeout = uerr.Err.Error() == "net/http: request canceled while waiting for connection"
+        // }
+
+        return nil, herr
     }
 
     return NewResponse(resp)
@@ -196,7 +206,7 @@ func (self *Session) SetHeaders(headers Dict) {
     }
 }
 
-func (self *Session) SetProxy(host String, port int) {
+func (self *Session) SetProxy(host String, port int, userAndPassword ...String) {
     if len(host) == 0 {
         self.client.Transport = nil
     } else {

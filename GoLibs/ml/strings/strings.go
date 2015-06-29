@@ -69,11 +69,11 @@ func (self *String) Index(sep String) int {
     return strings.Index(string(*self), string(sep))
 }
 
-func (self *String) HasPrefix(prefix String) bool {
+func (self *String) StartsWith(prefix String) bool {
     return strings.HasPrefix(string(*self), string(prefix))
 }
 
-func (self *String) HasSuffix(suffix String) bool {
+func (self *String) EndsWith(suffix String) bool {
     return strings.HasSuffix(string(*self), string(suffix))
 }
 
@@ -93,6 +93,95 @@ func (self *String) Trim(cutset ...String) String {
     }
 
     return String(strings.Trim(string(*self), s))
+}
+
+func (self *String) Join(a interface{}) String {
+    var ss []string
+
+    switch v := a.(type) {
+        case []string:
+            ss = v
+
+        case []String:
+            ss = make([]string, len(v))
+            for i := range v {
+                ss[i] = string(v[i])
+            }
+
+        default:
+            panic("only []string and []String can be joined")
+    }
+
+    return String(strings.Join(ss, string(*self)))
+}
+
+func (self *String) Split(sep String, maxSplit ...int) []String {
+    var max int = 0
+
+    switch len(maxSplit) {
+        case 1:
+            max = maxSplit[0]
+
+        default:
+            max = -1
+    }
+
+    switch {
+        case max < 0:
+            fallthrough
+        case max == 0:
+            max = -1
+
+        case max > 0:
+            max++
+    }
+
+    subs := strings.SplitN(string(*self), string(sep), max)
+    ss := make([]String, len(subs))
+
+    for i := range subs {
+        ss[i] = String(subs[i])
+    }
+
+    return ss
+}
+
+func (self *String) RSplit(sep String, maxSplit ...int) []String {
+    var max int = 0
+
+    switch len(maxSplit) {
+        case 1:
+            max = maxSplit[0]
+
+        default:
+            max = -1
+    }
+
+    switch {
+        case max < 0:
+            fallthrough
+        case max == 0:
+            max = -1
+
+        case max > 0:
+            max++
+    }
+
+    subs := self.Split(sep, -1)
+    if max < 0 {
+        return subs
+    }
+
+    max--
+
+    ss := make([]String, max + 1)
+    ss[0] = sep.Join(subs[:len(subs) - max])
+
+    for i, v := range subs[len(subs) - max:] {
+        ss[i + 1] = v
+    }
+
+    return ss
 }
 
 func init() {
