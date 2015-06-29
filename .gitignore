@@ -115,3 +115,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /*/captures
 .gitignore
 /TempSync/SublimeText Packages/User/GoSublime/windows-x32
+/TempSync/SublimeText Packages/User/*.*-ca-bundle

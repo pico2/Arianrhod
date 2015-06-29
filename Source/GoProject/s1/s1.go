@@ -128,7 +128,7 @@ func do() error {
 
             switch err {
                 case nil:
-                    time.Sleep(10 * time.Second)
+                    time.Sleep(10 * time.Minute)
 
                 default:
                     time.Sleep(2 * time.Second)
