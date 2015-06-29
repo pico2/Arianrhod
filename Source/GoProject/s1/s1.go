@@ -9,10 +9,14 @@ import (
     "ml/net/http"
     "ml/io2"
     "ml/os2"
-    "path/filepath"
+    "ml/random"
     "time"
-    "golang.org/x/net/html"
-    // "errors"
+    "path/filepath"
+    "github.com/PuerkitoBio/goquery"
+)
+
+const (
+    BASE_URL    = "http://bbs.saraba1st.com/2b/"
 )
 
 func login(session *http.Session, user, pass String) error {
@@ -49,14 +53,14 @@ func login(session *http.Session, user, pass String) error {
     return nil
 }
 
-func openPage(session *http.Session, url String) (doc *html.Node, err error) {
+func openPage(session *http.Session, url String) (doc *goquery.Document, err error) {
     resp, err := session.Get(url)
 
     if err != nil {
         return nil, err
     }
 
-    doc, err = html.Parse(strings.Decode(resp.Content, strings.CP_UTF8).NewReader())
+    doc, err = goquery.NewDocumentFromReader(strings.Decode(resp.Content, strings.CP_UTF8).NewReader())
     return
 }
 
@@ -66,20 +70,40 @@ func openThread(session *http.Session) error {
         return err
     }
 
-    var f func(*html.Node)
+    threads := []*goquery.Selection{}
 
-    f = func(n *html.Node) {
-        Printf("type = %v, data = %v\n", n.Type, n.Data)
-        for _, attr := range n.Attr {
-            Printf("  %s = %s\n", attr.Key, attr.Val)
+    doc.Find("tbody").Each(func(i int, s *goquery.Selection) {
+        id_, exist := s.Attr("id")
+        id := Str(id_)
+        if exist && id.StartsWith("normalthread_") {
+            threads = append(threads, s)
         }
+    })
 
-        for c := n.FirstChild; c != nil; c = c.NextSibling {
-            f(c)
-        }
+    if len(threads) == 0 {
+        return Errorf("empty thread")
     }
 
-    f(doc)
+    index, err := random.IntRange(0, len(threads))
+    if err != nil {
+        return err
+    }
+
+    t := threads[index].Find("a.s.xst")
+    href, ok := t.Attr("href")
+
+    if ok == false {
+        return Errorf("can't find thread addr")
+    }
+
+    credit := doc.Find("#extcreditmenu")
+
+    Printf("[%s] %s @ %s", time.Now().Format("2006-01-02 15:04:05"), credit.Text(), t.Text())
+
+    session.Get(BASE_URL + href)
+
+    // href, ok := t.Find(".s xst").Attr("href")
+    // Println("href =", href, ok)
 
     return nil
 }
@@ -90,7 +114,6 @@ func logout(session *http.Session) {
 
 func do() error {
     usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
-    Println(usertxt)
     acc, err := io2.ReadTextToLines(usertxt)
     if err != nil {
         return err
@@ -120,6 +143,8 @@ func do() error {
                 break
             }
 
+            Println(err)
+
             time.Sleep(time.Second)
         }
 
@@ -131,6 +156,7 @@ func do() error {
                     time.Sleep(10 * time.Minute)
 
                 default:
+                    Println(err)
                     time.Sleep(2 * time.Second)
             }
         }

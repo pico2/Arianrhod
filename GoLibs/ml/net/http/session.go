@@ -71,11 +71,14 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
     }
 }
 
-func (self *Session) Request(method, url String, params_ ...Dict) (*Response, error) {
+func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response, error) {
     var bodyReader  io.Reader
     var params      Dict
     var encoding    int
     var queryString string
+
+    method := toString(methodi)
+    url := toString(urli)
 
     switch (len(params_)) {
         case 1:
@@ -185,11 +188,11 @@ func (self *Session) Request(method, url String, params_ ...Dict) (*Response, er
     return NewResponse(resp)
 }
 
-func (self *Session) Get(url String, params ...Dict) (resp *Response, err error) {
+func (self *Session) Get(url interface{}, params ...Dict) (resp *Response, err error) {
     return self.Request("GET", url, params...)
 }
 
-func (self *Session) Post(url String, params ...Dict) (resp *Response, err error) {
+func (self *Session) Post(url interface{}, params ...Dict) (resp *Response, err error) {
     return self.Request("POST", url, params...)
 }
 

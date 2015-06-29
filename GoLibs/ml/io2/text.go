@@ -28,6 +28,8 @@ func ReadTextToLines(filename strings.String) ([]strings.String, error) {
         return nil, err
     }
 
+    defer file.Close()
+
     buf, err := ioutil.ReadAll(file)
     if err != nil {
         return nil, err
