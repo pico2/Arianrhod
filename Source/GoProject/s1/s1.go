@@ -5,6 +5,7 @@ import (
     . "ml"
     . "ml/dict"
     . "ml/strings"
+    "ml/console"
     "ml/strings"
     "ml/net/http"
     "ml/io2"
@@ -17,6 +18,7 @@ import (
 
 const (
     BASE_URL    = "http://bbs.saraba1st.com/2b/"
+    FORUM_URL   = "http://bbs.saraba1st.com/2b/forum-75-1.html"
 )
 
 func login(session *http.Session, user, pass String) error {
@@ -65,7 +67,7 @@ func openPage(session *http.Session, url String) (doc *goquery.Document, err err
 }
 
 func openThread(session *http.Session) error {
-    doc, err := openPage(session, "http://bbs.saraba1st.com/2b/forum-75-1.html")
+    doc, err := openPage(session, FORUM_URL)
     if err != nil {
         return err
     }
@@ -96,20 +98,35 @@ func openThread(session *http.Session) error {
         return Errorf("can't find thread addr")
     }
 
-    credit := doc.Find("#extcreditmenu")
+    credit := String(doc.Find("#extcreditmenu").Text())
+    console.SetTitle(credit.Split(":", 1)[1])
 
-    Printf("[%s] %s @ %s", time.Now().Format("2006-01-02 15:04:05"), credit.Text(), t.Text())
+    Printf("[%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), credit, t.Text())
 
-    session.Get(BASE_URL + href)
+    _, err = session.Get(BASE_URL + href)
 
-    // href, ok := t.Find(".s xst").Attr("href")
-    // Println("href =", href, ok)
-
-    return nil
+    return err
 }
 
-func logout(session *http.Session) {
+func logout(session *http.Session) error {
+    doc, err := openPage(session, FORUM_URL)
+    if err != nil {
+        return err
+    }
 
+    doc.Find("a").Each(func(i int, s *goquery.Selection){
+        href_, exist := s.Attr("href")
+        href := String(href_)
+        if exist && href.Contains("action=logout") {
+            session.Get(BASE_URL + href)
+        }
+    })
+
+    return nil
+
+    // logout = logout and page.find(lambda e : e.get('href') and 'action=logout' in e['href'])
+    // if logout:
+    //     yield from http.request('get', BASE_URL + logout['href'])
 }
 
 func do() error {
@@ -127,7 +144,7 @@ func do() error {
 
     for {
         session, _ := http.NewSession()
-        session.SetProxy("localhost", 6789)
+        // session.SetProxy("localhost", 6789)
         session.SetHeaders(Dict{
             "Accept"            : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Encoding"   : "gzip, deflate",
@@ -171,5 +188,5 @@ func main() {
         Println(err)
     }
 
-    Console.Pause("done")
+    console.Pause("done")
 }

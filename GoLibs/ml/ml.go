@@ -3,8 +3,8 @@ package ml
 import (
     "runtime"
     "ml/strings"
-    "ml/array"
-    "ml/console"
+    // "ml/array"
+    // "ml/console"
 )
 
 /* ++
@@ -13,11 +13,11 @@ import (
 
 -- */
 
-type _Console struct {
-    Pause func(...string)
-}
+// type _Console struct {
+//     Pause func(...string)
+// }
 
-var Console = _Console{Pause : console.Pause}
+// var Console = _Console{Pause : console.Pause}
 
 
 /* ++
@@ -37,9 +37,9 @@ func Str(s string) strings.String {
 
 -- */
 
-func Array(values ...interface{}) array.Array {
-    return array.Array(values)
-}
+// func Array(values ...interface{}) array.Array {
+//     return array.Array(values)
+// }
 
 
 /* ++

@@ -1,15 +1,11 @@
 package strings
 
 import (
-    "unicode/utf8"
+    "unicode/utf16"
 )
 
 func utf16BeEncode(table *codePageTableInfo, str String) (bytes []byte) {
-    utf8String := string(str)
-
-    for len(utf8String) > 0 {
-        r, size := utf8.DecodeRuneInString(utf8String)
-        utf8String = utf8String[size:]
+    for _, r := range utf16.Encode([]rune(string(str))) {
         bytes = append(bytes, byte(r >> 8))
         bytes = append(bytes, byte(r))
     }

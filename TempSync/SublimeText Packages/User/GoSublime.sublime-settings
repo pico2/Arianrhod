@@ -1,4 +1,14 @@
 {
+    "snippets": [
+        {
+            "snippets": [
+                {"text": "return", "title": "return", "value": "return"},
+                {"text": "break", "title": "break", "value": "break"},
+                {"text": "continue", "title": "continue", "value": "continue"}
+            ]
+        }
+    ],
+
     "env": {
         "GOPATH": "D:/Dev/go/pkgs",
         "GOROOT": "D:/Dev/go",
@@ -9,6 +19,5 @@
     "gslint_enabled": false,
     "lint_enabled": false,
     "fmt_enabled": false,
-    "autoinst": true,
-    "": ""
+    "autoinst": true
 }

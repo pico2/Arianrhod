@@ -1,11 +1,12 @@
 package console
 
 import (
-    "syscall"
-    "runtime"
+    "fmt"
 )
 
-var getch *syscall.Proc
+func SetTitle(text interface{}) {
+    setTitle(fmt.Sprintf("%v", text))
+}
 
 func Pause(text ...string) {
     if len(text) != 0 {
@@ -13,15 +14,5 @@ func Pause(text ...string) {
         print("\n")
     }
 
-    getch.Call()
-}
-
-func initWindows() {
-    getch = syscall.MustLoadDLL("msvcrt.dll").MustFindProc("_getch")
-}
-
-func init() {
-    if runtime.GOOS == "windows" {
-        initWindows()
-    }
+    pause()
 }

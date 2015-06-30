@@ -4,6 +4,8 @@ import (
     . "ml"
     . "fmt"
     . "ml/dict"
+    . "ml/array"
+    "ml/console"
     "ml/logging"
     "ml/syscall"
     "ml/strings"
@@ -22,10 +24,22 @@ func testString() (r int) {
     s = `中文`
     s += `fuck`
 
+    u16le := s.Encode(strings.CP_UTF16_LE)
+    for _, ch := range u16le {
+        Printf("%02X ", ch)
+    }
+    Println()
+
+    u16be := s.Encode(strings.CP_UTF16_BE)
+    for _, ch := range u16be {
+        Printf("%02X ", ch)
+    }
+    Println()
+
     Printf("%+v\n", s)
     Println((&s).Replace("f", "fuck you f"))
     Println(s.Index("k"))
-    Println(s.HasPrefix("fuck"))
+    Println(s.StartsWith("fuck"))
     Println(s.ToUpper())
     Println(s.ToLower())
     Println(s == "Fuck2")
@@ -51,7 +65,7 @@ func testString() (r int) {
 }
 
 func testArray() {
-    arr := Array(1, 2, 3, 4)
+    arr := Array{1, 2, 3, 4}
 
     arr.Append(1, 5, 432, "fuck", 1.555, 73.88)
     arr.Remove("fuck")
@@ -296,5 +310,5 @@ func main() {
     testEncoding()
     Println()
 
-    Console.Pause()
+    console.Pause()
 }
