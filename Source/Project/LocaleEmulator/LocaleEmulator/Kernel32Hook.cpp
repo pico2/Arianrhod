@@ -1,5 +1,12 @@
 #include "stdafx.h"
 
+using namespace Mp;
+
+LCID NTAPI LeGetUserDefaultLCID()
+{
+    return LeGetGlobalData()->GetLeb()->LocaleID;
+}
+
 NTSTATUS LeGlobalData::HackUserDefaultLCID(PVOID Kernel32)
 {
     LCID        Lcid;
@@ -35,8 +42,8 @@ NTSTATUS LeGlobalData::HackUserDefaultLCID(PVOID Kernel32)
         }
     );
 
-    if (gNlsProcessLocalCache != nullptr)
-        *(PLCID)(((PULONG_PTR)gNlsProcessLocalCache)[2]) = GetLeb()->LocaleID;
+    //if (gNlsProcessLocalCache != nullptr)
+        //*(PLCID)(((PULONG_PTR)gNlsProcessLocalCache)[2]) = GetLeb()->LocaleID;
 
     return STATUS_SUCCESS;
 }
@@ -44,10 +51,13 @@ NTSTATUS LeGlobalData::HackUserDefaultLCID(PVOID Kernel32)
 NTSTATUS LeGlobalData::HookKernel32Routines(PVOID Kernel32)
 {
     PVOID GetCurrentNlsCache;
+    NTSTATUS Status;
 
-    WriteLog(L"hook k32");
+    Status = this->HackUserDefaultLCID(Kernel32);
+    
+    WriteLog(L"hook k32: %p", Status);
 
-    return this->HackUserDefaultLCID(Kernel32);
+    return Status;
 }
 
 NTSTATUS LeGlobalData::UnHookKernel32Routines()
