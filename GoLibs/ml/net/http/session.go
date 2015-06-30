@@ -214,8 +214,22 @@ func (self *Session) SetHeaders(headers Dict) {
 func (self *Session) SetProxy(host String, port int, userAndPassword ...String) {
     if len(host) == 0 {
         self.client.Transport = nil
+
     } else {
-        proxyUrl, err := gourl.Parse(fmt.Sprintf("http://%s:%d", host, port))
+        var err error
+        var proxyUrl *gourl.URL
+
+        switch len(userAndPassword) {
+            case 1:
+                proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s", host, port, userAndPassword[0]))
+
+            case 2:
+                proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s:%s", host, port, userAndPassword[0], userAndPassword[1]))
+
+            default:
+                proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d", host, port))
+        }
+
         if err != nil {
             return
         }

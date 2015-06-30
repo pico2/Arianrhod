@@ -39,6 +39,7 @@ goto:eof
 
 :RUN
 call "%~f1"
+pause
 goto:eof
 
 :EXIT

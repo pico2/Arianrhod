@@ -18,6 +18,9 @@ import (
     "io"
 )
 
+import "database/sql"
+import _ "github.com/go-sql-driver/mysql"
+
 func testString() (r int) {
     s := Str("fuck")
 
@@ -218,7 +221,12 @@ func testNet() {
 
     resp, err := session.Get("http://www.taobao.com/")
 
-    Println(err, resp.Encoding)
+    if err != nil {
+        Println(err)
+        return
+    }
+
+    Println(resp.Encoding)
     Println(resp.Header.Get("Content-Type"))
 
     _ = resp
@@ -266,6 +274,40 @@ func testEncoding() {
     Println(gg)
 }
 
+func testSql() {
+    db, err := sql.Open("mysql", "")
+    if err != nil {
+        Println(err)
+        return
+    }
+
+    err = db.Ping()
+    Println("ping =", err)
+    if err != nil {
+        return
+    }
+
+    rows, err := db.Query("SELECT COUNT(id) from appstore_buydata_appleid WHERE `status` = 5")
+    Println("exec =", err)
+    if err != nil {
+        return
+    }
+
+    defer rows.Close()
+
+    for rows.Next() {
+        var name string
+        if err := rows.Scan(&name); err != nil {
+            Println(err)
+        }
+        Printf("%s\n", name)
+    }
+
+    if err := rows.Err(); err != nil {
+        Println(err)
+    }
+}
+
 func main() {
     testString()
     Println()
@@ -294,6 +336,9 @@ func main() {
     Println()
 
     testEncoding()
+    Println()
+
+    testSql()
     Println()
 
     console.Pause()
