@@ -62,7 +62,7 @@ func openPage(session *http.Session, url String) (doc *goquery.Document, err err
         return nil, err
     }
 
-    doc, err = goquery.NewDocumentFromReader(strings.Decode(resp.Content, strings.CP_UTF8).NewReader())
+    doc, err = goquery.NewDocumentFromReader(strings.Decode(resp.Content, resp.Encoding).NewReader())
     return
 }
 
@@ -178,6 +178,7 @@ func do() error {
             }
         }
 
+        Println("logout")
         logout(session)
     }
 }

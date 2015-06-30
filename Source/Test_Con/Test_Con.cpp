@@ -250,22 +250,8 @@ void quick_sort(int *array, int count)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    WCHAR buf[MAX_NTPATH];
 
-    GetEnvironmentVariableW(L"TEMP", buf, countof(buf));
-
-    //SetCurrentDirectoryW(L"D:\\Dev\\go\\bin\\");
-
-    Ps::CreateProcess(
-        L"D:\\Dev\\go\\bin\\go.exe",
-        L"go install ml/io2",
-        L"D:\\Dev\\go\\bin\\",
-        CREATE_UNICODE_ENVIRONMENT,
-        nullptr, nullptr, nullptr, nullptr,
-        L"GOPATH=D:/Dev/go/pkgs\0GOROOT=D:/Dev/go/\0"
-    );
-
-    Ps::Sleep(1000);
+    PrintLocaleDefaultAnsiCodePage();
 
     return;
 

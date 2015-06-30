@@ -1,12 +1,13 @@
 package http
 
 import (
+    . "ml/strings"
     "io"
     "io/ioutil"
     "compress/gzip"
     "compress/zlib"
     "net/url"
-    . "ml/strings"
+    "mime"
     gohttp "net/http"
 )
 
@@ -19,6 +20,7 @@ type Response struct {
     Header      gohttp.Header
     Content     []byte
     Request     *gohttp.Request
+    Encoding    int
 
     resp        *gohttp.Response
 }
@@ -41,32 +43,67 @@ func readBody(resp *gohttp.Response) ([]byte, error) {
             if err != nil {
                 return nil, err
             }
+            defer reader.Close()
 
         case "deflate":
             reader, err = zlib.NewReader(resp.Body)
             if err != nil {
                 return nil, err
             }
+            defer reader.Close()
 
         default:
             reader = resp.Body
     }
 
-    defer func() {
-        if reader != resp.Body{
-            reader.Close()
-        }
-    }()
-
     return ioutil.ReadAll(reader)
 }
 
-func NewResponse(resp *gohttp.Response) (*Response, error) {
-    defer resp.Body.Close()
+func getEncoding(resp *gohttp.Response, body []byte) int {
+    charsetTable := map[string]int{
+        "gb18030"   : CP_GBK,
+        "gb2312"    : CP_GBK,
+        "hz"        : CP_GBK,
+        "big5"      : CP_BIG5,
+        "shift_jis" : CP_SHIFT_JIS,
+        "euc-jp"    : CP_SHIFT_JIS,
+        "utf-8"     : CP_UTF8,
+    }
 
-    content, err := readBody(resp)
+    ctype := resp.Header.Get("Content-Type")
+    if len(ctype) == 0 {
+        return CP_UTF8
+    }
+
+    _, params, err := mime.ParseMediaType(ctype)
     if err != nil {
-        return nil, err
+        return CP_UTF8
+    }
+
+    charset, ok := params["charset"]
+    if ok == false {
+        return CP_UTF8
+    }
+
+    encoding, ok := charsetTable[string(String(charset).ToLower())]
+    if ok == false {
+        encoding = CP_UTF8
+    }
+
+    return encoding
+}
+
+func NewResponse(resp *gohttp.Response) (*Response, error) {
+    var content []byte
+    var err error
+
+    if resp.Body != nil {
+        defer resp.Body.Close()
+
+        content, err = readBody(resp)
+        if err != nil {
+            return nil, err
+        }
     }
 
     return &Response{
@@ -78,6 +115,7 @@ func NewResponse(resp *gohttp.Response) (*Response, error) {
         Header      : resp.Header,
         Content     : content,
         Request     : resp.Request,
+        Encoding    : getEncoding(resp, content),
 
         resp        : resp,
 

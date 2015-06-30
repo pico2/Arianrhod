@@ -150,6 +150,11 @@ func testLogger() {
 }
 
 func testMisc(a interface{}) {
+    switch 1 {
+        case 1:
+            defer Println("defer scope")
+    }
+
     xx := uintptr(a.(int))
     Println(xx)
 
@@ -206,34 +211,15 @@ func testNet() {
         "Accept"            : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Encoding"   : "gzip, deflate",
         "Accept-Language"   : "zh-CN,en-US;q=0.8,en;q=0.5,zh-HK;q=0.3",
-        "User-Agent"        : "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:39.0) Gecko/20100101 Firefox/39.0",
-        "Content-Type"      : "application/x-www-form-urlencoded",
+        "User-Agent"        : "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:42.0) Gecko/20100101 Firefox/42.0",
+        // "Content-Type"      : "application/x-www-form-urlencoded",
         "Connection"        : "keep-alive",
     })
 
-    resp, err := session.Post(
-                    "http://bbs.saraba1st.com/2b/member.php",
-                    Dict{
-                        "params": Dict{
-                            "mod"           : "logging",
-                            "action"        : "login",
-                            "loginsubmit"   : "yes",
-                            "infloat"       : "yes",
-                            "lssubmit"      : "yes",
-                            "inajax"        : "1",
-                        },
-                        "body": Dict{
-                            "fastloginfield"    : "username",
-                            "quickforward"      : "yes",
-                            "handlekey"         : "ls",
-                        },
-                        // "encoding": strings.CP_UTF8,
-                    },
-                )
+    resp, err := session.Get("http://www.taobao.com/")
 
-    resp, err = session.Get("http://bbs.saraba1st.com/2b/forum-75-1.html")
-
-    Println(err)
+    Println(err, resp.Encoding)
+    Println(resp.Header.Get("Content-Type"))
 
     _ = resp
 }
