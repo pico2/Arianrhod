@@ -295,6 +295,8 @@ def _complete_opts(fn, src, pos, builtins):
 		'Env': {
 			'GOROOT': nv.get('GOROOT', ''),
 			'GOPATH': nv.get('GOPATH', ''),
+			'TEMP': nv.get('TEMP', ''),
+			'TMP': nv.get('TMP', ''),
 		},
 	}
 
