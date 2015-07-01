@@ -42,6 +42,6 @@ func (self *Array) Pop(index int) (interface{}, bool) {
     return value, true
 }
 
-func New() Array {
-    return Array{}
+func NewArray(values ...interface{}) Array {
+    return Array{values}
 }

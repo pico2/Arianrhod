@@ -8,7 +8,7 @@ import (
     "ml/console"
     "ml/logging"
     "ml/strings"
-    "ml/preference"
+    "ml/preferences"
     "ml/net/http"
     "unicode/utf8"
     "net/url"
@@ -298,7 +298,7 @@ type Preferences struct {
 func testSql() {
     pref := &Preferences{}
 
-    err := preference.LoadFile(`D:\Desktop\xx\AppleIdRegister\Preferences.json`, pref)
+    err := preferences.LoadFile(`D:\Desktop\xx\AppleIdRegister\Preferences.json`, pref)
     if err != nil {
         Println(err)
         return

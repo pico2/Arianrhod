@@ -58,6 +58,9 @@ def parseObject(obj, adjust, depth = 0):
 
 def convert(jsonfile):
     obj = Preferences.LoadPreferences(jsonfile)
+    if not obj:
+        return
+
     structName = os.path.splitext(os.path.basename(jsonfile))[0]
 
     l = getMaxLength(obj)

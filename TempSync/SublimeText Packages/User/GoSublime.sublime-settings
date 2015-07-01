@@ -14,7 +14,9 @@
             "snippets": [
                 {"text": "return", "title": "return", "value": "return"},
                 {"text": "break", "title": "break", "value": "break"},
-                {"text": "continue", "title": "continue", "value": "continue"}
+                {"text": "continue", "title": "continue", "value": "continue"},
+                {"text": "interface", "title": "interface", "value": "interface"},
+                {}
             ]
         }
     ],
