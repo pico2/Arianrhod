@@ -7,7 +7,6 @@ import (
     . "ml/array"
     "ml/console"
     "ml/logging"
-    "ml/syscall"
     "ml/strings"
     "ml/preference"
     "ml/net/http"
@@ -161,9 +160,6 @@ func testMisc(a interface{}) {
 
     xx := uintptr(a.(int))
     Println(xx)
-
-    _ = syscall.Call
-    // syscall.Call(uintptr(0), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
     Ucs16String := []uint16{}
     UnicodeString := "中文"
@@ -385,5 +381,5 @@ func main() {
     testSql()
     Println()
 
-    console.Pause()
+    console.Pause("done")
 }

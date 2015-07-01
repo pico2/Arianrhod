@@ -8,10 +8,9 @@ func SetTitle(text interface{}) {
     setTitle(fmt.Sprintf("%v", text))
 }
 
-func Pause(text ...string) {
+func Pause(text ...interface{}) {
     if len(text) != 0 {
-        print(text[0])
-        print("\n")
+        fmt.Printf("%v\n", text[0])
     }
 
     pause()
