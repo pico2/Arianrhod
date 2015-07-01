@@ -9,6 +9,7 @@ import (
     "ml/logging"
     "ml/syscall"
     "ml/strings"
+    "ml/preference"
     "ml/net/http"
     "unicode/utf8"
     "net/url"
@@ -274,8 +275,51 @@ func testEncoding() {
     Println(gg)
 }
 
+type Preferences struct {
+    MaxAsyncTask    int         `json:"maxAsyncTask,omitempty"`
+    MaxWorkers      int         `json:"maxWorkers,omitempty"`
+
+    Proxy struct {
+        Port        int         `json:"Port,omitempty"`
+        User        string      `json:"User,omitempty"`
+        Password    string      `json:"Password,omitempty"`
+    }
+
+    ProxyServer struct {
+        Host        string      `json:"Host,omitempty"`
+        Port        int         `json:"Port,omitempty"`
+        Port2       int         `json:"Port2,omitempty"`
+    }
+
+    Database struct {
+        Host        string      `json:"Host,omitempty"`
+        User        string      `json:"User,omitempty"`
+        Password    string      `json:"Password,omitempty"`
+        Db          string      `json:"db,omitempty"`
+    }
+}
+
 func testSql() {
-    db, err := sql.Open("mysql", "")
+    pref := &Preferences{}
+
+    err := preference.LoadFile(`D:\Desktop\xx\AppleIdRegister\Preferences.json`, pref)
+    if err != nil {
+        Println(err)
+        return
+    }
+
+    dsn := Sprintf(
+                "%s:%s@tcp(%s:3306)/%s",
+                pref.Database.User,
+                pref.Database.Password,
+                pref.Database.Host,
+                pref.Database.Db,
+            )
+
+    Println(dsn)
+
+    db, err := sql.Open("mysql", dsn)
+
     if err != nil {
         Println(err)
         return
@@ -287,7 +331,7 @@ func testSql() {
         return
     }
 
-    rows, err := db.Query("SELECT COUNT(id) from appstore_buydata_appleid WHERE `status` = 5")
+    rows, err := db.Query("SELECT COUNT(id) from appstore_buydata_appleid WHERE `status` = 4")
     Println("exec =", err)
     if err != nil {
         return

@@ -2,7 +2,7 @@ from Libs.Misc.SysLib import *
 import json
 
 def MergeDict(dict1, dict2):
-    for key in sorted(dict2.keys()):
+    for key in dict2.keys():
         value1 = dict1.get(key)
         value2 = dict2[key]
 
@@ -27,19 +27,21 @@ def CreateDefaultPreferences():
     return {}
 
 def LoadPreferences(Preferences, defaultPreferences = None):
-    default = defaultPreferences or CreateDefaultPreferences()
+    default = defaultPreferences or {}
+
+    default = OrderedDictEx(default)
 
     if isinstance(Preferences, dict):
         overwrite = Preferences
 
     else:
         try:
-            overwrite = json.loads(open(Preferences, 'rb').read().decode('UTF8'))
+            overwrite = json.JSONDecoder(object_pairs_hook = OrderedDictEx).decode(open(Preferences, 'rb').read().decode('UTF8'))
         except (FileNotFoundError, PermissionError):
-            overwrite = dict()
+            overwrite = OrderedDictEx()
 
     MergeDict(default, overwrite)
-    return OrderedDictEx(default)
+    return default
 
 def SavePreferences(PreferencesPath, Preferences):
     pref = json.dumps(Preferences, indent = 4, sort_keys = True)
