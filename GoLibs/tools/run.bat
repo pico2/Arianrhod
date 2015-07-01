@@ -6,6 +6,12 @@ call init.bat
 
 cd/d "%~dp1"
 
+findstr /X /B /C:"func main() {" "%~f1" >NUL 2>NUL
+if %ERRORLEVEL% == 0 (
+    call:BUILD_AND_RUN "%~f1"
+    goto:EXIT
+)
+
 for /f %%i in ('dir/b *.go') do (
     findstr /X /B /C:"func main() {" "%%~fi" >NUL 2>NUL
     if !ERRORLEVEL! == 0 (

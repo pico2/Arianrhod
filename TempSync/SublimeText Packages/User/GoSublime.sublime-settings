@@ -1,6 +1,16 @@
 {
     "snippets": [
         {
+            "match": {"global": true, "pkgname": ".", "has_types": true},
+            "snippets": [
+                {
+                    "text": "func (*${typename})",
+                    "title": "method",
+                    "value": "func (self ${2:*}${typename}) ${3:name}($4)$5 {\n\t$0\n}"
+                }
+            ]
+        },
+        {
             "snippets": [
                 {"text": "return", "title": "return", "value": "return"},
                 {"text": "break", "title": "break", "value": "break"},
