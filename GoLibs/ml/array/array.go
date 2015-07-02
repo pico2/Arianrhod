@@ -1,6 +1,29 @@
 package array
 
+import (
+    . "ml/trace"
+    . "fmt"
+)
+
 type Array []interface{}
+
+func NewArray(values ...interface{}) *Array {
+    arr := &Array{}
+    if len(values) != 0 {
+        arr.Append(values...)
+    }
+
+    return arr
+}
+
+func (self *Array) Length() int {
+    return len(*self)
+}
+
+func (self *Array) Clear() *Array {
+    *self = (*self)[:0]
+    return self
+}
 
 func (self *Array) Index(value interface{}) (index int, found bool) {
     index = 0
@@ -17,8 +40,9 @@ func (self *Array) Index(value interface{}) (index int, found bool) {
     return
 }
 
-func (self *Array) Append(values ...interface{}) {
+func (self *Array) Append(values ...interface{}) *Array {
     *self = append(*self, values...)
+    return self
 }
 
 func (self *Array) Remove(value interface{}) bool {
@@ -42,6 +66,10 @@ func (self *Array) Pop(index int) (interface{}, bool) {
     return value, true
 }
 
-func NewArray(values ...interface{}) Array {
-    return Array{values}
+func (self *Array) Peek(index int) interface{} {
+    if index >= len(*self) {
+        Raise(Sprintf("peek out of index: %d", index))
+    }
+
+    return (*self)[index]
 }

@@ -251,7 +251,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintLocaleDefaultAnsiCodePage();
+    *(int *)0 = 0;
 
     return;
 

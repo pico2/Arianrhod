@@ -16,6 +16,7 @@ type Logger struct {
     formatter   String
     level       int
     callDepth   int
+    skip        int
     tag         String
     lock        sync.Mutex
     out         []io.WriteCloser
@@ -55,6 +56,10 @@ var lock = sync.Mutex{}
 
 var defaultFormatter = String("[%date %time][%tag][%file][%func:%line]")
 
+func (self *Logger) String() string {
+    return fmt.Sprintf("%s logger", self.tag)
+}
+
 func (self *Logger) output(level int, format interface{}, args ...interface{}) {
     if level < self.level {
         return
@@ -65,7 +70,7 @@ func (self *Logger) output(level int, format interface{}, args ...interface{}) {
 
     t := time.Now()
 
-    pc, file, line, ok := runtime.Caller(2)
+    pc, file, line, ok := runtime.Caller(self.skip)
     if !ok {
         file = "???"
         line = -1
@@ -85,7 +90,8 @@ func (self *Logger) output(level int, format interface{}, args ...interface{}) {
     }
 
     if formatter.Find("%func") != -1 {
-        formatter = formatter.Replace("%func", String(runtime.FuncForPC(pc).Name()))
+        names := String(runtime.FuncForPC(pc).Name()).RSplit(".", 1)
+        formatter = formatter.Replace("%func", names[len(names) - 1])
     }
 
     if formatter.Find("%line") != -1 {
@@ -115,23 +121,23 @@ func (self *Logger) output(level int, format interface{}, args ...interface{}) {
     }
 }
 
-func (self *Logger) Debug(format String, args ...interface{}) {
+func (self *Logger) Debug(format interface{}, args ...interface{}) {
     self.output(DEBUG, format, args...)
 }
 
-func (self *Logger) Info(format String, args ...interface{}) {
+func (self *Logger) Info(format interface{}, args ...interface{}) {
     self.output(INFO, format, args...)
 }
 
-func (self *Logger) Warning(format String, args ...interface{}) {
+func (self *Logger) Warning(format interface{}, args ...interface{}) {
     self.output(WARNING, format, args...)
 }
 
-func (self *Logger) Error(format String, args ...interface{}) {
+func (self *Logger) Error(format interface{}, args ...interface{}) {
     self.output(ERROR, format, args...)
 }
 
-func (self *Logger) Fatal(format String, args ...interface{}) {
+func (self *Logger) Fatal(format interface{}, args ...interface{}) {
     self.output(FATAL, format, args...)
 }
 
@@ -141,6 +147,10 @@ func (self *Logger) SetLevel(level int) {
 
 func (self *Logger) Level() int {
     return self.level
+}
+
+func (self *Logger) SetSkip(skip int) {
+    self.skip = skip
 }
 
 func (self *Logger) SetFormater(formatter ...String) {
@@ -220,12 +230,13 @@ func (self *Logger) removeOutput(output io.WriteCloser) {
     }
 }
 
-func NewLogger(tag String) *Logger {
+func NewLogger(tag interface{}) *Logger {
     return &Logger{
                formatter    : defaultFormatter,
                level        : DEBUG,
-               tag          : tag,
+               tag          : String(fmt.Sprint(tag)),
                callDepth    : 10,
+               skip         : 2,
                out          : []io.WriteCloser{os.Stdout},
             }
 }
