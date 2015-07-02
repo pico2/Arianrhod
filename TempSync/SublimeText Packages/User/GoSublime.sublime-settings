@@ -22,7 +22,7 @@
     ],
 
     "env": {
-        "GOPATH": "D:/Dev/go/pkgs",
+        "GOPATH": "D:/Dev/go/pkgs;D:/Desktop/Source/GoProject",
         "GOROOT": "D:/Dev/go",
         "PATH": "$GOROOT/bin;$PATH"
     },
@@ -31,5 +31,6 @@
     "gslint_enabled": false,
     "lint_enabled": false,
     "fmt_enabled": false,
+    "gscomplete_enabled": true,
     "autoinst": true
 }

@@ -2,6 +2,8 @@
 setlocal ENABLEDELAYEDEXPANSION
 cd/d "%~dp0"
 
+if [%1]==[] goto:eof
+
 call init.bat
 
 cd/d "%~dp1"
@@ -53,7 +55,7 @@ goto:eof
 
 :DELETE_ML_PKG
 if [%1] == [] (
-    for /f %%i in ('dir/s/b "%GOPATH%\pkg\ml.a"') do (
+    for /f %%i in ('dir/s/b "%~dp0\pkgs\pkg\ml.a"') do (
         call:DELETE_ML_PKG "%%~fi"
         goto:eof
     )

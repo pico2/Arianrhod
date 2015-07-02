@@ -116,3 +116,5 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 .gitignore
 /TempSync/SublimeText Packages/User/GoSublime/windows-x32
 /TempSync/SublimeText Packages/User/*.*-ca-bundle
+/Source/GoProject/src/AppleIdRegister
+/Source/GoProject/pkg
