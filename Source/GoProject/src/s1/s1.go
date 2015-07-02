@@ -12,6 +12,7 @@ import (
     "ml/os2"
     "ml/random"
     "time"
+    "sync"
     "path/filepath"
     "github.com/PuerkitoBio/goquery"
 )
@@ -66,7 +67,7 @@ func openPage(session *http.Session, url String) (doc *goquery.Document, err err
     return
 }
 
-func openThread(session *http.Session) error {
+func openThread(session *http.Session, user String) error {
     doc, err := openPage(session, FORUM_URL)
     if err != nil {
         return err
@@ -101,7 +102,7 @@ func openThread(session *http.Session) error {
     credit := String(doc.Find("#extcreditmenu").Text())
     console.SetTitle(credit.Split(":", 1)[1])
 
-    Printf("[%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), credit, t.Text())
+    Printf("[%s][%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), user, credit, t.Text())
 
     _, err = session.Get(BASE_URL + href)
 
@@ -129,18 +130,8 @@ func logout(session *http.Session) error {
     //     yield from http.request('get', BASE_URL + logout['href'])
 }
 
-func do() error {
-    usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
-    acc, err := io2.ReadTextToLines(usertxt)
-    if err != nil {
-        return err
-    }
-
-    if len(acc) < 2 {
-        panic("corrupt user.txt")
-    }
-
-    user, pass := acc[0], acc[1]
+func do(user, pass String) error {
+    // user, pass := acc[0], acc[1]
 
     for {
         session, _ := http.NewSession()
@@ -155,7 +146,7 @@ func do() error {
         })
 
         for {
-            err = login(session, user, pass)
+            err := login(session, user, pass)
             if err == nil {
                 break
             }
@@ -166,7 +157,7 @@ func do() error {
         }
 
         for i := 0; i != 6; i++ {
-            err = openThread(session)
+            err := openThread(session, user)
 
             switch err {
                 case nil:
@@ -183,11 +174,36 @@ func do() error {
     }
 }
 
-func main() {
-    err := do()
+func readuser() []String {
+    usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
+    acc, err := io2.ReadTextToLines(usertxt)
     if err != nil {
-        Println(err)
+        panic(err)
     }
 
-    console.Pause("done")
+    if len(acc) < 2 {
+        panic("corrupt user.txt")
+    }
+
+    return acc
+}
+
+func main() {
+    defer console.Pause("done")
+
+    wg := sync.WaitGroup{}
+
+    users := readuser()
+
+    for i := 0; i + 1 < len(users); i += 2 {
+        if users[i].Length() == 0 {
+            i--
+            continue
+        }
+
+        wg.Add(1)
+        go do(users[i], users[i + 1])
+    }
+
+    wg.Wait()
 }
