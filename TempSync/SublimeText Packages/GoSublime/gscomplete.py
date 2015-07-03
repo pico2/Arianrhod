@@ -151,13 +151,6 @@ class GoSublime(sublime_plugin.EventListener):
 				ctx['local'] = True
 				cl.extend(resolve_snippets(ctx))
 
-		for i, c in enumerate(cl):
-			p = c[0].split('\t', 1)
-			if len(p) == 1 or p[0].find(' ') == -1:
-				continue
-
-			cl[i] = [p[0].replace(' ', '\xA0') + '\t' + p[1], c[1]]
-
 		return (cl, AC_OPTS)
 
 	def find_end_pt(self, view, pat, start, end, flags=sublime.LITERAL):
