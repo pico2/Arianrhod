@@ -1,10 +1,12 @@
 package channels
 
 import (
-    "ml/array"
     . "fmt"
-    "sync"
+
     "time"
+
+    "ml/array"
+    "ml/sync2"
 )
 
 func unused() {
@@ -16,7 +18,7 @@ type InfiniteChannel struct {
     input   chan interface{}
     output  chan interface{}
     buffer  array.Array
-    cond    *sync.Cond
+    event  *sync2.Event
 }
 
 func NewInfiniteChannel() *InfiniteChannel {
@@ -24,7 +26,7 @@ func NewInfiniteChannel() *InfiniteChannel {
                 input   : make(chan interface{}),
                 output  : make(chan interface{}),
                 buffer  : *array.NewArray(),
-                cond    : sync.NewCond(&sync.Mutex{}),
+                event   : sync2.NewEvent(),
         }
 
     go ch.infiniteBuffer()
@@ -44,14 +46,14 @@ func (self *InfiniteChannel) Length() int {
 }
 
 func (self *InfiniteChannel) Close() {
+    Println("close input")
     close(self.input)
-    self.cond.L.Lock()
-    defer self.cond.L.Unlock()
-    self.cond.Wait()
+    Println("wait loop")
+    self.event.Wait()
 }
 
 func (self *InfiniteChannel) shutdown() {
-
+    Println("shutdown")
 FLUSH:
     for _, v := range (self.buffer) {
         select {
@@ -62,6 +64,7 @@ FLUSH:
         }
     }
 
+    Println("close output")
     close(self.output)
 }
 
@@ -69,6 +72,8 @@ func (self *InfiniteChannel) infiniteBuffer() {
 
 INFINITE_LOOP:
     for {
+        time.Sleep(time.Millisecond)
+
         switch self.buffer.Length() {
             case 0:
                 select {
@@ -96,5 +101,6 @@ INFINITE_LOOP:
     }
 
     self.shutdown()
-    self.cond.Broadcast()
+    Println("Broadcast")
+    self.event.Broadcast()
 }

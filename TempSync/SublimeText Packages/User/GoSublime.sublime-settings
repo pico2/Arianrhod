@@ -39,25 +39,21 @@
             "match": {"global": true, "pkgname": "."},
             "snippets": [
                 {"text": "import", "title": "import (...)", "value": "import (\n\t\"$1\"\n)"},
-                {"text": "func", "title": "func {...}", "value": "func ${1:name}($2)$3 {\n\t$0\n}"},
+                {"text": "func", "title": "{...}", "value": "func ${1:name}($2)$3 {\n\t$0\n}"},
                 {"text": "var", "title": "var (...)", "value": "var (\n\t$1\n)"},
                 {"text": "const", "title": "const (...)", "value": "const (\n\t$1\n)"},
-                {"text": "init", "title": "func init()", "value": "func init() {\n\t$1\n}"},
-                // {
-                //     "text": "func",
-                //     "title": "(ResponseWriter, Request)",
-                //     "value": "func ${1:name}(rw http.ResponseWriter, req *http.Request) {\n\t$0\n}"
-                // },
+                {"text": "init", "title": "init()", "value": "func init() {\n\t$1\n}"},
                 {}
             ]
         },
-        {
-            "match": {"local": true},
-            "snippets": [
-                {"text": "func", "title": "func{...}()", "value": "func($1) {\n\t$0\n}($2)"},
-                {"text": "var", "title": "var [name] [type]", "value": "var ${1:name} ${2:type}"}
-            ]
-        }
+        // {
+        //     "match": {"global": false, "local": true, "pkgname": "."},
+        //     "snippets": [
+        //         {"text": "func", "title": "{...}()", "value": "func($1) {\n\t$0\n}($2)"},
+        //         {"text": "var", "title": "var [name] [type]", "value": "var ${1:name} ${2:type}"}
+        //     ]
+        // },
+        {}
     ],
 
     "env": {

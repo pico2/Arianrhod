@@ -8,7 +8,7 @@ type Event struct {
     cond *sync.Cond
 }
 
-func NewEvent() {
+func NewEvent() *Event {
     return &Event{
                 cond : sync.NewCond(&sync.Mutex{}),
             }

@@ -23,6 +23,12 @@ func getCaller() (name, file string, line int) {
     return
 }
 
+func RaiseError(e error) {
+    if e != nil {
+        Raise(e)
+    }
+}
+
 func Raise(v interface{}) {
     name, _, line := getCaller()
     exp := &Exception{
