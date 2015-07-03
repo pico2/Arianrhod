@@ -82,6 +82,7 @@ def resolve_snippets(ctx):
 class GoSublime(sublime_plugin.EventListener):
 	gocode_set = False
 	def on_query_completions(self, view, prefix, locations):
+		AC_OPTS = 0
 		pos = locations[0]
 		scopes = view.scope_name(pos).split()
 		if ('source.go' not in scopes) or (gs.setting('gscomplete_enabled', False) is not True):
@@ -149,6 +150,14 @@ class GoSublime(sublime_plugin.EventListener):
 				ctx['global'] = False
 				ctx['local'] = True
 				cl.extend(resolve_snippets(ctx))
+
+		for i, c in enumerate(cl):
+			p = c[0].split('\t', 1)
+			if len(p) == 1 or p[0].find(' ') == -1:
+				continue
+
+			cl[i] = [p[0].replace(' ', '\xA0') + '\t' + p[1], c[1]]
+
 		return (cl, AC_OPTS)
 
 	def find_end_pt(self, view, pat, start, end, flags=sublime.LITERAL):
