@@ -15,28 +15,32 @@ func (self *Exception) String() string {
     return self.Message
 }
 
-func getCaller() (name, file string, line int) {
-    pc, file, line, _ := runtime.Caller(2)
+func getCaller(skip int) (name, file string, line int) {
+    pc, file, line, _ := runtime.Caller(skip)
 
     // file = filepath.Base(file)
     name = filepath.Base(runtime.FuncForPC(pc).Name())
     return
 }
 
-func RaiseError(e error) {
-    if e != nil {
-        Raise(e)
-    }
-}
-
-func Raise(v interface{}) {
-    name, _, line := getCaller()
+func raiseimpl(v interface{}) {
+    name, _, line := getCaller(3)
     exp := &Exception{
-                Message : Sprintf("%s\n[%s:%d] %v\n", stack(2), name, line, v),
+                Message : Sprintf("%s\n[%s:%d] %v\n", stack(3), name, line, v),
                 Value   : v,
             }
 
     panic(exp)
+}
+
+func RaiseIf(e error) {
+    if e != nil {
+        raiseimpl(e)
+    }
+}
+
+func Raise(v interface{}) {
+    raiseimpl(v)
 }
 
 func Catch(exp interface{}) *Exception {

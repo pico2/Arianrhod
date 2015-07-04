@@ -109,10 +109,10 @@ func NewDecoder(r io.ReadSeeker) *Decoder {
 // receives as a time.)
 //
 // Unmarshal returns the detected property list format and an error, if any.
-func Unmarshal(data []byte, v interface{}) (format int, err error) {
+func Unmarshal(data []byte, v interface{}) (err error) {
 	r := bytes.NewReader(data)
 	dec := NewDecoder(r)
 	err = dec.Decode(v)
-	format = dec.Format
+	// format = dec.Format
 	return
 }

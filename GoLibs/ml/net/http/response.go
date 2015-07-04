@@ -8,6 +8,7 @@ import (
     "compress/zlib"
     "net/url"
     "mime"
+    "plistlib"
     gohttp "net/http"
 )
 
@@ -23,6 +24,52 @@ type Response struct {
     Encoding    int
 
     resp        *gohttp.Response
+}
+
+func NewResponse(resp *gohttp.Response) (response *Response, err error) {
+    var content []byte
+
+    if resp.Body != nil {
+        defer resp.Body.Close()
+
+        content, err = readBody(resp)
+        if err != nil {
+            return
+        }
+    }
+
+    response = &Response{
+        Status      : String(resp.Status),
+        StatusCode  : resp.StatusCode,
+        Proto       : String(resp.Proto),
+        ProtoMajor  : resp.ProtoMajor,
+        ProtoMinor  : resp.ProtoMinor,
+        Header      : resp.Header,
+        Content     : content,
+        Request     : resp.Request,
+        Encoding    : getEncoding(resp, content),
+
+        resp        : resp,
+    }
+
+    return
+}
+
+func (self *Response) Text(encoding ...int) String {
+    var enc int
+    switch len(encoding) {
+        case 0:
+            enc = self.Encoding
+
+        default:
+            enc = encoding[0]
+    }
+
+    return Decode(self.Content, enc)
+}
+
+func (self *Response) Plist(v interface{}) error {
+    return plistlib.Unmarshal(self.Content, v)
 }
 
 func (self *Response) Cookies() []*gohttp.Cookie {
@@ -91,33 +138,4 @@ func getEncoding(resp *gohttp.Response, body []byte) int {
     }
 
     return encoding
-}
-
-func NewResponse(resp *gohttp.Response) (*Response, error) {
-    var content []byte
-    var err error
-
-    if resp.Body != nil {
-        defer resp.Body.Close()
-
-        content, err = readBody(resp)
-        if err != nil {
-            return nil, err
-        }
-    }
-
-    return &Response{
-        Status      : String(resp.Status),
-        StatusCode  : resp.StatusCode,
-        Proto       : String(resp.Proto),
-        ProtoMajor  : resp.ProtoMajor,
-        ProtoMinor  : resp.ProtoMinor,
-        Header      : resp.Header,
-        Content     : content,
-        Request     : resp.Request,
-        Encoding    : getEncoding(resp, content),
-
-        resp        : resp,
-
-    }, nil
 }

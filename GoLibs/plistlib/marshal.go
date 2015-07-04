@@ -4,6 +4,7 @@ import (
 	"encoding"
 	"reflect"
 	"time"
+	"fmt"
 )
 
 func isEmptyValue(v reflect.Value) bool {
@@ -133,17 +134,13 @@ func (p *Encoder) marshal(val reflect.Value) *plistValue {
 			return &plistValue{Array, subvalues}
 		}
 	case reflect.Map:
-		if typ.Key().Kind() != reflect.String {
-			panic(&unknownTypeError{typ})
-		}
-
 		l := val.Len()
 		dict := &dictionary{
 			m: make(map[string]*plistValue, l),
 		}
 		for _, keyv := range val.MapKeys() {
 			if subpval := p.marshal(val.MapIndex(keyv)); subpval != nil {
-				dict.m[keyv.String()] = subpval
+				dict.m[fmt.Sprint(keyv.Interface())] = subpval
 			}
 		}
 		return &plistValue{Dictionary, dict}
