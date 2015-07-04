@@ -13,11 +13,17 @@ import (
     . "ml/dict"
 )
 
+const (
+    HTTP_ERROR_GENERIC          = 0
+    HTTP_ERROR_TIMEOUT          = 1
+    HTTP_ERROR_CONNECT_PROXY    = 2
+)
+
 type HttpError struct {
     Op          string
     URL         string
     Err         error
-    Timeout     bool
+    Type        int
 }
 
 func (self *HttpError) Error() string {
@@ -175,14 +181,31 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
                     Op      : uerr.Op,
                     URL     : uerr.URL,
                     Err     : uerr.Err,
-                    Timeout : timeout,
                 }
 
-        // if timeout {
-        //     herr.Timeout = uerr.Err.Error() == "net/http: request canceled while waiting for connection"
-        // }
+        msg := String(herr.Err.Error())
+
+        switch {
+            case timeout:
+                herr.Type = HTTP_ERROR_TIMEOUT
+
+            case msg.Contains("error connecting to proxy"):
+                herr.Type = HTTP_ERROR_CONNECT_PROXY
+
+            default:
+                herr.Type = HTTP_ERROR_GENERIC
+        }
 
         return nil, herr
+    }
+
+    // fix net/http/client/shouldRedirectPost does not follow StatusTemporaryRedirect
+
+    switch resp.StatusCode {
+        case StatusTemporaryRedirect:
+            if location := resp.Header.Get("Location"); location != "" {
+                return self.Request(method, location, params_...)
+            }
     }
 
     return NewResponse(resp)

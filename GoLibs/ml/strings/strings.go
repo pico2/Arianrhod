@@ -1,11 +1,26 @@
 package strings
 
 import (
+    . "fmt"
+    . "ml/dict"
+    . "ml/trace"
+
+    "bytes"
+    "text/template"
     "strings"
     "unicode/utf8"
 )
 
 type String string
+
+func Format(format interface{}, params Dict) String {
+    t := template.Must(template.New("").Parse(Sprintf("%v", format)))
+    b := bytes.NewBufferString("")
+
+    RaiseIf(t.Execute(b, params))
+
+    return String(b.String())
+}
 
 func (self String) String() string {
     return string(self)
