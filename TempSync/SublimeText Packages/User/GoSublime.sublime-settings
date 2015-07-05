@@ -7,7 +7,8 @@
                     "text": "func",
                     "title": "(*${typename})",
                     "value": "func (self ${2:*}${typename}) ${3:name}($4)$5 {\n\t$0\n}"
-                }
+                },
+                {}
             ]
         },
         {

@@ -38,6 +38,10 @@ func (self String) IsEmpty() bool {
     return len(self) == 0
 }
 
+func (self String) Format(params Dict) String {
+    return Format(self, params)
+}
+
 func (self String) Encode(encoding int) []byte {
     return GetEncoder(encoding).Encode(self)
 }
