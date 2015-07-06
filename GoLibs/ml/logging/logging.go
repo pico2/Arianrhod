@@ -12,16 +12,6 @@ import (
     "path/filepath"
 )
 
-type Logger struct {
-    formatter   String
-    level       int
-    callDepth   int
-    skip        int
-    tag         String
-    lock        sync.Mutex
-    out         []io.WriteCloser
-}
-
 const (
     CRITICAL = 50
     FATAL    = CRITICAL
@@ -31,6 +21,8 @@ const (
     INFO     = 20
     DEBUG    = 10
     NOTSET   = 0
+
+    skipFuncs   = 3
 )
 
 var levelToName = map[int]string {
@@ -53,11 +45,53 @@ var nameToLevel = map[string]int {
 }
 
 var lock = sync.Mutex{}
-
 var defaultFormatter = String("[%date %time][%tag][%file][%func:%line]")
+
+type Logger struct {
+    formatter   String
+    level       int
+    callDepth   int
+    skip        int
+    tag         String
+    lock        sync.Mutex
+    out         []io.WriteCloser
+}
+
+func NewLogger(tag interface{}) *Logger {
+    return &Logger{
+               formatter    : defaultFormatter,
+               level        : DEBUG,
+               tag          : String(fmt.Sprint(tag)),
+               callDepth    : 10,
+               skip         : skipFuncs,
+               out          : []io.WriteCloser{os.Stdout},
+            }
+}
 
 func (self *Logger) String() string {
     return fmt.Sprintf("%s logger", self.tag)
+}
+
+func (self *Logger) getCaller(skip int) (pc uintptr, name, file string, line int, ok bool) {
+    for {
+
+        pc, file, line, ok = runtime.Caller(skip)
+        if ok == false {
+            break
+        }
+
+        names := String(runtime.FuncForPC(pc).Name()).RSplit(".", 1)
+        n := names[len(names) - 1]
+
+        if String("debug.info.warning.error.fatal").Contains(n.ToLower()) == false {
+            name = string(n)
+            break
+        }
+
+        skip++
+    }
+
+    return
 }
 
 func (self *Logger) output(level int, format interface{}, args ...interface{}) {
@@ -70,11 +104,13 @@ func (self *Logger) output(level int, format interface{}, args ...interface{}) {
 
     t := time.Now()
 
-    pc, file, line, ok := runtime.Caller(self.skip)
-    if !ok {
+    // pc, file, line, ok := runtime.Caller(self.skip)
+    _, name, file, line, ok := self.getCaller(self.skip)
+    if ok == false {
         file = "???"
+        name = "???"
         line = -1
-        pc = 0
+        // pc = 0
     }
 
     text := fmt.Sprintf(fmt.Sprintf("%v", format), args...)
@@ -90,8 +126,9 @@ func (self *Logger) output(level int, format interface{}, args ...interface{}) {
     }
 
     if formatter.Find("%func") != -1 {
-        names := String(runtime.FuncForPC(pc).Name()).RSplit(".", 1)
-        formatter = formatter.Replace("%func", names[len(names) - 1])
+        // names := String(runtime.FuncForPC(pc).Name()).RSplit(".", 1)
+        // formatter = formatter.Replace("%func", names[len(names) - 1])
+        formatter = formatter.Replace("%func", String(name))
     }
 
     if formatter.Find("%line") != -1 {
@@ -150,7 +187,7 @@ func (self *Logger) Level() int {
 }
 
 func (self *Logger) SetSkip(skip int) {
-    self.skip = skip
+    self.skip = skip + skipFuncs
 }
 
 func (self *Logger) SetFormater(formatter ...String) {
@@ -179,8 +216,6 @@ func (self *Logger) LogToFile(path ...String) error {
     if len(self.out) == 2 {
         self.removeOutput(self.out[1])
     }
-
-    fmt.Println(filename)
 
     output, err := os.OpenFile(filename, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0666)
     if err != nil {
@@ -228,19 +263,4 @@ func (self *Logger) removeOutput(output io.WriteCloser) {
         self.out = append(self.out[:i], self.out[i + 1:]...)
         break
     }
-}
-
-func NewLogger(tag interface{}) *Logger {
-    return &Logger{
-               formatter    : defaultFormatter,
-               level        : DEBUG,
-               tag          : String(fmt.Sprint(tag)),
-               callDepth    : 10,
-               skip         : 2,
-               out          : []io.WriteCloser{os.Stdout},
-            }
-}
-
-func init() {
-
 }

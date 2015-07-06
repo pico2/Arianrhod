@@ -33,9 +33,9 @@ func raiseimpl(v interface{}) {
     panic(exp)
 }
 
-func RaiseIf(e error) {
-    if e != nil {
-        raiseimpl(e)
+func RaiseIf(err error) {
+    if err != nil {
+        raiseimpl(err)
     }
 }
 

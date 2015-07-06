@@ -8,14 +8,14 @@ call init.bat
 
 cd/d "%~dp1"
 
-findstr /X /B /C:"func main() {" "%~f1" >NUL 2>NUL
+findstr /C:"func main() {" "%~f1" >NUL 2>NUL
 if %ERRORLEVEL% == 0 (
     call:BUILD_AND_RUN "%~f1"
     goto:EXIT
 )
 
 for /f %%i in ('dir/b *.go') do (
-    findstr /X /B /C:"func main() {" "%%~fi" >NUL 2>NUL
+    findstr /C:"func main() {" "%%~fi" >NUL 2>NUL
     if !ERRORLEVEL! == 0 (
         call:BUILD_AND_RUN "%%~fi"
         goto:EXIT
@@ -55,8 +55,8 @@ goto:eof
 
 :DELETE_ML_PKG
 if [%1] == [] (
-    for /f %%i in ('dir/s/b "%~dp0\pkgs\pkg\ml.a"') do (
-        call:DELETE_ML_PKG "%%~fi"
+    for /f %%i in ('dir/s/b "%~dp0\pkgs\pkg\ml"') do (
+        call:DELETE_ML_PKG "%%~fi.a"
         goto:eof
     )
 ) else (

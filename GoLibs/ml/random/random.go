@@ -10,6 +10,9 @@ import (
     "crypto/rand"
     "errors"
     "math/big"
+    "reflect"
+
+    . "ml/trace"
 )
 
 const (
@@ -22,24 +25,37 @@ const (
 
 var MinMaxError = errors.New("Min cannot be greater than max.")
 
+func ChoiceIndex(array interface{}) int {
+    arr := reflect.ValueOf(array)
+    return IntRange(0, arr.Len())
+}
+
+func Choice(array interface{}) interface{} {
+    arr := reflect.ValueOf(array)
+    return arr.Index(ChoiceIndex(array)).Interface()
+}
+
 // IntRange returns a random integer in the range from min to max.
-func IntRange(min, max int) (int, error) {
+func IntRange(min, max int) int {
     var result int
+
     switch {
         case min > max:
             // Fail with error
-            return result, MinMaxError
+            Raise(MinMaxError)
+
         case max == min:
             result = max
+
         case max > min:
             maxRand := max - min
             b, err := rand.Int(rand.Reader, big.NewInt(int64(maxRand)))
-            if err != nil {
-                return result, err
-            }
+            RaiseIf(err)
+
             result = min + int(b.Int64())
     }
-    return result, nil
+
+    return result
 }
 
 // String returns a random string n characters long, composed of entities
@@ -67,10 +83,8 @@ func StringRange(min, max int, charset string) (string, error) {
     var err error      // Holds errors
     var strlen int     // Length of random string to generate
     var randstr string // Random string to return
-    strlen, err = IntRange(min, max)
-    if err != nil {
-        return randstr, err
-    }
+    strlen = IntRange(min, max)
+
     randstr, err = String(strlen, charset)
     if err != nil {
         return randstr, err
@@ -90,26 +104,24 @@ func AlphaString(n int) (string, error) {
 }
 
 // ChoiceString returns a random selection from an array of strings.
-func ChoiceString(choices []string) (string, error) {
+func ChoiceString(choices []string) string {
     var winner string
     length := len(choices)
-    i, err := IntRange(0, length)
-    winner = choices[i]
-    return winner, err
+    winner = choices[IntRange(0, length)]
+    return winner
 }
 
 // ChoiceInt returns a random selection from an array of integers.
-func ChoiceInt(choices []int) (int, error) {
+func ChoiceInt(choices []int) int {
     var winner int
     length := len(choices)
-    i, err := IntRange(0, length)
-    winner = choices[i]
-    return winner, err
+    winner = choices[IntRange(0, length)]
+    return winner
 }
 
 // A Choice contains a generic item and a weight controlling the frequency with
 // which it will be selected.
-type Choice struct {
+type WeightChoice struct {
     Weight int
     Item   interface{}
 }
@@ -119,24 +131,21 @@ type Choice struct {
 // relative.  E.g. if you have two choices both weighted 3, they will be
 // returned equally often; and each will be returned 3 times as often as a
 // choice weighted 1.
-func WeightedChoice(choices []Choice) (Choice, error) {
+func WeightedChoice(choices []WeightChoice) (WeightChoice, error) {
     // Based on this algorithm:
     //     http://eli.thegreenplace.net/2010/01/22/weighted-random-generation-in-python/
-    var ret Choice
+    var ret WeightChoice
     sum := 0
     for _, c := range choices {
         sum += c.Weight
     }
-    r, err := IntRange(0, sum)
-    if err != nil {
-        return ret, err
-    }
+    r := IntRange(0, sum)
     for _, c := range choices {
         r -= c.Weight
         if r < 0 {
             return c, nil
         }
     }
-    err = errors.New("Internal error - code should not reach this point")
+    err := errors.New("Internal error - code should not reach this point")
     return ret, err
 }

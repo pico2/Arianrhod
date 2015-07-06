@@ -20,6 +20,7 @@
                 {"text": "default", "title": "default", "value": "default"},
                 {"text": "fallthrough", "title": "fallthrough", "value": "fallthrough"},
                 {"text": "recover", "title": "recover", "value": "recover"},
+                {"text": "append", "title": "append", "value": "append($1)"},
                 {}
             ]
         }

@@ -19,5 +19,5 @@ var (
 )
 
 func init() {
-    logger.SetSkip(3)
+    logger.SetSkip(1)
 }

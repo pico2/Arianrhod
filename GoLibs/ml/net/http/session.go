@@ -73,7 +73,7 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
     }
 
     for k, v := range extraHeaders {
-        request.Header.Add(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+        request.Header.Set(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
     }
 }
 
@@ -235,19 +235,32 @@ func (self *Session) SetHeaders(headers Dict) {
 }
 
 func (self *Session) SetProxy(host String, port int, userAndPassword ...String) {
-    if len(host) == 0 {
+    if host.IsEmpty() {
         self.client.Transport = nil
 
     } else {
         var err error
         var proxyUrl *gourl.URL
+        var user, pass String
 
         switch len(userAndPassword) {
-            case 1:
-                proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s", host, port, userAndPassword[0]))
-
             case 2:
-                proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s:%s", host, port, userAndPassword[0], userAndPassword[1]))
+                user, pass = userAndPassword[0], userAndPassword[1]
+                if user.IsEmpty() == false && pass.IsEmpty() == false {
+                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s:%s", host, port, user, pass))
+                    break
+                }
+
+                fallthrough
+
+            case 1:
+                user = userAndPassword[0]
+                if user.IsEmpty() == false {
+                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s", host, port, userAndPassword[0]))
+                    break
+                }
+
+                fallthrough
 
             default:
                 proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d", host, port))
