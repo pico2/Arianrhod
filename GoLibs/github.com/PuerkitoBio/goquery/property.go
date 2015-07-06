@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strings"
 
+	. "ml/trace"
+
 	"golang.org/x/net/html"
 )
 
@@ -18,6 +20,15 @@ func (s *Selection) Attr(attrName string) (val string, exists bool) {
 		return
 	}
 	return getAttributeValue(attrName, s.Nodes[0])
+}
+
+func (s *Selection) Attr2(attrName string) string {
+	val, exists := s.Attr(attrName)
+	if exists == false {
+		Raise("can't find attribute: '" + attrName + "'")
+	}
+
+	return val
 }
 
 // AttrOr works like Attr but returns default value if attribute is not present.

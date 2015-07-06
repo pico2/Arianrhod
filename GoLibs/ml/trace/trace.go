@@ -52,8 +52,10 @@ func Catch(exp interface{}) *Exception {
             return nil
 
         default:
+            const skip = 7
+            name, _, line := getCaller(skip)
             return &Exception{
-                        Message : Sprintf("%v", e),
+                        Message : Sprintf("%s\n[%s:%d] %v\n", stack(skip), name, line, e),
                         Value   : e,
                     }
     }
