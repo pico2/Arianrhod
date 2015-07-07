@@ -87,11 +87,7 @@ func openThread(session *http.Session, user String) error {
         return Errorf("empty thread")
     }
 
-    index, err := random.IntRange(0, len(threads))
-    if err != nil {
-        return err
-    }
-
+    index := random.IntRange(0, len(threads))
     t := threads[index].Find("a.s.xst")
     href, ok := t.Attr("href")
 
