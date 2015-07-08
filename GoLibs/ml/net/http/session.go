@@ -48,6 +48,7 @@ func toString(value interface{}) String {
             return String(fmt.Sprintf("%v", v))
 
         default:
+            fmt.Printf("%v\n", value)
             return String(v.(string))
     }
 }
