@@ -235,12 +235,11 @@ func (self *Session) SetHeaders(headers Dict) {
     }
 }
 
-func (self *Session) SetProxy(host String, port int, userAndPassword ...String) {
+func (self *Session) SetProxy(host String, port int, userAndPassword ...String) (err error) {
     if host.IsEmpty() {
         self.client.Transport = nil
 
     } else {
-        var err error
         var proxyUrl *gourl.URL
         var user, pass String
 
@@ -248,7 +247,7 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
             case 2:
                 user, pass = userAndPassword[0], userAndPassword[1]
                 if user.IsEmpty() == false && pass.IsEmpty() == false {
-                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s:%s", host, port, user, pass))
+                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%s@%s:%d", user, pass, host, port))
                     break
                 }
 
@@ -257,7 +256,7 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
             case 1:
                 user = userAndPassword[0]
                 if user.IsEmpty() == false {
-                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d@%s", host, port, userAndPassword[0]))
+                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s@%s:%d", user, host, port))
                     break
                 }
 
@@ -273,6 +272,8 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
 
         self.client.Transport = &gohttp.Transport{Proxy: gohttp.ProxyURL(proxyUrl)}
     }
+
+    return
 }
 
 func (self *Session) SetTimeout(second float64) {

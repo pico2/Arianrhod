@@ -13,6 +13,9 @@
         },
         {
             "snippets": [
+                {"text": "case", "title": "case", "value": "case"},
+                {"text": "select", "title": "select", "value": "select"},
+                {"text": "switch", "title": "switch", "value": "switch"},
                 {"text": "return", "title": "return", "value": "return"},
                 {"text": "break", "title": "break", "value": "break"},
                 {"text": "continue", "title": "continue", "value": "continue"},
@@ -21,6 +24,7 @@
                 {"text": "fallthrough", "title": "fallthrough", "value": "fallthrough"},
                 {"text": "recover", "title": "recover", "value": "recover"},
                 {"text": "append", "title": "append", "value": "append($1)"},
+                {"text": "delete", "title": "delete", "value": "delete($1)"},
                 {}
             ]
         }

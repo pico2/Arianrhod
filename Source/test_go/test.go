@@ -1,45 +1,32 @@
-package main
+﻿package main
 
 import (
-    _ "ml"
     . "fmt"
-    . "ml/dict"
-    . "ml/array"
-    . "ml/strings"
     "ml/console"
-
-    "plistlib"
-    "strconv"
     "os"
-
     "github.com/PuerkitoBio/goquery"
 )
 
 func unused() {
-    _ = Dict{}
-    _ = Array{}
-    _ = Printf
-    _ = strconv.Atoi
-    _ = plistlib.Unmarshal
+}
+
+var count int = 1
+
+func rand() int {
+    if count < 5 {
+        count++
+    }
+    println("count =", count)
+    return count
 }
 
 func main() {
-    r, _ := os.Open("1.html")
-    doc, _ := goquery.NewDocumentFromReader(r)
+    f, _ := os.Open("D:/desktop/111.html")
 
-    success := doc.Find(".email-verification").Length() != 0
-    Println(success)
+    doc, _ := goquery.NewDocumentFromReader(f)
+    g := doc.Find(".page-error").Find(".generic-error")
 
-    script := doc.Find("script[id=protocol][type*=text][type*=x-apple-plist]")
-
-    plist := Dict{}
-    plistlib.Unmarshal(
-        String("<plist version=\"1.0\">\r\n" + script.Text() + "</plist>").Encode(CP_UTF8),
-        &plist,
-    )
-
-    dsid, _ := strconv.ParseInt(plist["set-current-user"].(map[string]interface{})["dsPersonId"].(string), 10, 64)
-    Printf("%d\n", dsid)
+    Println(g.Length(), g.Text())
 
     console.Pause("done")
 }

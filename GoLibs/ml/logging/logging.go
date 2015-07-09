@@ -199,12 +199,20 @@ func (self *Logger) SetFormater(formatter ...String) {
     }
 }
 
-func (self *Logger) LogToFile(path ...String) error {
+func (self *Logger) LogToFile(enable bool, path ...String) error {
     var filename string
     var output io.WriteCloser = nil
 
     self.lock.Lock()
     defer self.lock.Unlock()
+
+    if enable == false {
+        if len(self.out) == 2 {
+            self.removeOutput(self.out[1])
+        }
+
+        return nil
+    }
 
     switch len(path) {
         case 0:

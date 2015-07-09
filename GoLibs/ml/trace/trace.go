@@ -24,11 +24,20 @@ func getCaller(skip int) (name, file string, line int) {
 }
 
 func raiseimpl(v interface{}) {
+    var exp *Exception
+
     name, _, line := getCaller(3)
-    exp := &Exception{
-                Message : Sprintf("%s\n[%s:%d] %v\n", stack(3), name, line, v),
-                Value   : v,
-            }
+
+    switch e := v.(type) {
+        case *Exception:
+            exp = e
+
+        default:
+            exp = &Exception{
+                        Message : Sprintf("%s\n[%s:%d] %v\n", stack(3), name, line, v),
+                        Value   : v,
+                    }
+    }
 
     panic(exp)
 }
@@ -52,7 +61,7 @@ func Catch(exp interface{}) *Exception {
             return nil
 
         default:
-            const skip = 2 + 4
+            const skip = 2
             name, _, line := getCaller(skip)
             return &Exception{
                         Message : Sprintf("%s\n[%s:%d] %v\n", stack(skip), name, line, e),
