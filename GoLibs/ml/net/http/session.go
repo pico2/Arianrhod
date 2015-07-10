@@ -1,34 +1,19 @@
 package http
 
 import (
+    . "ml/strings"
+    . "ml/dict"
+    . "ml/trace"
+
     gourl "net/url"
     gohttp "net/http"
+
     "net/http/cookiejar"
-    "errors"
     "fmt"
     "bytes"
     "io"
     "time"
-    . "ml/strings"
-    . "ml/dict"
 )
-
-const (
-    HTTP_ERROR_GENERIC          = 0
-    HTTP_ERROR_TIMEOUT          = 1
-    HTTP_ERROR_CONNECT_PROXY    = 2
-)
-
-type HttpError struct {
-    Op          string
-    URL         string
-    Err         error
-    Type        int
-}
-
-func (self *HttpError) Error() string {
-    return self.Op + " " + self.URL + ": " + self.Err.Error()
-}
 
 type Session struct {
     cookie  *cookiejar.Jar
@@ -78,11 +63,12 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
     }
 }
 
-func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response, error) {
+func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response) {
     var bodyReader  io.Reader
     var params      Dict
     var encoding    int
     var queryString string
+    var err         error
 
     method := toString(methodi)
     url := toString(urli)
@@ -95,7 +81,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
             params = Dict{}
 
         default:
-            return nil, errors.New("invalid params number")
+            Raise(NewHttpError(HTTP_ERROR_GENERIC, method, url, String(fmt.Sprintf("invalid params number: %d", len(params_)))))
     }
 
     switch v := params["encoding"].(type) {
@@ -125,9 +111,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     }
 
     request, err := gohttp.NewRequest(string(method), string(url), bodyReader)
-    if err != nil {
-        return nil, err
-    }
+    RaiseHttpError(err)
 
     switch query := params["params"].(type) {
         case Dict:
@@ -153,7 +137,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
     self.client.CheckRedirect = func(request *gohttp.Request, via []*gohttp.Request) error {
         if len(via) >= 10 {
-            return errors.New("stopped after 10 redirects")
+            Raise(NewHttpError(HTTP_TOO_MANY_REDIRECT, method, url, "stopped after 10 redirects"))
         }
 
         applyHeadersToRequest(request, &self.headers, extraHeaders)
@@ -188,16 +172,23 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
         switch {
             case timeout:
+                fallthrough
+            case msg.Contains("Client.Timeout exceeded while reading body"):
                 herr.Type = HTTP_ERROR_TIMEOUT
 
             case msg.Contains("error connecting to proxy"):
                 herr.Type = HTTP_ERROR_CONNECT_PROXY
 
+            case msg.Contains("unexpected EOF"):
+                herr.Type = HTTP_ERROR_INVALID_RESPONSE
+
             default:
                 herr.Type = HTTP_ERROR_GENERIC
         }
 
-        return nil, herr
+        Raise(herr)
+
+        return nil
     }
 
     // fix net/http/client/shouldRedirectPost does not follow StatusTemporaryRedirect
@@ -212,11 +203,11 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     return NewResponse(resp)
 }
 
-func (self *Session) Get(url interface{}, params ...Dict) (resp *Response, err error) {
+func (self *Session) Get(url interface{}, params ...Dict) (resp *Response) {
     return self.Request("GET", url, params...)
 }
 
-func (self *Session) Post(url interface{}, params ...Dict) (resp *Response, err error) {
+func (self *Session) Post(url interface{}, params ...Dict) (resp *Response) {
     return self.Request("POST", url, params...)
 }
 

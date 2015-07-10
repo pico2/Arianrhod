@@ -21,9 +21,11 @@ func NewTcpSocket() Socket {
     return tcp
 }
 
-func (self *TcpSocket) Connect(host string, port int, timeout time.Duration) (err error) {
+func (self *TcpSocket) Connect(host string, port int, timeout time.Duration) {
+    var err error
+
     if self.conn != nil {
-        return AlreadyConnectedError
+        RaiseSocketError(AlreadyConnectedError)
     }
 
     switch {
@@ -34,14 +36,12 @@ func (self *TcpSocket) Connect(host string, port int, timeout time.Duration) (er
             self.conn, err = net.DialTimeout("tcp", Sprintf("%s:%d", host, port), timeout)
     }
 
-    if err != nil {
-        return err
-    }
-
-    return nil
+    RaiseSocketError(err)
 }
 
-func (self *TcpSocket) Read(n int) (buf []byte, err error) {
+func (self *TcpSocket) Read(n int) (buf []byte) {
+    var err error
+
     buf = make([]byte, n)
 
     if self.ReadTimeout > 0 {
@@ -49,24 +49,29 @@ func (self *TcpSocket) Read(n int) (buf []byte, err error) {
     }
 
     n, err = self.conn.Read(buf)
-    return buf[:n], err
+    RaiseSocketError(err)
+
+    return buf[:n]
 }
 
-func (self *TcpSocket) Write(buf []byte) (n int, err error) {
+func (self *TcpSocket) Write(buf []byte) (n int) {
     if self.WriteTimeout > 0 {
         self.conn.SetWriteDeadline(time.Now().Add(self.WriteTimeout))
     }
 
-    return self.conn.Write(buf)
+    n, err := self.conn.Write(buf)
+    RaiseSocketError(err)
+
+    return n
 }
 
-func (self *TcpSocket) Close() (err error) {
-    if self.conn != nil {
-        err = self.conn.Close()
-        self.conn = nil
+func (self *TcpSocket) Close() {
+    if self.conn == nil {
+        return
     }
 
-    return
+    RaiseSocketError(self.conn.Close())
+    self.conn = nil
 }
 
 func (self *TcpSocket) LocalAddr() net.Addr {
@@ -90,16 +95,16 @@ func (self *TcpSocket) SetWriteTimeout(t time.Duration) {
     self.WriteTimeout = t
 }
 
-func (self *TcpSocket) SetDeadline(t time.Time) error {
-    return self.conn.SetDeadline(t)
+func (self *TcpSocket) SetDeadline(t time.Time) {
+    RaiseSocketError(self.conn.SetDeadline(t))
 }
 
-func (self *TcpSocket) SetReadDeadline(t time.Time) error {
+func (self *TcpSocket) SetReadDeadline(t time.Time) {
+    RaiseSocketError(self.conn.SetReadDeadline(t))
     self.SetTimeout(0)
-    return self.conn.SetReadDeadline(t)
 }
 
-func (self *TcpSocket) SetWriteDeadline(t time.Time) error {
+func (self *TcpSocket) SetWriteDeadline(t time.Time) {
+    RaiseSocketError(self.conn.SetWriteDeadline(t))
     self.SetTimeout(0)
-    return self.conn.SetWriteDeadline(t)
 }

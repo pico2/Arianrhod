@@ -2,31 +2,30 @@
 
 import (
     . "fmt"
+    . "ml/trace"
+    "ml/trace"
     "ml/console"
-    "os"
-    "github.com/PuerkitoBio/goquery"
+    "time"
+    // "os"
+    // "github.com/PuerkitoBio/goquery"
 )
 
 func unused() {
-}
-
-var count int = 1
-
-func rand() int {
-    if count < 5 {
-        count++
-    }
-    println("count =", count)
-    return count
+    _ = Raise
 }
 
 func main() {
-    f, _ := os.Open("D:/desktop/111.html")
+    trace.Config.ReadSource = false
 
-    doc, _ := goquery.NewDocumentFromReader(f)
-    g := doc.Find(".page-error").Find(".generic-error")
+    now := time.Now()
+    for i := 0; i != 100000; i++ {
+        Println(Try(func() {
+            Raise("fuck")
+        }))
+    }
 
-    Println(g.Length(), g.Text())
+    Println(time.Now().Sub(now))
+    console.SetTitle("done")
 
     console.Pause("done")
 }

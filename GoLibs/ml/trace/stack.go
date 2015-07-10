@@ -8,10 +8,11 @@ import (
 )
 
 var (
-    dunno     = []byte("???")
-    centerDot = []byte("·")
-    dot       = []byte(".")
-    slash     = []byte("/")
+    dunno           = []byte("???")
+    centerDot       = []byte("·")
+    dot             = []byte(".")
+    slash           = []byte("/")
+    mainFuncName    = []byte("main")
 )
 
 func source(lines [][]byte, n int) []byte {
@@ -21,12 +22,8 @@ func source(lines [][]byte, n int) []byte {
     return bytes.Trim(lines[n], " \t")
 }
 
-func function(pc uintptr) []byte {
-    fn := runtime.FuncForPC(pc)
-    if fn == nil {
-        return dunno
-    }
-    name := []byte(fn.Name())
+func function(n string) []byte {
+    name := []byte(n)
 
     if lastslash := bytes.LastIndex(name, slash); lastslash >= 0 {
         name = name[lastslash+1:]
@@ -39,33 +36,76 @@ func function(pc uintptr) []byte {
     return bytes.Replace(name, centerDot, dot, -1)
 }
 
-func stack(skip int) []byte {
+func stack(skip, depth int) []byte {
     buf := new(bytes.Buffer)
 
     var lines [][]byte
     var lastFile string
 
-    for i := skip; ; i++ {
-        pc, file, line, ok := runtime.Caller(i)
-        if !ok {
-            break
-        }
+    if false {
+        callers := make([]uintptr, depth)
+        n := runtime.Callers(skip, callers)
 
-        Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
-        if file != lastFile {
-            data, err := ioutil.ReadFile(file)
-            if err != nil {
-                continue
+        callers = callers[:n]
+
+        for _, pc := range callers {
+            f := runtime.FuncForPC(pc)
+            file, line := f.FileLine(pc)
+            funcName := function(f.Name())
+
+            Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
+
+            if Config.ReadSource {
+                if file != lastFile {
+                    data, err := ioutil.ReadFile(file)
+                    if err != nil {
+                        continue
+                    }
+                    lines = bytes.Split(data, []byte{'\n'})
+                    lastFile = file
+                }
+
+                Fprintf(buf, "\t%s: %s\n", funcName, source(lines, line - 1))
+            } else {
+                Fprintf(buf, "\t%s\n", funcName)
             }
-            lines = bytes.Split(data, []byte{'\n'})
-            lastFile = file
+
+            if bytes.Equal(funcName, mainFuncName) {
+                break
+            }
         }
 
-        funcName := function(pc)
-        Fprintf(buf, "\t%s: %s\n", funcName, source(lines, line - 1))
+    } else {
+        depth += skip
+        for i := skip; i < depth; i++ {
+            pc, file, line, ok := runtime.Caller(i)
+            if !ok {
+                break
+            }
 
-        if bytes.Equal(funcName, []byte("main")) {
-            break
+            funcName := function(runtime.FuncForPC(pc).Name())
+
+            Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
+
+            if Config.ReadSource {
+                if file != lastFile {
+                    data, err := ioutil.ReadFile(file)
+                    if err != nil {
+                        continue
+                    }
+                    lines = bytes.Split(data, []byte{'\n'})
+                    lastFile = file
+                }
+
+                Fprintf(buf, "\t%s: %s\n", funcName, source(lines, line - 1))
+
+            } else {
+                Fprintf(buf, "\t%s\n", funcName)
+            }
+
+            if bytes.Equal(funcName, mainFuncName) {
+                break
+            }
         }
     }
 

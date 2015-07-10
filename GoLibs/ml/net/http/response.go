@@ -1,6 +1,7 @@
 package http
 
 import (
+    . "ml/trace"
     . "ml/strings"
     "io"
     "io/ioutil"
@@ -26,16 +27,12 @@ type Response struct {
     resp        *gohttp.Response
 }
 
-func NewResponse(resp *gohttp.Response) (response *Response, err error) {
+func NewResponse(resp *gohttp.Response) (response *Response) {
     var content []byte
 
     if resp.Body != nil {
         defer resp.Body.Close()
-
-        content, err = readBody(resp)
-        if err != nil {
-            return
-        }
+        content = readBody(resp)
     }
 
     response = &Response{
@@ -68,42 +65,63 @@ func (self *Response) Text(encoding ...int) String {
     return Decode(self.Content, enc)
 }
 
-func (self *Response) Plist(v interface{}) error {
-    return plistlib.Unmarshal(self.Content, v)
+func (self *Response) Plist(v interface{}) {
+    RaiseHttpError(plistlib.Unmarshal(self.Content, v))
 }
 
 func (self *Response) Cookies() []*gohttp.Cookie {
     return self.resp.Cookies()
 }
 
-func (self *Response) Location() (*url.URL, error) {
-    return self.resp.Location()
+func (self *Response) Location() (*url.URL) {
+    u, err := self.resp.Location()
+    RaiseHttpError(err)
+    return u
 }
 
-func readBody(resp *gohttp.Response) ([]byte, error) {
+func raise(resp *gohttp.Response, err error) {
+    if err == nil {
+        return
+    }
+
+    msg := String(err.Error())
+    switch {
+        case msg.Contains("Client.Timeout exceeded while reading body"):
+            Raise(NewHttpError(
+                HTTP_ERROR_TIMEOUT,
+                String(resp.Request.Method),
+                String(resp.Request.URL.String()),
+                msg,
+            ))
+
+        default:
+            RaiseHttpError(err)
+    }
+}
+
+func readBody(resp *gohttp.Response) (body []byte) {
     var reader io.ReadCloser
     var err error
 
     switch String(resp.Header.Get("Content-Encoding")).ToLower() {
         case "gzip":
             reader, err = gzip.NewReader(resp.Body)
-            if err != nil {
-                return nil, err
-            }
+            raise(resp, err)
             defer reader.Close()
 
         case "deflate":
             reader, err = zlib.NewReader(resp.Body)
-            if err != nil {
-                return nil, err
-            }
+            raise(resp, err)
             defer reader.Close()
 
         default:
             reader = resp.Body
     }
 
-    return ioutil.ReadAll(reader)
+    body, err = ioutil.ReadAll(reader)
+    raise(resp, err)
+
+    return
 }
 
 func getEncoding(resp *gohttp.Response, body []byte) int {

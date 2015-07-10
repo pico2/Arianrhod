@@ -6,10 +6,10 @@ import (
 )
 
 type Socket interface {
-    Connect(host string, port int, timeout time.Duration) error
-    Read(n int) (buf []byte, err error)
-    Write(buf []byte) (n int, err error)
-    Close() error
+    Connect(host string, port int, timeout time.Duration)
+    Read(n int) (buf []byte)
+    Write(buf []byte) (n int)
+    Close()
 
     LocalAddr() net.Addr
     RemoteAddr() net.Addr
@@ -18,7 +18,7 @@ type Socket interface {
     SetReadTimeout(t time.Duration)
     SetWriteTimeout(t time.Duration)
 
-    SetDeadline(t time.Time) error
-    SetReadDeadline(t time.Time) error
-    SetWriteDeadline(t time.Time) error
+    SetDeadline(t time.Time)
+    SetReadDeadline(t time.Time)
+    SetWriteDeadline(t time.Time)
 }
