@@ -9,5 +9,5 @@ func fixTimePeriod() {
 }
 
 func init() {
-    fixTimePeriod()
+    // fixTimePeriod()
 }

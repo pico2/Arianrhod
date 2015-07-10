@@ -21,6 +21,28 @@ type Session struct {
     headers gohttp.Header
 }
 
+func NewSession() (*Session, error) {
+    jar, err := cookiejar.New(nil)
+    if err != nil {
+        return nil, err
+    }
+
+    client := &gohttp.Client{
+        CheckRedirect   : nil,
+        Jar             : jar,
+        Timeout         : 30 * time.Second,
+    }
+
+    return &Session{
+                cookie  : jar,
+                client  : client,
+                headers : make(gohttp.Header),
+            }, nil
+}
+
+func (self *Session) Close() {
+}
+
 func toString(value interface{}) String {
     switch v := value.(type) {
         case string:
@@ -153,6 +175,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
         })
     }
 
+    request.Close = true
     resp, err := self.client.Do(request)
     if timer != nil {
         timer.Stop()
@@ -269,23 +292,4 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
 
 func (self *Session) SetTimeout(second float64) {
     self.client.Timeout = time.Duration(second * 1000) * time.Millisecond
-}
-
-func NewSession() (*Session, error) {
-    jar, err := cookiejar.New(nil)
-    if err != nil {
-        return nil, err
-    }
-
-    client := &gohttp.Client{
-        CheckRedirect   : nil,
-        Jar             : jar,
-        Timeout         : 30 * time.Second,
-    }
-
-    return &Session{
-                cookie  : jar,
-                client  : client,
-                headers : make(gohttp.Header),
-            }, nil
 }
