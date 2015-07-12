@@ -159,7 +159,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
     self.client.CheckRedirect = func(request *gohttp.Request, via []*gohttp.Request) error {
         if len(via) >= 10 {
-            Raise(NewHttpError(HTTP_TOO_MANY_REDIRECT, method, url, "stopped after 10 redirects"))
+            Raise(NewHttpError(HTTP_ERROR_TOO_MANY_REDIRECT, method, url, "stopped after 10 redirects"))
         }
 
         applyHeadersToRequest(request, &self.headers, extraHeaders)

@@ -86,6 +86,14 @@ func raise(resp *gohttp.Response, err error) {
 
     msg := String(err.Error())
     switch {
+        case msg.Contains("No connection could be made because the target machine actively refused it"):
+            Raise(NewHttpError(
+                HTTP_ERROR_CANNOT_CONNECT,
+                String(resp.Request.Method),
+                String(resp.Request.URL.String()),
+                msg,
+            ))
+
         case msg.Contains("Client.Timeout exceeded while reading body"):
             Raise(NewHttpError(
                 HTTP_ERROR_TIMEOUT,

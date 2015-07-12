@@ -58,16 +58,16 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.h", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fjq"), "fjj", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fqA"), "fqt", 0);
             }
         });
 
         // "ERROR record duration, %dms !!!"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.bi", pkg.classLoader, "lO", new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.bi", pkg.classLoader, "lQ", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, "fnu"), "s", 0.f);
+                XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, "fuE"), "w", 0.f);
                 param.setResult(true);
                 //log("updateProgress");
                 //log(new Exception());
@@ -77,7 +77,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.p", pkg.classLoader, "z", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "A", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //                log("what the fuck");

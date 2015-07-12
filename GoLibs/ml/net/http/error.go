@@ -7,11 +7,12 @@ import (
 )
 
 const (
-    HTTP_ERROR_GENERIC          = 0
-    HTTP_ERROR_TIMEOUT          = 1
-    HTTP_ERROR_CONNECT_PROXY    = 2
-    HTTP_ERROR_INVALID_RESPONSE = 3
-    HTTP_TOO_MANY_REDIRECT      = 4
+    HTTP_ERROR_GENERIC              = 0
+    HTTP_ERROR_TIMEOUT              = 1
+    HTTP_ERROR_CONNECT_PROXY        = 2
+    HTTP_ERROR_INVALID_RESPONSE     = 3
+    HTTP_ERROR_TOO_MANY_REDIRECT    = 4
+    HTTP_ERROR_CANNOT_CONNECT       = 5
 )
 
 type HttpError struct {
