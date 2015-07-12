@@ -5,9 +5,13 @@
 *.obj
 *egg-info
 *.egg
+__pycache__
+.idea/
+.gradle/
+build/
+
 ImmPyCommands/*.pyc
 ImmPyLibs/*.pyc
-__pycache__
 Source/sources/3dlearn
 Source/sources/bluepillstudy
 /TempSync/Vim/_font

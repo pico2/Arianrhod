@@ -5,12 +5,17 @@ import (
     . "ml"
     . "ml/dict"
     . "ml/strings"
+
     "ml/console"
     "ml/strings"
     "ml/net/http"
     "ml/io2"
     "ml/os2"
     "ml/random"
+    "ml/pprof"
+
+    "os"
+    "os/signal"
     "time"
     "sync"
     "path/filepath"
@@ -22,32 +27,30 @@ const (
     FORUM_URL   = "http://bbs.saraba1st.com/2b/forum-75-1.html"
 )
 
-func login(session *http.Session, user, pass String) error {
-    resp, err := session.Post(
-                    "http://bbs.saraba1st.com/2b/member.php",
-                    Dict{
-                        "params": Dict{
-                            "mod"           : "logging",
-                            "action"        : "login",
-                            "loginsubmit"   : "yes",
-                            "infloat"       : "yes",
-                            "lssubmit"      : "yes",
-                            "inajax"        : "1",
-                        },
-                        "body": Dict{
-                            "fastloginfield"    : "username",
-                            "quickforward"      : "yes",
-                            "handlekey"         : "ls",
-                            "username"          : user,
-                            "password"          : pass,
-                        },
-                        "encoding": strings.CP_UTF8,
-                    },
-                )
+var exiting bool = false
 
-    if err != nil {
-        return err
-    }
+func login(session *http.Session, user, pass String) error {
+    resp := session.Post(
+                "http://bbs.saraba1st.com/2b/member.php",
+                Dict{
+                    "params": Dict{
+                        "mod"           : "logging",
+                        "action"        : "login",
+                        "loginsubmit"   : "yes",
+                        "infloat"       : "yes",
+                        "lssubmit"      : "yes",
+                        "inajax"        : "1",
+                    },
+                    "body": Dict{
+                        "fastloginfield"    : "username",
+                        "quickforward"      : "yes",
+                        "handlekey"         : "ls",
+                        "username"          : user,
+                        "password"          : pass,
+                    },
+                    "encoding": strings.CP_UTF8,
+                },
+            )
 
     if resp.StatusCode != http.StatusOK {
         return Errorf("login status: %s", http.StatusText(resp.StatusCode))
@@ -57,11 +60,7 @@ func login(session *http.Session, user, pass String) error {
 }
 
 func openPage(session *http.Session, url String) (doc *goquery.Document, err error) {
-    resp, err := session.Get(url)
-
-    if err != nil {
-        return nil, err
-    }
+    resp := session.Get(url)
 
     doc, err = goquery.NewDocumentFromReader(strings.Decode(resp.Content, resp.Encoding).NewReader())
     return
@@ -100,9 +99,9 @@ func openThread(session *http.Session, user String) error {
 
     Printf("[%s][%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), user, credit, t.Text())
 
-    _, err = session.Get(BASE_URL + href)
+    session.Get(BASE_URL + href)
 
-    return err
+    return nil
 }
 
 func logout(session *http.Session) error {
@@ -120,16 +119,12 @@ func logout(session *http.Session) error {
     })
 
     return nil
-
-    // logout = logout and page.find(lambda e : e.get('href') and 'action=logout' in e['href'])
-    // if logout:
-    //     yield from http.request('get', BASE_URL + logout['href'])
 }
 
 func do(user, pass String) error {
     // user, pass := acc[0], acc[1]
 
-    for {
+    for exiting == false {
         session, _ := http.NewSession()
         // session.SetProxy("localhost", 6789)
         session.SetHeaders(Dict{
@@ -141,7 +136,7 @@ func do(user, pass String) error {
             "Connection"        : "keep-alive",
         })
 
-        for {
+        for exiting == false {
             err := login(session, user, pass)
             if err == nil {
                 break
@@ -152,12 +147,14 @@ func do(user, pass String) error {
             time.Sleep(time.Second)
         }
 
-        for i := 0; i != 6; i++ {
+        for i := 0; i != 6 && exiting == false; i++ {
             err := openThread(session, user)
 
             switch err {
                 case nil:
-                    time.Sleep(10 * time.Minute)
+                    for i := 0; i != 600 && exiting == false; i++ {
+                        time.Sleep(time.Second)
+                    }
 
                 default:
                     Println(err)
@@ -168,6 +165,8 @@ func do(user, pass String) error {
         Println("logout")
         logout(session)
     }
+
+    return nil
 }
 
 func readuser() []String {
@@ -186,6 +185,23 @@ func readuser() []String {
 
 func main() {
     defer console.Pause("done")
+    pprof.Start()
+    defer pprof.Stop()
+
+    sigc := make(chan os.Signal, 10)
+
+    signal.Notify(sigc, os.Interrupt)
+
+    go func() {
+        for {
+            _, ok := <-sigc
+            if ok == false {
+                break
+            }
+
+            exiting = true
+        }
+    }()
 
     wg := sync.WaitGroup{}
 
@@ -198,7 +214,10 @@ func main() {
         }
 
         wg.Add(1)
-        go do(users[i], users[i + 1])
+        go func(i int) {
+            do(users[i], users[i + 1])
+            wg.Done()
+        }(i)
     }
 
     wg.Wait()
