@@ -3,12 +3,10 @@ package main
 import (
     . "fmt"
     . "ml/trace"
-    "ml/trace"
+    // "ml/trace"
     "ml/console"
     "time"
-    "runtime/pprof"
-    "runtime"
-    "os"
+    // "os"
     // "github.com/PuerkitoBio/goquery"
 )
 
@@ -27,18 +25,6 @@ func f2() {
 }
 
 func main() {
-    runtime.SetCPUProfileRate(1000000)
-    f, _ := os.Create("test.prof")
-    pprof.StartCPUProfile(f)
-    defer pprof.StopCPUProfile()
-
-    trace.Config.ReadSource = false
-
-    for i := 0; i != 100000; i++ {
-        f2()
-    }
-
-    console.SetTitle("done")
-
+    Println(time.Now().UnixNano() / int64(time.Millisecond))
     console.Pause("done")
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func Start() {
-    fn := os2.ExecutableName()
+    fn := os2.Executable()
 
     f, err := os.Create(fn + ".cpu.prof")
     RaiseIf(err)
@@ -20,7 +20,7 @@ func Start() {
 
 func Stop() {
     pprof.StopCPUProfile()
-    f, err := os.Create(os2.ExecutableName() + ".mem.prof")
+    f, err := os.Create(os2.Executable() + ".mem.prof")
     RaiseIf(err)
     pprof.WriteHeapProfile(f)
 }
