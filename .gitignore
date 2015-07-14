@@ -106,7 +106,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/bz2/
 /Source/Hooks/TaiG/JB
 /Source/iOS
-/Source/Project/WeChat
 /Source/Project/AppleIdRegister
 /Source/Project/Glorius2
 
@@ -122,3 +121,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/User/*.*-ca-bundle
 /Source/GoProject/src/AppleIdRegister
 /Source/GoProject/pkg
+/Source/Project/Private/
