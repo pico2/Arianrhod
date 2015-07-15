@@ -43,6 +43,10 @@ def FormatObject(obj, depth = 0, itergen = sorted):
         info.extend(FormatDictionary(obj, depth, itergen))
         return info
 
+    if isinstance(obj, (bytes, bytearray)):
+        info.append('%s%s\n' % (space, str(obj)))
+        return info
+
     for attr in itergen(dir(obj)):
         if attr.startswith('_'):
             continue
