@@ -242,6 +242,10 @@ pair as the key's value (values become dictionaries)."""
         else:
             return v['val']
 
+    def pop(self, key):
+        kv = dict.pop(self, key.lower())
+        return kv['val']
+
     def items(self):
         return [(v['key'], v['val']) for v in dict.values(self)]
 

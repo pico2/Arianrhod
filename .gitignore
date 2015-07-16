@@ -9,6 +9,7 @@ __pycache__
 .idea/
 .gradle/
 build/
+logs/
 
 ImmPyCommands/*.pyc
 ImmPyLibs/*.pyc

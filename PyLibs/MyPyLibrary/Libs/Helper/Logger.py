@@ -2,6 +2,7 @@ import logging
 import os, io, sys
 import datetime
 import types
+import traceback
 
 __FORMAT__ = '[%(asctime)s][%(thread)d][%(filename)s][%(funcName)s:%(lineno)d][%(levelname)s] %(message)s'
 
@@ -61,9 +62,13 @@ def getLogger(name, *, logPath = None):
             break
         return rv
 
+    def logException(self):
+        self.debug('\r\n'.join(traceback.format_exception(*sys.exc_info())))
+
     logger = logging.getLogger(name)
     logger.findCaller = findCaller
     logger.init = types.MethodType(init, logger)
     logger.getLogFileName = types.MethodType(getLogFileName, logger)
+    logger.logException = types.MethodType(logException, logger)
 
     return logger

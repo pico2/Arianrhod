@@ -415,6 +415,10 @@ class FileStream(object):
         self.Position = pos
 
     @property
+    def Remaining(self):
+        return self.Length - self.Position
+
+    @property
     def Position(self):
         return self.GetPosition()
 

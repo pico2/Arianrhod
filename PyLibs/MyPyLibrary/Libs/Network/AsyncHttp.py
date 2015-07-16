@@ -4,6 +4,9 @@ import asyncio
 import http.cookies
 import urllib
 
+def CanonicalHeaderKey(key):
+    return '-'.join([s[0].upper() + s[1:].lower() for s in key.split('-')])
+
 class Request(aiohttp.Request):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -11,7 +14,7 @@ class Request(aiohttp.Request):
 
     def _add_default_headers(self):
         aiohttp.HttpMessage._add_default_headers(self)
-        # super()._add_default_headers()
+        self.headers[CanonicalHeaderKey(aiohttp.hdrs.CONNECTION)] = self.headers.pop(aiohttp.hdrs.CONNECTION)
 
     def add_header(self, name, value):
         """Analyze headers. Calculate content length,
@@ -21,7 +24,7 @@ class Request(aiohttp.Request):
         assert set(name).issubset(aiohttp.protocol.ASCIISET), 'Header name should contain ASCII chars, got {!r}'.format(name)
         assert isinstance(value, str), 'Header {!r} should have string value, got {!r}'.format(name, value)
 
-        name = name.strip()
+        name = CanonicalHeaderKey(name.strip())
         value = value.strip()
 
         name_upper = name.upper()
