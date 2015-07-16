@@ -29,8 +29,9 @@ func raiseimpl(v interface{}) {
 
         default:
             exp = &Exception{
-                        Message : Sprintf("(traceback)\n%s\n[%s:%d] %v\n", stack(3, depth), name, line, v),
-                        Value   : v,
+                        Traceback   : string(stack(3, depth)),
+                        Message     : Sprintf("[%s:%d] %v\n", name, line, v),
+                        Value       : v,
                     }
     }
 
@@ -59,8 +60,9 @@ func Catch(exp interface{}) *Exception {
             const skip = 2
             name, _, line := getCaller(skip)
             return &Exception{
-                        Message : Sprintf("%s\n[%s:%d] %v\n", stack(skip, depth), name, line, e),
-                        Value   : e,
+                        Traceback   : string(stack(skip, depth)),
+                        Message     : Sprintf("[%s:%d] %v\n", name, line, e),
+                        Value       : e,
                     }
     }
 }

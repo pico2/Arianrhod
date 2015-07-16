@@ -1,14 +1,15 @@
 package trace
 
 type Exception struct {
-    Message string
-    Value   interface{}
+    Message     string
+    Traceback   string
+    Value       interface{}
 }
 
 func (self *Exception) String() string {
-    return self.Message
+    return "(traceback)\n" + self.Traceback + "\n" + self.Message
 }
 
 func (self *Exception) Error() string {
-    return self.Message
+    return self.String()
 }
