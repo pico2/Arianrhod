@@ -8,7 +8,11 @@ def PauseConsole(text = None):
     getch()
 
 def SetConsoleTitle(text):
-    windll.kernel32.SetConsoleTitleW(str(text))
+    if sys.platform == 'win32':
+        windll.kernel32.SetConsoleTitleW(str(text))
+
+    else:
+        raise NotImplementedError
 
 def cls2():
     os.system('cls')

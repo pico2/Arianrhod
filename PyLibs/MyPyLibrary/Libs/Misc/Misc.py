@@ -29,7 +29,7 @@ def FormatObject(obj, depth = 0, itergen = sorted):
 
     space = '  ' * depth
     if _IsBaseObject(obj):
-        info.append('%s%s\n' % ('', obj))
+        info.append('%s%r\n' % ('', obj))
         return info
 
     if isinstance(obj, (list, tuple)):
@@ -44,7 +44,7 @@ def FormatObject(obj, depth = 0, itergen = sorted):
         return info
 
     if isinstance(obj, (bytes, bytearray)):
-        info.append('%s%s\n' % (space, str(obj)))
+        info.append('%s%r\n' % (space, bytes(obj)))
         return info
 
     for attr in itergen(dir(obj)):
@@ -56,9 +56,9 @@ def FormatObject(obj, depth = 0, itergen = sorted):
             continue
 
         if _IsBaseObject(attrv):
-            info.append('%s%s = ' % (space, attr))
+            info.append('%s%r = ' % (space, attr))
         else:
-            info.append('%s[%s]' % (space, attr))
+            info.append('%s[%r]' % (space, attr))
 
         if isinstance(attrv, (list, tuple)):
             info.extend(FormatList(attrv, depth + 1, itergen))
@@ -102,15 +102,15 @@ def FormatDictionary(obj, depth = 0, itergen = sorted):
             v = obj.get(k)
 
         if isinstance(v, dict):
-            info.append('%s%s:\n' % (space, k))
+            info.append('%s%r:\n' % (space, k))
             info.extend(FormatDictionary(v, depth + 1, itergen))
 
         elif isinstance(v, (list, tuple)):
-            info.append('%s%s =' % (space, k))
+            info.append('%s%r =' % (space, k))
             info.extend(FormatList(v, depth + 1, itergen))
 
         else:
-            info.append('%s%s = ' % (space, k))
+            info.append('%s%r = ' % (space, k))
             info.extend(FormatObject(v, depth + 1, itergen))
 
     if depth == 0:
