@@ -1,13 +1,10 @@
 #if 1
 
-#define AUTHOR_NAME "Amano"
-#define SECTION_NAME "."AUTHOR_NAME
-
 #define _WIN32_WINNT 0x601
 
 #pragma comment(linker,"/ENTRY:main")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
-#pragma comment(linker, "/SECTION:"SECTION_NAME",ERW /MERGE:.text="SECTION_NAME)
+#pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
 #pragma warning(disable:4995 4273)
 
 #ifndef UNICODE
@@ -147,70 +144,6 @@ VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
     }
 }
 
-#include "mlpython.h"
-
-void test_void_void0()
-{
-    PrintConsole(L"%S\n", __FUNCTION__);
-}
-
-void FASTCALL test_void_uptr1(ULONG_PTR a)
-{
-    PrintConsole(L"%S: %Iu\n", __FUNCTION__, a);
-}
-
-void CDECL test_void_uptr2(ULONG_PTR a, ULONG_PTR b)
-{
-    PrintConsole(L"%S: %Iu, %Iu\n", __FUNCTION__, a, b);
-}
-
-ULONG NTAPI test_ulong_uptr3(ULONG_PTR a, ULONG_PTR b, ULONG_PTR c)
-{
-    return PrintConsole(L"%S: %Iu, %Iu, %Iu\n", __FUNCTION__, a, b, c);
-}
-
-struct test_class
-{
-    int dummy;
-    int member;
-
-    test_class(int m)
-    {
-        member = m;
-    }
-
-    static long static_func()
-    {
-        return 0;
-    }
-
-    void set_member(int m)
-    {
-        member = m;
-    }
-
-    long long_void()
-    {
-        return PrintConsole(L"%S, %u\n", __FUNCTION__, this->member);
-    }
-
-    VOID void_void()
-    {
-        PrintConsole(L"%S, %u\n", __FUNCTION__, this->member);
-    }
-
-    ml::String __repr__()
-    {
-        return L"FUCK";
-    }
-};
-
-template<typename wchar_t*>
-struct fuck
-{
-    ;
-};
-
 void quick_sort(int *array, int count)
 {
     int *left, *right, base;
@@ -251,58 +184,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    printf("fuck");
+
     *(int *)0 = 0;
-
-    return;
-
-#if 0
-
-    ml::MlInitialize();
-
-    LONG_PTR& a = argc;
-
-    argc = 123;
-
-    MlPython py;
-
-    py.Initialize();
-
-    py.Register(test_void_void0, L"test_void_void0")
-      .Register(
-        [&](ULONG_PTR a)
-        {
-            argc = a;
-            return PrintConsole(L"%S: %d\n", __FUNCTION__, a);
-        },
-        L"test_void_uptr1"
-    )
-    .AddToModule(L"mlpy");
-
-    py.Register(test_void_uptr2, L"test_void_uptr2")
-      .Register(test_ulong_uptr3, L"test_void_uptr3")
-      .AddToModule(L"mlpy");
-
-    py.RegisterClass<test_class, VOID(int)>(L"test_class")
-      .RegisterMethod(&test_class::set_member, L"set_member")
-      .RegisterMethod(&test_class::long_void, L"long_void")
-      .RegisterMethod(&test_class::void_void, L"void_void")
-      .RegisterProperty(&test_class::member, L"member")
-      .AddToModule(L"mlpy");
-
-    MlPyObject func = py.Invoke<PyObject *>(L"fuck - Copy", L"getfunc");
-
-    PrintConsole(L"%u\n", py.Invoke<ULONG>(func));
-
-    auto ret = py.Invoke<ULONG>(L"fuck", L"main", 1, 2, 3, 4, 5);
-
-    PrintConsole(L"ret = %u argc = %u\n", ret, argc);
-
-    if (py.GetPyException().ErrorOccurred())
-        PrintConsole(L"%s\n", py.GetPyException().Message);
-
-#endif
-
-    PauseConsole();
 
     return;
 
