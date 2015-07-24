@@ -14,6 +14,8 @@ Qsci.QsciScintillaBase.SC_CASEINSENSITIVEBEHAVIOUR_RESPECTCASE?10
 Qsci.QsciScintillaBase.SC_CASEINSENSITIVEBEHAVIOUR_IGNORECASE?10
 Qsci.QsciScintillaBase.SC_TECHNOLOGY_DEFAULT?10
 Qsci.QsciScintillaBase.SC_TECHNOLOGY_DIRECTWRITE?10
+Qsci.QsciScintillaBase.SC_TECHNOLOGY_DIRECTWRITERETAIN?10
+Qsci.QsciScintillaBase.SC_TECHNOLOGY_DIRECTWRITEDC?10
 Qsci.QsciScintillaBase.SC_WEIGHT_NORMAL?10
 Qsci.QsciScintillaBase.SC_WEIGHT_SEMIBOLD?10
 Qsci.QsciScintillaBase.SC_WEIGHT_BOLD?10
@@ -128,6 +130,14 @@ Qsci.QsciScintillaBase.SCLEX_LITERATEHASKELL?10
 Qsci.QsciScintillaBase.SCLEX_STTXT?10
 Qsci.QsciScintillaBase.SCLEX_KVIRC?10
 Qsci.QsciScintillaBase.SCLEX_RUST?10
+Qsci.QsciScintillaBase.SCLEX_DMAP?10
+Qsci.QsciScintillaBase.SCLEX_AS?10
+Qsci.QsciScintillaBase.SCLEX_DMIS?10
+Qsci.QsciScintillaBase.SCLEX_REGISTRY?10
+Qsci.QsciScintillaBase.SCLEX_BIBTEX?10
+Qsci.QsciScintillaBase.SCLEX_SREC?10
+Qsci.QsciScintillaBase.SCLEX_IHEX?10
+Qsci.QsciScintillaBase.SCLEX_TEHEX?10
 Qsci.QsciScintillaBase.SCMOD_NORM?10
 Qsci.QsciScintillaBase.SCMOD_SHIFT?10
 Qsci.QsciScintillaBase.SCMOD_CTRL?10
@@ -174,6 +184,8 @@ Qsci.QsciScintillaBase.SC_MOD_CHANGEMARGIN?10
 Qsci.QsciScintillaBase.SC_MOD_CHANGEANNOTATION?10
 Qsci.QsciScintillaBase.SC_MOD_CONTAINER?10
 Qsci.QsciScintillaBase.SC_MOD_LEXERSTATE?10
+Qsci.QsciScintillaBase.SC_MOD_INSERTCHECK?10
+Qsci.QsciScintillaBase.SC_MOD_CHANGETABSTOPS?10
 Qsci.QsciScintillaBase.SC_MODEVENTMASKALL?10
 Qsci.QsciScintillaBase.CARETSTYLE_INVISIBLE?10
 Qsci.QsciScintillaBase.CARETSTYLE_LINE?10
@@ -195,6 +207,10 @@ Qsci.QsciScintillaBase.EDGE_BACKGROUND?10
 Qsci.QsciScintillaBase.ANNOTATION_HIDDEN?10
 Qsci.QsciScintillaBase.ANNOTATION_STANDARD?10
 Qsci.QsciScintillaBase.ANNOTATION_BOXED?10
+Qsci.QsciScintillaBase.ANNOTATION_INDENTED?10
+Qsci.QsciScintillaBase.SC_PHASES_ONE?10
+Qsci.QsciScintillaBase.SC_PHASES_TWO?10
+Qsci.QsciScintillaBase.SC_PHASES_MULTIPLE?10
 Qsci.QsciScintillaBase.SC_CACHE_NONE?10
 Qsci.QsciScintillaBase.SC_CACHE_CARET?10
 Qsci.QsciScintillaBase.SC_CACHE_PAGE?10
@@ -205,12 +221,16 @@ Qsci.QsciScintillaBase.SC_WRAPINDENT_INDENT?10
 Qsci.QsciScintillaBase.SC_WRAP_NONE?10
 Qsci.QsciScintillaBase.SC_WRAP_WORD?10
 Qsci.QsciScintillaBase.SC_WRAP_CHAR?10
+Qsci.QsciScintillaBase.SC_WRAP_WHITESPACE?10
 Qsci.QsciScintillaBase.SC_TIME_FOREVER?10
+Qsci.QsciScintillaBase.SC_LINE_END_TYPE_DEFAULT?10
+Qsci.QsciScintillaBase.SC_LINE_END_TYPE_UNICODE?10
 Qsci.QsciScintillaBase.SC_FOLDFLAG_LINEBEFORE_EXPANDED?10
 Qsci.QsciScintillaBase.SC_FOLDFLAG_LINEBEFORE_CONTRACTED?10
 Qsci.QsciScintillaBase.SC_FOLDFLAG_LINEAFTER_EXPANDED?10
 Qsci.QsciScintillaBase.SC_FOLDFLAG_LINEAFTER_CONTRACTED?10
 Qsci.QsciScintillaBase.SC_FOLDFLAG_LEVELNUMBERS?10
+Qsci.QsciScintillaBase.SC_FOLDFLAG_LINESTATE?10
 Qsci.QsciScintillaBase.SC_FOLDLEVELBASE?10
 Qsci.QsciScintillaBase.SC_FOLDLEVELWHITEFLAG?10
 Qsci.QsciScintillaBase.SC_FOLDLEVELHEADERFLAG?10
@@ -220,6 +240,7 @@ Qsci.QsciScintillaBase.SCFIND_MATCHCASE?10
 Qsci.QsciScintillaBase.SCFIND_WORDSTART?10
 Qsci.QsciScintillaBase.SCFIND_REGEXP?10
 Qsci.QsciScintillaBase.SCFIND_POSIX?10
+Qsci.QsciScintillaBase.SCFIND_CXX11REGEX?10
 Qsci.QsciScintillaBase.SC_PRINT_NORMAL?10
 Qsci.QsciScintillaBase.SC_PRINT_INVERTLIGHT?10
 Qsci.QsciScintillaBase.SC_PRINT_BLACKONWHITE?10
@@ -240,12 +261,20 @@ Qsci.QsciScintillaBase.INDIC_SQUIGGLELOW?10
 Qsci.QsciScintillaBase.INDIC_DOTBOX?10
 Qsci.QsciScintillaBase.INDIC_SQUIGGLEPIXMAP?10
 Qsci.QsciScintillaBase.INDIC_COMPOSITIONTHICK?10
+Qsci.QsciScintillaBase.INDIC_COMPOSITIONTHIN?10
+Qsci.QsciScintillaBase.INDIC_FULLBOX?10
+Qsci.QsciScintillaBase.INDIC_TEXTFORE?10
+Qsci.QsciScintillaBase.INDIC_IME?10
+Qsci.QsciScintillaBase.INDIC_IME_MAX?10
 Qsci.QsciScintillaBase.INDIC_CONTAINER?10
 Qsci.QsciScintillaBase.INDIC_MAX?10
 Qsci.QsciScintillaBase.INDIC0_MASK?10
 Qsci.QsciScintillaBase.INDIC1_MASK?10
 Qsci.QsciScintillaBase.INDIC2_MASK?10
 Qsci.QsciScintillaBase.INDICS_MASK?10
+Qsci.QsciScintillaBase.SC_INDICVALUEBIT?10
+Qsci.QsciScintillaBase.SC_INDICVALUEMASK?10
+Qsci.QsciScintillaBase.SC_INDICFLAG_VALUEBEFORE?10
 Qsci.QsciScintillaBase.SC_IV_NONE?10
 Qsci.QsciScintillaBase.SC_IV_REAL?10
 Qsci.QsciScintillaBase.SC_IV_LOOKFORWARD?10
@@ -327,6 +356,7 @@ Qsci.QsciScintillaBase.SC_MARK_LEFTRECT?10
 Qsci.QsciScintillaBase.SC_MARK_AVAILABLE?10
 Qsci.QsciScintillaBase.SC_MARK_UNDERLINE?10
 Qsci.QsciScintillaBase.SC_MARK_RGBAIMAGE?10
+Qsci.QsciScintillaBase.SC_MARK_BOOKMARK?10
 Qsci.QsciScintillaBase.SC_MARK_CHARACTER?10
 Qsci.QsciScintillaBase.SC_CP_DBCS?10
 Qsci.QsciScintillaBase.SC_CP_UTF8?10
@@ -339,10 +369,6 @@ Qsci.QsciScintillaBase.SCWS_VISIBLEAFTERINDENT?10
 Qsci.QsciScintillaBase.SCVS_NONE?10
 Qsci.QsciScintillaBase.SCVS_RECTANGULARSELECTION?10
 Qsci.QsciScintillaBase.SCVS_USERACCESSIBLE?10
-Qsci.QsciScintillaBase.SC_SEL_STREAM?10
-Qsci.QsciScintillaBase.SC_SEL_RECTANGLE?10
-Qsci.QsciScintillaBase.SC_SEL_LINES?10
-Qsci.QsciScintillaBase.SC_SEL_THIN?10
 Qsci.QsciScintillaBase.SC_WRAPVISUALFLAGLOC_DEFAULT?10
 Qsci.QsciScintillaBase.SC_WRAPVISUALFLAGLOC_END_BY_TEXT?10
 Qsci.QsciScintillaBase.SC_WRAPVISUALFLAGLOC_START_BY_TEXT?10
@@ -357,10 +383,23 @@ Qsci.QsciScintillaBase.SC_UPDATE_H_SCROLL?10
 Qsci.QsciScintillaBase.SC_TYPE_BOOLEAN?10
 Qsci.QsciScintillaBase.SC_TYPE_INTEGER?10
 Qsci.QsciScintillaBase.SC_TYPE_STRING?10
+Qsci.QsciScintillaBase.SC_STATUS_OK?10
+Qsci.QsciScintillaBase.SC_STATUS_FAILURE?10
+Qsci.QsciScintillaBase.SC_STATUS_BADALLOC?10
+Qsci.QsciScintillaBase.SC_STATUS_WARN_START?10
+Qsci.QsciScintillaBase.SC_STATUS_WARNREGEX?10
+Qsci.QsciScintillaBase.SC_SEL_STREAM?10
+Qsci.QsciScintillaBase.SC_SEL_RECTANGLE?10
+Qsci.QsciScintillaBase.SC_SEL_LINES?10
+Qsci.QsciScintillaBase.SC_SEL_THIN?10
 Qsci.QsciScintillaBase.SC_MULTIPASTE_ONCE?10
 Qsci.QsciScintillaBase.SC_MULTIPASTE_EACH?10
+Qsci.QsciScintillaBase.SC_MULTIAUTOC_ONCE?10
+Qsci.QsciScintillaBase.SC_MULTIAUTOC_EACH?10
 Qsci.QsciScintillaBase.SC_MARGINOPTION_NONE?10
 Qsci.QsciScintillaBase.SC_MARGINOPTION_SUBLINESELECT?10
+Qsci.QsciScintillaBase.SC_IME_WINDOWED?10
+Qsci.QsciScintillaBase.SC_IME_INLINE?10
 Qsci.QsciScintillaBase.SC_EFF_QUALITY_MASK?10
 Qsci.QsciScintillaBase.SC_EFF_QUALITY_DEFAULT?10
 Qsci.QsciScintillaBase.SC_EFF_QUALITY_NON_ANTIALIASED?10
@@ -892,9 +931,6 @@ Qsci.QsciScintillaBase.SCI_GETADDITIONALSELECTIONTYPING?10
 Qsci.QsciScintillaBase.SCI_SETADDITIONALCARETSBLINK?10
 Qsci.QsciScintillaBase.SCI_GETADDITIONALCARETSBLINK?10
 Qsci.QsciScintillaBase.SCI_SCROLLRANGE?10
-Qsci.QsciScintillaBase.SCI_SETADDITIONALCARETSVISIBLE?10
-Qsci.QsciScintillaBase.SCI_GETADDITIONALCARETSVISIBLE?10
-Qsci.QsciScintillaBase.SCI_AUTOCGETCURRENTTEXT?10
 Qsci.QsciScintillaBase.SCI_GETSELECTIONS?10
 Qsci.QsciScintillaBase.SCI_CLEARSELECTIONS?10
 Qsci.QsciScintillaBase.SCI_SETSELECTION?10
@@ -933,6 +969,9 @@ Qsci.QsciScintillaBase.SCI_SETADDITIONALCARETFORE?10
 Qsci.QsciScintillaBase.SCI_GETADDITIONALCARETFORE?10
 Qsci.QsciScintillaBase.SCI_ROTATESELECTION?10
 Qsci.QsciScintillaBase.SCI_SWAPMAINANCHORCARET?10
+Qsci.QsciScintillaBase.SCI_SETADDITIONALCARETSVISIBLE?10
+Qsci.QsciScintillaBase.SCI_GETADDITIONALCARETSVISIBLE?10
+Qsci.QsciScintillaBase.SCI_AUTOCGETCURRENTTEXT?10
 Qsci.QsciScintillaBase.SCI_SETFONTQUALITY?10
 Qsci.QsciScintillaBase.SCI_GETFONTQUALITY?10
 Qsci.QsciScintillaBase.SCI_SETFIRSTVISIBLELINE?10
@@ -973,7 +1012,10 @@ Qsci.QsciScintillaBase.SCI_DESCRIBEPROPERTY?10
 Qsci.QsciScintillaBase.SCI_DESCRIBEKEYWORDSETS?10
 Qsci.QsciScintillaBase.SCI_AUTOCSETCASEINSENSITIVEBEHAVIOUR?10
 Qsci.QsciScintillaBase.SCI_AUTOCGETCASEINSENSITIVEBEHAVIOUR?10
+Qsci.QsciScintillaBase.SCI_AUTOCSETMULTI?10
+Qsci.QsciScintillaBase.SCI_AUTOCGETMULTI?10
 Qsci.QsciScintillaBase.SCI_CALLTIPSETPOSITION?10
+Qsci.QsciScintillaBase.SCI_CALLTIPSETPOSSTART?10
 Qsci.QsciScintillaBase.SCI_COUNTCHARACTERS?10
 Qsci.QsciScintillaBase.SCI_CREATELOADER?10
 Qsci.QsciScintillaBase.SCI_DELETERANGE?10
@@ -1004,15 +1046,45 @@ Qsci.QsciScintillaBase.SCI_GETAUTOMATICFOLD?10
 Qsci.QsciScintillaBase.SCI_AUTOCSETORDER?10
 Qsci.QsciScintillaBase.SCI_AUTOCGETORDER?10
 Qsci.QsciScintillaBase.SCI_POSITIONRELATIVE?10
+Qsci.QsciScintillaBase.SCI_DROPSELECTIONN?10
+Qsci.QsciScintillaBase.SCI_CHANGEINSERTION?10
+Qsci.QsciScintillaBase.SCI_GETPHASESDRAW?10
+Qsci.QsciScintillaBase.SCI_SETPHASESDRAW?10
+Qsci.QsciScintillaBase.SCI_CLEARTABSTOPS?10
+Qsci.QsciScintillaBase.SCI_ADDTABSTOP?10
+Qsci.QsciScintillaBase.SCI_GETNEXTTABSTOP?10
+Qsci.QsciScintillaBase.SCI_GETIMEINTERACTION?10
+Qsci.QsciScintillaBase.SCI_SETIMEINTERACTION?10
+Qsci.QsciScintillaBase.SCI_INDICSETHOVERSTYLE?10
+Qsci.QsciScintillaBase.SCI_INDICGETHOVERSTYLE?10
+Qsci.QsciScintillaBase.SCI_INDICSETHOVERFORE?10
+Qsci.QsciScintillaBase.SCI_INDICGETHOVERFORE?10
+Qsci.QsciScintillaBase.SCI_INDICSETFLAGS?10
+Qsci.QsciScintillaBase.SCI_INDICGETFLAGS?10
+Qsci.QsciScintillaBase.SCI_SETTARGETRANGE?10
+Qsci.QsciScintillaBase.SCI_GETTARGETRANGE?10
 Qsci.QsciScintillaBase.SCI_RELEASEALLEXTENDEDSTYLES?10
 Qsci.QsciScintillaBase.SCI_ALLOCATEEXTENDEDSTYLES?10
 Qsci.QsciScintillaBase.SCI_SETMOUSESELECTIONRECTANGULARSWITCH?10
 Qsci.QsciScintillaBase.SCI_GETMOUSESELECTIONRECTANGULARSWITCH?10
 Qsci.QsciScintillaBase.SCI_GETCARETLINEVISIBLEALWAYS?10
 Qsci.QsciScintillaBase.SCI_SETCARETLINEVISIBLEALWAYS?10
+Qsci.QsciScintillaBase.SCI_SETLINEENDTYPESALLOWED?10
+Qsci.QsciScintillaBase.SCI_GETLINEENDTYPESALLOWED?10
+Qsci.QsciScintillaBase.SCI_GETLINEENDTYPESACTIVE?10
 Qsci.QsciScintillaBase.SCI_SETREPRESENTATION?10
 Qsci.QsciScintillaBase.SCI_GETREPRESENTATION?10
 Qsci.QsciScintillaBase.SCI_CLEARREPRESENTATION?10
+Qsci.QsciScintillaBase.SCI_GETLINEENDTYPESSUPPORTED?10
+Qsci.QsciScintillaBase.SCI_ALLOCATESUBSTYLES?10
+Qsci.QsciScintillaBase.SCI_GETSUBSTYLESSTART?10
+Qsci.QsciScintillaBase.SCI_GETSUBSTYLESLENGTH?10
+Qsci.QsciScintillaBase.SCI_GETSTYLEFROMSUBSTYLE?10
+Qsci.QsciScintillaBase.SCI_GETPRIMARYSTYLEFROMSTYLE?10
+Qsci.QsciScintillaBase.SCI_FREESUBSTYLES?10
+Qsci.QsciScintillaBase.SCI_SETIDENTIFIERS?10
+Qsci.QsciScintillaBase.SCI_DISTANCETOSECONDARYSTYLES?10
+Qsci.QsciScintillaBase.SCI_GETSUBSTYLEBASES?10
 Qsci.QsciScintillaBase?1(QWidget parent=None)
 Qsci.QsciScintillaBase.__init__?1(self, QWidget parent=None)
 Qsci.QsciScintillaBase.pool?4() -> QsciScintillaBase
@@ -1092,6 +1164,7 @@ Qsci.QsciScintilla.WrapMode?10
 Qsci.QsciScintilla.WrapNone?10
 Qsci.QsciScintilla.WrapWord?10
 Qsci.QsciScintilla.WrapCharacter?10
+Qsci.QsciScintilla.WrapWhitespace?10
 Qsci.QsciScintilla.WhitespaceVisibility?10
 Qsci.QsciScintilla.WsInvisible?10
 Qsci.QsciScintilla.WsVisible?10
@@ -1125,6 +1198,7 @@ Qsci.QsciScintilla.ThreeRightArrows?10
 Qsci.QsciScintilla.FullRectangle?10
 Qsci.QsciScintilla.LeftRectangle?10
 Qsci.QsciScintilla.Underline?10
+Qsci.QsciScintilla.Bookmark?10
 Qsci.QsciScintilla.MarginType?10
 Qsci.QsciScintilla.SymbolMargin?10
 Qsci.QsciScintilla.SymbolMarginDefaultForegroundColor?10
@@ -1144,11 +1218,15 @@ Qsci.QsciScintilla.HiddenIndicator?10
 Qsci.QsciScintilla.BoxIndicator?10
 Qsci.QsciScintilla.RoundBoxIndicator?10
 Qsci.QsciScintilla.StraightBoxIndicator?10
+Qsci.QsciScintilla.FullBoxIndicator?10
 Qsci.QsciScintilla.DashesIndicator?10
 Qsci.QsciScintilla.DotsIndicator?10
 Qsci.QsciScintilla.SquiggleLowIndicator?10
 Qsci.QsciScintilla.DotBoxIndicator?10
 Qsci.QsciScintilla.SquigglePixmapIndicator?10
+Qsci.QsciScintilla.ThickCompositionIndicator?10
+Qsci.QsciScintilla.ThinCompositionIndicator?10
+Qsci.QsciScintilla.TextColorIndicator?10
 Qsci.QsciScintilla.FoldStyle?10
 Qsci.QsciScintilla.NoFoldStyle?10
 Qsci.QsciScintilla.PlainFoldStyle?10
@@ -1189,6 +1267,7 @@ Qsci.QsciScintilla.AnnotationDisplay?10
 Qsci.QsciScintilla.AnnotationHidden?10
 Qsci.QsciScintilla.AnnotationStandard?10
 Qsci.QsciScintilla.AnnotationBoxed?10
+Qsci.QsciScintilla.AnnotationIndented?10
 Qsci.QsciScintilla.AiMaintain?10
 Qsci.QsciScintilla.AiOpening?10
 Qsci.QsciScintilla.AiClosing?10
@@ -1315,6 +1394,8 @@ Qsci.QsciScintilla.setHotspotUnderline?4(bool)
 Qsci.QsciScintilla.setHotspotWrap?4(bool)
 Qsci.QsciScintilla.setIndicatorDrawUnder?4(bool, int indicatorNumber=-1)
 Qsci.QsciScintilla.setIndicatorForegroundColor?4(QColor, int indicatorNumber=-1)
+Qsci.QsciScintilla.setIndicatorHoverForegroundColor?4(QColor, int indicatorNumber=-1)
+Qsci.QsciScintilla.setIndicatorHoverStyle?4(QsciScintilla.IndicatorStyle, int indicatorNumber=-1)
 Qsci.QsciScintilla.setIndicatorOutlineColor?4(QColor, int indicatorNumber=-1)
 Qsci.QsciScintilla.setMarginOptions?4(int)
 Qsci.QsciScintilla.setMarginText?4(int, str, int)
@@ -1842,6 +1923,12 @@ Qsci.QsciLexerCPP.PreProcessorComment?10
 Qsci.QsciLexerCPP.InactivePreProcessorComment?10
 Qsci.QsciLexerCPP.PreProcessorCommentLineDoc?10
 Qsci.QsciLexerCPP.InactivePreProcessorCommentLineDoc?10
+Qsci.QsciLexerCPP.UserLiteral?10
+Qsci.QsciLexerCPP.InactiveUserLiteral?10
+Qsci.QsciLexerCPP.TaskMarker?10
+Qsci.QsciLexerCPP.InactiveTaskMarker?10
+Qsci.QsciLexerCPP.EscapeSequence?10
+Qsci.QsciLexerCPP.InactiveEscapeSequence?10
 Qsci.QsciLexerCPP?1(QObject parent=None, bool caseInsensitiveKeywords=False)
 Qsci.QsciLexerCPP.__init__?1(self, QObject parent=None, bool caseInsensitiveKeywords=False)
 Qsci.QsciLexerCPP.language?4() -> str
@@ -1865,6 +1952,12 @@ Qsci.QsciLexerCPP.setHighlightTripleQuotedStrings?4(bool)
 Qsci.QsciLexerCPP.highlightTripleQuotedStrings?4() -> bool
 Qsci.QsciLexerCPP.setHighlightHashQuotedStrings?4(bool)
 Qsci.QsciLexerCPP.highlightHashQuotedStrings?4() -> bool
+Qsci.QsciLexerCPP.setHighlightBackQuotedStrings?4(bool)
+Qsci.QsciLexerCPP.highlightBackQuotedStrings?4() -> bool
+Qsci.QsciLexerCPP.setHighlightEscapeSequences?4(bool)
+Qsci.QsciLexerCPP.highlightEscapeSequences?4() -> bool
+Qsci.QsciLexerCPP.setVerbatimStringEscapeSequencesAllowed?4(bool)
+Qsci.QsciLexerCPP.verbatimStringEscapeSequencesAllowed?4() -> bool
 Qsci.QsciLexerCPP.setFoldAtElse?4(bool)
 Qsci.QsciLexerCPP.setFoldComments?4(bool)
 Qsci.QsciLexerCPP.setFoldCompact?4(bool)
@@ -2624,6 +2717,7 @@ Qsci.QsciLexerSQL.KeywordSet6?10
 Qsci.QsciLexerSQL.KeywordSet7?10
 Qsci.QsciLexerSQL.KeywordSet8?10
 Qsci.QsciLexerSQL.QuotedIdentifier?10
+Qsci.QsciLexerSQL.QuotedOperator?10
 Qsci.QsciLexerSQL?1(QObject parent=None)
 Qsci.QsciLexerSQL.__init__?1(self, QObject parent=None)
 Qsci.QsciLexerSQL.language?4() -> str
@@ -2716,19 +2810,43 @@ Qsci.QsciLexerTeX.processIf?4() -> bool
 Qsci.QsciLexerTeX.readProperties?4(QSettings, str) -> bool
 Qsci.QsciLexerTeX.writeProperties?4(QSettings, str) -> bool
 Qsci.QsciLexerVerilog.Default?10
+Qsci.QsciLexerVerilog.InactiveDefault?10
 Qsci.QsciLexerVerilog.Comment?10
+Qsci.QsciLexerVerilog.InactiveComment?10
 Qsci.QsciLexerVerilog.CommentLine?10
+Qsci.QsciLexerVerilog.InactiveCommentLine?10
 Qsci.QsciLexerVerilog.CommentBang?10
+Qsci.QsciLexerVerilog.InactiveCommentBang?10
 Qsci.QsciLexerVerilog.Number?10
+Qsci.QsciLexerVerilog.InactiveNumber?10
 Qsci.QsciLexerVerilog.Keyword?10
+Qsci.QsciLexerVerilog.InactiveKeyword?10
 Qsci.QsciLexerVerilog.String?10
+Qsci.QsciLexerVerilog.InactiveString?10
 Qsci.QsciLexerVerilog.KeywordSet2?10
+Qsci.QsciLexerVerilog.InactiveKeywordSet2?10
 Qsci.QsciLexerVerilog.SystemTask?10
+Qsci.QsciLexerVerilog.InactiveSystemTask?10
 Qsci.QsciLexerVerilog.Preprocessor?10
+Qsci.QsciLexerVerilog.InactivePreprocessor?10
 Qsci.QsciLexerVerilog.Operator?10
+Qsci.QsciLexerVerilog.InactiveOperator?10
 Qsci.QsciLexerVerilog.Identifier?10
+Qsci.QsciLexerVerilog.InactiveIdentifier?10
 Qsci.QsciLexerVerilog.UnclosedString?10
+Qsci.QsciLexerVerilog.InactiveUnclosedString?10
 Qsci.QsciLexerVerilog.UserKeywordSet?10
+Qsci.QsciLexerVerilog.InactiveUserKeywordSet?10
+Qsci.QsciLexerVerilog.CommentKeyword?10
+Qsci.QsciLexerVerilog.InactiveCommentKeyword?10
+Qsci.QsciLexerVerilog.DeclareInputPort?10
+Qsci.QsciLexerVerilog.InactiveDeclareInputPort?10
+Qsci.QsciLexerVerilog.DeclareOutputPort?10
+Qsci.QsciLexerVerilog.InactiveDeclareOutputPort?10
+Qsci.QsciLexerVerilog.DeclareInputOutputPort?10
+Qsci.QsciLexerVerilog.InactiveDeclareInputOutputPort?10
+Qsci.QsciLexerVerilog.PortConnection?10
+Qsci.QsciLexerVerilog.InactivePortConnection?10
 Qsci.QsciLexerVerilog?1(QObject parent=None)
 Qsci.QsciLexerVerilog.__init__?1(self, QObject parent=None)
 Qsci.QsciLexerVerilog.language?4() -> str
@@ -2768,6 +2886,7 @@ Qsci.QsciLexerVHDL.StandardFunction?10
 Qsci.QsciLexerVHDL.StandardPackage?10
 Qsci.QsciLexerVHDL.StandardType?10
 Qsci.QsciLexerVHDL.KeywordSet7?10
+Qsci.QsciLexerVHDL.CommentBlock?10
 Qsci.QsciLexerVHDL?1(QObject parent=None)
 Qsci.QsciLexerVHDL.__init__?1(self, QObject parent=None)
 Qsci.QsciLexerVHDL.language?4() -> str

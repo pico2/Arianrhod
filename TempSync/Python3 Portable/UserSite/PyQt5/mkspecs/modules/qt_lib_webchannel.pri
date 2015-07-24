@@ -1,7 +1,7 @@
-QT.webchannel.VERSION = 5.4.1
+QT.webchannel.VERSION = 5.5.0
 QT.webchannel.MAJOR_VERSION = 5
-QT.webchannel.MINOR_VERSION = 4
-QT.webchannel.PATCH_VERSION = 1
+QT.webchannel.MINOR_VERSION = 5
+QT.webchannel.PATCH_VERSION = 0
 QT.webchannel.name = QtWebChannel
 QT.webchannel.libs = $$QT_MODULE_LIB_BASE
 QT.webchannel.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtWebChannel

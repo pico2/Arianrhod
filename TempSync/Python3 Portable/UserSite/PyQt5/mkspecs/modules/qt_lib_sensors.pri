@@ -1,7 +1,7 @@
-QT.sensors.VERSION = 5.4.1
+QT.sensors.VERSION = 5.5.0
 QT.sensors.MAJOR_VERSION = 5
-QT.sensors.MINOR_VERSION = 4
-QT.sensors.PATCH_VERSION = 1
+QT.sensors.MINOR_VERSION = 5
+QT.sensors.PATCH_VERSION = 0
 QT.sensors.name = QtSensors
 QT.sensors.libs = $$QT_MODULE_LIB_BASE
 QT.sensors.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtSensors

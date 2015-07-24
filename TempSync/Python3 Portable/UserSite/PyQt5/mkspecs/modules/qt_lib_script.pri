@@ -1,7 +1,7 @@
-QT.script.VERSION = 5.4.1
+QT.script.VERSION = 5.5.0
 QT.script.MAJOR_VERSION = 5
-QT.script.MINOR_VERSION = 4
-QT.script.PATCH_VERSION = 1
+QT.script.MINOR_VERSION = 5
+QT.script.PATCH_VERSION = 0
 QT.script.name = QtScript
 QT.script.libs = $$QT_MODULE_LIB_BASE
 QT.script.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtScript

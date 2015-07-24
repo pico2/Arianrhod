@@ -1,7 +1,7 @@
-QT.quickwidgets.VERSION = 5.4.1
+QT.quickwidgets.VERSION = 5.5.0
 QT.quickwidgets.MAJOR_VERSION = 5
-QT.quickwidgets.MINOR_VERSION = 4
-QT.quickwidgets.PATCH_VERSION = 1
+QT.quickwidgets.MINOR_VERSION = 5
+QT.quickwidgets.PATCH_VERSION = 0
 QT.quickwidgets.name = QtQuickWidgets
 QT.quickwidgets.libs = $$QT_MODULE_LIB_BASE
 QT.quickwidgets.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtQuickWidgets

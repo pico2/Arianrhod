@@ -1,7 +1,7 @@
-QT.axbase.VERSION = 5.4.1
+QT.axbase.VERSION = 5.5.0
 QT.axbase.MAJOR_VERSION = 5
-QT.axbase.MINOR_VERSION = 4
-QT.axbase.PATCH_VERSION = 1
+QT.axbase.MINOR_VERSION = 5
+QT.axbase.PATCH_VERSION = 0
 QT.axbase.name = QtAxBase
 QT.axbase.libs = $$QT_MODULE_LIB_BASE
 QT.axbase.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/ActiveQt

@@ -1,7 +1,7 @@
-QT.websockets.VERSION = 5.4.1
+QT.websockets.VERSION = 5.5.0
 QT.websockets.MAJOR_VERSION = 5
-QT.websockets.MINOR_VERSION = 4
-QT.websockets.PATCH_VERSION = 1
+QT.websockets.MINOR_VERSION = 5
+QT.websockets.PATCH_VERSION = 0
 QT.websockets.name = QtWebSockets
 QT.websockets.libs = $$QT_MODULE_LIB_BASE
 QT.websockets.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtWebSockets

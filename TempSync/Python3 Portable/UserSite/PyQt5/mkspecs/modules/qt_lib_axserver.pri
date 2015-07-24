@@ -1,7 +1,7 @@
-QT.axserver.VERSION = 5.4.1
+QT.axserver.VERSION = 5.5.0
 QT.axserver.MAJOR_VERSION = 5
-QT.axserver.MINOR_VERSION = 4
-QT.axserver.PATCH_VERSION = 1
+QT.axserver.MINOR_VERSION = 5
+QT.axserver.PATCH_VERSION = 0
 QT.axserver.name = QtAxServer
 QT.axserver.libs = $$QT_MODULE_LIB_BASE
 QT.axserver.master_header = ActiveQt

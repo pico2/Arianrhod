@@ -135,6 +135,10 @@ The full set of command line options is:
 
     The PyQt5 modules will not contain automatically generated docstrings.
 
+.. cmdoption:: --no-python-dbus
+
+    The Qt support for the standard Python DBus bindings is disabled.
+
 .. cmdoption:: --no-qml-plugin
 
     The :program:`qmlscene` plugin will not be built.

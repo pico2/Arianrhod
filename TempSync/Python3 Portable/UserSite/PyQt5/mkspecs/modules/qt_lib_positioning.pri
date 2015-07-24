@@ -1,7 +1,7 @@
-QT.positioning.VERSION = 5.4.1
+QT.positioning.VERSION = 5.5.0
 QT.positioning.MAJOR_VERSION = 5
-QT.positioning.MINOR_VERSION = 4
-QT.positioning.PATCH_VERSION = 1
+QT.positioning.MINOR_VERSION = 5
+QT.positioning.PATCH_VERSION = 0
 QT.positioning.name = QtPositioning
 QT.positioning.libs = $$QT_MODULE_LIB_BASE
 QT.positioning.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtPositioning

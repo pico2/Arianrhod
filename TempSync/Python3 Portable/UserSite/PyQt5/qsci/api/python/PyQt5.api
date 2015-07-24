@@ -4,6 +4,7 @@ PyQt5.QtCore.QtWarningMsg?10
 PyQt5.QtCore.QtCriticalMsg?10
 PyQt5.QtCore.QtFatalMsg?10
 PyQt5.QtCore.QtSystemMsg?10
+PyQt5.QtCore.QtInfoMsg?10
 PyQt5.QtCore.PYQT_VERSION?7
 PyQt5.QtCore.PYQT_VERSION_STR?7
 PyQt5.QtCore.QT_VERSION?7
@@ -81,6 +82,14 @@ PyQt5.QtCore.ws?4(QTextStream) -> QTextStream
 PyQt5.QtCore.qSetFieldWidth?4(int) -> QTextStreamManipulator
 PyQt5.QtCore.qSetPadChar?4(str) -> QTextStreamManipulator
 PyQt5.QtCore.qSetRealNumberPrecision?4(int) -> QTextStreamManipulator
+PyQt5.QtCore.Qt.ItemSelectionOperation?10
+PyQt5.QtCore.Qt.ReplaceSelection?10
+PyQt5.QtCore.Qt.AddToSelection?10
+PyQt5.QtCore.Qt.TabFocusBehavior?10
+PyQt5.QtCore.Qt.NoTabFocus?10
+PyQt5.QtCore.Qt.TabFocusTextControls?10
+PyQt5.QtCore.Qt.TabFocusListControls?10
+PyQt5.QtCore.Qt.TabFocusAllControls?10
 PyQt5.QtCore.Qt.MouseEventFlag?10
 PyQt5.QtCore.Qt.MouseEventCreatedDoubleClick?10
 PyQt5.QtCore.Qt.MouseEventSource?10
@@ -255,6 +264,7 @@ PyQt5.QtCore.Qt.AA_UseDesktopOpenGL?10
 PyQt5.QtCore.Qt.AA_UseOpenGLES?10
 PyQt5.QtCore.Qt.AA_UseSoftwareOpenGL?10
 PyQt5.QtCore.Qt.AA_ShareOpenGLContexts?10
+PyQt5.QtCore.Qt.AA_SetPalette?10
 PyQt5.QtCore.Qt.WindowModality?10
 PyQt5.QtCore.Qt.NonModal?10
 PyQt5.QtCore.Qt.WindowModal?10
@@ -280,6 +290,7 @@ PyQt5.QtCore.Qt.ItemIsUserCheckable?10
 PyQt5.QtCore.Qt.ItemIsEnabled?10
 PyQt5.QtCore.Qt.ItemIsTristate?10
 PyQt5.QtCore.Qt.ItemNeverHasChildren?10
+PyQt5.QtCore.Qt.ItemIsUserTristate?10
 PyQt5.QtCore.Qt.ItemDataRole?10
 PyQt5.QtCore.Qt.DisplayRole?10
 PyQt5.QtCore.Qt.DecorationRole?10
@@ -975,6 +986,8 @@ PyQt5.QtCore.Qt.ThresholdDither?10
 PyQt5.QtCore.Qt.AutoDither?10
 PyQt5.QtCore.Qt.PreferDither?10
 PyQt5.QtCore.Qt.AvoidDither?10
+PyQt5.QtCore.Qt.NoOpaqueDetection?10
+PyQt5.QtCore.Qt.NoFormatConversion?10
 PyQt5.QtCore.Qt.WidgetAttribute?10
 PyQt5.QtCore.Qt.WA_Disabled?10
 PyQt5.QtCore.Qt.WA_UnderMouse?10
@@ -1122,6 +1135,7 @@ PyQt5.QtCore.Qt.WindowFullscreenButtonHint?10
 PyQt5.QtCore.Qt.ForeignWindow?10
 PyQt5.QtCore.Qt.BypassWindowManagerHint?10
 PyQt5.QtCore.Qt.CoverWindow?10
+PyQt5.QtCore.Qt.MaximizeUsingFullscreenGeometryHint?10
 PyQt5.QtCore.Qt.TextElideMode?10
 PyQt5.QtCore.Qt.ElideLeft?10
 PyQt5.QtCore.Qt.ElideRight?10
@@ -1616,12 +1630,14 @@ PyQt5.QtCore.QAbstractTableModel.index?4(int, int, QModelIndex parent=QModelInde
 PyQt5.QtCore.QAbstractTableModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
 PyQt5.QtCore.QAbstractTableModel.flags?4(QModelIndex) -> Qt.ItemFlags
 PyQt5.QtCore.QAbstractTableModel.parent?4() -> QObject
+PyQt5.QtCore.QAbstractTableModel.sibling?4(int, int, QModelIndex) -> QModelIndex
 PyQt5.QtCore.QAbstractListModel?1(QObject parent=None)
 PyQt5.QtCore.QAbstractListModel.__init__?1(self, QObject parent=None)
 PyQt5.QtCore.QAbstractListModel.index?4(int, int column=0, QModelIndex parent=QModelIndex()) -> QModelIndex
 PyQt5.QtCore.QAbstractListModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
 PyQt5.QtCore.QAbstractListModel.flags?4(QModelIndex) -> Qt.ItemFlags
 PyQt5.QtCore.QAbstractListModel.parent?4() -> QObject
+PyQt5.QtCore.QAbstractListModel.sibling?4(int, int, QModelIndex) -> QModelIndex
 PyQt5.QtCore.QAbstractNativeEventFilter?1()
 PyQt5.QtCore.QAbstractNativeEventFilter.__init__?1(self)
 PyQt5.QtCore.QAbstractNativeEventFilter.nativeEventFilter?4(QByteArray, sip.voidptr) -> (bool, int)
@@ -1637,7 +1653,7 @@ PyQt5.QtCore.QAbstractProxyModel.submit?4() -> bool
 PyQt5.QtCore.QAbstractProxyModel.revert?4()
 PyQt5.QtCore.QAbstractProxyModel.data?4(QModelIndex, int role=Qt.DisplayRole) -> QVariant
 PyQt5.QtCore.QAbstractProxyModel.setData?4(QModelIndex, QVariant, int role=Qt.EditRole) -> bool
-PyQt5.QtCore.QAbstractProxyModel.headerData?4(int, Qt.Orientation, int) -> QVariant
+PyQt5.QtCore.QAbstractProxyModel.headerData?4(int, Qt.Orientation, int role=Qt.DisplayRole) -> QVariant
 PyQt5.QtCore.QAbstractProxyModel.setHeaderData?4(int, Qt.Orientation, QVariant, int role=Qt.EditRole) -> bool
 PyQt5.QtCore.QAbstractProxyModel.itemData?4(QModelIndex) -> dict-of-int-object
 PyQt5.QtCore.QAbstractProxyModel.flags?4(QModelIndex) -> Qt.ItemFlags
@@ -1668,6 +1684,9 @@ PyQt5.QtCore.QAbstractState.exited?4()
 PyQt5.QtCore.QAbstractState.onEntry?4(QEvent)
 PyQt5.QtCore.QAbstractState.onExit?4(QEvent)
 PyQt5.QtCore.QAbstractState.event?4(QEvent) -> bool
+PyQt5.QtCore.QAbstractTransition.TransitionType?10
+PyQt5.QtCore.QAbstractTransition.ExternalTransition?10
+PyQt5.QtCore.QAbstractTransition.InternalTransition?10
 PyQt5.QtCore.QAbstractTransition?1(QState sourceState=None)
 PyQt5.QtCore.QAbstractTransition.__init__?1(self, QState sourceState=None)
 PyQt5.QtCore.QAbstractTransition.sourceState?4() -> QState
@@ -1685,6 +1704,8 @@ PyQt5.QtCore.QAbstractTransition.targetStatesChanged?4()
 PyQt5.QtCore.QAbstractTransition.eventTest?4(QEvent) -> bool
 PyQt5.QtCore.QAbstractTransition.onTransition?4(QEvent)
 PyQt5.QtCore.QAbstractTransition.event?4(QEvent) -> bool
+PyQt5.QtCore.QAbstractTransition.transitionType?4() -> QAbstractTransition.TransitionType
+PyQt5.QtCore.QAbstractTransition.setTransitionType?4(QAbstractTransition.TransitionType)
 PyQt5.QtCore.QAnimationGroup?1(QObject parent=None)
 PyQt5.QtCore.QAnimationGroup.__init__?1(self, QObject parent=None)
 PyQt5.QtCore.QAnimationGroup.animationAt?4(int) -> QAbstractAnimation
@@ -2161,6 +2182,7 @@ PyQt5.QtCore.QEvent.TouchCancel?10
 PyQt5.QtCore.QEvent.PlatformPanel?10
 PyQt5.QtCore.QEvent.ApplicationStateChange?10
 PyQt5.QtCore.QEvent.ReadOnlyChange?10
+PyQt5.QtCore.QEvent.PlatformSurface?10
 PyQt5.QtCore.QEvent.User?10
 PyQt5.QtCore.QEvent.MaxUser?10
 PyQt5.QtCore.QEvent?1(QEvent.Type)
@@ -2245,6 +2267,7 @@ PyQt5.QtCore.QDataStream.Qt_5_1?10
 PyQt5.QtCore.QDataStream.Qt_5_2?10
 PyQt5.QtCore.QDataStream.Qt_5_3?10
 PyQt5.QtCore.QDataStream.Qt_5_4?10
+PyQt5.QtCore.QDataStream.Qt_5_5?10
 PyQt5.QtCore.QDataStream?1()
 PyQt5.QtCore.QDataStream.__init__?1(self)
 PyQt5.QtCore.QDataStream?1(QIODevice)
@@ -2915,7 +2938,7 @@ PyQt5.QtCore.QIdentityProxyModel.insertColumns?4(int, int, QModelIndex parent=QM
 PyQt5.QtCore.QIdentityProxyModel.insertRows?4(int, int, QModelIndex parent=QModelIndex()) -> bool
 PyQt5.QtCore.QIdentityProxyModel.removeColumns?4(int, int, QModelIndex parent=QModelIndex()) -> bool
 PyQt5.QtCore.QIdentityProxyModel.removeRows?4(int, int, QModelIndex parent=QModelIndex()) -> bool
-PyQt5.QtCore.QIdentityProxyModel.headerData?4(int, Qt.Orientation, int) -> QVariant
+PyQt5.QtCore.QIdentityProxyModel.headerData?4(int, Qt.Orientation, int role=Qt.DisplayRole) -> QVariant
 PyQt5.QtCore.QIdentityProxyModel.sibling?4(int, int, QModelIndex) -> QModelIndex
 PyQt5.QtCore.QIODevice.OpenMode?1(QIODevice.OpenMode)
 PyQt5.QtCore.QIODevice.OpenMode.__init__?1(self, QIODevice.OpenMode)
@@ -2960,8 +2983,8 @@ PyQt5.QtCore.QItemSelectionModel.Columns?10
 PyQt5.QtCore.QItemSelectionModel.SelectCurrent?10
 PyQt5.QtCore.QItemSelectionModel.ToggleCurrent?10
 PyQt5.QtCore.QItemSelectionModel.ClearAndSelect?10
-PyQt5.QtCore.QItemSelectionModel?1(QAbstractItemModel)
-PyQt5.QtCore.QItemSelectionModel.__init__?1(self, QAbstractItemModel)
+PyQt5.QtCore.QItemSelectionModel?1(QAbstractItemModel model=None)
+PyQt5.QtCore.QItemSelectionModel.__init__?1(self, QAbstractItemModel model=None)
 PyQt5.QtCore.QItemSelectionModel?1(QAbstractItemModel, QObject)
 PyQt5.QtCore.QItemSelectionModel.__init__?1(self, QAbstractItemModel, QObject)
 PyQt5.QtCore.QItemSelectionModel.currentIndex?4() -> QModelIndex
@@ -2988,6 +3011,8 @@ PyQt5.QtCore.QItemSelectionModel.emitSelectionChanged?4(QItemSelection, QItemSel
 PyQt5.QtCore.QItemSelectionModel.hasSelection?4() -> bool
 PyQt5.QtCore.QItemSelectionModel.selectedRows?4(int column=0) -> list-of-QModelIndex
 PyQt5.QtCore.QItemSelectionModel.selectedColumns?4(int row=0) -> list-of-QModelIndex
+PyQt5.QtCore.QItemSelectionModel.setModel?4(QAbstractItemModel)
+PyQt5.QtCore.QItemSelectionModel.modelChanged?4(QAbstractItemModel)
 PyQt5.QtCore.QItemSelectionModel.SelectionFlags?1(QItemSelectionModel.SelectionFlags)
 PyQt5.QtCore.QItemSelectionModel.SelectionFlags.__init__?1(self, QItemSelectionModel.SelectionFlags)
 PyQt5.QtCore.QItemSelectionModel.SelectionFlags?1(int)
@@ -3113,6 +3138,7 @@ PyQt5.QtCore.QLibrary.ResolveAllSymbolsHint?10
 PyQt5.QtCore.QLibrary.ExportExternalSymbolsHint?10
 PyQt5.QtCore.QLibrary.LoadArchiveMemberHint?10
 PyQt5.QtCore.QLibrary.PreventUnloadHint?10
+PyQt5.QtCore.QLibrary.DeepBindHint?10
 PyQt5.QtCore.QLibrary?1(QObject parent=None)
 PyQt5.QtCore.QLibrary.__init__?1(self, QObject parent=None)
 PyQt5.QtCore.QLibrary?1(str, QObject parent=None)
@@ -3347,6 +3373,29 @@ PyQt5.QtCore.QLocale.TakriScript?10
 PyQt5.QtCore.QLocale.UgariticScript?10
 PyQt5.QtCore.QLocale.BrailleScript?10
 PyQt5.QtCore.QLocale.HiraganaScript?10
+PyQt5.QtCore.QLocale.CaucasianAlbanianScript?10
+PyQt5.QtCore.QLocale.BassaVahScript?10
+PyQt5.QtCore.QLocale.DuployanScript?10
+PyQt5.QtCore.QLocale.ElbasanScript?10
+PyQt5.QtCore.QLocale.GranthaScript?10
+PyQt5.QtCore.QLocale.PahawhHmongScript?10
+PyQt5.QtCore.QLocale.KhojkiScript?10
+PyQt5.QtCore.QLocale.LinearAScript?10
+PyQt5.QtCore.QLocale.MahajaniScript?10
+PyQt5.QtCore.QLocale.ManichaeanScript?10
+PyQt5.QtCore.QLocale.MendeKikakuiScript?10
+PyQt5.QtCore.QLocale.ModiScript?10
+PyQt5.QtCore.QLocale.MroScript?10
+PyQt5.QtCore.QLocale.OldNorthArabianScript?10
+PyQt5.QtCore.QLocale.NabataeanScript?10
+PyQt5.QtCore.QLocale.PalmyreneScript?10
+PyQt5.QtCore.QLocale.PauCinHauScript?10
+PyQt5.QtCore.QLocale.OldPermicScript?10
+PyQt5.QtCore.QLocale.PsalterPahlaviScript?10
+PyQt5.QtCore.QLocale.SiddhamScript?10
+PyQt5.QtCore.QLocale.KhudawadiScript?10
+PyQt5.QtCore.QLocale.TirhutaScript?10
+PyQt5.QtCore.QLocale.VarangKshitiScript?10
 PyQt5.QtCore.QLocale.MeasurementSystem?10
 PyQt5.QtCore.QLocale.MetricSystem?10
 PyQt5.QtCore.QLocale.ImperialSystem?10
@@ -3956,6 +4005,31 @@ PyQt5.QtCore.QLocale.Ugaritic?10
 PyQt5.QtCore.QLocale.Akoose?10
 PyQt5.QtCore.QLocale.Lakota?10
 PyQt5.QtCore.QLocale.StandardMoroccanTamazight?10
+PyQt5.QtCore.QLocale.Mapuche?10
+PyQt5.QtCore.QLocale.CentralKurdish?10
+PyQt5.QtCore.QLocale.LowerSorbian?10
+PyQt5.QtCore.QLocale.UpperSorbian?10
+PyQt5.QtCore.QLocale.Kenyang?10
+PyQt5.QtCore.QLocale.Mohawk?10
+PyQt5.QtCore.QLocale.Nko?10
+PyQt5.QtCore.QLocale.Prussian?10
+PyQt5.QtCore.QLocale.Kiche?10
+PyQt5.QtCore.QLocale.SouthernSami?10
+PyQt5.QtCore.QLocale.LuleSami?10
+PyQt5.QtCore.QLocale.InariSami?10
+PyQt5.QtCore.QLocale.SkoltSami?10
+PyQt5.QtCore.QLocale.Warlpiri?10
+PyQt5.QtCore.QLocale.ManichaeanMiddlePersian?10
+PyQt5.QtCore.QLocale.Mende?10
+PyQt5.QtCore.QLocale.AncientNorthArabian?10
+PyQt5.QtCore.QLocale.LinearA?10
+PyQt5.QtCore.QLocale.HmongNjua?10
+PyQt5.QtCore.QLocale.Ho?10
+PyQt5.QtCore.QLocale.Lezghian?10
+PyQt5.QtCore.QLocale.Bassa?10
+PyQt5.QtCore.QLocale.Mono?10
+PyQt5.QtCore.QLocale.TedimChin?10
+PyQt5.QtCore.QLocale.Maithili?10
 PyQt5.QtCore.QLocale?1()
 PyQt5.QtCore.QLocale.__init__?1(self)
 PyQt5.QtCore.QLocale?1(str)
@@ -4072,6 +4146,7 @@ PyQt5.QtCore.QMessageLogger.debug?4(str)
 PyQt5.QtCore.QMessageLogger.warning?4(str)
 PyQt5.QtCore.QMessageLogger.critical?4(str)
 PyQt5.QtCore.QMessageLogger.fatal?4(str)
+PyQt5.QtCore.QMessageLogger.info?4(str)
 PyQt5.QtCore.QMargins?1()
 PyQt5.QtCore.QMargins.__init__?1(self)
 PyQt5.QtCore.QMargins?1(int, int, int, int)
@@ -4198,6 +4273,7 @@ PyQt5.QtCore.QMetaType.TypeFlag?10
 PyQt5.QtCore.QMetaType.NeedsConstruction?10
 PyQt5.QtCore.QMetaType.NeedsDestruction?10
 PyQt5.QtCore.QMetaType.MovableType?10
+PyQt5.QtCore.QMetaType.IsGadget?10
 PyQt5.QtCore.QMetaType.Type?10
 PyQt5.QtCore.QMetaType.UnknownType?10
 PyQt5.QtCore.QMetaType.Void?10
@@ -4275,6 +4351,7 @@ PyQt5.QtCore.QMetaType.QJsonObject?10
 PyQt5.QtCore.QMetaType.QJsonArray?10
 PyQt5.QtCore.QMetaType.QJsonDocument?10
 PyQt5.QtCore.QMetaType.QByteArrayList?10
+PyQt5.QtCore.QMetaType.QPersistentModelIndex?10
 PyQt5.QtCore.QMetaType.User?10
 PyQt5.QtCore.QMetaType?1(int)
 PyQt5.QtCore.QMetaType.__init__?1(self, int)
@@ -5161,7 +5238,7 @@ PyQt5.QtCore.QSortFilterProxyModel.columnCount?4(QModelIndex parent=QModelIndex(
 PyQt5.QtCore.QSortFilterProxyModel.hasChildren?4(QModelIndex parent=QModelIndex()) -> bool
 PyQt5.QtCore.QSortFilterProxyModel.data?4(QModelIndex, int role=Qt.DisplayRole) -> QVariant
 PyQt5.QtCore.QSortFilterProxyModel.setData?4(QModelIndex, QVariant, int role=Qt.EditRole) -> bool
-PyQt5.QtCore.QSortFilterProxyModel.headerData?4(int, Qt.Orientation, int role=Qt.EditRole) -> QVariant
+PyQt5.QtCore.QSortFilterProxyModel.headerData?4(int, Qt.Orientation, int role=Qt.DisplayRole) -> QVariant
 PyQt5.QtCore.QSortFilterProxyModel.setHeaderData?4(int, Qt.Orientation, QVariant, int role=Qt.EditRole) -> bool
 PyQt5.QtCore.QSortFilterProxyModel.mimeData?4(list-of-QModelIndex) -> QMimeData
 PyQt5.QtCore.QSortFilterProxyModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
@@ -5216,6 +5293,7 @@ PyQt5.QtCore.QStandardPaths.GenericCacheLocation?10
 PyQt5.QtCore.QStandardPaths.GenericConfigLocation?10
 PyQt5.QtCore.QStandardPaths.AppDataLocation?10
 PyQt5.QtCore.QStandardPaths.AppLocalDataLocation?10
+PyQt5.QtCore.QStandardPaths.AppConfigLocation?10
 PyQt5.QtCore.QStandardPaths?1(QStandardPaths)
 PyQt5.QtCore.QStandardPaths.__init__?1(self, QStandardPaths)
 PyQt5.QtCore.QStandardPaths.writableLocation?4(QStandardPaths.StandardLocation) -> str
@@ -5582,6 +5660,7 @@ PyQt5.QtCore.QThread.eventDispatcher?4() -> QAbstractEventDispatcher
 PyQt5.QtCore.QThread.setEventDispatcher?4(QAbstractEventDispatcher)
 PyQt5.QtCore.QThread.requestInterruption?4()
 PyQt5.QtCore.QThread.isInterruptionRequested?4() -> bool
+PyQt5.QtCore.QThread.loopLevel?4() -> int
 PyQt5.QtCore.QThreadPool?1(QObject parent=None)
 PyQt5.QtCore.QThreadPool.__init__?1(self, QObject parent=None)
 PyQt5.QtCore.QThreadPool.globalInstance?4() -> QThreadPool
@@ -5596,6 +5675,7 @@ PyQt5.QtCore.QThreadPool.reserveThread?4()
 PyQt5.QtCore.QThreadPool.releaseThread?4()
 PyQt5.QtCore.QThreadPool.waitForDone?4(int msecs=-1) -> bool
 PyQt5.QtCore.QThreadPool.clear?4()
+PyQt5.QtCore.QThreadPool.cancel?4(QRunnable)
 PyQt5.QtCore.QTimeLine.State?10
 PyQt5.QtCore.QTimeLine.NotRunning?10
 PyQt5.QtCore.QTimeLine.Paused?10
@@ -5711,6 +5791,8 @@ PyQt5.QtCore.QTimeZone.windowsIdToDefaultIanaId?4(QByteArray) -> QByteArray
 PyQt5.QtCore.QTimeZone.windowsIdToDefaultIanaId?4(QByteArray, QLocale.Country) -> QByteArray
 PyQt5.QtCore.QTimeZone.windowsIdToIanaIds?4(QByteArray) -> list-of-QByteArray
 PyQt5.QtCore.QTimeZone.windowsIdToIanaIds?4(QByteArray, QLocale.Country) -> list-of-QByteArray
+PyQt5.QtCore.QTimeZone.systemTimeZone?4() -> QTimeZone
+PyQt5.QtCore.QTimeZone.utc?4() -> QTimeZone
 PyQt5.QtCore.QTimeZone.OffsetData.abbreviation?7
 PyQt5.QtCore.QTimeZone.OffsetData.atUtc?7
 PyQt5.QtCore.QTimeZone.OffsetData.daylightTimeOffset?7
@@ -5955,6 +6037,7 @@ PyQt5.QtCore.QVariant.Uuid?10
 PyQt5.QtCore.QVariant.ModelIndex?10
 PyQt5.QtCore.QVariant.PolygonF?10
 PyQt5.QtCore.QVariant.RegularExpression?10
+PyQt5.QtCore.QVariant.PersistentModelIndex?10
 PyQt5.QtCore.QVariant.UserType?10
 PyQt5.QtCore.QVariant?1()
 PyQt5.QtCore.QVariant.__init__?1(self)
@@ -6236,6 +6319,7 @@ PyQt5.QtGui.qPixelFormatCmyk?4(int, int alphaSize=0, QPixelFormat.AlphaUsage alp
 PyQt5.QtGui.qPixelFormatHsl?4(int, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.FloatingPoint) -> QPixelFormat
 PyQt5.QtGui.qPixelFormatHsv?4(int, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.FloatingPoint) -> QPixelFormat
 PyQt5.QtGui.qPixelFormatYuv?4(QPixelFormat.YUVLayout, int alphaSize=0, QPixelFormat.AlphaUsage alphaUsage=QPixelFormat.IgnoresAlpha, QPixelFormat.AlphaPosition alphaPosition=QPixelFormat.AtBeginning, QPixelFormat.AlphaPremultiplied premultiplied=QPixelFormat.NotPremultiplied, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.UnsignedByte, QPixelFormat.ByteOrder byteOrder=QPixelFormat.LittleEndian) -> QPixelFormat
+PyQt5.QtGui.qPixelFormatAlpha?4(int, QPixelFormat.TypeInterpretation typeInterpretation=QPixelFormat.UnsignedInteger) -> QPixelFormat
 PyQt5.QtGui.qFuzzyCompare?4(QQuaternion, QQuaternion) -> bool
 PyQt5.QtGui.qRed?4(int) -> int
 PyQt5.QtGui.qGreen?4(int) -> int
@@ -6743,6 +6827,8 @@ PyQt5.QtGui.QWheelEvent?1(QPointF, QPointF, QPoint, QPoint, int, Qt.Orientation,
 PyQt5.QtGui.QWheelEvent.__init__?1(self, QPointF, QPointF, QPoint, QPoint, int, Qt.Orientation, Qt.MouseButtons, Qt.KeyboardModifiers)
 PyQt5.QtGui.QWheelEvent?1(QPointF, QPointF, QPoint, QPoint, int, Qt.Orientation, Qt.MouseButtons, Qt.KeyboardModifiers, Qt.ScrollPhase)
 PyQt5.QtGui.QWheelEvent.__init__?1(self, QPointF, QPointF, QPoint, QPoint, int, Qt.Orientation, Qt.MouseButtons, Qt.KeyboardModifiers, Qt.ScrollPhase)
+PyQt5.QtGui.QWheelEvent?1(QPointF, QPointF, QPoint, QPoint, int, Qt.Orientation, Qt.MouseButtons, Qt.KeyboardModifiers, Qt.ScrollPhase, Qt.MouseEventSource)
+PyQt5.QtGui.QWheelEvent.__init__?1(self, QPointF, QPointF, QPoint, QPoint, int, Qt.Orientation, Qt.MouseButtons, Qt.KeyboardModifiers, Qt.ScrollPhase, Qt.MouseEventSource)
 PyQt5.QtGui.QWheelEvent?1(QWheelEvent)
 PyQt5.QtGui.QWheelEvent.__init__?1(self, QWheelEvent)
 PyQt5.QtGui.QWheelEvent.pos?4() -> QPoint
@@ -6757,6 +6843,7 @@ PyQt5.QtGui.QWheelEvent.angleDelta?4() -> QPoint
 PyQt5.QtGui.QWheelEvent.posF?4() -> QPointF
 PyQt5.QtGui.QWheelEvent.globalPosF?4() -> QPointF
 PyQt5.QtGui.QWheelEvent.phase?4() -> Qt.ScrollPhase
+PyQt5.QtGui.QWheelEvent.source?4() -> Qt.MouseEventSource
 PyQt5.QtGui.QTabletEvent.PointerType?10
 PyQt5.QtGui.QTabletEvent.UnknownPointer?10
 PyQt5.QtGui.QTabletEvent.Pen?10
@@ -7066,6 +7153,14 @@ PyQt5.QtGui.QNativeGestureEvent.globalPos?4() -> QPoint
 PyQt5.QtGui.QNativeGestureEvent.localPos?4() -> QPointF
 PyQt5.QtGui.QNativeGestureEvent.windowPos?4() -> QPointF
 PyQt5.QtGui.QNativeGestureEvent.screenPos?4() -> QPointF
+PyQt5.QtGui.QPlatformSurfaceEvent.SurfaceEventType?10
+PyQt5.QtGui.QPlatformSurfaceEvent.SurfaceCreated?10
+PyQt5.QtGui.QPlatformSurfaceEvent.SurfaceAboutToBeDestroyed?10
+PyQt5.QtGui.QPlatformSurfaceEvent?1(QPlatformSurfaceEvent.SurfaceEventType)
+PyQt5.QtGui.QPlatformSurfaceEvent.__init__?1(self, QPlatformSurfaceEvent.SurfaceEventType)
+PyQt5.QtGui.QPlatformSurfaceEvent?1(QPlatformSurfaceEvent)
+PyQt5.QtGui.QPlatformSurfaceEvent.__init__?1(self, QPlatformSurfaceEvent)
+PyQt5.QtGui.QPlatformSurfaceEvent.surfaceEventType?4() -> QPlatformSurfaceEvent.SurfaceEventType
 PyQt5.QtGui.QFont.HintingPreference?10
 PyQt5.QtGui.QFont.PreferDefaultHinting?10
 PyQt5.QtGui.QFont.PreferNoHinting?10
@@ -7095,10 +7190,14 @@ PyQt5.QtGui.QFont.StyleNormal?10
 PyQt5.QtGui.QFont.StyleItalic?10
 PyQt5.QtGui.QFont.StyleOblique?10
 PyQt5.QtGui.QFont.Weight?10
+PyQt5.QtGui.QFont.Thin?10
+PyQt5.QtGui.QFont.ExtraLight?10
 PyQt5.QtGui.QFont.Light?10
 PyQt5.QtGui.QFont.Normal?10
+PyQt5.QtGui.QFont.Medium?10
 PyQt5.QtGui.QFont.DemiBold?10
 PyQt5.QtGui.QFont.Bold?10
+PyQt5.QtGui.QFont.ExtraBold?10
 PyQt5.QtGui.QFont.Black?10
 PyQt5.QtGui.QFont.StyleStrategy?10
 PyQt5.QtGui.QFont.PreferDefault?10
@@ -7275,6 +7374,7 @@ PyQt5.QtGui.QFontDatabase.removeApplicationFont?4(int) -> bool
 PyQt5.QtGui.QFontDatabase.removeAllApplicationFonts?4() -> bool
 PyQt5.QtGui.QFontDatabase.supportsThreadedFontRendering?4() -> bool
 PyQt5.QtGui.QFontDatabase.systemFont?4(QFontDatabase.SystemFont) -> QFont
+PyQt5.QtGui.QFontDatabase.isPrivateFamily?4(str) -> bool
 PyQt5.QtGui.QFontInfo?1(QFont)
 PyQt5.QtGui.QFontInfo.__init__?1(self, QFont)
 PyQt5.QtGui.QFontInfo?1(QFontInfo)
@@ -7644,6 +7744,8 @@ PyQt5.QtGui.QImage.Format_BGR30?10
 PyQt5.QtGui.QImage.Format_A2BGR30_Premultiplied?10
 PyQt5.QtGui.QImage.Format_RGB30?10
 PyQt5.QtGui.QImage.Format_A2RGB30_Premultiplied?10
+PyQt5.QtGui.QImage.Format_Alpha8?10
+PyQt5.QtGui.QImage.Format_Grayscale8?10
 PyQt5.QtGui.QImage.InvertMode?10
 PyQt5.QtGui.QImage.InvertRgb?10
 PyQt5.QtGui.QImage.InvertRgba?10
@@ -7734,6 +7836,7 @@ PyQt5.QtGui.QImage.textKeys?4() -> list-of-str
 PyQt5.QtGui.QImage.text?4(str key='') -> str
 PyQt5.QtGui.QImage.setText?4(str, str)
 PyQt5.QtGui.QImage.metric?4(QPaintDevice.PaintDeviceMetric) -> int
+PyQt5.QtGui.QImage.smoothScaled?4(int, int) -> QImage
 PyQt5.QtGui.QImage.createMaskFromColor?4(int, Qt.MaskMode mode=Qt.MaskInColor) -> QImage
 PyQt5.QtGui.QImage.transformed?4(QTransform, Qt.TransformationMode mode=Qt.FastTransformation) -> QImage
 PyQt5.QtGui.QImage.trueMatrix?4(QTransform, int, int) -> QTransform
@@ -7748,6 +7851,15 @@ PyQt5.QtGui.QImage.setDevicePixelRatio?4(float)
 PyQt5.QtGui.QImage.pixelFormat?4() -> QPixelFormat
 PyQt5.QtGui.QImage.toPixelFormat?4(QImage.Format) -> QPixelFormat
 PyQt5.QtGui.QImage.toImageFormat?4(QPixelFormat) -> QImage.Format
+PyQt5.QtGui.QImageIOHandler.Transformation?10
+PyQt5.QtGui.QImageIOHandler.TransformationNone?10
+PyQt5.QtGui.QImageIOHandler.TransformationMirror?10
+PyQt5.QtGui.QImageIOHandler.TransformationFlip?10
+PyQt5.QtGui.QImageIOHandler.TransformationRotate180?10
+PyQt5.QtGui.QImageIOHandler.TransformationRotate90?10
+PyQt5.QtGui.QImageIOHandler.TransformationMirrorAndRotate90?10
+PyQt5.QtGui.QImageIOHandler.TransformationFlipAndRotate90?10
+PyQt5.QtGui.QImageIOHandler.TransformationRotate270?10
 PyQt5.QtGui.QImageIOHandler.ImageOption?10
 PyQt5.QtGui.QImageIOHandler.Size?10
 PyQt5.QtGui.QImageIOHandler.ClipRect?10
@@ -7764,6 +7876,10 @@ PyQt5.QtGui.QImageIOHandler.Endianness?10
 PyQt5.QtGui.QImageIOHandler.Animation?10
 PyQt5.QtGui.QImageIOHandler.BackgroundColor?10
 PyQt5.QtGui.QImageIOHandler.SupportedSubTypes?10
+PyQt5.QtGui.QImageIOHandler.OptimizedWrite?10
+PyQt5.QtGui.QImageIOHandler.ProgressiveScanWrite?10
+PyQt5.QtGui.QImageIOHandler.ImageTransformation?10
+PyQt5.QtGui.QImageIOHandler.TransformedByDefault?10
 PyQt5.QtGui.QImageIOHandler?1()
 PyQt5.QtGui.QImageIOHandler.__init__?1(self)
 PyQt5.QtGui.QImageIOHandler.setDevice?4(QIODevice)
@@ -7783,6 +7899,12 @@ PyQt5.QtGui.QImageIOHandler.imageCount?4() -> int
 PyQt5.QtGui.QImageIOHandler.nextImageDelay?4() -> int
 PyQt5.QtGui.QImageIOHandler.currentImageNumber?4() -> int
 PyQt5.QtGui.QImageIOHandler.currentImageRect?4() -> QRect
+PyQt5.QtGui.QImageIOHandler.Transformations?1(QImageIOHandler.Transformations)
+PyQt5.QtGui.QImageIOHandler.Transformations.__init__?1(self, QImageIOHandler.Transformations)
+PyQt5.QtGui.QImageIOHandler.Transformations?1(int)
+PyQt5.QtGui.QImageIOHandler.Transformations.__init__?1(self, int)
+PyQt5.QtGui.QImageIOHandler.Transformations?1()
+PyQt5.QtGui.QImageIOHandler.Transformations.__init__?1(self)
 PyQt5.QtGui.QImageReader.ImageReaderError?10
 PyQt5.QtGui.QImageReader.UnknownError?10
 PyQt5.QtGui.QImageReader.FileNotFoundError?10
@@ -7839,6 +7961,9 @@ PyQt5.QtGui.QImageReader.decideFormatFromContent?4() -> bool
 PyQt5.QtGui.QImageReader.supportedMimeTypes?4() -> list-of-QByteArray
 PyQt5.QtGui.QImageReader.subType?4() -> QByteArray
 PyQt5.QtGui.QImageReader.supportedSubTypes?4() -> list-of-QByteArray
+PyQt5.QtGui.QImageReader.transformation?4() -> QImageIOHandler.Transformations
+PyQt5.QtGui.QImageReader.setAutoTransform?4(bool)
+PyQt5.QtGui.QImageReader.autoTransform?4() -> bool
 PyQt5.QtGui.QImageWriter.ImageWriterError?10
 PyQt5.QtGui.QImageWriter.UnknownError?10
 PyQt5.QtGui.QImageWriter.DeviceError?10
@@ -7872,6 +7997,12 @@ PyQt5.QtGui.QImageWriter.supportedMimeTypes?4() -> list-of-QByteArray
 PyQt5.QtGui.QImageWriter.setSubType?4(QByteArray)
 PyQt5.QtGui.QImageWriter.subType?4() -> QByteArray
 PyQt5.QtGui.QImageWriter.supportedSubTypes?4() -> list-of-QByteArray
+PyQt5.QtGui.QImageWriter.setOptimizedWrite?4(bool)
+PyQt5.QtGui.QImageWriter.optimizedWrite?4() -> bool
+PyQt5.QtGui.QImageWriter.setProgressiveScanWrite?4(bool)
+PyQt5.QtGui.QImageWriter.progressiveScanWrite?4() -> bool
+PyQt5.QtGui.QImageWriter.transformation?4() -> QImageIOHandler.Transformations
+PyQt5.QtGui.QImageWriter.setTransformation?4(QImageIOHandler.Transformations)
 PyQt5.QtGui.QInputMethod.Action?10
 PyQt5.QtGui.QInputMethod.Click?10
 PyQt5.QtGui.QInputMethod.ContextMenu?10
@@ -7969,6 +8100,7 @@ PyQt5.QtGui.QKeySequence.Quit?10
 PyQt5.QtGui.QKeySequence.FullScreen?10
 PyQt5.QtGui.QKeySequence.Deselect?10
 PyQt5.QtGui.QKeySequence.DeleteCompleteLine?10
+PyQt5.QtGui.QKeySequence.Backspace?10
 PyQt5.QtGui.QKeySequence.SequenceMatch?10
 PyQt5.QtGui.QKeySequence.NoMatch?10
 PyQt5.QtGui.QKeySequence.PartialMatch?10
@@ -8048,6 +8180,7 @@ PyQt5.QtGui.QMatrix4x4.mapVector?4(QVector3D) -> QVector3D
 PyQt5.QtGui.QMatrix4x4.map?4(QVector4D) -> QVector4D
 PyQt5.QtGui.QMatrix4x4.viewport?4(float, float, float, float, float nearPlane=0, float farPlane=1)
 PyQt5.QtGui.QMatrix4x4.viewport?4(QRectF)
+PyQt5.QtGui.QMatrix4x4.isAffine?4() -> bool
 PyQt5.QtGui.QMovie.CacheMode?10
 PyQt5.QtGui.QMovie.CacheNone?10
 PyQt5.QtGui.QMovie.CacheAll?10
@@ -8214,6 +8347,8 @@ PyQt5.QtGui.QOpenGLContext.openGLModuleType?4() -> QOpenGLContext.OpenGLModuleTy
 PyQt5.QtGui.QOpenGLContext.isOpenGLES?4() -> bool
 PyQt5.QtGui.QOpenGLContext.setNativeHandle?4(QVariant)
 PyQt5.QtGui.QOpenGLContext.nativeHandle?4() -> QVariant
+PyQt5.QtGui.QOpenGLContext.supportsThreadedOpenGL?4() -> bool
+PyQt5.QtGui.QOpenGLContext.globalShareContext?4() -> QOpenGLContext
 PyQt5.QtGui.QOpenGLVersionProfile?1()
 PyQt5.QtGui.QOpenGLVersionProfile.__init__?1(self)
 PyQt5.QtGui.QOpenGLVersionProfile?1(QSurfaceFormat)
@@ -8521,6 +8656,18 @@ PyQt5.QtGui.QOpenGLShaderProgram.defaultOuterTessellationLevels?4() -> list-of-f
 PyQt5.QtGui.QOpenGLShaderProgram.setDefaultInnerTessellationLevels?4(list-of-float)
 PyQt5.QtGui.QOpenGLShaderProgram.defaultInnerTessellationLevels?4() -> list-of-float
 PyQt5.QtGui.QOpenGLShaderProgram.create?4() -> bool
+PyQt5.QtGui.QOpenGLTexture.ComparisonMode?10
+PyQt5.QtGui.QOpenGLTexture.CompareRefToTexture?10
+PyQt5.QtGui.QOpenGLTexture.CompareNone?10
+PyQt5.QtGui.QOpenGLTexture.ComparisonFunction?10
+PyQt5.QtGui.QOpenGLTexture.CompareLessEqual?10
+PyQt5.QtGui.QOpenGLTexture.CompareGreaterEqual?10
+PyQt5.QtGui.QOpenGLTexture.CompareLess?10
+PyQt5.QtGui.QOpenGLTexture.CompareGreater?10
+PyQt5.QtGui.QOpenGLTexture.CompareEqual?10
+PyQt5.QtGui.QOpenGLTexture.CommpareNotEqual?10
+PyQt5.QtGui.QOpenGLTexture.CompareAlways?10
+PyQt5.QtGui.QOpenGLTexture.CompareNever?10
 PyQt5.QtGui.QOpenGLTexture.CoordinateDirection?10
 PyQt5.QtGui.QOpenGLTexture.DirectionS?10
 PyQt5.QtGui.QOpenGLTexture.DirectionT?10
@@ -8567,6 +8714,8 @@ PyQt5.QtGui.QOpenGLTexture.AnisotropicFiltering?10
 PyQt5.QtGui.QOpenGLTexture.NPOTTextures?10
 PyQt5.QtGui.QOpenGLTexture.NPOTTextureRepeat?10
 PyQt5.QtGui.QOpenGLTexture.Texture1D?10
+PyQt5.QtGui.QOpenGLTexture.TextureComparisonOperators?10
+PyQt5.QtGui.QOpenGLTexture.TextureMipMapLevel?10
 PyQt5.QtGui.QOpenGLTexture.PixelType?10
 PyQt5.QtGui.QOpenGLTexture.NoPixelType?10
 PyQt5.QtGui.QOpenGLTexture.Int8?10
@@ -8709,6 +8858,16 @@ PyQt5.QtGui.QOpenGLTexture.RGBAFormat?10
 PyQt5.QtGui.QOpenGLTexture.LuminanceFormat?10
 PyQt5.QtGui.QOpenGLTexture.LuminanceAlphaFormat?10
 PyQt5.QtGui.QOpenGLTexture.S8?10
+PyQt5.QtGui.QOpenGLTexture.R11_EAC_UNorm?10
+PyQt5.QtGui.QOpenGLTexture.R11_EAC_SNorm?10
+PyQt5.QtGui.QOpenGLTexture.RG11_EAC_UNorm?10
+PyQt5.QtGui.QOpenGLTexture.RG11_EAC_SNorm?10
+PyQt5.QtGui.QOpenGLTexture.RGB8_ETC2?10
+PyQt5.QtGui.QOpenGLTexture.SRGB8_ETC2?10
+PyQt5.QtGui.QOpenGLTexture.RGB8_PunchThrough_Alpha1_ETC2?10
+PyQt5.QtGui.QOpenGLTexture.SRGB8_PunchThrough_Alpha1_ETC2?10
+PyQt5.QtGui.QOpenGLTexture.RGBA8_ETC2_EAC?10
+PyQt5.QtGui.QOpenGLTexture.SRGB8_Alpha8_ETC2_EAC?10
 PyQt5.QtGui.QOpenGLTexture.TextureUnitReset?10
 PyQt5.QtGui.QOpenGLTexture.ResetTextureUnit?10
 PyQt5.QtGui.QOpenGLTexture.DontResetTextureUnit?10
@@ -8768,6 +8927,7 @@ PyQt5.QtGui.QOpenGLTexture.setLayers?4(int)
 PyQt5.QtGui.QOpenGLTexture.layers?4() -> int
 PyQt5.QtGui.QOpenGLTexture.faces?4() -> int
 PyQt5.QtGui.QOpenGLTexture.allocateStorage?4()
+PyQt5.QtGui.QOpenGLTexture.allocateStorage?4(QOpenGLTexture.PixelFormat, QOpenGLTexture.PixelType)
 PyQt5.QtGui.QOpenGLTexture.isStorageAllocated?4() -> bool
 PyQt5.QtGui.QOpenGLTexture.createTextureView?4(QOpenGLTexture.Target, QOpenGLTexture.TextureFormat, int, int, int, int) -> QOpenGLTexture
 PyQt5.QtGui.QOpenGLTexture.isTextureView?4() -> bool
@@ -8822,6 +8982,10 @@ PyQt5.QtGui.QOpenGLTexture.setSamples?4(int)
 PyQt5.QtGui.QOpenGLTexture.samples?4() -> int
 PyQt5.QtGui.QOpenGLTexture.setFixedSamplePositions?4(bool)
 PyQt5.QtGui.QOpenGLTexture.isFixedSamplePositions?4() -> bool
+PyQt5.QtGui.QOpenGLTexture.setComparisonFunction?4(QOpenGLTexture.ComparisonFunction)
+PyQt5.QtGui.QOpenGLTexture.comparisonFunction?4() -> QOpenGLTexture.ComparisonFunction
+PyQt5.QtGui.QOpenGLTexture.setComparisonMode?4(QOpenGLTexture.ComparisonMode)
+PyQt5.QtGui.QOpenGLTexture.comparisonMode?4() -> QOpenGLTexture.ComparisonMode
 PyQt5.QtGui.QOpenGLTexture.Features?1(QOpenGLTexture.Features)
 PyQt5.QtGui.QOpenGLTexture.Features.__init__?1(self, QOpenGLTexture.Features)
 PyQt5.QtGui.QOpenGLTexture.Features?1(int)
@@ -8974,6 +9138,8 @@ PyQt5.QtGui.QWindow.setMinimumWidth?4(int)
 PyQt5.QtGui.QWindow.setMinimumHeight?4(int)
 PyQt5.QtGui.QWindow.setMaximumWidth?4(int)
 PyQt5.QtGui.QWindow.setMaximumHeight?4(int)
+PyQt5.QtGui.QWindow.alert?4(int)
+PyQt5.QtGui.QWindow.requestUpdate?4()
 PyQt5.QtGui.QWindow.screenChanged?4(QScreen)
 PyQt5.QtGui.QWindow.modalityChanged?4(Qt.WindowModality)
 PyQt5.QtGui.QWindow.windowStateChanged?4(Qt.WindowState)
@@ -9012,7 +9178,6 @@ PyQt5.QtGui.QWindow.opacity?4() -> float
 PyQt5.QtGui.QWindow.setMask?4(QRegion)
 PyQt5.QtGui.QWindow.mask?4() -> QRegion
 PyQt5.QtGui.QWindow.fromWinId?4(sip.voidptr) -> QWindow
-PyQt5.QtGui.QWindow.alert?4(int)
 PyQt5.QtGui.QWindow.visibilityChanged?4(QWindow.Visibility)
 PyQt5.QtGui.QWindow.activeChanged?4()
 PyQt5.QtGui.QWindow.opacityChanged?4(float)
@@ -9029,6 +9194,8 @@ PyQt5.QtGui.QOpenGLWindow.PartialUpdateBlit?10
 PyQt5.QtGui.QOpenGLWindow.PartialUpdateBlend?10
 PyQt5.QtGui.QOpenGLWindow?1(QOpenGLWindow.UpdateBehavior updateBehavior=QOpenGLWindow.NoPartialUpdate, QWindow parent=None)
 PyQt5.QtGui.QOpenGLWindow.__init__?1(self, QOpenGLWindow.UpdateBehavior updateBehavior=QOpenGLWindow.NoPartialUpdate, QWindow parent=None)
+PyQt5.QtGui.QOpenGLWindow?1(QOpenGLContext, QOpenGLWindow.UpdateBehavior updateBehavior=QOpenGLWindow.NoPartialUpdate, QWindow parent=None)
+PyQt5.QtGui.QOpenGLWindow.__init__?1(self, QOpenGLContext, QOpenGLWindow.UpdateBehavior updateBehavior=QOpenGLWindow.NoPartialUpdate, QWindow parent=None)
 PyQt5.QtGui.QOpenGLWindow.updateBehavior?4() -> QOpenGLWindow.UpdateBehavior
 PyQt5.QtGui.QOpenGLWindow.isValid?4() -> bool
 PyQt5.QtGui.QOpenGLWindow.makeCurrent?4()
@@ -9036,6 +9203,7 @@ PyQt5.QtGui.QOpenGLWindow.doneCurrent?4()
 PyQt5.QtGui.QOpenGLWindow.context?4() -> QOpenGLContext
 PyQt5.QtGui.QOpenGLWindow.defaultFramebufferObject?4() -> int
 PyQt5.QtGui.QOpenGLWindow.grabFramebuffer?4() -> QImage
+PyQt5.QtGui.QOpenGLWindow.shareContext?4() -> QOpenGLContext
 PyQt5.QtGui.QOpenGLWindow.frameSwapped?4()
 PyQt5.QtGui.QOpenGLWindow.initializeGL?4()
 PyQt5.QtGui.QOpenGLWindow.resizeGL?4(int, int)
@@ -10163,6 +10331,7 @@ PyQt5.QtGui.QPixelFormat.CMYK?10
 PyQt5.QtGui.QPixelFormat.HSL?10
 PyQt5.QtGui.QPixelFormat.HSV?10
 PyQt5.QtGui.QPixelFormat.YUV?10
+PyQt5.QtGui.QPixelFormat.Alpha?10
 PyQt5.QtGui.QPixelFormat?1()
 PyQt5.QtGui.QPixelFormat.__init__?1(self)
 PyQt5.QtGui.QPixelFormat?1(QPixelFormat.ColorModel, int, int, int, int, int, int, QPixelFormat.AlphaUsage, QPixelFormat.AlphaPosition, QPixelFormat.AlphaPremultiplied, QPixelFormat.TypeInterpretation, QPixelFormat.ByteOrder byteOrder=QPixelFormat.CurrentSystemEndian, int subEnum=0)
@@ -10342,6 +10511,20 @@ PyQt5.QtGui.QQuaternion.setVector?4(QVector3D)
 PyQt5.QtGui.QQuaternion.vector?4() -> QVector3D
 PyQt5.QtGui.QQuaternion.setVector?4(float, float, float)
 PyQt5.QtGui.QQuaternion.toVector4D?4() -> QVector4D
+PyQt5.QtGui.QQuaternion.getAxisAndAngle?4() -> (QVector3D, float)
+PyQt5.QtGui.QQuaternion.getEulerAngles?4() -> (float, float, float)
+PyQt5.QtGui.QQuaternion.fromEulerAngles?4(float, float, float) -> QQuaternion
+PyQt5.QtGui.QQuaternion.toRotationMatrix?4() -> QMatrix3x3
+PyQt5.QtGui.QQuaternion.fromRotationMatrix?4(QMatrix3x3) -> QQuaternion
+PyQt5.QtGui.QQuaternion.getAxes?4() -> (QVector3D, QVector3D, QVector3D)
+PyQt5.QtGui.QQuaternion.fromAxes?4(QVector3D, QVector3D, QVector3D) -> QQuaternion
+PyQt5.QtGui.QQuaternion.fromDirection?4(QVector3D, QVector3D) -> QQuaternion
+PyQt5.QtGui.QQuaternion.rotationTo?4(QVector3D, QVector3D) -> QQuaternion
+PyQt5.QtGui.QQuaternion.dotProduct?4(QQuaternion, QQuaternion) -> float
+PyQt5.QtGui.QQuaternion.inverted?4() -> QQuaternion
+PyQt5.QtGui.QQuaternion.conjugated?4() -> QQuaternion
+PyQt5.QtGui.QQuaternion.toEulerAngles?4() -> QVector3D
+PyQt5.QtGui.QQuaternion.fromEulerAngles?4(QVector3D) -> QQuaternion
 PyQt5.QtGui.QRasterWindow?1(QWindow parent=None)
 PyQt5.QtGui.QRasterWindow.__init__?1(self, QWindow parent=None)
 PyQt5.QtGui.QRasterWindow.metric?4(QPaintDevice.PaintDeviceMetric) -> int
@@ -10685,6 +10868,13 @@ PyQt5.QtGui.QStyleHints.useRtlExtensions?4() -> bool
 PyQt5.QtGui.QStyleHints.passwordMaskCharacter?4() -> str
 PyQt5.QtGui.QStyleHints.setFocusOnTouchRelease?4() -> bool
 PyQt5.QtGui.QStyleHints.mousePressAndHoldInterval?4() -> int
+PyQt5.QtGui.QStyleHints.tabFocusBehavior?4() -> Qt.TabFocusBehavior
+PyQt5.QtGui.QStyleHints.singleClickActivation?4() -> bool
+PyQt5.QtGui.QStyleHints.cursorFlashTimeChanged?4(int)
+PyQt5.QtGui.QStyleHints.keyboardInputIntervalChanged?4(int)
+PyQt5.QtGui.QStyleHints.mouseDoubleClickIntervalChanged?4(int)
+PyQt5.QtGui.QStyleHints.startDragDistanceChanged?4(int)
+PyQt5.QtGui.QStyleHints.startDragTimeChanged?4(int)
 PyQt5.QtGui.QSurfaceFormat.OpenGLContextProfile?10
 PyQt5.QtGui.QSurfaceFormat.NoProfile?10
 PyQt5.QtGui.QSurfaceFormat.CoreProfile?10
@@ -10703,6 +10893,7 @@ PyQt5.QtGui.QSurfaceFormat.FormatOption?10
 PyQt5.QtGui.QSurfaceFormat.StereoBuffers?10
 PyQt5.QtGui.QSurfaceFormat.DebugContext?10
 PyQt5.QtGui.QSurfaceFormat.DeprecatedFunctions?10
+PyQt5.QtGui.QSurfaceFormat.ResetNotification?10
 PyQt5.QtGui.QSurfaceFormat?1()
 PyQt5.QtGui.QSurfaceFormat.__init__?1(self)
 PyQt5.QtGui.QSurfaceFormat?1(QSurfaceFormat.FormatOptions)
@@ -10923,8 +11114,10 @@ PyQt5.QtGui.QTextDocument.toPlainText?4() -> str
 PyQt5.QtGui.QTextDocument.setPlainText?4(str)
 PyQt5.QtGui.QTextDocument.find?4(str, int position=0, QTextDocument.FindFlags options=0) -> QTextCursor
 PyQt5.QtGui.QTextDocument.find?4(QRegExp, int position=0, QTextDocument.FindFlags options=0) -> QTextCursor
+PyQt5.QtGui.QTextDocument.find?4(QRegularExpression, int position=0, QTextDocument.FindFlags options=0) -> QTextCursor
 PyQt5.QtGui.QTextDocument.find?4(str, QTextCursor, QTextDocument.FindFlags options=0) -> QTextCursor
 PyQt5.QtGui.QTextDocument.find?4(QRegExp, QTextCursor, QTextDocument.FindFlags options=0) -> QTextCursor
+PyQt5.QtGui.QTextDocument.find?4(QRegularExpression, QTextCursor, QTextDocument.FindFlags options=0) -> QTextCursor
 PyQt5.QtGui.QTextDocument.rootFrame?4() -> QTextFrame
 PyQt5.QtGui.QTextDocument.object?4(int) -> QTextObject
 PyQt5.QtGui.QTextDocument.objectForFormat?4(QTextFormat) -> QTextObject
@@ -11744,6 +11937,7 @@ PyQt5.QtGui.QTouchDevice.Pressure?10
 PyQt5.QtGui.QTouchDevice.Velocity?10
 PyQt5.QtGui.QTouchDevice.RawPositions?10
 PyQt5.QtGui.QTouchDevice.NormalizedPosition?10
+PyQt5.QtGui.QTouchDevice.MouseEmulation?10
 PyQt5.QtGui.QTouchDevice.DeviceType?10
 PyQt5.QtGui.QTouchDevice.TouchScreen?10
 PyQt5.QtGui.QTouchDevice.TouchPad?10
@@ -11950,6 +12144,8 @@ PyQt5.QtGui.QVector3D.setZ?4(float)
 PyQt5.QtGui.QVector3D.toPoint?4() -> QPoint
 PyQt5.QtGui.QVector3D.toPointF?4() -> QPointF
 PyQt5.QtGui.QVector3D.distanceToPoint?4(QVector3D) -> float
+PyQt5.QtGui.QVector3D.project?4(QMatrix4x4, QMatrix4x4, QRect) -> QVector3D
+PyQt5.QtGui.QVector3D.unproject?4(QMatrix4x4, QMatrix4x4, QRect) -> QVector3D
 PyQt5.QtGui.QVector4D?1()
 PyQt5.QtGui.QVector4D.__init__?1(self)
 PyQt5.QtGui.QVector4D?1(float, float, float, float)
@@ -12119,6 +12315,24 @@ PyQt5.QtMultimedia.QAbstractVideoBuffer.map?4(QAbstractVideoBuffer.MapMode) -> (
 PyQt5.QtMultimedia.QAbstractVideoBuffer.unmap?4()
 PyQt5.QtMultimedia.QAbstractVideoBuffer.handle?4() -> QVariant
 PyQt5.QtMultimedia.QAbstractVideoBuffer.release?4()
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlag?10
+PyQt5.QtMultimedia.QVideoFilterRunnable.LastInChain?10
+PyQt5.QtMultimedia.QVideoFilterRunnable?1()
+PyQt5.QtMultimedia.QVideoFilterRunnable.__init__?1(self)
+PyQt5.QtMultimedia.QVideoFilterRunnable?1(QVideoFilterRunnable)
+PyQt5.QtMultimedia.QVideoFilterRunnable.__init__?1(self, QVideoFilterRunnable)
+PyQt5.QtMultimedia.QVideoFilterRunnable.run?4(QVideoFrame, QVideoSurfaceFormat, QVideoFilterRunnable.RunFlags) -> QVideoFrame
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlags?1(QVideoFilterRunnable.RunFlags)
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlags.__init__?1(self, QVideoFilterRunnable.RunFlags)
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlags?1(int)
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlags.__init__?1(self, int)
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlags?1()
+PyQt5.QtMultimedia.QVideoFilterRunnable.RunFlags.__init__?1(self)
+PyQt5.QtMultimedia.QAbstractVideoFilter?1(QObject parent=None)
+PyQt5.QtMultimedia.QAbstractVideoFilter.__init__?1(self, QObject parent=None)
+PyQt5.QtMultimedia.QAbstractVideoFilter.isActive?4() -> bool
+PyQt5.QtMultimedia.QAbstractVideoFilter.createFilterRunnable?4() -> QVideoFilterRunnable
+PyQt5.QtMultimedia.QAbstractVideoFilter.activeChanged?4()
 PyQt5.QtMultimedia.QAbstractVideoSurface.Error?10
 PyQt5.QtMultimedia.QAbstractVideoSurface.NoError?10
 PyQt5.QtMultimedia.QAbstractVideoSurface.UnsupportedFormatError?10
@@ -12513,6 +12727,12 @@ PyQt5.QtMultimedia.QCamera.lockFailed?4()
 PyQt5.QtMultimedia.QCamera.lockStatusChanged?4(QCamera.LockStatus, QCamera.LockChangeReason)
 PyQt5.QtMultimedia.QCamera.lockStatusChanged?4(QCamera.LockType, QCamera.LockStatus, QCamera.LockChangeReason)
 PyQt5.QtMultimedia.QCamera.error?4(QCamera.Error)
+PyQt5.QtMultimedia.QCamera.viewfinderSettings?4() -> QCameraViewfinderSettings
+PyQt5.QtMultimedia.QCamera.setViewfinderSettings?4(QCameraViewfinderSettings)
+PyQt5.QtMultimedia.QCamera.supportedViewfinderSettings?4(QCameraViewfinderSettings settings=QCameraViewfinderSettings()) -> list-of-QCameraViewfinderSettings
+PyQt5.QtMultimedia.QCamera.supportedViewfinderResolutions?4(QCameraViewfinderSettings settings=QCameraViewfinderSettings()) -> list-of-QSize
+PyQt5.QtMultimedia.QCamera.supportedViewfinderFrameRateRanges?4(QCameraViewfinderSettings settings=QCameraViewfinderSettings()) -> list-of-QCamera.FrameRateRange
+PyQt5.QtMultimedia.QCamera.supportedViewfinderPixelFormats?4(QCameraViewfinderSettings settings=QCameraViewfinderSettings()) -> list-of-QVideoFrame.PixelFormat
 PyQt5.QtMultimedia.QCamera.CaptureModes?1(QCamera.CaptureModes)
 PyQt5.QtMultimedia.QCamera.CaptureModes.__init__?1(self, QCamera.CaptureModes)
 PyQt5.QtMultimedia.QCamera.CaptureModes?1(int)
@@ -12525,6 +12745,14 @@ PyQt5.QtMultimedia.QCamera.LockTypes?1(int)
 PyQt5.QtMultimedia.QCamera.LockTypes.__init__?1(self, int)
 PyQt5.QtMultimedia.QCamera.LockTypes?1()
 PyQt5.QtMultimedia.QCamera.LockTypes.__init__?1(self)
+PyQt5.QtMultimedia.QCamera.FrameRateRange.maximumFrameRate?7
+PyQt5.QtMultimedia.QCamera.FrameRateRange.minimumFrameRate?7
+PyQt5.QtMultimedia.QCamera.FrameRateRange?1(float, float)
+PyQt5.QtMultimedia.QCamera.FrameRateRange.__init__?1(self, float, float)
+PyQt5.QtMultimedia.QCamera.FrameRateRange?1()
+PyQt5.QtMultimedia.QCamera.FrameRateRange.__init__?1(self)
+PyQt5.QtMultimedia.QCamera.FrameRateRange?1(QCamera.FrameRateRange)
+PyQt5.QtMultimedia.QCamera.FrameRateRange.__init__?1(self, QCamera.FrameRateRange)
 PyQt5.QtMultimedia.QCameraExposure.MeteringMode?10
 PyQt5.QtMultimedia.QCameraExposure.MeteringMatrix?10
 PyQt5.QtMultimedia.QCameraExposure.MeteringAverage?10
@@ -12541,6 +12769,16 @@ PyQt5.QtMultimedia.QCameraExposure.ExposureSnow?10
 PyQt5.QtMultimedia.QCameraExposure.ExposureBeach?10
 PyQt5.QtMultimedia.QCameraExposure.ExposureLargeAperture?10
 PyQt5.QtMultimedia.QCameraExposure.ExposureSmallAperture?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureAction?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureLandscape?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureNightPortrait?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureTheatre?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureSunset?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureSteadyPhoto?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureFireworks?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureParty?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureCandlelight?10
+PyQt5.QtMultimedia.QCameraExposure.ExposureBarcode?10
 PyQt5.QtMultimedia.QCameraExposure.ExposureModeVendor?10
 PyQt5.QtMultimedia.QCameraExposure.FlashMode?10
 PyQt5.QtMultimedia.QCameraExposure.FlashAuto?10
@@ -12693,6 +12931,17 @@ PyQt5.QtMultimedia.QCameraImageCapture.CaptureDestinations?1(int)
 PyQt5.QtMultimedia.QCameraImageCapture.CaptureDestinations.__init__?1(self, int)
 PyQt5.QtMultimedia.QCameraImageCapture.CaptureDestinations?1()
 PyQt5.QtMultimedia.QCameraImageCapture.CaptureDestinations.__init__?1(self)
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilter?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterNone?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterGrayscale?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterNegative?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterSolarize?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterSepia?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterPosterize?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterWhiteboard?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterBlackboard?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterAqua?10
+PyQt5.QtMultimedia.QCameraImageProcessing.ColorFilterVendor?10
 PyQt5.QtMultimedia.QCameraImageProcessing.WhiteBalanceMode?10
 PyQt5.QtMultimedia.QCameraImageProcessing.WhiteBalanceAuto?10
 PyQt5.QtMultimedia.QCameraImageProcessing.WhiteBalanceManual?10
@@ -12718,6 +12967,9 @@ PyQt5.QtMultimedia.QCameraImageProcessing.sharpeningLevel?4() -> float
 PyQt5.QtMultimedia.QCameraImageProcessing.setSharpeningLevel?4(float)
 PyQt5.QtMultimedia.QCameraImageProcessing.denoisingLevel?4() -> float
 PyQt5.QtMultimedia.QCameraImageProcessing.setDenoisingLevel?4(float)
+PyQt5.QtMultimedia.QCameraImageProcessing.colorFilter?4() -> QCameraImageProcessing.ColorFilter
+PyQt5.QtMultimedia.QCameraImageProcessing.setColorFilter?4(QCameraImageProcessing.ColorFilter)
+PyQt5.QtMultimedia.QCameraImageProcessing.isColorFilterSupported?4(QCameraImageProcessing.ColorFilter) -> bool
 PyQt5.QtMultimedia.QCameraInfo?1(QByteArray name=QByteArray())
 PyQt5.QtMultimedia.QCameraInfo.__init__?1(self, QByteArray name=QByteArray())
 PyQt5.QtMultimedia.QCameraInfo?1(QCamera)
@@ -12731,6 +12983,24 @@ PyQt5.QtMultimedia.QCameraInfo.position?4() -> QCamera.Position
 PyQt5.QtMultimedia.QCameraInfo.orientation?4() -> int
 PyQt5.QtMultimedia.QCameraInfo.defaultCamera?4() -> QCameraInfo
 PyQt5.QtMultimedia.QCameraInfo.availableCameras?4(QCamera.Position position=QCamera.UnspecifiedPosition) -> list-of-QCameraInfo
+PyQt5.QtMultimedia.QCameraViewfinderSettings?1()
+PyQt5.QtMultimedia.QCameraViewfinderSettings.__init__?1(self)
+PyQt5.QtMultimedia.QCameraViewfinderSettings?1(QCameraViewfinderSettings)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.__init__?1(self, QCameraViewfinderSettings)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.swap?4(QCameraViewfinderSettings)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.isNull?4() -> bool
+PyQt5.QtMultimedia.QCameraViewfinderSettings.resolution?4() -> QSize
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setResolution?4(QSize)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setResolution?4(int, int)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.minimumFrameRate?4() -> float
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setMinimumFrameRate?4(float)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.maximumFrameRate?4() -> float
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setMaximumFrameRate?4(float)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.pixelFormat?4() -> QVideoFrame.PixelFormat
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setPixelFormat?4(QVideoFrame.PixelFormat)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.pixelAspectRatio?4() -> QSize
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setPixelAspectRatio?4(QSize)
+PyQt5.QtMultimedia.QCameraViewfinderSettings.setPixelAspectRatio?4(int, int)
 PyQt5.QtMultimedia.QMediaContent?1()
 PyQt5.QtMultimedia.QMediaContent.__init__?1(self)
 PyQt5.QtMultimedia.QMediaContent?1(QUrl)
@@ -13720,6 +13990,8 @@ PyQt5.QtNetwork.QDnsLookup?1(QObject parent=None)
 PyQt5.QtNetwork.QDnsLookup.__init__?1(self, QObject parent=None)
 PyQt5.QtNetwork.QDnsLookup?1(QDnsLookup.Type, str, QObject parent=None)
 PyQt5.QtNetwork.QDnsLookup.__init__?1(self, QDnsLookup.Type, str, QObject parent=None)
+PyQt5.QtNetwork.QDnsLookup?1(QDnsLookup.Type, str, QHostAddress, QObject parent=None)
+PyQt5.QtNetwork.QDnsLookup.__init__?1(self, QDnsLookup.Type, str, QHostAddress, QObject parent=None)
 PyQt5.QtNetwork.QDnsLookup.error?4() -> QDnsLookup.Error
 PyQt5.QtNetwork.QDnsLookup.errorString?4() -> str
 PyQt5.QtNetwork.QDnsLookup.isFinished?4() -> bool
@@ -13934,6 +14206,7 @@ PyQt5.QtNetwork.QNetworkAccessManager.finished?4(QNetworkReply)
 PyQt5.QtNetwork.QNetworkAccessManager.encrypted?4(QNetworkReply)
 PyQt5.QtNetwork.QNetworkAccessManager.sslErrors?4(QNetworkReply, list-of-QSslError)
 PyQt5.QtNetwork.QNetworkAccessManager.networkAccessibleChanged?4(QNetworkAccessManager.NetworkAccessibility)
+PyQt5.QtNetwork.QNetworkAccessManager.preSharedKeyAuthenticationRequired?4(QNetworkReply, QSslPreSharedKeyAuthenticator)
 PyQt5.QtNetwork.QNetworkAccessManager.createRequest?4(QNetworkAccessManager.Operation, QNetworkRequest, QIODevice device=None) -> QNetworkReply
 PyQt5.QtNetwork.QNetworkAccessManager.proxyFactory?4() -> QNetworkProxyFactory
 PyQt5.QtNetwork.QNetworkAccessManager.setProxyFactory?4(QNetworkProxyFactory)
@@ -14277,6 +14550,7 @@ PyQt5.QtNetwork.QNetworkReply.error?4(QNetworkReply.NetworkError)
 PyQt5.QtNetwork.QNetworkReply.sslErrors?4(list-of-QSslError)
 PyQt5.QtNetwork.QNetworkReply.uploadProgress?4(int, int)
 PyQt5.QtNetwork.QNetworkReply.downloadProgress?4(int, int)
+PyQt5.QtNetwork.QNetworkReply.preSharedKeyAuthenticationRequired?4(QSslPreSharedKeyAuthenticator)
 PyQt5.QtNetwork.QNetworkReply.writeData?4(str) -> int
 PyQt5.QtNetwork.QNetworkReply.setOperation?4(QNetworkAccessManager.Operation)
 PyQt5.QtNetwork.QNetworkReply.setRequest?4(QNetworkRequest)
@@ -14323,6 +14597,7 @@ PyQt5.QtNetwork.QNetworkRequest.CookieSaveControlAttribute?10
 PyQt5.QtNetwork.QNetworkRequest.BackgroundRequestAttribute?10
 PyQt5.QtNetwork.QNetworkRequest.SpdyAllowedAttribute?10
 PyQt5.QtNetwork.QNetworkRequest.SpdyWasUsedAttribute?10
+PyQt5.QtNetwork.QNetworkRequest.EmitAllUploadProgressSignalsAttribute?10
 PyQt5.QtNetwork.QNetworkRequest.User?10
 PyQt5.QtNetwork.QNetworkRequest.UserMax?10
 PyQt5.QtNetwork.QNetworkRequest.KnownHeaders?10
@@ -14423,8 +14698,11 @@ PyQt5.QtNetwork.QSsl.UnknownProtocol?10
 PyQt5.QtNetwork.QSsl.SslV3?10
 PyQt5.QtNetwork.QSsl.SslV2?10
 PyQt5.QtNetwork.QSsl.TlsV1_0?10
+PyQt5.QtNetwork.QSsl.TlsV1_0OrLater?10
 PyQt5.QtNetwork.QSsl.TlsV1_1?10
+PyQt5.QtNetwork.QSsl.TlsV1_1OrLater?10
 PyQt5.QtNetwork.QSsl.TlsV1_2?10
+PyQt5.QtNetwork.QSsl.TlsV1_2OrLater?10
 PyQt5.QtNetwork.QSsl.AnyProtocol?10
 PyQt5.QtNetwork.QSsl.TlsV1SslV3?10
 PyQt5.QtNetwork.QSsl.SecureProtocols?10
@@ -14435,6 +14713,7 @@ PyQt5.QtNetwork.QSsl.KeyAlgorithm?10
 PyQt5.QtNetwork.QSsl.Opaque?10
 PyQt5.QtNetwork.QSsl.Rsa?10
 PyQt5.QtNetwork.QSsl.Dsa?10
+PyQt5.QtNetwork.QSsl.Ec?10
 PyQt5.QtNetwork.QSsl.EncodingFormat?10
 PyQt5.QtNetwork.QSsl.Pem?10
 PyQt5.QtNetwork.QSsl.Der?10
@@ -14544,6 +14823,11 @@ PyQt5.QtNetwork.QSslConfiguration.allowedNextProtocols?4() -> list-of-QByteArray
 PyQt5.QtNetwork.QSslConfiguration.nextNegotiatedProtocol?4() -> QByteArray
 PyQt5.QtNetwork.QSslConfiguration.nextProtocolNegotiationStatus?4() -> QSslConfiguration.NextProtocolNegotiationStatus
 PyQt5.QtNetwork.QSslConfiguration.sessionProtocol?4() -> QSsl.SslProtocol
+PyQt5.QtNetwork.QSslConfiguration.supportedCiphers?4() -> list-of-QSslCipher
+PyQt5.QtNetwork.QSslConfiguration.systemCaCertificates?4() -> list-of-QSslCertificate
+PyQt5.QtNetwork.QSslConfiguration.ellipticCurves?4() -> list-of-QSslEllipticCurve
+PyQt5.QtNetwork.QSslConfiguration.setEllipticCurves?4(list-of-QSslEllipticCurve)
+PyQt5.QtNetwork.QSslConfiguration.supportedEllipticCurves?4() -> list-of-QSslEllipticCurve
 PyQt5.QtNetwork.QSslCipher?1()
 PyQt5.QtNetwork.QSslCipher.__init__?1(self)
 PyQt5.QtNetwork.QSslCipher?1(str)
@@ -14562,6 +14846,16 @@ PyQt5.QtNetwork.QSslCipher.encryptionMethod?4() -> str
 PyQt5.QtNetwork.QSslCipher.protocolString?4() -> str
 PyQt5.QtNetwork.QSslCipher.protocol?4() -> QSsl.SslProtocol
 PyQt5.QtNetwork.QSslCipher.swap?4(QSslCipher)
+PyQt5.QtNetwork.QSslEllipticCurve?1()
+PyQt5.QtNetwork.QSslEllipticCurve.__init__?1(self)
+PyQt5.QtNetwork.QSslEllipticCurve?1(QSslEllipticCurve)
+PyQt5.QtNetwork.QSslEllipticCurve.__init__?1(self, QSslEllipticCurve)
+PyQt5.QtNetwork.QSslEllipticCurve.fromShortName?4(str) -> QSslEllipticCurve
+PyQt5.QtNetwork.QSslEllipticCurve.fromLongName?4(str) -> QSslEllipticCurve
+PyQt5.QtNetwork.QSslEllipticCurve.shortName?4() -> str
+PyQt5.QtNetwork.QSslEllipticCurve.longName?4() -> str
+PyQt5.QtNetwork.QSslEllipticCurve.isValid?4() -> bool
+PyQt5.QtNetwork.QSslEllipticCurve.isTlsNamedCurve?4() -> bool
 PyQt5.QtNetwork.QSslError.SslError?10
 PyQt5.QtNetwork.QSslError.UnspecifiedError?10
 PyQt5.QtNetwork.QSslError.NoError?10
@@ -14620,6 +14914,18 @@ PyQt5.QtNetwork.QSslKey.toPem?4(QByteArray passPhrase=QByteArray()) -> QByteArra
 PyQt5.QtNetwork.QSslKey.toDer?4(QByteArray passPhrase=QByteArray()) -> QByteArray
 PyQt5.QtNetwork.QSslKey.handle?4() -> sip.voidptr
 PyQt5.QtNetwork.QSslKey.swap?4(QSslKey)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator?1()
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.__init__?1(self)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator?1(QSslPreSharedKeyAuthenticator)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.__init__?1(self, QSslPreSharedKeyAuthenticator)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.swap?4(QSslPreSharedKeyAuthenticator)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.identityHint?4() -> QByteArray
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.setIdentity?4(QByteArray)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.identity?4() -> QByteArray
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.maximumIdentityLength?4() -> int
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.setPreSharedKey?4(QByteArray)
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.preSharedKey?4() -> QByteArray
+PyQt5.QtNetwork.QSslPreSharedKeyAuthenticator.maximumPreSharedKeyLength?4() -> int
 PyQt5.QtNetwork.QTcpSocket?1(QObject parent=None)
 PyQt5.QtNetwork.QTcpSocket.__init__?1(self, QObject parent=None)
 PyQt5.QtNetwork.QSslSocket.PeerVerifyMode?10
@@ -14686,6 +14992,7 @@ PyQt5.QtNetwork.QSslSocket.ignoreSslErrors?4()
 PyQt5.QtNetwork.QSslSocket.encrypted?4()
 PyQt5.QtNetwork.QSslSocket.sslErrors?4(list-of-QSslError)
 PyQt5.QtNetwork.QSslSocket.modeChanged?4(QSslSocket.SslMode)
+PyQt5.QtNetwork.QSslSocket.preSharedKeyAuthenticationRequired?4(QSslPreSharedKeyAuthenticator)
 PyQt5.QtNetwork.QSslSocket.readData?4(int) -> bytes
 PyQt5.QtNetwork.QSslSocket.writeData?4(str) -> int
 PyQt5.QtNetwork.QSslSocket.peerVerifyMode?4() -> QSslSocket.PeerVerifyMode
@@ -15271,6 +15578,7 @@ PyQt5.QtPrintSupport.QPrintPreviewWidget.updatePreview?4()
 PyQt5.QtPrintSupport.QPrintPreviewWidget.paintRequested?4(QPrinter)
 PyQt5.QtPrintSupport.QPrintPreviewWidget.previewChanged?4()
 PyQt5.QtPrintSupport.QPrintPreviewWidget.pageCount?4() -> int
+PyQt5.QtQml.qjsEngine?4(QObject) -> QJSEngine
 PyQt5.QtQml.qmlAttachedPropertiesObject?4(type, QObject, bool create=True) -> QObject
 PyQt5.QtQml.qmlRegisterRevision?4(type, int, str, int, int, type attachedProperties=0) -> int
 PyQt5.QtQml.qmlRegisterSingletonType?4(QUrl, str, int, int, str) -> int
@@ -15927,6 +16235,7 @@ PyQt5.QtQuick.QQuickRenderControl.sync?4() -> bool
 PyQt5.QtQuick.QQuickRenderControl.grab?4() -> QImage
 PyQt5.QtQuick.QQuickRenderControl.renderWindowFor?4(QQuickWindow, QPoint offset=None) -> QWindow
 PyQt5.QtQuick.QQuickRenderControl.renderWindow?4(QPoint) -> QWindow
+PyQt5.QtQuick.QQuickRenderControl.prepareThread?4(QThread)
 PyQt5.QtQuick.QQuickRenderControl.renderRequested?4()
 PyQt5.QtQuick.QQuickRenderControl.sceneChanged?4()
 PyQt5.QtQuick.QQuickTextDocument?1(QQuickItem)
@@ -16005,6 +16314,7 @@ PyQt5.QtQuick.QQuickWindow.sceneGraphAboutToStop?4()
 PyQt5.QtQuick.QQuickWindow.sceneGraphError?4(QQuickWindow.SceneGraphError, str)
 PyQt5.QtQuick.QQuickWindow.scheduleRenderJob?4(QRunnable, QQuickWindow.RenderStage)
 PyQt5.QtQuick.QQuickWindow.effectiveDevicePixelRatio?4() -> float
+PyQt5.QtQuick.QQuickWindow.isSceneGraphInitialized?4() -> bool
 PyQt5.QtQuick.QQuickView.Status?10
 PyQt5.QtQuick.QQuickView.Null?10
 PyQt5.QtQuick.QQuickView.Ready?10
@@ -16345,6 +16655,9 @@ PyQt5.QtQuick.QSGSimpleTextureNode.setTextureCoordinatesTransform?4(QSGSimpleTex
 PyQt5.QtQuick.QSGSimpleTextureNode.textureCoordinatesTransform?4() -> QSGSimpleTextureNode.TextureCoordinatesTransformMode
 PyQt5.QtQuick.QSGSimpleTextureNode.setOwnsTexture?4(bool)
 PyQt5.QtQuick.QSGSimpleTextureNode.ownsTexture?4() -> bool
+PyQt5.QtQuick.QSGSimpleTextureNode.setSourceRect?4(QRectF)
+PyQt5.QtQuick.QSGSimpleTextureNode.setSourceRect?4(float, float, float, float)
+PyQt5.QtQuick.QSGSimpleTextureNode.sourceRect?4() -> QRectF
 PyQt5.QtQuick.QSGSimpleTextureNode.TextureCoordinatesTransformMode?1(QSGSimpleTextureNode.TextureCoordinatesTransformMode)
 PyQt5.QtQuick.QSGSimpleTextureNode.TextureCoordinatesTransformMode.__init__?1(self, QSGSimpleTextureNode.TextureCoordinatesTransformMode)
 PyQt5.QtQuick.QSGSimpleTextureNode.TextureCoordinatesTransformMode?1(int)
@@ -17372,6 +17685,7 @@ PyQt5.QtWebKitWidgets.QWebHitTestResult.enclosingBlockElement?4() -> QWebElement
 PyQt5.QtWebKitWidgets.QWebHitTestResult.linkElement?4() -> QWebElement
 PyQt5.QtWebKitWidgets.QWebHitTestResult.element?4() -> QWebElement
 PyQt5.QtWebKitWidgets.QWebHitTestResult.mediaUrl?4() -> QUrl
+PyQt5.QtWebKitWidgets.QWebHitTestResult.linkTitleString?4() -> str
 PyQt5.QtWebKitWidgets.QWebFrame.RenderLayer?10
 PyQt5.QtWebKitWidgets.QWebFrame.ContentsLayer?10
 PyQt5.QtWebKitWidgets.QWebFrame.ScrollBarLayer?10
@@ -17777,6 +18091,7 @@ PyQt5.QtWebKitWidgets.QWebView.setRenderHints?4(QPainter.RenderHints)
 PyQt5.QtWebKitWidgets.QWebView.setRenderHint?4(QPainter.RenderHint, bool enabled=True)
 PyQt5.QtWebKitWidgets.QWebView.hasSelection?4() -> bool
 PyQt5.QtWebKitWidgets.QWebView.selectedHtml?4() -> str
+PyQt5.QtWidgets.QWIDGETSIZE_MAX?7
 PyQt5.QtWidgets.qApp?7
 PyQt5.QtWidgets.qDrawShadeLine?4(QPainter, int, int, int, int, QPalette, bool sunken=True, int lineWidth=1, int midLineWidth=0)
 PyQt5.QtWidgets.qDrawShadeLine?4(QPainter, QPoint, QPoint, QPalette, bool sunken=True, int lineWidth=1, int midLineWidth=0)
@@ -18176,6 +18491,7 @@ PyQt5.QtWidgets.QFrame.event?4(QEvent) -> bool
 PyQt5.QtWidgets.QFrame.paintEvent?4(QPaintEvent)
 PyQt5.QtWidgets.QFrame.changeEvent?4(QEvent)
 PyQt5.QtWidgets.QFrame.drawFrame?4(QPainter)
+PyQt5.QtWidgets.QFrame.initStyleOption?4(QStyleOptionFrame)
 PyQt5.QtWidgets.QAbstractScrollArea.SizeAdjustPolicy?10
 PyQt5.QtWidgets.QAbstractScrollArea.AdjustIgnored?10
 PyQt5.QtWidgets.QAbstractScrollArea.AdjustToContentsOnFirstShow?10
@@ -18193,6 +18509,9 @@ PyQt5.QtWidgets.QAbstractScrollArea.maximumViewportSize?4() -> QSize
 PyQt5.QtWidgets.QAbstractScrollArea.minimumSizeHint?4() -> QSize
 PyQt5.QtWidgets.QAbstractScrollArea.sizeHint?4() -> QSize
 PyQt5.QtWidgets.QAbstractScrollArea.setViewportMargins?4(int, int, int, int)
+PyQt5.QtWidgets.QAbstractScrollArea.setViewportMargins?4(QMargins)
+PyQt5.QtWidgets.QAbstractScrollArea.viewportMargins?4() -> QMargins
+PyQt5.QtWidgets.QAbstractScrollArea.viewportSizeHint?4() -> QSize
 PyQt5.QtWidgets.QAbstractScrollArea.event?4(QEvent) -> bool
 PyQt5.QtWidgets.QAbstractScrollArea.viewportEvent?4(QEvent) -> bool
 PyQt5.QtWidgets.QAbstractScrollArea.resizeEvent?4(QResizeEvent)
@@ -18218,7 +18537,6 @@ PyQt5.QtWidgets.QAbstractScrollArea.addScrollBarWidget?4(QWidget, Qt.Alignment)
 PyQt5.QtWidgets.QAbstractScrollArea.scrollBarWidgets?4(Qt.Alignment) -> list-of-QWidget
 PyQt5.QtWidgets.QAbstractScrollArea.setViewport?4(QWidget)
 PyQt5.QtWidgets.QAbstractScrollArea.setupViewport?4(QWidget)
-PyQt5.QtWidgets.QAbstractScrollArea.setViewportMargins?4(QMargins)
 PyQt5.QtWidgets.QAbstractScrollArea.sizeAdjustPolicy?4() -> QAbstractScrollArea.SizeAdjustPolicy
 PyQt5.QtWidgets.QAbstractScrollArea.setSizeAdjustPolicy?4(QAbstractScrollArea.SizeAdjustPolicy)
 PyQt5.QtWidgets.QAbstractItemView.DropIndicatorPosition?10
@@ -18349,6 +18667,7 @@ PyQt5.QtWidgets.QAbstractItemView.doubleClicked?4(QModelIndex)
 PyQt5.QtWidgets.QAbstractItemView.activated?4(QModelIndex)
 PyQt5.QtWidgets.QAbstractItemView.entered?4(QModelIndex)
 PyQt5.QtWidgets.QAbstractItemView.viewportEntered?4()
+PyQt5.QtWidgets.QAbstractItemView.iconSizeChanged?4(QSize)
 PyQt5.QtWidgets.QAbstractItemView.moveCursor?4(QAbstractItemView.CursorAction, Qt.KeyboardModifiers) -> QModelIndex
 PyQt5.QtWidgets.QAbstractItemView.horizontalOffset?4() -> int
 PyQt5.QtWidgets.QAbstractItemView.verticalOffset?4() -> int
@@ -19344,6 +19663,12 @@ PyQt5.QtWidgets.QStyle.SH_Widget_Animate?10
 PyQt5.QtWidgets.QStyle.SH_Splitter_OpaqueResize?10
 PyQt5.QtWidgets.QStyle.SH_LineEdit_PasswordMaskDelay?10
 PyQt5.QtWidgets.QStyle.SH_TabBar_ChangeCurrentDelay?10
+PyQt5.QtWidgets.QStyle.SH_Menu_SubMenuUniDirection?10
+PyQt5.QtWidgets.QStyle.SH_Menu_SubMenuUniDirectionFailCount?10
+PyQt5.QtWidgets.QStyle.SH_Menu_SubMenuSloppySelectOtherActions?10
+PyQt5.QtWidgets.QStyle.SH_Menu_SubMenuSloppyCloseTimeout?10
+PyQt5.QtWidgets.QStyle.SH_Menu_SubMenuResetWhenReenteringParent?10
+PyQt5.QtWidgets.QStyle.SH_Menu_SubMenuDontStartSloppyOnLeave?10
 PyQt5.QtWidgets.QStyle.SH_CustomBase?10
 PyQt5.QtWidgets.QStyle.ContentsType?10
 PyQt5.QtWidgets.QStyle.CT_PushButton?10
@@ -19465,6 +19790,8 @@ PyQt5.QtWidgets.QStyle.PM_ScrollView_ScrollBarSpacing?10
 PyQt5.QtWidgets.QStyle.PM_SubMenuOverlap?10
 PyQt5.QtWidgets.QStyle.PM_ScrollView_ScrollBarOverlap?10
 PyQt5.QtWidgets.QStyle.PM_TreeViewIndentation?10
+PyQt5.QtWidgets.QStyle.PM_HeaderDefaultSectionSizeHorizontal?10
+PyQt5.QtWidgets.QStyle.PM_HeaderDefaultSectionSizeVertical?10
 PyQt5.QtWidgets.QStyle.PM_CustomBase?10
 PyQt5.QtWidgets.QStyle.SubControl?10
 PyQt5.QtWidgets.QStyle.SC_None?10
@@ -21523,6 +21850,7 @@ PyQt5.QtWidgets.QGraphicsScene.invalidate?4(float, float, float, float, QGraphic
 PyQt5.QtWidgets.QGraphicsScene.minimumRenderSize?4() -> float
 PyQt5.QtWidgets.QGraphicsScene.setMinimumRenderSize?4(float)
 PyQt5.QtWidgets.QGraphicsScene.focusItemChanged?4(QGraphicsItem, QGraphicsItem, Qt.FocusReason)
+PyQt5.QtWidgets.QGraphicsScene.setSelectionArea?4(QPainterPath, Qt.ItemSelectionOperation, Qt.ItemSelectionMode mode=Qt.IntersectsItemShape, QTransform deviceTransform=QTransform())
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers?1(QGraphicsScene.SceneLayers)
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers.__init__?1(self, QGraphicsScene.SceneLayers)
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers?1(int)
@@ -21530,7 +21858,6 @@ PyQt5.QtWidgets.QGraphicsScene.SceneLayers.__init__?1(self, int)
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers?1()
 PyQt5.QtWidgets.QGraphicsScene.SceneLayers.__init__?1(self)
 PyQt5.QtWidgets.QGraphicsSceneEvent.widget?4() -> QWidget
-PyQt5.QtWidgets.QGraphicsSceneEvent.setWidget?4(QWidget)
 PyQt5.QtWidgets.QGraphicsSceneMouseEvent.pos?4() -> QPointF
 PyQt5.QtWidgets.QGraphicsSceneMouseEvent.scenePos?4() -> QPointF
 PyQt5.QtWidgets.QGraphicsSceneMouseEvent.screenPos?4() -> QPoint
@@ -21949,6 +22276,7 @@ PyQt5.QtWidgets.QHeaderView.setResizeContentsPrecision?4(int)
 PyQt5.QtWidgets.QHeaderView.resizeContentsPrecision?4() -> int
 PyQt5.QtWidgets.QHeaderView.maximumSectionSize?4() -> int
 PyQt5.QtWidgets.QHeaderView.setMaximumSectionSize?4(int)
+PyQt5.QtWidgets.QHeaderView.resetDefaultSectionSize?4()
 PyQt5.QtWidgets.QInputDialog.InputMode?10
 PyQt5.QtWidgets.QInputDialog.TextInput?10
 PyQt5.QtWidgets.QInputDialog.IntInput?10
@@ -22143,6 +22471,7 @@ PyQt5.QtWidgets.QSpacerItem.isEmpty?4() -> bool
 PyQt5.QtWidgets.QSpacerItem.setGeometry?4(QRect)
 PyQt5.QtWidgets.QSpacerItem.geometry?4() -> QRect
 PyQt5.QtWidgets.QSpacerItem.spacerItem?4() -> QSpacerItem
+PyQt5.QtWidgets.QSpacerItem.sizePolicy?4() -> QSizePolicy
 PyQt5.QtWidgets.QWidgetItem?1(QWidget)
 PyQt5.QtWidgets.QWidgetItem.__init__?1(self, QWidget)
 PyQt5.QtWidgets.QWidgetItem.sizeHint?4() -> QSize
@@ -22884,6 +23213,9 @@ PyQt5.QtWidgets.QMouseEventTransition.hitTestPath?4() -> QPainterPath
 PyQt5.QtWidgets.QMouseEventTransition.setHitTestPath?4(QPainterPath)
 PyQt5.QtWidgets.QMouseEventTransition.onTransition?4(QEvent)
 PyQt5.QtWidgets.QMouseEventTransition.eventTest?4(QEvent) -> bool
+PyQt5.QtWidgets.QOpenGLWidget.UpdateBehavior?10
+PyQt5.QtWidgets.QOpenGLWidget.NoPartialUpdate?10
+PyQt5.QtWidgets.QOpenGLWidget.PartialUpdate?10
 PyQt5.QtWidgets.QOpenGLWidget?1(QWidget parent=None, Qt.WindowFlags flags=0)
 PyQt5.QtWidgets.QOpenGLWidget.__init__?1(self, QWidget parent=None, Qt.WindowFlags flags=0)
 PyQt5.QtWidgets.QOpenGLWidget.setFormat?4(QSurfaceFormat)
@@ -22906,6 +23238,8 @@ PyQt5.QtWidgets.QOpenGLWidget.resizeEvent?4(QResizeEvent)
 PyQt5.QtWidgets.QOpenGLWidget.event?4(QEvent) -> bool
 PyQt5.QtWidgets.QOpenGLWidget.metric?4(QPaintDevice.PaintDeviceMetric) -> int
 PyQt5.QtWidgets.QOpenGLWidget.paintEngine?4() -> QPaintEngine
+PyQt5.QtWidgets.QOpenGLWidget.setUpdateBehavior?4(QOpenGLWidget.UpdateBehavior)
+PyQt5.QtWidgets.QOpenGLWidget.updateBehavior?4() -> QOpenGLWidget.UpdateBehavior
 PyQt5.QtWidgets.QPlainTextEdit.LineWrapMode?10
 PyQt5.QtWidgets.QPlainTextEdit.NoWrap?10
 PyQt5.QtWidgets.QPlainTextEdit.WidgetWidth?10
@@ -22945,6 +23279,7 @@ PyQt5.QtWidgets.QPlainTextEdit.toPlainText?4() -> str
 PyQt5.QtWidgets.QPlainTextEdit.ensureCursorVisible?4()
 PyQt5.QtWidgets.QPlainTextEdit.loadResource?4(int, QUrl) -> QVariant
 PyQt5.QtWidgets.QPlainTextEdit.createStandardContextMenu?4() -> QMenu
+PyQt5.QtWidgets.QPlainTextEdit.createStandardContextMenu?4(QPoint) -> QMenu
 PyQt5.QtWidgets.QPlainTextEdit.cursorForPosition?4(QPoint) -> QTextCursor
 PyQt5.QtWidgets.QPlainTextEdit.cursorRect?4(QTextCursor) -> QRect
 PyQt5.QtWidgets.QPlainTextEdit.cursorRect?4() -> QRect
@@ -23100,6 +23435,36 @@ PyQt5.QtWidgets.QProgressDialog.showEvent?4(QShowEvent)
 PyQt5.QtWidgets.QProgressDialog.forceShow?4()
 PyQt5.QtWidgets.QProgressDialog.open?4()
 PyQt5.QtWidgets.QProgressDialog.open?4(slot)
+PyQt5.QtWidgets.QProxyStyle?1(QStyle style=None)
+PyQt5.QtWidgets.QProxyStyle.__init__?1(self, QStyle style=None)
+PyQt5.QtWidgets.QProxyStyle?1(str)
+PyQt5.QtWidgets.QProxyStyle.__init__?1(self, str)
+PyQt5.QtWidgets.QProxyStyle.baseStyle?4() -> QStyle
+PyQt5.QtWidgets.QProxyStyle.setBaseStyle?4(QStyle)
+PyQt5.QtWidgets.QProxyStyle.drawPrimitive?4(QStyle.PrimitiveElement, QStyleOption, QPainter, QWidget widget=None)
+PyQt5.QtWidgets.QProxyStyle.drawControl?4(QStyle.ControlElement, QStyleOption, QPainter, QWidget widget=None)
+PyQt5.QtWidgets.QProxyStyle.drawComplexControl?4(QStyle.ComplexControl, QStyleOptionComplex, QPainter, QWidget widget=None)
+PyQt5.QtWidgets.QProxyStyle.drawItemText?4(QPainter, QRect, int, QPalette, bool, str, QPalette.ColorRole textRole=QPalette.NoRole)
+PyQt5.QtWidgets.QProxyStyle.drawItemPixmap?4(QPainter, QRect, int, QPixmap)
+PyQt5.QtWidgets.QProxyStyle.sizeFromContents?4(QStyle.ContentsType, QStyleOption, QSize, QWidget) -> QSize
+PyQt5.QtWidgets.QProxyStyle.subElementRect?4(QStyle.SubElement, QStyleOption, QWidget) -> QRect
+PyQt5.QtWidgets.QProxyStyle.subControlRect?4(QStyle.ComplexControl, QStyleOptionComplex, QStyle.SubControl, QWidget) -> QRect
+PyQt5.QtWidgets.QProxyStyle.itemTextRect?4(QFontMetrics, QRect, int, bool, str) -> QRect
+PyQt5.QtWidgets.QProxyStyle.itemPixmapRect?4(QRect, int, QPixmap) -> QRect
+PyQt5.QtWidgets.QProxyStyle.hitTestComplexControl?4(QStyle.ComplexControl, QStyleOptionComplex, QPoint, QWidget widget=None) -> QStyle.SubControl
+PyQt5.QtWidgets.QProxyStyle.styleHint?4(QStyle.StyleHint, QStyleOption option=None, QWidget widget=None, QStyleHintReturn returnData=None) -> int
+PyQt5.QtWidgets.QProxyStyle.pixelMetric?4(QStyle.PixelMetric, QStyleOption option=None, QWidget widget=None) -> int
+PyQt5.QtWidgets.QProxyStyle.layoutSpacing?4(QSizePolicy.ControlType, QSizePolicy.ControlType, Qt.Orientation, QStyleOption option=None, QWidget widget=None) -> int
+PyQt5.QtWidgets.QProxyStyle.standardIcon?4(QStyle.StandardPixmap, QStyleOption option=None, QWidget widget=None) -> QIcon
+PyQt5.QtWidgets.QProxyStyle.standardPixmap?4(QStyle.StandardPixmap, QStyleOption, QWidget widget=None) -> QPixmap
+PyQt5.QtWidgets.QProxyStyle.generatedIconPixmap?4(QIcon.Mode, QPixmap, QStyleOption) -> QPixmap
+PyQt5.QtWidgets.QProxyStyle.standardPalette?4() -> QPalette
+PyQt5.QtWidgets.QProxyStyle.polish?4(QWidget)
+PyQt5.QtWidgets.QProxyStyle.polish?4(QPalette) -> QPalette
+PyQt5.QtWidgets.QProxyStyle.polish?4(QApplication)
+PyQt5.QtWidgets.QProxyStyle.unpolish?4(QWidget)
+PyQt5.QtWidgets.QProxyStyle.unpolish?4(QApplication)
+PyQt5.QtWidgets.QProxyStyle.event?4(QEvent) -> bool
 PyQt5.QtWidgets.QRadioButton?1(QWidget parent=None)
 PyQt5.QtWidgets.QRadioButton.__init__?1(self, QWidget parent=None)
 PyQt5.QtWidgets.QRadioButton?1(str, QWidget parent=None)
@@ -28194,6 +28559,8 @@ PyQt5.QtSerialPort.QSerialPort.readData?4(int) -> bytes
 PyQt5.QtSerialPort.QSerialPort.readLineData?4(int) -> bytes
 PyQt5.QtSerialPort.QSerialPort.writeData?4(str) -> int
 PyQt5.QtSerialPort.QSerialPort.handle?4() -> sip.voidptr
+PyQt5.QtSerialPort.QSerialPort.isBreakEnabled?4() -> bool
+PyQt5.QtSerialPort.QSerialPort.breakEnabledChanged?4(bool)
 PyQt5.QtSerialPort.QSerialPort.Directions?1(QSerialPort.Directions)
 PyQt5.QtSerialPort.QSerialPort.Directions.__init__?1(self, QSerialPort.Directions)
 PyQt5.QtSerialPort.QSerialPort.Directions?1(int)
@@ -28261,6 +28628,7 @@ PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.NoError?10
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.InputOutputError?10
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.PoweredOffError?10
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.InvalidBluetoothAdapterError?10
+PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.UnsupportedPlatformError?10
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.UnknownError?10
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent?1(QObject parent=None)
 PyQt5.QtBluetooth.QBluetoothDeviceDiscoveryAgent.__init__?1(self, QObject parent=None)
@@ -28398,6 +28766,8 @@ PyQt5.QtBluetooth.QBluetoothDeviceInfo?1()
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.__init__?1(self)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo?1(QBluetoothAddress, str, int)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.__init__?1(self, QBluetoothAddress, str, int)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo?1(QBluetoothUuid, str, int)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.__init__?1(self, QBluetoothUuid, str, int)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo?1(QBluetoothDeviceInfo)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.__init__?1(self, QBluetoothDeviceInfo)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.isValid?4() -> bool
@@ -28415,6 +28785,8 @@ PyQt5.QtBluetooth.QBluetoothDeviceInfo.serviceUuids?4() -> (list-of-QBluetoothUu
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.serviceUuidsCompleteness?4() -> QBluetoothDeviceInfo.DataCompleteness
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.setCoreConfigurations?4(QBluetoothDeviceInfo.CoreConfigurations)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.coreConfigurations?4() -> QBluetoothDeviceInfo.CoreConfigurations
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.setDeviceUuid?4(QBluetoothUuid)
+PyQt5.QtBluetooth.QBluetoothDeviceInfo.deviceUuid?4() -> QBluetoothUuid
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses?1(QBluetoothDeviceInfo.ServiceClasses)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses.__init__?1(self, QBluetoothDeviceInfo.ServiceClasses)
 PyQt5.QtBluetooth.QBluetoothDeviceInfo.ServiceClasses?1(int)
@@ -28682,6 +29054,9 @@ PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicAggregateFormat?10
 PyQt5.QtBluetooth.QBluetoothUuid.ValidRange?10
 PyQt5.QtBluetooth.QBluetoothUuid.ExternalReportReference?10
 PyQt5.QtBluetooth.QBluetoothUuid.ReportReference?10
+PyQt5.QtBluetooth.QBluetoothUuid.EnvironmentalSensingConfiguration?10
+PyQt5.QtBluetooth.QBluetoothUuid.EnvironmentalSensingMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.EnvironmentalSensingTriggerSetting?10
 PyQt5.QtBluetooth.QBluetoothUuid.CharacteristicType?10
 PyQt5.QtBluetooth.QBluetoothUuid.DeviceName?10
 PyQt5.QtBluetooth.QBluetoothUuid.Appearance?10
@@ -28764,6 +29139,62 @@ PyQt5.QtBluetooth.QBluetoothUuid.Navigation?10
 PyQt5.QtBluetooth.QBluetoothUuid.PositionQuality?10
 PyQt5.QtBluetooth.QBluetoothUuid.LNFeature?10
 PyQt5.QtBluetooth.QBluetoothUuid.LNControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.MagneticDeclination?10
+PyQt5.QtBluetooth.QBluetoothUuid.Elevation?10
+PyQt5.QtBluetooth.QBluetoothUuid.Pressure?10
+PyQt5.QtBluetooth.QBluetoothUuid.Temperature?10
+PyQt5.QtBluetooth.QBluetoothUuid.Humidity?10
+PyQt5.QtBluetooth.QBluetoothUuid.TrueWindSpeed?10
+PyQt5.QtBluetooth.QBluetoothUuid.TrueWindDirection?10
+PyQt5.QtBluetooth.QBluetoothUuid.ApparentWindSpeed?10
+PyQt5.QtBluetooth.QBluetoothUuid.ApparentWindDirection?10
+PyQt5.QtBluetooth.QBluetoothUuid.GustFactor?10
+PyQt5.QtBluetooth.QBluetoothUuid.PollenConcentration?10
+PyQt5.QtBluetooth.QBluetoothUuid.UVIndex?10
+PyQt5.QtBluetooth.QBluetoothUuid.Irradiance?10
+PyQt5.QtBluetooth.QBluetoothUuid.Rainfall?10
+PyQt5.QtBluetooth.QBluetoothUuid.WindChill?10
+PyQt5.QtBluetooth.QBluetoothUuid.HeatIndex?10
+PyQt5.QtBluetooth.QBluetoothUuid.DewPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.DescriptorValueChanged?10
+PyQt5.QtBluetooth.QBluetoothUuid.AerobicHeartRateLowerLimit?10
+PyQt5.QtBluetooth.QBluetoothUuid.AerobicThreshold?10
+PyQt5.QtBluetooth.QBluetoothUuid.Age?10
+PyQt5.QtBluetooth.QBluetoothUuid.AnaerobicHeartRateLowerLimit?10
+PyQt5.QtBluetooth.QBluetoothUuid.AnaerobicHeartRateUpperLimit?10
+PyQt5.QtBluetooth.QBluetoothUuid.AnaerobicThreshold?10
+PyQt5.QtBluetooth.QBluetoothUuid.AerobicHeartRateUpperLimit?10
+PyQt5.QtBluetooth.QBluetoothUuid.DateOfBirth?10
+PyQt5.QtBluetooth.QBluetoothUuid.DateOfThresholdAssessment?10
+PyQt5.QtBluetooth.QBluetoothUuid.EmailAddress?10
+PyQt5.QtBluetooth.QBluetoothUuid.FatBurnHeartRateLowerLimit?10
+PyQt5.QtBluetooth.QBluetoothUuid.FatBurnHeartRateUpperLimit?10
+PyQt5.QtBluetooth.QBluetoothUuid.FirstName?10
+PyQt5.QtBluetooth.QBluetoothUuid.FiveZoneHeartRateLimits?10
+PyQt5.QtBluetooth.QBluetoothUuid.Gender?10
+PyQt5.QtBluetooth.QBluetoothUuid.HeartRateMax?10
+PyQt5.QtBluetooth.QBluetoothUuid.Height?10
+PyQt5.QtBluetooth.QBluetoothUuid.HipCircumference?10
+PyQt5.QtBluetooth.QBluetoothUuid.LastName?10
+PyQt5.QtBluetooth.QBluetoothUuid.MaximumRecommendedHeartRate?10
+PyQt5.QtBluetooth.QBluetoothUuid.RestingHeartRate?10
+PyQt5.QtBluetooth.QBluetoothUuid.SportTypeForAerobicAnaerobicThresholds?10
+PyQt5.QtBluetooth.QBluetoothUuid.ThreeZoneHeartRateLimits?10
+PyQt5.QtBluetooth.QBluetoothUuid.TwoZoneHeartRateLimits?10
+PyQt5.QtBluetooth.QBluetoothUuid.VO2Max?10
+PyQt5.QtBluetooth.QBluetoothUuid.WaistCircumference?10
+PyQt5.QtBluetooth.QBluetoothUuid.Weight?10
+PyQt5.QtBluetooth.QBluetoothUuid.DatabaseChangeIncrement?10
+PyQt5.QtBluetooth.QBluetoothUuid.UserIndex?10
+PyQt5.QtBluetooth.QBluetoothUuid.BodyCompositionFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.BodyCompositionMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.WeightMeasurement?10
+PyQt5.QtBluetooth.QBluetoothUuid.WeightScaleFeature?10
+PyQt5.QtBluetooth.QBluetoothUuid.UserControlPoint?10
+PyQt5.QtBluetooth.QBluetoothUuid.MagneticFluxDensity2D?10
+PyQt5.QtBluetooth.QBluetoothUuid.MagneticFluxDensity3D?10
+PyQt5.QtBluetooth.QBluetoothUuid.Language?10
+PyQt5.QtBluetooth.QBluetoothUuid.BarometricPressureTrend?10
 PyQt5.QtBluetooth.QBluetoothUuid.ServiceClassUuid?10
 PyQt5.QtBluetooth.QBluetoothUuid.ServiceDiscoveryServer?10
 PyQt5.QtBluetooth.QBluetoothUuid.BrowseGroupDescriptor?10
@@ -28850,6 +29281,12 @@ PyQt5.QtBluetooth.QBluetoothUuid.RunningSpeedAndCadence?10
 PyQt5.QtBluetooth.QBluetoothUuid.CyclingSpeedAndCadence?10
 PyQt5.QtBluetooth.QBluetoothUuid.CyclingPower?10
 PyQt5.QtBluetooth.QBluetoothUuid.LocationAndNavigation?10
+PyQt5.QtBluetooth.QBluetoothUuid.EnvironmentalSensing?10
+PyQt5.QtBluetooth.QBluetoothUuid.BodyComposition?10
+PyQt5.QtBluetooth.QBluetoothUuid.UserData?10
+PyQt5.QtBluetooth.QBluetoothUuid.WeightScale?10
+PyQt5.QtBluetooth.QBluetoothUuid.BondManagement?10
+PyQt5.QtBluetooth.QBluetoothUuid.ContinuousGlucoseMonitoring?10
 PyQt5.QtBluetooth.QBluetoothUuid.ProtocolUuid?10
 PyQt5.QtBluetooth.QBluetoothUuid.Sdp?10
 PyQt5.QtBluetooth.QBluetoothUuid.Udp?10
@@ -28940,6 +29377,9 @@ PyQt5.QtBluetooth.QLowEnergyController.UnknownError?10
 PyQt5.QtBluetooth.QLowEnergyController.UnknownRemoteDeviceError?10
 PyQt5.QtBluetooth.QLowEnergyController.NetworkError?10
 PyQt5.QtBluetooth.QLowEnergyController.InvalidBluetoothAdapterError?10
+PyQt5.QtBluetooth.QLowEnergyController.ConnectionError?10
+PyQt5.QtBluetooth.QLowEnergyController?1(QBluetoothDeviceInfo, QObject parent=None)
+PyQt5.QtBluetooth.QLowEnergyController.__init__?1(self, QBluetoothDeviceInfo, QObject parent=None)
 PyQt5.QtBluetooth.QLowEnergyController?1(QBluetoothAddress, QObject parent=None)
 PyQt5.QtBluetooth.QLowEnergyController.__init__?1(self, QBluetoothAddress, QObject parent=None)
 PyQt5.QtBluetooth.QLowEnergyController?1(QBluetoothAddress, QBluetoothAddress, QObject parent=None)
@@ -28956,6 +29396,7 @@ PyQt5.QtBluetooth.QLowEnergyController.services?4() -> list-of-QBluetoothUuid
 PyQt5.QtBluetooth.QLowEnergyController.createServiceObject?4(QBluetoothUuid, QObject parent=None) -> QLowEnergyService
 PyQt5.QtBluetooth.QLowEnergyController.error?4() -> QLowEnergyController.Error
 PyQt5.QtBluetooth.QLowEnergyController.errorString?4() -> str
+PyQt5.QtBluetooth.QLowEnergyController.remoteName?4() -> str
 PyQt5.QtBluetooth.QLowEnergyController.connected?4()
 PyQt5.QtBluetooth.QLowEnergyController.disconnected?4()
 PyQt5.QtBluetooth.QLowEnergyController.stateChanged?4(QLowEnergyController.ControllerState)
@@ -28985,6 +29426,9 @@ PyQt5.QtBluetooth.QLowEnergyService.NoError?10
 PyQt5.QtBluetooth.QLowEnergyService.OperationError?10
 PyQt5.QtBluetooth.QLowEnergyService.CharacteristicWriteError?10
 PyQt5.QtBluetooth.QLowEnergyService.DescriptorWriteError?10
+PyQt5.QtBluetooth.QLowEnergyService.CharacteristicReadError?10
+PyQt5.QtBluetooth.QLowEnergyService.DescriptorReadError?10
+PyQt5.QtBluetooth.QLowEnergyService.UnknownError?10
 PyQt5.QtBluetooth.QLowEnergyService.ServiceType?10
 PyQt5.QtBluetooth.QLowEnergyService.PrimaryService?10
 PyQt5.QtBluetooth.QLowEnergyService.IncludedService?10
@@ -29006,6 +29450,10 @@ PyQt5.QtBluetooth.QLowEnergyService.characteristicChanged?4(QLowEnergyCharacteri
 PyQt5.QtBluetooth.QLowEnergyService.characteristicWritten?4(QLowEnergyCharacteristic, QByteArray)
 PyQt5.QtBluetooth.QLowEnergyService.descriptorWritten?4(QLowEnergyDescriptor, QByteArray)
 PyQt5.QtBluetooth.QLowEnergyService.error?4(QLowEnergyService.ServiceError)
+PyQt5.QtBluetooth.QLowEnergyService.readCharacteristic?4(QLowEnergyCharacteristic)
+PyQt5.QtBluetooth.QLowEnergyService.readDescriptor?4(QLowEnergyDescriptor)
+PyQt5.QtBluetooth.QLowEnergyService.characteristicRead?4(QLowEnergyCharacteristic, QByteArray)
+PyQt5.QtBluetooth.QLowEnergyService.descriptorRead?4(QLowEnergyDescriptor, QByteArray)
 PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes?1(QLowEnergyService.ServiceTypes)
 PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes.__init__?1(self, QLowEnergyService.ServiceTypes)
 PyQt5.QtBluetooth.QLowEnergyService.ServiceTypes?1(int)
@@ -29099,6 +29547,8 @@ PyQt5.QtPositioning.QGeoShape.isValid?4() -> bool
 PyQt5.QtPositioning.QGeoShape.isEmpty?4() -> bool
 PyQt5.QtPositioning.QGeoShape.contains?4(QGeoCoordinate) -> bool
 PyQt5.QtPositioning.QGeoShape.extendShape?4(QGeoCoordinate)
+PyQt5.QtPositioning.QGeoShape.center?4() -> QGeoCoordinate
+PyQt5.QtPositioning.QGeoShape.toString?4() -> str
 PyQt5.QtPositioning.QGeoCircle?1()
 PyQt5.QtPositioning.QGeoCircle.__init__?1(self)
 PyQt5.QtPositioning.QGeoCircle?1(QGeoCoordinate, float radius=-1)
@@ -29113,6 +29563,7 @@ PyQt5.QtPositioning.QGeoCircle.setRadius?4(float)
 PyQt5.QtPositioning.QGeoCircle.radius?4() -> float
 PyQt5.QtPositioning.QGeoCircle.translate?4(float, float)
 PyQt5.QtPositioning.QGeoCircle.translated?4(float, float) -> QGeoCircle
+PyQt5.QtPositioning.QGeoCircle.toString?4() -> str
 PyQt5.QtPositioning.QGeoCoordinate.CoordinateFormat?10
 PyQt5.QtPositioning.QGeoCoordinate.Degrees?10
 PyQt5.QtPositioning.QGeoCoordinate.DegreesWithHemisphere?10
@@ -29244,6 +29695,7 @@ PyQt5.QtPositioning.QGeoRectangle.intersects?4(QGeoRectangle) -> bool
 PyQt5.QtPositioning.QGeoRectangle.translate?4(float, float)
 PyQt5.QtPositioning.QGeoRectangle.translated?4(float, float) -> QGeoRectangle
 PyQt5.QtPositioning.QGeoRectangle.united?4(QGeoRectangle) -> QGeoRectangle
+PyQt5.QtPositioning.QGeoRectangle.toString?4() -> str
 PyQt5.QtPositioning.QGeoSatelliteInfo.SatelliteSystem?10
 PyQt5.QtPositioning.QGeoSatelliteInfo.Undefined?10
 PyQt5.QtPositioning.QGeoSatelliteInfo.GPS?10
@@ -29530,8 +29982,13 @@ PyQt5.QtQuickWidgets.QQuickWidget.wheelEvent?4(QWheelEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.event?4(QEvent) -> bool
 PyQt5.QtQuickWidgets.QQuickWidget.focusInEvent?4(QFocusEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.focusOutEvent?4(QFocusEvent)
+PyQt5.QtQuickWidgets.QQuickWidget.dragEnterEvent?4(QDragEnterEvent)
+PyQt5.QtQuickWidgets.QQuickWidget.dragMoveEvent?4(QDragMoveEvent)
+PyQt5.QtQuickWidgets.QQuickWidget.dragLeaveEvent?4(QDragLeaveEvent)
+PyQt5.QtQuickWidgets.QQuickWidget.dropEvent?4(QDropEvent)
 PyQt5.QtQuickWidgets.QQuickWidget.grabFramebuffer?4() -> QImage
 PyQt5.QtQuickWidgets.QQuickWidget.setClearColor?4(QColor)
+PyQt5.QtQuickWidgets.QQuickWidget.quickWindow?4() -> QQuickWindow
 PyQt5.QtWebSockets.QMaskGenerator?1(QObject parent=None)
 PyQt5.QtWebSockets.QMaskGenerator.__init__?1(self, QObject parent=None)
 PyQt5.QtWebSockets.QMaskGenerator.seed?4() -> bool
@@ -29754,3 +30211,773 @@ PyQt5.QtWebChannel.QWebChannelAbstractTransport?1(QObject parent=None)
 PyQt5.QtWebChannel.QWebChannelAbstractTransport.__init__?1(self, QObject parent=None)
 PyQt5.QtWebChannel.QWebChannelAbstractTransport.sendMessage?4(dict-of-str-QJsonValue)
 PyQt5.QtWebChannel.QWebChannelAbstractTransport.messageReceived?4(dict-of-str-QJsonValue, QWebChannelAbstractTransport)
+PyQt5.QtLocation.QGeoCodeReply.Error?10
+PyQt5.QtLocation.QGeoCodeReply.NoError?10
+PyQt5.QtLocation.QGeoCodeReply.EngineNotSetError?10
+PyQt5.QtLocation.QGeoCodeReply.CommunicationError?10
+PyQt5.QtLocation.QGeoCodeReply.ParseError?10
+PyQt5.QtLocation.QGeoCodeReply.UnsupportedOptionError?10
+PyQt5.QtLocation.QGeoCodeReply.CombinationError?10
+PyQt5.QtLocation.QGeoCodeReply.UnknownError?10
+PyQt5.QtLocation.QGeoCodeReply?1(QGeoCodeReply.Error, str, QObject parent=None)
+PyQt5.QtLocation.QGeoCodeReply.__init__?1(self, QGeoCodeReply.Error, str, QObject parent=None)
+PyQt5.QtLocation.QGeoCodeReply?1(QObject parent=None)
+PyQt5.QtLocation.QGeoCodeReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QGeoCodeReply.isFinished?4() -> bool
+PyQt5.QtLocation.QGeoCodeReply.error?4() -> QGeoCodeReply.Error
+PyQt5.QtLocation.QGeoCodeReply.errorString?4() -> str
+PyQt5.QtLocation.QGeoCodeReply.viewport?4() -> QGeoShape
+PyQt5.QtLocation.QGeoCodeReply.locations?4() -> list-of-QGeoLocation
+PyQt5.QtLocation.QGeoCodeReply.limit?4() -> int
+PyQt5.QtLocation.QGeoCodeReply.offset?4() -> int
+PyQt5.QtLocation.QGeoCodeReply.abort?4()
+PyQt5.QtLocation.QGeoCodeReply.finished?4()
+PyQt5.QtLocation.QGeoCodeReply.error?4(QGeoCodeReply.Error, str errorString=QString())
+PyQt5.QtLocation.QGeoCodeReply.setError?4(QGeoCodeReply.Error, str)
+PyQt5.QtLocation.QGeoCodeReply.setFinished?4(bool)
+PyQt5.QtLocation.QGeoCodeReply.setViewport?4(QGeoShape)
+PyQt5.QtLocation.QGeoCodeReply.addLocation?4(QGeoLocation)
+PyQt5.QtLocation.QGeoCodeReply.setLocations?4(list-of-QGeoLocation)
+PyQt5.QtLocation.QGeoCodeReply.setLimit?4(int)
+PyQt5.QtLocation.QGeoCodeReply.setOffset?4(int)
+PyQt5.QtLocation.QGeoCodingManager.managerName?4() -> str
+PyQt5.QtLocation.QGeoCodingManager.managerVersion?4() -> int
+PyQt5.QtLocation.QGeoCodingManager.geocode?4(QGeoAddress, QGeoShape bounds=QGeoShape()) -> QGeoCodeReply
+PyQt5.QtLocation.QGeoCodingManager.geocode?4(str, int limit=-1, int offset=0, QGeoShape bounds=QGeoShape()) -> QGeoCodeReply
+PyQt5.QtLocation.QGeoCodingManager.reverseGeocode?4(QGeoCoordinate, QGeoShape bounds=QGeoShape()) -> QGeoCodeReply
+PyQt5.QtLocation.QGeoCodingManager.setLocale?4(QLocale)
+PyQt5.QtLocation.QGeoCodingManager.locale?4() -> QLocale
+PyQt5.QtLocation.QGeoCodingManager.finished?4(QGeoCodeReply)
+PyQt5.QtLocation.QGeoCodingManager.error?4(QGeoCodeReply, QGeoCodeReply.Error, str errorString=QString())
+PyQt5.QtLocation.QGeoCodingManagerEngine?1(dict-of-str-object, QObject parent=None)
+PyQt5.QtLocation.QGeoCodingManagerEngine.__init__?1(self, dict-of-str-object, QObject parent=None)
+PyQt5.QtLocation.QGeoCodingManagerEngine.managerName?4() -> str
+PyQt5.QtLocation.QGeoCodingManagerEngine.managerVersion?4() -> int
+PyQt5.QtLocation.QGeoCodingManagerEngine.geocode?4(QGeoAddress, QGeoShape) -> QGeoCodeReply
+PyQt5.QtLocation.QGeoCodingManagerEngine.geocode?4(str, int, int, QGeoShape) -> QGeoCodeReply
+PyQt5.QtLocation.QGeoCodingManagerEngine.reverseGeocode?4(QGeoCoordinate, QGeoShape) -> QGeoCodeReply
+PyQt5.QtLocation.QGeoCodingManagerEngine.setLocale?4(QLocale)
+PyQt5.QtLocation.QGeoCodingManagerEngine.locale?4() -> QLocale
+PyQt5.QtLocation.QGeoCodingManagerEngine.finished?4(QGeoCodeReply)
+PyQt5.QtLocation.QGeoCodingManagerEngine.error?4(QGeoCodeReply, QGeoCodeReply.Error, str errorString=QString())
+PyQt5.QtLocation.QGeoManeuver.InstructionDirection?10
+PyQt5.QtLocation.QGeoManeuver.NoDirection?10
+PyQt5.QtLocation.QGeoManeuver.DirectionForward?10
+PyQt5.QtLocation.QGeoManeuver.DirectionBearRight?10
+PyQt5.QtLocation.QGeoManeuver.DirectionLightRight?10
+PyQt5.QtLocation.QGeoManeuver.DirectionRight?10
+PyQt5.QtLocation.QGeoManeuver.DirectionHardRight?10
+PyQt5.QtLocation.QGeoManeuver.DirectionUTurnRight?10
+PyQt5.QtLocation.QGeoManeuver.DirectionUTurnLeft?10
+PyQt5.QtLocation.QGeoManeuver.DirectionHardLeft?10
+PyQt5.QtLocation.QGeoManeuver.DirectionLeft?10
+PyQt5.QtLocation.QGeoManeuver.DirectionLightLeft?10
+PyQt5.QtLocation.QGeoManeuver.DirectionBearLeft?10
+PyQt5.QtLocation.QGeoManeuver?1()
+PyQt5.QtLocation.QGeoManeuver.__init__?1(self)
+PyQt5.QtLocation.QGeoManeuver?1(QGeoManeuver)
+PyQt5.QtLocation.QGeoManeuver.__init__?1(self, QGeoManeuver)
+PyQt5.QtLocation.QGeoManeuver.isValid?4() -> bool
+PyQt5.QtLocation.QGeoManeuver.setPosition?4(QGeoCoordinate)
+PyQt5.QtLocation.QGeoManeuver.position?4() -> QGeoCoordinate
+PyQt5.QtLocation.QGeoManeuver.setInstructionText?4(str)
+PyQt5.QtLocation.QGeoManeuver.instructionText?4() -> str
+PyQt5.QtLocation.QGeoManeuver.setDirection?4(QGeoManeuver.InstructionDirection)
+PyQt5.QtLocation.QGeoManeuver.direction?4() -> QGeoManeuver.InstructionDirection
+PyQt5.QtLocation.QGeoManeuver.setTimeToNextInstruction?4(int)
+PyQt5.QtLocation.QGeoManeuver.timeToNextInstruction?4() -> int
+PyQt5.QtLocation.QGeoManeuver.setDistanceToNextInstruction?4(float)
+PyQt5.QtLocation.QGeoManeuver.distanceToNextInstruction?4() -> float
+PyQt5.QtLocation.QGeoManeuver.setWaypoint?4(QGeoCoordinate)
+PyQt5.QtLocation.QGeoManeuver.waypoint?4() -> QGeoCoordinate
+PyQt5.QtLocation.QGeoRoute?1()
+PyQt5.QtLocation.QGeoRoute.__init__?1(self)
+PyQt5.QtLocation.QGeoRoute?1(QGeoRoute)
+PyQt5.QtLocation.QGeoRoute.__init__?1(self, QGeoRoute)
+PyQt5.QtLocation.QGeoRoute.setRouteId?4(str)
+PyQt5.QtLocation.QGeoRoute.routeId?4() -> str
+PyQt5.QtLocation.QGeoRoute.setRequest?4(QGeoRouteRequest)
+PyQt5.QtLocation.QGeoRoute.request?4() -> QGeoRouteRequest
+PyQt5.QtLocation.QGeoRoute.setBounds?4(QGeoRectangle)
+PyQt5.QtLocation.QGeoRoute.bounds?4() -> QGeoRectangle
+PyQt5.QtLocation.QGeoRoute.setFirstRouteSegment?4(QGeoRouteSegment)
+PyQt5.QtLocation.QGeoRoute.firstRouteSegment?4() -> QGeoRouteSegment
+PyQt5.QtLocation.QGeoRoute.setTravelTime?4(int)
+PyQt5.QtLocation.QGeoRoute.travelTime?4() -> int
+PyQt5.QtLocation.QGeoRoute.setDistance?4(float)
+PyQt5.QtLocation.QGeoRoute.distance?4() -> float
+PyQt5.QtLocation.QGeoRoute.setTravelMode?4(QGeoRouteRequest.TravelMode)
+PyQt5.QtLocation.QGeoRoute.travelMode?4() -> QGeoRouteRequest.TravelMode
+PyQt5.QtLocation.QGeoRoute.setPath?4(list-of-QGeoCoordinate)
+PyQt5.QtLocation.QGeoRoute.path?4() -> list-of-QGeoCoordinate
+PyQt5.QtLocation.QGeoRouteReply.Error?10
+PyQt5.QtLocation.QGeoRouteReply.NoError?10
+PyQt5.QtLocation.QGeoRouteReply.EngineNotSetError?10
+PyQt5.QtLocation.QGeoRouteReply.CommunicationError?10
+PyQt5.QtLocation.QGeoRouteReply.ParseError?10
+PyQt5.QtLocation.QGeoRouteReply.UnsupportedOptionError?10
+PyQt5.QtLocation.QGeoRouteReply.UnknownError?10
+PyQt5.QtLocation.QGeoRouteReply?1(QGeoRouteReply.Error, str, QObject parent=None)
+PyQt5.QtLocation.QGeoRouteReply.__init__?1(self, QGeoRouteReply.Error, str, QObject parent=None)
+PyQt5.QtLocation.QGeoRouteReply?1(QGeoRouteRequest, QObject parent=None)
+PyQt5.QtLocation.QGeoRouteReply.__init__?1(self, QGeoRouteRequest, QObject parent=None)
+PyQt5.QtLocation.QGeoRouteReply.isFinished?4() -> bool
+PyQt5.QtLocation.QGeoRouteReply.error?4() -> QGeoRouteReply.Error
+PyQt5.QtLocation.QGeoRouteReply.errorString?4() -> str
+PyQt5.QtLocation.QGeoRouteReply.request?4() -> QGeoRouteRequest
+PyQt5.QtLocation.QGeoRouteReply.routes?4() -> list-of-QGeoRoute
+PyQt5.QtLocation.QGeoRouteReply.abort?4()
+PyQt5.QtLocation.QGeoRouteReply.finished?4()
+PyQt5.QtLocation.QGeoRouteReply.error?4(QGeoRouteReply.Error, str errorString=QString())
+PyQt5.QtLocation.QGeoRouteReply.setError?4(QGeoRouteReply.Error, str)
+PyQt5.QtLocation.QGeoRouteReply.setFinished?4(bool)
+PyQt5.QtLocation.QGeoRouteReply.setRoutes?4(list-of-QGeoRoute)
+PyQt5.QtLocation.QGeoRouteReply.addRoutes?4(list-of-QGeoRoute)
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetail?10
+PyQt5.QtLocation.QGeoRouteRequest.NoManeuvers?10
+PyQt5.QtLocation.QGeoRouteRequest.BasicManeuvers?10
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetail?10
+PyQt5.QtLocation.QGeoRouteRequest.NoSegmentData?10
+PyQt5.QtLocation.QGeoRouteRequest.BasicSegmentData?10
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimization?10
+PyQt5.QtLocation.QGeoRouteRequest.ShortestRoute?10
+PyQt5.QtLocation.QGeoRouteRequest.FastestRoute?10
+PyQt5.QtLocation.QGeoRouteRequest.MostEconomicRoute?10
+PyQt5.QtLocation.QGeoRouteRequest.MostScenicRoute?10
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeight?10
+PyQt5.QtLocation.QGeoRouteRequest.NeutralFeatureWeight?10
+PyQt5.QtLocation.QGeoRouteRequest.PreferFeatureWeight?10
+PyQt5.QtLocation.QGeoRouteRequest.RequireFeatureWeight?10
+PyQt5.QtLocation.QGeoRouteRequest.AvoidFeatureWeight?10
+PyQt5.QtLocation.QGeoRouteRequest.DisallowFeatureWeight?10
+PyQt5.QtLocation.QGeoRouteRequest.FeatureType?10
+PyQt5.QtLocation.QGeoRouteRequest.NoFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.TollFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.HighwayFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.PublicTransitFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.FerryFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.TunnelFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.DirtRoadFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.ParksFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.MotorPoolLaneFeature?10
+PyQt5.QtLocation.QGeoRouteRequest.TravelMode?10
+PyQt5.QtLocation.QGeoRouteRequest.CarTravel?10
+PyQt5.QtLocation.QGeoRouteRequest.PedestrianTravel?10
+PyQt5.QtLocation.QGeoRouteRequest.BicycleTravel?10
+PyQt5.QtLocation.QGeoRouteRequest.PublicTransitTravel?10
+PyQt5.QtLocation.QGeoRouteRequest.TruckTravel?10
+PyQt5.QtLocation.QGeoRouteRequest?1(list-of-QGeoCoordinate waypoints=QList&lt;QGeoCoordinate&gt;())
+PyQt5.QtLocation.QGeoRouteRequest.__init__?1(self, list-of-QGeoCoordinate waypoints=QList&lt;QGeoCoordinate&gt;())
+PyQt5.QtLocation.QGeoRouteRequest?1(QGeoCoordinate, QGeoCoordinate)
+PyQt5.QtLocation.QGeoRouteRequest.__init__?1(self, QGeoCoordinate, QGeoCoordinate)
+PyQt5.QtLocation.QGeoRouteRequest?1(QGeoRouteRequest)
+PyQt5.QtLocation.QGeoRouteRequest.__init__?1(self, QGeoRouteRequest)
+PyQt5.QtLocation.QGeoRouteRequest.setWaypoints?4(list-of-QGeoCoordinate)
+PyQt5.QtLocation.QGeoRouteRequest.waypoints?4() -> list-of-QGeoCoordinate
+PyQt5.QtLocation.QGeoRouteRequest.setExcludeAreas?4(list-of-QGeoRectangle)
+PyQt5.QtLocation.QGeoRouteRequest.excludeAreas?4() -> list-of-QGeoRectangle
+PyQt5.QtLocation.QGeoRouteRequest.setNumberAlternativeRoutes?4(int)
+PyQt5.QtLocation.QGeoRouteRequest.numberAlternativeRoutes?4() -> int
+PyQt5.QtLocation.QGeoRouteRequest.setTravelModes?4(QGeoRouteRequest.TravelModes)
+PyQt5.QtLocation.QGeoRouteRequest.travelModes?4() -> QGeoRouteRequest.TravelModes
+PyQt5.QtLocation.QGeoRouteRequest.setFeatureWeight?4(QGeoRouteRequest.FeatureType, QGeoRouteRequest.FeatureWeight)
+PyQt5.QtLocation.QGeoRouteRequest.featureWeight?4(QGeoRouteRequest.FeatureType) -> QGeoRouteRequest.FeatureWeight
+PyQt5.QtLocation.QGeoRouteRequest.featureTypes?4() -> list-of-QGeoRouteRequest.FeatureType
+PyQt5.QtLocation.QGeoRouteRequest.setRouteOptimization?4(QGeoRouteRequest.RouteOptimizations)
+PyQt5.QtLocation.QGeoRouteRequest.routeOptimization?4() -> QGeoRouteRequest.RouteOptimizations
+PyQt5.QtLocation.QGeoRouteRequest.setSegmentDetail?4(QGeoRouteRequest.SegmentDetail)
+PyQt5.QtLocation.QGeoRouteRequest.segmentDetail?4() -> QGeoRouteRequest.SegmentDetail
+PyQt5.QtLocation.QGeoRouteRequest.setManeuverDetail?4(QGeoRouteRequest.ManeuverDetail)
+PyQt5.QtLocation.QGeoRouteRequest.maneuverDetail?4() -> QGeoRouteRequest.ManeuverDetail
+PyQt5.QtLocation.QGeoRouteRequest.TravelModes?1(QGeoRouteRequest.TravelModes)
+PyQt5.QtLocation.QGeoRouteRequest.TravelModes.__init__?1(self, QGeoRouteRequest.TravelModes)
+PyQt5.QtLocation.QGeoRouteRequest.TravelModes?1(int)
+PyQt5.QtLocation.QGeoRouteRequest.TravelModes.__init__?1(self, int)
+PyQt5.QtLocation.QGeoRouteRequest.TravelModes?1()
+PyQt5.QtLocation.QGeoRouteRequest.TravelModes.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureTypes?1(QGeoRouteRequest.FeatureTypes)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureTypes.__init__?1(self, QGeoRouteRequest.FeatureTypes)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureTypes?1(int)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureTypes.__init__?1(self, int)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureTypes?1()
+PyQt5.QtLocation.QGeoRouteRequest.FeatureTypes.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeights?1(QGeoRouteRequest.FeatureWeights)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeights.__init__?1(self, QGeoRouteRequest.FeatureWeights)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeights?1(int)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeights.__init__?1(self, int)
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeights?1()
+PyQt5.QtLocation.QGeoRouteRequest.FeatureWeights.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimizations?1(QGeoRouteRequest.RouteOptimizations)
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimizations.__init__?1(self, QGeoRouteRequest.RouteOptimizations)
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimizations?1(int)
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimizations.__init__?1(self, int)
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimizations?1()
+PyQt5.QtLocation.QGeoRouteRequest.RouteOptimizations.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetails?1(QGeoRouteRequest.SegmentDetails)
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetails.__init__?1(self, QGeoRouteRequest.SegmentDetails)
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetails?1(int)
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetails.__init__?1(self, int)
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetails?1()
+PyQt5.QtLocation.QGeoRouteRequest.SegmentDetails.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetails?1(QGeoRouteRequest.ManeuverDetails)
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetails.__init__?1(self, QGeoRouteRequest.ManeuverDetails)
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetails?1(int)
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetails.__init__?1(self, int)
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetails?1()
+PyQt5.QtLocation.QGeoRouteRequest.ManeuverDetails.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteSegment?1()
+PyQt5.QtLocation.QGeoRouteSegment.__init__?1(self)
+PyQt5.QtLocation.QGeoRouteSegment?1(QGeoRouteSegment)
+PyQt5.QtLocation.QGeoRouteSegment.__init__?1(self, QGeoRouteSegment)
+PyQt5.QtLocation.QGeoRouteSegment.isValid?4() -> bool
+PyQt5.QtLocation.QGeoRouteSegment.setNextRouteSegment?4(QGeoRouteSegment)
+PyQt5.QtLocation.QGeoRouteSegment.nextRouteSegment?4() -> QGeoRouteSegment
+PyQt5.QtLocation.QGeoRouteSegment.setTravelTime?4(int)
+PyQt5.QtLocation.QGeoRouteSegment.travelTime?4() -> int
+PyQt5.QtLocation.QGeoRouteSegment.setDistance?4(float)
+PyQt5.QtLocation.QGeoRouteSegment.distance?4() -> float
+PyQt5.QtLocation.QGeoRouteSegment.setPath?4(list-of-QGeoCoordinate)
+PyQt5.QtLocation.QGeoRouteSegment.path?4() -> list-of-QGeoCoordinate
+PyQt5.QtLocation.QGeoRouteSegment.setManeuver?4(QGeoManeuver)
+PyQt5.QtLocation.QGeoRouteSegment.maneuver?4() -> QGeoManeuver
+PyQt5.QtLocation.QGeoRoutingManager.managerName?4() -> str
+PyQt5.QtLocation.QGeoRoutingManager.managerVersion?4() -> int
+PyQt5.QtLocation.QGeoRoutingManager.calculateRoute?4(QGeoRouteRequest) -> QGeoRouteReply
+PyQt5.QtLocation.QGeoRoutingManager.updateRoute?4(QGeoRoute, QGeoCoordinate) -> QGeoRouteReply
+PyQt5.QtLocation.QGeoRoutingManager.supportedTravelModes?4() -> QGeoRouteRequest.TravelModes
+PyQt5.QtLocation.QGeoRoutingManager.supportedFeatureTypes?4() -> QGeoRouteRequest.FeatureTypes
+PyQt5.QtLocation.QGeoRoutingManager.supportedFeatureWeights?4() -> QGeoRouteRequest.FeatureWeights
+PyQt5.QtLocation.QGeoRoutingManager.supportedRouteOptimizations?4() -> QGeoRouteRequest.RouteOptimizations
+PyQt5.QtLocation.QGeoRoutingManager.supportedSegmentDetails?4() -> QGeoRouteRequest.SegmentDetails
+PyQt5.QtLocation.QGeoRoutingManager.supportedManeuverDetails?4() -> QGeoRouteRequest.ManeuverDetails
+PyQt5.QtLocation.QGeoRoutingManager.setLocale?4(QLocale)
+PyQt5.QtLocation.QGeoRoutingManager.locale?4() -> QLocale
+PyQt5.QtLocation.QGeoRoutingManager.setMeasurementSystem?4(QLocale.MeasurementSystem)
+PyQt5.QtLocation.QGeoRoutingManager.measurementSystem?4() -> QLocale.MeasurementSystem
+PyQt5.QtLocation.QGeoRoutingManager.finished?4(QGeoRouteReply)
+PyQt5.QtLocation.QGeoRoutingManager.error?4(QGeoRouteReply, QGeoRouteReply.Error, str errorString=QString())
+PyQt5.QtLocation.QGeoRoutingManagerEngine?1(dict-of-str-object, QObject parent=None)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.__init__?1(self, dict-of-str-object, QObject parent=None)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.managerName?4() -> str
+PyQt5.QtLocation.QGeoRoutingManagerEngine.managerVersion?4() -> int
+PyQt5.QtLocation.QGeoRoutingManagerEngine.calculateRoute?4(QGeoRouteRequest) -> QGeoRouteReply
+PyQt5.QtLocation.QGeoRoutingManagerEngine.updateRoute?4(QGeoRoute, QGeoCoordinate) -> QGeoRouteReply
+PyQt5.QtLocation.QGeoRoutingManagerEngine.supportedTravelModes?4() -> QGeoRouteRequest.TravelModes
+PyQt5.QtLocation.QGeoRoutingManagerEngine.supportedFeatureTypes?4() -> QGeoRouteRequest.FeatureTypes
+PyQt5.QtLocation.QGeoRoutingManagerEngine.supportedFeatureWeights?4() -> QGeoRouteRequest.FeatureWeights
+PyQt5.QtLocation.QGeoRoutingManagerEngine.supportedRouteOptimizations?4() -> QGeoRouteRequest.RouteOptimizations
+PyQt5.QtLocation.QGeoRoutingManagerEngine.supportedSegmentDetails?4() -> QGeoRouteRequest.SegmentDetails
+PyQt5.QtLocation.QGeoRoutingManagerEngine.supportedManeuverDetails?4() -> QGeoRouteRequest.ManeuverDetails
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setLocale?4(QLocale)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.locale?4() -> QLocale
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setMeasurementSystem?4(QLocale.MeasurementSystem)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.measurementSystem?4() -> QLocale.MeasurementSystem
+PyQt5.QtLocation.QGeoRoutingManagerEngine.finished?4(QGeoRouteReply)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.error?4(QGeoRouteReply, QGeoRouteReply.Error, str errorString=QString())
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setSupportedTravelModes?4(QGeoRouteRequest.TravelModes)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setSupportedFeatureTypes?4(QGeoRouteRequest.FeatureTypes)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setSupportedFeatureWeights?4(QGeoRouteRequest.FeatureWeights)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setSupportedRouteOptimizations?4(QGeoRouteRequest.RouteOptimizations)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setSupportedSegmentDetails?4(QGeoRouteRequest.SegmentDetails)
+PyQt5.QtLocation.QGeoRoutingManagerEngine.setSupportedManeuverDetails?4(QGeoRouteRequest.ManeuverDetails)
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.NoPlacesFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.OnlinePlacesFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.OfflinePlacesFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.SavePlaceFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.RemovePlaceFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.SaveCategoryFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.RemoveCategoryFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.PlaceRecommendationsFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.SearchSuggestionsFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.LocalizedPlacesFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.NotificationsFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.PlaceMatchingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.AnyPlacesFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.NoMappingFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.OnlineMappingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.OfflineMappingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.LocalizedMappingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.AnyMappingFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.NoGeocodingFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.OnlineGeocodingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.OfflineGeocodingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.ReverseGeocodingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.LocalizedGeocodingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.AnyGeocodingFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.NoRoutingFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.OnlineRoutingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.OfflineRoutingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.LocalizedRoutingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.RouteUpdatesFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.AlternativeRoutesFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.ExcludeAreasRoutingFeature?10
+PyQt5.QtLocation.QGeoServiceProvider.AnyRoutingFeatures?10
+PyQt5.QtLocation.QGeoServiceProvider.Error?10
+PyQt5.QtLocation.QGeoServiceProvider.NoError?10
+PyQt5.QtLocation.QGeoServiceProvider.NotSupportedError?10
+PyQt5.QtLocation.QGeoServiceProvider.UnknownParameterError?10
+PyQt5.QtLocation.QGeoServiceProvider.MissingRequiredParameterError?10
+PyQt5.QtLocation.QGeoServiceProvider.ConnectionError?10
+PyQt5.QtLocation.QGeoServiceProvider?1(str, dict-of-str-object parameters=QMap&lt;QString,QVariant&gt;(), bool allowExperimental=False)
+PyQt5.QtLocation.QGeoServiceProvider.__init__?1(self, str, dict-of-str-object parameters=QMap&lt;QString,QVariant&gt;(), bool allowExperimental=False)
+PyQt5.QtLocation.QGeoServiceProvider.availableServiceProviders?4() -> list-of-str
+PyQt5.QtLocation.QGeoServiceProvider.routingFeatures?4() -> QGeoServiceProvider.RoutingFeatures
+PyQt5.QtLocation.QGeoServiceProvider.geocodingFeatures?4() -> QGeoServiceProvider.GeocodingFeatures
+PyQt5.QtLocation.QGeoServiceProvider.mappingFeatures?4() -> QGeoServiceProvider.MappingFeatures
+PyQt5.QtLocation.QGeoServiceProvider.placesFeatures?4() -> QGeoServiceProvider.PlacesFeatures
+PyQt5.QtLocation.QGeoServiceProvider.geocodingManager?4() -> QGeoCodingManager
+PyQt5.QtLocation.QGeoServiceProvider.routingManager?4() -> QGeoRoutingManager
+PyQt5.QtLocation.QGeoServiceProvider.placeManager?4() -> QPlaceManager
+PyQt5.QtLocation.QGeoServiceProvider.error?4() -> QGeoServiceProvider.Error
+PyQt5.QtLocation.QGeoServiceProvider.errorString?4() -> str
+PyQt5.QtLocation.QGeoServiceProvider.setParameters?4(dict-of-str-object)
+PyQt5.QtLocation.QGeoServiceProvider.setLocale?4(QLocale)
+PyQt5.QtLocation.QGeoServiceProvider.setAllowExperimental?4(bool)
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeatures?1(QGeoServiceProvider.RoutingFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeatures.__init__?1(self, QGeoServiceProvider.RoutingFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeatures?1(int)
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeatures.__init__?1(self, int)
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeatures?1()
+PyQt5.QtLocation.QGeoServiceProvider.RoutingFeatures.__init__?1(self)
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeatures?1(QGeoServiceProvider.GeocodingFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeatures.__init__?1(self, QGeoServiceProvider.GeocodingFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeatures?1(int)
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeatures.__init__?1(self, int)
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeatures?1()
+PyQt5.QtLocation.QGeoServiceProvider.GeocodingFeatures.__init__?1(self)
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeatures?1(QGeoServiceProvider.MappingFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeatures.__init__?1(self, QGeoServiceProvider.MappingFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeatures?1(int)
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeatures.__init__?1(self, int)
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeatures?1()
+PyQt5.QtLocation.QGeoServiceProvider.MappingFeatures.__init__?1(self)
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeatures?1(QGeoServiceProvider.PlacesFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeatures.__init__?1(self, QGeoServiceProvider.PlacesFeatures)
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeatures?1(int)
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeatures.__init__?1(self, int)
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeatures?1()
+PyQt5.QtLocation.QGeoServiceProvider.PlacesFeatures.__init__?1(self)
+PyQt5.QtLocation.QLocation.Visibility?10
+PyQt5.QtLocation.QLocation.UnspecifiedVisibility?10
+PyQt5.QtLocation.QLocation.DeviceVisibility?10
+PyQt5.QtLocation.QLocation.PrivateVisibility?10
+PyQt5.QtLocation.QLocation.PublicVisibility?10
+PyQt5.QtLocation.QLocation.VisibilityScope?1(QLocation.VisibilityScope)
+PyQt5.QtLocation.QLocation.VisibilityScope.__init__?1(self, QLocation.VisibilityScope)
+PyQt5.QtLocation.QLocation.VisibilityScope?1(int)
+PyQt5.QtLocation.QLocation.VisibilityScope.__init__?1(self, int)
+PyQt5.QtLocation.QLocation.VisibilityScope?1()
+PyQt5.QtLocation.QLocation.VisibilityScope.__init__?1(self)
+PyQt5.QtLocation.QPlace?1()
+PyQt5.QtLocation.QPlace.__init__?1(self)
+PyQt5.QtLocation.QPlace?1(QPlace)
+PyQt5.QtLocation.QPlace.__init__?1(self, QPlace)
+PyQt5.QtLocation.QPlace.categories?4() -> list-of-QPlaceCategory
+PyQt5.QtLocation.QPlace.setCategory?4(QPlaceCategory)
+PyQt5.QtLocation.QPlace.setCategories?4(list-of-QPlaceCategory)
+PyQt5.QtLocation.QPlace.location?4() -> QGeoLocation
+PyQt5.QtLocation.QPlace.setLocation?4(QGeoLocation)
+PyQt5.QtLocation.QPlace.ratings?4() -> QPlaceRatings
+PyQt5.QtLocation.QPlace.setRatings?4(QPlaceRatings)
+PyQt5.QtLocation.QPlace.supplier?4() -> QPlaceSupplier
+PyQt5.QtLocation.QPlace.setSupplier?4(QPlaceSupplier)
+PyQt5.QtLocation.QPlace.attribution?4() -> str
+PyQt5.QtLocation.QPlace.setAttribution?4(str)
+PyQt5.QtLocation.QPlace.icon?4() -> QPlaceIcon
+PyQt5.QtLocation.QPlace.setIcon?4(QPlaceIcon)
+PyQt5.QtLocation.QPlace.content?4(QPlaceContent.Type) -> dict-of-int-QPlaceContent
+PyQt5.QtLocation.QPlace.setContent?4(QPlaceContent.Type, dict-of-int-QPlaceContent)
+PyQt5.QtLocation.QPlace.insertContent?4(QPlaceContent.Type, dict-of-int-QPlaceContent)
+PyQt5.QtLocation.QPlace.totalContentCount?4(QPlaceContent.Type) -> int
+PyQt5.QtLocation.QPlace.setTotalContentCount?4(QPlaceContent.Type, int)
+PyQt5.QtLocation.QPlace.name?4() -> str
+PyQt5.QtLocation.QPlace.setName?4(str)
+PyQt5.QtLocation.QPlace.placeId?4() -> str
+PyQt5.QtLocation.QPlace.setPlaceId?4(str)
+PyQt5.QtLocation.QPlace.primaryPhone?4() -> str
+PyQt5.QtLocation.QPlace.primaryFax?4() -> str
+PyQt5.QtLocation.QPlace.primaryEmail?4() -> str
+PyQt5.QtLocation.QPlace.primaryWebsite?4() -> QUrl
+PyQt5.QtLocation.QPlace.detailsFetched?4() -> bool
+PyQt5.QtLocation.QPlace.setDetailsFetched?4(bool)
+PyQt5.QtLocation.QPlace.extendedAttributeTypes?4() -> list-of-str
+PyQt5.QtLocation.QPlace.extendedAttribute?4(str) -> QPlaceAttribute
+PyQt5.QtLocation.QPlace.setExtendedAttribute?4(str, QPlaceAttribute)
+PyQt5.QtLocation.QPlace.removeExtendedAttribute?4(str)
+PyQt5.QtLocation.QPlace.contactTypes?4() -> list-of-str
+PyQt5.QtLocation.QPlace.contactDetails?4(str) -> list-of-QPlaceContactDetail
+PyQt5.QtLocation.QPlace.setContactDetails?4(str, list-of-QPlaceContactDetail)
+PyQt5.QtLocation.QPlace.appendContactDetail?4(str, QPlaceContactDetail)
+PyQt5.QtLocation.QPlace.removeContactDetails?4(str)
+PyQt5.QtLocation.QPlace.visibility?4() -> QLocation.Visibility
+PyQt5.QtLocation.QPlace.setVisibility?4(QLocation.Visibility)
+PyQt5.QtLocation.QPlace.isEmpty?4() -> bool
+PyQt5.QtLocation.QPlaceAttribute.OpeningHours?7
+PyQt5.QtLocation.QPlaceAttribute.Payment?7
+PyQt5.QtLocation.QPlaceAttribute.Provider?7
+PyQt5.QtLocation.QPlaceAttribute?1()
+PyQt5.QtLocation.QPlaceAttribute.__init__?1(self)
+PyQt5.QtLocation.QPlaceAttribute?1(QPlaceAttribute)
+PyQt5.QtLocation.QPlaceAttribute.__init__?1(self, QPlaceAttribute)
+PyQt5.QtLocation.QPlaceAttribute.label?4() -> str
+PyQt5.QtLocation.QPlaceAttribute.setLabel?4(str)
+PyQt5.QtLocation.QPlaceAttribute.text?4() -> str
+PyQt5.QtLocation.QPlaceAttribute.setText?4(str)
+PyQt5.QtLocation.QPlaceAttribute.isEmpty?4() -> bool
+PyQt5.QtLocation.QPlaceCategory?1()
+PyQt5.QtLocation.QPlaceCategory.__init__?1(self)
+PyQt5.QtLocation.QPlaceCategory?1(QPlaceCategory)
+PyQt5.QtLocation.QPlaceCategory.__init__?1(self, QPlaceCategory)
+PyQt5.QtLocation.QPlaceCategory.categoryId?4() -> str
+PyQt5.QtLocation.QPlaceCategory.setCategoryId?4(str)
+PyQt5.QtLocation.QPlaceCategory.name?4() -> str
+PyQt5.QtLocation.QPlaceCategory.setName?4(str)
+PyQt5.QtLocation.QPlaceCategory.visibility?4() -> QLocation.Visibility
+PyQt5.QtLocation.QPlaceCategory.setVisibility?4(QLocation.Visibility)
+PyQt5.QtLocation.QPlaceCategory.icon?4() -> QPlaceIcon
+PyQt5.QtLocation.QPlaceCategory.setIcon?4(QPlaceIcon)
+PyQt5.QtLocation.QPlaceCategory.isEmpty?4() -> bool
+PyQt5.QtLocation.QPlaceContactDetail.Email?7
+PyQt5.QtLocation.QPlaceContactDetail.Fax?7
+PyQt5.QtLocation.QPlaceContactDetail.Phone?7
+PyQt5.QtLocation.QPlaceContactDetail.Website?7
+PyQt5.QtLocation.QPlaceContactDetail?1()
+PyQt5.QtLocation.QPlaceContactDetail.__init__?1(self)
+PyQt5.QtLocation.QPlaceContactDetail?1(QPlaceContactDetail)
+PyQt5.QtLocation.QPlaceContactDetail.__init__?1(self, QPlaceContactDetail)
+PyQt5.QtLocation.QPlaceContactDetail.label?4() -> str
+PyQt5.QtLocation.QPlaceContactDetail.setLabel?4(str)
+PyQt5.QtLocation.QPlaceContactDetail.value?4() -> str
+PyQt5.QtLocation.QPlaceContactDetail.setValue?4(str)
+PyQt5.QtLocation.QPlaceContactDetail.clear?4()
+PyQt5.QtLocation.QPlaceContent.Type?10
+PyQt5.QtLocation.QPlaceContent.NoType?10
+PyQt5.QtLocation.QPlaceContent.ImageType?10
+PyQt5.QtLocation.QPlaceContent.ReviewType?10
+PyQt5.QtLocation.QPlaceContent.EditorialType?10
+PyQt5.QtLocation.QPlaceContent?1()
+PyQt5.QtLocation.QPlaceContent.__init__?1(self)
+PyQt5.QtLocation.QPlaceContent?1(QPlaceContent)
+PyQt5.QtLocation.QPlaceContent.__init__?1(self, QPlaceContent)
+PyQt5.QtLocation.QPlaceContent.type?4() -> QPlaceContent.Type
+PyQt5.QtLocation.QPlaceContent.supplier?4() -> QPlaceSupplier
+PyQt5.QtLocation.QPlaceContent.setSupplier?4(QPlaceSupplier)
+PyQt5.QtLocation.QPlaceContent.user?4() -> QPlaceUser
+PyQt5.QtLocation.QPlaceContent.setUser?4(QPlaceUser)
+PyQt5.QtLocation.QPlaceContent.attribution?4() -> str
+PyQt5.QtLocation.QPlaceContent.setAttribution?4(str)
+PyQt5.QtLocation.QPlaceReply.Type?10
+PyQt5.QtLocation.QPlaceReply.Reply?10
+PyQt5.QtLocation.QPlaceReply.DetailsReply?10
+PyQt5.QtLocation.QPlaceReply.SearchReply?10
+PyQt5.QtLocation.QPlaceReply.SearchSuggestionReply?10
+PyQt5.QtLocation.QPlaceReply.ContentReply?10
+PyQt5.QtLocation.QPlaceReply.IdReply?10
+PyQt5.QtLocation.QPlaceReply.MatchReply?10
+PyQt5.QtLocation.QPlaceReply.Error?10
+PyQt5.QtLocation.QPlaceReply.NoError?10
+PyQt5.QtLocation.QPlaceReply.PlaceDoesNotExistError?10
+PyQt5.QtLocation.QPlaceReply.CategoryDoesNotExistError?10
+PyQt5.QtLocation.QPlaceReply.CommunicationError?10
+PyQt5.QtLocation.QPlaceReply.ParseError?10
+PyQt5.QtLocation.QPlaceReply.PermissionsError?10
+PyQt5.QtLocation.QPlaceReply.UnsupportedError?10
+PyQt5.QtLocation.QPlaceReply.BadArgumentError?10
+PyQt5.QtLocation.QPlaceReply.CancelError?10
+PyQt5.QtLocation.QPlaceReply.UnknownError?10
+PyQt5.QtLocation.QPlaceReply?1(QObject parent=None)
+PyQt5.QtLocation.QPlaceReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QPlaceReply.isFinished?4() -> bool
+PyQt5.QtLocation.QPlaceReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceReply.errorString?4() -> str
+PyQt5.QtLocation.QPlaceReply.error?4() -> QPlaceReply.Error
+PyQt5.QtLocation.QPlaceReply.abort?4()
+PyQt5.QtLocation.QPlaceReply.finished?4()
+PyQt5.QtLocation.QPlaceReply.error?4(QPlaceReply.Error, str errorString=QString())
+PyQt5.QtLocation.QPlaceReply.setFinished?4(bool)
+PyQt5.QtLocation.QPlaceReply.setError?4(QPlaceReply.Error, str)
+PyQt5.QtLocation.QPlaceContentReply?1(QObject parent=None)
+PyQt5.QtLocation.QPlaceContentReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QPlaceContentReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceContentReply.content?4() -> dict-of-int-QPlaceContent
+PyQt5.QtLocation.QPlaceContentReply.totalCount?4() -> int
+PyQt5.QtLocation.QPlaceContentReply.request?4() -> QPlaceContentRequest
+PyQt5.QtLocation.QPlaceContentReply.previousPageRequest?4() -> QPlaceContentRequest
+PyQt5.QtLocation.QPlaceContentReply.nextPageRequest?4() -> QPlaceContentRequest
+PyQt5.QtLocation.QPlaceContentReply.setContent?4(dict-of-int-QPlaceContent)
+PyQt5.QtLocation.QPlaceContentReply.setTotalCount?4(int)
+PyQt5.QtLocation.QPlaceContentReply.setRequest?4(QPlaceContentRequest)
+PyQt5.QtLocation.QPlaceContentReply.setPreviousPageRequest?4(QPlaceContentRequest)
+PyQt5.QtLocation.QPlaceContentReply.setNextPageRequest?4(QPlaceContentRequest)
+PyQt5.QtLocation.QPlaceContentRequest?1()
+PyQt5.QtLocation.QPlaceContentRequest.__init__?1(self)
+PyQt5.QtLocation.QPlaceContentRequest?1(QPlaceContentRequest)
+PyQt5.QtLocation.QPlaceContentRequest.__init__?1(self, QPlaceContentRequest)
+PyQt5.QtLocation.QPlaceContentRequest.contentType?4() -> QPlaceContent.Type
+PyQt5.QtLocation.QPlaceContentRequest.setContentType?4(QPlaceContent.Type)
+PyQt5.QtLocation.QPlaceContentRequest.placeId?4() -> str
+PyQt5.QtLocation.QPlaceContentRequest.setPlaceId?4(str)
+PyQt5.QtLocation.QPlaceContentRequest.contentContext?4() -> QVariant
+PyQt5.QtLocation.QPlaceContentRequest.setContentContext?4(QVariant)
+PyQt5.QtLocation.QPlaceContentRequest.limit?4() -> int
+PyQt5.QtLocation.QPlaceContentRequest.setLimit?4(int)
+PyQt5.QtLocation.QPlaceContentRequest.clear?4()
+PyQt5.QtLocation.QPlaceDetailsReply?1(QObject parent=None)
+PyQt5.QtLocation.QPlaceDetailsReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QPlaceDetailsReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceDetailsReply.place?4() -> QPlace
+PyQt5.QtLocation.QPlaceDetailsReply.setPlace?4(QPlace)
+PyQt5.QtLocation.QPlaceEditorial?1()
+PyQt5.QtLocation.QPlaceEditorial.__init__?1(self)
+PyQt5.QtLocation.QPlaceEditorial?1(QPlaceContent)
+PyQt5.QtLocation.QPlaceEditorial.__init__?1(self, QPlaceContent)
+PyQt5.QtLocation.QPlaceEditorial?1(QPlaceEditorial)
+PyQt5.QtLocation.QPlaceEditorial.__init__?1(self, QPlaceEditorial)
+PyQt5.QtLocation.QPlaceEditorial.text?4() -> str
+PyQt5.QtLocation.QPlaceEditorial.setText?4(str)
+PyQt5.QtLocation.QPlaceEditorial.title?4() -> str
+PyQt5.QtLocation.QPlaceEditorial.setTitle?4(str)
+PyQt5.QtLocation.QPlaceEditorial.language?4() -> str
+PyQt5.QtLocation.QPlaceEditorial.setLanguage?4(str)
+PyQt5.QtLocation.QPlaceIcon.SingleUrl?7
+PyQt5.QtLocation.QPlaceIcon?1()
+PyQt5.QtLocation.QPlaceIcon.__init__?1(self)
+PyQt5.QtLocation.QPlaceIcon?1(QPlaceIcon)
+PyQt5.QtLocation.QPlaceIcon.__init__?1(self, QPlaceIcon)
+PyQt5.QtLocation.QPlaceIcon.url?4(QSize size=QSize()) -> QUrl
+PyQt5.QtLocation.QPlaceIcon.manager?4() -> QPlaceManager
+PyQt5.QtLocation.QPlaceIcon.setManager?4(QPlaceManager)
+PyQt5.QtLocation.QPlaceIcon.parameters?4() -> dict-of-str-object
+PyQt5.QtLocation.QPlaceIcon.setParameters?4(dict-of-str-object)
+PyQt5.QtLocation.QPlaceIcon.isEmpty?4() -> bool
+PyQt5.QtLocation.QPlaceIdReply.OperationType?10
+PyQt5.QtLocation.QPlaceIdReply.SavePlace?10
+PyQt5.QtLocation.QPlaceIdReply.SaveCategory?10
+PyQt5.QtLocation.QPlaceIdReply.RemovePlace?10
+PyQt5.QtLocation.QPlaceIdReply.RemoveCategory?10
+PyQt5.QtLocation.QPlaceIdReply?1(QPlaceIdReply.OperationType, QObject parent=None)
+PyQt5.QtLocation.QPlaceIdReply.__init__?1(self, QPlaceIdReply.OperationType, QObject parent=None)
+PyQt5.QtLocation.QPlaceIdReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceIdReply.operationType?4() -> QPlaceIdReply.OperationType
+PyQt5.QtLocation.QPlaceIdReply.id?4() -> str
+PyQt5.QtLocation.QPlaceIdReply.setId?4(str)
+PyQt5.QtLocation.QPlaceImage?1()
+PyQt5.QtLocation.QPlaceImage.__init__?1(self)
+PyQt5.QtLocation.QPlaceImage?1(QPlaceContent)
+PyQt5.QtLocation.QPlaceImage.__init__?1(self, QPlaceContent)
+PyQt5.QtLocation.QPlaceImage?1(QPlaceImage)
+PyQt5.QtLocation.QPlaceImage.__init__?1(self, QPlaceImage)
+PyQt5.QtLocation.QPlaceImage.url?4() -> QUrl
+PyQt5.QtLocation.QPlaceImage.setUrl?4(QUrl)
+PyQt5.QtLocation.QPlaceImage.imageId?4() -> str
+PyQt5.QtLocation.QPlaceImage.setImageId?4(str)
+PyQt5.QtLocation.QPlaceImage.mimeType?4() -> str
+PyQt5.QtLocation.QPlaceImage.setMimeType?4(str)
+PyQt5.QtLocation.QPlaceManager.managerName?4() -> str
+PyQt5.QtLocation.QPlaceManager.managerVersion?4() -> int
+PyQt5.QtLocation.QPlaceManager.getPlaceDetails?4(str) -> QPlaceDetailsReply
+PyQt5.QtLocation.QPlaceManager.getPlaceContent?4(QPlaceContentRequest) -> QPlaceContentReply
+PyQt5.QtLocation.QPlaceManager.search?4(QPlaceSearchRequest) -> QPlaceSearchReply
+PyQt5.QtLocation.QPlaceManager.searchSuggestions?4(QPlaceSearchRequest) -> QPlaceSearchSuggestionReply
+PyQt5.QtLocation.QPlaceManager.savePlace?4(QPlace) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManager.removePlace?4(str) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManager.saveCategory?4(QPlaceCategory, str parentId=QString()) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManager.removeCategory?4(str) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManager.initializeCategories?4() -> QPlaceReply
+PyQt5.QtLocation.QPlaceManager.parentCategoryId?4(str) -> str
+PyQt5.QtLocation.QPlaceManager.childCategoryIds?4(str parentId=QString()) -> list-of-str
+PyQt5.QtLocation.QPlaceManager.category?4(str) -> QPlaceCategory
+PyQt5.QtLocation.QPlaceManager.childCategories?4(str parentId=QString()) -> list-of-QPlaceCategory
+PyQt5.QtLocation.QPlaceManager.locales?4() -> list-of-QLocale
+PyQt5.QtLocation.QPlaceManager.setLocale?4(QLocale)
+PyQt5.QtLocation.QPlaceManager.setLocales?4(list-of-QLocale)
+PyQt5.QtLocation.QPlaceManager.compatiblePlace?4(QPlace) -> QPlace
+PyQt5.QtLocation.QPlaceManager.matchingPlaces?4(QPlaceMatchRequest) -> QPlaceMatchReply
+PyQt5.QtLocation.QPlaceManager.finished?4(QPlaceReply)
+PyQt5.QtLocation.QPlaceManager.error?4(QPlaceReply, QPlaceReply.Error, str errorString=QString())
+PyQt5.QtLocation.QPlaceManager.placeAdded?4(str)
+PyQt5.QtLocation.QPlaceManager.placeUpdated?4(str)
+PyQt5.QtLocation.QPlaceManager.placeRemoved?4(str)
+PyQt5.QtLocation.QPlaceManager.categoryAdded?4(QPlaceCategory, str)
+PyQt5.QtLocation.QPlaceManager.categoryUpdated?4(QPlaceCategory, str)
+PyQt5.QtLocation.QPlaceManager.categoryRemoved?4(str, str)
+PyQt5.QtLocation.QPlaceManager.dataChanged?4()
+PyQt5.QtLocation.QPlaceManagerEngine?1(dict-of-str-object, QObject parent=None)
+PyQt5.QtLocation.QPlaceManagerEngine.__init__?1(self, dict-of-str-object, QObject parent=None)
+PyQt5.QtLocation.QPlaceManagerEngine.managerName?4() -> str
+PyQt5.QtLocation.QPlaceManagerEngine.managerVersion?4() -> int
+PyQt5.QtLocation.QPlaceManagerEngine.getPlaceDetails?4(str) -> QPlaceDetailsReply
+PyQt5.QtLocation.QPlaceManagerEngine.getPlaceContent?4(QPlaceContentRequest) -> QPlaceContentReply
+PyQt5.QtLocation.QPlaceManagerEngine.search?4(QPlaceSearchRequest) -> QPlaceSearchReply
+PyQt5.QtLocation.QPlaceManagerEngine.searchSuggestions?4(QPlaceSearchRequest) -> QPlaceSearchSuggestionReply
+PyQt5.QtLocation.QPlaceManagerEngine.savePlace?4(QPlace) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManagerEngine.removePlace?4(str) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManagerEngine.saveCategory?4(QPlaceCategory, str) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManagerEngine.removeCategory?4(str) -> QPlaceIdReply
+PyQt5.QtLocation.QPlaceManagerEngine.initializeCategories?4() -> QPlaceReply
+PyQt5.QtLocation.QPlaceManagerEngine.parentCategoryId?4(str) -> str
+PyQt5.QtLocation.QPlaceManagerEngine.childCategoryIds?4(str) -> list-of-str
+PyQt5.QtLocation.QPlaceManagerEngine.category?4(str) -> QPlaceCategory
+PyQt5.QtLocation.QPlaceManagerEngine.childCategories?4(str) -> list-of-QPlaceCategory
+PyQt5.QtLocation.QPlaceManagerEngine.locales?4() -> list-of-QLocale
+PyQt5.QtLocation.QPlaceManagerEngine.setLocales?4(list-of-QLocale)
+PyQt5.QtLocation.QPlaceManagerEngine.constructIconUrl?4(QPlaceIcon, QSize) -> QUrl
+PyQt5.QtLocation.QPlaceManagerEngine.compatiblePlace?4(QPlace) -> QPlace
+PyQt5.QtLocation.QPlaceManagerEngine.matchingPlaces?4(QPlaceMatchRequest) -> QPlaceMatchReply
+PyQt5.QtLocation.QPlaceManagerEngine.finished?4(QPlaceReply)
+PyQt5.QtLocation.QPlaceManagerEngine.error?4(QPlaceReply, QPlaceReply.Error, str errorString=QString())
+PyQt5.QtLocation.QPlaceManagerEngine.placeAdded?4(str)
+PyQt5.QtLocation.QPlaceManagerEngine.placeUpdated?4(str)
+PyQt5.QtLocation.QPlaceManagerEngine.placeRemoved?4(str)
+PyQt5.QtLocation.QPlaceManagerEngine.categoryAdded?4(QPlaceCategory, str)
+PyQt5.QtLocation.QPlaceManagerEngine.categoryUpdated?4(QPlaceCategory, str)
+PyQt5.QtLocation.QPlaceManagerEngine.categoryRemoved?4(str, str)
+PyQt5.QtLocation.QPlaceManagerEngine.dataChanged?4()
+PyQt5.QtLocation.QPlaceManagerEngine.manager?4() -> QPlaceManager
+PyQt5.QtLocation.QPlaceMatchReply?1(QObject parent=None)
+PyQt5.QtLocation.QPlaceMatchReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QPlaceMatchReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceMatchReply.places?4() -> list-of-QPlace
+PyQt5.QtLocation.QPlaceMatchReply.request?4() -> QPlaceMatchRequest
+PyQt5.QtLocation.QPlaceMatchReply.setPlaces?4(list-of-QPlace)
+PyQt5.QtLocation.QPlaceMatchReply.setRequest?4(QPlaceMatchRequest)
+PyQt5.QtLocation.QPlaceMatchRequest.AlternativeId?7
+PyQt5.QtLocation.QPlaceMatchRequest?1()
+PyQt5.QtLocation.QPlaceMatchRequest.__init__?1(self)
+PyQt5.QtLocation.QPlaceMatchRequest?1(QPlaceMatchRequest)
+PyQt5.QtLocation.QPlaceMatchRequest.__init__?1(self, QPlaceMatchRequest)
+PyQt5.QtLocation.QPlaceMatchRequest.places?4() -> list-of-QPlace
+PyQt5.QtLocation.QPlaceMatchRequest.setPlaces?4(list-of-QPlace)
+PyQt5.QtLocation.QPlaceMatchRequest.setResults?4(list-of-QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceMatchRequest.parameters?4() -> dict-of-str-object
+PyQt5.QtLocation.QPlaceMatchRequest.setParameters?4(dict-of-str-object)
+PyQt5.QtLocation.QPlaceMatchRequest.clear?4()
+PyQt5.QtLocation.QPlaceSearchResult.SearchResultType?10
+PyQt5.QtLocation.QPlaceSearchResult.UnknownSearchResult?10
+PyQt5.QtLocation.QPlaceSearchResult.PlaceResult?10
+PyQt5.QtLocation.QPlaceSearchResult.ProposedSearchResult?10
+PyQt5.QtLocation.QPlaceSearchResult?1()
+PyQt5.QtLocation.QPlaceSearchResult.__init__?1(self)
+PyQt5.QtLocation.QPlaceSearchResult?1(QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceSearchResult.__init__?1(self, QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceSearchResult.type?4() -> QPlaceSearchResult.SearchResultType
+PyQt5.QtLocation.QPlaceSearchResult.title?4() -> str
+PyQt5.QtLocation.QPlaceSearchResult.setTitle?4(str)
+PyQt5.QtLocation.QPlaceSearchResult.icon?4() -> QPlaceIcon
+PyQt5.QtLocation.QPlaceSearchResult.setIcon?4(QPlaceIcon)
+PyQt5.QtLocation.QPlaceProposedSearchResult?1()
+PyQt5.QtLocation.QPlaceProposedSearchResult.__init__?1(self)
+PyQt5.QtLocation.QPlaceProposedSearchResult?1(QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceProposedSearchResult.__init__?1(self, QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceProposedSearchResult?1(QPlaceProposedSearchResult)
+PyQt5.QtLocation.QPlaceProposedSearchResult.__init__?1(self, QPlaceProposedSearchResult)
+PyQt5.QtLocation.QPlaceProposedSearchResult.searchRequest?4() -> QPlaceSearchRequest
+PyQt5.QtLocation.QPlaceProposedSearchResult.setSearchRequest?4(QPlaceSearchRequest)
+PyQt5.QtLocation.QPlaceRatings?1()
+PyQt5.QtLocation.QPlaceRatings.__init__?1(self)
+PyQt5.QtLocation.QPlaceRatings?1(QPlaceRatings)
+PyQt5.QtLocation.QPlaceRatings.__init__?1(self, QPlaceRatings)
+PyQt5.QtLocation.QPlaceRatings.average?4() -> float
+PyQt5.QtLocation.QPlaceRatings.setAverage?4(float)
+PyQt5.QtLocation.QPlaceRatings.count?4() -> int
+PyQt5.QtLocation.QPlaceRatings.setCount?4(int)
+PyQt5.QtLocation.QPlaceRatings.maximum?4() -> float
+PyQt5.QtLocation.QPlaceRatings.setMaximum?4(float)
+PyQt5.QtLocation.QPlaceRatings.isEmpty?4() -> bool
+PyQt5.QtLocation.QPlaceResult?1()
+PyQt5.QtLocation.QPlaceResult.__init__?1(self)
+PyQt5.QtLocation.QPlaceResult?1(QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceResult.__init__?1(self, QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceResult?1(QPlaceResult)
+PyQt5.QtLocation.QPlaceResult.__init__?1(self, QPlaceResult)
+PyQt5.QtLocation.QPlaceResult.distance?4() -> float
+PyQt5.QtLocation.QPlaceResult.setDistance?4(float)
+PyQt5.QtLocation.QPlaceResult.place?4() -> QPlace
+PyQt5.QtLocation.QPlaceResult.setPlace?4(QPlace)
+PyQt5.QtLocation.QPlaceResult.isSponsored?4() -> bool
+PyQt5.QtLocation.QPlaceResult.setSponsored?4(bool)
+PyQt5.QtLocation.QPlaceReview?1()
+PyQt5.QtLocation.QPlaceReview.__init__?1(self)
+PyQt5.QtLocation.QPlaceReview?1(QPlaceContent)
+PyQt5.QtLocation.QPlaceReview.__init__?1(self, QPlaceContent)
+PyQt5.QtLocation.QPlaceReview?1(QPlaceReview)
+PyQt5.QtLocation.QPlaceReview.__init__?1(self, QPlaceReview)
+PyQt5.QtLocation.QPlaceReview.dateTime?4() -> QDateTime
+PyQt5.QtLocation.QPlaceReview.setDateTime?4(QDateTime)
+PyQt5.QtLocation.QPlaceReview.text?4() -> str
+PyQt5.QtLocation.QPlaceReview.setText?4(str)
+PyQt5.QtLocation.QPlaceReview.language?4() -> str
+PyQt5.QtLocation.QPlaceReview.setLanguage?4(str)
+PyQt5.QtLocation.QPlaceReview.rating?4() -> float
+PyQt5.QtLocation.QPlaceReview.setRating?4(float)
+PyQt5.QtLocation.QPlaceReview.reviewId?4() -> str
+PyQt5.QtLocation.QPlaceReview.setReviewId?4(str)
+PyQt5.QtLocation.QPlaceReview.title?4() -> str
+PyQt5.QtLocation.QPlaceReview.setTitle?4(str)
+PyQt5.QtLocation.QPlaceSearchReply?1(QObject parent=None)
+PyQt5.QtLocation.QPlaceSearchReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QPlaceSearchReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceSearchReply.results?4() -> list-of-QPlaceSearchResult
+PyQt5.QtLocation.QPlaceSearchReply.request?4() -> QPlaceSearchRequest
+PyQt5.QtLocation.QPlaceSearchReply.previousPageRequest?4() -> QPlaceSearchRequest
+PyQt5.QtLocation.QPlaceSearchReply.nextPageRequest?4() -> QPlaceSearchRequest
+PyQt5.QtLocation.QPlaceSearchReply.setResults?4(list-of-QPlaceSearchResult)
+PyQt5.QtLocation.QPlaceSearchReply.setRequest?4(QPlaceSearchRequest)
+PyQt5.QtLocation.QPlaceSearchReply.setPreviousPageRequest?4(QPlaceSearchRequest)
+PyQt5.QtLocation.QPlaceSearchReply.setNextPageRequest?4(QPlaceSearchRequest)
+PyQt5.QtLocation.QPlaceSearchRequest.RelevanceHint?10
+PyQt5.QtLocation.QPlaceSearchRequest.UnspecifiedHint?10
+PyQt5.QtLocation.QPlaceSearchRequest.DistanceHint?10
+PyQt5.QtLocation.QPlaceSearchRequest.LexicalPlaceNameHint?10
+PyQt5.QtLocation.QPlaceSearchRequest?1()
+PyQt5.QtLocation.QPlaceSearchRequest.__init__?1(self)
+PyQt5.QtLocation.QPlaceSearchRequest?1(QPlaceSearchRequest)
+PyQt5.QtLocation.QPlaceSearchRequest.__init__?1(self, QPlaceSearchRequest)
+PyQt5.QtLocation.QPlaceSearchRequest.searchTerm?4() -> str
+PyQt5.QtLocation.QPlaceSearchRequest.setSearchTerm?4(str)
+PyQt5.QtLocation.QPlaceSearchRequest.categories?4() -> list-of-QPlaceCategory
+PyQt5.QtLocation.QPlaceSearchRequest.setCategory?4(QPlaceCategory)
+PyQt5.QtLocation.QPlaceSearchRequest.setCategories?4(list-of-QPlaceCategory)
+PyQt5.QtLocation.QPlaceSearchRequest.searchArea?4() -> QGeoShape
+PyQt5.QtLocation.QPlaceSearchRequest.setSearchArea?4(QGeoShape)
+PyQt5.QtLocation.QPlaceSearchRequest.recommendationId?4() -> str
+PyQt5.QtLocation.QPlaceSearchRequest.setRecommendationId?4(str)
+PyQt5.QtLocation.QPlaceSearchRequest.searchContext?4() -> QVariant
+PyQt5.QtLocation.QPlaceSearchRequest.setSearchContext?4(QVariant)
+PyQt5.QtLocation.QPlaceSearchRequest.visibilityScope?4() -> QLocation.VisibilityScope
+PyQt5.QtLocation.QPlaceSearchRequest.setVisibilityScope?4(QLocation.VisibilityScope)
+PyQt5.QtLocation.QPlaceSearchRequest.relevanceHint?4() -> QPlaceSearchRequest.RelevanceHint
+PyQt5.QtLocation.QPlaceSearchRequest.setRelevanceHint?4(QPlaceSearchRequest.RelevanceHint)
+PyQt5.QtLocation.QPlaceSearchRequest.limit?4() -> int
+PyQt5.QtLocation.QPlaceSearchRequest.setLimit?4(int)
+PyQt5.QtLocation.QPlaceSearchRequest.clear?4()
+PyQt5.QtLocation.QPlaceSearchSuggestionReply?1(QObject parent=None)
+PyQt5.QtLocation.QPlaceSearchSuggestionReply.__init__?1(self, QObject parent=None)
+PyQt5.QtLocation.QPlaceSearchSuggestionReply.suggestions?4() -> list-of-str
+PyQt5.QtLocation.QPlaceSearchSuggestionReply.type?4() -> QPlaceReply.Type
+PyQt5.QtLocation.QPlaceSearchSuggestionReply.setSuggestions?4(list-of-str)
+PyQt5.QtLocation.QPlaceSupplier?1()
+PyQt5.QtLocation.QPlaceSupplier.__init__?1(self)
+PyQt5.QtLocation.QPlaceSupplier?1(QPlaceSupplier)
+PyQt5.QtLocation.QPlaceSupplier.__init__?1(self, QPlaceSupplier)
+PyQt5.QtLocation.QPlaceSupplier.name?4() -> str
+PyQt5.QtLocation.QPlaceSupplier.setName?4(str)
+PyQt5.QtLocation.QPlaceSupplier.supplierId?4() -> str
+PyQt5.QtLocation.QPlaceSupplier.setSupplierId?4(str)
+PyQt5.QtLocation.QPlaceSupplier.url?4() -> QUrl
+PyQt5.QtLocation.QPlaceSupplier.setUrl?4(QUrl)
+PyQt5.QtLocation.QPlaceSupplier.icon?4() -> QPlaceIcon
+PyQt5.QtLocation.QPlaceSupplier.setIcon?4(QPlaceIcon)
+PyQt5.QtLocation.QPlaceSupplier.isEmpty?4() -> bool
+PyQt5.QtLocation.QPlaceUser?1()
+PyQt5.QtLocation.QPlaceUser.__init__?1(self)
+PyQt5.QtLocation.QPlaceUser?1(QPlaceUser)
+PyQt5.QtLocation.QPlaceUser.__init__?1(self, QPlaceUser)
+PyQt5.QtLocation.QPlaceUser.userId?4() -> str
+PyQt5.QtLocation.QPlaceUser.setUserId?4(str)
+PyQt5.QtLocation.QPlaceUser.name?4() -> str
+PyQt5.QtLocation.QPlaceUser.setName?4(str)

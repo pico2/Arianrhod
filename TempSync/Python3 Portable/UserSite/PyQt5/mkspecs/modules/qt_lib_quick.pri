@@ -1,7 +1,7 @@
-QT.quick.VERSION = 5.4.1
+QT.quick.VERSION = 5.5.0
 QT.quick.MAJOR_VERSION = 5
-QT.quick.MINOR_VERSION = 4
-QT.quick.PATCH_VERSION = 1
+QT.quick.MINOR_VERSION = 5
+QT.quick.PATCH_VERSION = 0
 QT.quick.name = QtQuick
 QT.quick.libs = $$QT_MODULE_LIB_BASE
 QT.quick.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtQuick

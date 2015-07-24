@@ -1,7 +1,7 @@
-QT.printsupport.VERSION = 5.4.1
+QT.printsupport.VERSION = 5.5.0
 QT.printsupport.MAJOR_VERSION = 5
-QT.printsupport.MINOR_VERSION = 4
-QT.printsupport.PATCH_VERSION = 1
+QT.printsupport.MINOR_VERSION = 5
+QT.printsupport.PATCH_VERSION = 0
 QT.printsupport.name = QtPrintSupport
 QT.printsupport.libs = $$QT_MODULE_LIB_BASE
 QT.printsupport.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtPrintSupport

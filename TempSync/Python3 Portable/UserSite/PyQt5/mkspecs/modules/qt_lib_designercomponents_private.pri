@@ -1,10 +1,10 @@
-QT.designercomponents_private.VERSION = 5.4.1
+QT.designercomponents_private.VERSION = 5.5.0
 QT.designercomponents_private.MAJOR_VERSION = 5
-QT.designercomponents_private.MINOR_VERSION = 4
-QT.designercomponents_private.PATCH_VERSION = 1
+QT.designercomponents_private.MINOR_VERSION = 5
+QT.designercomponents_private.PATCH_VERSION = 0
 QT.designercomponents_private.name = QtDesignerComponents
 QT.designercomponents_private.libs = $$QT_MODULE_LIB_BASE
-QT.designercomponents_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtDesignerComponents $$QT_MODULE_INCLUDE_BASE/QtDesignerComponents/5.4.1 $$QT_MODULE_INCLUDE_BASE/QtDesignerComponents/5.4.1/QtDesignerComponents
+QT.designercomponents_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtDesignerComponents $$QT_MODULE_INCLUDE_BASE/QtDesignerComponents/5.5.0 $$QT_MODULE_INCLUDE_BASE/QtDesignerComponents/5.5.0/QtDesignerComponents
 QT.designercomponents_private.bins = $$QT_MODULE_BIN_BASE
 QT.designercomponents_private.libexecs = $$QT_MODULE_LIBEXEC_BASE
 QT.designercomponents_private.plugins = $$QT_MODULE_PLUGIN_BASE

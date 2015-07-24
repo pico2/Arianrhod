@@ -1,7 +1,7 @@
-QT.core.VERSION = 5.4.1
+QT.core.VERSION = 5.5.0
 QT.core.MAJOR_VERSION = 5
-QT.core.MINOR_VERSION = 4
-QT.core.PATCH_VERSION = 1
+QT.core.MINOR_VERSION = 5
+QT.core.PATCH_VERSION = 0
 QT.core.name = QtCore
 QT.core.libs = $$QT_MODULE_LIB_BASE
 QT.core.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtCore

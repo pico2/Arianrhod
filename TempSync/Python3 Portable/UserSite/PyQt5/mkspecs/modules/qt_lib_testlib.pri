@@ -1,7 +1,7 @@
-QT.testlib.VERSION = 5.4.1
+QT.testlib.VERSION = 5.5.0
 QT.testlib.MAJOR_VERSION = 5
-QT.testlib.MINOR_VERSION = 4
-QT.testlib.PATCH_VERSION = 1
+QT.testlib.MINOR_VERSION = 5
+QT.testlib.PATCH_VERSION = 0
 QT.testlib.name = QtTest
 QT.testlib.libs = $$QT_MODULE_LIB_BASE
 QT.testlib.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtTest

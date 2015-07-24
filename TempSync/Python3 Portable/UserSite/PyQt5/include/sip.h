@@ -54,8 +54,8 @@ extern "C" {
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x041006
-#define SIP_VERSION_STR     "4.16.6"
+#define SIP_VERSION         0x041009
+#define SIP_VERSION_STR     "4.16.9"
 
 
 /*
@@ -67,6 +67,8 @@ extern "C" {
  * to 0.
  *
  * History:
+ *
+ * 11.2 Added sip_api_get_reference() to the private API.
  *
  * 11.1 Added sip_api_invoke_slot_ex().
  *
@@ -212,7 +214,7 @@ extern "C" {
  * 0.0  Original version.
  */
 #define SIP_API_MAJOR_NR    11
-#define SIP_API_MINOR_NR    1
+#define SIP_API_MINOR_NR    2
 
 
 /* The name of the sip module. */
@@ -1522,6 +1524,10 @@ typedef struct _sipAPIDef {
      */
     PyObject *(*api_invoke_slot_ex)(const sipSlot *slot, PyObject *sigargs,
             int check_receiver);
+    /*
+     * The following are not part of the public API.
+     */
+    PyObject *(*api_get_reference)(PyObject *self, int key);
 } sipAPIDef;
 
 

@@ -460,10 +460,12 @@ class Properties(object):
     value = _setViaSetProperty
 
     objectName = _ignore
+    margin = _ignore
     leftMargin = _ignore
     topMargin = _ignore
     rightMargin = _ignore
     bottomMargin = _ignore
+    spacing = _ignore
     horizontalSpacing = _ignore
     verticalSpacing = _ignore
 
@@ -498,23 +500,16 @@ class Properties(object):
         else:
             widget.setOrientation(self._enum(prop[0]))
 
-    def margin(self, widget, prop):
-        # Qt5 doesn't have setMargin().
-        value = self.convert(prop)
-        widget.setContentsMargins(value, value, value, value)
-
     # The isWrapping attribute of QListView is named inconsistently, it should
     # be wrapping.
     def isWrapping(self, widget, prop):
         widget.setWrapping(self.convert(prop))
 
-    # This is a pseudo-property injected to deal with setContentsMargin()
-    # introduced in Qt v4.3.
-    def pyuicContentsMargins(self, widget, prop):
+    # This is a pseudo-property injected to deal with margins.
+    def pyuicMargins(self, widget, prop):
         widget.setContentsMargins(*int_list(prop))
 
-    # This is a pseudo-property injected to deal with setHorizontalSpacing()
-    # and setVerticalSpacing() introduced in Qt v4.3.
+    # This is a pseudo-property injected to deal with spacing.
     def pyuicSpacing(self, widget, prop):
         horiz, vert = int_list(prop)
 
