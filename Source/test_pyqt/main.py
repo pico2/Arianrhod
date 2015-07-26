@@ -6,12 +6,10 @@ class MainWindow(DockerContainer):
         super().__init__()
 
         for dockName in 'First Second Third Fourth'.split():
-            docker = self.mgr.createDocker(dockName)
+            docker = self.createDocker(dockName)
             docker.setWidget(QListWidget())
-            docker.setTitleBarVisible(False)
 
-            # self.addDockWidget(Qt.TopDockWidgetArea, docker)
-            self.tab.addTab(docker, dockName)
+            self.addDockWidget(Qt.TopDockWidgetArea, docker)
 
 def main():
     app = QApplication(sys.argv)

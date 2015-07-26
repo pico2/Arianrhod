@@ -8,6 +8,8 @@ class DockerManager(QObject):
         self.tabs = []
         self.mainWindow = mainWindow
 
+        self.dockerIdMap = {}
+
     def createDocker(self, *args, **kwargs):
         docker = Docker(*args, **kwargs)
         docker.topLevelChanged.connect(self.dockerTopLevelChanged)
@@ -25,17 +27,24 @@ class DockerManager(QObject):
     def dockerTopLevelChanged(self, topLevel):
         docker = self.sender()
 
+        print(docker)
+
         if topLevel:
             state = Docker.Floating
 
         else:
-            docker.setFloating(False)
             tabifiedDockers = self.mainWindow.tabifiedDockWidgets(docker)
             if tabifiedDockers:
                 state = Docker.Tabified
 
+                for tab in self.mainWindow.findChildren(QTabBar):
+                    self.dockerIdMap[tab.tabData(0)] = docker
+                    print(tab)
+                    for i in range(tab.count()):
+                        print('%X, %X' % (tab.tabData(i), id(docker)))
+
             else:
-                state = Docker.Tabified
+                state = Docker.Docked
 
         # self.updateDocker(docker, state)
 
