@@ -26,9 +26,6 @@ class DockerManager(QObject):
 
     def dockerTopLevelChanged(self, topLevel):
         docker = self.sender()
-
-        print(docker)
-
         if topLevel:
             state = Docker.Floating
 
@@ -37,16 +34,13 @@ class DockerManager(QObject):
             if tabifiedDockers:
                 state = Docker.Tabified
 
-                for tab in self.mainWindow.findChildren(QTabBar):
-                    self.dockerIdMap[tab.tabData(0)] = docker
-                    print(tab)
-                    for i in range(tab.count()):
-                        print('%X, %X' % (tab.tabData(i), id(docker)))
+                for t in self.mainWindow.findChildren(QTabBar):
+                    t.setMovable(True)
 
             else:
                 state = Docker.Docked
 
-        # self.updateDocker(docker, state)
+        self.updateDocker(docker, state)
 
     def dockerToggleViewActionTriggered(self, visible):
         pass

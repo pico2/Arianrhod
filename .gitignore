@@ -10,6 +10,7 @@ __pycache__
 .gradle/
 build/
 logs/
+local.properties
 
 ImmPyCommands/*.pyc
 ImmPyLibs/*.pyc
@@ -124,3 +125,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/GoProject/pkg
 /Source/Project/Private/
 /Source/sources/qt
+/Source/Project/AppleIdAuthorizer

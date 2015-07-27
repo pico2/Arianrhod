@@ -11,7 +11,4 @@ class Docker(QDockWidget):
         self.emptyTitleBar = QWidget()
 
     def setTitleBarVisible(self, visible):
-        if visible:
-            self.setTitleBarWidget(None)
-        else:
-            self.setTitleBarWidget(self.emptyTitleBar)
+        self.setTitleBarWidget(None if visible else self.emptyTitleBar)
