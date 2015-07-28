@@ -183,10 +183,13 @@ void quick_sort(int *array, int count)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    OBJECT_ATTRIBUTES oa;
 
-    printf("fuck");
+    PrintLocaleDefaultAnsiCodePage();
 
-    *(int *)0 = 0;
+    InitializeObjectAttributes(&oa, PUSTR(L"\\Registry\\Machine"), OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+    printf("%p\n", FindLdrModuleByName(PUSTR(L"KERNEL32.dll")));
 
     return;
 

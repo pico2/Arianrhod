@@ -15,6 +15,8 @@ class DockerManager(QObject):
         docker.topLevelChanged.connect(self.dockerTopLevelChanged)
         # docker.toggleViewAction().triggered.connect(self.dockerToggleViewActionTriggered)
 
+        docker.installEventFilter(self)
+
         return docker
 
     def updateDocker(self, docker, state):
@@ -24,23 +26,32 @@ class DockerManager(QObject):
             Docker.Tabified    : False,
         }[state])
 
+    def eventFilter(self, target, event):
+        if isinstance(target, Docker):
+            return self.handleDockerEvent(target, event)
+
+        return super().eventFilter(target, event)
+
+    def handleDockerEvent(self, docker, event):
+        eventType = event.type()
+        if eventType == QEvent.KeyPress:
+            key = event.key()
+            if key == Qt.Key_F5:
+                floating = docker.titleBarWidget() is None
+                docker.setTitleBarVisible(not floating)
+                docker.setFloating(not floating)
+
+                return True
+
+        return super().eventFilter(docker, event)
+
     def dockerTopLevelChanged(self, topLevel):
         docker = self.sender()
-        if topLevel:
-            state = Docker.Floating
 
-        else:
-            tabifiedDockers = self.mainWindow.tabifiedDockWidgets(docker)
-            if tabifiedDockers:
-                state = Docker.Tabified
-
-                for t in self.mainWindow.findChildren(QTabBar):
-                    t.setMovable(True)
-
-            else:
-                state = Docker.Docked
-
-        self.updateDocker(docker, state)
+        if not topLevel:
+            for d in self.mainWindow.tabifiedDockWidgets(docker):
+                print(d)
+                d.setTitleBarVisible(False)
 
     def dockerToggleViewActionTriggered(self, visible):
         pass

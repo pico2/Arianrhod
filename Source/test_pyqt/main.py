@@ -5,7 +5,7 @@ class MainWindow(DockerContainer):
     def __init__(self):
         super().__init__()
 
-        for dockName in 'First Second Third Fourth'.split():
+        for dockName in 'First Second Third Fourth Fifth'.split():
             docker = self.createDocker(dockName)
             docker.setWidget(QListWidget())
 

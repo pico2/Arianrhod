@@ -3,12 +3,37 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtWebKitWidgets import *
-from PyQt5.QtNetwork import *
-from PyQt5.QtWebKit import *
-from PyQt5.QtQml import *
-from PyQt5.QtQuick import *
-from PyQt5.QtQuickWidgets import *
+
+try:
+    from PyQt5.QtWebKitWidgets import *
+except ImportError as e:
+    print(e)
+
+try:
+    from PyQt5.QtNetwork import *
+except ImportError as e:
+    print(e)
+
+try:
+    from PyQt5.QtWebKit import *
+except ImportError as e:
+    print(e)
+
+try:
+    from PyQt5.QtQml import *
+except ImportError as e:
+    print(e)
+
+try:
+    from PyQt5.QtQuick import *
+except ImportError as e:
+    print(e)
+
+try:
+    from PyQt5.QtQuickWidgets import *
+except ImportError as e:
+    print(e)
+
 
 from MyPyLibrary import QtHelper
 from QtHelper.Extension import *

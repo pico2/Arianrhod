@@ -111,6 +111,9 @@ ML_NAMESPACE_BEGIN(iTunesApi);
 
 inline NTSTATUS Initialize()
 {
+    if (AMD::AMDeviceNotificationSubscribe != nullptr)
+        return STATUS_SUCCESS;
+
     Rtl::EnvironmentAppend(&USTR(L"Path"), &USTR(APPLE_APPLICATION_SUPPORT));
     Rtl::EnvironmentAppend(&USTR(L"Path"), &USTR(MOBILE_DEVICE_SUPPORT));
 

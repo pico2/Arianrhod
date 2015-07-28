@@ -341,16 +341,44 @@ OpenOrCreateLePeb(
     return LePeb;
 }
 
-#define ENABLE_LOG 0
+#define ENABLE_LOG 1
 
 #if ENABLE_LOG
 
-#define InitLog() { WCHAR LogFilePath[MAX_NTPATH]; swprintf(LogFilePath, L"D:\\%p_log.txt", CurrentPid()); ULONG BOM = BOM_UTF16_LE; LogFile.Create(LogFilePath); LogFile.Write(&BOM, 2); PROCESS_IMAGE_FILE_NAME2 proc; NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &proc, sizeof(proc), NULL); LogFile.Print(NULL, L"%wZ", &proc.ImageFileName); }
+inline VOID InitLog(NtFileDisk &LogFile)
+{
+    WCHAR LogFilePath[MAX_NTPATH];
+    UNICODE_STRING SelfPath;
+    PLDR_MODULE Self, Target;
+
+    if (FindThreadFrame(LE_LOADER_PROCESS) != nullptr)
+        return;
+
+    Target = FindLdrModuleByHandle(nullptr);
+    Self = FindLdrModuleByHandle(&__ImageBase);
+
+    SelfPath = Self->FullDllName;
+    SelfPath.Length -= Self->BaseDllName.Length;
+
+    swprintf(LogFilePath, L"%wZ\\%wZ.%p.log.txt", &SelfPath, &Target->BaseDllName, CurrentPid());
+
+    ULONG BOM = BOM_UTF16_LE;
+    LogFile.Create(LogFilePath);
+    LogFile.Write(&BOM, 2);
+
+    PROCESS_IMAGE_FILE_NAME2 proc;
+    //NtQueryInformationProcess(CurrentProcess, ProcessImageFileName, &proc, sizeof(proc), NULL);
+    proc.ImageFileName = Target->FullDllName;
+    LogFile.Write(proc.ImageFileName.Buffer, proc.ImageFileName.Length);
+    LogFile.Write(L"\r\n", 4);
+}
+
 #define WriteLog(...) { LeGetGlobalData()->LogFile.Print(NULL, __VA_ARGS__); LeGetGlobalData()->LogFile.Print(NULL, L"\r\n"); }
 
 #else
 
-#define InitLog()
+inline VOID InitLog(...) {}
+
 #define WriteLog(...)
 
 #endif // ENABLE_LOG
@@ -457,7 +485,10 @@ public:
     LeGlobalData()
     {
         ZeroMemory(this, sizeof(*this));
-        InitLog();
+        IF_EXIST(LeGlobalData::LogFile)
+        {
+            InitLog(this->LogFile);
+        }
     }
 
     ~LeGlobalData()
@@ -543,6 +574,7 @@ public:
     );
 
     NTSTATUS HackUserDefaultLCID(PVOID Kernel32);
+    NTSTATUS HackUserDefaultLCID2(PVOID Kernel32);
     NTSTATUS InjectSelfToChildProcess(HANDLE Process, PCLIENT_ID Cid);
 
     /************************************************************************
