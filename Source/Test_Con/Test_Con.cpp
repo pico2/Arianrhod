@@ -2,7 +2,7 @@
 
 #define _WIN32_WINNT 0x601
 
-#pragma comment(linker,"/ENTRY:main")
+#pragma comment(linker,"/ENTRY:main2")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
 #pragma warning(disable:4995 4273)
@@ -183,13 +183,8 @@ void quick_sort(int *array, int count)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    OBJECT_ATTRIBUTES oa;
 
-    PrintLocaleDefaultAnsiCodePage();
-
-    InitializeObjectAttributes(&oa, PUSTR(L"\\Registry\\Machine"), OBJ_CASE_INSENSITIVE, NULL, NULL);
-
-    printf("%p\n", FindLdrModuleByName(PUSTR(L"KERNEL32.dll")));
+    CreateDirectoryW(L"\\\\?\\D:\\dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd", nullptr);
 
     return;
 
