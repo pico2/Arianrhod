@@ -83,7 +83,7 @@ PVOID FASTCALL LeGetNamedLocaleHashNode(PWSTR LocaleName, LANGID LangId)
 
 NTSTATUS LeGlobalData::HackUserDefaultLCID2(PVOID Kernel32)
 {
-    PVOID GetTimeFormatEx, GetNamedLocaleHashNode;
+    PVOID GetNLSVersionEx, GetNamedLocaleHashNode;
     PLDR_MODULE Kernel;
     API_POINTER(GetUserDefaultLCID) GetUserDefaultLCID;
 
@@ -91,11 +91,11 @@ NTSTATUS LeGlobalData::HackUserDefaultLCID2(PVOID Kernel32)
     if (Kernel == nullptr)
         Kernel = FindLdrModuleByHandle(Kernel32);
 
-    *(PVOID *)&GetTimeFormatEx = LookupExportTable(Kernel->DllBase, KERNEL32_GetTimeFormatEx);
+    *(PVOID *)&GetNLSVersionEx = LookupExportTable(Kernel->DllBase, KERNEL32_GetNLSVersionEx);
 
     GetNamedLocaleHashNode = nullptr;
 
-    WalkOpCodeT(GetTimeFormatEx, 0x20,
+    WalkOpCodeT(GetNLSVersionEx, 0x20,
         WalkOpCodeM(Buffer, OpLength, Ret)
         {
             if (Buffer[0] != CALL)
