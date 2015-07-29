@@ -34,6 +34,11 @@ typedef LeGlobalData* PLeGlobalData;
 #define THREAD_LOCAL_BUFFER_CONTEXT TAG4('LTLB')
 #define LE_LOADER_PROCESS           TAG4('LELP')
 
+inline BOOL IsLeLoader()
+{
+    return FindThreadFrame(LE_LOADER_PROCESS) != nullptr;
+}
+
 typedef struct THREAD_LOCAL_BUFFER : public TEB_ACTIVE_FRAME
 {
     BYTE Buffer[MEMORY_PAGE_SIZE * 2];
@@ -351,9 +356,6 @@ inline VOID InitLog(NtFileDisk &LogFile)
     UNICODE_STRING SelfPath;
     PLDR_MODULE Self, Target;
 
-    if (FindThreadFrame(LE_LOADER_PROCESS) != nullptr)
-        return;
-
     Target = FindLdrModuleByHandle(nullptr);
     Self = FindLdrModuleByHandle(&__ImageBase);
 
@@ -373,7 +375,7 @@ inline VOID InitLog(NtFileDisk &LogFile)
     LogFile.Write(L"\r\n", 4);
 }
 
-#define WriteLog(...) { LeGetGlobalData()->LogFile.Print(NULL, __VA_ARGS__); LeGetGlobalData()->LogFile.Print(NULL, L"\r\n"); }
+#define WriteLog(...) { if (LeGetGlobalData() != nullptr && LeGetGlobalData()->LogFile) LeGetGlobalData()->LogFile.Print(NULL, __VA_ARGS__), LeGetGlobalData()->LogFile.Print(NULL, L"\r\n"); }
 
 #else
 

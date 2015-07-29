@@ -572,6 +572,10 @@ LookupRegistryRedirectionEntry(
     PREGISTRY_REDIRECTION_ENTRY Entry;
     UNICODE_STRING              KeyFullPath;
 
+    // RtlAllocateHeap dead lock
+    if (RtlEqualUnicodeString(ValueName, PUSTR(L"ResourcePolicies"), FALSE))
+        return STATUS_NOT_FOUND;
+
     Status = QueryRegKeyFullPath(KeyHandle, &KeyFullPath);
     FAIL_RETURN(Status);
 
@@ -629,8 +633,13 @@ LeNtQueryValueKey(
         return 0;
 
     GlobalData = (PLeGlobalData)HpGetFilterContext();
+    
+    WriteLog(L"lookup %s", ValueName->Buffer);
 
     Status = GlobalData->LookupRegistryRedirectionEntry(KeyHandle, ValueName, &Entry);
+
+    WriteLog(L"lookup %s: %p", ValueName->Buffer, Status);
+
     FAIL_RETURN(Status);
 
     HpSetFilterAction(BlockSystemCall);
@@ -873,17 +882,21 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
     if (LdrInitNtContinue == nullptr)
         return STATUS_NOT_SUPPORTED;
 
+    ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
+
+    if (IsLeLoader())
+        return STATUS_SUCCESS;
+
     if (this->RegistryRedirectionEntry.GetSize() != 0)
     {
         ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
     }
 
     ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
-    ADD_FILTER_(NtCreateUserProcess,        LeNtCreateUserProcess,      this);
     ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
     ADD_FILTER_(NtQueryDefaultLocale,       LeNtQueryDefaultLocale,     this);
     ADD_FILTER_(NtQueryDefaultUILanguage,   LeNtQueryDefaultUILanguage, this);
-    ADD_FILTER_(NtQueryInstallUILanguage,   LeNtQueryInstallUILanguage, this);
+    //ADD_FILTER_(NtQueryInstallUILanguage,   LeNtQueryInstallUILanguage, this);
     //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     //ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
 
