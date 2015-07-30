@@ -5,7 +5,7 @@
 #pragma comment(linker,"/ENTRY:main2")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Amano,ERW /MERGE:.text=.Amano")
-#pragma warning(disable:4995 4273)
+#pragma warning(disable:4995 4273 4005)
 
 #ifndef UNICODE
     #define UNICODE
@@ -88,62 +88,6 @@ VOID PrintLocaleDefaultAnsiCodePage()
 
 using namespace std;
 
-VOID setcpu(ULONG_PTR Percent, ULONG_PTR ProcessMask)
-{
-    HANDLE BusyThread;
-
-    NtSetInformationProcess(CurrentProcess, ProcessAffinityMask, &ProcessMask, sizeof(ProcessMask));
-
-    Ps::CreateThreadT(
-        [](PVOID)
-        {
-            for (;;);
-            return 0;
-        },
-        nullptr,
-        TRUE,
-        CurrentProcess,
-        &BusyThread
-    );
-
-    ULONG_PTR BusyTime, IdleTime;
-
-    Percent = ML_MAX(Percent, 0);
-    Percent = ML_MIN(Percent, 100);
-    BusyTime = Percent * 10;
-    IdleTime = 1000 - BusyTime;
-
-    LOOP_FOREVER
-    {
-        NtResumeThread(BusyThread, nullptr);
-        WaitForSingleObject(BusyThread, BusyTime);
-        NtSuspendThread(BusyThread, nullptr);
-        Ps::Sleep(IdleTime);
-    }
-}
-
-VOID setcpu2(ULONG_PTR Percent, ULONG_PTR ProcessMask)
-{
-    HANDLE BusyThread;
-
-    NtSetInformationProcess(CurrentProcess, ProcessAffinityMask, &ProcessMask, sizeof(ProcessMask));
-
-    ULONG_PTR BusyTime, IdleTime;
-
-    Percent = ML_MAX(Percent, 0);
-    Percent = ML_MIN(Percent, 100);
-    BusyTime = Percent * 10;
-    IdleTime = 1000 - BusyTime;
-
-    LOOP_FOREVER
-    {
-        ULONG64 start = NtGetTickCount();
-
-        while (NtGetTickCount() - start <= BusyTime);
-        Ps::Sleep(IdleTime);
-    }
-}
-
 void quick_sort(int *array, int count)
 {
     int *left, *right, base;
@@ -176,15 +120,39 @@ void quick_sort(int *array, int count)
     quick_sort(left, &array[count] - left);
 }
 
-//#define IMPORT_LIBLLDB 1
-
 #include "iTunes/iTunes.h"
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    CreateDirectoryW(L"\\\\?\\D:\\dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd\\ddddddddddddddddddddddddddddd", nullptr);
+    RtlAddVectoredExceptionHandler(TRUE,
+        [](PEXCEPTION_POINTERS Exception) -> LONG
+        {
+            if (Exception->ExceptionRecord->ExceptionCode == EXCEPTION_PRIV_INSTRUCTION)
+            {
+                Exception->ContextRecord->Rip++;
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+    );
+
+    ULONG64 beg, end;
+
+    beg = NtGetTickCount();
+
+    for (int i = 1000000; i; --i)
+    {
+        __halt();
+        YieldProcessor();
+    }
+
+    end = NtGetTickCount();
+
+    PrintConsole(L"%d\n", end - beg);
+    PauseConsole();
 
     return;
 
