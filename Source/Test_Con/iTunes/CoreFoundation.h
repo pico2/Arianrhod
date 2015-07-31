@@ -67,7 +67,8 @@ DECL_SELECTANY CFTypeID (CDECL *CFStringGetTypeID)();
 DECL_SELECTANY CFTypeID (CDECL *CFDictionaryGetTypeID)();
 DECL_SELECTANY CFTypeID (CDECL *CFArrayGetTypeID)();
 DECL_SELECTANY CFTypeID (CDECL *CFNumberGetTypeID)();
-
+DECL_SELECTANY CFTypeID (CDECL *CFDataGetTypeID)();
+DECL_SELECTANY CFTypeID (CDECL *CFBooleanGetTypeID)();
 
 // number
 
@@ -469,6 +470,8 @@ DECL_SELECTANY PCFBooleanRef    kCFBooleanFalse;
 DECL_SELECTANY CFStringRef*     kCFRunLoopDefaultMode;
 DECL_SELECTANY CFStringRef*     kCFRunLoopCommonModes;
 
+DECL_SELECTANY BOOLEAN (CDECL *CFBooleanGetValue)(CFObjectRef Object);
+
 inline NTSTATUS Initialize()
 {
     PVOID Module = LoadDll(L"CoreFoundation.dll");
@@ -490,6 +493,8 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(CFDictionaryGetTypeID);
     LOAD_INTERFACE(CFArrayGetTypeID);
     LOAD_INTERFACE(CFNumberGetTypeID);
+    LOAD_INTERFACE(CFDataGetTypeID);
+    LOAD_INTERFACE(CFBooleanGetTypeID);
 
     LOAD_INTERFACE(CFNumberCreate);
     LOAD_INTERFACE(CFNumberGetByteSize);
@@ -534,6 +539,8 @@ inline NTSTATUS Initialize()
 
     LOAD_INTERFACE(kCFBooleanTrue);
     LOAD_INTERFACE(kCFBooleanFalse);
+    LOAD_INTERFACE(CFBooleanGetValue);
+
     LOAD_INTERFACE(kCFRunLoopDefaultMode);
     LOAD_INTERFACE(kCFRunLoopCommonModes);
 

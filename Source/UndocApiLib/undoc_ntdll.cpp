@@ -10,6 +10,11 @@ long __cdecl _ftol(float)
     return 0;
 }
 
+int __cdecl _strnicmp(const char*, const char *, size_t)
+{
+    return 0;
+}
+
 int __cdecl _stricmp(__in_z const char * _Str1, __in_z const char * _Str2)
 {
     return 0;
@@ -30,6 +35,11 @@ wchar_t* __cdecl wcsstr(const wchar_t *_Str, const wchar_t *_SubStr)
     return 0;
 }
 
+wchar_t* __cdecl _wcslwr(wchar_t*)
+{
+    return 0;
+}
+
 int __cdecl sprintf(char * _DstBuf, const char * _Format, ...)
 {
     return 0;
@@ -45,9 +55,26 @@ int __cdecl _vswprintf(wchar_t *string, const wchar_t *format, va_list ap)
     return 0;
 }
 
+int __cdecl _snprintf(char * _DstBuf, size_t _MaxCount, const char * _Format, ...)
+{
+    return 0;
+}
+
 int __cdecl _snwprintf(wchar_t * _DstBuf, size_t _MaxCount, const wchar_t * _Format, ...)
 {
     return 0;
+}
+
+void __cdecl qsort(void *, size_t, size_t, int(__cdecl*)(const void *, const void *))
+{}
+
+VOID
+NTAPI
+KiUserExceptionDispatcher(
+    PEXCEPTION_RECORD   ExceptionRecord,
+    PCONTEXT            Context
+)
+{
 }
 
 VOID

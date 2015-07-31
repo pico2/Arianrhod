@@ -442,7 +442,7 @@ NTSTATUS
 */
 
 DECL_SELECTANY
-CFStringRef
+CFObjectRef
 (CDECL
 *AMDeviceCopyValue)(
     PIOS_DEVICE Device,

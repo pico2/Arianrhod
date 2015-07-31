@@ -35,12 +35,17 @@ EXPORTS
 	RtlUnicodeToUTF8N
 	RtlUTF8ToUnicodeN
 	KiUserCallbackDispatcher
-	_snwprintf
+	KiUserExceptionDispatcher
 	swprintf
 	sprintf
 	wcsstr
 	strstr
 	_ftol
 	_stricmp
+	_strnicmp
 	_wcsicmp
+	_snprintf
+	_snwprintf
 	_vswprintf
+	qsort
+	_wcslwr

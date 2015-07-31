@@ -28,7 +28,7 @@
     </ClCompile>
     <Link>
       <OutputFile>$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>MyLib_NT.lib;undoc_ntdll.lib;undoc_k32.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MyLib.lib;undoc_ntdll.lib;undoc_k32.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DataExecutionPrevention />
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <RandomizedBaseAddress />
