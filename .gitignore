@@ -5,6 +5,7 @@
 *.obj
 *egg-info
 *.egg
+*.suo
 __pycache__
 .idea/
 .gradle/
@@ -126,4 +127,3 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Project/Private/
 /Source/sources/qt
 /Source/Project/AppleIdAuthorizer
-/Source/Test_Con/.vs/Test_Con/v14/*.suo
