@@ -39,7 +39,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LOCALEEMULATOR_EXPORTS" /FD /c
-# ADD CPP /nologo /Gr /MD /W4 /GR- /Zi /O2 /Ob1 /D "WIN32" /D "NDEBUG" /D USE_NT_VER=1 /FD /GS- /MP /GL /arch:SSE /c
+# ADD CPP /nologo /Gr /MD /W4 /GR- /Zi /O2 /Ob1 /I "." /D "WIN32" /D "NDEBUG" /D USE_NT_VER=1 /FD /GS- /MP /GL /arch:SSE /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -54,29 +54,61 @@ LINK32=link.exe
 # Begin Target
 
 # Name "LocaleEmulator - Win32 Release"
+# Begin Group "Utility"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Gdi32Hook.cpp
-# ADD CPP /Yu"stdafx.h"
+SOURCE=.\Utility\Utility.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Gdi32Hook.h
+SOURCE=.\Utility\Utility.h
+# End Source File
+# End Group
+# Begin Group "Hooks"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\Hooks\Gdi32Hook.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Kernel32Hook.cpp
-# ADD CPP /Yu"stdafx.h"
+SOURCE=.\Hooks\Gdi32Hook.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\Kernel32Hook.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\MessageTable.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\NtdllHook.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\NtdllHook.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\User32Hook.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\User32Hook.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\leml.cpp
-# ADD CPP /Yu"stdafx.h"
 # End Source File
 # Begin Source File
 
 SOURCE=.\LocaleEmulator.cpp
-# ADD CPP /Yu"stdafx.h"
 # End Source File
 # Begin Source File
 
@@ -84,43 +116,11 @@ SOURCE=.\LocaleEmulator.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\MessageTable.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\NtdllHook.cpp
-# ADD CPP /Yu"stdafx.h"
-# End Source File
-# Begin Source File
-
-SOURCE=.\NtdllHook.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\Runtime.cpp
-# ADD CPP /Yu"stdafx.h"
-# End Source File
-# Begin Source File
-
-SOURCE=.\Runtime.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\stdafx.cpp
-# ADD CPP /Yc"stdafx.h"
 # End Source File
 # Begin Source File
 
 SOURCE=.\stdafx.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\User32Hook.cpp
-# ADD CPP /Yu"stdafx.h"
-# End Source File
-# Begin Source File
-
-SOURCE=.\User32Hook.h
 # End Source File
 # End Target
 # End Project

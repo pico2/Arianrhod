@@ -4,10 +4,10 @@
 #include "ml.h"
 #include <CommCtrl.h>
 #include "LocaleEmulator.h"
-#include "NtdllHook.h"
-#include "User32Hook.h"
-#include "Gdi32Hook.h"
-#include "Runtime.h"
+#include "Hooks\NtdllHook.h"
+#include "Hooks\User32Hook.h"
+#include "Hooks\Gdi32Hook.h"
+#include "Utility\Utility.h"
 #include "SectionProtector.h"
 
 #include "HookPort.h"

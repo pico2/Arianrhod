@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Config.h"
 
 using namespace Mp;
 
