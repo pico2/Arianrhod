@@ -1,3 +1,6 @@
+#ifndef _ITUNES_H_18d0eb7c_8df5_40e0_be11_6b0c5f2f3645_
+#define _ITUNES_H_18d0eb7c_8df5_40e0_be11_6b0c5f2f3645_
+
 #include "ml.h"
 
 #define USE_ITUNES_MOBILE_DEVICE_DLL    0
@@ -130,3 +133,5 @@ inline NTSTATUS Initialize()
 }
 
 ML_NAMESPACE_END_(iTunesApi);
+
+#endif // _ITUNES_H_18d0eb7c_8df5_40e0_be11_6b0c5f2f3645_

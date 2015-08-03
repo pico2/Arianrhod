@@ -121,10 +121,44 @@ void quick_sort(int *array, int count)
 }
 
 #include "iTunes/iTunes.h"
+#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper\iTunesHelper.cpp"
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    ml::MlInitialize();
+
+#if ML_X86
+
+    iTunesHelper itunes;
+
+    Rtl::SetExeDirectoryAsCurrent();
+    itunes.iTunesInitialize();
+
+    DEVICE_ID mid, mid2;
+    HANDLE kbsync;
+
+    mid.length = 6;
+    *(PULONG)&mid.deviceId[0] = GetRandom32();
+    *(PUSHORT)&mid.deviceId[4] = GetRandom32() + *(PULONG)&mid.deviceId[0];
+
+    mid2.length = 6;
+    *(PULONG)&mid2.deviceId[0] = GetRandom32() + *(PULONG)&mid.deviceId[1];
+    *(PUSHORT)&mid2.deviceId[4] = GetRandom32() + *(PULONG)&mid2.deviceId[0];
+
+    LOOP_FOREVER
+    {
+        printf("2 %p\n", itunes.KbsyncCreateSession(&kbsync, &mid, &mid2, "C:\\ProgramData\\Apple Computer\\SC Info"));
+        printf("%p\n", kbsync);
+        //itunes.KbsyncCloseSession(kbsync);
+        Ps::Sleep(1000);
+    }
+
+    Ps::ExitProcess(0);
+    return;
+
+#else
 
     RtlAddVectoredExceptionHandler(TRUE,
         [](PEXCEPTION_POINTERS Exception) -> LONG
@@ -153,6 +187,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     PrintConsole(L"%d\n", end - beg);
     PauseConsole();
+
+#endif
 
     return;
 
