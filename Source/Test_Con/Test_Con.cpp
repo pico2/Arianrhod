@@ -139,19 +139,19 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     DEVICE_ID mid, mid2;
     HANDLE kbsync;
 
-    mid.length = 6;
-    *(PULONG)&mid.deviceId[0] = GetRandom32();
-    *(PUSHORT)&mid.deviceId[4] = GetRandom32() + *(PULONG)&mid.deviceId[0];
-
-    mid2.length = 6;
-    *(PULONG)&mid2.deviceId[0] = GetRandom32() + *(PULONG)&mid.deviceId[1];
-    *(PUSHORT)&mid2.deviceId[4] = GetRandom32() + *(PULONG)&mid2.deviceId[0];
-
     LOOP_FOREVER
     {
-        printf("2 %p\n", itunes.KbsyncCreateSession(&kbsync, &mid, &mid2, "C:\\ProgramData\\Apple Computer\\SC Info"));
+        mid.length = 6;
+        *(PULONG)&mid.deviceId[0] = GetRandom32();
+        *(PUSHORT)&mid.deviceId[4] = GetRandom32() + *(PULONG)&mid.deviceId[0];
+
+        mid2.length = 6;
+        *(PULONG)&mid2.deviceId[0] = GetRandom32() + *(PULONG)&mid.deviceId[1];
+        *(PUSHORT)&mid2.deviceId[4] = GetRandom32() + *(PULONG)&mid2.deviceId[0];
+
+        printf("2 %p\n", itunes.KbsyncCreateSession(&kbsync, &mid, &mid2, ""));
         printf("%p\n", kbsync);
-        //itunes.KbsyncCloseSession(kbsync);
+        itunes.KbsyncCloseSession(kbsync);
         Ps::Sleep(1000);
     }
 
