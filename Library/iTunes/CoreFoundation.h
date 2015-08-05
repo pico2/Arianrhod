@@ -403,7 +403,13 @@ CFStringRef
     CFStringEncoding    Encoding
 );
 
-#define CFSTR(s) ((s) ? iTunesApi::CF::CFStringMakeConstantString(s) : nullptr)
+template<class T>
+inline CFStringRef CFSTR(T s)
+{
+    return (s) ? iTunesApi::CF::CFStringMakeConstantString(s) : nullptr;
+}
+
+// #define CFSTR(s) ((s) ? iTunesApi::CF::CFStringMakeConstantString(s) : nullptr)
 
 DECL_SELECTANY CFStringRef (CDECL *CFStringMakeConstantString)(PCSTR String);
 DECL_SELECTANY CFIndex  (CDECL *CFStringGetLength)(CFStringRef String);
