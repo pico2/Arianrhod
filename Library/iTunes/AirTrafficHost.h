@@ -66,7 +66,7 @@ NTSTATUS
 );
 
 DECL_SELECTANY
-NTSTATUS
+VOID
 (CDECL
 *ATHostConnectionDestroy)(
     ATH_CONNECTION Connection
@@ -144,6 +144,20 @@ NTSTATUS
     PVOID           cfstrParam1
 );
 
+DECL_SELECTANY
+CFStringRef
+(CDECL
+*ATCFMessageGetName)(
+    CFPropertyListRef Message
+);
+
+DECL_SELECTANY
+CFDictionaryRef
+(CDECL
+*ATCFMessageGetParam)(
+    CFPropertyListRef Message
+);
+
 inline NTSTATUS Initialize()
 {
     // SetDllDirectoryW(MOBILE_DEVICE_SUPPORT);
@@ -167,6 +181,9 @@ inline NTSTATUS Initialize()
     LOAD_INTERFACE(ATHostConnectionSendSyncFailed);
     LOAD_INTERFACE(ATHostConnectionSendPing);
     LOAD_INTERFACE(ATHostConnectionSendMessage);
+
+    LOAD_INTERFACE(ATCFMessageGetName);
+    LOAD_INTERFACE(ATCFMessageGetParam);
 
     return STATUS_SUCCESS;
 }

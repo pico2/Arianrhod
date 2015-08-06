@@ -467,6 +467,7 @@ CFComparisonResult
 
 DECL_SELECTANY VOID (CDECL *CFRetain)(CFObjectRef Object);
 DECL_SELECTANY VOID (CDECL *CFRelease)(CFObjectRef Object);
+DECL_SELECTANY BOOLEAN (CDECL *CFEqual)(CFObjectRef Object1, CFObjectRef Object2);
 
 
 // boolean
@@ -542,6 +543,7 @@ inline NTSTATUS Initialize()
 
     LOAD_INTERFACE(CFRetain);
     LOAD_INTERFACE(CFRelease);
+    LOAD_INTERFACE(CFEqual);
 
     LOAD_INTERFACE(kCFBooleanTrue);
     LOAD_INTERFACE(kCFBooleanFalse);
