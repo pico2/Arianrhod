@@ -55,29 +55,37 @@ public class HookWeChat implements IXposedHookLoadPackage {
 //       });
 
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.h", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fqA"), "fqt", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fAO"), "fAH", 0);
             }
         });
 
         // "ERROR record duration, %dms !!!"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.bi", pkg.classLoader, "lQ", new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lP", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, "fuE"), "w", 0.f);
+                Object fES = XposedHelpers.getObjectField(param.thisObject, "fES");
+                Object fEG = XposedHelpers.getObjectField(fES, "fEG");
+
+                float v2 = ((Long)XposedHelpers.callMethod(fEG, "amK")).floatValue() / 6500.f;
+                if (Float.compare(v2, 0.f) > 0) {
+                    if (Float.compare(v2, 1f) <= 0) {
+                        XposedHelpers.callMethod(fES, "x", v2);
+                    } else {
+                        XposedHelpers.callMethod(fES, "x", 1f);
+                    }
+                }
+
                 param.setResult(true);
-                //log("updateProgress");
-                //log(new Exception());
-                //log(Boolean.toString(Looper.getMainLooper().getThread() == Thread.currentThread()));
             }
         });
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "A", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.p", pkg.classLoader, "B", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //                log("what the fuck");
