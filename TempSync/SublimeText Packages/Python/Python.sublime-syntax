@@ -409,7 +409,7 @@ contexts:
   builtin_types:
     - match: |-
         (?x)\b(
-        	basestring|bool|buffer|bytearray|bytes|complex|dict|float|frozenset|int|
+        	basestring|bool|bytearray|bytes|complex|dict|float|frozenset|int|
         	list|long|memoryview|object|range|set|slice|str|tuple|unicode|xrange
         )\b
       scope: support.type.python
