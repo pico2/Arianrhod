@@ -1,7 +1,7 @@
 import base64
 
 class AesCipher:
-    def __init__(self, key, iv = None, *, Fast = False, Secret = 0, savePadding = True):
+    def __init__(self, key, iv = None, *, Fast = False, Secret = 0, savePadding = True, paddingByte = b'\x00'):
 
         if Fast:
             from Crypto.Cipher import AES
@@ -19,6 +19,7 @@ class AesCipher:
         self.EncryptBlockSize = 16
         self.Secret           = Secret
         self.savePadding      = savePadding
+        self.paddingByte      = paddingByte[:1]
 
     def encrypt(self, message, *, encoding = 'UTF8'):
         if isinstance(message, str):
@@ -60,7 +61,7 @@ class AesCipher:
         pad = 0
         if len(message) < self.EncryptBlockSize:
             pad = self.EncryptBlockSize - len(message)
-            message = message + b'\x00' * pad
+            message = message + self.paddingByte * pad
 
         return self.aes.encrypt(message)
 
