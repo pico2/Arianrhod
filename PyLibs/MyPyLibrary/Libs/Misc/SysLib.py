@@ -172,6 +172,9 @@ class dict2(dict):
 from collections import *
 from .ordered_set import OrderedSet
 
+# OrderedDict.__str__ = dict.__str__
+# OrderedDict.__repr__ = dict.__repr__
+
 class OrderedDictEx(OrderedDict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
