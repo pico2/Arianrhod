@@ -7,6 +7,7 @@ import (
 
     gourl "net/url"
     gohttp "net/http"
+    gonet "net"
 
     "net/http/cookiejar"
     "fmt"
@@ -16,31 +17,46 @@ import (
 )
 
 type Session struct {
-    cookie  *cookiejar.Jar
-    client  *gohttp.Client
-    headers gohttp.Header
+    cookie             *cookiejar.Jar
+    client             *gohttp.Client
+    headers             gohttp.Header
+    defaultTransport   *gohttp.Transport
 }
 
-func NewSession() (*Session, error) {
+func NewSession() *Session {
     jar, err := cookiejar.New(nil)
     if err != nil {
-        return nil, err
+        RaiseHttpError(err)
+    }
+
+    defaultTransport := &gohttp.Transport{
+        Proxy               : nil,
+        // DisableKeepAlives   : true,
+        Dial                : (&gonet.Dialer{
+                                    Timeout     : 30 * time.Second,
+                                    KeepAlive   : 30 * time.Second,
+                                }).Dial,
+
+        TLSHandshakeTimeout : 10 * time.Second,
     }
 
     client := &gohttp.Client{
         CheckRedirect   : nil,
         Jar             : jar,
         Timeout         : 30 * time.Second,
+        Transport       : defaultTransport,
     }
 
     return &Session{
-                cookie  : jar,
-                client  : client,
-                headers : make(gohttp.Header),
-            }, nil
+                cookie              : jar,
+                client              : client,
+                headers             : make(gohttp.Header),
+                defaultTransport    : defaultTransport,
+            }
 }
 
 func (self *Session) Close() {
+    self.defaultTransport.CloseIdleConnections()
 }
 
 func toString(value interface{}) String {
@@ -175,7 +191,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
         })
     }
 
-    request.Close = true
+    // request.Close = true
     resp, err := self.client.Do(request)
     if timer != nil {
         timer.Stop()
@@ -251,7 +267,7 @@ func (self *Session) SetHeaders(headers Dict) {
 
 func (self *Session) SetProxy(host String, port int, userAndPassword ...String) (err error) {
     if host.IsEmpty() {
-        self.client.Transport = nil
+        self.defaultTransport.Proxy = nil
 
     } else {
         var proxyUrl *gourl.URL
@@ -284,7 +300,7 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
             return
         }
 
-        self.client.Transport = &gohttp.Transport{Proxy: gohttp.ProxyURL(proxyUrl)}
+        self.defaultTransport.Proxy = gohttp.ProxyURL(proxyUrl)
     }
 
     return

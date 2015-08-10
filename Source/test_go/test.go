@@ -1,13 +1,10 @@
 package main
 
 import (
-    . "fmt"
     . "ml/trace"
-    // "ml/trace"
+    "ml/net/http"
     "ml/console"
     "time"
-    // "os"
-    // "github.com/PuerkitoBio/goquery"
 )
 
 func unused() {
@@ -15,13 +12,19 @@ func unused() {
 }
 
 func f2() {
-    now := time.Now()
-    Println("fuck")
-    Println(Try(func() {
-        Raise("can't find attribute")
-    }).Message)
+    console.Pause("get")
 
-    Println(time.Now().Sub(now))
+    sesstion := http.NewSession()
+    // sesstion.SetProxy("localhost", 6789)
+
+    for i := 0; i < 10; i++ {
+        sesstion.Get("http://www.baidu.com")
+        time.Sleep(time.Second)
+    }
+
+    console.Pause("got")
+    sesstion.Close()
+    console.Pause("closed")
 }
 
 func main() {
