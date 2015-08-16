@@ -1,6 +1,8 @@
 package com.ouroboros.arianrhod.apphooks;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import android.util.Log;
@@ -32,7 +34,7 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
     }
 
     @Override
-    public void handleLoadPackage(LoadPackageParam pkg) throws Throwable {
+    public void handleLoadPackage(final LoadPackageParam pkg) throws Throwable {
         switch (pkg.packageName) {
             case "pl.solidexplorer2":
                 new HookSolidExplorer().handleLoadPackage(pkg);
@@ -40,6 +42,10 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 
             case "com.tencent.mm":
                 new HookWeChat().handleLoadPackage(pkg);
+                break;
+
+            case "flar2.exkernelmanager":
+                new HookExkernelManager().handleLoadPackage(pkg);
                 break;
         }
     }

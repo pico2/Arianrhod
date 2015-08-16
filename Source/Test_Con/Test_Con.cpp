@@ -131,31 +131,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
 #if ML_X86
 
-    iTunesHelper itunes;
+    SendMessageA((HWND)0x4A0592, WM_SETTEXT, 0, (LPARAM)"431670");
 
-    Rtl::SetExeDirectoryAsCurrent();
-    itunes.iTunesInitialize();
-
-    DEVICE_ID mid, mid2;
-    HANDLE kbsync;
-
-    LOOP_FOREVER
-    {
-        mid.length = 6;
-        *(PULONG)&mid.deviceId[0] = GetRandom32();
-        *(PUSHORT)&mid.deviceId[4] = GetRandom32() + *(PULONG)&mid.deviceId[0];
-
-        mid2.length = 6;
-        *(PULONG)&mid2.deviceId[0] = GetRandom32() + *(PULONG)&mid.deviceId[1];
-        *(PUSHORT)&mid2.deviceId[4] = GetRandom32() + *(PULONG)&mid2.deviceId[0];
-
-        printf("2 %p\n", itunes.KbsyncCreateSession(&kbsync, &mid, &mid2, ""));
-        printf("%p\n", kbsync);
-        itunes.KbsyncCloseSession(kbsync);
-        Ps::Sleep(1000);
-    }
-
-    Ps::ExitProcess(0);
     return;
 
 #else
