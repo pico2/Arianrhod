@@ -47,6 +47,10 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
             case "flar2.exkernelmanager":
                 new HookExkernelManager().handleLoadPackage(pkg);
                 break;
+
+            case "com.ceco.lollipop.gravitybox":
+                new HookGravityBox().handleLoadPackage(pkg);
+                break;
         }
     }
 }

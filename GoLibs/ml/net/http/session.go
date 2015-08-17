@@ -200,6 +200,8 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     self.client.CheckRedirect = nil
 
     if err != nil {
+        self.defaultTransport.CancelRequest(request)
+
         uerr := err.(*gourl.Error)
         herr := &HttpError{
                     Op      : uerr.Op,

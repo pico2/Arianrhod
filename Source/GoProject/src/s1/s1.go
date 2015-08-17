@@ -5,6 +5,7 @@ import (
     . "ml"
     . "ml/dict"
     . "ml/strings"
+    . "ml/trace"
 
     "ml/console"
     "ml/strings"
@@ -12,7 +13,7 @@ import (
     "ml/io2"
     "ml/os2"
     "ml/random"
-    "ml/pprof"
+    // "ml/pprof"
 
     "os"
     "os/signal"
@@ -29,7 +30,7 @@ const (
 
 var exiting bool = false
 
-func login(session *http.Session, user, pass String) error {
+func login(session *http.Session, user, pass String) {
     resp := session.Post(
                 "http://bbs.saraba1st.com/2b/member.php",
                 Dict{
@@ -53,24 +54,21 @@ func login(session *http.Session, user, pass String) error {
             )
 
     if resp.StatusCode != http.StatusOK {
-        return Errorf("login status: %s", http.StatusText(resp.StatusCode))
+        Raisef("login status: %s", http.StatusText(resp.StatusCode))
     }
-
-    return nil
 }
 
-func openPage(session *http.Session, url String) (doc *goquery.Document, err error) {
+func openPage(session *http.Session, url String) (doc *goquery.Document) {
     resp := session.Get(url)
 
-    doc, err = goquery.NewDocumentFromReader(strings.Decode(resp.Content, resp.Encoding).NewReader())
+    doc, err := goquery.NewDocumentFromReader(strings.Decode(resp.Content, resp.Encoding).NewReader())
+    RaiseIf(err)
+
     return
 }
 
-func openThread(session *http.Session, user String) error {
-    doc, err := openPage(session, FORUM_URL)
-    if err != nil {
-        return err
-    }
+func openThread(session *http.Session, user String) {
+    doc := openPage(session, FORUM_URL)
 
     threads := []*goquery.Selection{}
 
@@ -83,7 +81,7 @@ func openThread(session *http.Session, user String) error {
     })
 
     if len(threads) == 0 {
-        return Errorf("empty thread")
+        Raise("empty thread")
     }
 
     index := random.IntRange(0, len(threads))
@@ -91,7 +89,7 @@ func openThread(session *http.Session, user String) error {
     href, ok := t.Attr("href")
 
     if ok == false {
-        return Errorf("can't find thread addr")
+        Raise("can't find thread addr")
     }
 
     credit := String(doc.Find("#extcreditmenu").Text())
@@ -100,15 +98,10 @@ func openThread(session *http.Session, user String) error {
     Printf("[%s][%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), user, credit, t.Text())
 
     session.Get(BASE_URL + href)
-
-    return nil
 }
 
-func logout(session *http.Session) error {
-    doc, err := openPage(session, FORUM_URL)
-    if err != nil {
-        return err
-    }
+func logout(session *http.Session) {
+    doc := openPage(session, FORUM_URL)
 
     doc.Find("a").Each(func(i int, s *goquery.Selection){
         href_, exist := s.Attr("href")
@@ -117,15 +110,13 @@ func logout(session *http.Session) error {
             session.Get(BASE_URL + href)
         }
     })
-
-    return nil
 }
 
 func do(user, pass String) error {
     // user, pass := acc[0], acc[1]
 
     for exiting == false {
-        session, _ := http.NewSession()
+        session := http.NewSession()
         // session.SetProxy("localhost", 6789)
         session.SetHeaders(Dict{
             "Accept"            : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -137,33 +128,39 @@ func do(user, pass String) error {
         })
 
         for exiting == false {
-            err := login(session, user, pass)
-            if err == nil {
+            exp := Try(func() {
+                login(session, user, pass)
+            })
+
+            if exp == nil {
                 break
             }
 
-            Println(err)
-
+            Println(exp)
             time.Sleep(time.Second)
         }
 
         for i := 0; i != 6 && exiting == false; i++ {
-            err := openThread(session, user)
+            exp := Try(func() {
+                        openThread(session, user)
+                    })
 
-            switch err {
+            switch exp {
                 case nil:
                     for i := 0; i != 600 && exiting == false; i++ {
                         time.Sleep(time.Second)
                     }
 
                 default:
-                    Println(err)
+                    Println(exp)
                     time.Sleep(2 * time.Second)
             }
         }
 
-        Println("logout")
-        logout(session)
+        Try(func() {
+            Println("logout")
+            logout(session)
+        })
     }
 
     return nil
@@ -172,12 +169,10 @@ func do(user, pass String) error {
 func readuser() []String {
     usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
     acc, err := io2.ReadTextToLines(usertxt)
-    if err != nil {
-        panic(err)
-    }
+    RaiseIf(err)
 
     if len(acc) < 2 {
-        panic("corrupt user.txt")
+        Raise("corrupt user.txt")
     }
 
     return acc
@@ -185,8 +180,8 @@ func readuser() []String {
 
 func main() {
     defer console.Pause("done")
-    pprof.Start()
-    defer pprof.Stop()
+    // pprof.Start()
+    // defer pprof.Stop()
 
     sigc := make(chan os.Signal, 10)
 

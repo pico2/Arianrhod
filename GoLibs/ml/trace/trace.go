@@ -48,6 +48,10 @@ func Raise(v interface{}) {
     raiseimpl(v)
 }
 
+func Raisef(v ...interface{}) {
+    raiseimpl(Sprintf(v[0].(string), v[1:]...))
+}
+
 func Catch(exp interface{}) *Exception {
     switch e := exp.(type) {
         case *Exception:
