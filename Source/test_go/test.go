@@ -1,33 +1,38 @@
 package main
 
 import (
-    . "ml/trace"
-    "ml/net/http"
-    "ml/console"
-    "time"
+    // . "ml"
+    // . "ml/trace"
+    // "ml/net/http"
+    // "ml/console"
+    // "time"
+    "github.com/andlabs/ui"
 )
 
-func unused() {
-    _ = Raise
-}
-
-func f2() {
-    console.Pause("get")
-
-    sesstion := http.NewSession()
-    // sesstion.SetProxy("localhost", 6789)
-
-    for i := 0; i < 10; i++ {
-        sesstion.Get("http://www.baidu.com")
-        time.Sleep(time.Second)
-    }
-
-    console.Pause("got")
-    sesstion.Close()
-    console.Pause("closed")
-}
-
 func main() {
-    f2()
-    console.Pause("done")
+    var window ui.Window
+
+    go ui.Do(func() {
+        name := ui.NewTextField()
+        button := ui.NewButton("Greet")
+        greeting := ui.NewLabel("")
+        stack := ui.NewVerticalStack(
+            ui.NewLabel("Enter your name:"),
+            name,
+            button,
+            greeting)
+        window = ui.NewWindow("Hello", 200, 100, stack)
+        button.OnClicked(func() {
+            greeting.SetText("Hello, " + name.Text() + "!")
+        })
+        window.OnClosing(func() bool {
+            ui.Stop()
+            return true
+        })
+        window.Show()
+    })
+    err := ui.Go()
+    if err != nil {
+        panic(err)
+    }
 }

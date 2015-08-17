@@ -40,7 +40,7 @@ goto:eof
 :BUILD
 del "%~dpn1.exe" >NUL 2>NUL
 
-call:DELETE_ML_PKG >NUL 2>NUL
+call:DELETE_ML_PKG
 
 go.exe build -ldflags "-s" "%~f1"
 goto:eof
@@ -61,7 +61,7 @@ if [%1] == [] (
     )
 ) else (
     del/q "%~f1"
-    rd/s/q "%~dp1"
+    rd/s/q "%~dpn1"
 )
 
 goto:eof
