@@ -1,37 +1,44 @@
 package main
 
 import (
-    // . "ml"
-    // . "ml/trace"
-    // "ml/net/http"
-    // "ml/console"
-    // "time"
+    _ "ml"
+    . "fmt"
+    "goqml"
 )
 
-func main() {
-    var window ui.Window
+func run() error {
+    q := `
+        import QtQuick 2.0
 
-    go ui.Do(func() {
-        name := ui.NewTextField()
-        button := ui.NewButton("Greet")
-        greeting := ui.NewLabel("")
-        stack := ui.NewVerticalStack(
-            ui.NewLabel("Enter your name:"),
-            name,
-            button,
-            greeting)
-        window = ui.NewWindow("Hello", 200, 100, stack)
-        button.OnClicked(func() {
-            greeting.SetText("Hello, " + name.Text() + "!")
-        })
-        window.OnClosing(func() bool {
-            ui.Stop()
-            return true
-        })
-        window.Show()
-    })
-    err := ui.Go()
+        Rectangle {
+            id: page
+            width: 320; height: 480
+            color: "lightgray"
+
+            Text {
+                id: helloText
+                text: "Hello world!"
+                y: 30
+                anchors.horizontalCenter: page.horizontalCenter
+                font.pointSize: 24; font.bold: true
+            }
+        }
+    `
+
+    engine := qml.NewEngine()
+    component, err := engine.LoadString("fuck.qml", q)
     if err != nil {
-        panic(err)
+        return err
+    }
+
+    window := component.CreateWindow(nil)
+    window.Show()
+    window.Wait()
+    return nil
+}
+
+func main() {
+    if err := qml.Run(run); err != nil {
+        Printf("error: %v\n", err)
     }
 }
