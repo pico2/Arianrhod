@@ -51,6 +51,10 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
             case "com.ceco.lollipop.gravitybox":
                 new HookGravityBox().handleLoadPackage(pkg);
                 break;
+
+            case "com.android.systemui":
+                new HookSystemUi().handleLoadPackage(pkg);
+                break;
         }
     }
 }
