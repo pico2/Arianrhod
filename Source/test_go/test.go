@@ -38,6 +38,11 @@ func run() error {
 }
 
 func main() {
+    switch ("fuck") {
+        case "1", "fuck":
+            Println("case fuck")
+    }
+
     if err := qml.Run(run); err != nil {
         Printf("error: %v\n", err)
     }

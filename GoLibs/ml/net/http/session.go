@@ -212,9 +212,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
         msg := String(herr.Err.Error())
 
         switch {
-            case timeout:
-                fallthrough
-            case msg.Contains("Client.Timeout exceeded while reading body"):
+            case timeout, msg.Contains("Client.Timeout exceeded while reading body"):
                 herr.Type = HTTP_ERROR_TIMEOUT
 
             case msg.Contains("error connecting to proxy"):

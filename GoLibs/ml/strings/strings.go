@@ -159,9 +159,7 @@ func (self String) Split(sep String, maxSplit ...int) []String {
     }
 
     switch {
-        case max < 0:
-            fallthrough
-        case max == 0:
+        case max <= 0:
             max = -1
 
         case max > 0:
@@ -190,9 +188,7 @@ func (self String) RSplit(sep String, maxSplit ...int) []String {
     }
 
     switch {
-        case max < 0:
-            fallthrough
-        case max == 0:
+        case max <= 0:
             max = -1
 
         case max > 0:
