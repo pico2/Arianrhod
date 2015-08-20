@@ -55,6 +55,10 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
             case "com.android.systemui":
                 new HookSystemUi().handleLoadPackage(pkg);
                 break;
+
+            case "com.android.mms":
+//                new HookMms().handleLoadPackage(pkg);
+                break;
         }
     }
 }
