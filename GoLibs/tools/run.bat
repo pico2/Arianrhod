@@ -40,7 +40,7 @@ goto:eof
 :BUILD
 del "%~dpn1.exe" >NUL 2>NUL
 
-call:DELETE_ML_PKG
+call:DELETE_ML_PKG >NUL 2>NUL
 
 go.exe build -ldflags "-s" "%~f1"
 goto:eof
