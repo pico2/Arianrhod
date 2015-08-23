@@ -424,6 +424,7 @@ HRESULT DWriteCreateResources(HDC hdc, wchar_t *text, HFONT hfont)
         // Create a text layout.
         if (SUCCEEDED(hr))
         {
+            g_pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
             hr = g_pDWriteFactory->CreateTextLayout(
                 text,
                 textLength,
@@ -517,7 +518,7 @@ HRESULT DWriteOnPaint(HDC hdc, wchar_t *text, HFONT hfont)
     // Draw the text below the GDI text
     if (SUCCEEDED(hr))
     {
-        hr = g_pTextLayout->Draw(NULL, g_pGdiTextRenderer, 0, 150);
+        hr = g_pTextLayout->Draw(NULL, g_pGdiTextRenderer, 0, 300);
     }
 
     return hr;
@@ -533,7 +534,7 @@ void OnPaint(HDC hdc)
     SIZE size = {};
 
     // Set the height, equivalent to 50 em for DirectWrite.
-    height = -MulDiv(200, GetDeviceCaps(hdc, LOGPIXELSY), 96);
+    height = -MulDiv(300, GetDeviceCaps(hdc, LOGPIXELSY), 96);
 
     hfont = CreateFontW(height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, L"Consolas");
 
