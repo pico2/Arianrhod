@@ -55,10 +55,10 @@ public class HookWeChat implements IXposedHookLoadPackage {
 //       });
 
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "e", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fAO"), "fAH", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fHs"), "fHl", 0);
             }
         });
 
@@ -67,15 +67,15 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lP", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object fES = XposedHelpers.getObjectField(param.thisObject, "fES");
-                Object fEG = XposedHelpers.getObjectField(fES, "fEG");
+                Object fLu = XposedHelpers.getObjectField(param.thisObject, "fLu");
+                Object fLi = XposedHelpers.getObjectField(fLu, "fLi");
 
-                float v2 = ((Long)XposedHelpers.callMethod(fEG, "amK")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(fLi, "anX")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
-                        XposedHelpers.callMethod(fES, "x", v2);
+                        XposedHelpers.callMethod(fLu, "z", v2);
                     } else {
-                        XposedHelpers.callMethod(fES, "x", 1f);
+                        XposedHelpers.callMethod(fLu, "z", 1f);
                     }
                 }
 

@@ -121,11 +121,593 @@ void quick_sort(int *array, int count)
 }
 
 #include "iTunes/iTunes.h"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper\iTunesHelper.cpp"
+
+#include <dwrite.h>
+
+#pragma comment(lib, "dwrite.lib")
+
+class GdiTextRenderer : public IDWriteTextRenderer
+{
+public:
+    GdiTextRenderer(
+        IDWriteBitmapRenderTarget* bitmapRenderTarget,
+        IDWriteRenderingParams* renderingParams
+        )
+        :
+    cRefCount_(0),
+        pRenderTarget_(bitmapRenderTarget),
+        pRenderingParams_(renderingParams)
+    {
+        pRenderTarget_->AddRef();
+        pRenderingParams_->AddRef();
+    }
+
+    GdiTextRenderer::~GdiTextRenderer()
+    {
+        SafeReleaseT(pRenderTarget_);
+        SafeReleaseT(pRenderingParams_);
+    }
+
+    IFACEMETHOD(IsPixelSnappingDisabled)(
+        __maybenull void* clientDrawingContext,
+        __out BOOL* isDisabled
+        )
+    {
+        *isDisabled = FALSE;
+        return S_OK;
+}
+
+    IFACEMETHOD(GetCurrentTransform)(
+        __maybenull void* clientDrawingContext,
+        __out DWRITE_MATRIX* transform
+        )
+    {
+        //forward the render target's transform
+        pRenderTarget_->GetCurrentTransform(transform);
+        return S_OK;
+}
+
+    IFACEMETHOD(GetPixelsPerDip)(
+        __maybenull void* clientDrawingContext,
+        __out FLOAT* pixelsPerDip
+        )
+    {
+        *pixelsPerDip = pRenderTarget_->GetPixelsPerDip();
+        return S_OK;
+}
+
+    IFACEMETHOD(DrawGlyphRun)(
+        __maybenull void* clientDrawingContext,
+        FLOAT baselineOriginX,
+        FLOAT baselineOriginY,
+        DWRITE_MEASURING_MODE measuringMode,
+        __in DWRITE_GLYPH_RUN const* glyphRun,
+        __in DWRITE_GLYPH_RUN_DESCRIPTION const* glyphRunDescription,
+        IUnknown* clientDrawingEffect
+        )
+    {
+        HRESULT hr = S_OK;
+
+        // Pass on the drawing call to the render target to do the real work.
+        RECT dirtyRect = {0};
+
+        hr = pRenderTarget_->DrawGlyphRun(
+            baselineOriginX,
+            baselineOriginY,
+            measuringMode,
+            glyphRun,
+            pRenderingParams_,
+            RGB(0,200,255),
+            &dirtyRect
+            );
+
+
+        return hr;
+}
+
+    IFACEMETHOD(DrawUnderline)(
+        __maybenull void* clientDrawingContext,
+        FLOAT baselineOriginX,
+        FLOAT baselineOriginY,
+        __in DWRITE_UNDERLINE const* underline,
+        IUnknown* clientDrawingEffect
+        )
+    {
+        // Not implemented
+        return E_NOTIMPL;
+}
+
+    IFACEMETHOD(DrawStrikethrough)(
+        __maybenull void* clientDrawingContext,
+        FLOAT baselineOriginX,
+        FLOAT baselineOriginY,
+        __in DWRITE_STRIKETHROUGH const* strikethrough,
+        IUnknown* clientDrawingEffect
+        )
+    {
+        // Not implemented
+        return E_NOTIMPL;
+}
+
+    IFACEMETHOD(DrawInlineObject)(
+        __maybenull void* clientDrawingContext,
+        FLOAT originX,
+        FLOAT originY,
+        IDWriteInlineObject* inlineObject,
+        BOOL isSideways,
+        BOOL isRightToLeft,
+        IUnknown* clientDrawingEffect
+        )
+    {
+        // Not implemented
+        return E_NOTIMPL;
+}
+
+public:
+    IFACEMETHOD_(unsigned long, AddRef) ()
+    {
+        return InterlockedIncrement(&cRefCount_);
+}
+
+    IFACEMETHOD_(unsigned long, Release) ()
+    {
+        long newCount = InterlockedDecrement(&cRefCount_);
+
+        if (newCount == 0)
+        {
+            delete this;
+            return 0;
+        }
+        return newCount;
+}
+    IFACEMETHOD(QueryInterface)(
+        IID const& riid,
+        void** ppvObject
+
+        )
+    {
+        if (__uuidof(IDWriteTextRenderer) == riid)
+        {
+            *ppvObject = this;
+        }
+        else if (__uuidof(IDWritePixelSnapping) == riid)
+        {
+            *ppvObject = this;
+        }
+        else if (__uuidof(IUnknown) == riid)
+        {
+            *ppvObject = this;
+        }
+        else
+        {
+            *ppvObject = NULL;
+            return E_FAIL;
+        }
+
+        return S_OK;
+}
+
+private:
+    unsigned long cRefCount_;
+    IDWriteBitmapRenderTarget* pRenderTarget_;
+    IDWriteRenderingParams* pRenderingParams_;
+};
+
+IDWriteFactory* g_pDWriteFactory = NULL;
+IDWriteTextFormat* g_pTextFormat = NULL;
+IDWriteGdiInterop* g_pGdiInterop = NULL;
+IDWriteTextLayout* g_pTextLayout = NULL;
+IDWriteBitmapRenderTarget* g_pBitmapRenderTarget = NULL;
+IDWriteRenderingParams* g_pRenderingParams = NULL;
+
+// For our custom renderer class.
+IDWriteTextRenderer* g_pGdiTextRenderer = NULL;
+
+HRESULT DWriteCreateResources(HDC hdc, wchar_t *text, HFONT hfont)
+{
+    HRESULT hr = S_OK;
+
+    // If the DirectWrite factory doesn't exist, create the resources,
+    // only create these resources once.
+    if (!g_pDWriteFactory)
+    {
+        HWND hwnd;
+        RECT r;
+
+        // DirectWrite variables.
+        IDWriteFontFamily* pFontFamily = NULL;
+        IDWriteFont* pFont = NULL;
+        IDWriteLocalizedStrings* pFamilyNames = NULL;
+
+        // Logical (GDI) font.
+        LOGFONT lf = {};
+
+        UINT32 length = 0;
+        UINT32 index = 0;
+        float fontSize = 0;
+
+        // length of the string
+        UINT32 textLength = 0;
+
+        wchar_t *name = NULL;
+
+        // Get a handle to the DC and the window rect.
+        hwnd = WindowFromDC(hdc);
+        GetClientRect(hwnd, &r);
+
+        // Calculate the string length.
+        textLength = UINT32(wcslen(text));
+
+        // Create the DirectWrite factory.
+        hr = DWriteCreateFactory(
+            DWRITE_FACTORY_TYPE_SHARED,
+            __uuidof(IDWriteFactory),
+            reinterpret_cast<IUnknown**>(&g_pDWriteFactory)
+            );
+
+        // Create a GDI interop interface.
+        if (SUCCEEDED(hr))
+        {
+            hr = g_pDWriteFactory->GetGdiInterop(&g_pGdiInterop);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            // Get a logical font from the font handle.
+            GetObject(hfont, sizeof(LOGFONT), &lf);
+        }
+
+        // Convert to a DirectWrite font.
+        if (SUCCEEDED(hr))
+        {
+            hr = g_pGdiInterop->CreateFontFromLOGFONT(&lf, &pFont);
+        }
+
+        // Get the font family.
+        if (SUCCEEDED(hr))
+        {
+            hr = pFont->GetFontFamily(&pFontFamily);
+        }
+
+        // Get a list of localized family names.
+        if (SUCCEEDED(hr))
+        {
+            hr = pFontFamily->GetFamilyNames(&pFamilyNames);
+        }
+
+        // Select the first locale.  This is OK, because we are not displaying the family name.
+        index = 0;
+
+        // Get the length of the family name.
+        if (SUCCEEDED(hr))
+        {
+            hr = pFamilyNames->GetStringLength(index, &length);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            // Allocate a new string.
+            name = new (std::nothrow) wchar_t[length+1];
+		    if (name == NULL)
+            {
+			    hr = E_OUTOFMEMORY;
+            }
+        }
+
+        // Get the actual family name.
+        if (SUCCEEDED(hr))
+        {
+            hr = pFamilyNames->GetString(index, name, length+1);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            // Calculate the font size.
+            fontSize = (float) -MulDiv(lf.lfHeight, 96, GetDeviceCaps(hdc, LOGPIXELSY));
+        }
+
+        // Create a text format using the converted font information.
+        if (SUCCEEDED(hr))
+        {
+            hr = g_pDWriteFactory->CreateTextFormat(
+                name,                // Font family name.
+                NULL,
+                pFont->GetWeight(),
+                pFont->GetStyle(),
+                pFont->GetStretch(),
+                fontSize,
+                L"en-us",
+                &g_pTextFormat
+                );
+        }
+
+        // Create a text layout.
+        if (SUCCEEDED(hr))
+        {
+            hr = g_pDWriteFactory->CreateTextLayout(
+                text,
+                textLength,
+                g_pTextFormat,
+                1024.0f,
+                480.0f,
+                &g_pTextLayout
+                );
+        }
+
+        // Underline and strikethrough are part of a LOGFONT structure, but are not
+        // part of a DWrite font object so we must set them using the text layout.
+        if(lf.lfUnderline)
+        {
+            DWRITE_TEXT_RANGE textRange = {0, textLength};
+            g_pTextLayout->SetUnderline(true, textRange);
+        }
+
+        if(lf.lfStrikeOut)
+        {
+            DWRITE_TEXT_RANGE textRange = {0, textLength};
+            g_pTextLayout->SetStrikethrough(true, textRange);
+        }
+
+        // Create a bitmap render target for our custom renderer.
+        if (SUCCEEDED(hr))
+        {
+            hr = g_pGdiInterop->CreateBitmapRenderTarget(hdc, r.right, r.bottom, &g_pBitmapRenderTarget);
+        }
+
+        // Create default rendering params for our custom renderer.
+        if (SUCCEEDED(hr))
+        {
+            hr = g_pDWriteFactory->CreateRenderingParams(&g_pRenderingParams);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            // Initialize the custom renderer class.
+		    g_pGdiTextRenderer = new (std::nothrow) GdiTextRenderer(g_pBitmapRenderTarget, g_pRenderingParams);
+        }
+
+        // Clean up local interfaces.
+        SafeReleaseT(pFontFamily);
+        SafeReleaseT(pFont);
+        SafeReleaseT(pFamilyNames);
+    }
+
+    return hr;
+}
+
+/******************************************************************
+*                                                                 *
+*  GdiOnPaint                                                     *
+*                                                                 *
+*  Draw the text using GDI and the TextOut function.              *
+*                                                                 *
+*                                                                 *
+******************************************************************/
+
+void GdiOnPaint(HDC hdc, wchar_t *text, HFONT hfont)
+{
+    HFONT hf;
+    UINT32 textLength;
+
+    textLength = UINT32(wcslen(text));
+
+    hf = (HFONT) SelectObject(hdc, hfont);
+
+    SetTextColor(hdc, RGB(0, 200, 255));
+
+    TextOut(hdc, 0, 0, text, textLength);
+
+    SelectObject(hdc, hf);
+}
+
+/******************************************************************
+*                                                                 *
+*  DWriteOnPaint                                                  *
+*                                                                 *
+*  Clears the memory DC of the bitmap render target, renders to   *
+*  it using a custom text renderer, and then copies it to the     *
+*  window device context using the BitBlt function.               *
+*                                                                 *
+******************************************************************/
+
+HRESULT DWriteOnPaint(HDC hdc, wchar_t *text, HFONT hfont)
+{
+    HRESULT hr = S_OK;
+
+    // Draw the text below the GDI text
+    if (SUCCEEDED(hr))
+    {
+        hr = g_pTextLayout->Draw(NULL, g_pGdiTextRenderer, 0, 150);
+    }
+
+    return hr;
+}
+
+void OnPaint(HDC hdc)
+{
+    HRESULT hr = S_OK;
+
+    HFONT hfont = NULL;
+    long height = 0;
+    HDC memoryHdc = NULL;
+    SIZE size = {};
+
+    // Set the height, equivalent to 50 em for DirectWrite.
+    height = -MulDiv(200, GetDeviceCaps(hdc, LOGPIXELSY), 96);
+
+    hfont = CreateFontW(height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, L"Consolas");
+
+    wchar_t dwriteText[ ] = L"Sample text using DirectWrite.";
+    wchar_t gdiText[ ] = L"Sample text using GDI TextOut.";
+
+    // The DirectWrite objects need only be created once and can be reused each time the window paints
+    hr = DWriteCreateResources(hdc, dwriteText, hfont);
+
+    // Get the memory device context, the drawing is done offscreen.
+    if (SUCCEEDED(hr))
+    {
+        memoryHdc = g_pBitmapRenderTarget->GetMemoryDC();
+        SetBoundsRect(memoryHdc, NULL, DCB_ENABLE|DCB_RESET);
+    }
+
+    // Get the size of the target.
+    if (SUCCEEDED(hr))
+    {
+        hr = g_pBitmapRenderTarget->GetSize(&size);
+    }
+
+    // Clear the background
+    if (SUCCEEDED(hr))
+    {
+        SetDCBrushColor(memoryHdc, 0xFFFFFF);
+        SelectObject(memoryHdc, GetStockObject(NULL_PEN));
+        SelectObject(memoryHdc, GetStockObject(DC_BRUSH));
+        Rectangle(memoryHdc, 0, 0, size.cx + 1, size.cy + 1);
+    }
+
+    // Draw the string to the memory HDC using GDI.
+    if (SUCCEEDED(hr))
+    {
+        GdiOnPaint(memoryHdc, gdiText, hfont);
+    }
+
+    // Draw the same string below the first to the memory HDC using DirectWrite.
+    if (SUCCEEDED(hr))
+    {
+        hr = DWriteOnPaint(memoryHdc, dwriteText, hfont);
+    }
+
+    // Transfer from DWrite's rendering target to the window.
+    BitBlt(
+        hdc,
+        0, 0,
+        size.cx + 1, size.cy + 1,
+        memoryHdc,
+        0, 0,
+        SRCCOPY
+        );
+
+    // If the DirectWrite drawing failed, exit and display an error.
+    if (FAILED(hr))
+    {
+        wchar_t error[255];
+
+        swprintf(error, L"HRESULT = %x", hr);
+
+        MessageBox(0, error, L"Error, exiting.", 0);
+
+        exit(1);
+    }
+}
+
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int wmId, wmEvent;
+    PAINTSTRUCT ps;
+    HDC hdc;
+
+    switch (message)
+    {
+    case WM_COMMAND:
+        wmId    = LOWORD(wParam);
+        wmEvent = HIWORD(wParam);
+        // Parse the menu selections:
+        switch (wmId)
+        {
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+        break;
+    case WM_PAINT:
+        hdc = BeginPaint(hWnd, &ps);
+        OnPaint(hdc);
+        EndPaint(hWnd, &ps);
+        break;
+    case WM_SIZE:
+        if (g_pBitmapRenderTarget)
+        {
+            int width = LOWORD(lParam);
+            int height = HIWORD(lParam);
+            g_pBitmapRenderTarget->Resize(width, height);
+        }
+        break;
+    case WM_DESTROY:
+        // The window is closing, release the DirectWrite variables we created for drawing.
+        SafeReleaseT(g_pDWriteFactory);
+        SafeReleaseT(g_pTextFormat);
+        SafeReleaseT(g_pGdiInterop);
+        SafeReleaseT(g_pTextLayout);
+        SafeReleaseT(g_pBitmapRenderTarget);
+        SafeReleaseT(g_pRenderingParams);
+        SafeReleaseT(g_pGdiTextRenderer);
+
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+
+    MSG msg;
+
+    WNDCLASSEXW wcex;
+
+    ZeroMemory(&wcex, sizeof(wcex));
+    wcex.cbSize = sizeof(wcex);
+
+    wcex.style            = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc    = WndProc;
+    wcex.cbClsExtra        = 0;
+    wcex.cbWndExtra        = 0;
+    wcex.hInstance        = (HINSTANCE)&__ImageBase;
+    wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+    wcex.hbrBackground    = NULL;
+    wcex.lpszClassName    = L"FUCK";
+
+    RegisterClassExW(&wcex);
+
+    auto InitInstance = [](HINSTANCE hInstance, int nCmdShow)
+    {
+        HWND hWnd;
+
+        hInstance; // Store instance handle in our global variable
+
+        hWnd = CreateWindow(L"FUCK", L"FUCK", WS_OVERLAPPEDWINDOW,
+            CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+
+        if (!hWnd)
+        {
+            return FALSE;
+        }
+
+        ShowWindow(hWnd, nCmdShow);
+        UpdateWindow(hWnd);
+
+        return TRUE;
+    };
+
+    // Perform application initialization:
+    if (!InitInstance ((HINSTANCE)&__ImageBase, SW_SHOWNORMAL))
+    {
+        return;
+    }
+
+    // Main message loop:
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    Ps::ExitProcess(0);
+
+    return;
 
     ml::MlInitialize();
 
@@ -699,483 +1281,6 @@ VOID DeleteSelf()
 }
 
 #endif // x86
-
-#if 0
-
-#include "json-c/json.h"
-#include "json-c/json_object_private.h"
-
-#include "E:/Desktop/Source/GUI/Celestial Globe/Internal/CG_Script.h"
-
-#define CG_SCRIPT_CONFIG_ROOT_TAG       L"CoreConfig"
-#define CG_SCRIPT_CONFIG_UI_MODULE      L"UIModule"
-#define CG_SCRIPT_CONFIG_IMAGE_PLUGIN   L"ImagePlugin"
-#define CG_SCRIPT_CONFIG_CATEGORY       L"Category"
-#define CG_SCRIPT_CONFIG_CATEGORY_LIST  L"List"
-
-#define CG_SCRIPT_GAMELIST_ROOT_TAG     L"GameList"
-
-#define PARSE_SCRIPT_CHECK_BUFFER_SIZE(size, info) \
-            if ((size) < sizeof(info)) \
-                return STATUS_BUFFER_TOO_SMALL
-
-CGSTATUS
-ParseCoreConfig(
-    JSON_OBJECT            *Script,
-    CG_SCRIPT_CORE_CONFIG  *CoreConfig,
-    ULONG                   InfoSize
-)
-{
-    CGSTATUS     Status;
-    JSON_OBJECT *Object, *CategoryObject, *CategoryItem;
-    CG_GAME_CATEGORY_ENTRY *CategoryEntry;
-
-    PARSE_SCRIPT_CHECK_BUFFER_SIZE(InfoSize, CoreConfig);
-
-    ZeroMemory(CoreConfig, sizeof(*CoreConfig));
-    CoreConfig->ScriptType = CG_SCRIPT_TYPE_CONFIG;
-
-    Status = STATUS_SUCCESS;
-    Object = Script->Value.Object.Object;
-    for (ULONG Count = Script->Value.Object.Count; Count; ++Object, --Count)
-    {
-        if (!StrICompareW(Object->Name.Buffer, CG_SCRIPT_CONFIG_CATEGORY))
-        {
-            if (Object->Type != JSON_TYPE_OBJECT)
-            {
-                Status = STATUS_UNSUCCESSFUL;
-                break;
-            }
-
-            CoreConfig->Category.Count = Object->Value.Object.Count;
-            CategoryEntry = (CG_GAME_CATEGORY_ENTRY *)malloc(sizeof(*CategoryEntry) * CoreConfig->Category.Count);
-            if (CategoryEntry == NULL)
-            {
-                Status = STATUS_NO_MEMORY;
-                break;
-            }
-
-            CoreConfig->Category.pCategory = CategoryEntry;
-
-            CategoryObject = Object->Value.Object.Object;
-            for (ULONG Count = Object->Value.Object.Count; Count; --Count)
-            {
-                if (CategoryObject->Type != JSON_TYPE_OBJECT)
-                    continue;
-
-                CategoryItem = CategoryObject->Value.Object.Object;
-                RtlCreateUnicodeString(&CategoryEntry->Name, CategoryObject->Name.Buffer);
-                for (ULONG ItemCount = CategoryObject->Value.Object.Count; ItemCount; --ItemCount)
-                {
-                    if (!StrICompareW(CategoryItem->Name.Buffer, CG_SCRIPT_CONFIG_CATEGORY_LIST))
-                    {
-                        if (CategoryItem->Type != JSON_TYPE_STRING)
-                            continue;
-
-                        RtlCreateUnicodeString(
-                            &CategoryEntry->ScriptPath,
-                            CategoryItem->Value.String.Buffer
-                        );
-                    }
-                }
-
-                ++CategoryObject;
-                ++CategoryEntry;
-            }
-        }
-        else if (!StrICompareW(Object->Name.Buffer, CG_SCRIPT_CONFIG_UI_MODULE))
-        {
-            RtlCreateUnicodeString(&CoreConfig->UIModule, Object->Value.String.Buffer);
-        }
-    }
-
-    return Status;
-}
-
-CGSTATUS FreeScript(CG_SCRIPT_BASE *ScriptInfo)
-{
-    union
-    {
-        CG_SCRIPT_BASE          *Base;
-        CG_SCRIPT_CORE_CONFIG   *CoreConfig;
-        CG_SCRIPT_PLUGIN        *Plugin;
-    };
-
-    CGSTATUS Status;
-    CG_GAME_CATEGORY_ENTRY *pCategory;
-
-    Status = STATUS_SUCCESS;
-    Base = ScriptInfo;
-    switch (Base->ScriptType)
-    {
-        case CG_SCRIPT_TYPE_CONFIG:
-            RtlFreeUnicodeString(&CoreConfig->UIModule);
-            RtlFreeUnicodeString(&CoreConfig->ImagePlugin);
-
-            pCategory = CoreConfig->Category.pCategory;
-            for (ULONG Count = CoreConfig->Category.Count; Count; ++pCategory, --Count)
-            {
-                RtlFreeUnicodeString(&pCategory->Name);
-                RtlFreeUnicodeString(&pCategory->ScriptPath);
-            }
-
-            free(CoreConfig->Category.pCategory);
-            break;
-    }
-
-    ZeroMemory(CoreConfig, sizeof(*CoreConfig));
-
-    return Status;
-}
-
-CGSTATUS
-ParseScript(
-    PVOID           Script,
-    ULONG           ScriptSize,
-    CG_SCRIPT_BASE *ScriptInfo,
-    ULONG           InfoSize
-)
-{
-    CGSTATUS    Status;
-    JSON_OBJECT Object, *ScriptObject;
-    CJsonParser JsonParser;
-
-    Status = JsonParser.Parse(Script, ScriptSize, &Object);
-    if (!CG_SUCCESS(Status))
-        return Status;
-
-    Status = STATUS_UNSUCCESSFUL;
-    LOOP_ONCE
-    {
-        if (Object.Type != JSON_TYPE_OBJECT ||
-            Object.Value.Object.Count < 1   ||
-            Object.Value.Object.Object->Type != JSON_TYPE_OBJECT)
-        {
-            break;
-        }
-
-        ScriptObject = Object.Value.Object.Object;
-        if (!StrICompare(ScriptObject->Name.Buffer, CG_SCRIPT_CONFIG_ROOT_TAG))
-        {
-            Status = ParseCoreConfig(ScriptObject, (CG_SCRIPT_CORE_CONFIG *)ScriptInfo, InfoSize);
-        }
-        else if (StrICompareW(ScriptObject->Name.Buffer, CG_SCRIPT_GAMELIST_ROOT_TAG))
-        {
-            ;
-        }
-    }
-
-    JsonParser.Destroy(&Object);
-    if (!CG_SUCCESS(Status))
-        FreeScript(ScriptInfo);
-
-    return Status;
-}
-
-#endif
-
-#if 0
-
-#define _JUNK_CODE(label, junk_bytes) \
-            label: INLINE_ASM push label + 0xC3654321 + 0xE + junk_bytes \
-            INLINE_ASM sub  dword ptr [esp], 0xC3654321 - junk_bytes + 4 \
-            INLINE_ASM __emit 0xEB INLINE_ASM __emit 0xFD \
-            INLINE_ASM __emit 0x28
-
-#define JUNK_CODE() _JUNK_CODE(MAKE_UNIQUE_NAME(__COUNTER__), 1)
-
-PCHAR SkipSpace(PCHAR p, BOOL Forward)
-{
-    ULONG delta = Forward ? 1 : -1;
-
-    while (*p == ' ' || *p == '\t')
-        p += delta;
-
-    return p;
-}
-
-VOID AntiDllInject()
-{
-    ULONG Version, ClientLoadDllIndex;
-
-    Version = 500;
-    switch (Version)
-    {
-        case 500:
-            ClientLoadDllIndex = 0x40;
-            break;
-
-        case 501:
-        case 600:
-            ClientLoadDllIndex = 0x42;
-            break;
-
-        case 601:
-            ClientLoadDllIndex = 0x41;
-            break;
-
-        default:
-            return;
-    }
-}
-
-#define HANDLE_INDEX_MASK 0xFC000000u
-
-template<class HandleType>
-class HandleTableManager
-{
-protected:
-    RTL_HANDLE_TABLE m_HandleTable;
-
-    const static ULONG m_kHandleSize = sizeof(HandleType);
-
-public:
-    HandleTableManager()
-    {
-        ZeroMemory(&m_HandleTable, sizeof(m_HandleTable));
-    }
-
-    HandleTableManager(ULONG MaximumHandleCount)
-    {
-        Initialize(MaximumHandleCount);
-    }
-
-    ~HandleTableManager()
-    {
-        RtlDestroyHandleTable(&m_HandleTable);
-    }
-
-    VOID Initialize(ULONG MaximumHandleCount)
-    {
-        RtlInitializeHandleTable(
-            MaximumHandleCount * m_kHandleSize,
-            m_kHandleSize,
-            &m_HandleTable
-        );
-    }
-
-    HANDLE AllocateHandle(PRTL_HANDLE_TABLE_ENTRY *Object = NULL)
-    {
-        ULONG_PTR Handle;
-        PRTL_HANDLE_TABLE_ENTRY Entry;
-
-        if (Object != NULL)
-            *Object = NULL;
-
-        Entry = RtlAllocateHandle(&m_HandleTable, &Handle);
-        if (Entry == NULL)
-            return NULL;
-
-        SET_FLAG(Entry->Flags, RTL_HANDLE_VALID);
-
-        if (Object != NULL)
-            *Object = Entry;
-
-        return GetHandleByIndex(Handle);
-    }
-
-    BOOL ReferenceObjectByHandle(HANDLE Handle, HandleType **Object)
-    {
-        return IsValidHandle(Handle, (PVOID *)Object);
-    }
-
-    BOOL FreeHandle(HandleType *Object)
-    {
-        if (!RtlIsValidHandle(&m_HandleTable, (PRTL_HANDLE_TABLE_ENTRY)Object))
-            return FALSE;
-
-        return RtlFreeHandle(&m_HandleTable, (PRTL_HANDLE_TABLE_ENTRY)Object);
-    }
-
-    BOOL FreeHandle(HANDLE Handle)
-    {
-        HandleType *Object;
-
-        if (!ReferenceObjectByHandle(Handle, &Object))
-            return FALSE;
-
-        return FreeHandle(Object);
-    }
-
-protected:
-    BOOL IsValidHandle(HANDLE Handle, PVOID *Object = NULL)
-    {
-        ULONG_PTR Index;
-
-        if (Handle == NULL || PtrAnd(Handle, 3) != 0)
-            return FALSE;
-
-        Index = GetIndexByHandle(Handle);
-
-        return IsValidIndexHandle(Index, Object);
-    }
-
-    BOOL IsValidIndexHandle(ULONG_PTR Index, PVOID *Object = NULL)
-    {
-        PRTL_HANDLE_TABLE_ENTRY Entry;
-
-        if (Object == NULL)
-            Object = (PVOID *)&Entry;
-
-        return RtlIsValidIndexHandle(&m_HandleTable, Index, (PRTL_HANDLE_TABLE_ENTRY *)Object);
-    }
-
-    ULONG_PTR GetIndexByHandle(HANDLE Handle)
-    {
-        return (ULONG_PTR)Handle / 4 - 1;
-    }
-
-    HANDLE GetHandleByIndex(ULONG_PTR Index)
-    {
-        return (HANDLE)(++Index * 4);
-    }
-};
-
-struct HANDLE_OBJECT
-{
-    enum HandleObjectTypeClass
-    {
-        ObjectFile,
-    };
-
-    ULONG RefCount;
-    ULONG Flags;        // HANDLE_FLAG_PROTECT_FROM_CLOSE
-    ULONG ObjectType;
-
-    union
-    {
-        struct
-        {
-            UNICODE_STRING  FileName;
-            LARGE_INTEGER   FileSize;
-            LARGE_INTEGER   CurrentPosition;
-        } FileObject;
-
-    } Data;
-
-    HANDLE_OBJECT()
-    {
-        RefCount    = 1;
-        Flags       = 0;
-    }
-
-    ULONG AddRef()
-    {
-        return _InterlockedIncrement((PLONG)&RefCount);
-    }
-
-    ULONG Release()
-    {
-        ULONG Ref;
-
-        Ref = _InterlockedDecrement((PLONG)&RefCount);
-        if (Ref == 0)
-            delete this;
-
-        return Ref;
-    }
-};
-
-DECL_ALIGN(8) struct HANDLE_ENTRY : public RTL_HANDLE_TABLE_ENTRY
-{
-    HANDLE_OBJECT *Object;
-};
-
-typedef enum
-{
-    RTMP_HEADER_LENGTH_12   = 0,
-    RTMP_HEADER_LENGTH_8    = 1,
-    RTMP_HEADER_LENGTH_4    = 2,
-    RTMP_HEADER_LENGTH_1    = 3,
-
-} RtmpHeaderLengthClass;
-
-DECL_ALIGN(1) struct RTMP_HEADER
-{
-    union
-    {
-        struct
-        {
-            BYTE Type   : 6;
-            BYTE Length : 2;
-        };
-
-        ULONG TimeStamp;
-    };
-
-    BYTE  AMFSize[3];
-    BYTE  AMFType;
-    ULONG StreamID;
-
-    ULONG GetType()
-    {
-        return Type;
-    }
-
-    ULONG GetLength()
-    {
-        BYTE RtmpLengthMap[] = { 12, 8, 4, 1 };
-
-        return Length > countof(RtmpLengthMap) ? -1 : RtmpLengthMap[Length];
-    }
-
-    ULONG GetLengthRaw()
-    {
-        return Length;
-    }
-
-    ULONG GetTimeStamp()
-    {
-        return Bswap(TimeStamp >> 8);
-    }
-
-    ULONG GetAMFSize()
-    {
-        ULONG Size = *(PULONG)AMFSize & 0xFFFFFF;
-
-        return ((Size & 0xFF) << 16) | (Size & 0x0000FF00) | (Size >> 16);
-    }
-
-    ULONG GetAMFType()
-    {
-        return AMFType;
-    }
-
-    ULONG GetStreamID()
-    {
-        return Bswap(StreamID);
-    }
-
-    PVOID GetAMFData()
-    {
-        return PtrAdd((PVOID)this, GetLength());
-    }
-};
-
-typedef enum
-{
-    AMF_TYPE_NUMBER         = 0x00,
-    AMF_TYPE_BOOLEAN        = 0x01,
-    AMF_TYPE_STRING         = 0x02,
-    AMF_TYPE_OBJECT         = 0x03,
-    AMF_TYPE_MOVIECLIP      = 0x04 ,
-    AMF_TYPE_NULL           = 0x05,
-    AMF_TYPE_UNDEFINED      = 0x06,
-    AMF_TYPE_REFERENCE      = 0x07,
-    AMF_TYPE_ECMA_ARRAY     = 0x08,
-    AMF_TYPE_END_OF_OBJECT  = 0x09,
-    AMF_TYPE_ARRAY          = 0x0A,
-    AMF_TYPE_DATE           = 0x0B,
-    AMF_TYPE_LONG_STRING    = 0x0C,
-    AMF_TYPE_UNSUPPORTED    = 0x0D,
-    AMF_TYPE_RECORDSET      = 0x0E,
-    AMF_TYPE_XML            = 0x0F,
-    AMF_TYPE_TYPED_OBJECT   = 0x10,
-    AMF_TYPE_AMF3_OBJECT    = 0x11,
-
-} AmfTypeClass;
-
-#endif
 
 #endif
 
