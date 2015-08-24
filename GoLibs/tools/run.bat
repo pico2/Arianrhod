@@ -54,6 +54,7 @@ goto:eof
 goto:eof
 
 :DELETE_ML_PKG
+goto:eof
 if [%1] == [] (
     for /f %%i in ('dir/s/b "%~dp0\pkgs\pkg\ml"') do (
         call:DELETE_ML_PKG "%%~fi.a"
