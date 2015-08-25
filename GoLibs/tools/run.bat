@@ -42,6 +42,7 @@ del "%~dpn1.exe" >NUL 2>NUL
 
 call:DELETE_ML_PKG >NUL 2>NUL
 
+:: -H windowsgui
 go.exe build -ldflags "-s" "%~f1"
 goto:eof
 
