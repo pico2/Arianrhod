@@ -178,7 +178,31 @@ func run() error {
         data.PackageName = pkgname
     }
 
-    return tmpl.Execute(f, data)
+    err = tmpl.Execute(f, data)
+    if err != nil {
+        return err
+    }
+
+    f.WriteString("    ")
+
+    count := 0
+    for _, ch := range resdata {
+        _, err = f.WriteString(fmt.Sprintf("0x%02X,", ch))
+        count++
+
+        if err == nil && count == 16 {
+            count = 0
+            _, err = f.WriteString("\n    ")
+        }
+
+        if err != nil {
+            break
+        }
+    }
+
+    _, err = f.WriteString("\n}")
+
+    return err
 }
 
 type templateData struct {
@@ -268,5 +292,5 @@ func repackResources() []byte {
     return rp.Pack().Bytes()
 }
 
-var qrcResourcesData = []byte({{printf "%q" .ResourcesData}})
+var qrcResourcesData = []byte{
 `)
