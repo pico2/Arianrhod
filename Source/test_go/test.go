@@ -4,11 +4,12 @@ import (
     _ "ml"
     . "fmt"
     "goqml"
+    _ "./resource"
 )
 
 func run() error {
     engine := qml.NewEngine()
-    component, err := engine.LoadFile("resource/fuck.qml")
+    component, err := engine.LoadFile("qrc:///resource/calqlatr.qml")
     if err != nil {
         return err
     }
