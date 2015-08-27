@@ -2,6 +2,7 @@ package main
 
 import (
     _ "ml"
+    "ml/console"
     . "fmt"
     "goqml"
     _ "./resource"
@@ -9,7 +10,7 @@ import (
 
 func run() error {
     engine := qml.NewEngine()
-    component, err := engine.LoadFile("qrc:///resource/calqlatr.qml")
+    component, err := engine.LoadFile("qrc:///resource/main.qml")
     if err != nil {
         return err
     }
@@ -28,5 +29,6 @@ func main() {
 
     if err := qml.Run(run); err != nil {
         Printf("error: %v\n", err)
+        console.Pause("done")
     }
 }
