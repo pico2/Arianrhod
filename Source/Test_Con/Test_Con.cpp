@@ -126,16 +126,12 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    static CHAR x[] = u8"жпнд";
-    printf("%s\n", x);
-
     return;
 
     ml::MlInitialize();
 
 #if ML_X86
 
-    SendMessageA((HWND)0x4A0592, WM_SETTEXT, 0, (LPARAM)"431670");
 
     return;
 
