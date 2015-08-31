@@ -26,5 +26,5 @@ md "%TARGET%\platforms"
 copy "%QT_PATH%\plugins\platforms\qwindows.dll" "%TARGET%\platforms"
 
 ::echo D | xcopy /E /Y "%QT_PATH%\qml\QtQml" "%TARGET%\QtQml"
-::echo D | xcopy /E /Y "%QT_PATH%\qml\QtQuick" "%TARGET%\QtQuick"
+echo D | xcopy /E /Y "%QT_PATH%\qml\QtQuick" "%TARGET%\QtQuick"
 echo D | xcopy /E /Y "%QT_PATH%\qml\QtQuick.2" "%TARGET%\QtQuick.2"
