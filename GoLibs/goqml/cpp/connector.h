@@ -16,6 +16,9 @@ class Connector : public QObject
 
     virtual ~Connector();
 
+    const QMetaObject::Connection& connection() { return this->qconnection; }
+    void setConnection(const QMetaObject::Connection& connection);
+
     // MOC HACK: s/Connector::qt_metacall/Connector::standard_qt_metacall/
     int standard_qt_metacall(QMetaObject::Call c, int idx, void **a);
 
@@ -27,6 +30,7 @@ class Connector : public QObject
 
     QQmlEngine *engine;
     QMetaMethod method;
+    QMetaObject::Connection qconnection;
     void *func;
     int argsLen;
 };

@@ -438,6 +438,11 @@ func (m *Map) Convert(mapAddr interface{}) {
 type Common struct {
 	addr   unsafe.Pointer
 	engine *Engine
+	connections map[string]map[uintptr]uintptr
+}
+
+func newConnections() map[string]map[uintptr]uintptr {
+	return map[string]map[uintptr]uintptr{}
 }
 
 var _ Object = (*Common)(nil)
@@ -447,7 +452,7 @@ var _ Object = (*Common)(nil)
 // This is meant for extensions that integrate directly with the
 // underlying QML logic.
 func CommonOf(addr unsafe.Pointer, engine *Engine) *Common {
-	return &Common{addr, engine}
+	return &Common{addr, engine, newConnections()}
 }
 
 // Common returns obj itself.
@@ -677,14 +682,14 @@ func (obj *Common) ObjectByName(objectName string) Object {
 			if fold.init.IsValid() {
 				panic("internal error: custom Go type not initialized")
 			}
-			object = &Common{fold.cvalue, fold.engine}
+			object = &Common{fold.cvalue, fold.engine, newConnections()}
 		} else {
 			object, _ = value.(Object)
 		}
 	})
-	if object == nil {
-		panic(fmt.Sprintf("cannot find descendant with objectName == %q", objectName))
-	}
+	// if object == nil {
+	// 	panic(fmt.Sprintf("cannot find descendant with objectName == %q", objectName))
+	// }
 	return object
 }
 
@@ -788,6 +793,10 @@ var connectedFunction = make(map[*interface{}]bool)
 //     http://qt-project.org/doc/qt-5.0/qtqml/qml-qtquick2-connections.html
 //
 func (obj *Common) On(signal string, function interface{}) {
+	if obj.connections == nil {
+		obj.connections = make(map[string]map[uintptr]uintptr)
+	}
+
 	funcv := reflect.ValueOf(function)
 	funct := funcv.Type()
 	if funcv.Kind() != reflect.Func {
@@ -797,19 +806,68 @@ func (obj *Common) On(signal string, function interface{}) {
 		panic("function takes too many arguments")
 	}
 	csignal, csignallen := unsafeStringData(signal)
+
 	var cerr *C.error
+	var connection uintptr
 	RunMain(func() {
-		cerr = C.objectConnect(obj.addr, csignal, csignallen, obj.engine.addr, unsafe.Pointer(&function), C.int(funcv.Type().NumIn()))
+		cerr = C.objectConnect(
+					obj.addr,
+					csignal,
+					csignallen,
+					obj.engine.addr,
+					unsafe.Pointer(&function),
+					C.int(funcv.Type().NumIn()),
+					(*unsafe.Pointer)(unsafe.Pointer(&connection)),
+				)
 		if cerr == nil {
+			table, exists := obj.connections[signal]
+			if exists == false {
+				table = make(map[uintptr]uintptr)
+				obj.connections[signal] = table
+			}
+			table[funcv.Pointer()] = connection
 			connectedFunction[&function] = true
 			stats.connectionsAlive(+1)
 		}
 	})
+
 	cmust(cerr)
+}
+
+func (obj *Common) Off(signal string, function interface{}) bool {
+	if obj.connections == nil {
+		return false
+	}
+
+	table, exists := obj.connections[signal]
+	if exists == false {
+		return false
+	}
+
+	addr := reflect.ValueOf(function).Pointer()
+	conn, exists := table[addr]
+	if exists == false {
+		return false
+	}
+
+	success := false
+	RunMain(func() {
+		success = C.objectDisconnect(obj.addr, unsafe.Pointer(conn)) != 0
+	})
+
+	if success {
+		delete(table, addr)
+		if len(table) == 0 {
+			delete(obj.connections, signal)
+		}
+	}
+
+	return success
 }
 
 //export hookSignalDisconnect
 func hookSignalDisconnect(funcp unsafe.Pointer) {
+	// println("hookSignalDisconnect")
 	before := len(connectedFunction)
 	delete(connectedFunction, (*interface{})(funcp))
 	if before == len(connectedFunction) {

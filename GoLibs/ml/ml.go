@@ -7,10 +7,6 @@ import (
     // "ml/console"
 )
 
-func unused() {
-    _ = runtime.GOMAXPROCS
-}
-
 /* ++
 
   console

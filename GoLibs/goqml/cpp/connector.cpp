@@ -5,7 +5,16 @@
 
 Connector::~Connector()
 {
-    hookSignalDisconnect(func);
+    if (this->qconnection)
+    {
+        disconnect(this->qconnection);
+        hookSignalDisconnect(func);
+    }
+}
+
+void Connector::setConnection(const QMetaObject::Connection& connection)
+{
+    this->qconnection = connection;
 }
 
 void Connector::invoke()

@@ -362,7 +362,7 @@ const char *objectTypeName(QObject_ *object)
 int objectGetProperty(QObject_ *object, const char *name, DataValue *result)
 {
     QObject *qobject = reinterpret_cast<QObject *>(object);
-    
+
     QVariant var = qobject->property(name);
     packDataValue(&var, result);
 
@@ -452,7 +452,7 @@ error *objectInvoke(QObject_ *object, const char *method, int methodLen, DataVal
 
                 bool ok;
                 if (metaMethod.returnType() == QMetaType::Void) {
-                    ok = metaMethod.invoke(qobject, Qt::DirectConnection, 
+                    ok = metaMethod.invoke(qobject, Qt::DirectConnection,
                         arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9]);
                 } else {
                     ok = metaMethod.invoke(qobject, Qt::DirectConnection, Q_RETURN_ARG(QVariant, result),
@@ -475,7 +475,7 @@ void objectFindChild(QObject_ *object, QString_ *name, DataValue *resultdv)
 {
     QObject *qobject = reinterpret_cast<QObject *>(object);
     QString *qname = reinterpret_cast<QString *>(name);
-    
+
     QVariant var;
     QObject *result = qobject->findChild<QObject *>(*qname);
     if (result) {
@@ -492,32 +492,65 @@ void objectSetParent(QObject_ *object, QObject_ *parent)
     qobject->setParent(qparent);
 }
 
-error *objectConnect(QObject_ *object, const char *signal, int signalLen, QQmlEngine_ *engine, void *func, int argsLen)
+error*
+objectConnect(
+    QObject_*       object,
+    const char*     signal,
+    int             signalLen,
+    QQmlEngine_*    engine,
+    void*           func,
+    int             argsLen,
+    void**          connection
+)
 {
     QObject *qobject = reinterpret_cast<QObject *>(object);
     QQmlEngine *qengine = reinterpret_cast<QQmlEngine *>(engine);
-    QByteArray qsignal(signal, signalLen);
 
     const QMetaObject *meta = qobject->metaObject();
     // Walk backwards so descendants have priority.
     for (int i = meta->methodCount()-1; i >= 0; i--) {
-            QMetaMethod method = meta->method(i);
-            if (method.methodType() == QMetaMethod::Signal) {
-                QByteArray name = method.name();
-                if (name.length() == signalLen && qstrncmp(name.constData(), signal, signalLen) == 0) {
-                    if (method.parameterCount() < argsLen) {
-                        // TODO Might continue looking to see if a different signal has the same name and enough arguments.
-                        return errorf("signal \"%s\" has too few parameters for provided function", name.constData());
-                    }
-                    Connector *connector = new Connector(qobject, method, qengine, func, argsLen);
-                    const QMetaObject *connmeta = connector->metaObject();
-                    QObject::connect(qobject, method, connector, connmeta->method(connmeta->methodOffset()));
-                    return 0;
-                }
-            }
+        QMetaMethod method = meta->method(i);
+        if (method.methodType() != QMetaMethod::Signal)
+            continue;
+
+        QByteArray name = method.name();
+        if (name.length() != signalLen || qstrncmp(name.constData(), signal, signalLen) != 0)
+            continue;
+
+        if (method.parameterCount() < argsLen) {
+            // TODO Might continue looking to see if a different signal has the same name and enough arguments.
+            return errorf("signal \"%s\" has too few parameters for provided function", name.constData());
+        }
+
+        Connector *connector = new Connector(qobject, method, qengine, func, argsLen);
+        const QMetaObject *connmeta = connector->metaObject();
+        connector->setConnection(QObject::connect(
+                        qobject,
+                        method,
+                        connector,
+                        connmeta->method(connmeta->methodOffset())
+                    ));
+
+        if (!connector->connection())
+        {
+            delete connector;
+            return errorf("object cannot connect to '%.*s' signal", signalLen, signal);
+        }
+
+        *connection = connector;
+
+        return nullptr;
     }
+
     // Cannot use constData here as the byte array is not null-terminated.
-    return errorf("object does not expose a \"%s\" signal", qsignal.data());
+    return errorf("object does not expose a '%.*s' signal", signal, signalLen);
+}
+
+char objectDisconnect(QObject_ *object, void* connection)
+{
+    Connector *connector = reinterpret_cast<Connector *>(connection);
+    delete connector;
+    return 1;
 }
 
 QQmlContext_ *objectContext(QObject_ *object)

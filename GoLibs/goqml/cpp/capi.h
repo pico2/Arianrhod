@@ -140,7 +140,8 @@ QQmlContext_ *objectContext(QObject_ *object);
 int objectIsComponent(QObject_ *object);
 int objectIsWindow(QObject_ *object);
 int objectIsView(QObject_ *object);
-error *objectConnect(QObject_ *object, const char *signal, int signalLen, QQmlEngine_ *engine, void *func, int argsLen);
+error *objectConnect(QObject_ *object, const char *signal, int signalLen, QQmlEngine_ *engine, void *func, int argsLen, void** connection);
+char objectDisconnect(QObject_ *object, void* connection);
 error *objectGoAddr(QObject_ *object, GoAddr **addr);
 
 QQmlComponent_ *newComponent(QQmlEngine_ *engine, QObject_ *parent);
