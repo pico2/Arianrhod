@@ -1,7 +1,10 @@
 #ifndef _ITUNES_H_18d0eb7c_8df5_40e0_be11_6b0c5f2f3645_
 #define _ITUNES_H_18d0eb7c_8df5_40e0_be11_6b0c5f2f3645_
 
+#pragma warning(disable:4091)
+
 #include "ml.h"
+#include <Shlobj.h>
 
 #define USE_ITUNES_MOBILE_DEVICE_DLL    0
 
@@ -114,11 +117,21 @@ ML_NAMESPACE_BEGIN(iTunesApi);
 
 inline NTSTATUS Initialize()
 {
+    using ml::String;
+
     if (AMD::AMDeviceNotificationSubscribe != nullptr)
         return STATUS_SUCCESS;
 
-    Rtl::EnvironmentAppend(&USTR(L"Path"), &USTR(APPLE_APPLICATION_SUPPORT));
-    Rtl::EnvironmentAppend(&USTR(L"Path"), &USTR(MOBILE_DEVICE_SUPPORT));
+    WCHAR CommonFiles[MAX_NTPATH];
+
+    SHGetFolderPathW(nullptr, IsWow64Process() ? CSIDL_PROGRAM_FILES_COMMONX86 : CSIDL_PROGRAM_FILES_COMMON, nullptr, SHGFP_TYPE_CURRENT, CommonFiles);
+
+    String path = CommonFiles;
+
+    path += L"\\Apple\\";
+
+    Rtl::EnvironmentAppend(PUSTR(L"Path"), path + L"Apple Application Support");
+    Rtl::EnvironmentAppend(PUSTR(L"Path"), path + L"Mobile Device Support");
 
     LoadDll(L"pthreadVC2.dll");
     LoadDll(L"CoreFoundation.dll");
