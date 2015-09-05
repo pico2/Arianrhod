@@ -1,16 +1,22 @@
-__all__ = ('Request', 'StreamResponse', 'Response')
+__all__ = ('ContentCoding', 'Request', 'StreamResponse', 'Response')
 
 import asyncio
 import binascii
 import cgi
 import collections
+import datetime
 import http.cookies
 import io
 import json
+import math
+import time
 import warnings
 
-from urllib.parse import urlsplit, parse_qsl, unquote
+import enum
+
+from email.utils import parsedate
 from types import MappingProxyType
+from urllib.parse import urlsplit, parse_qsl, unquote
 
 from . import hdrs
 from .helpers import reify
@@ -65,8 +71,17 @@ class HeadersMixin:
         else:
             return int(l)
 
-
 FileField = collections.namedtuple('Field', 'name filename file content_type')
+
+
+class ContentCoding(enum.Enum):
+    # The content codings that we have support for.
+    #
+    # Additional registered codings are listed at:
+    # https://www.iana.org/assignments/http-parameters/http-parameters.xhtml#content-coding
+    deflate = 'deflate'
+    gzip = 'gzip'
+    identity = 'identity'
 
 
 ############################################################
@@ -80,7 +95,7 @@ class Request(dict, HeadersMixin):
                     hdrs.METH_TRACE, hdrs.METH_DELETE}
 
     def __init__(self, app, message, payload, transport, reader, writer, *,
-                 _HOST=hdrs.HOST):
+                 _HOST=hdrs.HOST, secure_proxy_ssl_header=None):
         self._app = app
         self._version = message.version
         self._transport = transport
@@ -89,9 +104,6 @@ class Request(dict, HeadersMixin):
         self._method = message.method
         self._host = message.headers.get(_HOST)
         self._path_qs = message.path
-        res = urlsplit(message.path)
-        self._path = unquote(res.path)
-        self._query_string = res.query
         self._post = None
         self._post_files_cache = None
         self._headers = CIMultiDictProxy(message.headers)
@@ -108,6 +120,24 @@ class Request(dict, HeadersMixin):
         self._cookies = None
 
         self._read_bytes = None
+        self._has_body = not payload.at_eof()
+
+        self._secure_proxy_ssl_header = secure_proxy_ssl_header
+
+    @property
+    def scheme(self):
+        """A string representing the scheme of the request.
+
+        'http' or 'https'.
+        """
+        if self._transport.get_extra_info('sslcontext'):
+            return 'https'
+        secure_proxy_ssl_header = self._secure_proxy_ssl_header
+        if secure_proxy_ssl_header is not None:
+            header, value = secure_proxy_ssl_header
+            if self._headers.get(header) == value:
+                return 'https'
+        return 'http'
 
     @property
     def method(self):
@@ -141,21 +171,34 @@ class Request(dict, HeadersMixin):
         """
         return self._path_qs
 
+    @reify
+    def _splitted_path(self):
+        return urlsplit(self._path_qs)
+
     @property
+    def raw_path(self):
+        """ The URL including raw *PATH INFO* without the host or scheme.
+        Warning, the path is unquoted and may contains non valid URL characters
+
+        E.g., ``/my%2Fpath%7Cwith%21some%25strange%24characters``
+        """
+        return self._splitted_path.path
+
+    @reify
     def path(self):
         """The URL including *PATH INFO* without the host or scheme.
 
         E.g., ``/app/blog``
         """
-        return self._path
+        return unquote(self.raw_path)
 
-    @property
+    @reify
     def query_string(self):
         """The query string in the URL.
 
         E.g., id=10
         """
-        return self._query_string
+        return self._splitted_path.query
 
     @reify
     def GET(self):
@@ -163,7 +206,8 @@ class Request(dict, HeadersMixin):
 
         Lazy property.
         """
-        return MultiDictProxy(MultiDict(parse_qsl(self._query_string)))
+        return MultiDictProxy(MultiDict(parse_qsl(self.query_string,
+                                                  keep_blank_values=True)))
 
     @reify
     def POST(self):
@@ -177,11 +221,22 @@ class Request(dict, HeadersMixin):
 
     @property
     def headers(self):
-        """A case-insensitive multidict with all headers.
-
-        Lazy property.
-        """
+        """A case-insensitive multidict proxy with all headers."""
         return self._headers
+
+    @property
+    def if_modified_since(self, _IF_MODIFIED_SINCE=hdrs.IF_MODIFIED_SINCE):
+        """The value of If-Modified-Since HTTP header, or None.
+
+        This header is represented as a `datetime` object.
+        """
+        httpdate = self.headers.get(_IF_MODIFIED_SINCE)
+        if httpdate is not None:
+            timetuple = parsedate(httpdate)
+            if timetuple is not None:
+                return datetime.datetime(*timetuple[:6],
+                                         tzinfo=datetime.timezone.utc)
+        return None
 
     @property
     def keep_alive(self):
@@ -226,6 +281,11 @@ class Request(dict, HeadersMixin):
     def content(self):
         """Return raw payload stream."""
         return self._payload
+
+    @property
+    def has_body(self):
+        """Return True if request has HTTP BODY, False otherwise."""
+        return self._has_body
 
     @asyncio.coroutine
     def release(self):
@@ -301,6 +361,7 @@ class Request(dict, HeadersMixin):
         }
 
         out = MultiDict()
+        _count = 1
         for field in fs.list or ():
             transfer_encoding = field.headers.get(
                 hdrs.CONTENT_TRANSFER_ENCODING, None)
@@ -311,7 +372,8 @@ class Request(dict, HeadersMixin):
                                field.type)
                 if self._post_files_cache is None:
                     self._post_files_cache = {}
-                self._post_files_cache[field.name] = field
+                self._post_files_cache[field.name+str(_count)] = field
+                _count += 1
                 out.add(field.name, ff)
             else:
                 value = field.value
@@ -398,8 +460,12 @@ class StreamResponse(HeadersMixin):
         self._chunked = True
         self._chunk_size = chunk_size
 
-    def enable_compression(self, force=False):
-        """Enables response compression with `deflate` encoding."""
+    def enable_compression(self, force=None):
+        """Enables response compression encoding."""
+        # Backwards compatibility for when force was a bool <0.17.
+        if type(force) == bool:
+            force = ContentCoding.deflate if force else ContentCoding.identity
+
         self._compression = True
         self._compression_force = force
 
@@ -462,8 +528,8 @@ class StreamResponse(HeadersMixin):
             value = int(value)
             # TODO: raise error if chunked enabled
             self.headers[hdrs.CONTENT_LENGTH] = str(value)
-        elif hdrs.CONTENT_LENGTH in self.headers:
-            del self.headers[hdrs.CONTENT_LENGTH]
+        else:
+            self.headers.pop(hdrs.CONTENT_LENGTH, None)
 
     @property
     def content_type(self):
@@ -493,6 +559,34 @@ class StreamResponse(HeadersMixin):
             self._content_dict['charset'] = str(value).lower()
         self._generate_content_type_header()
 
+    @property
+    def last_modified(self, _LAST_MODIFIED=hdrs.LAST_MODIFIED):
+        """The value of Last-Modified HTTP header, or None.
+
+        This header is represented as a `datetime` object.
+        """
+        httpdate = self.headers.get(_LAST_MODIFIED)
+        if httpdate is not None:
+            timetuple = parsedate(httpdate)
+            if timetuple is not None:
+                return datetime.datetime(*timetuple[:6],
+                                         tzinfo=datetime.timezone.utc)
+        return None
+
+    @last_modified.setter
+    def last_modified(self, value):
+        if value is None:
+            if hdrs.LAST_MODIFIED in self.headers:
+                del self.headers[hdrs.LAST_MODIFIED]
+        elif isinstance(value, (int, float)):
+            self.headers[hdrs.LAST_MODIFIED] = time.strftime(
+                "%a, %d %b %Y %H:%M:%S GMT", time.gmtime(math.ceil(value)))
+        elif isinstance(value, datetime.datetime):
+            self.headers[hdrs.LAST_MODIFIED] = time.strftime(
+                "%a, %d %b %Y %H:%M:%S GMT", value.utctimetuple())
+        elif isinstance(value, str):
+            self.headers[hdrs.LAST_MODIFIED] = value
+
     def _generate_content_type_header(self, CONTENT_TYPE=hdrs.CONTENT_TYPE):
         params = '; '.join("%s=%s" % i for i in self._content_dict.items())
         if params:
@@ -510,6 +604,23 @@ class StreamResponse(HeadersMixin):
                 return self._resp_impl
         else:
             return None
+
+    def _start_compression(self, request):
+        def start(coding):
+            if coding != ContentCoding.identity:
+                self.headers[hdrs.CONTENT_ENCODING] = coding.value
+                self._resp_impl.add_compression_filter(coding.value)
+                self.content_length = None
+
+        if self._compression_force:
+            start(self._compression_force)
+        else:
+            accept_encoding = request.headers.get(
+                hdrs.ACCEPT_ENCODING, '').lower()
+            for coding in ContentCoding:
+                if coding.value in accept_encoding:
+                    start(coding)
+                    return
 
     def start(self, request):
         resp_impl = self._start_pre_check(request)
@@ -532,10 +643,7 @@ class StreamResponse(HeadersMixin):
         self._copy_cookies()
 
         if self._compression:
-            if (self._compression_force or
-                    'deflate' in request.headers.get(
-                        hdrs.ACCEPT_ENCODING, '')):
-                resp_impl.add_compression_filter()
+            self._start_compression(request)
 
         if self._chunked:
             resp_impl.enable_chunked_encoding()
@@ -636,6 +744,8 @@ class Response(StreamResponse):
 
     @property
     def text(self):
+        if self._body is None:
+            return None
         return self._body.decode(self.charset or 'utf-8')
 
     @text.setter

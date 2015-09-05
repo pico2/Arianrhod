@@ -3,8 +3,8 @@
 *.sdf
 *.pdb
 *.obj
-*egg-info
-*.egg
+# *egg-info
+# *.egg
 *.suo
 __pycache__
 .idea/

@@ -10,13 +10,14 @@ import re
 import os
 import inspect
 
-from urllib.parse import urlencode
+from urllib.parse import urlencode, unquote
 
 from . import hdrs
 from .abc import AbstractRouter, AbstractMatchInfo
 from .protocol import HttpVersion11
-from .web_exceptions import HTTPMethodNotAllowed, HTTPNotFound
+from .web_exceptions import HTTPMethodNotAllowed, HTTPNotFound, HTTPNotModified
 from .web_reqrep import StreamResponse
+from .multidict import upstr
 
 
 class UrlMappingMatchInfo(dict, AbstractMatchInfo):
@@ -46,7 +47,7 @@ def _defaultExpectHandler(request):
 
 class Route(metaclass=abc.ABCMeta):
 
-    def __init__(self, method, handler, name, expect_handler=None):
+    def __init__(self, method, handler, name, *, expect_handler=None):
         if expect_handler is None:
             expect_handler = _defaultExpectHandler
         assert asyncio.iscoroutinefunction(expect_handler), \
@@ -92,7 +93,7 @@ class Route(metaclass=abc.ABCMeta):
 
 class PlainRoute(Route):
 
-    def __init__(self, method, handler, name, path, expect_handler=None):
+    def __init__(self, method, handler, name, path, *, expect_handler=None):
         super().__init__(method, handler, name, expect_handler=expect_handler)
         self._path = path
 
@@ -115,7 +116,7 @@ class PlainRoute(Route):
 
 class DynamicRoute(Route):
 
-    def __init__(self, method, handler, name, pattern, formatter,
+    def __init__(self, method, handler, name, pattern, formatter, *,
                  expect_handler=None):
         super().__init__(method, handler, name, expect_handler=expect_handler)
         self._pattern = pattern
@@ -141,16 +142,25 @@ class DynamicRoute(Route):
 
 class StaticRoute(Route):
 
-    limit = 8192
-
-    def __init__(self, name, prefix, directory, expect_handler=None):
+    def __init__(self, name, prefix, directory, *,
+                 expect_handler=None, chunk_size=256*1024,
+                 response_factory=None):
         assert prefix.startswith('/'), prefix
         assert prefix.endswith('/'), prefix
         super().__init__(
             'GET', self.handle, name, expect_handler=expect_handler)
         self._prefix = prefix
         self._prefix_len = len(self._prefix)
-        self._directory = directory
+        self._directory = os.path.abspath(directory) + os.sep
+        self._chunk_size = chunk_size
+        if response_factory is None:
+            self._response_factory = StreamResponse
+        else:
+            self._response_factory = response_factory
+
+        if not os.path.isdir(self._directory):
+            raise ValueError(
+                "No directory exists at '{}'".format(self._directory))
 
     def match(self, path):
         if not path.startswith(self._prefix):
@@ -165,36 +175,44 @@ class StaticRoute(Route):
 
     @asyncio.coroutine
     def handle(self, request):
-        resp = StreamResponse()
         filename = request.match_info['filename']
-        filepath = os.path.join(self._directory, filename)
-        if '..' in filename:
+        filepath = os.path.abspath(os.path.join(self._directory, filename))
+        if not filepath.startswith(self._directory):
             raise HTTPNotFound()
         if not os.path.exists(filepath) or not os.path.isfile(filepath):
             raise HTTPNotFound()
 
-        ct, encoding = mimetypes.guess_type(filename)
+        st = os.stat(filepath)
+
+        modsince = request.if_modified_since
+        if modsince is not None and st.st_mtime <= modsince.timestamp():
+            raise HTTPNotModified()
+
+        ct, encoding = mimetypes.guess_type(filepath)
         if not ct:
             ct = 'application/octet-stream'
+
+        resp = self._response_factory()
         resp.content_type = ct
         if encoding:
-            resp.headers['content-encoding'] = encoding
+            resp.headers[hdrs.CONTENT_ENCODING] = encoding
+        resp.last_modified = st.st_mtime
 
-        file_size = os.stat(filepath).st_size
-        single_chunk = file_size < self.limit
+        file_size = st.st_size
+        single_chunk = file_size < self._chunk_size
 
         if single_chunk:
             resp.content_length = file_size
         resp.start(request)
 
         with open(filepath, 'rb') as f:
-            chunk = f.read(self.limit)
+            chunk = f.read(self._chunk_size)
             if single_chunk:
                 resp.write(chunk)
             else:
                 while chunk:
                     resp.write(chunk)
-                    chunk = f.read(self.limit)
+                    chunk = f.read(self._chunk_size)
 
         return resp
 
@@ -205,7 +223,35 @@ class StaticRoute(Route):
             directory=self._directory)
 
 
+class SystemRoute(Route):
+
+    def __init__(self, status, reason):
+        super().__init__(hdrs.METH_ANY, None, None)
+        self._status = status
+        self._reason = reason
+
+    def url(self, **kwargs):
+        raise RuntimeError(".url() is not allowed for SystemRoute")
+
+    def match(self, path):
+        return None
+
+    @property
+    def status(self):
+        return self._status
+
+    @property
+    def reason(self):
+        return self._reason
+
+    def __repr__(self):
+        return "<SystemRoute {status}: {reason}>".format(status=self._status,
+                                                         reason=self._reason)
+
+
 class _NotFoundMatchInfo(UrlMappingMatchInfo):
+
+    route = SystemRoute(404, 'Not Found')
 
     def __init__(self):
         super().__init__({}, None)
@@ -213,10 +259,6 @@ class _NotFoundMatchInfo(UrlMappingMatchInfo):
     @property
     def handler(self):
         return self._not_found
-
-    @property
-    def route(self):
-        return None
 
     @asyncio.coroutine
     def _not_found(self, request):
@@ -228,6 +270,8 @@ class _NotFoundMatchInfo(UrlMappingMatchInfo):
 
 class _MethodNotAllowedMatchInfo(UrlMappingMatchInfo):
 
+    route = SystemRoute(405, 'Method Not Allowed')
+
     def __init__(self, method, allowed_methods):
         super().__init__({}, None)
         self._method = method
@@ -236,10 +280,6 @@ class _MethodNotAllowedMatchInfo(UrlMappingMatchInfo):
     @property
     def handler(self):
         return self._not_allowed
-
-    @property
-    def route(self):
-        return None
 
     @asyncio.coroutine
     def _not_allowed(self, request):
@@ -270,7 +310,7 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
 
     @asyncio.coroutine
     def resolve(self, request):
-        path = request.path
+        path = request.raw_path
         method = request.method
         allowed_methods = set()
 
@@ -281,6 +321,9 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
 
             route_method = route.method
             if route_method == method or route_method == hdrs.METH_ANY:
+                # Unquote separate matching parts
+                match_dict = {key: unquote(value) for key, value in
+                              match_dict.items()}
                 return UrlMappingMatchInfo(match_dict, route)
 
             allowed_methods.add(route_method)
@@ -318,13 +361,17 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
     def add_route(self, method, path, handler,
                   *, name=None, expect_handler=None):
 
+        if not path.startswith('/'):
+            raise ValueError("path should be started with /")
+
         assert callable(handler), handler
         if (not asyncio.iscoroutinefunction(handler) and
                 not inspect.isgeneratorfunction(handler)):
             handler = asyncio.coroutine(handler)
 
-        method = method.upper()
-        assert method in self.METHODS, method
+        method = upstr(method)
+        if method not in self.METHODS:
+            raise ValueError("{} is not allowed HTTP method".format(method))
 
         if not ('{' in path or '}' in path or self.ROUTE_RE.search(path)):
             route = PlainRoute(
@@ -364,17 +411,19 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
         self.register_route(route)
         return route
 
-    def add_static(self, prefix, path, *, name=None, expect_handler=None):
+    def add_static(self, prefix, path, *, name=None, expect_handler=None,
+                   chunk_size=256*1024, response_factory=None):
         """
         Adds static files view
         :param prefix - url prefix
         :param path - folder with files
         """
         assert prefix.startswith('/')
-        assert os.path.isdir(path), 'Path does not directory %s' % path
-        path = os.path.abspath(path)
         if not prefix.endswith('/'):
             prefix += '/'
-        route = StaticRoute(name, prefix, path, expect_handler=expect_handler)
+        route = StaticRoute(name, prefix, path,
+                            expect_handler=expect_handler,
+                            chunk_size=chunk_size,
+                            response_factory=response_factory)
         self.register_route(route)
         return route

@@ -1,6 +1,7 @@
 import sys
 from collections import abc
 from collections.abc import Iterable, Set
+from operator import itemgetter
 
 
 _marker = object()
@@ -25,6 +26,20 @@ class upstr(str):
         return self
 
 
+cdef _eq(self, other):
+    cdef _Base typed_self
+    cdef _Base typed_other
+
+    if isinstance(self, _Base) and isinstance(other, _Base):
+        return (<_Base>self)._items == (<_Base>other)._items
+    elif isinstance(self, _Base) and isinstance(other, abc.Mapping):
+        return (<_Base>self)._eq_to_mapping(other)
+    elif isinstance(other, _Base) and isinstance(self, abc.Mapping):
+        return (<_Base>other)._eq_to_mapping(self)
+    else:
+        return NotImplemented
+
+
 cdef class _Base:
 
     cdef list _items
@@ -45,7 +60,10 @@ cdef class _Base:
     cdef _getall(self, str key, default):
         cdef list res
         key = self._upper(key)
-        res = [v for k, v in self._items if k == key]
+        res = []
+        for k, v in self._items:
+            if k == key:
+                res.append(v)
         if res:
             return res
         if not res and default is not _marker:
@@ -108,37 +126,34 @@ cdef class _Base:
         return _ValuesView.__new__(_ValuesView, self._items)
 
     def __repr__(self):
-        body = ', '.join("'{}': {!r}".format(k, v) for k, v in self.items())
+        lst = []
+        for k, v in self._items:
+            lst.append("'{}': {!r}".format(k, v))
+        body = ', '.join(lst)
         return '<{} {{{}}}>'.format(self.__class__.__name__, body)
 
-    def __richcmp__(self, other, op):
-        cdef _Base typed_self
-        cdef _Base typed_other
-        cdef tuple item
-        if op == 2:
-            if isinstance(self, _Base) and isinstance(other, _Base):
-                typed_self = self
-                typed_other = other
-                return typed_self._items == typed_other._items
-            elif not isinstance(other, abc.Mapping):
-                return NotImplemented
-            for item in self.items():
-                nv = other.get(item[0], _marker)
-                if item[1] != nv:
-                    return False
-            return True
-        elif op != 2:
-            if isinstance(self, _Base) and isinstance(other, _Base):
-                typed_self = self
-                typed_other = other
-                return typed_self._items != typed_other._items
-            elif not isinstance(other, abc.Mapping):
-                return NotImplemented
-            for item in self.items():
-                nv = other.get(item[0], _marker)
-                if item[1] == nv:
-                    return True
+    cdef _eq_to_mapping(self, other):
+        left_keys = set(self.keys())
+        right_keys = set(other.keys())
+        if left_keys != right_keys:
             return False
+        if len(self._items) != len(right_keys):
+            return False
+        for item in self._items:
+            nv = other.get(item[0], _marker)
+            if item[1] != nv:
+                return False
+        return True
+
+    def __richcmp__(self, other, op):
+        if op == 2:  # ==
+            return _eq(self, other)
+        elif op == 3:  # !=
+            ret = _eq(self, other)
+            if ret is NotImplemented:
+                return ret
+            else:
+                return not ret
         else:
             return NotImplemented
 
@@ -353,7 +368,6 @@ abc.MutableMapping.register(CIMultiDict)
 
 cdef class _ViewBase:
 
-    cdef list _keys
     cdef list _items
 
     def __cinit__(self, list items):
@@ -361,6 +375,9 @@ cdef class _ViewBase:
 
     def __len__(self):
         return len(self._items)
+
+    def __repr__(self):
+        return '{}({!r})'.format(self.__class__.__name__, self._items)
 
 
 cdef class _ViewBaseSet(_ViewBase):
@@ -402,27 +419,30 @@ cdef class _ViewBaseSet(_ViewBase):
     def __and__(self, other):
         if not isinstance(other, Iterable):
             return NotImplemented
-        return set(value for value in other if value in self)
+        if not isinstance(other, Set):
+            other = set(other)
+        return set(self) & other
 
     def __or__(self, other):
         if not isinstance(other, Iterable):
             return NotImplemented
-        return {e for s in (self, other) for e in s}
+        if not isinstance(other, Set):
+            other = set(other)
+        return set(self) | other
 
     def __sub__(self, other):
+        if not isinstance(other, Iterable):
+            return NotImplemented
         if not isinstance(other, Set):
-            if not isinstance(other, Iterable):
-                return NotImplemented
             other = set(other)
-        return {value for value in self
-                if value not in other}
+        return set(self) - other
 
     def __xor__(self, other):
         if not isinstance(other, Set):
             if not isinstance(other, Iterable):
                 return NotImplemented
             other = set(other)
-        return (self - other) | (other - self)
+        return set(self) ^ other
 
 
 cdef class _ItemsView(_ViewBaseSet):
@@ -457,9 +477,7 @@ cdef class _ValuesView(_ViewBase):
         return False
 
     def __iter__(self):
-        cdef tuple item
-        for item in self._items:
-            yield item[1]
+        return map(itemgetter(1), self._items)
 
 
 abc.ValuesView.register(_ValuesView)
@@ -483,9 +501,7 @@ cdef class _KeysView(_ViewBaseSet):
         return False
 
     def __iter__(self):
-        cdef tuple item
-        for item in self._items:
-            yield item[0]
+        return map(itemgetter(0), self._items)
 
 
 abc.KeysView.register(_KeysView)

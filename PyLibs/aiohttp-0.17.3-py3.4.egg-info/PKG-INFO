@@ -1,0 +1,237 @@
+Metadata-Version: 1.1
+Name: aiohttp
+Version: 0.17.3
+Summary: http client/server for asyncio
+Home-page: https://github.com/KeepSafe/aiohttp/
+Author: Nikolay Kim
+Author-email: fafhrd91@gmail.com
+License: Apache 2
+Description: http client/server for asyncio
+        ==============================
+        
+        .. image:: https://raw.github.com/KeepSafe/aiohttp/master/docs/_static/aiohttp-icon-128x128.png
+          :height: 64px
+          :width: 64px
+          :alt: aiohttp logo
+        
+        .. image:: https://secure.travis-ci.org/KeepSafe/aiohttp.png
+          :target:  https://secure.travis-ci.org/KeepSafe/aiohttp
+          :align: right
+        
+        Features
+        --------
+        
+        - Supports both client and server side of HTTP protocol.
+        - Supports both client and server Web-Sockets out-of-the-box.
+        - Web-server has middlewares and pluggable routing.
+        
+        
+        Requirements
+        ------------
+        
+        - Python >= 3.3
+        - asyncio https://pypi.python.org/pypi/asyncio
+        
+        
+        License
+        -------
+        
+        ``aiohttp`` is offered under the Apache 2 license.
+        
+        
+        Documentation
+        -------------
+        
+        http://aiohttp.readthedocs.org/
+        
+        Source code
+        ------------
+        
+        The latest developer version is available in a github repository:
+        https://github.com/KeepSafe/aiohttp
+        
+        Benchmarks
+        ----------
+        
+        If you are interested in by efficiency, AsyncIO community maintains a list of benchmarks on the official wiki:
+        https://github.com/python/asyncio/wiki/Benchmarks
+        
+        Getting started
+        ---------------
+        
+        Client
+        ^^^^^^
+        
+        To retrieve something from the web:
+        
+        .. code-block:: python
+        
+          import aiohttp
+          import asyncio
+        
+          def get_body(url):
+              response = yield from aiohttp.request('GET', url)
+              return (yield from response.read())
+        
+          if __name__ == '__main__':
+              loop = asyncio.get_event_loop()
+              raw_html = loop.run_until_complete(get_body('http://python.org'))
+              print(raw_html)
+        
+        
+        You can use the get command like this anywhere in your ``asyncio``
+        powered program:
+        
+        .. code-block:: python
+        
+          response = yield from aiohttp.request('GET', 'http://python.org')
+          body = yield from response.read()
+          print(body)
+        
+        If you want to use timeouts for aiohttp client side please use standard
+        asyncio approach:
+        
+        .. code-block:: python
+        
+           yield from asyncio.wait_for(request('GET', url), 10)
+        
+        
+        Server
+        ^^^^^^
+        
+        This is simple usage example:
+        
+        .. code-block:: python
+        
+            import asyncio
+            from aiohttp import web
+        
+        
+            @asyncio.coroutine
+            def handle(request):
+                name = request.match_info.get('name', "Anonymous")
+                text = "Hello, " + name
+                return web.Response(body=text.encode('utf-8'))
+        
+        
+            @asyncio.coroutine
+            def wshandler(request):
+                ws = web.WebSocketResponse()
+                ws.start(request)
+        
+                while True:
+                    msg = yield from ws.receive()
+        
+                    if msg.tp == web.MsgType.text:
+                        ws.send_str("Hello, {}".format(msg.data))
+                    elif msg.tp == web.MsgType.binary:
+                        ws.send_bytes(msg.data)
+                    elif msg.tp == web.MsgType.close:
+                        break
+        
+                return ws
+        
+        
+            @asyncio.coroutine
+            def init(loop):
+                app = web.Application(loop=loop)
+                app.router.add_route('GET', '/echo', wshandler)
+                app.router.add_route('GET', '/{name}', handle)
+        
+                srv = yield from loop.create_server(app.make_handler(),
+                                                    '127.0.0.1', 8080)
+                print("Server started at http://127.0.0.1:8080")
+                return srv
+        
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(init(loop))
+            loop.run_forever()
+        
+        CHANGES
+        =======
+        
+        0.17.3 (08-28-2015)
+        ---------------------
+        
+        - Remove Content-Length header on compressed responses #450
+        
+        - Support Python 3.5
+        
+        - Improve performance of transport in-use list #472
+        
+        - Fix connection pooling #473
+        
+        0.17.2 (08-11-2015)
+        ---------------------
+        
+        - Don't forget to pass `data` argument forward #462
+        
+        - Fix multipart read bytes count #463
+        
+        0.17.1 (08-10-2015)
+        ---------------------
+        
+        - Fix multidict comparsion to arbitrary abc.Mapping
+        
+        0.17.0 (08-04-2015)
+        ---------------------
+        
+        - Make StaticRoute support Last-Modified and If-Modified-Since headers #386
+        
+        - Add Request.if_modified_since and Stream.Response.last_modified properties
+        
+        - Fix deflate compression when writing a chunked response #395
+        
+        - Request`s content-length header is cleared now after redirect from
+          POST method #391
+        
+        - Return a 400 if server received a non HTTP content #405
+        
+        - Fix keep-alive support for aiohttp clients #406
+        
+        - Allow gzip compression in high-level server response interface #403
+        
+        - Rename TCPConnector.resolve and family to dns_cache #415
+        
+        - Make UrlDispatcher ignore quoted characters during url matching #414
+          Backward-compatibility warning: this may change the url matched by
+          your queries if they send quoted character (like %2F for /) #414
+        
+        - Use optional cchardet accelerator if present #418
+        
+        - Borrow loop from Connector in ClientSession if loop is not set
+        
+        - Add context manager support to ClientSession for session closing.
+        
+        - Add toplevel get(), post(), put(), head(), delete(), options(),
+          patch() coroutines.
+        
+        - Fix IPv6 support for client API #425
+        
+        - Pass SSL context through proxy connector #421
+        
+        - Make the rule: path for add_route should start with slash
+        
+        - Don't process request finishing by low-level server on closed event loop
+        
+        - Don't override data if multiple files are uploaded with same key #433
+        
+        - Ensure multipart.BodyPartReader.read_chunk read all the necessary data
+          to avoid false assertions about malformed multipart payload
+        
+        - Dont sent body for  204, 205 and 304 http exceptions #442
+        
+        - Correctly skip Cython compilation in MSVC not found #453
+        
+        - Add response factory to StaticRoute #456
+        
+        - Don't append trailing CRLF for multipart.BodyPartReader #454
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Internet :: WWW/HTTP

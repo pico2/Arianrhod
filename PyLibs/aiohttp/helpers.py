@@ -66,8 +66,14 @@ class FormData:
 
         if isinstance(value, io.IOBase):
             self._is_multipart = True
+        elif isinstance(value, (bytes, bytearray, memoryview)):
+            if filename is None and content_transfer_encoding is None:
+                filename = name
 
         type_options = multidict.MultiDict({'name': name})
+        if filename is not None and not isinstance(filename, str):
+            raise TypeError('filename must be an instance of str. '
+                            'Got: %s' % filename)
         if filename is None and isinstance(value, io.IOBase):
             filename = guess_filename(value, name)
         if filename is not None:
@@ -76,9 +82,15 @@ class FormData:
 
         headers = {}
         if content_type is not None:
+            if not isinstance(content_type, str):
+                raise TypeError('content_type must be an instance of str. '
+                                'Got: %s' % content_type)
             headers[hdrs.CONTENT_TYPE] = content_type
             self._is_multipart = True
         if content_transfer_encoding is not None:
+            if not isinstance(content_transfer_encoding, str):
+                raise TypeError('content_transfer_encoding must be an instance'
+                                ' of str. Got: %s' % content_transfer_encoding)
             headers[hdrs.CONTENT_TRANSFER_ENCODING] = content_transfer_encoding
             self._is_multipart = True
 
@@ -278,6 +290,9 @@ class SafeAtoms(dict):
             return '-'
 
 
+_marker = object()
+
+
 class reify:
     """Use as a class method decorator.  It operates almost exactly like
     the Python ``@property`` decorator, but it puts the result of the
@@ -293,10 +308,17 @@ class reify:
             self.__doc__ = wrapped.__doc__
         except:  # pragma: no cover
             pass
+        self.name = wrapped.__name__
 
-    def __get__(self, inst, objtype=None):
+    def __get__(self, inst, owner, _marker=_marker):
         if inst is None:
             return self
+        val = inst.__dict__.get(self.name, _marker)
+        if val is not _marker:
+            return val
         val = self.wrapped(inst)
-        setattr(inst, self.wrapped.__name__, val)
+        inst.__dict__[self.name] = val
         return val
+
+    def __set__(self, inst, value):
+        raise AttributeError("reified property is read-only")

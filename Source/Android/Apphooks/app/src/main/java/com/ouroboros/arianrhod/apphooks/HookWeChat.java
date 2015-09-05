@@ -58,7 +58,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "e", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fHs"), "fHl", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fHJ"), "fHC", 0);
             }
         });
 
@@ -67,15 +67,15 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lP", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object fLu = XposedHelpers.getObjectField(param.thisObject, "fLu");
-                Object fLi = XposedHelpers.getObjectField(fLu, "fLi");
+                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "fLL");
+                Object obj2 = XposedHelpers.getObjectField(obj1, "fLz");
 
-                float v2 = ((Long)XposedHelpers.callMethod(fLi, "anX")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(obj2, "aob")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
-                        XposedHelpers.callMethod(fLu, "z", v2);
+                        XposedHelpers.callMethod(obj1, "z", v2);
                     } else {
-                        XposedHelpers.callMethod(fLu, "z", 1f);
+                        XposedHelpers.callMethod(obj1, "z", 1f);
                     }
                 }
 

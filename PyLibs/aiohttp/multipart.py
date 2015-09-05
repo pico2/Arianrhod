@@ -10,7 +10,7 @@ import uuid
 import warnings
 import zlib
 from urllib.parse import quote, unquote, urlencode, parse_qsl
-from collections import Mapping, Sequence
+from collections import deque, Mapping, Sequence
 
 from .helpers import parse_mimetype
 from .multidict import CIMultiDict
@@ -200,7 +200,7 @@ class BodyPartReader(object):
         length = self.headers.get(CONTENT_LENGTH, None)
         self._length = int(length) if length is not None else None
         self._read_bytes = 0
-        self._unread = []
+        self._unread = deque()
 
     @asyncio.coroutine
     def next(self):
@@ -228,8 +228,6 @@ class BodyPartReader(object):
         else:
             while not self._at_eof:
                 data.extend((yield from self.read_chunk(self.chunk_size)))
-            assert b'\r\n' == (yield from self._content.readline()), \
-                'reader did not read all the data or it is malformed'
         if decode:
             return self.decode(data)
         return data
@@ -249,9 +247,11 @@ class BodyPartReader(object):
             'Content-Length required for chunked read'
         chunk_size = min(size, self._length - self._read_bytes)
         chunk = yield from self._content.read(chunk_size)
-        self._read_bytes += chunk_size
+        self._read_bytes += len(chunk)
         if self._read_bytes == self._length:
             self._at_eof = True
+            assert b'\r\n' == (yield from self._content.readline()), \
+                'reader did not read all the data or it is malformed'
         return chunk
 
     @asyncio.coroutine
@@ -262,7 +262,12 @@ class BodyPartReader(object):
         """
         if self._at_eof:
             return b''
-        line = yield from self._content.readline()
+
+        if self._unread:
+            line = self._unread.popleft()
+        else:
+            line = yield from self._content.readline()
+
         if line.startswith(self._boundary):
             # the very last boundary may not come with \r\n,
             # so set single rules for everyone
@@ -274,6 +279,12 @@ class BodyPartReader(object):
                 self._at_eof = True
                 self._unread.append(line)
                 return b''
+        else:
+            next_line = yield from self._content.readline()
+            if next_line.startswith(self._boundary):
+                line = line[:-2]  # strip CRLF but only once
+            self._unread.append(next_line)
+
         return line
 
     @asyncio.coroutine
@@ -290,7 +301,6 @@ class BodyPartReader(object):
         else:
             while not self._at_eof:
                 yield from self.read_chunk(self.chunk_size)
-            assert b'\r\n' == (yield from self._content.readline())
 
     @asyncio.coroutine
     def text(self, *, encoding=None):
