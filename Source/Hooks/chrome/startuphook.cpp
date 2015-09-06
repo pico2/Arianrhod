@@ -7,7 +7,7 @@
 #pragma comment(linker, "/EXPORT:WTSRegisterSessionNotification=_PWTSRegisterSessionNotification@8")
 #pragma comment(linker, "/EXPORT:WTSQueryUserToken=_PWTSQueryUserToken@8")
 
-#include "MyLibrary.cpp"
+#include "ml.cpp"
 #include <windowsx.h>
 #include <WtsApi32.h>
 
@@ -205,7 +205,7 @@ BOOL TranslateKeyEvent(PMSG Msg, BOOL KeyDown)
 BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg)
 {
     BOOL        Success, forward;
-    LONG        X, Y, WheelDistance, fwKeys;
+    LONG        X, Y, WheelDistance, fwKeys, vPixelsPerMm;
     POINT       point;
 
     static LONG LastDelta;
@@ -218,6 +218,8 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
     {
         case WM_MOUSEWHEEL:
             //static int n = 0;
+            if (lpMsg->hwnd == nullptr || GetParent(lpMsg->hwnd) != nullptr)
+                break;
 
             fwKeys = GET_KEYSTATE_WPARAM(lpMsg->wParam);
 
@@ -246,8 +248,14 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
             Y = point.y;
             //PrintConsole(L"%d, %d\n", X, Y);
 
+            {
+                HDC screen = GetDC(nullptr);
+                vPixelsPerMm = GetDeviceCaps(screen, LOGPIXELSY) / 25;
+                ReleaseDC(nullptr, screen);
+            }
+
             //if (Y > GetSystemMetrics(SM_CYCAPTION))
-            if (Y > (IsMaximized(lpMsg->hwnd) ? 30 : 50))
+            if (Y > (IsMaximized(lpMsg->hwnd) ? (10 * vPixelsPerMm) : (12 * vPixelsPerMm)))
                 break;
 
             forward = WheelDistance > 0;
@@ -322,6 +330,8 @@ BOOL Initialize(PVOID BaseAddress)
     *(PVOID *)&StubWTSRegisterSessionNotification   = GetRoutineAddress(hModule, "WTSRegisterSessionNotification");
     *(PVOID *)&StubWTSQueryUserToken                = GetRoutineAddress(hModule, "WTSQueryUserToken");
 
+#if 0
+
     lpCmdLineW = Ps::GetCommandLine();
 
     Length = StrLengthW(lpCmdLineW);
@@ -360,12 +370,14 @@ BOOL Initialize(PVOID BaseAddress)
     g_pCmdLineA = (PChar)AllocateMemory(Length * 2);
     UnicodeToAnsi(g_pCmdLineA, Length * 2, g_pCmdLineW, -1);
 
-    hModule = Nt_GetModuleHandle(L"chrome.dll");
+#endif
+
+    hModule = FindLdrModuleByName(PUSTR(L"chrome.dll"));
 
     Mp::PATCH_MEMORY_DATA p[] =
     {
-        Mp::FunctionJumpVa(::GetCommandLineW,   MyGetCommandLineW),
-        Mp::FunctionJumpVa(::GetCommandLineA,   MyGetCommandLineA),
+        //Mp::FunctionJumpVa(::GetCommandLineW,   MyGetCommandLineW),
+        //Mp::FunctionJumpVa(::GetCommandLineA,   MyGetCommandLineA),
 
         //Mp::FunctionJumpVa(LoadAcceleratorsW,   MyLoadAcceleratorsW,    &StubLoadAcceleratorsW),
         Mp::FunctionJumpVa(PeekMessageW,        ChromePeekMessageW,     &StubPeekMessageW),
