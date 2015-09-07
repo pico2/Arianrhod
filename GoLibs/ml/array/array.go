@@ -25,6 +25,11 @@ func (self *Array) Clear() *Array {
     return self
 }
 
+func (self *Array) Contain(value interface{}) bool {
+    _, found := self.Index(value)
+    return found
+}
+
 func (self *Array) Index(value interface{}) (index int, found bool) {
     index = 0
     found = false
