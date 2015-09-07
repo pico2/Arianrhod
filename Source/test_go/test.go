@@ -22,7 +22,6 @@ func run() error {
 }
 
 func main() {
-    return
     if err := qml.Run(run); err != nil {
         Printf("error: %v\n", err)
         console.Pause("done")
