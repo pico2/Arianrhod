@@ -81,6 +81,7 @@ KEY_MAP KeyMapTable[] =
     { { 0,      VK_F2   }, { FCONTROL,          VK_NEXT     } },
     { { 0,      VK_F4   }, { FCONTROL,          'W'         } },
     { { FALT,   'Z'     }, { FCONTROL | FSHIFT, 'T'         } },
+    { { FALT,   'Q'     }, { FALT,              VK_HOME     } },
 };
 
 VOID SendKeyList(ULONG Modifier, PULONG VirtualKey, ULONG KeyCount, BOOL KeyDown)
