@@ -10,7 +10,7 @@ import (
 
 func run() error {
     engine := qml.NewEngine()
-    component, err := engine.LoadFile("qrc:///resource/main.qml")
+    component, err := engine.LoadFile(`D:\Dev\Library\Qt\Examples\Qt-5.5\quick\views\listview\dynamiclist.qml`)
     if err != nil {
         return err
     }
