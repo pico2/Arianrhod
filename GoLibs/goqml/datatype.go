@@ -109,6 +109,34 @@ func packDataValue(value interface{}, dvalue *C.DataValue, engine *Engine, owner
 		dvalue.dataType = C.DTColor
 		*(*uint32)(datap) = uint32(value.A)<<24 | uint32(value.R)<<16 | uint32(value.G)<<8 | uint32(value.B)
 	default:
+		rv := reflect.ValueOf(value)
+		switch rv.Type().Kind() {
+			case reflect.Ptr:
+				rv = rv.Elem()
+				if rv.Kind() == reflect.Array || rv.Kind() == reflect.Slice {
+					packDataValue(rv.Interface(), dvalue, engine, owner)
+					return
+				}
+
+			case reflect.Array, reflect.Slice:
+				dvalue.dataType = C.DTVariantList
+				dataValues := make([]C.DataValue, rv.Len())
+
+				for i := range dataValues {
+					packDataValue(rv.Index(i).Interface(), &dataValues[i], engine, owner)
+				}
+
+				switch len(dataValues) {
+					case 0:
+						*(*unsafe.Pointer)(unsafe.Pointer(&dvalue.data)) = C.newVariantList(nil, C.int(len(dataValues)))
+
+					default:
+						*(*unsafe.Pointer)(unsafe.Pointer(&dvalue.data)) = C.newVariantList(&dataValues[0], C.int(len(dataValues)))
+				}
+
+				return
+		}
+
 		dvalue.dataType = C.DTObject
 		if obj, ok := value.(Object); ok {
 			*(*unsafe.Pointer)(datap) = obj.Common().addr

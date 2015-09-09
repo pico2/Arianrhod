@@ -638,43 +638,56 @@ void unpackDataValue(DataValue *value, QVariant_ *var)
     case DTString:
         *qvar = QString::fromUtf8(*(char **)value->data, value->len);
         break;
+
     case DTBool:
         *qvar = bool(*(char *)(value->data) != 0);
         break;
+
     case DTInt64:
         *qvar = *(qint64*)(value->data);
         break;
+
     case DTInt32:
         *qvar = *(qint32*)(value->data);
         break;
+
     case DTUint64:
         *qvar = *(quint64*)(value->data);
         break;
+
     case DTUint32:
         *qvar = *(quint32*)(value->data);
         break;
+
     case DTFloat64:
         *qvar = *(double*)(value->data);
         break;
+
     case DTFloat32:
         *qvar = *(float*)(value->data);
         break;
+
     case DTColor:
         *qvar = QColor::fromRgba(*(QRgb*)(value->data));
         break;
+
     case DTVariantList:
         *qvar = **(QVariantList**)(value->data);
         delete *(QVariantList**)(value->data);
+        printf("type = %d v = %lld\n", qvar->type(), qvar->toList().at(0)->toLongLong());
         break;
+
     case DTObject:
         qvar->setValue(*(QObject**)(value->data));
         break;
+
     case DTInvalid:
         // null would be more natural, but an invalid variant means
         // it has proper semantics when dealing with non-qml qt code.
         //qvar->setValue(QJSValue(QJSValue::NullValue));
         qvar->clear();
         break;
+
     default:
         panicf("unknown data type: %d", value->dataType);
         break;
