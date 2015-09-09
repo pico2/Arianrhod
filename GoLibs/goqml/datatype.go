@@ -113,10 +113,10 @@ func packDataValue(value interface{}, dvalue *C.DataValue, engine *Engine, owner
 		switch rv.Type().Kind() {
 			case reflect.Ptr:
 				rv = rv.Elem()
-				if rv.Kind() == reflect.Array || rv.Kind() == reflect.Slice {
-					packDataValue(rv.Interface(), dvalue, engine, owner)
-					return
+				if rv.Kind() != reflect.Array && rv.Kind() != reflect.Slice {
+					break
 				}
+				fallthrough
 
 			case reflect.Array, reflect.Slice:
 				dvalue.dataType = C.DTVariantList

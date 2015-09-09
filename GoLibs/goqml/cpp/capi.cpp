@@ -674,7 +674,6 @@ void unpackDataValue(DataValue *value, QVariant_ *var)
     case DTVariantList:
         *qvar = **(QVariantList**)(value->data);
         delete *(QVariantList**)(value->data);
-        printf("type = %d v = %lld\n", qvar->type(), qvar->toList().at(0)->toLongLong());
         break;
 
     case DTObject:
