@@ -1,0 +1,578 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0066)http://hi.baidu.com/850317/blog/item/7f77b418a99a65b74bedbc37.html -->
+<!--STATUS OK--><HTML><HEAD><TITLE>汉诺塔－Ｃ语言问题分析与算法设计_DJBOY</TITLE>
+<META http-equiv=content-type content="text/html; charset=gb2312">
+<STYLE>.error {
+	FONT-SIZE: 12px; COLOR: #ff0000
+}
+</STYLE>
+
+<SCRIPT language=javascript 
+src="汉诺塔－Ｃ语言问题分析与算法设计_DJBOY.files/popup.js"></SCRIPT>
+
+<SCRIPT language=JavaScript 
+src="汉诺塔－Ｃ语言问题分析与算法设计_DJBOY.files/g_spjs.js"></SCRIPT>
+
+<SCRIPT language=javascript>
+<!--
+
+var allkey="";
+var i=0;
+var flag=0;
+function setpv(allnum)
+{
+	var num = allnum.split('_');
+	document.getElementById("result").innerHTML=num[0];
+}
+		 
+function checkMail(s) 
+{ 
+  	var pattern=/\w+@\w+\.[a-z]+/; 
+  	if(pattern.test(s)) 
+    { 
+       return true; 
+    } 
+  	else 
+   { 
+      return false; 
+   } 
+} 
+
+
+function checkeandu(eanduid)
+{
+	var eanduvalue=G(eanduid).value;
+	var len=bytes(eanduvalue);
+	if(len>128)
+	{
+		showErr(2,"您输入的网址或邮箱太长，请保持在128字节以内。");
+		return false;
+	}
+	else
+	{ 
+		 return true;
+	}
+		
+}
+
+function cmtdel(str)
+{
+	var pop=new Popup({ contentType:3,isReloadOnClose:false,width:340,height:80});
+	pop.setContent("title","删除评论");
+	pop.setContent("confirmCon","您确定要彻底删除这条评论吗？");
+	pop.setContent("callBack",delCallback2);
+	pop.setContent("parameter",{fid:str,popup:pop});
+	pop.build();
+	pop.show();
+	return false;
+}
+function delCallback2(para)
+{
+	var o_pop=para["popup"];
+	o_pop.config.contentType=1;
+	o_pop.setContent("contentUrl","");
+	o_pop.reBuild();
+	G(para["fid"]).target=o_pop.iframeIdName;
+	eval("document."+para["fid"]).submit();
+}
+
+
+
+function checkname(strid)
+{
+	var ele=document.getElementById(strid);
+	var len=bytes(ele.value);
+	if(len>49)
+	{
+		showErr(1,"您输入的姓名太长，请保持在49字节以内。");
+		return false;
+	}
+	else 
+	{		
+		if(len==0)
+		{
+			document.getElementById(strid).value="匿名网友";
+		}
+		 return true;
+	}	
+	
+}
+
+function checktext(textid)
+{
+		document.getElementById(textid).value=trimlr(textid);
+		var str=trimrn(textid);
+		len=str.length;
+		if(len==0 || ((/^[\s,　]+$/gi).test(str)) )
+		{
+			showErr(3,"您必须输入评论内容，请检查。");
+			return false;
+		}
+		else 
+		{
+				if(len>1000)
+				{
+					showErr(3,"您输入的评论内容太长，请保持在500字以内。");
+					return false;
+				}
+			return true;
+		}	
+}
+
+function showErr(index,str)
+{
+	G(index+"_err").style.display="";
+	G(index+"_err_con").innerHTML=str;
+}
+function hidErr(index)
+{
+	G(index+"_err").style.display="none";
+	G(index+"_err_con").innerHTML="";
+}
+
+function alertPop(tit,con)
+{
+	var pop=new Popup({ contentType:4,isReloadOnClose:false,width:340,height:80});
+	pop.setContent("title",tit);
+	pop.setContent("alertCon",con);
+	pop.build();
+	pop.show();
+}
+
+function cmtfull()
+{
+	var cnum=0;
+	if(cnum>=50000)
+	{
+		alertPop("发表评论","单篇日志评论数最多为50000条.");
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+function checkcmtform()
+{
+	if(checkname("spBlogCmtor")&&checkeandu("spBlogCmtURL")&&checktext("spBlogCmtText")&&cmtfull())
+	{
+		submitForm();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+var g_pop=null;
+function submitForm()
+{
+	g_pop=new Popup({ contentType:1,isReloadOnClose:false,width:340,height:80});
+	g_pop.setContent("title","添加评论");
+	g_pop.setContent("contentUrl","");
+	g_pop.setContent("someDisabledBtn","btn_ok");
+	g_pop.build();
+	G("popFormSubmit").target=g_pop.iframeIdName;
+	g_pop.show();
+}
+
+function g_close_pop()
+{
+	g_pop.close();
+}
+
+function formatonlinpic()
+{
+var picobj=document.getElementsByName("onlinepic");
+var picnum=picobj.length;
+	
+	for(var i=0;i<picnum;i++)
+	{
+		if(picobj[i].width>200)
+		{
+			picobj[i].width=200;
+		}
+		if(picobj[i].height>200)
+		{
+			picobj[i].height=200;
+		}
+	}
+
+}
+
+function addToFavor(){
+var blogTitle='汉诺塔－Ｃ语言问题分析与算法设计'.replace(/&#39;/g,'\'');
+window.open('http://cang.baidu.com/do/add?it='+encodeURIComponent(blogTitle+'_百度空间')+'&iu='+encodeURIComponent(location.href)+'&fr=sp#nw=1','_s','scrollbars=no,width=600,height=450,right=75,top=20,status=no,resizable=yes'); 
+return false;
+}
+
+//-->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY onload=formatonlinpic();>
+<CENTER>
+<SCRIPT language=JavaScript>
+<!--
+if (top.location != self.location) 
+{
+	top.location=self.location;
+}
+//-->
+</SCRIPT>
+<LINK href="汉诺塔－Ｃ语言问题分析与算法设计_DJBOY.files/4dee57386b6fc22396ddd843.css" 
+type=text/css rel=stylesheet><LINK href="汉诺塔－Ｃ语言问题分析与算法设计_DJBOY.files/space.css" 
+type=text/css rel=stylesheet>
+<STYLE type=text/css>#usrbar {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 0px; FONT-SIZE: 12px; BACKGROUND: #ffffff; FILTER: alpha(opacity=65); PADDING-BOTTOM: 3px; WIDTH: 100%; COLOR: #000000; LINE-HEIGHT: 19px; PADDING-TOP: 4px; FONT-FAMILY: Arial; LETTER-SPACING: normal; HEIGHT: 19px; TEXT-ALIGN: right; moz-opacity: 0.5
+}
+#usrbar A {
+	COLOR: #0000cc; TEXT-DECORATION: underline
+}
+#usrbar A:link {
+	COLOR: #0000cc; TEXT-DECORATION: underline
+}
+#usrbar A:visited {
+	COLOR: #0000cc; TEXT-DECORATION: underline
+}
+#ft {
+	CLEAR: both; FONT-SIZE: 12px; COLOR: #666666; LINE-HEIGHT: 20px; FONT-FAMILY: Arial; HEIGHT: 20px; TEXT-ALIGN: center
+}
+#ft A {
+	COLOR: #7777cc; TEXT-DECORATION: underline
+}
+#ft A:link {
+	COLOR: #7777cc; TEXT-DECORATION: underline
+}
+#ft A:visited {
+	COLOR: #7777cc; TEXT-DECORATION: underline
+}
+#usrbar {
+	LETTER-SPACING: normal
+}
+#usrbar A {
+	LETTER-SPACING: normal
+}
+#usrbar A:link {
+	LETTER-SPACING: normal
+}
+#usrbar A:visited {
+	LETTER-SPACING: normal
+}
+#ft {
+	LETTER-SPACING: normal
+}
+#ft A {
+	LETTER-SPACING: normal
+}
+#ft A:link {
+	LETTER-SPACING: normal
+}
+#ft A:visited {
+	LETTER-SPACING: normal
+}
+</STYLE>
+
+<DIV id=usrbar><NOBR>
+<SCRIPT> var myref = encodeURI("http://hi.baidu.com/850317/blog/item/7f77b418a99a65b74bedbc37%2Ehtml");</SCRIPT>
+<A href="http://www.baidu.com/" target=_blank>百度首页</A> | <A 
+href="http://hi.baidu.com/" target=_blank>百度空间</A>
+<SCRIPT language=JavaScript>
+        document.write(" | <a href='http://passport.baidu.com/?login&tpl=sp&tpl_reg=sp&u="+myref+"'>登录</a>");
+        </SCRIPT>
+ </NOBR></DIV>
+<DIV id=main align=left><!--[if IE]>
+<SCRIPT>
+var objmain = document.getElementById("main");
+function updatesize(){ var bodyw = window.document.body.offsetWidth; if(bodyw <= 790) objmain.style.width="772px"; else if(bodyw >= 1016) objmain.style.width="996px"; else objmain.style.width="100%"; }
+updatesize(); window.onresize = updatesize;
+</SCRIPT>
+<![endif]-->
+<DIV id=header>
+<DIV class=lc>
+<DIV class=rc></DIV></DIV>
+<DIV class=tit><A class=titlink 
+title="DJBOY850317的空间 http://hi.baidu.com/850317" 
+href="http://hi.baidu.com/850317">DJBOY</A></DIV>
+<DIV class=desc>懂得珍惜，才能拥有</DIV>
+<DIV id=tabline></DIV>
+<DIV id=tab><A href="http://hi.baidu.com/850317">主页</A><A class=on 
+href="http://hi.baidu.com/850317/blog">博客</A><A 
+href="http://hi.baidu.com/850317/album">相册</A><SPAN>|</SPAN><A 
+href="http://hi.baidu.com/850317/profile">个人档案</A> <SPAN>|</SPAN><A 
+href="http://hi.baidu.com/850317/friends">好友</A> </DIV></DIV>
+<DIV class=stage>
+<DIV class=stagepad>
+<DIV style="WIDTH: 100%">
+<TABLE class=modth cellSpacing=0 cellPadding=0 width="100%" border=0>
+  <TBODY>
+  <TR>
+    <TD class=modtl width=7>&nbsp;</TD>
+    <TD class=modtc noWrap>
+      <DIV class=modhead><SPAN class=modtit>查看文章</SPAN></DIV></TD>
+    <TD class=modtc noWrap align=right></TD>
+    <TD class=modtr width=7>&nbsp;</TD></TR></TBODY></TABLE>
+<DIV class=modbox id=m_blog>
+<DIV class=tit>汉诺塔－Ｃ语言问题分析与算法设计</DIV>
+<DIV class=date>2007-11-24 15:10</DIV>
+<TABLE style="TABLE-LAYOUT: fixed">
+  <TBODY>
+  <TR>
+    <TD>
+      <DIV class=cnt>
+      <P><FONT 
+      color=#ff99cc>约19世纪末，在欧州的商店中出售一种智力玩具，在一块铜板上有三根杆，最左边的杆上自上而下、由小到大顺序串着由64个圆盘构成的塔。目的是将最左边杆上的盘全部移到右边的杆上，条件是一次只能移动一个盘，且不允许大盘放在小盘的上面。</FONT></P>
+      <P>
+      <P><STRONG><FONT color=#ff0000>汉诺塔</FONT></STRONG>（又称<FONT 
+      color=#0000ff><STRONG>河内塔</STRONG></FONT>）问题是印度的一个古老的传说。开天辟地的神勃拉玛在一个庙里留下了三根金刚石的棒，第一根上面套着64个圆的金片，最大的一个在底下，其余一个比一个小，依次叠上去，庙里的众僧不倦地把它们一个个地从这根棒搬到另一根棒上，规定可利用中间的一根棒作为帮助，但每次只能搬一个，而且大的不能放在小的上面。解答结果请自己运行计算，程序见尾部。面对庞大的数字(移动圆片的次数)18446744073709551615，看来，众僧们耗尽毕生精力也不可能完成金片的移动。</P>
+      <P>后来，这个传说就演变为汉诺塔游戏:</P>
+      <P>1.有三根杆子A,B,C。A杆上有若干碟子</P>
+      <P>2.每次移动一块碟子,小的只能叠在大的上面</P>
+      <P>3.把所有碟子从A杆全部移到C杆上</P>
+      <P>经过研究发现，汉诺塔的破解很简单，就是按照移动规则向一个方向移动金片：</P>
+      <P>如3阶汉诺塔的移动：A→C,A→B,C→B,A→C,B→A,B→C,A→C</P>
+      <P>此外，汉诺塔问题也是程序设计中的经典递归问题。</P>
+      <P><STRONG>*问题分析与算法设计</STRONG><BR>这是一个著名的问题，几乎所有的教材上都有这个问题。由于条件是一次只能移动一个盘，且不允许大盘放在小盘上面，所以64个盘的移动次数是：<BR>18，446，744，073，709，551，615<BR>这是一个天文数字，若每一微秒可能计算(并不输出)一次移动，那么也需要几乎一百万年。我们仅能找出问题的解决方法并解决较小N值时的汉诺塔，但很难用计算机解决64层的汉诺塔。<BR>分析问题，找出移动盘子的正确算法。<BR>首先考虑a杆下面的盘子而非杆上最上面的盘子，于是任务变成了：<BR>*将上面的63个盘子移到b杆上；<BR>*将a杆上剩下的盘子移到c杆上；<BR>*将b杆上的全部盘子移到c杆上。<BR>将这个过程继续下去，就是要先完成移动63个盘子、62个盘子、61个盘子....的工作。<BR>为了更清楚地描述算法，可以定义一个函数movedisc(n,a,b,c)。该函数的功能是：将N个盘子从A杆上借助C杆移动到B杆上。这样移动N个盘子的工作就可以按照以下过程进行：<BR>1) 
+      movedisc(n-1,a,c,b);<BR>2) 将一个盘子从a移动到b上；<BR>3) 
+      movedisc(n-1,c,b,a)；<BR>重复以上过程，直到将全部的盘子移动到位时为止。</P>
+      <P><STRONG><FONT color=#ff0000 size=4>汉诺塔递归过程</FONT></STRONG></P>
+      <DIV align=center forimg="1"><A 
+      href="http://hiphotos.baidu.com/850317/pic/item/3477d9c4dcbea0a58326ac13.jpg" 
+      target=_blank>
+      <DIV align=center forimg="1"><IMG class=blogimg 
+      src="汉诺塔－Ｃ语言问题分析与算法设计_DJBOY.files/c8ace762713101d1e7113ae4.jpg" border=0 
+      small="0"></DIV></A></DIV>
+      <P><STRONG>*程序说明与注释</STRONG><BR>#include&lt;stdio.h&gt;<BR>void 
+      movedisc(unsigned n,char fromneedle,char toneedle,char 
+      usingneedle);<BR>int i=0;<BR>int main()<BR>{<BR>unsigned 
+      n;<BR>printf("please enter the number of disc:");<BR>scanf("%d",&amp;n); 
+      /*输入N值*/<BR>printf("\tneedle:\ta\t b\t c\n");<BR>movedisc(n,'a','c','b'); 
+      /*从A上借助B将N个盘子移动到C上*/<BR>printf("\t Total: %d\n",i);<BR>}<BR>void 
+      movedisc(unsigned n,char fromneedle,char toneedle,char 
+      usingneedle)<BR>{<BR>if(n&gt;0)<BR>{<BR>movedisc(n-1,fromneedle,usingneedle,toneedle);<BR>/*从fromneedle上借助toneedle将N-1个盘子移动到usingneedle上*/<BR>++i;<BR>switch(fromneedle) 
+      /*将fromneedle 上的一个盘子移到toneedle上*/<BR>{<BR>case 'a': 
+      switch(toneedle)<BR>{<BR>case 'b': 
+      printf("\t[%d]:\t%2d.........&gt;%2d\n",i,n,n);<BR>break;<BR>case 'c': 
+      printf("\t[%d]:\t%2d...............&gt;%2d\n",i,n,n);<BR>break;<BR>}<BR>break;<BR>case 
+      'b': switch(toneedle)<BR>{<BR>case 'a': 
+      printf("\t[%d]:\t%2d&lt;...............&gt;%2d\n",i,n,n);<BR>break;<BR>case 
+      'c': printf("\t[%d]:\t 
+      %2d........&gt;%2d\n",i,n,n);<BR>break;<BR>}<BR>break;<BR>case 'c': 
+      switch(toneedle)<BR>{<BR>case 'a': 
+      printf("\t[%d]:\t%2d&lt;............%2d\n",i,n,n);<BR>break;<BR>case 'b': 
+      printf("\t[%d]:\t%2d&lt;........%2d\n",i,n,n);<BR>break;<BR>}<BR>break;<BR>}<BR>movedisc(n-1,usingneedle,toneedle,fromneedle);<BR>/*从usingneedle上借助fromneedle将N-1个盘子移动到toneedle上*/<BR>}<BR>}</P>
+      <P></P>
+      <DIV align=center forimg="1"><IMG class=blogimg 
+      src="汉诺塔－Ｃ语言问题分析与算法设计_DJBOY.files/4e5342cf15307c31f9dc6116.jpg" border=0 
+      small="0"></DIV></DIV></TD></TR></TBODY></TABLE><BR>
+<DIV class=opt><A title=查看该分类中所有文章 
+href="http://hi.baidu.com/850317/blog/category/&micro;&ccedil;&Auml;&Ocirc;&Ouml;&reg;&frac14;&Ograve;">类别：电脑之家</A> | <A 
+title=将此文章添加到百度搜藏 onclick="return addToFavor();" 
+href="http://cang.baidu.com/do/add" target=_blank>添加到搜藏</A> | 浏览(<SPAN 
+id=result></SPAN>) | <A 
+href="http://hi.baidu.com/850317/blog/item/7f77b418a99a65b74bedbc37.html#send">评论</A>&nbsp;(0) 
+</DIV>
+<DIV class=line></DIV>
+<SCRIPT language=javascript>
+/*<![CDATA[*/
+var pre = [true,'哈希函数', '/850317/blog/item/8dbf50d94a08e82f10df9b2a.html'];
+var post = [true,'Microsoft Windows &reg; 2000的加密...', '/850317/blog/item/8e4a9918e5d76b0434fa410a.html'];
+if(pre[0] || post[0]){
+	document.write('<div id="in_nav">');
+	if(pre[0]){
+	document.write('上一篇：<a href="' + pre[2] + '">' +  pre[1] + '</a>&nbsp;&nbsp;&nbsp;&nbsp;');
+	}
+	if(post[0]){
+		document.write('下一篇：<a href="' + post[2] + '">' +  post[1] + '</a>');
+	}
+	document.write('</div>');
+	document.write('<div class="line">&nbsp;</div>');
+}
+/*]]>*/
+</SCRIPT>
+
+<DIV id=in_reader>
+<DIV class=tit>最近读者：</DIV>
+<SCRIPT>
+
+	var g_spAnnony=true;
+
+
+var g_read=[
+
+{}
+];
+g_read.length=g_read.length-1;
+
+var _rh1="";
+var _rh2="";
+
+function wrreader(){
+	_rh1 += '<table width="100%" ><tr>';
+	_rh2+='<tr>';
+	if(g_spAnnony){
+		_rh1+='<td align="center" width="10%" ><img border="0" width="55" height="55" src="http://img.baidu.com/hi/img/portraitn.jpg"></td>';
+		_rh2+='<td>&nbsp;</td>';
+		if(g_read.length>0){
+			_rh1+='<td align="left" width="12%">';
+		}else{
+			_rh1+='<td align="left" width="100%">';
+		}
+		_rh1+="<a href='http://passport.baidu.com/?login&tpl=sp&tpl_reg=sp&u="+myref+"' target='_self'>登录</a>后，您就出现在这里。</td>";
+		_rh2+='<td>&nbsp;</td>'
+	}
+	if(g_read.length==0){
+		if(!g_spAnnony){
+			_rh1+='<td align=left width="100%">最近还没有登录用户看过这篇文章……</td>';
+			_rh2+='<td>&nbsp;</td>';
+		}
+	}else{
+		for(i=0,len=g_read.length;i<len;i++){
+			_rh1+='<td align="center" valign="bottom" width="10%" class="user"><a href="/'+g_read[i][0]+'" target="_blank"><img border="0" src="http://himg.baidu.com/sys/portraitn/item/'+g_read[i][1]+'.jpg"></a></td>';
+			_rh2+='<td align="center" valign="top" class="user"><a href="/'+g_read[i][0]+'" target="_blank">'+g_read[i][2]+'</a></td>';
+		}
+	}
+	_rh1+='<td width="100%"></td></tr>';
+	_rh2+='<td></td></tr></table>';
+	document.write(_rh1+_rh2);
+}
+
+wrreader();
+</SCRIPT>
+</DIV>
+<DIV class=line></DIV>
+<SCRIPT language=JavaScript>
+allkey=allkey+"3710f880e2563ed79123d9b9_7f77b418a99a65b74bedbc37_";
+</SCRIPT>
+
+<DIV id=in_comment><A name=comment></A>
+<DIV class=tit>网友评论：</DIV>
+<SCRIPT>
+function writecmt(type,id,cmtname,cmturl,portraitId){
+	var html1="";
+
+	if(type==1){
+			html1="<a name='"+id+"' href='"+cmturl+"' target='_blank' title='"+cmturl+"'><img  border='0' src='http://himg.baidu.com/sys/portraitn/item/"+portraitId+".jpg'><br>"+cmtname+"</a>";
+	}else{
+		if(cmtname=="" || cmtname=="匿名网友"){
+			if(cmturl==""){
+				html1="<a name='"+id+"'>匿名网友</a>";
+			}else{
+				html1="<a name='"+id+"' href='"+cmturl+"' target='_blank' title='"+cmturl+"'>"+cmtname+"</a>";
+			}
+		}else{
+			if(cmturl==""){
+				html1="<div class='f14' style='display:inline'>网友:<a name='"+id+"'>"+cmtname+"</a></div>";
+			}else{
+				html1="<div class='f14' style='display:inline'>网友:<a name='"+id+"' href='"+cmturl+"' target='_blank' title='"+cmturl+"'>"+cmtname+"</a></div>";
+			}
+		}
+	}
+	document.write(html1);
+}
+
+</SCRIPT>
+
+<DIV id=page></DIV></DIV>
+<DIV id=in_send><A name=send></A>
+<FORM id=popFormSubmit name=form1 onsubmit="return checkcmtform()" 
+action=/850317/commit method=post><INPUT type=hidden value=8 name=ct> <INPUT 
+type=hidden value=1 name=cm> <INPUT type=hidden value=7f77b418a99a65b74bedbc37 
+name=spBlogID>
+<SCRIPT language=JavaScript>
+	document.write("<input type='hidden' name='spRefURL' value='"+window.location.href+"'>");
+</SCRIPT>
+ 
+<DIV class=tit>发表评论：</DIV>
+<TABLE cellSpacing=5 cellPadding=0 width=620 border=0>
+  <TBODY>
+  <TR>
+    <TD class=f14>姓　名：</TD>
+    <TD><INPUT id=spBlogCmtor style="WIDTH: 220px" onfocus=hidErr(1); 
+      tabIndex=1 maxLength=49 onchange="checkname('spBlogCmtor')" 
+      name=spBlogCmtor>
+      <SCRIPT>
+document.write(" &nbsp;&nbsp; <a href='http://passport.baidu.com/?reg&tpl=sp&return_method=get&skip_ok=1&u=http://hi.baidu.com/sys/reg/' target='_blank'>注册</a>");
+document.write(" | <a href='http://passport.baidu.com/?login&tpl=sp&tpl_reg=sp&u="+myref+"'>登录</a>");
+
+</SCRIPT>
+       
+      <DIV id=nmerror style="DISPLAY: none">*姓名最长为50字节</DIV></TD></TR>
+  <TR id=1_err style="DISPLAY: none">
+    <TD>&nbsp;</TD>
+    <TD>
+      <DIV class=error id=1_err_con></DIV></TD></TR>
+  <TR>
+    <TD class=f14>网址或邮箱：</TD>
+    <TD><INPUT id=spBlogCmtURL style="WIDTH: 360px" onfocus=hidErr(2); 
+      tabIndex=2 maxLength=128 onchange="checkeandu('spBlogCmtURL')" 
+      name=spBlogCmtURL> (选填)</TD>
+    <SCRIPT>
+G("spBlogCmtor").value="";
+G("spBlogCmtURL").value="";
+</SCRIPT>
+  </TR>
+  <TR id=2_err style="DISPLAY: none">
+    <TD>&nbsp;</TD>
+    <TD>
+      <DIV class=error id=2_err_con></DIV></TD></TR>
+  <TR>
+    <TD class=f14 vAlign=top>内　容：</TD>
+    <TD><TEXTAREA id=spBlogCmtText style="WIDTH: 520px; HEIGHT: 155px" onfocus=hidErr(3); tabIndex=3 name=spBlogCmtText></TEXTAREA>
+      <SCRIPT>
+G("spBlogCmtor").value=G("spBlogCmtor").defaultValue;
+G("spBlogCmtText").value="";
+</SCRIPT>
+       </TD></TR>
+  <TR id=3_err style="DISPLAY: none">
+    <TD>&nbsp;</TD>
+    <TD>
+      <DIV class=error id=3_err_con></DIV></TD></TR>
+  <TR id=vercode>
+    <TD class=f14 vAlign=top>验证码：</TD>
+    <TD vAlign=top><INPUT type=hidden 
+      value=09947C54B831E8078C7757A67FF862600F512AD70E3A4C0E2526DC28FF59C41C6FD7DF696D95DC42C7DA8E9A427F9D46E08B87B187B21BF9CB8551911CB1BE0D 
+      name=spVcode> <INPUT id=spVerifyKey tabIndex=4 maxLength=4 size=6 
+      name=spVerifyKey autocomplete="off">请输入下图中的四位验证码，字母不区分大小写。<BR>
+      <SCRIPT language=JavaScript>
+
+			var imgsrc="http://post.baidu.com/cgi-bin/genimg?09947C54B831E8078C7757A67FF862600F512AD70E3A4C0E2526DC28FF59C41C6FD7DF696D95DC42C7DA8E9A427F9D46E08B87B187B21BF9CB8551911CB1BE0D";
+			document.write("<img id='verifypic' src='"+imgsrc+"' width='120' height='40'>");
+
+			function newverifypic(){
+				document.getElementById("verifypic").src = imgsrc +"&t="+ Math.random();
+			}
+		</SCRIPT>
+      <A title=看不清左边的字符 href="javascript:newverifypic();">看不清?</A> </TD></TR>
+  <TR>
+    <TD class=f14 vAlign=top>&nbsp;</TD>
+    <TD class=f14 vAlign=top><INPUT id=btn_ok tabIndex=5 type=submit value=发表评论 name=btn_ok></TD></TR></TBODY></TABLE></FORM></DIV><BR></DIV>
+<TABLE height=8 cellSpacing=0 cellPadding=0 width="100%" border=0>
+  <TBODY>
+  <TR>
+    <TD class=modbl width=7>&nbsp;</TD>
+    <TD class=modbc>&nbsp;</TD>
+    <TD class=modbr width=7>&nbsp;</TD></TR></TBODY></TABLE></DIV></DIV></DIV></DIV>
+<SCRIPT language=javascript>
+<!--
+var hstr="/850317/brwstat?key1=1";
+document.write("<script src='"+hstr+"&key2="+allkey+"'><\/script>");
+//-->
+</SCRIPT>
+<BR>
+<CENTER>
+<DIV id=ft>&copy;2007 Baidu</DIV></CENTER>
+<SCRIPT>
+if(document.getElementById("m_blog"))
+{
+	var imgarray = document.getElementById("m_blog").getElementsByTagName('img');
+	var imgw = document.getElementById("m_blog").offsetWidth;
+	imgw =imgw-40;
+	for(var i=0; i<imgarray.length; i++){
+	if(imgarray[i].className=="blogimg" && imgarray[i].width>=imgw) imgarray[i].width=imgw;
+	}
+}
+</SCRIPT>
+</CENTER><IMG style="DISPLAY: none" src=""> </BODY></HTML>
