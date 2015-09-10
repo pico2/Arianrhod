@@ -128,7 +128,7 @@ func packDataValue(value interface{}, dvalue *C.DataValue, engine *Engine, owner
 
                 switch len(dataValues) {
                     case 0:
-                        *(*unsafe.Pointer)(unsafe.Pointer(&dvalue.data)) = C.newVariantList(nil, C.int(len(dataValues)))
+                        *(*unsafe.Pointer)(unsafe.Pointer(&dvalue.data)) = C.newVariantList(nil, 0)
 
                     default:
                         *(*unsafe.Pointer)(unsafe.Pointer(&dvalue.data)) = C.newVariantList(&dataValues[0], C.int(len(dataValues)))
