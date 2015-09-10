@@ -1081,19 +1081,29 @@ func registerType(location string, major, minor int, spec *TypeSpec) error {
 	if ft.Kind() != reflect.Func {
 		return fmt.Errorf("TypeSpec.Init must be a function, got %#v", localSpec.Init)
 	}
-	if ft.NumIn() != 2 {
-		return fmt.Errorf("TypeSpec.Init's function must accept two arguments: %s", ft)
+	if ft.NumIn() != 1 {
+		return fmt.Errorf("TypeSpec.Init's function must accept single argument: %s", ft)
 	}
-	firstArg := ft.In(0)
-	if firstArg.Kind() != reflect.Ptr || firstArg.Elem().Kind() == reflect.Ptr {
-		return fmt.Errorf("TypeSpec.Init's function must take a pointer type as the second argument: %s", ft)
-	}
-	if ft.In(1) != typeObject {
+	// firstArg := ft.In(0)
+	// if firstArg.Kind() != reflect.Ptr || firstArg.Elem().Kind() == reflect.Ptr {
+	// 	return fmt.Errorf("TypeSpec.Init's function must take a pointer type as the first argument: %s", ft)
+	// }
+	if ft.In(0) != typeObject {
 		return fmt.Errorf("TypeSpec.Init's function must take qml.Object as the second argument: %s", ft)
 	}
-	customType := typeInfo(reflect.New(firstArg.Elem()).Interface())
+
+	if ft.NumOut() != 1 {
+		return fmt.Errorf("TypeSpec.Init's function must return instance pointer: %s", ft)
+	}
+
+	returnValue := ft.Out(0)
+	if returnValue.Kind() != reflect.Ptr {
+		return fmt.Errorf("TypeSpec.Init's function must return a pointer type: %s", ft)
+	}
+
+	customType := typeInfo(reflect.New(returnValue.Elem()).Interface())
 	if localSpec.Name == "" {
-		localSpec.Name = firstArg.Elem().Name()
+		localSpec.Name = returnValue.Elem().Name()
 		if localSpec.Name == "" {
 			panic("cannot determine registered type name; please provide one explicitly")
 		}

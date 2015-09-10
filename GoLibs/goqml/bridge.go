@@ -295,7 +295,8 @@ func hookGoValueTypeNew(cvalue unsafe.Pointer, specp unsafe.Pointer) (foldp unsa
 	init := reflect.ValueOf((*TypeSpec)(specp).Init)
 	fold := &valueFold{
 		init:   init,
-		gvalue: reflect.New(init.Type().In(0).Elem()).Interface(),
+		// gvalue: reflect.New(init.Type().In(0).Elem()).Interface(),
+		gvalue: nil,
 		cvalue: cvalue,
 		owner:  jsOwner,
 	}
@@ -585,6 +586,9 @@ func ensureEngine(enginep, foldp unsafe.Pointer) *valueFold {
 		panic("unknown engine pointer; who created the engine?")
 	}
 	fold.engine = engine
+
+	initGoType(fold)
+
 	prev := engine.values[fold.gvalue]
 	if prev != nil {
 		for prev.next != nil {
@@ -600,7 +604,6 @@ func ensureEngine(enginep, foldp unsafe.Pointer) *valueFold {
 	if len(typeNew) == before {
 		panic("value had no engine, but was not created by a registered type; who created the value?")
 	}
-	initGoType(fold)
 	return fold
 }
 
@@ -618,7 +621,8 @@ func _initGoType(fold *valueFold, schedulePaint bool) {
 	}
 	// TODO Would be good to preserve identity on the Go side. See unpackDataValue as well.
 	obj := &Common{engine: fold.engine, addr: fold.cvalue}
-	fold.init.Call([]reflect.Value{reflect.ValueOf(fold.gvalue), reflect.ValueOf(obj)})
+	// fold.gvalue = fold.init.Call([]reflect.Value{reflect.ValueOf(fold.gvalue), reflect.ValueOf(obj)})
+	fold.gvalue = fold.init.Call([]reflect.Value{reflect.ValueOf(obj)})[0].Interface()
 	fold.init = reflect.Value{}
 	if schedulePaint {
 		obj.Call("update")
