@@ -5,12 +5,12 @@ import (
     "ml/console"
     . "fmt"
     "goqml"
-    _ "./resource"
+    // _ "./resource"
 )
 
 func run() error {
     engine := qml.NewEngine()
-    component, err := engine.LoadFile(`D:\Dev\Library\Qt\Examples\Qt-5.5\quick\views\listview\dynamiclist.qml`)
+    component, err := engine.LoadFile(`D:\Dev\Library\Qt\Examples\Qt-5.5\quick\demos\stocqt\stocqt.qml`)
     if err != nil {
         return err
     }
