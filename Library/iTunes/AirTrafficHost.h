@@ -30,6 +30,23 @@ NTSTATUS
 DECL_SELECTANY
 NTSTATUS
 (CDECL
+*ATHostConnectionSendMetadataSyncFinished)(
+    ATH_CONNECTION  Connection,
+    CFDictionaryRef Dataclasses,
+    CFDictionaryRef DataclassAnchors
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
+*ATHostConnectionSendSyncFailed)(
+    ATH_CONNECTION  Connection,
+    NTSTATUS        nErrorCode
+);
+
+DECL_SELECTANY
+NTSTATUS
+(CDECL
 *ATHostConnectionSendHostInfo)(
     ATH_CONNECTION  Connection,
     CFDictionaryRef HostInfo
@@ -54,15 +71,6 @@ VOID
 (CDECL
 *ATHostConnectionRelease)(
     ATH_CONNECTION Connection
-);
-
-DECL_SELECTANY
-NTSTATUS
-(CDECL
-*ATHostConnectionSendMetadataSyncFinished)(
-    ATH_CONNECTION  Connection,
-    PVOID           cfmudictParam1,
-    PVOID           cfmudictParam2
 );
 
 DECL_SELECTANY
@@ -118,14 +126,6 @@ NTSTATUS
     ATH_CONNECTION  Connection,
     PVOID           cfstrParam1,
     PVOID           cfstrParam2,
-    NTSTATUS        nErrorCode
-);
-
-DECL_SELECTANY
-NTSTATUS
-(CDECL
-*ATHostConnectionSendSyncFailed)(
-    ATH_CONNECTION  Connection,
     NTSTATUS        nErrorCode
 );
 
