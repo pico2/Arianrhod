@@ -8,6 +8,12 @@ call init.bat
 
 cd/d "%~dp1"
 
+findstr /C:"package test" "%~f1" >NUL 2>NUL
+if %ERRORLEVEL% == 0 (
+    call:BUILD_AND_TEST "%~f1"
+    goto:EXIT
+)
+
 findstr /C:"func main() {" "%~f1" >NUL 2>NUL
 if %ERRORLEVEL% == 0 (
     call:BUILD_AND_RUN "%~f1"
@@ -27,6 +33,7 @@ pause
 goto:eof
 
 :BUILD_AND_RUN
+call:DELETE_AUTO_INSTALL_PKGS "%~f1\.."
 call:BUILD "%~f1"
 
 if not %ERRORLEVEL% == 0 (
@@ -35,6 +42,22 @@ if not %ERRORLEVEL% == 0 (
 )
 
 call:RUN "%~dpn1.exe"
+goto:eof
+
+:BUILD_AND_TEST
+call:DELETE_AUTO_INSTALL_PKGS "%~f1\.."
+go.exe test -v "%~f1"
+pause
+goto:eof
+
+:DELETE_AUTO_INSTALL_PKGS
+call:DELETE_AUTO_INSTALL_PKGS2 "%~f1.x"
+goto:eof
+
+:DELETE_AUTO_INSTALL_PKGS2
+for /f %%i in ('dir/s/b %~dp1\pkg\%~n1') do (
+    rd/s/q "%%i"
+)
 goto:eof
 
 :BUILD

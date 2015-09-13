@@ -2,7 +2,6 @@ package main
 
 import (
     . "fmt"
-    . "ml"
     . "ml/dict"
     . "ml/strings"
     . "ml/trace"
@@ -74,7 +73,7 @@ func openThread(session *http.Session, user String) {
 
     doc.Find("tbody").Each(func(i int, s *goquery.Selection) {
         id_, exist := s.Attr("id")
-        id := Str(id_)
+        id := String(id_)
         if exist && id.StartsWith("normalthread_") {
             threads = append(threads, s)
         }
