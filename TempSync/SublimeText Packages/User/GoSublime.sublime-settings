@@ -20,13 +20,14 @@
                 {"text": "break", "title": "break", "value": "break"},
                 {"text": "continue", "title": "continue", "value": "continue"},
                 {"text": "interface", "title": "interface", "value": "interface"},
+                {"text": "struct", "title": "struct", "value": "struct"},
                 {"text": "default", "title": "default", "value": "default"},
                 {"text": "fallthrough", "title": "fallthrough", "value": "fallthrough"},
                 {"text": "recover", "title": "recover", "value": "recover"},
                 {"text": "append", "title": "append", "value": "append($1)"},
                 {"text": "delete", "title": "delete", "value": "delete($1)"},
-                {"text": "$mlc1", "title": "comment1", "value": "/***************************************************\n$1\n***************************************************/"},
-                {"text": "$mlc2", "title": "comment2", "value": "/*++\n\n    $1\n\n--*/"},
+                {"text": "mlc1", "title": "comment1", "value": "/***************************************************\n$1\n***************************************************/"},
+                {"text": "mlc2", "title": "comment2", "value": "/*++\n\n    $1\n\n--*/"},
                 {}
             ]
         }
