@@ -789,6 +789,13 @@ void packDataValue(QVariant_ *var, DataValue *value)
         }
         break;
     default:
+        if (qvar->canConvert<QJSValue>()) {
+            QJSValue jsvalue = qvar->value<QJSValue>();
+            QVariant qvar1 = jsvalue.toVariant();
+            packDataValue(&qvar1, value);
+            break;
+        }
+
         if (qvar->type() == (int)QMetaType::QObjectStar || qvar->canConvert<QObject *>()) {
             QObject *qobject = qvar->value<QObject *>();
             GoValue *goValue = dynamic_cast<GoValue *>(qobject);
@@ -807,6 +814,7 @@ void packDataValue(QVariant_ *var, DataValue *value)
             *(void **)(value->data) = qobject;
             break;
         }
+
         {
             QQmlListReference ref = qvar->value<QQmlListReference>();
             if (ref.isValid() && ref.canCount() && ref.canAt()) {
@@ -823,6 +831,7 @@ void packDataValue(QVariant_ *var, DataValue *value)
                 break;
             }
         }
+
         if (qstrncmp(qvar->typeName(), "QQmlListProperty<", 17) == 0) {
             QQmlListProperty<QObject> *list = reinterpret_cast<QQmlListProperty<QObject>*>(qvar->data());
             if (list->count && list->at) {
@@ -839,6 +848,7 @@ void packDataValue(QVariant_ *var, DataValue *value)
                 break;
             }
         }
+
         panicf("unsupported variant type: %d (%s)", qvar->type(), qvar->typeName());
         break;
     }
