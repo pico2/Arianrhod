@@ -55,8 +55,15 @@ call:DELETE_AUTO_INSTALL_PKGS2 "%~f1.x" >NUL 2>NUL
 goto:eof
 
 :DELETE_AUTO_INSTALL_PKGS2
-for /f %%i in ('dir/s/b %~dp1\pkg\%~n1') do (
-    rd/s/q "%%i"
+set "p=%~dp1"
+if [%p:~-4%] == [src\] (
+    for /f %%i in ('dir/s/b %~dp1\..\pkg\%~n1') do (
+        rd/s/q "%%i"
+    )
+) else (
+    for /f %%i in ('dir/s/b %~dp1\pkg\%~n1') do (
+        rd/s/q "%%i"
+    )
 )
 goto:eof
 

@@ -10,7 +10,7 @@ import (
 
 func run() error {
     engine := qml.NewEngine()
-    component, err := engine.LoadFile(`D:\Dev\Library\Qt\Examples\Qt-5.5\quick\demos\stocqt\stocqt.qml`)
+    component, err := engine.LoadFile(`D:\Dev\Library\Qt\Examples\Qt-5.5\quick\controls\gallery\qml\InputPage.qml`)
     if err != nil {
         return err
     }
@@ -21,10 +21,22 @@ func run() error {
     return nil
 }
 
-func main() {
-    Println('s')
+type String2 struct {
+    string
+}
 
-    return
+func funcTakeString(str string) {
+    Println(str)
+}
+
+func main() {
+    // f := "normal string"
+    // var x String2 = f
+
+    // Printf("%T\n", x)
+    // funcTakeString(x)
+
+    // return
 
     if err := qml.Run(run); err != nil {
         Printf("error: %v\n", err)
