@@ -159,16 +159,16 @@ class AES(object):
 
             # Key expansion for 256-bit keys is "slightly different" (fips-197)
             else:
-                for i in range(1, KC / 2):
+                for i in range(1, KC // 2):
                     tk[i] ^= tk[i - 1]
-                tt = tk[KC / 2 - 1]
+                tt = tk[KC // 2 - 1]
 
-                tk[KC / 2] ^= (self.S[ tt        & 0xFF]        ^
+                tk[KC // 2] ^= (self.S[ tt        & 0xFF]        ^
                               (self.S[(tt >>  8) & 0xFF] <<  8) ^
                               (self.S[(tt >> 16) & 0xFF] << 16) ^
                               (self.S[(tt >> 24) & 0xFF] << 24))
 
-                for i in range(KC / 2 + 1, KC):
+                for i in range(KC // 2 + 1, KC):
                     tk[i] ^= tk[i-1]
 
             # Copy values into round key arrays
