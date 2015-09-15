@@ -79,6 +79,7 @@ func (m *mGocode) Call() (interface{}, string) {
 	if m.Autoinst && len(res.Candidates) == 0 {
 		autoInstall(AutoInstOptions{
 			Src:           m.Src,
+			Dir:           m.Dir,
 			Env:           m.Env,
 			InstallSuffix: m.InstallSuffix,
 		})

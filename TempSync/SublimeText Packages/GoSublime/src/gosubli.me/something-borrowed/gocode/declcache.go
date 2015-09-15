@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"strings"
 )
 
 //-------------------------------------------------------------------------
@@ -169,13 +170,45 @@ func append_to_top_decls(decls map[string]*decl, decl ast.Decl, scope *scope) {
 	})
 }
 
+func normalizeSeparators(path string) string {
+	return strings.Replace(strings.Replace(path, "\\", "/", -1), "/", string(filepath.Separator), -1)
+}
+
+func findBestPath(dir string, env *gocode_env) (found string) {
+	maxlen := 0
+	dir = normalizeSeparators(dir)
+
+	for _, root := range filepath.SplitList(env.GOPATH) {
+		root = normalizeSeparators(root)
+		if strings.HasPrefix(dir, root) && len(root) > maxlen {
+			maxlen = len(root)
+			found = root
+			switch (found[len(found) - 1]) {
+				case '\\':
+				case '/':
+
+				default:
+					found += string(filepath.Separator)
+			}
+		}
+	}
+	return
+}
+
 func abs_path_for_package(filename, p string, env *gocode_env) (string, bool) {
 	dir, _ := filepath.Split(filename)
 	if len(p) == 0 {
 		return "", false
 	}
+
 	if p[0] == '.' {
-		return fmt.Sprintf("%s.a", filepath.Join(dir, p)), true
+		pkgpath := filepath.Join(dir, p)
+		bestPath := findBestPath(pkgpath, env)
+		if len(bestPath) == 0 {
+			return pkgpath + ".a", true
+		}
+
+		p = pkgpath[len(bestPath):]
 	}
 	pkg, ok := find_go_dag_package(p, dir)
 	if ok {

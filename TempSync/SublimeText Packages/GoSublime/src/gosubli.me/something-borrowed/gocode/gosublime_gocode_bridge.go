@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"os"
 )
 
 var Margo = newMargoState()
@@ -32,7 +33,12 @@ type MargoCandidate struct {
 }
 
 func newMargoState() *margoState {
-	env := &gocode_env{}
+	env := &gocode_env{
+		GOPATH	: os.Getenv("GOPATH"),
+		GOROOT	: os.Getenv("GOROOT"),
+		GOARCH	: os.Getenv("GOARCH"),
+		GOOS	: os.Getenv("GOOS"),
+	}
 	pkgCache := new_package_cache()
 	declCache := new_decl_cache(env)
 	return &margoState{

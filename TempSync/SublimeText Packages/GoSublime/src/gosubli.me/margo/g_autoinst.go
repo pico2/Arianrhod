@@ -24,6 +24,7 @@ type AutoInstOptions struct {
 	// if ImportPaths is empty, Src is parsed in order to populate it
 	ImportPaths []string
 	Src         string
+	Dir         string
 
 	// the environment variables as passed by the client - they should not be merged with os.Environ(...)
 	// GOPATH is be valid
@@ -85,7 +86,43 @@ func (a *AutoInstOptions) install() {
 	el := envSlice(a.Env)
 	installed := []string{}
 
+	normalizeSeparators := func (path string) string {
+		return strings.Replace(strings.Replace(path, "\\", "/", -1), "/", string(filepath.Separator), -1)
+	}
+
+	findBestPath := func (dir string) (found string) {
+		maxlen := 0
+		dir = normalizeSeparators(dir)
+
+		for _, root := range pathList(a.Env["GOPATH"]) {
+			root = normalizeSeparators(root)
+
+			if strings.HasPrefix(dir, root) && len(root) > maxlen {
+				maxlen = len(root)
+				found = root
+				switch (found[len(found) - 1]) {
+					case '\\':
+					case '/':
+
+					default:
+						found += string(filepath.Separator)
+				}
+			}
+		}
+		return
+	}
+
+	bestPath := findBestPath(a.Dir)
+
 	for path, fn := range a.imports() {
+		if path[0] == '.' && len(bestPath) != 0 {
+			// relative package path
+			path = filepath.Join(a.Dir, path)
+			fn = filepath.Join(a.Dir, fn)
+			path = path[len(bestPath):]
+			fn = fn[len(bestPath):]
+		}
+
 		if !archiveOk(fn) {
 			var cmd *exec.Cmd
 			if sfx == "" {
