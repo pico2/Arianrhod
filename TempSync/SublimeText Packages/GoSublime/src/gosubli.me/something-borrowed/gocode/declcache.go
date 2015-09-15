@@ -177,6 +177,7 @@ func normalizeSeparators(path string) string {
 func findBestPath(dir string, env *gocode_env) (found string) {
 	maxlen := 0
 	dir = normalizeSeparators(dir)
+	srcPath := "src" + string(filepath.Separator)
 
 	for _, root := range filepath.SplitList(env.GOPATH) {
 		root = normalizeSeparators(root)
@@ -189,6 +190,10 @@ func findBestPath(dir string, env *gocode_env) (found string) {
 
 				default:
 					found += string(filepath.Separator)
+			}
+
+			if dir[len(found):len(found) + 4] == srcPath {
+				found += srcPath
 			}
 		}
 	}

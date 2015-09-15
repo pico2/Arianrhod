@@ -93,6 +93,7 @@ func (a *AutoInstOptions) install() {
 	findBestPath := func (dir string) (found string) {
 		maxlen := 0
 		dir = normalizeSeparators(dir)
+		srcPath := "src" + string(filepath.Separator)
 
 		for _, root := range pathList(a.Env["GOPATH"]) {
 			root = normalizeSeparators(root)
@@ -106,6 +107,10 @@ func (a *AutoInstOptions) install() {
 
 					default:
 						found += string(filepath.Separator)
+				}
+
+				if dir[len(found):len(found) + 4] == srcPath {
+					found += srcPath
 				}
 			}
 		}
