@@ -3,6 +3,7 @@ package main
 import (
     _ "ml"
     "ml/console"
+    "path/filepath"
     . "fmt"
     "goqml"
     // _ "./resource"
@@ -30,13 +31,9 @@ func funcTakeString(str string) {
 }
 
 func main() {
-    // f := "normal string"
-    // var x String2 = f
-
-    // Printf("%T\n", x)
-    // funcTakeString(x)
-
-    // return
+    Println(filepath.Join(`D:\Desktop\Source\Project\Private\bettor\common\match`, `../site`))
+    Println(`../site`[0] == '.')
+    return
 
     if err := qml.Run(run); err != nil {
         Printf("error: %v\n", err)
