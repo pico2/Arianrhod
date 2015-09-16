@@ -13,6 +13,7 @@ import (
     "net"
     "strconv"
     "strings"
+    "time"
 )
 
 // The POP3 client.
@@ -65,6 +66,7 @@ func (self *Client) Close() {
 // Output sent after the first line must be retrieved via readLines.
 func (c *Client) Cmd(format string, args ...interface{}) (string, error) {
     fmt.Fprintf(c.conn, format, args...)
+    c.conn.SetReadDeadline(time.Now().Add(30 * time.Second))
     line, _, err := c.bin.ReadLine()
     if err != nil { return "", err }
     l := string(line)
@@ -79,6 +81,7 @@ func (c *Client) Cmd(format string, args ...interface{}) (string, error) {
 
 func (c *Client) ReadLines() (lines []string, err error) {
     lines = make([]string, 0)
+    c.conn.SetReadDeadline(time.Now().Add(30 * time.Second))
     l, _, err := c.bin.ReadLine()
     line := string(l)
     for err == nil && line != "." {
@@ -86,6 +89,7 @@ func (c *Client) ReadLines() (lines []string, err error) {
             line = line[1:]
         }
         lines = append(lines, line)
+        c.conn.SetReadDeadline(time.Now().Add(30 * time.Second))
         l, _, err = c.bin.ReadLine()
         line = string(l)
     }

@@ -7,6 +7,7 @@ import (
     "ml/net/pop3"
     "net/mail"
     "strings"
+    "time"
     "io/ioutil"
     . "ml/trace"
 )
@@ -24,11 +25,20 @@ import (
 //     return nil
 // }
 
-func main2() {
-    c, err := pop3.DialTLS("pop3.sohu.com:995")
+func list(user, pass string) {
+    Printf("try %s @ %s...", user, pass)
+    start := time.Now()
+
+    defer func () {
+        Printf(" take %v  ", time.Now().Sub(start))
+    }()
+
+    c, err := pop3.DialTLS("pop.sina.com:995")
     RaiseIf(err)
 
-    Println(c.Auth("", ""))
+    err = c.Auth(user, pass)
+    RaiseIf(err)
+
     _, sizes, err := c.ListAll()
     RaiseIf(err)
 
@@ -38,10 +48,23 @@ func main2() {
 
         m, err := mail.ReadMessage(strings.NewReader(text))
         RaiseIf(err)
-        Println(m.Header)
-        body, err := ioutil.ReadAll(m.Body)
+        _, err = ioutil.ReadAll(m.Body)
         RaiseIf(err)
-        Println("body\n", string(body))
+    }
+}
+
+func main2() {
+    for _, acc := range [][]string{
+    } {
+        exp := Try(func () {
+            list(acc[0], acc[1])
+        })
+
+        if exp != nil {
+            Println(strings.Trim(exp.Message, "\n"), "failed")
+        } else {
+            Println("success")
+        }
     }
 }
 
