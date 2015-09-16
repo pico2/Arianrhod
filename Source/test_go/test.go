@@ -8,6 +8,7 @@ import (
     "net/mail"
     "strings"
     "io/ioutil"
+    . "ml/trace"
 )
 
 // func run() error {
@@ -25,26 +26,27 @@ import (
 
 func main2() {
     c, err := pop3.DialTLS("pop3.sohu.com:995")
-    Println(err)
+    RaiseIf(err)
 
     Println(c.Auth("", ""))
     _, sizes, err := c.ListAll()
-    Println(err)
+    RaiseIf(err)
 
     for i := 0; i != len(sizes); i++ {
         text, err := c.Retr(i + 1)
-        Println(err)
+        RaiseIf(err)
 
         m, err := mail.ReadMessage(strings.NewReader(text))
-        Println(err)
+        RaiseIf(err)
         Println(m.Header)
         body, err := ioutil.ReadAll(m.Body)
-        Println(err)
-        Println(string(body))
+        RaiseIf(err)
+        Println("body\n", string(body))
     }
 }
 
 func main() {
+    // defer console.Pause("done")
     main2()
     return
 

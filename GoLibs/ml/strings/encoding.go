@@ -12,6 +12,10 @@ type Encoder struct {
 }
 
 func (self *Encoder) Encode(str String) []byte {
+    if len(str) == 0 {
+        return []byte{}
+    }
+
     switch self.table.encode != nil {
         case true:
             return self.table.encode(self.table, str)
@@ -22,6 +26,10 @@ func (self *Encoder) Encode(str String) []byte {
 }
 
 func (self *Encoder) Decode(bytes []byte) String {
+    if len(bytes) == 0 {
+        return ""
+    }
+
     switch self.table.decode != nil {
         case true:
             return self.table.decode(self.table, bytes)
