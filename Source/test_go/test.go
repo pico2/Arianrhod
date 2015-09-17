@@ -1,80 +1,53 @@
 package main
 
 import (
-    _ "ml"
     . "fmt"
-    // "ml/console"
-    "ml/net/pop3"
-    "net/mail"
-    "strings"
+    "encoding/json"
+    "./pinyin"
+    "ml/random"
+    "os"
     "time"
-    "io/ioutil"
-    . "ml/trace"
 )
 
-// func run() error {
-//     engine := qml.NewEngine()
-//     component, err := engine.LoadFile(`D:\Dev\Library\Qt\Examples\Qt-5.5\quick\controls\gallery\qml\InputPage.qml`)
-//     if err != nil {
-//         return err
-//     }
-
-//     window := component.CreateWindow(nil)
-//     window.Show()
-//     window.Wait()
-//     return nil
-// }
-
-func list(user, pass string) {
-    Printf("try %s @ %s...", user, pass)
-    start := time.Now()
-
-    defer func () {
-        Printf(" take %v  ", time.Now().Sub(start))
-    }()
-
-    c, err := pop3.DialTLS("pop.sina.com:995")
-    RaiseIf(err)
-
-    err = c.Auth(user, pass)
-    RaiseIf(err)
-
-    _, sizes, err := c.ListAll()
-    RaiseIf(err)
-
-    for i := 0; i != len(sizes); i++ {
-        text, err := c.Retr(i + 1)
-        RaiseIf(err)
-
-        m, err := mail.ReadMessage(strings.NewReader(text))
-        RaiseIf(err)
-        _, err = ioutil.ReadAll(m.Body)
-        RaiseIf(err)
-    }
-}
-
-func main2() {
-    for _, acc := range [][]string{
-    } {
-        exp := Try(func () {
-            list(acc[0], acc[1])
-        })
-
-        if exp != nil {
-            Println(strings.Trim(exp.Message, "\n"), "failed")
-        } else {
-            Println("success")
-        }
-    }
-}
-
 func main() {
-    // defer console.Pause("done")
-    main2()
+    Println(time.Unix(0, int64(1442485578335) * int64(time.Millisecond)))
     return
 
-    // if err := qml.Run(run); err != nil {
-    //     Printf("error: %v\n", err)
-    //     console.Pause("done")
-    // }
+    py := [][]string{}
+    json.Unmarshal([]byte(pinyin.Json), &py)
+
+    domains := []string{
+    }
+
+    // names := []string{}
+    nameset := map[string]bool{}
+
+    f, _ := os.Create("names.txt")
+    defer f.Close()
+
+    // f.WriteString("INSERT IGNORE INTO appstore_buydata_appleid (username) VALUES\n")
+
+    for i := 0; i != 3000000; i++ {
+        n := random.IntRange(1, 5)
+        name := ""
+        for n > 0 {
+            p := py[random.ChoiceIndex(py)][1]
+            if len(p) > 4 {
+                continue
+            }
+
+            name += p
+            n--
+        }
+
+        name += Sprintf("%d%s", random.IntRange(1000, 100000), random.Choice(domains).(string))
+        if nameset[name] {
+            continue
+        }
+
+        nameset[name] = true
+
+        f.WriteString("INSERT IGNORE INTO appstore_buydata_appleid (username) VALUES ")
+        f.WriteString(Sprintf("('%s');\n", name))
+    }
 }

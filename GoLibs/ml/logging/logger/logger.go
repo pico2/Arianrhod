@@ -6,7 +6,7 @@ import (
 )
 
 var (
-    logger = logging.NewLogger(os2.ExecutableName())
+    logger      = logging.NewLogger(os2.ExecutableName())
     Debug       = logger.Debug
     Info        = logger.Info
     Warning     = logger.Warning

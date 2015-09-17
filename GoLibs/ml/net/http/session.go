@@ -20,7 +20,7 @@ type Session struct {
     cookie             *cookiejar.Jar
     client             *gohttp.Client
     headers             gohttp.Header
-    defaultTransport   *gohttp.Transport
+    defaultTransport   *Transport
 }
 
 func NewSession() *Session {
@@ -29,7 +29,7 @@ func NewSession() *Session {
         RaiseHttpError(err)
     }
 
-    defaultTransport := &gohttp.Transport{
+    defaultTransport := newTransport(&gohttp.Transport{
         Proxy               : nil,
         // DisableKeepAlives   : true,
         Dial                : (&gonet.Dialer{
@@ -38,7 +38,7 @@ func NewSession() *Session {
                                 }).Dial,
 
         TLSHandshakeTimeout : 10 * time.Second,
-    }
+    })
 
     client := &gohttp.Client{
         CheckRedirect   : nil,
@@ -182,20 +182,11 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
         return nil
     }
 
-    var timer *time.Timer
-    timeout := false
-
-    if self.client.Timeout > 0 {
-        timer = time.AfterFunc(self.client.Timeout, func() {
-            timeout = true
-        })
-    }
-
     // request.Close = true
     resp, err := self.client.Do(request)
-    if timer != nil {
-        timer.Stop()
-    }
+
+    timeout := self.defaultTransport.canceledRequests[request]
+    delete(self.defaultTransport.canceledRequests, request)
 
     self.client.CheckRedirect = nil
 
@@ -212,7 +203,9 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
         msg := String(herr.Err.Error())
 
         switch {
-            case timeout, msg.Contains("Client.Timeout exceeded while reading body"):
+            case timeout,
+                 msg.Contains("TLS handshake timeout"),
+                 msg.Contains("Client.Timeout exceeded"):
                 herr.Type = HTTP_ERROR_TIMEOUT
 
             case msg.Contains("error connecting to proxy"):
@@ -220,6 +213,9 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
             case msg.Contains("unexpected EOF"):
                 herr.Type = HTTP_ERROR_INVALID_RESPONSE
+
+            case msg.Contains("wsarecv"):
+                herr.Type = HTTP_ERROR_READ_ERROR
 
             default:
                 herr.Type = HTTP_ERROR_GENERIC

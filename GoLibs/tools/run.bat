@@ -74,6 +74,7 @@ call:DELETE_ML_PKG >NUL 2>NUL
 
 :: -H windowsgui  -extldflags=--large-address-aware
 go.exe build -ldflags "-s" "%~f1"
+::go.exe build "%~f1"
 goto:eof
 
 :RUN

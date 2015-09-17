@@ -1,6 +1,7 @@
 package http
 
 import (
+    . "fmt"
     . "ml/strings"
     . "ml/trace"
     "errors"
@@ -13,6 +14,8 @@ const (
     HTTP_ERROR_INVALID_RESPONSE     = 3
     HTTP_ERROR_TOO_MANY_REDIRECT    = 4
     HTTP_ERROR_CANNOT_CONNECT       = 5
+    HTTP_ERROR_READ_ERROR           = 6
+    HTTP_ERROR_RESPONSE_ERROR       = 7
 )
 
 type HttpError struct {
@@ -27,7 +30,7 @@ func NewHttpError(t int, op, url, msg String) *HttpError {
 }
 
 func (self *HttpError) Error() string {
-    return self.Op + " " + self.URL + ": " + self.Err.Error()
+    return Sprintf("%v %v: (%v) %v", self.Op, self.URL, self.Type, self.Err.Error())
 }
 
 func RaiseHttpError(err error) {

@@ -94,7 +94,7 @@ func raise(resp *gohttp.Response, err error) {
                 msg,
             ))
 
-        case msg.Contains("Client.Timeout exceeded while reading body"):
+        case msg.Contains("Client.Timeout exceeded"):
             Raise(NewHttpError(
                 HTTP_ERROR_TIMEOUT,
                 String(resp.Request.Method),
@@ -103,7 +103,13 @@ func raise(resp *gohttp.Response, err error) {
             ))
 
         default:
-            RaiseHttpError(err)
+            Raise(NewHttpError(
+                HTTP_ERROR_RESPONSE_ERROR,
+                String(resp.Request.Method),
+                String(resp.Request.URL.String()),
+                String(err.Error()),
+            ))
+            // RaiseHttpError(err)
     }
 }
 

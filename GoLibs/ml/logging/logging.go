@@ -242,7 +242,7 @@ func (self *Logger) getDefaultFileName() string {
     exe := os2.Executable()
     exeName := filepath.Base(exe)
 
-    baseName := fmt.Sprintf("[%s][%s][%04d-%02d-%02d %02d.%02d.%02d][%d].txt", exeName[:len(filepath.Ext(exeName))], self.tag, year, month, day, hour, minute, second, os.Getpid())
+    baseName := fmt.Sprintf("[%s][%s][%04d-%02d-%02d %02d.%02d.%02d][%d].txt", exeName[:len(exeName) - len(filepath.Ext(exeName))], self.tag, year, month, day, hour, minute, second, os.Getpid())
 
     logPath := filepath.Join(filepath.Dir(exe), "logs")
     err := os.MkdirAll(logPath, 0666)
