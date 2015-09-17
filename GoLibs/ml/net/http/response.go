@@ -7,6 +7,7 @@ import (
     "io/ioutil"
     "compress/gzip"
     "compress/zlib"
+    "encoding/json"
     "net/url"
     "mime"
     "plistlib"
@@ -63,6 +64,10 @@ func (self *Response) Text(encoding ...int) String {
     }
 
     return Decode(self.Content, enc)
+}
+
+func (self *Response) Json(v interface{}) {
+    RaiseHttpError(json.Unmarshal(self.Content, v))
 }
 
 func (self *Response) Plist(v interface{}) {

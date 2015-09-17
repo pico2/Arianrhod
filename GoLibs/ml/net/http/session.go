@@ -217,6 +217,9 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
             case msg.Contains("wsarecv"):
                 herr.Type = HTTP_ERROR_READ_ERROR
 
+            case msg.Contains("Bad Gateway"):
+                herr.Type = HTTP_ERROR_BAD_GATE_WAY
+
             default:
                 herr.Type = HTTP_ERROR_GENERIC
         }

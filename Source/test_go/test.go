@@ -2,35 +2,36 @@ package main
 
 import (
     . "fmt"
+    . "ml/strings"
     "encoding/json"
     "./pinyin"
     "ml/random"
     "os"
-    "time"
+    "io/ioutil"
 )
 
 func main() {
-    Println(time.Unix(0, int64(1442485578335) * int64(time.Millisecond)))
-    return
-
     py := [][]string{}
     json.Unmarshal([]byte(pinyin.Json), &py)
 
-    domains := []string{
-    }
+    f, _ := os.Open("domains.txt")
+    bytes, _ := ioutil.ReadAll(f)
+    f.Close()
+
+    domains := String(bytes).SplitLines()
 
     // names := []string{}
     nameset := map[string]bool{}
 
-    f, _ := os.Create("names.txt")
-    defer f.Close()
+    target  := 3000000
+    perline := 30000
+    index   := 0
 
-    // f.WriteString("INSERT IGNORE INTO appstore_buydata_appleid (username) VALUES\n")
+    names := []String{}
 
-    for i := 0; i != 3000000; i++ {
-        n := random.IntRange(1, 5)
+    for i := 0; i != target; i++ {
         name := ""
-        for n > 0 {
+        for n := random.IntRange(1, 5); n > 0; {
             p := py[random.ChoiceIndex(py)][1]
             if len(p) > 4 {
                 continue
@@ -40,14 +41,27 @@ func main() {
             n--
         }
 
-        name += Sprintf("%d%s", random.IntRange(1000, 100000), random.Choice(domains).(string))
+        name += Sprintf("%d%s", random.IntRange(1000, 100000), random.Choice(domains).(String))
         if nameset[name] {
+            i--
             continue
         }
 
         nameset[name] = true
+        names = append(names, String(name))
 
-        f.WriteString("INSERT IGNORE INTO appstore_buydata_appleid (username) VALUES ")
-        f.WriteString(Sprintf("('%s');\n", name))
+        switch {
+            case i + 1 == target,
+                 i != 0 && i % perline == 0:
+                 f, _ = os.Create(Sprintf("names%d.txt", index))
+                 f.WriteString("INSERT IGNORE INTO appstore_buydata_appleid (username) VALUES (\"")
+                 f.WriteString(string(String("\"),(\"").Join(names)))
+                 f.WriteString("\");\n")
+
+                 f.Close()
+
+                 index++
+                 names = []String{}
+        }
     }
 }

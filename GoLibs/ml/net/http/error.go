@@ -16,6 +16,7 @@ const (
     HTTP_ERROR_CANNOT_CONNECT       = 5
     HTTP_ERROR_READ_ERROR           = 6
     HTTP_ERROR_RESPONSE_ERROR       = 7
+    HTTP_ERROR_BAD_GATE_WAY         = 8
 )
 
 type HttpError struct {
