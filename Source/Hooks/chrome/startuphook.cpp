@@ -278,30 +278,85 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
     return Success;
 }
 
-API_POINTER(CreateFontIndirectW) StubCreateFontIndirectW;
-API_POINTER(CreateFontW) StubCreateFontW;
-
-HFONT NTAPI CreateFontIndirectBypassW(LOGFONTW *lplf)
+VOID FuckDisableNewAvatarMenu(PLDR_MODULE chrome)
 {
-    AllocConsole();
-    PrintConsole(L"%s\n", lplf->lfFaceName);
+    using namespace Mp;
 
-    WCHAR face[] = L"Î¢ÈíÑÅºÚ";
-    LOGFONTW f2;
+    static CHAR text[] = "disable-new-avatar-menu";
 
-    f2 = *lplf;
-    lstrcpyW(f2.lfFaceName, L"Î¢ÈíÑÅºÚ");
+    PVOID push, firstCall, secondCall;
 
-    return StubCreateFontIndirectW(lplf);
+    push = SearchStringReference(chrome, text, sizeof(text));
+    if (push == IMAGE_INVALID_VA)
+        return;
+
+    push = PtrAdd(push, sizeof(push));
+    firstCall = nullptr;
+    secondCall = nullptr;
+
+    WalkOpCodeT(push, 0x14,
+        WalkOpCodeM(Buffer, OpLength, Ret)
+        {
+            switch (Buffer[0])
+            {
+                case CALL:
+                    if (firstCall == nullptr)
+                    {
+                        firstCall = Buffer;
+                        break;
+                    }
+
+                    secondCall = Buffer;
+                    return STATUS_SUCCESS;
+            }
+
+            return STATUS_NOT_FOUND;
+        }
+    );
+
+    if (secondCall == nullptr)
+        return;
+
+    auto fuckit = [](PCSTR) -> BOOL
+    {
+        return TRUE;
+    };
+
+    PATCH_MEMORY_DATA p[] =
+    {
+        FunctionCallVa(secondCall, (BOOL(NTAPI*)(PCSTR))fuckit),
+    };
+
+    PatchMemory(p, countof(p), chrome->DllBase);
 }
 
-HFONT NTAPI CcCreateFontW(_In_ int cHeight, _In_ int cWidth, _In_ int cEscapement, _In_ int cOrientation, _In_ int cWeight, _In_ DWORD bItalic, _In_ DWORD bUnderline, _In_ DWORD bStrikeOut, _In_ DWORD iCharSet, _In_ DWORD iOutPrecision, _In_ DWORD iClipPrecision, _In_ DWORD iQuality, _In_ DWORD iPitchAndFamily, _In_opt_ LPCWSTR pszFaceName)
+VOID FuckExtensionDeveloperModeWarning(PLDR_MODULE chrome)
 {
-    AllocConsole();
-    PrintConsole(L"%s\n", pszFaceName);
-    WCHAR face[] = L"Î¢ÈíÑÅºÚ";
-    pszFaceName = face;
-    return StubCreateFontW(cHeight, cWidth, cEscapement, cOrientation, cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision, iQuality, iPitchAndFamily, pszFaceName);
+    using namespace Mp;
+
+    static CHAR text[] = "ExtensionDeveloperModeWarning";
+
+    PBYTE push;
+
+    push = (PBYTE)SearchStringReference(chrome, text, sizeof(text));
+    if (push == IMAGE_INVALID_VA)
+        return;
+
+    --push;
+
+    for (LONG_PTR length = 0x20; length > 0; --push, --length)
+    {
+        if ((*(PULONG)push & 0x00FFFFFF) != 0x00C301B0)
+            continue;
+
+        PATCH_MEMORY_DATA p[] =
+        {
+            MemoryPatchVa(0ull, 1, push + 1),
+        };
+
+        PatchMemory(p, countof(p), chrome->DllBase);
+        break;
+    }
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -311,10 +366,10 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
-    PVOID   hModule;
-    SizeT   Length, Length2;
-    LPWSTR  lpCmdLineW, pCmdLine;
-    WChar   end, szCmdLine[MAX_PATH + 40];
+    PLDR_MODULE chrome;
+    SizeT       Length, Length2;
+    LPWSTR      lpCmdLineW, pCmdLine;
+    WChar       end, szCmdLine[MAX_PATH + 40];
 
     static WChar AddCmdLineHeadW[] = L" --user-data-dir=\"";
     static WChar AddCmdLineTailW[] = L"UserData\" --purge-memory-button";
@@ -323,13 +378,13 @@ BOOL Initialize(PVOID BaseAddress)
 
     Length = Nt_GetSystemDirectory(szCmdLine, countof(szCmdLine));
     CopyStruct(szCmdLine + Length, L"wtsapi32.dll", sizeof(L"wtsapi32.dll"));
-    hModule = Ldr::LoadDll(szCmdLine);
+    BaseAddress = Ldr::LoadDll(szCmdLine);
 
-    *(PVOID *)&StubWTSFreeMemory                    = GetRoutineAddress(hModule, "WTSFreeMemory");
-    *(PVOID *)&StubWTSQuerySessionInformationW      = GetRoutineAddress(hModule, "WTSQuerySessionInformationW");
-    *(PVOID *)&StubWTSUnRegisterSessionNotification = GetRoutineAddress(hModule, "WTSUnRegisterSessionNotification");
-    *(PVOID *)&StubWTSRegisterSessionNotification   = GetRoutineAddress(hModule, "WTSRegisterSessionNotification");
-    *(PVOID *)&StubWTSQueryUserToken                = GetRoutineAddress(hModule, "WTSQueryUserToken");
+    *(PVOID *)&StubWTSFreeMemory                    = GetRoutineAddress(BaseAddress, "WTSFreeMemory");
+    *(PVOID *)&StubWTSQuerySessionInformationW      = GetRoutineAddress(BaseAddress, "WTSQuerySessionInformationW");
+    *(PVOID *)&StubWTSUnRegisterSessionNotification = GetRoutineAddress(BaseAddress, "WTSUnRegisterSessionNotification");
+    *(PVOID *)&StubWTSRegisterSessionNotification   = GetRoutineAddress(BaseAddress, "WTSRegisterSessionNotification");
+    *(PVOID *)&StubWTSQueryUserToken                = GetRoutineAddress(BaseAddress, "WTSQueryUserToken");
 
 #if 0
 
@@ -373,7 +428,25 @@ BOOL Initialize(PVOID BaseAddress)
 
 #endif
 
-    hModule = FindLdrModuleByName(PUSTR(L"chrome.dll"));
+    PVOID DllNotificationCookie;
+
+    LdrRegisterDllNotification(0,
+        [] (ULONG NotificationReason, PCLDR_DLL_NOTIFICATION_DATA NotificationData, PVOID Context)
+        {
+            if (NotificationReason != LDR_DLL_NOTIFICATION_REASON_LOADED)
+                return;
+
+            if (RtlEqualUnicodeString(NotificationData->Loaded.BaseDllName, PUSTR(L"chrome.dll"), FALSE) == FALSE)
+                return;
+
+            PLDR_MODULE chrome = FindLdrModuleByHandle(NotificationData->Loaded.DllBase);
+
+            FuckDisableNewAvatarMenu(chrome);
+            FuckExtensionDeveloperModeWarning(chrome);
+        },
+        nullptr,
+        &DllNotificationCookie
+    );
 
     Mp::PATCH_MEMORY_DATA p[] =
     {
@@ -382,9 +455,6 @@ BOOL Initialize(PVOID BaseAddress)
 
         //Mp::FunctionJumpVa(LoadAcceleratorsW,   MyLoadAcceleratorsW,    &StubLoadAcceleratorsW),
         Mp::FunctionJumpVa(PeekMessageW,        ChromePeekMessageW,     &StubPeekMessageW),
-
-        //Mp::FunctionJumpVa(CreateFontW, CcCreateFontW, &StubCreateFontW),
-        //Mp::FunctionJumpVa(CreateFontIndirectW, CreateFontIndirectBypassW, &StubCreateFontIndirectW),
     };
 
     Mp::PatchMemory(p, countof(p));
