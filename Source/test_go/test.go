@@ -23,7 +23,7 @@ func main() {
     // names := []string{}
     nameset := map[string]bool{}
 
-    target  := 3000000
+    target  := 300000
     perline := 30000
     index   := 0
 
@@ -41,7 +41,7 @@ func main() {
             n--
         }
 
-        name += Sprintf("%d%s", random.IntRange(1000, 100000), random.Choice(domains).(String))
+        name += Sprintf("%d@%s", random.IntRange(1000, 100000), random.Choice(domains).(String))
         if nameset[name] {
             i--
             continue

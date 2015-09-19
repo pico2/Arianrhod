@@ -344,6 +344,11 @@ BOOL Initialize(PVOID BaseAddress)
     {
         PATCH_MEMORY(0xEB,  1, 0x02509D),   // 路牌边界检查
         PATCH_MEMORY(0x6,   1, 0xD43FF),    // dinput 屏蔽win
+        // #define DISCL_EXCLUSIVE     0x00000001
+        // #define DISCL_NONEXCLUSIVE  0x00000002
+        // #define DISCL_FOREGROUND    0x00000004
+        // #define DISCL_BACKGROUND    0x00000008
+        // #define DISCL_NOWINKEY      0x00000010
 
         // text offset patch
         PATCH_MEMORY(ULONG_PTR("Ｒａｎｋ　%s"),                                                       sizeof(PVOID), 0x0857A),
