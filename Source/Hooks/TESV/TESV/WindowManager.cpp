@@ -43,14 +43,14 @@ NTSTATUS WindowManager::CenterSkyrimWindow(PVOID TESVBase)
 
 HWND NTAPI WindowManager::TESVCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
-	HWND    hWnd;
-	RECT    workArea;
+    HWND    hWnd;
+    RECT    workArea;
     HWND*   which;
 
     if (FLAG_OFF(dwStyle, WS_CHILD))
     {
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0);
-	    X = ((workArea.right - workArea.left) - nWidth) / 2;
+        X = ((workArea.right - workArea.left) - nWidth) / 2;
         Y = ((workArea.bottom - workArea.top) - nHeight)  / 2;
 
         which = &MainWindow;
@@ -60,10 +60,10 @@ HWND NTAPI WindowManager::TESVCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassNam
         which = &RendererWindow;
     }
 
-	hWnd = StubCreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    hWnd = StubCreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
     *which = hWnd;
 
-	return hWnd;
+    return hWnd;
 }
 
 BOOL NTAPI WindowManager::TESVSetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
