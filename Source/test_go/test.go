@@ -23,7 +23,7 @@ func main() {
     // names := []string{}
     nameset := map[string]bool{}
 
-    target  := 300000
+    target  := 500000
     perline := 30000
     index   := 0
 
