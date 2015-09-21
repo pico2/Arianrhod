@@ -23,3 +23,7 @@ func NewSocketError(msg string) *SocketError {
 func (self *SocketError) String() string {
     return self.Message
 }
+
+func (self *SocketError) Error() string {
+    return self.Message
+}
