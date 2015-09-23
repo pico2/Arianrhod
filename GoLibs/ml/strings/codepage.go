@@ -7,15 +7,21 @@ var (
 )
 
 const (
-    CP_GBK          = 936
-    CP_SHIFT_JIS    = 932
-    CP_BIG5         = 950
-    CP_UTF8         = 65001
-    CP_UTF16_LE     = 1200
-    CP_UTF16_BE     = 1201
+    CP_GBK          = Encoding(936)
+    CP_SHIFT_JIS    = Encoding(932)
+    CP_BIG5         = Encoding(950)
+    CP_UTF8         = Encoding(65001)
+    CP_UTF16_LE     = Encoding(1200)
+    CP_UTF16_BE     = Encoding(1201)
 )
 
-var cptext = map[int]string {
+type Encoding int
+
+func (self Encoding) String() string {
+    return cptext[self]
+}
+
+var cptext = map[Encoding]string {
     CP_GBK          : "GBK",
     CP_SHIFT_JIS    : "SHIFT JIS",
     CP_BIG5         : "BIG5",

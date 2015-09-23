@@ -8,9 +8,10 @@ import (
     "ml/random"
     "os"
     "io/ioutil"
+    "regexp"
 )
 
-func main() {
+func genacc() {
     py := [][]string{}
     json.Unmarshal([]byte(pinyin.Json), &py)
 
@@ -64,4 +65,41 @@ func main() {
                  names = []String{}
         }
     }
+}
+
+var (
+    FORM_DATA_PATTERN       = regexp.MustCompile(`"fd"\s*:\s*({.*?})`)
+    WIDGET_KEY_PATTERN      = regexp.MustCompile(`"wk"\s*:\s*({.*?})`)
+    STRIP_CALLBACK_PATTERN  = regexp.MustCompile(`.*\(({.*?})\).*`)
+)
+
+func peekProperty(text, property string) (value string) {
+    pattern := regexp.MustCompile(Sprintf(`(?m:\.%s\s*=\s*(.*);?$)`, property))
+    value = pattern.FindStringSubmatch(text)[1]
+    return
+}
+
+func main() {
+    text := `
+        var iTSMetricsCallbackFunction = function() {
+            ITSMetrics.reportingSuite = "appleitmswww,appleitmscn";
+            ITSMetrics.omniture = ITSMetrics.createBaselineOmnitureObject();
+
+            ITSMetrics.isPageMetricsEnabled = true;
+
+            ITSMetrics.isBuyMetricsEnabled = true;
+
+
+            /* Page Metrics */
+            ITSMetrics.omniture.pageName = "Signup View Terms-CN";
+            ITSMetrics.omniture.channel = "Signup";
+            ITSMetrics.omniture.prop22 = "HTML";
+            ITSMetrics.omniture.eVar22 = "HTML";
+    `
+
+    Println(peekProperty(text, "reportingSuite"))
+    Println(peekProperty(text, "pageName"))
+    Println(peekProperty(text, "channel"))
+    Println(peekProperty(text, "prop22"))
+    Println(peekProperty(text, "eVar22"))
 }

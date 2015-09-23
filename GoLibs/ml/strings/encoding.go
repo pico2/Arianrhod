@@ -4,10 +4,10 @@ import (
     "fmt"
 )
 
-var cptable = map[int]codePageTableInfo {}
+var cptable = map[Encoding]codePageTableInfo {}
 
 type Encoder struct {
-    codepage int
+    codepage Encoding
     table *codePageTableInfo
 }
 
@@ -43,7 +43,7 @@ func (self *Encoder) String() string {
     return cptext[self.codepage] + " encoder"
 }
 
-func GetEncoder(codepage int) (*Encoder) {
+func GetEncoder(codepage Encoding) (*Encoder) {
     table, ok := cptable[codepage]
 
     if !ok {

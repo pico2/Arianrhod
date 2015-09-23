@@ -42,11 +42,11 @@ func (self String) Format(params Dict) String {
     return Format(self, params)
 }
 
-func (self String) Encode(encoding int) []byte {
+func (self String) Encode(encoding Encoding) []byte {
     return GetEncoder(encoding).Encode(self)
 }
 
-func Decode(bytes []byte, encoding int) String {
+func Decode(bytes []byte, encoding Encoding) String {
     return GetEncoder(encoding).Decode(bytes)
 }
 

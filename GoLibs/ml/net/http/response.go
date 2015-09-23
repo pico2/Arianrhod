@@ -23,7 +23,8 @@ type Response struct {
     Header      gohttp.Header
     Content     []byte
     Request     *gohttp.Request
-    Encoding    int
+    Encoding    Encoding
+    URL         *url.URL
 
     resp        *gohttp.Response
 }
@@ -46,6 +47,7 @@ func NewResponse(resp *gohttp.Response) (response *Response) {
         Content     : content,
         Request     : resp.Request,
         Encoding    : getEncoding(resp, content),
+        URL         : resp.Request.URL,
 
         resp        : resp,
     }
@@ -53,8 +55,8 @@ func NewResponse(resp *gohttp.Response) (response *Response) {
     return
 }
 
-func (self *Response) Text(encoding ...int) String {
-    var enc int
+func (self *Response) Text(encoding ...Encoding) String {
+    var enc Encoding
     switch len(encoding) {
         case 0:
             enc = self.Encoding
@@ -143,8 +145,8 @@ func readBody(resp *gohttp.Response) (body []byte) {
     return
 }
 
-func getEncoding(resp *gohttp.Response, body []byte) int {
-    charsetTable := map[string]int{
+func getEncoding(resp *gohttp.Response, body []byte) Encoding {
+    charsetTable := map[string]Encoding{
         "gb18030"   : CP_GBK,
         "gb2312"    : CP_GBK,
         "hz"        : CP_GBK,
@@ -169,7 +171,7 @@ func getEncoding(resp *gohttp.Response, body []byte) int {
         return CP_UTF8
     }
 
-    encoding, ok := charsetTable[string(String(charset).ToLower())]
+    encoding, ok := charsetTable[String(charset).ToLower().String()]
     if ok == false {
         encoding = CP_UTF8
     }

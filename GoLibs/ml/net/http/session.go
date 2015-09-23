@@ -76,7 +76,7 @@ func toString(value interface{}) String {
     }
 }
 
-func dictToValues(d Dict, encoding int) gourl.Values {
+func dictToValues(d Dict, encoding Encoding) gourl.Values {
     values := gourl.Values{}
     for k, v := range d {
 
@@ -104,7 +104,7 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
 func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response) {
     var bodyReader  io.Reader
     var params      Dict
-    var encoding    int
+    var encoding    Encoding
     var queryString string
     var err         error
 
@@ -123,8 +123,8 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     }
 
     switch v := params["encoding"].(type) {
-        case int:
-            encoding = v
+        case int, Encoding:
+            encoding = v.(Encoding)
 
         default:
             encoding = CP_UTF8

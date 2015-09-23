@@ -24,7 +24,7 @@ func utf16BeDecode(table *codePageTableInfo, bytes []byte) String {
 
 func init() {
     cptable[CP_UTF16_BE] = codePageTableInfo{
-                        CodePage    : CP_UTF16_BE,
+                        CodePage    : uint16(CP_UTF16_BE),
                         initialized : true,
                         encode      : utf16BeEncode,
                         decode      : utf16BeDecode,

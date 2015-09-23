@@ -18,9 +18,9 @@ type SharedFileMappingNp struct {
 }
 
 type CacheImageInfo struct {
-    Address         uint64
-    ModTime         uint64
-    Inode           uint64
-    PathFileOffset  uint32
-    Pad             uint32
+    Address     uint64
+    ModTime     uint64
+    Inode       uint64
+    PathOffset  uint32
+    Pad         uint32
 }
