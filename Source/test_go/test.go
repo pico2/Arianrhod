@@ -34,7 +34,7 @@ func genacc() {
         name := ""
         for n := random.IntRange(1, 5); n > 0; {
             p := py[random.ChoiceIndex(py)][1]
-            if len(p) > 4 {
+            if len(p) > 2 {
                 continue
             }
 
