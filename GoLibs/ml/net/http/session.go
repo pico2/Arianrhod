@@ -253,6 +253,23 @@ func (self *Session) ClearHeaders() {
     self.headers = gohttp.Header{}
 }
 
+func (self *Session) SetCookies(url String, cookies Dict) {
+    u, err := gourl.Parse(url.String())
+    RaiseHttpError(err)
+
+    c := []*gohttp.Cookie{}
+
+    for k, v := range cookies {
+        c = append(c, &gohttp.Cookie{
+                Name    : fmt.Sprintf("%v", k),
+                Value   : fmt.Sprintf("%v", v),
+            },
+        )
+    }
+
+    self.cookie.SetCookies(u, c)
+}
+
 func (self *Session) SetHeaders(headers Dict) {
     if len(headers) == 0 {
         self.ClearHeaders()
