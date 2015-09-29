@@ -13,6 +13,7 @@ import (
     "reflect"
 
     . "ml/trace"
+    . "ml/array"
 )
 
 const (
@@ -33,6 +34,24 @@ func ChoiceIndex(array interface{}) int {
 func Choice(array interface{}) interface{} {
     arr := reflect.ValueOf(array)
     return arr.Index(ChoiceIndex(array)).Interface()
+}
+
+func Shuffle(array Array) Array {
+    shuffled    := Array{}
+    mask        := map[int]bool{}
+    length      := array.Length()
+
+    for len(mask) != length {
+        index := IntRange(0, length)
+        if mask[index] {
+            continue
+        }
+
+        shuffled.Append(array[index])
+        mask[index] = true
+    }
+
+    return shuffled
 }
 
 // IntRange returns a random integer in the range from min to max.

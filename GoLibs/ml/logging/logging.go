@@ -230,6 +230,7 @@ func (self *Logger) LogToFile(enable bool, path ...String) error {
         return err
     }
 
+    output.Write([]byte{0xEF, 0xBB, 0xBF})
     self.out = append(self.out, output)
 
     return nil
