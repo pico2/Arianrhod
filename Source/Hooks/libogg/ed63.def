@@ -1,5 +1,0 @@
-EXPORTS
-    Direct3DCreate8         = MyDirect3DCreate8
-    DebugSetMute            = MyDebugSetMute
-    ValidatePixelShader     = MyValidatePixelShader
-    ValidateVertexShader    = MyValidateVertexShader
