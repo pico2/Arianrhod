@@ -33,6 +33,7 @@ Source/Drivers
 Source/Hooks/OllyDbgEx
 Source/MyLibrary
 Source/ShimEngine
+Source/Falcom/src/
 Source/sources/ReactOS*
 Source/sources/loki-lib
 Source/sources/AvalonDock
