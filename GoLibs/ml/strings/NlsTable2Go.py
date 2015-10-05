@@ -81,7 +81,7 @@ def main():
 
         cp = info.CodePage
 
-        MultiByteTable = bytes((BYTE * MB_TBL_SIZE).from_address(info.MultiByteTable))
+        MultiByteTable = bytes((USHORT * MB_TBL_SIZE).from_address(info.MultiByteTable))
 
         TranslateTableSize = info.WideCharTable - info.DBCSOffsets - 2
         TranslateTable = bytes((USHORT * (TranslateTableSize // 2)).from_address(info.DBCSOffsets))

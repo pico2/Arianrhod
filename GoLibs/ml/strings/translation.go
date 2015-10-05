@@ -45,7 +45,6 @@ CustomCPToUnicodeN(
                 BytesInCustomCPString--
 
             } else {
-
                 runes = append(runes, rune(CustomCP.MultiByteTable[CustomCPString[index]]))
                 index++
             }
