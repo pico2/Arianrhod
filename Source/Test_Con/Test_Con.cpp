@@ -125,12 +125,12 @@ void quick_sort(int *array, int count)
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    
+    ml::MlInitialize();
 
-    PrintLocaleDefaultAnsiCodePage();
+    String::Decode("´Ø¨Ú°»Þ°", 8, CP_SHIFTJIS);
 
     return;
-
-    ml::MlInitialize();
 
 #if ML_X86
 
