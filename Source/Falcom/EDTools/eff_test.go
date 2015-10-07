@@ -7,8 +7,7 @@ import (
     "testing"
     "path/filepath"
     "os"
-    "bytes"
-    "ml/io2/filestream"
+    "encoding/json"
     "./eff/eff"
 )
 
@@ -23,11 +22,32 @@ func TestEff(t *testing.T) {
             return nil
         }
 
-        if String(path).EndsWith(".eff") == false {
+        p := String(path)
+
+        if p.EndsWith(".eff") == false {
             return nil
         }
 
+        if p.EndsWith("sysatk07.eff") == false {
+            // return nil
+        }
+
         e := eff.NewEDAOEffect(path)
+
+        Println(e)
+        Println()
+
+        b, err := json.MarshalIndent(e, "", "  ")
+        Println(err)
+
+        e = eff.EDAOEffectFromJson(b)
+        b, err = json.MarshalIndent(e, "", "  ")
+
+        f, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\fuck.json`)
+        f.Write(b)
+        f.Close()
+
+        return Errorf("break")
 
         return nil
     })
