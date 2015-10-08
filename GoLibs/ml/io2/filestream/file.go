@@ -184,6 +184,22 @@ func (self *File) Write(args ...interface{}) int {
     return n
 }
 
+func (self *File) ReadAll() (data []byte) {
+    length := self.Length()
+
+    for length > 0 {
+        read := self.Read(int(length))
+        if len(read) == 0 {
+            break
+        }
+
+        length -= int64(len(read))
+        data = append(data, read...)
+    }
+
+    return
+}
+
 func (self *File) Flush() {
     raiseFileError(self.file.Sync())
 }

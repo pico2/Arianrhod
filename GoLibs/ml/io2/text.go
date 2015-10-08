@@ -1,9 +1,10 @@
 package io2
 
 import (
-    "os"
+    // "os"
     "bytes"
-    "io/ioutil"
+    // "io/ioutil"
+    "ml/io2/filestream"
     "ml/strings"
     "unicode/utf8"
 )
@@ -22,18 +23,23 @@ func isAnsiAsUtf8(buf []byte) bool {
     return true
 }
 
-func ReadTextToLines(filename strings.String) ([]strings.String, error) {
-    file, err := os.Open(string(filename))
-    if err != nil {
-        return nil, err
-    }
+func ReadTextToLines(filename strings.String) ([]strings.String) {
+    // file, err := os.Open(string(filename))
+    // if err != nil {
+    //     return nil, err
+    // }
 
+    // defer file.Close()
+
+    // buf, err := ioutil.ReadAll(file)
+    // if err != nil {
+    //     return nil, err
+    // }
+
+    file := filestream.Open(filename.String())
     defer file.Close()
 
-    buf, err := ioutil.ReadAll(file)
-    if err != nil {
-        return nil, err
-    }
+    buf := file.ReadAll()
 
     var text strings.String
 
@@ -55,5 +61,5 @@ func ReadTextToLines(filename strings.String) ([]strings.String, error) {
             }
     }
 
-    return text.SplitLines(), nil
+    return text.SplitLines()
 }

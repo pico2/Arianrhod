@@ -2,197 +2,120 @@
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
+#pragma comment(linker, "/EXPORT:GetAdaptersInfo=IPHLPAPI.GetAdaptersInfo")
+#pragma comment(linker, "/EXPORT:GetAdaptersAddresses=IPHLPAPI.GetAdaptersAddresses")
+
 #include "ml.cpp"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper\iTunesHelper.cpp"
-
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper/iOSService.h"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper/iOSAFC.h"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper/iOSDeviceMonitor.h"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper/iOSATH.h"
-
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper\iOS.cpp"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper\iOSDevice.cpp"
-#include "D:\Desktop\Source\Project\AppleIdAuthorizer\AppleIdAuthorizer\iTunesHelper/iOSATH.cpp"
+#include "iTunes/iTunes.h"
 
 ML_OVERLOAD_NEW
 
-NTSTATUS
-getAfsyncResponse(
-    ULONG                   grappaSessionId,
-    PVOID                   fairPlayCertificate,
-    ULONG_PTR               certificateSize,
-    PVOID                   afsyncRequest,
-    ULONG_PTR               requestSize,
-    PVOID                   afsyncRequestSignature,
-    ULONG_PTR               signatureSize,
-    PAIR_FAIR_DEVICE_INFO   deviceInfo,
-    PDEVICE_ID              fairPlayGuid
-)
+using ml::String;
+using namespace iTunesApi::AMD;
+
+enum
 {
-    HANDLE          kbsync, afsync;
-    DEVICE_ID       mid, mid2;
-    NTSTATUS        status;
-    iTunesHelper    itunes;
+    STATE_NONE,
+    STATE_SERVICE_START,
+    STATE_SERVICE_SEND,
+    STATE_SERVICE_RECV,
+    STATE_AFC_SEND,
+    STATE_AFC_READ,
+    STATE_SOCKET_SEND,
+    STATE_SOCKET_RECV,
+};
 
-    ULONG64 dsids[] =
+ULONG_PTR PreviousState = STATE_NONE;
+
+VOID DumpData(ULONG_PTR State, PCWSTR Prefix, PVOID Buffer, ULONG_PTR Size, PCSTR ServiceName = nullptr)
+{
+    static ULONG_PTR Sequence;
+
+    if (Size == 4)
+        return;
+
+    BOOL CreateNew = FALSE;
+
+    if (State == STATE_SOCKET_SEND || State == STATE_SOCKET_RECV)
     {
-        0x38AC242C,
-    };
-
-    kbsync = nullptr;
-    afsync = nullptr;
-
-    LOOP_ONCE
+        CreateNew = TRUE;
+    }
+    else if (PreviousState != State || State == STATE_SERVICE_START)
     {
-        ZeroMemory(&mid, sizeof(mid));
-        ZeroMemory(&mid2, sizeof(mid2));
+        ++Sequence;
+        PreviousState = State;
+        CreateNew = TRUE;
+    }
 
-        mid.length = 6;
-        *(PULONG)&mid.deviceId[0] = GetRandom32();
-        *(PUSHORT)&mid.deviceId[4] = (USHORT)(GetRandom32() + *(PULONG)&mid.deviceId[0]);
+    ULONG_PTR Length;
+    NtFileDisk bin;
+    WCHAR name[MAX_NTPATH];
 
-        mid2.length = 6;
-        *(PULONG)&mid2.deviceId[0] = GetRandom32() + *(PULONG)&mid.deviceId[1];
-        *(PUSHORT)&mid2.deviceId[4] = (USHORT)(GetRandom32() + *(PULONG)&mid2.deviceId[0]);
+    static SYSTEMTIME LastTime;
 
-        *(PULONG)&mid.deviceId[0] = 0x28AE81F3;
-        *(PUSHORT)&mid.deviceId[1] = 0x2E1C;
+    if (CreateNew)
+        GetLocalTime(&LastTime);
 
-        *(PULONG)&mid2.deviceId[0] = 0xDE903948;
-        *(PUSHORT)&mid2.deviceId[1] = 0x8CE8;
-
-        status = itunes.iTunesInitialize();
-        //status = itunes.KbsyncCreateSession(&kbsync, &mid, &mid2, "C:\\ProgramData\\Apple Computer\\iTunes\\SC Info");
-
-        kbsync = *(PHANDLE)PtrAdd(FindLdrModuleByName(PUSTR(L"iOSDevice.dll"))->DllBase, 0x63C599BC - 0x63A80000);
-
-        //itunes.AirFairFetchRequest(grappaSessionId, afsyncRequest, requestSize, afsyncRequestSignature, signatureSize);
-
-        // 14 00 00 00 4E 0E 3F 92 17 5D 64 73 50 75 53 8B 57 5E 31 09 5F 3F 9A 30
-        // 14 00 00 00 4E 0E 3F 92 17 5D 64 73 F0 75 53 8B F7 FE 31 09 5F 3F 9A 30
-        // 14 00 00 00 4E 0E 3F 92 17 5D 64 73 F0 75 53 8B F7 FE 31 09 5F 3F 9A 30
-
-        status = itunes.AirFairSyncCreateSession(
-                    &afsync,
-                    kbsync,
-                    fairPlayCertificate,
-                    certificateSize,
-                    fairPlayGuid,
-                    deviceInfo
+    Length = swprintf(name, L"dumps\\[%02d-%02d-%02d.%04d] %05d_%s",
+                    LastTime.wHour, LastTime.wMinute, LastTime.wSecond, LastTime.wMilliseconds, Sequence, Prefix
                 );
+    if (ServiceName != nullptr)
+        swprintf(name + Length, L"_%S", ServiceName);
 
-        status = itunes.AirFairSyncSetRequest(afsync, afsyncRequest, requestSize, nullptr, 0);
+    wcscat(name, L".xml");
 
-        PAIR_FAIR_AUTHORIZED_DSID authed;
-        ULONG_PTR count;
-
-        itunes.AirFairSyncGetAuthorizedAccount(nullptr, fairPlayGuid, deviceInfo->deviceType, afsyncRequest, requestSize, &authed, &count);
-
-        for (ULONG_PTR i = 0; i != countof(dsids); ++i)
-        {
-            itunes.AirFairSyncAddAccount(afsync, dsids[i]);
-        }
-
-        itunes.AirFairSyncGetAuthorizedAccount(afsync, fairPlayGuid, deviceInfo->deviceType, afsyncRequest, requestSize, &authed, &count);
-        itunes.FreeSessionData(authed);
+    if (CreateNew == FALSE)
+    {
+        bin.Append(name);
+    }
+    else
+    {
+        bin.Create(name);
     }
 
-    itunes.KbsyncCloseSession(kbsync);
-
-    return 0;
+    bin.Write(Buffer, Size);
 }
 
-VOID onconnect(PDEVICE_CONNECTION_INFO Info)
+VOID DumpData(ULONG_PTR State, PCWSTR Prefix, const String &str, PCSTR ServiceName = nullptr)
 {
-    iOSDevice device(Info->Device);
-
-    iOSDeviceConnector conn(device);
-
-    String FairPlayGUID = device.GetFairPlayGUID();
-    CFData FairPlayCertificate(*(CFData *)&device.GetFairPlayCertificate());
-    CFNumber FairPlayDeviceType(*(CFNumber *)&device.GetFairPlayDeviceType());
-    CFNumber KeyTypeSupportVersion(*(CFNumber *)&device.GetKeyTypeSupportVersion());
-
-    DEVICE_ID guid;
-
-    guid.length = __min((ULONG)FairPlayGUID.GetCount() / 2, sizeof(guid.deviceId));
-
-    PBYTE buf = guid.deviceId;
-    PCWSTR str = FairPlayGUID.GetBuffer();
-    for (LONG_PTR i = guid.length; i > 0; --i)
-    {
-        *buf++ = (BYTE)(((str[0] >= '0' && str[0] <= '9') ? (str[0] - '0') : ((str[0] & 0xDF) - 'A' + 10)) << 4) |
-                 (BYTE)((str[1] >= '0' && str[1] <= '9') ? (str[1] - '0') : ((str[1] & 0xDF) - 'A' + 10));
-        str += 2;
-    }
-
-    iOSATH ath(device);
-    ULONG grappa;
-
-    grappa = 0;
-
-#if 0
-
-    ath.Connect();
-
-    ath.SendPowerAssertion(TRUE);
-
-    while (ath.SyncAllowed == FALSE)
-    {
-        YieldProcessor();
-    }
-
-    PrintConsole(L"SendSyncRequest\n");
-    ath.SendSyncRequest();
-
-    while (ath.ReadyForSync == FALSE)
-    {
-        YieldProcessor();
-    }
-
-    grappa = ath.GetGrappaSessionId();
-
-#endif
-
-    AIR_FAIR_DEVICE_INFO deviceInfo;
-
-    deviceInfo.deviceType = (ULONG_PTR)FairPlayDeviceType.ToULong64();
-    deviceInfo.keyTypeSupportVersion = (ULONG_PTR)KeyTypeSupportVersion.ToULong64();
-
-    CFData request = iOSAFC::ReadFileToBuffer(device, L"/AirFair/sync/afsync.rq");
-    CFData sig = iOSAFC::ReadFileToBuffer(device, L"/AirFair/sync/afsync.rq.sig");
-
-    if (request != nullptr)
-    {
-        getAfsyncResponse(
-            grappa,
-            CFDataGetBytePtr(FairPlayCertificate),
-            CFDataGetLength(FairPlayCertificate),
-            CFDataGetBytePtr(request),
-            CFDataGetLength(request),
-            CFDataGetBytePtr(sig),
-            CFDataGetLength(sig),
-            &deviceInfo,
-            &guid
-        );
-    }
+    return DumpData(State, Prefix, (PWSTR)str, str.GetCount() * 2, ServiceName);
 }
+
+LONG CDECL TGAMDServiceConnectionSend(CFServiceRef Connection, PVOID Buffer, ULONG Length)
+{
+    LONG ret = AMDServiceConnectionSend(Connection, Buffer, Length);
+
+    DumpData(STATE_SERVICE_SEND, L"AMDServiceConnectionSend", Buffer, ret, (PCSTR)PtrAdd(Connection, 0x18));
+
+    return ret;
+}
+
+LONG CDECL TGAMDServiceConnectionReceive(CFServiceRef Connection, PVOID Buffer, ULONG Length)
+{
+    LONG ret = AMDServiceConnectionReceive(Connection, Buffer, Length);
+
+    DumpData(STATE_SERVICE_RECV, L"AMDServiceConnectionReceive", Buffer, ret, (PCSTR)PtrAdd(Connection, 0x18));
+
+    return ret;
+}
+
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionSend)       PtrAMDServiceConnectionSend = TGAMDServiceConnectionSend;
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionReceive)    PtrAMDServiceConnectionReceive = TGAMDServiceConnectionReceive;
 
 EXTC_EXPORT VOID CDECL e()
 {
+    NtFileDisk().CreateDirectory(L"dumps");
+
     iTunesApi::Initialize();
 
-    iOSDeviceMonitor monitor;
+    PLDR_MODULE module;
 
-    monitor.NotificationSubscribe(
-        [](PDEVICE_CONNECTION_INFO Info, PVOID Context)
-        {
-            onconnect(Info);
-        },
-        nullptr
-    );
+    module = FindLdrModuleByName(PUSTR(L"iOSDevice.dll"));
 
-    monitor.WaitForDeviceConnectionChanged();
+    Mm::ProtectMemory(CurrentProcess, PtrAdd(module->DllBase, 0x16b43C), MEMORY_PAGE_SIZE, PAGE_READWRITE);
+
+    *(PVOID *)PtrAdd(module->DllBase, 0x16b43C) = &PtrAMDServiceConnectionSend;
+    *(PVOID *)PtrAdd(module->DllBase, 0x16b440) = &PtrAMDServiceConnectionReceive;
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
@@ -204,6 +127,8 @@ BOOL Initialize(PVOID BaseAddress)
 {
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
+
+    e();
 
     return TRUE;
 }
