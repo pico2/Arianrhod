@@ -24,7 +24,7 @@ func genacc() {
     // names := []string{}
     nameset := map[string]bool{}
 
-    target  := 500000
+    target  := 1000000
     perline := 30000
     index   := 0
 
@@ -68,10 +68,5 @@ func genacc() {
 }
 
 func main() {
-    var text String = `
-<select viewName="state" placeholder="选择省份" class="select optional" id="state" title="选择省份" name="state">
-    `
-
-    doc, _ := goquery.NewDocumentFromReader(text.NewReader())
-    Println(doc.Find("#state").Nodes[0].Data)
+    genacc()
 }
