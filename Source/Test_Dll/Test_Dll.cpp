@@ -4,6 +4,7 @@
 
 #pragma comment(linker, "/EXPORT:GetAdaptersInfo=IPHLPAPI.GetAdaptersInfo")
 #pragma comment(linker, "/EXPORT:GetAdaptersAddresses=IPHLPAPI.GetAdaptersAddresses")
+#pragma comment(linker, "/EXPORT:GetModuleInformation=PSAPI.GetModuleInformation")
 
 #include "ml.cpp"
 #include "iTunes/iTunes.h"
@@ -26,6 +27,9 @@ enum
 };
 
 ULONG_PTR PreviousState = STATE_NONE;
+
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionSend)       StubAMDServiceConnectionSend;
+TYPE_OF(iTunesApi::AMD::AMDServiceConnectionReceive)    StubAMDServiceConnectionReceive;
 
 VOID DumpData(ULONG_PTR State, PCWSTR Prefix, PVOID Buffer, ULONG_PTR Size, PCSTR ServiceName = nullptr)
 {
@@ -83,7 +87,7 @@ VOID DumpData(ULONG_PTR State, PCWSTR Prefix, const String &str, PCSTR ServiceNa
 
 LONG CDECL TGAMDServiceConnectionSend(CFServiceRef Connection, PVOID Buffer, ULONG Length)
 {
-    LONG ret = AMDServiceConnectionSend(Connection, Buffer, Length);
+    LONG ret = StubAMDServiceConnectionSend(Connection, Buffer, Length);
 
     DumpData(STATE_SERVICE_SEND, L"AMDServiceConnectionSend", Buffer, ret, (PCSTR)PtrAdd(Connection, 0x18));
 
@@ -92,7 +96,7 @@ LONG CDECL TGAMDServiceConnectionSend(CFServiceRef Connection, PVOID Buffer, ULO
 
 LONG CDECL TGAMDServiceConnectionReceive(CFServiceRef Connection, PVOID Buffer, ULONG Length)
 {
-    LONG ret = AMDServiceConnectionReceive(Connection, Buffer, Length);
+    LONG ret = StubAMDServiceConnectionReceive(Connection, Buffer, Length);
 
     DumpData(STATE_SERVICE_RECV, L"AMDServiceConnectionReceive", Buffer, ret, (PCSTR)PtrAdd(Connection, 0x18));
 
@@ -104,9 +108,29 @@ TYPE_OF(iTunesApi::AMD::AMDServiceConnectionReceive)    PtrAMDServiceConnectionR
 
 EXTC_EXPORT VOID CDECL e()
 {
-    NtFileDisk().CreateDirectory(L"dumps");
+    NtFileDisk().CreateDirectory(L"Dumps");
 
-    iTunesApi::Initialize();
+    //iTunesApi::Initialize();
+
+    iTunesApi::AMD::Initialize();
+
+    PrintConsole(L"%s = %p\n", MOBILE_DEVICE_DLL, LoadDll(MOBILE_DEVICE_DLL));
+    PrintConsole(L"AMDServiceConnectionSend = %p\n", AMDServiceConnectionSend);
+    PrintConsole(L"AMDServiceConnectionReceive = %p\n", AMDServiceConnectionReceive);
+
+    using namespace Mp;
+
+    PATCH_MEMORY_DATA p[] =
+    {
+        FunctionJumpVa(AMDServiceConnectionSend, TGAMDServiceConnectionSend, &StubAMDServiceConnectionSend),
+        FunctionJumpVa(AMDServiceConnectionReceive, TGAMDServiceConnectionReceive, &StubAMDServiceConnectionReceive),
+    };
+
+    PatchMemory(p, countof(p), nullptr);
+
+    PrintConsole(L"patch done\n");
+
+    return;
 
     PLDR_MODULE module;
 
@@ -128,7 +152,24 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    e();
+    using namespace Mp;
+
+    static VOID (CDECL *StubStartiOSLayer)(PVOID);
+
+    auto StartiOSLayer = [] (PVOID cb)
+    {
+        StubStartiOSLayer(cb);
+        e();
+    };
+
+    BaseAddress = GetExeModuleHandle();
+
+    PATCH_MEMORY_DATA p[] =
+    {
+        FunctionJumpVa(GetRoutineAddress(BaseAddress, "StartiOSLayer"), (TYPE_OF(StubStartiOSLayer))StartiOSLayer, &StubStartiOSLayer),
+    };
+
+    PatchMemory(p, countof(p), nullptr);
 
     return TRUE;
 }
