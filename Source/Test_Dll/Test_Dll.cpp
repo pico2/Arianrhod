@@ -110,9 +110,8 @@ EXTC_EXPORT VOID CDECL e()
 {
     NtFileDisk().CreateDirectory(L"Dumps");
 
-    //iTunesApi::Initialize();
-
-    iTunesApi::AMD::Initialize();
+    iTunesApi::Initialize();
+    //iTunesApi::AMD::Initialize();
 
     PrintConsole(L"%s = %p\n", MOBILE_DEVICE_DLL, LoadDll(MOBILE_DEVICE_DLL));
     PrintConsole(L"AMDServiceConnectionSend = %p\n", AMDServiceConnectionSend);
@@ -151,6 +150,7 @@ BOOL Initialize(PVOID BaseAddress)
 {
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
+    e();
 
     using namespace Mp;
 
@@ -169,7 +169,7 @@ BOOL Initialize(PVOID BaseAddress)
         FunctionJumpVa(GetRoutineAddress(BaseAddress, "StartiOSLayer"), (TYPE_OF(StubStartiOSLayer))StartiOSLayer, &StubStartiOSLayer),
     };
 
-    PatchMemory(p, countof(p), nullptr);
+    //PatchMemory(p, countof(p), nullptr);
 
     return TRUE;
 }
