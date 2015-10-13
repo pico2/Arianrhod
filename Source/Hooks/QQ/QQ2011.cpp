@@ -1,15 +1,17 @@
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
-#pragma comment(linker, "/EXPORT:Netbios=_QqNetbios@4")
-#pragma comment(linker, "/EXPORT:NetApiBufferFree=_QqNetApiBufferFree@4")
-#pragma comment(linker, "/EXPORT:NetWkstaTransportEnum=_QqNetWkstaTransportEnum@28")
-#pragma comment(linker, "/EXPORT:NetWkstaUserGetInfo=_QqNetWkstaUserGetInfo@12")
+
+#pragma comment(linker, "/EXPORT:WTSFreeMemory=_QqWTSFreeMemory@4")
+#pragma comment(linker, "/EXPORT:WTSQuerySessionInformationW=_QqWTSQuerySessionInformationW@0")
+#pragma comment(linker, "/EXPORT:WTSRegisterSessionNotification=_QqWTSRegisterSessionNotification@8")
+#pragma comment(linker, "/EXPORT:WTSUnRegisterSessionNotification=_QqWTSUnRegisterSessionNotification@4")
 
 #include "QQ2011.h"
 #include "MyLibrary.cpp"
 #include <Psapi.h>
 #include <Lm.h>
+#include <WtsApi32.h>
 #include "QQMethod.h"
 
 ML_OVERLOAD_NEW
@@ -43,11 +45,10 @@ API_POINTER(NtQueryAttributesFile)      StubNtQueryAttributesFile;
 API_POINTER(RegOpenKeyExW)              StubRegOpenKeyExW;
 API_POINTER(RegQueryValueExW)           StubRegQueryValueExW;
 
-API_POINTER(Netbios)                    StubNetbios;
-API_POINTER(NetApiBufferFree)           StubNetApiBufferFree;
-API_POINTER(NetWkstaTransportEnum)      StubNetWkstaTransportEnum;
-API_POINTER(NetWkstaUserGetInfo)        StubNetWkstaUserGetInfo;
-
+API_POINTER(WTSFreeMemory)                      StubWTSFreeMemory;
+API_POINTER(WTSQuerySessionInformationW)        StubWTSQuerySessionInformationW;
+API_POINTER(WTSRegisterSessionNotification)     StubWTSRegisterSessionNotification;
+API_POINTER(WTSUnRegisterSessionNotification)   StubWTSUnRegisterSessionNotification;
 
 HRESULT
 (NTAPI
@@ -87,22 +88,22 @@ BOOL InitializeNetapi32()
     PLDR_MODULE     Self, Netapi32;
     UNICODE_STRING  SystemRoot;
 
-    if (StubNetbios != nullptr)
+    if (StubWTSFreeMemory != nullptr)
         return TRUE;
 
     Status = Rtl::GetSystemDirectory(&SystemRoot);
     if (NT_FAILED(Status))
         return 0;
 
-    module = Ldr::LoadDll(String(SystemRoot) + L"netapi32.dll");
+    module = Ldr::LoadDll(String(SystemRoot) + L"wtsapi32.dll");
     RtlFreeUnicodeString(&SystemRoot);
 
     LdrAddRefDll(LDR_ADDREF_DLL_PIN, module);
-
-    *(PVOID *)&StubNetbios                  = GetRoutineAddress(module, "Netbios");
-    *(PVOID *)&StubNetApiBufferFree         = GetRoutineAddress(module, "NetApiBufferFree");
-    *(PVOID *)&StubNetWkstaTransportEnum    = GetRoutineAddress(module, "NetWkstaTransportEnum");
-    *(PVOID *)&StubNetWkstaUserGetInfo      = GetRoutineAddress(module, "NetWkstaUserGetInfo");
+    
+    *(PVOID *)&StubWTSFreeMemory                    = GetRoutineAddress(module, "WTSFreeMemory");
+    *(PVOID *)&StubWTSQuerySessionInformationW      = GetRoutineAddress(module, "WTSQuerySessionInformationW");
+    *(PVOID *)&StubWTSRegisterSessionNotification   = GetRoutineAddress(module, "WTSRegisterSessionNotification");
+    *(PVOID *)&StubWTSUnRegisterSessionNotification = GetRoutineAddress(module, "WTSUnRegisterSessionNotification");
 
     Self = FindLdrModuleByHandle(&__ImageBase);
     Netapi32 = FindLdrModuleByHandle(module);
@@ -120,41 +121,29 @@ BOOL InitializeNetapi32()
     return TRUE;
 }
 
-EXTC
-NET_API_STATUS
-NET_API_FUNCTION
-QqNetWkstaTransportEnum(
-    LPTSTR servername,
-    DWORD level,
-    LPBYTE *bufptr,
-    DWORD prefmaxlen,
-    LPDWORD entriesread,
-    LPDWORD totalentries,
-    LPDWORD resume_handle
-)
+EXTC VOID WINAPI QqWTSFreeMemory(PVOID Memory)
 {
     InitializeNetapi32();
-    return StubNetWkstaTransportEnum(servername, level, bufptr, prefmaxlen, entriesread, totalentries, resume_handle);
+    return StubWTSFreeMemory(Memory);
 }
 
-EXTC NET_API_STATUS NET_API_FUNCTION QqNetApiBufferFree(LPVOID Buffer)
+EXTC BOOL WINAPI QqWTSQuerySessionInformationW()
 {
     InitializeNetapi32();
-    return StubNetApiBufferFree(Buffer);
+    return ((API_POINTER(QqWTSQuerySessionInformationW))StubWTSQuerySessionInformationW)();
 }
 
-EXTC UCHAR NTAPI QqNetbios(PNCB pcnb)
+EXTC LONG WINAPI QqWTSRegisterSessionNotification(HWND hWnd, DWORD Flags)
 {
     InitializeNetapi32();
-    return StubNetbios(pcnb);
+    return StubWTSRegisterSessionNotification(hWnd, Flags);
 }
 
-EXTC NET_API_STATUS NET_API_FUNCTION QqNetWkstaUserGetInfo(LMSTR reserved, DWORD level, LPBYTE *bufptr)
+EXTC LONG WINAPI QqWTSUnRegisterSessionNotification(HWND hWnd)
 {
     InitializeNetapi32();
-    return StubNetWkstaUserGetInfo(reserved, level, bufptr);
+    return StubWTSUnRegisterSessionNotification(hWnd);
 }
-
 
 BOOL InitializeUin()
 {
@@ -787,7 +776,7 @@ BOOL NTAPI PopupSecurityFrame(PVOID, PVOID)
     return TRUE;
 }
 
-BOOL CDECL ReportScanResult()
+VOID CDECL ReportScanResult()
 {
     DebugBreakPoint();
     //return TRUE;
