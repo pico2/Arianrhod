@@ -128,7 +128,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     
     ml::MlInitialize();
 
-    String::Decode("´Ø¨Ú°»Þ°", 8, CP_SHIFTJIS);
+    TIME_ZONE_INFORMATION tzi;
+
+    GetTimeZoneInformation(&tzi);
 
     return;
 
