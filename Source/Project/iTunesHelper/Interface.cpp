@@ -39,7 +39,7 @@ EXTC NTSTATUS NTAPI Initialize()
 
     helper = new iTunesHelper;
 
-    Rtl::SetExeDirectoryAsCurrent();
+    //Rtl::SetExeDirectoryAsCurrent();
 
     status = helper->iTunesInitialize();
     if (NT_FAILED(status))

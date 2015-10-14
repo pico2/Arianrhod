@@ -39,7 +39,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "QQ2011_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /Gr /MD /W4 /GR- /O2 /Ob1 /D "WIN32" /D "NDEBUG" /FD /GL /GS- /arch:SSE /c
+# ADD CPP /nologo /Gr /MD /W4 /GR- /O2 /Ob1 /D "WIN32" /D "NDEBUG" /FD /GL /GS- /arch:SSE /MP /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x804 /d "NDEBUG"
@@ -49,11 +49,55 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 mylib.lib undoc_ntdll.lib ntdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"Z:\QQ\Bin\wtsapi32.dll" /LTCG /OPT:REF
+# ADD LINK32 mylib.lib undoc_ntdll.lib ntdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"wtsapi32.pdb" /debug /machine:I386 /out:"wtsapi32.dll" /LTCG /OPT:REF
 # SUBTRACT LINK32 /pdb:none
 # Begin Target
 
 # Name "QQ2011 - Win32 Release"
+# Begin Group "Hooks"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\Hooks\HookAppMisc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookAppUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookCommon.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookGroupApp.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookKernelUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookMainFrame.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookNtdll.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookPsapi.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\Hooks.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookUser32.cpp
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\QQ2011.cpp

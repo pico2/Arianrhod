@@ -1,3 +1,6 @@
+#ifndef _QQMETHOD_H_1408431a_e0b5_4df9_a8b5_4f98002b8e00_
+#define _QQMETHOD_H_1408431a_e0b5_4df9_a8b5_4f98002b8e00_
+
 
 /***
 
@@ -227,3 +230,5 @@ inline NTSTATUS InitializeQqFunctionTable()
 
     return STATUS_SUCCESS;
 }
+
+#endif // _QQMETHOD_H_1408431a_e0b5_4df9_a8b5_4f98002b8e00_

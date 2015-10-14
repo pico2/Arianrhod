@@ -130,9 +130,6 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     if (this->Initialized)
         return status;
 
-    status = iTunesApi::Initialize();
-    FAIL_RETURN(status);
-
     String ExePath;
 
     Rtl::GetModuleDirectory(ExePath, nullptr);
@@ -147,7 +144,8 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
 #else
 
-    Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH);
+    status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH);
+    PrintConsole(L"EnvironmentAppend: %p", status);
 
     status = Ldr::LoadPeImage(ExePath + ITUNES_DLL_PATH L"\\iTunes.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
     FAIL_RETURN(status);
@@ -158,6 +156,9 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     *(PVOID *)&StubRegQueryValueExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), ItRegQueryValueExA);
 
 #endif
+
+    status = iTunesApi::Initialize();
+    FAIL_RETURN(status);
 
     this->LoadiTunesRoutines();
     //CopyStruct(PtrAdd(this->iTunesBase, 0x19DC120), L"iTunes", sizeof(L"iTunes"));
