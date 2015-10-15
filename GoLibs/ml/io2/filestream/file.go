@@ -66,7 +66,10 @@ func CreateFile(name string, mode int) *File {
 }
 
 func (self *File) Close() {
-    self.file.Close()
+    if self.file != nil {
+        self.file.Close()
+        self.file = nil
+    }
 }
 
 func (self *File) Length() int64 {

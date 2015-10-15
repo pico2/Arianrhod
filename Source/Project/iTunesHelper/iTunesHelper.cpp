@@ -79,6 +79,7 @@ ItRegQueryValueExA(
 
         DllPath += ITUNES_DLL_PATH;
         DllPath += L"\\CoreFP.dll";
+        DllPath = L"CoreFP.dll";
 
         auto CoreFPPath = DllPath.Encode(CP_ACP);
 
@@ -130,13 +131,15 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     if (this->Initialized)
         return status;
 
+    status = iTunesApi::Initialize();
+    FAIL_RETURN(status);
+
     String ExePath;
 
     Rtl::GetModuleDirectory(ExePath, nullptr);
 
 #if 0
 
-    Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + L"iTunes");
     Rtl::EnvironmentAppend(PUSTR(L"Path"), PUSTR(L"C:\\Program Files (x86)\\iTunes"));
 
     this->iTunesBase = Ldr::LoadDll(L"iTunes.dll");
@@ -145,7 +148,6 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 #else
 
     status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH);
-    PrintConsole(L"EnvironmentAppend: %p", status);
 
     status = Ldr::LoadPeImage(ExePath + ITUNES_DLL_PATH L"\\iTunes.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
     FAIL_RETURN(status);
@@ -156,9 +158,6 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     *(PVOID *)&StubRegQueryValueExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), ItRegQueryValueExA);
 
 #endif
-
-    status = iTunesApi::Initialize();
-    FAIL_RETURN(status);
 
     this->LoadiTunesRoutines();
     //CopyStruct(PtrAdd(this->iTunesBase, 0x19DC120), L"iTunes", sizeof(L"iTunes"));
@@ -240,11 +239,11 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x7D80,         // sapCreateSession
         0xC960,         // sapCloseSession
         0x8CD0,         // sapExchangeData
-        0x2ACE0,        // sapCreateActionSignature
-        0x3B100,        // sapUpdateActionSignature
+        0x2ACE0,        // sapCreatePrimeSignature
+        0x3B100,        // sapVerifyPrimeSignature
         0x3A350,        // sapSignData
 
-        0x113C0,        // airFairFetchRequest
+        0x113C0,        // airFairVerifyRequest
         0x33090,        // airFairSyncCreateSession
         0x34460,        // airFairSyncSetRequest
         0x35270,        // airFairSyncAddAccount
@@ -363,7 +362,7 @@ NTSTATUS iTunesHelper::SapCloseSession(HANDLE sapSession)
 
 NTSTATUS iTunesHelper::SapCreatePrimeSignature(HANDLE sapSession, PVOID* output, PULONG_PTR outputSize)
 {
-    return this->iTunes.sapCreateActionSignature(sapSession, 0x64, 0, output, outputSize);
+    return this->iTunes.sapCreatePrimeSignature(sapSession, 0x64, 0, output, outputSize);
 }
 
 NTSTATUS iTunesHelper::SapVerifyPrimeSignature(HANDLE sapSession, PVOID signature, ULONG_PTR signatureSize)

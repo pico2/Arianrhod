@@ -36,16 +36,16 @@ func TestEff(t *testing.T) {
         Println(e)
         Println()
 
-        b := e.Serialize()
+        // b := e.Serialize()
 
-        f, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\fuck.json`)
-        f.Write(b)
-        f.Close()
+        // f, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\fuck.json`)
+        // f.Write(b)
+        // f.Close()
 
         e = eff.LoadEDAOEffect(`D:\Desktop\Source\Falcom\EDTools\fuck.json`)
         Println(e)
 
-        new, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\fuck.eff`)
+        new, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\` + e.FileName().String())
         new.Write(e.ToBinary())
         new.Close()
 

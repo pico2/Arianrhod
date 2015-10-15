@@ -8,8 +8,6 @@ import (
     "path/filepath"
     "ml/encoding/json"
     "ml/io2/filestream"
-    "bytes"
-    "encoding/binary"
 
     "../../utility"
 )
@@ -233,12 +231,16 @@ func (self EDAOEffect) String() string {
 
 func (self *EDAOEffect) Serialize() (data []byte) {
     data, err := json.MarshalIndent(self, "", "  ")
-    RaiseIf(err)
+    if err != nil {
+        Raise(&JsonError{err.Error()})
+    }
     return
 }
 
 func (self *EDAOEffect) Unserialize(data []byte) {
-    RaiseIf(json.Unmarshal(data, self))
+    if err := json.Unmarshal(data, self); err != nil {
+        Raise(JsonError{err.Error()})
+    }
 }
 
 func (self *EDAOEffect) ToBinary() (data []byte) {

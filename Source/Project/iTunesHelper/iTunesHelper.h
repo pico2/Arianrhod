@@ -8,7 +8,8 @@
 #include "iOSDeviceMonitor.h"
 #include "SectionProtector.h"
 
-#define DSID_NOT_AUTHORIZED ((NTSTATUS)(-42004))
+#define DSID_NOT_AUTHORIZED     ((NTSTATUS)(-42004))
+#define AFSYC_SIGN_DATA_FILAED  ((NTSTATUS)(-42553))
 
 typedef struct
 {
@@ -82,7 +83,7 @@ typedef struct
 
     NTSTATUS
     (CDECL*
-    sapCreateActionSignature)(
+    sapCreatePrimeSignature)(
         HANDLE      sapSession,
         ULONG       _64,
         ULONG64     zero,
@@ -233,9 +234,9 @@ public:
     NTSTATUS    KbsyncCloseSession(HANDLE session);
 
     /*++
-    
+
         SAP
-    
+
     --*/
 
     NTSTATUS    SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO deviceId);
@@ -264,9 +265,9 @@ public:
     );
 
     /*++
-    
+
         afsync
-    
+
     --*/
 
     NTSTATUS
