@@ -4,13 +4,7 @@ import (
     "unicode/utf8"
 )
 
-func
-CustomCPToUnicodeN(
-    CustomCP *codePageTableInfo,
-    CustomCPString []byte,
-)(
-    UnicodeString String,
-) {
+func CustomCPToUnicodeN(CustomCP *codePageTableInfo, CustomCPString []byte)(UnicodeString String) {
 
     BytesInCustomCPString := uint(len(CustomCPString))
 
@@ -55,13 +49,7 @@ CustomCPToUnicodeN(
     return String(string(runes))
 }
 
-func
-UnicodeToCustomCPN(
-    CustomCP *codePageTableInfo,
-    UnicodeString_ String,
-) (
-    CustomCPString []byte,
-) {
+func UnicodeToCustomCPN(CustomCP *codePageTableInfo, UnicodeString_ String) (CustomCPString []byte) {
 
     Ucs16String := []uint16{}
     UnicodeString := string(UnicodeString_)

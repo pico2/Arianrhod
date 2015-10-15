@@ -29,7 +29,7 @@ const (
 )
 
 type File struct {
-    file *os.File
+    file FileGeneric
     Endian binary.ByteOrder
 }
 
@@ -39,6 +39,10 @@ func Open(name string) *File {
 
 func Create(name string) *File {
     return CreateFile(name, READWRITE)
+}
+
+func CreateMemory() *File {
+    return &File{newBytesIO(), LittleEndian}
 }
 
 func CreateFile(name string, mode int) *File {
@@ -298,4 +302,17 @@ func (self *File) ReadType(t interface{}) interface{} {
     typ := reflect.TypeOf(t)
     bytes:= self.Read(int(typ.Size()))
     return reflect.NewAt(typ, unsafe.Pointer(&bytes[0])).Elem().Interface()
+}
+
+func (self *File) WriteType(v interface{}) int {
+    val := reflect.ValueOf(v)
+    for val.Kind() == reflect.Ptr {
+        val = val.Elem()
+    }
+
+    typ := val.Type()
+    addr := val.Addr().Pointer()
+    p := (*[^uint32(0) >> 1]byte)(unsafe.Pointer(addr))
+
+    return self.Write(p[:typ.Size()])
 }

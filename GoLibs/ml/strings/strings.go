@@ -50,6 +50,14 @@ func Decode(bytes []byte, encoding Encoding) String {
     return GetEncoder(encoding).Decode(bytes)
 }
 
+func (self String) Capitalize() String {
+    if self.Length() == 0 {
+        return self
+    }
+
+    return String(self[:1]).ToUpper() + String(self[1:])
+}
+
 func (self String) Replace(old, new String, count ...int) String {
     var n = 0
 
