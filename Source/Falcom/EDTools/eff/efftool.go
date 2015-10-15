@@ -97,6 +97,6 @@ func main() {
     if haserror {
         console.Pause("press any key to continue ...")
     } else {
-        time.Sleep(time.Second * 3)
+        // time.Sleep(time.Second * 3)
     }
 }
