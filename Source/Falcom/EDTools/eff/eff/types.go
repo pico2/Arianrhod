@@ -56,7 +56,8 @@ func (self effFloat) MarshalJSON() (data []byte, err error) {
 
 func (self *effFloat) UnmarshalJSON(data []byte) (err error) {
     if bytes.Compare(data, []byte(`"NaN"`)) == 0 {
-        *self = effFloat(math.NaN())
+        // *self = effFloat(math.NaN())
+        *self = effFloat(math.Float32frombits(0xFFFFFFFF))
         return
     }
 

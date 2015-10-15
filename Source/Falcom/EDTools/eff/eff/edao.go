@@ -6,8 +6,10 @@ import (
     . "ml/trace"
 
     "path/filepath"
+    "ml/encoding/json"
     "ml/io2/filestream"
-    "encoding/json"
+    "bytes"
+    "encoding/binary"
 
     "../../utility"
 )
@@ -141,9 +143,13 @@ type EDAOEffect struct {
     PartData        [partDataCount]*EDAOPartData
 }
 
-func EDAOEffectFromJson(data []byte) *EDAOEffect {
+func LoadEDAOEffect(jsonpath string) *EDAOEffect {
+    f := filestream.Open(jsonpath)
+    defer f.Close()
+
     eff := &EDAOEffect{}
-    RaiseIf(json.Unmarshal(data, eff))
+    eff.Unserialize(f.ReadAll())
+
     return eff
 }
 
@@ -167,16 +173,12 @@ func NewEDAOEffect(effpath string) *EDAOEffect {
 
     for _, texture := range header.Texture {
         t := utility.BytesToString(texture[:])
-        if t.IsEmpty() == false {
-            eff.texture = append(eff.texture, t)
-        }
+        eff.texture = append(eff.texture, t)
     }
 
     for _, child := range header.Children {
         c := utility.BytesToString(child[:])
-        if c.IsEmpty() == false {
-            eff.children = append(eff.children, c)
-        }
+        eff.children = append(eff.children, c)
     }
 
     for i := uint(0); i != partDataCount; i++ {
@@ -214,7 +216,7 @@ func (self *EDAOEffect) PartDataNames() []String {
     return v
 }
 
-func (self *EDAOEffect) String() string {
+func (self EDAOEffect) String() string {
     return String("\n").Join([]string{
         Sprintf("Magic          = %v",      self.Magic),
         Sprintf("FileName       = %v",      self.FileName()),
@@ -230,9 +232,53 @@ func (self *EDAOEffect) String() string {
 }
 
 func (self *EDAOEffect) Serialize() (data []byte) {
-
+    data, err := json.MarshalIndent(self, "", "  ")
+    RaiseIf(err)
+    return
 }
 
 func (self *EDAOEffect) Unserialize(data []byte) {
+    RaiseIf(json.Unmarshal(data, self))
+}
 
+func (self *EDAOEffect) ToBinary() (data []byte) {
+    buf := filestream.CreateMemory()
+
+    header := edaoEffFileHeader{
+        Unknown         : uint16(self.Unknown),
+        Flags           : uint16(self.Flags),
+        PartDataBits    : uint16(self.PartDataBits),
+    }
+
+    copy(header.Magic[:], self.Magic.Encode(utility.ENCODING))
+    copy(header.Name[:], self.Name().Encode(utility.ENCODING))
+
+    texture := self.Texture()
+    for i, _ := range header.Texture {
+        copy(header.Texture[i][:], texture[i].Encode(utility.ENCODING))
+    }
+
+    children := self.Children()
+    for i, _ := range header.Children {
+        copy(header.Children[i][:], children[i].Encode(utility.ENCODING))
+    }
+
+    buf.WriteType(&header)
+
+    for _, part := range self.PartData {
+        if part == nil {
+            continue
+        }
+
+        buf.WriteType(&part.edaoPartData)
+
+        for _, extra := range part.Extra {
+            buf.WriteType(&extra)
+        }
+    }
+
+    buf.SetPosition(0)
+    data = buf.ReadAll()
+
+    return
 }

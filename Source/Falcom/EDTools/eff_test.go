@@ -7,7 +7,6 @@ import (
     "testing"
     "path/filepath"
     "os"
-    "encoding/json"
     "./eff/eff"
 )
 
@@ -37,15 +36,18 @@ func TestEff(t *testing.T) {
         Println(e)
         Println()
 
-        b, err := json.MarshalIndent(e, "", "  ")
-        Println(err)
-
-        e = eff.EDAOEffectFromJson(b)
-        b, err = json.MarshalIndent(e, "", "  ")
+        b := e.Serialize()
 
         f, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\fuck.json`)
         f.Write(b)
         f.Close()
+
+        e = eff.LoadEDAOEffect(`D:\Desktop\Source\Falcom\EDTools\fuck.json`)
+        Println(e)
+
+        new, _ := os.Create(`D:\Desktop\Source\Falcom\EDTools\fuck.eff`)
+        new.Write(e.ToBinary())
+        new.Close()
 
         return Errorf("break")
 
