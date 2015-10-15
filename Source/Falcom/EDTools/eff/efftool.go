@@ -42,7 +42,10 @@ func handleJsonFile(input string) {
 func handleEffFile(input string) {
     success := false
 
-    Printf("convert %s to .json ... ", input)
+    ext := filepath.Ext(input)
+    output := input[0:len(input) - len(ext)] + ".json"
+
+    Printf("convert %s to %s ... ", input, output)
     defer func () {
         Println(If(success, "success", "failed").(string))
     }()
@@ -50,9 +53,7 @@ func handleEffFile(input string) {
     e := eff.NewEDAOEffect(input)
     e.Serialize()
 
-    ext := filepath.Ext(input)
-
-    f, err := os.Create(input[0:len(input) - len(ext)] + ".json")
+    f, err := os.Create(output)
     RaiseIf(err)
 
     f.Write(e.Serialize())
@@ -80,7 +81,7 @@ func main() {
         return
     }
 
-    defer time.Sleep(time.Second * 3)
+    haserror := false
 
     for _, f := range os.Args[1:] {
         exp := Try(func () {
@@ -89,6 +90,13 @@ func main() {
 
         if exp != nil {
             Println(exp.Message)
+            haserror = true
         }
+    }
+
+    if haserror {
+        console.Pause("press any key to continue ...")
+    } else {
+        time.Sleep(time.Second * 3)
     }
 }
