@@ -2,6 +2,55 @@
 #include "iOSDevice.h"
 #include "iOSService.h"
 
+VOID GenerateModuleList(String &ModuleNames)
+{
+    PVOID                               Address, BaseAddress, LastAllocationBase;
+    ULONG_PTR                           Size, Need, BufferSize;
+    NTSTATUS                            Status;
+    SYSTEM_BASIC_INFORMATION            SystemBasic;
+    MEMORY_BASIC_INFORMATION            MemoryBasic;
+
+    union
+    {
+        MEMORY_MAPPED_FILENAME_INFORMATION2 MappedFile;
+        BYTE MappedFileBuffer[0x2000];
+    };
+
+    Status = NtQuerySystemInformation(SystemBasicInformation, &SystemBasic, sizeof(SystemBasic), nullptr);
+    if (!NT_SUCCESS(Status))
+        return;
+
+    LastAllocationBase = IMAGE_INVALID_VA;
+    BaseAddress = (PVOID)SystemBasic.MinimumUserModeAddress;
+    BaseAddress = nullptr;
+
+    for (; (ULONG_PTR)BaseAddress < SystemBasic.MaximumUserModeAddress; BaseAddress = PtrAdd(BaseAddress, MemoryBasic.RegionSize))
+    {
+        MemoryBasic.RegionSize = MEMORY_PAGE_SIZE;
+        Status = NtQueryVirtualMemory(CurrentProcess, BaseAddress, MemoryBasicInformation, &MemoryBasic, sizeof(MemoryBasic), nullptr);
+        FAIL_CONTINUE(Status);
+
+        BaseAddress = MemoryBasic.BaseAddress;
+
+        if (MemoryBasic.Type != MEM_IMAGE || MemoryBasic.AllocationBase == LastAllocationBase)
+            continue;
+
+        LastAllocationBase = MemoryBasic.AllocationBase;
+
+        Status = NtQueryVirtualMemory(CurrentProcess, BaseAddress, MemoryMappedFilenameInformation, &MappedFile, sizeof(MappedFileBuffer), nullptr);
+        if (NT_FAILED(Status) || MappedFile.Name.Length == 0)
+            continue;
+
+        UNICODE_STRING DosPath;
+
+        Status = Io::QueryDosPathFromNtDeviceName(&DosPath, &MappedFile.Name);
+
+        ModuleNames += ml::String::Format(L"%p: %wZ\n", BaseAddress, NT_SUCCESS(Status) ? &DosPath : &MappedFile.Name);
+
+        RtlFreeUnicodeString(&DosPath);
+    }
+}
+
 NTSTATUS iOSDevice::IsJailbroken()
 {
     // kAMDInvalidServiceError
@@ -84,8 +133,10 @@ GetAfsyncResponse(
 
             helper.GetDeviceId(&mid, &mid2);
 
+            DebugLog(L"ScInfoPath = %S", ScInfoPath);   
             status = helper.KbsyncCreateSession(&kbsync, &mid, &mid2, ScInfoPath);
-            BREAK_IF(status != 0);
+            DebugLog(L"KbsyncCreateSession = %p", status);
+            RETURN_IF(status != 0, status);
         }
 
         //status = itunes.AirFairVerifyRequest(GrappaSessionId, afsyncRequest, requestSize, afsyncRequestSignature, signatureSize);
@@ -98,9 +149,11 @@ GetAfsyncResponse(
                     FairPlayGuid,
                     DeviceInfo
                 );
+        DebugLog(L"AirFairSyncCreateSession = %p", status);
         BREAK_IF(status != 0);
 
         status = helper.AirFairSyncSetRequest(afsync, CFDataGetBytePtr(AFSyncRequest), CFDataGetLength(AFSyncRequest), nullptr, 0);
+        DebugLog(L"AirFairSyncSetRequest = %p", status);
         BREAK_IF(status != 0);
 
         PAIR_FAIR_AUTHORIZED_DSID authed;
@@ -116,6 +169,7 @@ GetAfsyncResponse(
                         &count
                     );
 
+        DebugLog(L"AirFairSyncGetAuthorizedAccount = %p", status);
         BREAK_IF(status != 0);
 
         helper.FreeSessionData(authed);
@@ -144,6 +198,7 @@ GetAfsyncResponse(
         ULONG rssize;
 
         status = helper.AirFairSyncGetResponse(afsync, &rs, &rssize);
+        DebugLog(L"AirFairSyncGetResponse = %p", status);
         BREAK_IF(status != 0);
 
         if (rssize != 0 && rs != nullptr)
@@ -251,6 +306,13 @@ AuthorizeDsids(
             DsidAuthed,
             response
         );
+    DebugLog(L"GetAfsyncResponse = %p", status);
+
+    String ml;
+    
+    GenerateModuleList(ml);
+    wprintf(L"%s\n", ml);
+
     if (status != STATUS_SUCCESS)
         return status;
 
@@ -258,6 +320,7 @@ AuthorizeDsids(
         return STATUS_SUCCESS;
 
     status = GetAfsyncResponseSignature(*helper, ath.GetGrappaSessionId(), response, signature);
+    DebugLog(L"GetAfsyncResponseSignature = %p", status);
     if (status != STATUS_SUCCESS)
         return status;
 

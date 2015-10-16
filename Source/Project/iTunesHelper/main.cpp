@@ -7,6 +7,22 @@
 
 ML_OVERLOAD_NEW
 
+API_POINTER(LdrLoadDll) StubLdrLoadDll;
+
+NTSTATUS
+NTAPI
+iLdrLoadDll(
+    IN  PWSTR               PathToFile OPTIONAL,
+    IN  PULONG              DllCharacteristics OPTIONAL,
+    IN  PCUNICODE_STRING    ModuleFileName,
+    OUT PVOID*              DllHandle
+)
+{
+    auto st = StubLdrLoadDll(PathToFile, DllCharacteristics, ModuleFileName, DllHandle);
+    DebugLog(L"load %wZ %p", ModuleFileName, st);
+    return st;
+}
+
 BOOL UnInitialize(PVOID BaseAddress)
 {
     return FALSE;
@@ -16,6 +32,15 @@ BOOL Initialize(PVOID BaseAddress)
 {
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
+
+    using namespace Mp;
+
+    PATCH_MEMORY_DATA p[] =
+    {
+        FunctionJumpVa(LdrLoadDll, iLdrLoadDll, &StubLdrLoadDll),
+    };
+
+    PatchMemory(p, countof(p), BaseAddress);
 
     return TRUE;
 }

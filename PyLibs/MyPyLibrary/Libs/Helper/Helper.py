@@ -88,7 +88,6 @@ def TryForEachFile(filelist, callback, filter = '*.*'):
 def TryForEachFileMP(filelist, callback, filter = '*.*'):
     TryInvoke(ForEachFileMP, filelist, callback, filter)
 
-
 def ForEachFileMPInvoker(cb, flist):
     for f in flist:
         cb(f)
