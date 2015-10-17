@@ -109,12 +109,12 @@ class StructureUnionBase(object):
         else:
             basetype.__init__(self, *args, **kwargs)
 
-    def __tobytes__(self):
+    def __bytes__(self):
         size = len(self)
         buff = (CHAR * size)()
         ctypes.memmove(buff, ctypes.addressof(self), size)
 
-        return bytearray(buff)
+        return bytes(buff)
 
     def __frombytes__(self, buffer):
         size = len(buffer)
