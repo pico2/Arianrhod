@@ -596,14 +596,14 @@ BOOL Initialize(PVOID BaseAddress)
 
         // iat hook
 
-        MemoryPatchRva((ULONG64)AoGetKeyState,         4, 0x9D5A00),       // GetKeyState
+        MemoryPatchRva((ULONG64)AoGetKeyState,         4, 0x9D5A00),        // GetKeyState
 
 #if !D3D9_VER
 
-        MemoryPatchRva(0x1CEB,                2, 0x64ACFE),       // remove crappy mouse control @ PositionWindow
-        MemoryPatchRva(0x00ull,               4, 0x329851),       // disable foolish get joy stick pos
-        MemoryPatchRva(8 * sizeof(ULONG_PTR), 4, 0x403E92),       // fix WNDCLASS::cbWndExtra
-        MemoryPatchRva((ULONG64)CreateWindowExCenterA, 4, 0x9D59E8),       // CreateWindowExA
+        MemoryPatchRva(0x1CEB,                2, 0x64ACFE),                 // remove crappy mouse control @ PositionWindow
+        MemoryPatchRva(0x00ull,               4, 0x329851),                 // disable stupid get joy stick pos
+        MemoryPatchRva(8 * sizeof(ULONG_PTR), 4, 0x403E92),                 // fix WNDCLASS::cbWndExtra
+        MemoryPatchRva((ULONG64)CreateWindowExCenterA, 4, 0x9D59E8),        // CreateWindowExA
 
 #endif
 
