@@ -304,6 +304,6 @@ def main():
     SCraftAIList        = [SCraft_圣技大十字]
     SupportCraftAIList  = []
 
-    SaveToMS("ms90010.dat", locals())
+    SaveToMS("ms04670.dat", locals())
 
 TryInvoke(main)
