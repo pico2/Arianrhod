@@ -1,4 +1,7 @@
 from ActionHelper import *
+from Voice import *
+
+arts_aria_eff_id = 0
 
 def init():
     #LoadEffect(0x80, "battle/mgaria0.eff")
@@ -29,60 +32,22 @@ def stand():
     Call('clear_all_debuff')
 
     SetChrChip(0xFF, 0x0)
-    SetChrSubChip(0xFF, 0x0)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x1)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x2)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x1)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x0)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x3)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x4)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x3)
-    Sleep(130)
-    Yield()
+    for i in range(8):
+        SetChrSubChip(CraftTarget.Self, i)
+        Sleep(130)
+        Yield()
+
     Jump("SysCraft_Stand")
 
 def move():
     label("SysCraft_Move")
 
     SetChrChip(0xFF, 0x1)
-    SetChrSubChip(0xFF, 0x0)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x1)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x2)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x3)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x4)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x5)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x6)
-    Sleep(40)
-    Yield()
-    SetChrSubChip(0xFF, 0x7)
-    Sleep(40)
-    Yield()
+    for i in range(8):
+        SetChrSubChip(CraftTarget.Self, i)
+        Sleep(40)
+        Yield()
+
     Jump("SysCraft_Move")
 
 def underAttack():
@@ -91,25 +56,23 @@ def underAttack():
     AS_78(0)
 
     Knockback(0)
-    SoundEx(115, 0)
-    PlayEffect(0xFF, 0xFF, 1, 0, 0, 1200, 0, 0, 0, 0, 1000, 1000, 1000, 0xFF)
     SetChrChip(CraftTarget.Self, 4)
-    SetChrSubChip(CraftTarget.Self, 3)
+    SetChrSubChip(CraftTarget.Self, 2)
+    SoundEx(卡西乌斯_防御, 0)
+    PlayEffect(0xFF, 0xFF, 1, 0, 0, 800, 0, 0, 0, 0, 1000, 1000, 1000, 0xFF)
     Sleep(1000)
     Yield()
 
     FreeEffect(1)
 
 def dead():
-    AS_6C()
+    Dead()
 
-    SoundEx(3868, 0)
-    SetChrChip(0xFF, 0)
-    SetChrSubChip(0xFF, 0)
-    Sleep(1000)
+    Voice(0, 卡西乌斯_死亡1, 0, 0, 0, 0xFE)
+    Sleep(100)
     Yield()
-
-    StopSound(3868)
+    SetChrChip(0xFF, 5)
+    SetChrSubChip(0xFF, 0)
     Yield()
 
     Return()
@@ -125,7 +88,7 @@ def artsAria():
     label("other_voice")
 
     PlayEffect(0xFF, 0xFF, 0x80, 0x41, 0, 50, 0, 0, 0, 0, -1, -1, -1, arts_aria_eff_id)
-    Voice(0x0, 3864, 3883, 3884, 0, 0xFE)
+    Voice(0x0, 卡西乌斯_蓄力, 0, 0, 0, 0xFE)
     SoundEx(509, 0x0)
 
     label("arts_effect_end")
@@ -140,18 +103,11 @@ def artsAria():
 
     label("arts_chip_loop")
 
-    SetChrSubChip(0xFF, 0x0)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x1)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x2)
-    Sleep(130)
-    Yield()
-    SetChrSubChip(0xFF, 0x1)
-    Sleep(130)
-    Yield()
+    for i in range(4):
+        SetChrSubChip(0xFF, i)
+        Sleep(130)
+        Yield()
+
     Jump("arts_chip_loop")
 
 def artsCast():
@@ -162,12 +118,12 @@ def artsCast():
     TurnDirection(0xFF, 0xFB, 0, 500, 0x0)
     Sleep(200)
     Yield()
-    SetChrChip(0xFF, 0x3)
-    SetChrSubChip(0xFF, 0x3)
+    SetChrChip(0xFF, 3)
+    SetChrSubChip(0xFF, 4)
     Sleep(300)
     Yield()
-    Voice(0x0, 3875, 3876, 0, 0, 0xFE)
-    SetChrSubChip(0xFF, 0x4)
+    Voice(0x0, 卡西乌斯_魔法施放, 0, 0, 0, 0xFE)
+    SetChrSubChip(0xFF, 5)
     Sleep(0)
     Yield()
 
@@ -179,7 +135,7 @@ def artsCast():
 
 def enterBattle():
     BeginChrThread(0xFF, 1, "SysCraft_Stand", 0x0)
-    Voice(0x0, 3881, 3882, 0, 0, 0xFE)
+    Voice(0x0, 卡西乌斯_YAREYARE, 0, 0, 0, 0xFE)
     Yield()
     EndChrThread(0xFF, 1)
     Return()
@@ -188,12 +144,12 @@ def battleWin():
     pass
 
 def useItem():
-    SetChrChip(0xFF, 0x3)
-    SetChrSubChip(0xFF, 0x0)
+    SetChrChip(0xFF, 2)
+    SetChrSubChip(0xFF, 1)
     Sleep(300)
     Yield()
-    Voice(0x0, 3881, 3906, 0, 0, 0xFE)
-    SetChrSubChip(0xFF, 0x4)
+    Voice(0x0, 卡西乌斯_YAREYARE, 0, 0, 0, 0xFE)
+    SetChrSubChip(0xFF, 2)
     Sleep(300)
     Yield()
     PlayEffect(0xFF, 0xFF, 0x2A, 0x2, 0, 1000, 500, 0, 0, 0, 65535, 65535, 65535, 0xFF)
@@ -206,7 +162,7 @@ def useItem():
 def normalAttack():
     AS_78(0x1)
     LoadChrChip(0x7, "chr/ch04672.itc", 0xFF)
-    LoadEffect(0x0, "battle/ms00001.eff")
+    LoadEffect(0, "battle/ms00001.eff")
     AS_78(0x0)
 
     ResetTarget()
@@ -230,35 +186,34 @@ def normalAttack():
     Yield()
 
     SetChrSubChip(0xFF, 0x1)
-    Sleep(0x50)
+    Sleep(100)
     Yield()
 
     AS_05(0xFF, 0x0, 0x0)
-    Voice(0x0, 3987, 0, 0, 0, 0xFE)
+    Voice(0x0, 卡西乌斯_攻击1, 卡西乌斯_攻击2, 卡西乌斯_攻击3, 0, 0xFE)
 
     for i in range(2, 7):
         SetChrSubChip(CraftTarget.Self, i)
         Sleep(0x50)
         Yield()
 
-    Knockback(2)
+    PlayEffect(0xFF, 0xFE, 0, 0x1, 0, 1000, 0, 0, 0, 0, 1000, 1000, 1000, -1)
+    SoundEx(卡西乌斯_音效_普通攻击, 0)
+    Knockback(1)
     ResetLookingTargetData()
     DamageAnime(0xFE, 0x1, 0x32)
     DamageCue(0xFE)
     ResetLookingTargetData()
-
-    LookingTargetAdd(0xFF, "", 0x0)
-    LookingTargetAdd(0xFC, "", 0x0)
-    LookingTarget(100, 20, 30)
-    AS_21(0x1, 0xFF, 150, 2000)
-    Sleep(500)
-    Yield()
 
     for i in range(7, 10):
         SetChrSubChip(CraftTarget.Self, i)
         Sleep(32)
         Yield()
 
+    LookingTargetAdd(0xFF, "", 0x0)
+    LookingTargetAdd(0xFC, "", 0x0)
+    LookingTarget(100, 20, 30)
+    AS_21(0x1, 0xFF, 150, 2000)
     Sleep(200)
     Yield()
 
@@ -273,4 +228,7 @@ def normalAttack():
     EndChrThread(0xFF, 1)
     AS_6E(0x200000)
     AS_6B()
+
+    FreeEffect(0)
+
     Return()

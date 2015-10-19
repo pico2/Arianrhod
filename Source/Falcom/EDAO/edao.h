@@ -869,6 +869,10 @@ INIT_STATIC_MEMBER(CBattle::StubOnSetChrConditionFlag);
 class CSound
 {
 public:
+    PCSTR GetSoundDataPath()
+    {
+        return (PCSTR)PtrAdd(this, 0x10);
+    }
 
     VOID THISCALL PlaySound(ULONG SeIndex, ULONG v1 = 1, ULONG v2 = 0, ULONG v3 = 100, ULONG v4 = 0, ULONG v5 = 35, ULONG v6 = 0)
     {
@@ -878,7 +882,18 @@ public:
 
         return (this->*PlaySound)(SeIndex, v1, v2, v3, v4, v5, v6);
     }
+
+    PVOID THISCALL GetSeEntryBySoundIndex(ULONG SeIndex)
+    {
+        DETOUR_METHOD(CSound, GetSeEntryBySoundIndex, 0x90E690, SeIndex);
+    }
+
+    PVOID THISCALL GetSoundPathByIndex(PSTR SoundPath, ULONG SeIndex);
+
+    DECL_STATIC_METHOD_POINTER(CSound, GetSoundPathByIndex);
 };
+
+INIT_STATIC_MEMBER(CSound::StubGetSoundPathByIndex);
 
 typedef struct
 {

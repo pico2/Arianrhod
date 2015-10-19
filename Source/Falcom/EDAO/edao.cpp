@@ -6,13 +6,15 @@
 #include "MyLibrary.cpp"
 #include "edao_vm.h"
 
-#define ENABLE_LOG  0
+using ml::String;
 
 #if !D3D9_VER
     #undef ENABLE_LOG
     #define ENABLE_LOG 0
     #define DEBUG_DISABLE_PATCH 0
 #endif
+
+#define ENABLE_LOG  0
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved);
 
@@ -143,89 +145,72 @@ HWND WINAPI CreateWindowExCenterA(ULONG dwExStyle, LPCSTR lpClassName, LPCSTR lp
     return Window;
 }
 
-
 typedef struct
 {
-    UNICODE_STRING Original;
-    UNICODE_STRING Redirected;
+    String Original;
+    String Redirected;
 
 } FILE_REDIRECT_ENTRY, *PFILE_REDIRECT_ENTRY;
 
-PFILE_REDIRECT_ENTRY GlobalRedirectEntry;
+typedef GrowableArray<FILE_REDIRECT_ENTRY> FILE_REDIRECT_ENTRY_VEC, *PFILE_REDIRECT_ENTRY_VEC;
 
-#define REDIRECT_PATH(orig, redir) { RTL_CONSTANT_STRING(orig), RTL_CONSTANT_STRING(redir) }
-
+PFILE_REDIRECT_ENTRY_VEC GlobalRedirectEntry;
 
 NTSTATUS InitializeRedirectEntry()
 {
-    NTSTATUS                Status;
-    UNICODE_STRING          ExePath;
-    PLDR_MODULE             Module;
-    PWSTR                   Buffer;
-    ULONG_PTR               Length;
-    PFILE_REDIRECT_ENTRY    Entry, RedirectEntry;
+    NTSTATUS        Status;
+    PLDR_MODULE     Module;
+    UNICODE_STRING  ExeNtPathString;
 
-    static FILE_REDIRECT_ENTRY RedirectSubDirectory[] =
-    {
-        REDIRECT_PATH(L"data\\", L"patch2\\"),
-        REDIRECT_PATH(L"data\\", L"patch\\"),
-    };
+    auto RedirectSubDirectory = new GrowableArray<FILE_REDIRECT_ENTRY>;
+
+    if (RedirectSubDirectory == nullptr)
+        return STATUS_NO_MEMORY;
+
+    GlobalRedirectEntry = RedirectSubDirectory;
+
+    String ExeNtPath, DataPath;
 
     Module = FindLdrModuleByHandle(nullptr);
-    Status = NtFileDisk::QueryFullNtPath(Module->FullDllName.Buffer, &ExePath);
-    FAIL_RETURN(Status);
+    FAIL_RETURN(NtFileDisk::QueryFullNtPath(Module->FullDllName.Buffer, &ExeNtPathString));
 
-    RedirectEntry = (PFILE_REDIRECT_ENTRY)AllocateMemoryP((countof(RedirectSubDirectory) + 1) * sizeof(*RedirectEntry), HEAP_ZERO_MEMORY);
-    if (RedirectEntry == nullptr)
+    ExeNtPath = ExeNtPathString;
+    RtlFreeUnicodeString(&ExeNtPathString);
+
+    ExeNtPath = ExeNtPath.SubString(0, ExeNtPath.GetCount() - Module->BaseDllName.Length / sizeof(Module->BaseDllName.Buffer[0]));
+    DataPath = ExeNtPath + L"data\\";
+
+    RedirectSubDirectory->Add({ DataPath, ExeNtPath + L"patch\\" });
+
+    for (ULONG_PTR index = 1; ;++index)
     {
-        RtlFreeUnicodeString(&ExePath);
-        return STATUS_NO_MEMORY;
+        auto patch = String::Format(L"%spatch%d\\", ExeNtPath, index);
+
+        if (Io::IsPathExists(patch) == FALSE)
+            break;
+
+        RedirectSubDirectory->Add({ DataPath, patch});
     }
 
-    GlobalRedirectEntry = RedirectEntry;
-
-    ExePath.Length -= Module->BaseDllName.Length;
-    Length = 0;
-    FOR_EACH(Entry, RedirectSubDirectory, countof(RedirectSubDirectory))
-    {
-        Length = ML_MAX(Entry->Original.Length, ML_MAX(Entry->Redirected.Length, Length));
-    }
-
-    Length += ExePath.Length;
-
-    Buffer = (PWSTR)AllocStack(Length + sizeof(WCHAR));
-
-    FOR_EACH(Entry, RedirectSubDirectory, countof(RedirectSubDirectory))
-    {
-        CopyMemory(Buffer, ExePath.Buffer, ExePath.Length);
-        CopyMemory(PtrAdd(Buffer, ExePath.Length), Entry->Original.Buffer, Entry->Original.Length);
-        *PtrAdd(Buffer, ExePath.Length + Entry->Original.Length) = 0;
-        RtlCreateUnicodeString(&RedirectEntry->Original, Buffer);
-
-        CopyMemory(PtrAdd(Buffer, ExePath.Length), Entry->Redirected.Buffer, Entry->Redirected.Length);
-        *PtrAdd(Buffer, ExePath.Length + Entry->Redirected.Length) = 0;
-        RtlCreateUnicodeString(&RedirectEntry->Redirected, Buffer);
-
-        ++RedirectEntry;
-    }
+    RedirectSubDirectory->Add({ DataPath, ExeNtPath + L"Ouroboros\\" });
+    RedirectSubDirectory->Add({});
 
     return STATUS_SUCCESS;
 }
 
 NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING RedirectedFile)
 {
-    ULONG_PTR               Length, BufferLength;
-    PWSTR                   Buffer;
-    NTSTATUS                Status;
-    UNICODE_STRING          SubFilePath, Redirected, OriginalPath;
-    OBJECT_ATTRIBUTES       oa;
-    FILE_BASIC_INFORMATION  FileBasic;
-    PFILE_REDIRECT_ENTRY    Entry;
+    ULONG_PTR                   Length, BufferLength;
+    PWSTR                       Buffer;
+    NTSTATUS                    Status;
+    UNICODE_STRING              SubFilePath, Redirected, OriginalPath;
+    OBJECT_ATTRIBUTES           oa;
+    FILE_BASIC_INFORMATION      FileBasic;
+    PFILE_REDIRECT_ENTRY        Entry;
 
     RtlInitEmptyString(RedirectedFile);
 
-    Entry = GlobalRedirectEntry;
-    if (Entry == nullptr)
+    if (GlobalRedirectEntry == nullptr)
         return STATUS_FLT_NOT_INITIALIZED;
 
     if (OriginalFile == nullptr || OriginalFile->Buffer == nullptr)
@@ -240,19 +225,22 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
     Buffer = (PWSTR)AllocStack(BufferLength);
     SubFilePath = OriginalPath;
 
-    FOR_EACH(Entry, Entry, ~0u)
+    FOR_EACH_VEC(Entry, *GlobalRedirectEntry)
     {
-        if (Entry->Original.Buffer == nullptr)
-            return STATUS_NO_MATCH;
+        if (!Entry->Original)
+            return STATUS_NOT_FOUND;
 
-        if (OriginalPath.Length <= Entry->Original.Length)
+        auto RedirectedSize = Entry->Redirected.GetSize();
+        auto OriginalSize = Entry->Original.GetSize();
+
+        if (OriginalPath.Length <= OriginalSize)
             continue;
 
-        SubFilePath.Length = Entry->Original.Length;
-        if (!RtlEqualUnicodeString(&SubFilePath, &Entry->Original, TRUE))
+        SubFilePath.Length = OriginalSize;
+        if (!RtlEqualUnicodeString(&SubFilePath, Entry->Original, TRUE))
             continue;
 
-        Length = Entry->Redirected.Length + OriginalPath.Length - SubFilePath.Length + sizeof(WCHAR);
+        Length = RedirectedSize + OriginalPath.Length - SubFilePath.Length + sizeof(WCHAR);
         if (Length > BufferLength)
         {
             Buffer = (PWSTR)AllocStack(Length - BufferLength);
@@ -261,9 +249,9 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
 
         Length = OriginalPath.Length - SubFilePath.Length;
 
-        CopyMemory(Buffer, Entry->Redirected.Buffer, Entry->Redirected.Length);
-        CopyMemory(PtrAdd(Buffer, Entry->Redirected.Length), PtrAdd(OriginalPath.Buffer, SubFilePath.Length), Length);
-        Length += Entry->Redirected.Length;
+        CopyMemory(Buffer, (PCWSTR)Entry->Redirected, RedirectedSize);
+        CopyMemory(PtrAdd(Buffer, RedirectedSize), PtrAdd(OriginalPath.Buffer, SubFilePath.Length), Length);
+        Length += RedirectedSize;
         *PtrAdd(Buffer, Length) = 0;
 
         Redirected.Length           = (USHORT)Length;
@@ -272,11 +260,9 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
 
         InitializeObjectAttributes(&oa, &Redirected, OBJ_CASE_INSENSITIVE, nullptr, 0);
         Status = StubNtQueryAttributesFile(&oa, &FileBasic);
-        if (
-            NT_SUCCESS(Status) &&
+        if (NT_SUCCESS(Status) &&
             FileBasic.FileAttributes != INVALID_FILE_ATTRIBUTES &&
-            FLAG_OFF(FileBasic.FileAttributes, FILE_ATTRIBUTE_DIRECTORY)
-           )
+            FLAG_OFF(FileBasic.FileAttributes, FILE_ATTRIBUTE_DIRECTORY))
         {
             Status = RtlDuplicateUnicodeString(RTL_DUPSTR_ADD_NULL, &Redirected, RedirectedFile);
             if (NT_SUCCESS(Status))
@@ -644,6 +630,11 @@ BOOL Initialize(PVOID BaseAddress)
 
         FunctionCallRva(0x328C77, &CInput::HandleMainInterfaceInputState, &CInput::StubHandleMainInterfaceInputState),
 
+        // patch max se index
+
+        MemoryPatchRva((ULONG64)0xEB, 1, 0x50EC22),
+        FunctionJumpRva(0x2795B2, &CSound::GetSoundPathByIndex, &CSound::StubGetSoundPathByIndex),
+
         // bug fix
 
         FunctionCallRva(0x5B1BE6, &CBattleATBar::LookupReplaceAtBarEntry),
@@ -723,7 +714,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // acgn
 
-        FunctionJumpRva(0x275EFD, &CBattle::LoadMSFile, &CBattle::StubLoadMSFile),   //it3
+        FunctionJumpRva(0x275EFD, &CBattle::LoadMSFile, &CBattle::StubLoadMSFile),  //it3
         FunctionJumpRva(0x5D3545, &CBattle::NakedAS_8D_5F),                         //Ê±¿Õ´ó±À»µ
 
 
