@@ -50,13 +50,16 @@ def png2itp(input, output):
         print(p.stderr.read())
         raise Exception('nconvert %s failed' % input)
 
-    p = call(ITPCNV_PATH, png8, output)
-    if p.returncode != 0:
-        p = call(ITPCNV_PATH, '-v4', png8, output)
+    for mode in ['-v6', '-v4', '-v2', '-v0']:
+        p = call(ITPCNV_PATH, mode, png8, output)
+        if p.returncode == 0 and os.path.exists(output):
+            break
+
+        print(p.stdout.read().decode('mbcs'))
+        p.returncode = -1
 
     os.remove(png8)
     if p.returncode != 0:
-        print(p.stdout.read().decode('mbcs'))
         raise Exception('convert %s to itp failed with ret code = %X' % (input, p.returncode))
 
 def png2itc(prefix, namelen, output):

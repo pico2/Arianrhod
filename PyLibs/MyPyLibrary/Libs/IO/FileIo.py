@@ -5,6 +5,8 @@ def EnumDirectoryFiles(path, filter = '*.*'):
     allfiles = []
     if filter == '*.*':
         filter = '*'
+    elif not filter.startswith('*'):
+        filter = '*' + filter
 
     for root, dirs, files in os.walk(path):
         for f in files:

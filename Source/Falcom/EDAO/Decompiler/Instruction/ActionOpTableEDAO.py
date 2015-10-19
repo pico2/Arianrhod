@@ -69,7 +69,7 @@ InstructionNames[0x39] = 'SetCameraDegree'
 InstructionNames[0x3A] = 'AS_3A'
 InstructionNames[0x3B] = 'SetCameraDistance'
 InstructionNames[0x3C] = 'AS_3C'
-InstructionNames[0x3D] = 'AS_3D'
+InstructionNames[0x3D] = 'ShakeScreen'
 InstructionNames[0x3E] = 'AS_3E'
 InstructionNames[0x3F] = 'AS_3F'
 InstructionNames[0x40] = 'AS_40'
@@ -480,7 +480,7 @@ edao_as_op_list = \
     inst(AS_3A,                         'WW'),
     inst(SetCameraDistance,             'ih'),          # SetCameraDistance(Distance, MoveToTime)
     inst(AS_3C,                         'WW'),
-    inst(AS_3D,                         'HHHH'),
+    inst(ShakeScreen,                   'HHHH'),
     inst(AS_3E,                         'WW'),
     inst(AS_3F,                         'B'),
     inst(AS_40,                         'B'),

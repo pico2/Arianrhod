@@ -78,7 +78,6 @@ SHORT NTAPI AoGetKeyState(int VirtualKey)
             VirtualKey = VK_SHIFT;
 
         case VK_SHIFT:
-
             if (!Turbo)
                 break;
 
