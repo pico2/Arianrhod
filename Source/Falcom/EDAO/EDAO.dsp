@@ -97,10 +97,6 @@ SOURCE=.\Battle.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\BattleSound.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\edao.cpp
 # End Source File
 # Begin Source File
@@ -114,6 +110,10 @@ SOURCE=.\edao_vm.h
 # Begin Source File
 
 SOURCE=.\Global.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Sound.cpp
 # End Source File
 # Begin Source File
 

@@ -42,7 +42,7 @@ def _ReadAString(fs, cp = ANSI_CODE_PAGE):
 
         string += buf
 
-    return string.decode(cp)
+    return string.decode(cp, errors='ignore')
 
 def _ReadWString(fs):
     string = b''

@@ -10,13 +10,12 @@ def main():
 
     eff_list = [hit_eff, critical_hit_eff, pre_critical_hit_eff]
 
-    AS_78(1)
-    LoadChrChip(chip, "chr/ch04678.itc", 0xFF)
-    LoadChrChip(attach_chip, "chr/ch04672.itc", 0xFF)
-    LoadEffect(hit_eff, "battle/ms00001.eff")
-    LoadEffect(critical_hit_eff, "battle/cr006402.eff")
-    LoadEffect(pre_critical_hit_eff, "battle/cr006401.eff")
-    AS_78(0)
+    with ResourceLock:
+        LoadChrChip(chip, "chr/ch04678.itc", 0xFF)
+        LoadChrChip(attach_chip, "chr/ch04672.itc", 0xFF)
+        LoadEffect(hit_eff, "battle/ms00001.eff")
+        LoadEffect(critical_hit_eff, "battle/cr006402.eff")
+        LoadEffect(pre_critical_hit_eff, "battle/cr006401.eff")
 
     ResetTarget()
     ResetLookingTargetData()
