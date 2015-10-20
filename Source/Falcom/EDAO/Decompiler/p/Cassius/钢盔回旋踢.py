@@ -73,6 +73,7 @@ def main():
     ChrMove(CraftTarget.Self, CraftTarget.TargetChr, 0, 0, 0, 50, 0)
     PlayEffect(0xFF, 0xF8, hit_eff, 0, 0, 0, 0, 0, 0, 0, 1000, 1000, 1000, 0xFF)
     AS_8D(0x1F, CraftTarget.Self, 0xF0, 0x0, 0x0)
+    SoundEx(卡西乌斯_音效_雷光击_击中, 0)
     DamageAnime(CraftTarget.TargetChr, 0, 50)
     DamageCue(CraftTarget.TargetChr)
     LockCamera(0xF8, 0, 0, 0, 100)

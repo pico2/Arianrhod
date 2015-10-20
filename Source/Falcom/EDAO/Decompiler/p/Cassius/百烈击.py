@@ -41,9 +41,11 @@ def main():
 
         if t % 2 == 0:
             DamageAnime(CraftTarget.TargetChr, 0, 0x32)
+            DamageCue(CraftTarget.TargetChr)
             PlayEffect(0xFF, 0xFE, hit_eff, 0x1, 0, 1000, 0, 0, 0, 0, 1000, 1000, 1000, -1)
 
     DamageAnime(CraftTarget.TargetChr, 0, 0x32)
+    DamageCue(CraftTarget.TargetChr)
     SetChrChip(CraftTarget.Self, attack_chip)
     SetChrSubChip(CraftTarget.Self, 0x0)
     Yield()
