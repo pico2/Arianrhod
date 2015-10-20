@@ -62,6 +62,12 @@ def underAttack():
 
     FreeEffect(1)
 
+def stun():
+    SetChrChip(0xFF, 5)
+    SetChrSubChip(0xFF, 0)
+    Sleep(100)
+    Yield()
+
 def dead():
     Dead()
 
@@ -231,14 +237,14 @@ def normalAttack():
     Return()
 
 def counter():
-    attach_chip = 8
+    attack_chip = 8
     critical_hit_eff = 1
     pre_critical_hit_eff = 2
 
     eff_list = [critical_hit_eff, pre_critical_hit_eff]
 
     with ResourceLock:
-        LoadChrChip(attach_chip, "chr/ch04672.itc", 0xFF)
+        LoadChrChip(attack_chip, "chr/ch04672.itc", 0xFF)
         LoadEffect(critical_hit_eff, "battle/cr006402.eff")
         LoadEffect(pre_critical_hit_eff, "battle/cr006401.eff")
 
@@ -252,7 +258,7 @@ def counter():
     AS_89(0xFF)
     Yield()
 
-    SetChrChip(CraftTarget.Self, attach_chip)
+    SetChrChip(CraftTarget.Self, attack_chip)
     SetChrSubChip(CraftTarget.Self, 0x0)
     Yield()
 

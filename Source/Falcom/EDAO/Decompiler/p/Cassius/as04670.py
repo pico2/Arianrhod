@@ -1,5 +1,6 @@
 ﻿from ActionHelper import *
 from Voice import *
+import SysCraft
 
 def main():
     CreateBattleAction("as04670.dat", ((128, 176), (128, 176), (128, 176), (128, 176), (128, 176), (128, 176), (128, 176), (128, 176)))
@@ -31,7 +32,7 @@ def main():
         'stub_craft',                       # 0E 14
         "SysCraft_Counter",                 # 0F 15
         "Craft_百烈击",                      # 10 16
-        EMPTY_ACTION,                       # 11 17
+        "Craft_钢盔回旋踢",                  # 11 17
         EMPTY_ACTION,                       # 12 18
         EMPTY_ACTION,                       # 13 19
         EMPTY_ACTION,                       # 14 20
@@ -64,14 +65,6 @@ def main():
         EMPTY_ACTION,                       # 2D 45
     ))
 
-    import SysCraft
-
-    label('SysCraft_TeamRushInit')
-    Return()
-
-    label('SysCraft_TeamRushAction')
-    Return()
-
     label('Craft_麒麟功')
 
     AS_8D(0x4B, 0xFF, 0x10000, 0xFFFFFFFF, 0x0)
@@ -85,9 +78,13 @@ def main():
     百烈击.main()
     Return()
 
-    label('stub_craft')
+    label('Craft_钢盔回旋踢')
+    import 钢盔回旋踢
+    钢盔回旋踢.main()
     Return()
 
+    label('stub_craft')
+    Return()
 
     label("SysCraft_ArtsAria")
     SysCraft.artsAria()
@@ -176,48 +173,10 @@ def main():
     SysCraft.normalAttack()
     Return()
 
-    label("loc_65A")
-
-    SetChrSubChip(0xFF, 0x4)
-    Sleep(50)
-    Yield()
-    SetChrSubChip(0xFF, 0x3)
-    Sleep(50)
-    Yield()
-    SetChrSubChip(0xFF, 0x2)
-    Sleep(50)
-    Yield()
-    Jump("loc_65A")
-
-    label("loc_672")
-
-    ResetTarget()
-
-    #label("loc_673")
-
-    #ForeachTarget("loc_6B2")
-    PlayEffect(0xFF, 0xFE, 0x0, 0x0, 0, 500, 0, 0, 0, 0, 500, 500, 500, 0x3)
-    AS_A7(0xFF, 0x3, 0xFE, 0xFF38, 0x1F4, 0xFF38, 0xC8, 0x3E8, 0xC8, 0x0)
-    DamageAnime(0xFE, 0x0, 0x32)
-    Sleep(100)
-    Yield()
-    #NextTarget()
-    #Jump("loc_673")
-
-    label("loc_6B2")
-
-    Sleep(100)
-    Yield()
-    Jump("loc_672")
-
     # SysCraft_NormalAttack end
 
-
     label("SysCraft_Stun")
-    SetChrChip(0xFF, 5)
-    SetChrSubChip(0xFF, 0)
-    Sleep(100)
-    Yield()
+    SysCraft.stun()
     Return()
 
     # SysCraft_Stun end
@@ -239,6 +198,13 @@ def main():
     Return()
 
     # SysCraft_Counter end
+
+
+    label('SysCraft_TeamRushInit')
+    Return()
+
+    label('SysCraft_TeamRushAction')
+    Return()
 
     SaveToFile()
 
