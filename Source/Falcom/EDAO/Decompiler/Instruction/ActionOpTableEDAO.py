@@ -132,7 +132,7 @@ InstructionNames[0x7E] = 'AS_7E'
 InstructionNames[0x7F] = 'BlurSwitch'
 InstructionNames[0x80] = 'CancelBlur'
 InstructionNames[0x82] = 'AS_82'
-InstructionNames[0x83] = 'AS_83'
+InstructionNames[0x83] = 'SortTarget'
 InstructionNames[0x84] = 'ChrRotate'
 InstructionNames[0x85] = 'AS_85'
 InstructionNames[0x87] = 'AS_87'
@@ -161,7 +161,7 @@ InstructionNames[0xA0] = 'AS_A0'
 InstructionNames[0xA1] = 'PlayEffectIfConditionExist'
 InstructionNames[0xA6] = 'AS_A6'
 InstructionNames[0xA7] = 'AS_A7'
-InstructionNames[0xA8] = 'AS_A8'
+InstructionNames[0xA8] = 'DamageVoice'
 InstructionNames[0xA9] = 'SetEffectColor'
 InstructionNames[0xAC] = 'AS_AC'
 InstructionNames[0xAD] = 'AS_AD'
@@ -540,10 +540,10 @@ edao_as_op_list = \
     inst(AS_7C,                         'BB'),
     inst(AS_7D,                         'BL'),
     inst(AS_7E,                         'L'),
-    inst(BlurSwitch,                    'WLBBB'),
+    inst(BlurSwitch,                    'WLBBB'),       # BlurSwitch(0, rgba, 0, 1, 3)
     inst(CancelBlur,                    'I'),
     inst(AS_82),
-    inst(AS_83,                         'B'),
+    inst(SortTarget,                    'B'),
     inst(ChrRotate,                     'BHHHIB'),      # ChrRotate(TargetChr, Degree, xx, xxx, xxxx, 4)
     inst(AS_85,                         'BBL'),
     inst(AS_87,                         'WB'),
@@ -572,7 +572,7 @@ edao_as_op_list = \
     inst(PlayEffectIfConditionExist,    'BLWS'),            # PlayEffectIfConditionExist(target, condition_flags, eff_index, '')
     inst(AS_A6,                         'BBLLB'),
     inst(AS_A7,                         'BBBhhhhhhh'),
-    inst(AS_A8,                         'BB'),
+    inst(DamageVoice,                         'BB'),
     inst(SetEffectColor,                'BCL'),             # SetEffectColor(owner, eff_handle, rgba)
     inst(AS_AC,                         'LL'),
     inst(AS_AD,                         'B'),

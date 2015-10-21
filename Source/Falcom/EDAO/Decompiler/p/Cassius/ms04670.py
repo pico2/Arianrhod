@@ -33,7 +33,7 @@ def main():
 
     Level              = 120
     MaximumHP          = 59000
-    InitialHP          = 9000
+    InitialHP          = 59000
     MaximumEP          = 9000
     InitialEP          = 9000
     MaximumCP          = 200
@@ -137,13 +137,13 @@ def main():
                     0x05, 0x12, 0x1,
                     CraftAttribute.NoAttribute,
                     CraftRange.LineOnLocation,
-                    CraftState.Physical, CraftState.NoneState,
+                    CraftState.Physical, CraftState.ATDelay,
                     54, 100,
                     0, 0,
                     0,
                     5,
                     0, 0,
-                    0, 0,
+                    50, 0,
                )
 
     CraftList = CreateCraftList([
