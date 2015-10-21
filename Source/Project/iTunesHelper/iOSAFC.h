@@ -258,7 +258,7 @@ public:
 
     NTSTATUS CloseFile(AFCFileRef Handle)
     {
-        DebugLog(L"close file: %p", (ULONG_PTR)Handle);
+        DebugLog(L"close file: %p", (PVOID)Handle);
         return AFCFileRefClose(*this, Handle);
     }
 
