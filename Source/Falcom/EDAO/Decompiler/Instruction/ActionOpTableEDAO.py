@@ -170,8 +170,8 @@ InstructionNames[0xAF] = 'AS_AF'
 InstructionNames[0xB0] = 'AS_B0'
 InstructionNames[0xB1] = 'AS_B1'
 InstructionNames[0xB2] = 'PlayBGM'
-InstructionNames[0xB3] = 'AS_B3'
-InstructionNames[0xB4] = 'AS_B4'
+InstructionNames[0xB3] = 'SetScenarioFlags'
+InstructionNames[0xB4] = 'SetChrCalcEnable'
 InstructionNames[0xB5] = 'LoadCclm'
 InstructionNames[0xB6] = 'UnlockCclm'
 InstructionNames[0xB7] = 'AS_B7'
@@ -581,8 +581,8 @@ edao_as_op_list = \
     inst(AS_B0,                         'WW'),
     inst(AS_B1,                         'BSBL'),
     inst(PlayBGM,                       'BW'),
-    inst(AS_B3,                         'BW'),
-    inst(AS_B4,                         'BB'),
+    inst(SetScenarioFlags,              'BW'),
+    inst(SetChrCalcEnable,              'BB'),
     inst(LoadCclm,                      NO_OPERAND,             0,                          as_load_cclm),
     inst(UnlockCclm,                    NO_OPERAND,             0,                          as_unlock_cclm),
     inst(AS_B7),

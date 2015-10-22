@@ -88,7 +88,10 @@ def main():
     Return()
 
     label('Craft_神罗天征')
-    PlayBGM(0, 0x228)
+    PlayBGM(0, 9999)
+    Sleep(5000)
+    Yield()
+    PlayBGM(0, 0)
     Return()
 
     label('stub_craft')
