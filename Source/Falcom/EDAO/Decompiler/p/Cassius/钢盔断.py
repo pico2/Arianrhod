@@ -7,20 +7,19 @@ def main():
 
     attackChip      = 7
 
-    showupEff       = 0
-    turnAroundEff   = 1
-    kickEff         = 2
-    hitEff          = 3
+    hitEff          = 0
+    earthEff        = 1
 
     effList = [
-        showupEff,
-        turnAroundEff,
-        kickEff,
         hitEff,
+        earthEff,
     ]
 
+    ResetTarget()
+
     with ResourceLock:
-        LoadEffect(0x4,         "battle/cr432000.eff")
+        LoadEffect(hitEff,      "battle/ms00000.eff")
+        LoadEffect(earthEff,    "battle/cr432000.eff")
         LoadChrChip(attackChip, CHR_Cassius_Attack, 0xFF)
 
     ResetLookingTargetData()
@@ -103,31 +102,30 @@ def main():
 
         ForeachTarget('钢盔断_next_target_end')
         TurnDirection(TargetChr, Self, 0, 0, 0x0)
-        DamageAnime(TargetChr, 0, 30)
 
         def underattack():
+            EndChrThread(Self, 0)
+            SetChrChip(0xFF, 0x2)
+            SetChrSubChip(0xFF, 0x0)
+
             AS_89(Self)
-            ShowInfoText('before jump', 500)
             ChrJump(Self, Self, 0, 0, 0, 3000, 1000)
-            ShowInfoText('after jump', 1000)
-            ChrMove(Self, 0xF0, 0, 0, 0, 0, 0)
-            # WaitChrThread(Self, 0)
+            # ChrMove(Self, 0xF0, 0, 0, 0, 0, 0)
             AS_9C(Self)
             Yield()
             Return()
 
         QueueWorkItem(TargetChr, 1, underattack)
 
-        # ShowEff(0x1:b, 0xFF:b, Target, 0x3:s, 0x0:i, 0x0:i, 0x0:i, 0x0:s, 0x0:s, 0x0:s, 0x3E8:s, 0x3E8:s, 0x3E8:s, 0xFF:b)
-        Sleep(50)
+        PlayEffect(TargetChr, TargetChr, hitEff, 3, 0, -500, 0, 0, 0, 0, 500, 500, 500, 0xFF)
         Yield()
         NextTarget()
         Jump('钢盔断_next_target')
 
         label('钢盔断_next_target_end')
 
-        # WaitChrThread(0xFC, 1)
-        # WaitChrThread(0xFC, 2)
+        WaitChrThread(0xFC, 1)
+        WaitChrThread(0xFC, 2)
 
         ResetTarget()
 
@@ -142,25 +140,22 @@ def main():
 
         label('钢盔断_damage_next_target_end')
 
-        # AS_8F(0)
+        AS_8F(0)
         Return()
 
-    for _ in range(2):
-        PlayEffect(Self, Self, 4, 5, 0, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-        PlayEffect(Self, Self, 4, 5, 1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-        PlayEffect(Self, Self, 4, 5, -1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-        Sleep(50)
-        Yield()
+    PlayEffect(Self, Self, earthEff, 5, 0, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, 1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, -1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
 
     ResetLookingTargetData()
     LookingTargetAdd(0xFC, "", 0)
     LookingTargetAdd(Self, "", 0)
-    LookingTarget(500, 0x8, 0xF)
+    LookingTarget(500, 20, 20)
     CancelBlur(1500)
 
-    QueueWorkItem(Self, 2, damage)
-    # damage()
-    Sleep(500)
+    # QueueWorkItem(Self, 2, damage)
+    # Sleep(500)
+    damage()
     Yield()
 
     WaitChrThread(Self, 1)
@@ -170,4 +165,5 @@ def main():
     Sleep(500)
     Yield()
 
-    FreeEffect(4)
+    for eff in effList:
+        FreeEffect(eff)

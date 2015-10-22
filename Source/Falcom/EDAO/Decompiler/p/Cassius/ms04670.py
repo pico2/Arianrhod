@@ -109,10 +109,10 @@ def main():
                     CraftRange.Target,
                     CraftState.Physical, CraftState.NoneState,
                     3, 1,
-                    0, 10,
+                    0, 0,
                     0,
                     2,
-                    30, 0,
+                    0, 0,
                     0, 0,
                )
 

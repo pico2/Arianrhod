@@ -161,7 +161,7 @@ InstructionNames[0xA0] = 'AS_A0'
 InstructionNames[0xA1] = 'PlayEffectIfConditionExist'
 InstructionNames[0xA6] = 'AS_A6'
 InstructionNames[0xA7] = 'AS_A7'
-InstructionNames[0xA8] = 'DamageVoice'
+InstructionNames[0xA8] = 'AS_A8'
 InstructionNames[0xA9] = 'SetEffectColor'
 InstructionNames[0xAC] = 'AS_AC'
 InstructionNames[0xAD] = 'AS_AD'
@@ -572,7 +572,7 @@ edao_as_op_list = \
     inst(PlayEffectIfConditionExist,    'BLWS'),            # PlayEffectIfConditionExist(target, condition_flags, eff_index, '')
     inst(AS_A6,                         'BBLLB'),
     inst(AS_A7,                         'BBBhhhhhhh'),
-    inst(DamageVoice,                         'BB'),
+    inst(AS_A8,                         'BB'),
     inst(SetEffectColor,                'BCL'),             # SetEffectColor(owner, eff_handle, rgba)
     inst(AS_AC,                         'LL'),
     inst(AS_AD,                         'B'),

@@ -7,6 +7,7 @@ cd/d "%~dp0"
 ::for /f %%i in ('dir/s/b ms*.py') do %%i
 
 for /f %%i in ('dir/s/b Cassius\?s*.py') do %%i
+::for /f %%i in ('dir/s/b Arianrhod\?s*.py') do %%i
 
 move /y *._bn D:\Game\Falcom\ED_AO\Ouroboros\system
 move /y *._dt D:\Game\Falcom\ED_AO\Ouroboros\text
