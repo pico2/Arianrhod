@@ -31,9 +31,9 @@ def main():
         'stub_craft',                       # 0E 14
         "SysCraft_Counter",                 # 0F 15
         "Craft_百烈击",                      # 10 16
-        "Craft_钢盔回旋踢",                  # 11 17
+        "Craft_钢盔回旋踢",                 # 11 17
         "Craft_钢盔断",                     # 12 18
-        EMPTY_ACTION,                       # 13 19
+        "Craft_神罗天征",                   # 13 19
         EMPTY_ACTION,                       # 14 20
         EMPTY_ACTION,                       # 15 21
         EMPTY_ACTION,                       # 16 22
@@ -85,6 +85,10 @@ def main():
     label('Craft_钢盔断')
     import 钢盔断
     钢盔断.main()
+    Return()
+
+    label('Craft_神罗天征')
+    PlayBGM(0, 0x228)
     Return()
 
     label('stub_craft')

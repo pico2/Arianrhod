@@ -47,7 +47,6 @@ def main():
     ShowChrTrails(Self, 50, 200)
 
     def attackInTheSky():
-        SoundEx(256, 0)
 
         # SetChrSubChip(Self, 6)
         # Sleep(60)
@@ -84,7 +83,18 @@ def main():
     QueueWorkItem(Self, 1, jumpInTheSky)
     ChrJump(Self, Self, 0, 0, 0, 3000, 2000)
     WaitChrThread(Self, 1)
+
     QueueWorkItem(Self, 1, attackInTheSky)
+    Sleep(10)
+    Yield()
+
+    PlayEffect(Self, Self, earthEff, 5, 0, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, 1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, -1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
+    Sleep(10)
+    Yield()
+
+    SoundEx(256, 0)
 
     HideChrTrails(Self)
     ShakeScreen(200, 200, 200, 500)
@@ -142,10 +152,6 @@ def main():
 
         AS_8F(0)
         Return()
-
-    PlayEffect(Self, Self, earthEff, 5, 0, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-    PlayEffect(Self, Self, earthEff, 5, 1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-    PlayEffect(Self, Self, earthEff, 5, -1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
 
     ResetLookingTargetData()
     LookingTargetAdd(0xFC, "", 0)

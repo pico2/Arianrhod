@@ -483,7 +483,9 @@ INT NTAPI LeEnumFontCallbackW(CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW
             break;
 
         if (lf->lfCharSet == ANSI_CHARSET)
-            ((LPLOGFONTW)lf)->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
+            break;
+
+        ((LPLOGFONTW)lf)->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
 
         //if (lf->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
         //    break;
