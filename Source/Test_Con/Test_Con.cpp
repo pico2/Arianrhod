@@ -122,74 +122,11 @@ void quick_sort(int *array, int count)
 
 #include "iTunes/iTunes.h"
 
-
-
-VOID GenerateModuleList(ml::String &ModuleNames)
-{
-    PVOID                               Address, BaseAddress, LastAllocationBase;
-    ULONG_PTR                           Size, Need, BufferSize;
-    NTSTATUS                            Status;
-    SYSTEM_BASIC_INFORMATION            SystemBasic;
-    MEMORY_BASIC_INFORMATION            MemoryBasic;
-
-    union
-    {
-        MEMORY_MAPPED_FILENAME_INFORMATION2 MappedFile;
-        BYTE MappedFileBuffer[0x2000];
-    };
-
-    Status = NtQuerySystemInformation(SystemBasicInformation, &SystemBasic, sizeof(SystemBasic), nullptr);
-    if (!NT_SUCCESS(Status))
-        return;
-
-    LastAllocationBase = IMAGE_INVALID_VA;
-    BaseAddress = (PVOID)SystemBasic.MinimumUserModeAddress;
-    BaseAddress = nullptr;
-
-    for (; (ULONG_PTR)BaseAddress < SystemBasic.MaximumUserModeAddress; BaseAddress = PtrAdd(BaseAddress, MemoryBasic.RegionSize))
-    {
-        MemoryBasic.RegionSize = MEMORY_PAGE_SIZE;
-        Status = NtQueryVirtualMemory(CurrentProcess, BaseAddress, MemoryBasicInformation, &MemoryBasic, sizeof(MemoryBasic), nullptr);
-        FAIL_CONTINUE(Status);
-
-        BaseAddress = MemoryBasic.BaseAddress;
-
-        if (MemoryBasic.Type != MEM_IMAGE || MemoryBasic.AllocationBase == LastAllocationBase)
-            continue;
-
-        LastAllocationBase = MemoryBasic.AllocationBase;
-
-        Status = NtQueryVirtualMemory(CurrentProcess, BaseAddress, MemoryMappedFilenameInformation, &MappedFile, sizeof(MappedFileBuffer), nullptr);
-        if (NT_FAILED(Status) || MappedFile.Name.Length == 0)
-            continue;
-
-        UNICODE_STRING DosPath;
-
-        Status = Io::QueryDosPathFromNtDeviceName(&DosPath, &MappedFile.Name);
-
-        ModuleNames += ml::String::Format(L"%p: %wZ\n", BaseAddress, NT_SUCCESS(Status) ? &DosPath : &MappedFile.Name);
-
-        RtlFreeUnicodeString(&DosPath);
-    }
-}
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    ml::MlInitialize();
-
-    iTunesApi::Initialize();
-
-    String s;
-
-    GenerateModuleList(s);
-
-    PrintConsole(L"AMDeviceConnect = %p\n", iTunesApi::AMD::AMDeviceConnect);
-    wprintf(L"%s\n", s);
-    PauseConsole(L"any key");
-
-    Ps::ExitProcess(0);
+    PrintLocaleDefaultAnsiCodePage();
 
     return;
 
