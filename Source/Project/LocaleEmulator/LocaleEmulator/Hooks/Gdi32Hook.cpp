@@ -297,8 +297,6 @@ NTSTATUS LeGlobalData::AdjustFontDataInternal(PADJUST_FONT_DATA AdjustData)
     if (TableSize == GDI_ERROR)
         return STATUS_OBJECT_NAME_NOT_FOUND;
 
-    return -1;
-
     RtlInitEmptyString(&FaceName, FaceNameBuffer, sizeof(FaceNameBuffer));
     RtlInitEmptyString(&FullName, FullNameBuffer, sizeof(FullNameBuffer));
 
@@ -504,11 +502,11 @@ INT NTAPI LeEnumFontCallbackW(CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW
         if (EnumParam->Charset != DEFAULT_CHARSET)
             break;
 
-        //PrintConsole(L"%s @ %d\n", lf->lfFaceName, lf->lfCharSet);
+        PrintConsole(L"%s @ %d\n", lf->lfFaceName, lf->lfCharSet);
 
-        if (lf->lfCharSet == ANSI_CHARSET &&
-            lf->lfCharSet == DEFAULT_CHARSET &&
-            lf->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+        if (lf->lfCharSet != ANSI_CHARSET &&
+            lf->lfCharSet != DEFAULT_CHARSET &&
+            lf->lfCharSet != EnumParam->GlobalData->GetLePeb()->OriginalCharset)
         {
             break;
         }
