@@ -297,6 +297,8 @@ NTSTATUS LeGlobalData::AdjustFontDataInternal(PADJUST_FONT_DATA AdjustData)
     if (TableSize == GDI_ERROR)
         return STATUS_OBJECT_NAME_NOT_FOUND;
 
+    return -1;
+
     RtlInitEmptyString(&FaceName, FaceNameBuffer, sizeof(FaceNameBuffer));
     RtlInitEmptyString(&FullName, FullNameBuffer, sizeof(FullNameBuffer));
 
@@ -386,6 +388,26 @@ NTSTATUS LeGlobalData::AdjustFontData(HDC DC, LPENUMLOGFONTEXW EnumLogFontEx, PT
                 GetTextMetricsW(DC, &TextMetric->TextMetricW))
             {
                 TextMetric->Filled = TRUE;
+                /*TextMetric->TextMetricA.tmHeight = TextMetric->TextMetricW.tmHeight;
+                TextMetric->TextMetricA.tmAscent = TextMetric->TextMetricW.tmAscent;
+                TextMetric->TextMetricA.tmDescent = TextMetric->TextMetricW.tmDescent;
+                TextMetric->TextMetricA.tmInternalLeading = TextMetric->TextMetricW.tmInternalLeading;
+                TextMetric->TextMetricA.tmExternalLeading = TextMetric->TextMetricW.tmExternalLeading;
+                TextMetric->TextMetricA.tmAveCharWidth = TextMetric->TextMetricW.tmAveCharWidth;
+                TextMetric->TextMetricA.tmMaxCharWidth = TextMetric->TextMetricW.tmMaxCharWidth;
+                TextMetric->TextMetricA.tmWeight = TextMetric->TextMetricW.tmWeight;
+                TextMetric->TextMetricA.tmOverhang = TextMetric->TextMetricW.tmOverhang;
+                TextMetric->TextMetricA.tmDigitizedAspectX = TextMetric->TextMetricW.tmDigitizedAspectX;
+                TextMetric->TextMetricA.tmDigitizedAspectY = TextMetric->TextMetricW.tmDigitizedAspectY;
+                TextMetric->TextMetricA.tmFirstChar = TextMetric->TextMetricW.tmFirstChar;
+                TextMetric->TextMetricA.tmLastChar = TextMetric->TextMetricW.tmLastChar;
+                TextMetric->TextMetricA.tmDefaultChar = TextMetric->TextMetricW.tmDefaultChar;
+                TextMetric->TextMetricA.tmBreakChar = TextMetric->TextMetricW.tmBreakChar;
+                TextMetric->TextMetricA.tmItalic = TextMetric->TextMetricW.tmItalic;
+                TextMetric->TextMetricA.tmUnderlined = TextMetric->TextMetricW.tmUnderlined;
+                TextMetric->TextMetricA.tmStruckOut = TextMetric->TextMetricW.tmStruckOut;
+                TextMetric->TextMetricA.tmPitchAndFamily = TextMetric->TextMetricW.tmPitchAndFamily;
+                TextMetric->TextMetricA.tmCharSet = TextMetric->TextMetricW.tmCharSet;*/
             }
         }
     }
@@ -482,13 +504,16 @@ INT NTAPI LeEnumFontCallbackW(CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW
         if (EnumParam->Charset != DEFAULT_CHARSET)
             break;
 
-        if (lf->lfCharSet == ANSI_CHARSET)
+        //PrintConsole(L"%s @ %d\n", lf->lfFaceName, lf->lfCharSet);
+
+        if (lf->lfCharSet == ANSI_CHARSET &&
+            lf->lfCharSet == DEFAULT_CHARSET &&
+            lf->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+        {
             break;
+        }
 
         ((LPLOGFONTW)lf)->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
-
-        //if (lf->lfCharSet == EnumParam->GlobalData->GetLePeb()->OriginalCharset)
-        //    break;
     }
 
     //if (wcscmp(lf->lfFaceName, L"MS Gothic") == 0) _asm int 4;
