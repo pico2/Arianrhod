@@ -122,11 +122,29 @@ void quick_sort(int *array, int count)
 
 #include "iTunes/iTunes.h"
 
+using ml::HashTableT;
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    HashTableT<LOGFONTW> table;
+    ULONG hash[3];
 
-    PrintLocaleDefaultAnsiCodePage();
+    table.Initialize();
+
+    EnumFontsW(GetDC(nullptr), nullptr, 
+        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW, DWORD FontType, LPARAM param) -> INT
+        {
+            if (wcsstr(lf->lfFaceName, L"MS Gothic")) PrintConsole(L"%s@%d\n", (LPENUMLOGFONTEXW(lf))->elfFullName, lf->lfCharSet);
+            ((HashTableT<LOGFONTW> *)param)->Add(String::Format(L"%s@%d", (LPENUMLOGFONTEXW(lf))->elfFullName, lf->lfCharSet), *lf);
+            return 1;
+        },
+        (LPARAM)&table
+    );
+
+    PrintConsole(L"22 %s\n", table.Get(L"MS Gothic@0")->lfFaceName);
+
+    Ps::ExitProcess(0);
 
     return;
 

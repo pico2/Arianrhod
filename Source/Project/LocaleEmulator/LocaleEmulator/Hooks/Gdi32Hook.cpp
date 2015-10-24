@@ -109,6 +109,28 @@ VOID LeGlobalData::GetTextMetricsWFromLogFont(PTEXTMETRICW TextMetricW, CONST LO
     DeleteDC(hDC);
 }
 
+PTEXT_METRIC_INTERNAL LeGlobalData::GetTextMetricFromCache(LPENUMLOGFONTEXW LogFont)
+{
+    WCHAR buf[LF_FULLFACESIZE * 2];
+
+    swprintf(buf, L"%s@%d", LogFont->elfFullName, LogFont->elfLogFont.lfCharSet);
+
+    auto r = this->TextMetricCache.Get(buf);
+
+    return r;
+}
+
+VOID LeGlobalData::AddTextMetricToCache(LPENUMLOGFONTEXW LogFont, PTEXT_METRIC_INTERNAL TextMetric)
+{
+    WCHAR buf[LF_FULLFACESIZE * 2];
+
+    swprintf(buf, L"%s@%d", LogFont->elfFullName, LogFont->elfLogFont.lfCharSet);
+
+    //PrintConsole(L"add %s\n", buf);
+
+    this->TextMetricCache.Add(buf, *TextMetric);
+}
+
 HGDIOBJ NTAPI LeGetStockObject(LONG Object)
 {
     HGDIOBJ         StockObject;
@@ -494,37 +516,68 @@ INT NTAPI LeEnumFontCallbackW(CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW
     NTSTATUS                Status;
     PGDI_ENUM_FONT_PARAM    EnumParam;
     TEXT_METRIC_INTERNAL    TextMetric;
+    LPENUMLOGFONTEXW        EnumLogFontEx;
+    ULONG_PTR               LogFontCharset;
 
     EnumParam = (PGDI_ENUM_FONT_PARAM)param;
+    EnumLogFontEx = (LPENUMLOGFONTEXW)lf;
+    LogFontCharset = EnumLogFontEx->elfLogFont.lfCharSet;
 
     LOOP_ONCE
     {
-        if (EnumParam->Charset != DEFAULT_CHARSET)
-            break;
+        PTEXT_METRIC_INTERNAL CachedTextMetric;
 
-        PrintConsole(L"%s @ %d\n", lf->lfFaceName, lf->lfCharSet);
-
-        if (lf->lfCharSet != ANSI_CHARSET &&
-            lf->lfCharSet != DEFAULT_CHARSET &&
-            lf->lfCharSet != EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+        CachedTextMetric = EnumParam->GlobalData->GetTextMetricFromCache(EnumLogFontEx);
+        if (CachedTextMetric != nullptr)
         {
+            if (CachedTextMetric->VerifyMagic() == FALSE)
+                return TRUE;
+
+            TextMetric.TextMetricA = CachedTextMetric->TextMetricA;
+            TextMetric.TextMetricW = CachedTextMetric->TextMetricW;
+            TextMetric.Filled = TRUE;
             break;
         }
 
-        ((LPLOGFONTW)lf)->lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
+        LOOP_ONCE
+        {
+            if (EnumParam->Charset != DEFAULT_CHARSET)
+                break;
+
+            if (lf->lfCharSet != ANSI_CHARSET &&
+                lf->lfCharSet != DEFAULT_CHARSET &&
+                lf->lfCharSet != EnumParam->GlobalData->GetLePeb()->OriginalCharset)
+            {
+                break;
+            }
+
+            EnumLogFontEx->elfLogFont.lfCharSet = EnumParam->GlobalData->GetLeb()->DefaultCharset;
+        }
+
+        //if (wcscmp(lf->lfFaceName, L"MS Gothic") == 0) _asm int 4;
+        //PrintConsole(L"Original:        %s\n", lf->lfFaceName);
+
+        Status = EnumParam->GlobalData->AdjustFontData(EnumParam->DC, EnumLogFontEx, &TextMetric, FontType);
+
+        ENUMLOGFONTEXW Captured = *EnumLogFontEx;
+
+        Captured.elfLogFont.lfCharSet = LogFontCharset;
+
+        if (Status == STATUS_OBJECT_NAME_NOT_FOUND || Status == STATUS_CONTEXT_MISMATCH)
+        {
+            TextMetric.Magic = 0;
+            EnumParam->GlobalData->AddTextMetricToCache(&Captured, &TextMetric);
+            return TRUE;
+        }
+
+        EnumParam->GlobalData->AddTextMetricToCache(&Captured, &TextMetric);
     }
-
-    //if (wcscmp(lf->lfFaceName, L"MS Gothic") == 0) _asm int 4;
-    //PrintConsole(L"Original:        %s\n", lf->lfFaceName);
-
-    Status = EnumParam->GlobalData->AdjustFontData(EnumParam->DC, (LPENUMLOGFONTEXW)lf, &TextMetric, FontType);
-    if (Status == STATUS_OBJECT_NAME_NOT_FOUND || Status == STATUS_CONTEXT_MISMATCH)
-        return TRUE;
 
     if (TextMetric.Filled == FALSE)
     {
         TextMetric.TextMetricW = *TextMetricW;
         TextMetric.Magic = 0;
+        EnumLogFontEx->elfLogFont.lfCharSet = LogFontCharset;
     }
 
     TextMetricW = &TextMetric.TextMetricW;
