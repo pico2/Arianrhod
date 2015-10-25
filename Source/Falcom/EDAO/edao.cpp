@@ -180,6 +180,8 @@ NTSTATUS InitializeRedirectEntry()
     ExeNtPath = ExeNtPath.SubString(0, ExeNtPath.GetCount() - Module->BaseDllName.Length / sizeof(Module->BaseDllName.Buffer[0]));
     DataPath = ExeNtPath + L"data\\";
 
+    RedirectSubDirectory->Add({});
+    RedirectSubDirectory->Add({ DataPath, ExeNtPath + L"Ouroboros\\" });
     RedirectSubDirectory->Add({ DataPath, ExeNtPath + L"patch\\" });
 
     for (ULONG_PTR index = 1; ;++index)
@@ -191,9 +193,6 @@ NTSTATUS InitializeRedirectEntry()
 
         RedirectSubDirectory->Add({ DataPath, patch});
     }
-
-    RedirectSubDirectory->Add({ DataPath, ExeNtPath + L"Ouroboros\\" });
-    RedirectSubDirectory->Add({});
 
     return STATUS_SUCCESS;
 }
@@ -225,7 +224,7 @@ NTSTATUS GetRedirectedFileName(PUNICODE_STRING OriginalFile, PUNICODE_STRING Red
     Buffer = (PWSTR)AllocStack(BufferLength);
     SubFilePath = OriginalPath;
 
-    FOR_EACH_VEC(Entry, *GlobalRedirectEntry)
+    FOR_EACH_VEC_REVERSE(Entry, *GlobalRedirectEntry)
     {
         if (!Entry->Original)
             return STATUS_NOT_FOUND;

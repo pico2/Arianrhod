@@ -127,40 +127,6 @@ using ml::HashTableT;
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    HashTableT<LOGFONTW> table;
-    ULONG hash[3];
-
-    table.Initialize();
-
-    EnumDirectoryFiles(nullptr, L"*.*", 0, L"D:\\Game\\Falcom\\ED_AO", 0, 
-        [] (PVOID, PWIN32_FIND_DATAW fd, ULONG_PTR param) -> LONG
-        {
-            ((HashTableT<LOGFONTW> *)param)->Add(fd->cFileName, {});
-            return 1;
-        },
-        (ULONG_PTR)&table,
-        EDF_SUBDIR
-    );
-
-    table.Remove(L"D:\\Game\\Falcom\\ED_AO\\ED_AO_CRACK.exe");
-
-    PrintConsole(L"%d\n", table.Count());
-
-    ULONG64 beg, end;
-
-    beg = NtGetTickCount();
-
-    for (ULONG_PTR len = 100000000; len != 0; --len)
-    {
-    	table.Get(L"MS Gothic@0");
-        //YieldProcessor();
-    }
-
-    end = NtGetTickCount();
-
-    wprintf(L"took %f\n", (end - beg) / 1000.f);
-
-    Ps::ExitProcess(0);
 
     return;
 
