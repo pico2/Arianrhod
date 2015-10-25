@@ -132,17 +132,33 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     table.Initialize();
 
-    EnumFontsW(GetDC(nullptr), nullptr, 
-        [] (CONST LOGFONTW *lf, CONST TEXTMETRICW *TextMetricW, DWORD FontType, LPARAM param) -> INT
+    EnumDirectoryFiles(nullptr, L"*.*", 0, L"D:\\Game\\Falcom\\ED_AO", 0, 
+        [] (PVOID, PWIN32_FIND_DATAW fd, ULONG_PTR param) -> LONG
         {
-            if (wcsstr(lf->lfFaceName, L"MS Gothic")) PrintConsole(L"%s@%d\n", (LPENUMLOGFONTEXW(lf))->elfFullName, lf->lfCharSet);
-            ((HashTableT<LOGFONTW> *)param)->Add(String::Format(L"%s@%d", (LPENUMLOGFONTEXW(lf))->elfFullName, lf->lfCharSet), *lf);
+            ((HashTableT<LOGFONTW> *)param)->Add(fd->cFileName, {});
             return 1;
         },
-        (LPARAM)&table
+        (ULONG_PTR)&table,
+        EDF_SUBDIR
     );
 
-    PrintConsole(L"22 %s\n", table.Get(L"MS Gothic@0")->lfFaceName);
+    table.Remove(L"D:\\Game\\Falcom\\ED_AO\\ED_AO_CRACK.exe");
+
+    PrintConsole(L"%d\n", table.Count());
+
+    ULONG64 beg, end;
+
+    beg = NtGetTickCount();
+
+    for (ULONG_PTR len = 100000000; len != 0; --len)
+    {
+    	table.Get(L"MS Gothic@0");
+        //YieldProcessor();
+    }
+
+    end = NtGetTickCount();
+
+    wprintf(L"took %f\n", (end - beg) / 1000.f);
 
     Ps::ExitProcess(0);
 
