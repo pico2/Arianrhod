@@ -16,11 +16,11 @@ def main():
     ]
 
     with ResourceLock:
-        LoadEffect(showupEff,      "battle/cr007200.eff")
-        LoadEffect(turnAroundEff, "battle/cr007100.eff")
-        LoadEffect(kickEff,        "battle/cr007400.eff")
-        LoadEffect(hitEff,         "battle/ms00000.eff")
-        LoadChrChip(attackChip,    CHR_Cassius_Attack, 0xFF)
+        LoadEffect(showupEff,       "battle/cr007200.eff")
+        LoadEffect(turnAroundEff,   "battle/cr007100.eff")
+        LoadEffect(kickEff,         "battle/cr007400.eff")
+        LoadEffect(hitEff,          "battle/ms00000.eff")
+        LoadChrChip(attackChip,     CHR_Cassius_Attack, 0xFF)
 
     # ResetLookingTargetData()
     # LookingTargetAdd(0xFF, "", 0x0)

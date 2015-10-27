@@ -88,9 +88,9 @@ def main():
     Sleep(10)
     Yield()
 
-    PlayEffect(Self, Self, earthEff, 5, 0, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-    PlayEffect(Self, Self, earthEff, 5, 1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
-    PlayEffect(Self, Self, earthEff, 5, -1000, 0, 0, 0, 0, 0, 800, 800, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, 0, 0, 0, 0, 0, 0, 800, 2000, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, 1000, 0, 0, 0, 0, 0, 800, 2000, 800, 0xFF)
+    PlayEffect(Self, Self, earthEff, 5, -1000, 0, 0, 0, 0, 0, 800, 2000, 800, 0xFF)
     Sleep(10)
     Yield()
 

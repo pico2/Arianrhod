@@ -33,7 +33,7 @@ def main():
 
     Level              = 120
     MaximumHP          = 59000
-    InitialHP          = 100
+    InitialHP          = 59000
     MaximumEP          = 9000
     InitialEP          = 9000
     MaximumCP          = 200
@@ -157,7 +157,7 @@ def main():
                     0, 0,
                     0,
                     0,
-                    0, 0,
+                    50, 0,
                     0, 0,
                )
 

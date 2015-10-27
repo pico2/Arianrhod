@@ -521,4 +521,5 @@ class CraftTarget:
     TargetPos   = 0xFB
     Self        = 0xFF
     InitialPos  = 0xFD
+    OriginalPos = 0xF0
 

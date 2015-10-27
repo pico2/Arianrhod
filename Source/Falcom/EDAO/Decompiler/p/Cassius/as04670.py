@@ -88,7 +88,8 @@ def main():
     Return()
 
     label('Craft_神罗天征')
-    PlayBGM(0, 9999)
+    import 神罗天征
+    神罗天征.main()
     Return()
 
     label('stub_craft')

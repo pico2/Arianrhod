@@ -439,8 +439,8 @@ edao_as_op_list = \
     inst(SetTeamRushState,              'B'),
     inst(ChrJumpToMonster,              'HH'),              # ChrJumpToMonster(hight, speed)
     inst(ChrJumpBack,                   'HH'),
-    inst(ChrMove,                       'BBiiiiB'),         # ChrMove(chr, target, x, z, y, time, 0)
-    inst(LoadEffect,                    'BS'),
+    inst(ChrMove,                       'BBiiiiB'),         # ChrMove(chr, target, x, y, z, time, 0)
+    inst(LoadEffect,                    'BS'),              # LoadEffect(effId, effPath[:10])
     inst(FreeEffect,                    'B'),
     inst(AS_14,                         'B'),
     inst(WaitEffect,                    'BB'),
@@ -517,8 +517,8 @@ edao_as_op_list = \
     inst(SetBattleSpeed,                'I'),
     inst(Voice,                         'BHHHHB'),
     inst(Sound,                         'H'),
-    inst(SoundEx,                       'HB'),
-    inst(StopSound,                     'H'),
+    inst(SoundEx,                       'HB'),          # SoundEx(se, repeat)
+    inst(StopSound,                     'H'),           # StopSound(se)
     inst(AS_67,                         'WBB'),
     inst(AS_68,                         'BBL'),
     inst(LoadChrChip,                   NO_OPERAND,             0,                          as_load_chr_chip),
