@@ -128,6 +128,25 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
+    WCHAR buf[1000];
+    HashTableT<ULONG_PTR> table;
+
+    table.Initialize();
+
+    for (ULONG_PTR i = 0; i != 100000000; ++i)
+    {
+        PrintConsole(L"\r%d                      ", i);
+        table.Add(i, i);
+    }
+
+    PrintConsole(L"done\n");
+
+    for (ULONG_PTR i = 0; i != 100; ++i)
+    {
+        auto x = GetRandom32Range(0, 10000);
+        PrintConsole(L"%d = %d\n", x, *table.Get(x));
+    }
+
     return;
 
 #if ML_X86
