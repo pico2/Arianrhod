@@ -109,10 +109,10 @@ def main():
                     CraftRange.Target,
                     CraftState.Physical, CraftState.NoneState,
                     3, 1,
-                    0, 0,
+                    0, 35,
                     0,
                     2,
-                    0, 0,
+                    50, 0,
                     0, 0,
                )
 
@@ -124,10 +124,10 @@ def main():
                     CraftRange.CircleOnSelf,
                     CraftState.Physical, CraftState.NoneState,
                     1, 1,
-                    0, 0,
+                    0, 40,
                     0,
                     10,
-                    0, 0,
+                    70, 0,
                     0, 0,
                )
 
@@ -139,10 +139,10 @@ def main():
                     CraftRange.LineOnLocation,
                     CraftState.Physical, CraftState.ATDelay,
                     54, 100,
-                    0, 0,
+                    0, 40,
                     0,
                     5,
-                    0, 0,
+                    50, 0,
                     50, 0,
                )
 
@@ -154,10 +154,10 @@ def main():
                     CraftRange.FullMap,
                     CraftState.Physical, CraftState.NoneState,
                     1, 100,
-                    0, 0,
+                    0, 100,
                     0,
                     0,
-                    50, 0,
+                    100, 0,
                     0, 0,
                )
 

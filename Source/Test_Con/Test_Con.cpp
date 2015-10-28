@@ -135,7 +135,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     for (ULONG_PTR i = 0; i != 100000000; ++i)
     {
-        PrintConsole(L"\r%d                      ", i);
+        if ((i & 0xFFFF) == 0)
+            PrintConsole(L"%d                      \r", i);
+
         table.Add(i, i);
     }
 
