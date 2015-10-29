@@ -693,6 +693,12 @@ BOOL Initialize(PVOID BaseAddress)
         FunctionCallRva(0x5AA2FF, &CBattle::   NakedUpdateCraftReflectLeftTime),
 
 
+        // avatar
+
+        FunctionCallRva(0x5B6FBD, &CBattle::FindEmptyPosition),
+        FunctionJumpRva(0x276C81, &CBattle::IsAvatarLoaded),
+
+
         // inherit custom flags
 
         FunctionCallRva(0x358457, &CScript::NakedInheritSaveData),

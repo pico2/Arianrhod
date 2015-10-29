@@ -224,7 +224,7 @@ enum
 {
     CHR_FLAG_ENEMY  = 0x1000,
     CHR_FLAG_NPC    = 0x2000,
-    CHR_FLAG_PARTY = 0x4000,
+    CHR_FLAG_PARTY  = 0x4000,
     CHR_FLAG_EMPTY  = 0x8000,
 };
 
@@ -264,7 +264,6 @@ typedef union MONSTER_STATUS
 
     struct
     {
-
         USHORT                  CharPosition;               // 0x00
         USHORT                  State;                      // 0x02
         USHORT                  State2;                     // 0x04
@@ -273,8 +272,9 @@ typedef union MONSTER_STATUS
         DUMMY_STRUCT(4);                                    // 0x0C
         ULONG                   SymbolIndex;                // 0x10
         ULONG                   MSFileIndex;                // 0x14
+        ULONG                   ASFileIndex;                // 0x18
 
-        DUMMY_STRUCT(0x16C - 0x18);
+        DUMMY_STRUCT(0x16C - 0x1C);
 
         USHORT                  CurrentActionType;          // 0x16C
 
@@ -788,18 +788,66 @@ public:
     {
         AS_8D_FUNCTION_MINIMUM  = 0x70,
 
-        AS_8D_FUNCTION_REI_JI_MAI_GO    =   AS_8D_FUNCTION_MINIMUM,
+        AS_8D_FUNCTION_REI_JI_MAI_GO    = 0x70,
+        AS_8D_FUNCTION_AVATAR           = 0x71,
     };
 
     VOID NakedAS8DDispatcher();
     VOID FASTCALL AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM ASBuffer);
+    VOID HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter);
+    ULONG FASTCALL FindEmptyPosition(PMONSTER_STATUS MSData, BOOL FindEnemyOnly = FALSE);
 
+    BOOL THISCALL CloneMSData(PMONSTER_STATUS MSData, USHORT CraftIndex, PCRAFT_AI_INFO AIInfo)
+    {
+        DETOUR_METHOD(CBattle, CloneMSData, 0x9B6DF0, MSData, CraftIndex, AIInfo);
+    }
+
+    VOID THISCALL ResetCtrlData(ULONG CharPosition)
+    {
+        DETOUR_METHOD(CBattle, ResetCtrlData, 0x9A8100, CharPosition);
+    }
+
+    VOID THISCALL ResetMSData(ULONG CharPosition)
+    {
+        DETOUR_METHOD(CBattle, ResetMSData, 0x9A84D0, CharPosition);
+    }
+
+    BOOL THISCALL LoadMSData(ULONG MSFileIndex, ULONG CharPosition)
+    {
+        DETOUR_METHOD(CBattle, LoadMSData, 0x9A4A50, MSFileIndex, CharPosition);
+    }
+
+    BOOL THISCALL IsAvatarLoaded(ULONG AvatarIndex);
+
+    PROPERTY(ULONG, SummonX);
+    PROPERTY(ULONG, SummonY);
+
+    GET(SummonX)
+    {
+        return *(PULONG)PtrAdd(this, 0xF3F48);
+    }
+
+    SET(SummonX)
+    {
+        *(PULONG)PtrAdd(this, 0xF3F48) = value;
+    }
+
+    GET(SummonY)
+    {
+        return *(PULONG)PtrAdd(this, 0xF3F4C);
+    }
+
+    SET(SummonY)
+    {
+        *(PULONG)PtrAdd(this, 0xF3F4C) = value;
+    }
 
     /************************************************************************
       enemy sbreak
     ************************************************************************/
 
-#define THINK_SBREAK_FILTER TAG4('THSB')
+#define THINK_SBREAK_FILTER         TAG4('THSB')
+#define FIND_EMPTY_POSITION_FILTER  TAG4('EPOS')
 
     VOID NakedGetBattleState();
     VOID FASTCALL HandleBattleState(ULONG_PTR CurrentState);

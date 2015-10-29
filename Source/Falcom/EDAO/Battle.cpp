@@ -523,7 +523,96 @@ VOID FASTCALL CBattle::AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM Param
             UpdateHP(MSData, Increment, Initial);
         }
         break;
+
+        case AS_8D_FUNCTION_AVATAR:
+            HandleAvatar(MSData, Parameter);
+            break;
     }
+}
+
+VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
+{
+    ULONG           MSFileIndex, CharPosition;
+    COORD           TargetPos;
+    PCRAFT_AI_INFO  AIInfo;
+
+    if (MSData->SelectedActionType != ACTION_CRAFT)
+        return;
+
+    MSFileIndex = Parameter->Param[0];
+    if (MSFileIndex == 0)
+        return;
+
+    CharPosition = FindEmptyPosition(MSData, FLAG_ON(MSData->State, CHR_FLAG_PARTY));
+    if (CharPosition == -1)
+        return;
+
+    TEB_ACTIVE_FRAME Frame(FIND_EMPTY_POSITION_FILTER);
+
+    Frame.Data = CharPosition;
+    Frame.Push();
+
+    AIInfo = &MSData->CraftAiInfo[MSData->CurrentAiIndex];
+
+    LOOP_ONCE
+    {
+        TargetPos = MSData->SelectedTargetPos;
+        if (this->CloneMSData(MSData, MSData->CurrentCraftIndex, AIInfo) == FALSE)
+            break;
+
+        MSData->SelectedTargetPos = TargetPos;
+
+        this->ResetCtrlData(CharPosition);
+        this->ResetMSData(CharPosition);
+        if (this->LoadMSData(MSFileIndex, CharPosition) == FALSE)
+            break;
+
+        this->SummonX = TargetPos.X;
+        this->SummonY = TargetPos.Y;
+
+        *(PFLOAT)(PtrAdd(this, 0x660 + CharPosition * 0x31C)) = TargetPos.X;
+        *(PFLOAT)(PtrAdd(this, 0x668 + CharPosition * 0x31C)) = TargetPos.Y;
+
+        // reset ctrl data
+        // reset ms data
+        // load ms data
+    }
+}
+
+ULONG CBattle::FindEmptyPosition(PMONSTER_STATUS MSData, BOOL FindEnemyOnly /* = FALSE */)
+{
+    ULONG_PTR Index, InvalidPosition;
+    PTEB_ACTIVE_FRAME Frame;
+
+    Frame = FindThreadFrame(FIND_EMPTY_POSITION_FILTER);
+    if (Frame != nullptr)
+        return Frame->Data;
+
+    Index           = FindEnemyOnly ? 8 : 0;
+    MSData          = MSData - MSData->CharPosition + Index;
+    InvalidPosition = 0x78080;
+
+    for (; Index != MAXIMUM_CHR_NUMBER_IN_BATTLE; ++MSData, ++Index)
+    {
+        if (FLAG_ON(MSData->State, CHR_FLAG_EMPTY) && FLAG_OFF(InvalidPosition, 1 << Index))
+            return Index;
+    }
+
+    return -1;
+}
+
+BOOL CBattle::IsAvatarLoaded(ULONG AvatarIndex)
+{
+    if (FindThreadFrame(FIND_EMPTY_POSITION_FILTER) != nullptr)
+        return TRUE;
+
+    PMONSTER_STATUS MSData;
+
+    MSData = this->GetMonsterStatus() + AvatarIndex;
+    if (FLAG_ON(MSData->State, CHR_FLAG_EMPTY))
+        return FALSE;
+
+    return FLAG_OFF(*(PBYTE)PtrAdd(this, 0x7C8 + AvatarIndex * 0x31C), 0x80);     // ??
 }
 
 NAKED VOID CBattle::NakedNoResistConditionUp()
