@@ -54,7 +54,7 @@ def main():
     EXP                = 1024
     Unknown_2E         = 0x0
     Unknown_30         = 0x0
-    AIType             = 0x0
+    AIType             = 0xFF
     Unknown_33         = 0x3E8
     Unknown_35         = 0x9
     Unknown_36         = 0xA280
@@ -183,11 +183,11 @@ def main():
                     CraftAttribute.NoAttribute,
                     CraftRange.SelectLocation,
                     CraftState.NoneState, CraftState.NoneState,
-                    1, 100,
+                    0, 0,
                     0, 0,
                     0,
                     0,
-                    0, 10,
+                    0, 0,
                     0xFF, 1,
                )
 

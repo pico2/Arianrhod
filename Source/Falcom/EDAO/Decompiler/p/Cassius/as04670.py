@@ -94,16 +94,19 @@ def main():
 
     label('Craft_精神分裂')
     LoadAvatar("ms4670")
-    # ReiJiMaiGo()
+    SendMessage(2)
+    Yield()
 
-    # label("try_walk_avatar")
+    ResetTarget()
+    label("try_walk_avatar")
 
-    # ForeachTarget("try_walk_avatar_end")
-    # TurnDirection(0xFE, 0xEC, 0, 0, 0)
-    # NextTarget()
-    # Jump("try_walk_avatar")
+    ForeachTarget("try_walk_avatar_end")
+    TurnDirection(0xFE, 0xFF, 0, 0, 0)
+    ShowChr(0xFE, 0)
+    NextTarget()
+    Jump("try_walk_avatar")
 
-    # label('try_walk_avatar_end')
+    label('try_walk_avatar_end')
 
     Return()
 

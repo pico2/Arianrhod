@@ -560,9 +560,6 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     {
         TargetPos = MSData->SelectedTargetPos;
 
-        //MSData->Target[0] = CharPosition;
-        //MSData->TargetCount = 0;
-
         if (this->LoadMSData(MSFileIndex, AVATAR_CHR_POSITION) == FALSE)
             break;
 
@@ -571,16 +568,24 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
 
         MSData->SelectedTargetPos = TargetPos;
 
-        //this->ResetCtrlData(CharPosition);
-        //this->ResetMSData(CharPosition);
-        //if (this->LoadMSData(MSFileIndex, CharPosition) == FALSE)
-        //    break;
+        this->ResetCtrlData(CharPosition);
+        this->ResetMSData(CharPosition);
+        if (this->LoadMSData(MSFileIndex, CharPosition) == FALSE)
+            break;
 
         this->SummonX = TargetPos.X;
         this->SummonY = TargetPos.Y;
 
-        *(PFLOAT)(PtrAdd(this, 0x660 + CharPosition * 0x31C)) = TargetPos.X;
-        *(PFLOAT)(PtrAdd(this, 0x668 + CharPosition * 0x31C)) = TargetPos.Y;
+        *(PFLOAT)(PtrAdd(this, 0x660 + 0x80 + CharPosition * 0x31C)) = TargetPos.X;
+        *(PFLOAT)(PtrAdd(this, 0x668 + 0x80 + CharPosition * 0x31C)) = TargetPos.Y;
+
+        GetMonsterStatus()[CharPosition].State = MSData->State;
+
+        //MSData->Target[0] = CharPosition;
+        //MSData->TargetCount = 1;
+
+        //MSData = GetMonsterStatus() + CharPosition;
+        //UpdateHP(MSData, 0, MSData->ChrStatus[BattleStatusFinal].InitialHP);
     }
 
     GetMonsterStatus()[AVATAR_CHR_POSITION] = AvatarBackup;
@@ -588,7 +593,7 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
 
 ULONG CBattle::FindEmptyPosition(BOOL FindEnemyOnly /* = FALSE */)
 {
-    ULONG_PTR           Index, InvalidPosition;
+    ULONG_PTR           Index, ValidPosition;
     PMONSTER_STATUS     MSData;
     PTEB_ACTIVE_FRAME   Frame;
 
@@ -598,11 +603,12 @@ ULONG CBattle::FindEmptyPosition(BOOL FindEnemyOnly /* = FALSE */)
 
     Index           = FindEnemyOnly ? 8 : 0;
     MSData          = this->GetMonsterStatus() + Index;
-    InvalidPosition = 0x78080;
+    ValidPosition   = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) |
+                      (1 << 8) | (1 << 9) | (1 << 0xA) | (1 << 0xB) | (1 << 0xC) | (1 << 0xD) | (1 << 0xE) | (1 << 0xF);
 
     for (; Index != MAXIMUM_CHR_NUMBER_IN_BATTLE; ++MSData, ++Index)
     {
-        if (FLAG_ON(MSData->State, CHR_FLAG_EMPTY) && FLAG_OFF(InvalidPosition, 1 << Index))
+        if (FLAG_ON(MSData->State, CHR_FLAG_EMPTY) && FLAG_ON(ValidPosition, 1 << Index))
             return Index;
     }
 
