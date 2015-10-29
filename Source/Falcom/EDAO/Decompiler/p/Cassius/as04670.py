@@ -34,7 +34,7 @@ def main():
         "Craft_钢盔回旋踢",                 # 11 17
         "Craft_钢盔断",                     # 12 18
         "Craft_神罗天征",                   # 13 19
-        EMPTY_ACTION,                       # 14 20
+        "Craft_精神分裂",                    # 14 20
         EMPTY_ACTION,                       # 15 21
         EMPTY_ACTION,                       # 16 22
         EMPTY_ACTION,                       # 17 23
@@ -90,6 +90,21 @@ def main():
     label('Craft_神罗天征')
     import 神罗天征
     神罗天征.main()
+    Return()
+
+    label('Craft_精神分裂')
+    LoadAvatar("ms4670")
+    # ReiJiMaiGo()
+
+    # label("try_walk_avatar")
+
+    # ForeachTarget("try_walk_avatar_end")
+    # TurnDirection(0xFE, 0xEC, 0, 0, 0)
+    # NextTarget()
+    # Jump("try_walk_avatar")
+
+    # label('try_walk_avatar_end')
+
     Return()
 
     label('stub_craft')

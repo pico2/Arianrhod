@@ -695,8 +695,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         // avatar
 
-        FunctionCallRva(0x5B6FBD, &CBattle::FindEmptyPosition),
-        FunctionJumpRva(0x276C81, &CBattle::IsAvatarLoaded),
+        FunctionCallRva(0x5B7E4B, &CBattle::FindEmptyPosition),
+        //FunctionJumpRva(0x276C81, &CBattle::IsAvatarLoaded),
 
 
         // inherit custom flags

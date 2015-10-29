@@ -30,6 +30,7 @@ class CBattle;
 #define MINIMUM_CUSTOM_CHAR_ID          0xB0
 #define MINIMUM_CUSTOM_CRAFT_INDEX      0x3E8
 #define MAXIMUM_CHR_NUMBER_IN_BATTLE    0x16
+#define AVATAR_CHR_POSITION             0x14
 
 
 #define PSP_WIDTH_F                       480.f
@@ -770,6 +771,7 @@ public:
     BOOL FASTCALL UpdateCraftReflectLeftTime(BOOL CanNotReflect, PMONSTER_STATUS MSData);
     VOID NakedUpdateCraftReflectLeftTime();
 
+#pragma pack(push, 1)
 
     typedef struct
     {
@@ -784,6 +786,8 @@ public:
 
     } AS_8D_PARAM, *PAS_8D_PARAM;
 
+#pragma pack(pop)
+
     enum
     {
         AS_8D_FUNCTION_MINIMUM  = 0x70,
@@ -795,7 +799,7 @@ public:
     VOID NakedAS8DDispatcher();
     VOID FASTCALL AS8DDispatcher(PMONSTER_STATUS MSData, PAS_8D_PARAM ASBuffer);
     VOID HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter);
-    ULONG FASTCALL FindEmptyPosition(PMONSTER_STATUS MSData, BOOL FindEnemyOnly = FALSE);
+    ULONG FASTCALL FindEmptyPosition(BOOL FindEnemyOnly = FALSE);
 
     BOOL THISCALL CloneMSData(PMONSTER_STATUS MSData, USHORT CraftIndex, PCRAFT_AI_INFO AIInfo)
     {

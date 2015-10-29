@@ -535,6 +535,7 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     ULONG           MSFileIndex, CharPosition;
     COORD           TargetPos;
     PCRAFT_AI_INFO  AIInfo;
+    MONSTER_STATUS  AvatarBackup;
 
     if (MSData->SelectedActionType != ACTION_CRAFT)
         return;
@@ -543,7 +544,7 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     if (MSFileIndex == 0)
         return;
 
-    CharPosition = FindEmptyPosition(MSData, FLAG_ON(MSData->State, CHR_FLAG_PARTY));
+    CharPosition = FindEmptyPosition(FLAG_OFF(MSData->State, CHR_FLAG_PARTY));
     if (CharPosition == -1)
         return;
 
@@ -553,43 +554,50 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     Frame.Push();
 
     AIInfo = &MSData->CraftAiInfo[MSData->CurrentAiIndex];
+    AvatarBackup = GetMonsterStatus()[AVATAR_CHR_POSITION];
 
     LOOP_ONCE
     {
         TargetPos = MSData->SelectedTargetPos;
+
+        //MSData->Target[0] = CharPosition;
+        //MSData->TargetCount = 0;
+
+        if (this->LoadMSData(MSFileIndex, AVATAR_CHR_POSITION) == FALSE)
+            break;
+
         if (this->CloneMSData(MSData, MSData->CurrentCraftIndex, AIInfo) == FALSE)
             break;
 
         MSData->SelectedTargetPos = TargetPos;
 
-        this->ResetCtrlData(CharPosition);
-        this->ResetMSData(CharPosition);
-        if (this->LoadMSData(MSFileIndex, CharPosition) == FALSE)
-            break;
+        //this->ResetCtrlData(CharPosition);
+        //this->ResetMSData(CharPosition);
+        //if (this->LoadMSData(MSFileIndex, CharPosition) == FALSE)
+        //    break;
 
         this->SummonX = TargetPos.X;
         this->SummonY = TargetPos.Y;
 
         *(PFLOAT)(PtrAdd(this, 0x660 + CharPosition * 0x31C)) = TargetPos.X;
         *(PFLOAT)(PtrAdd(this, 0x668 + CharPosition * 0x31C)) = TargetPos.Y;
-
-        // reset ctrl data
-        // reset ms data
-        // load ms data
     }
+
+    GetMonsterStatus()[AVATAR_CHR_POSITION] = AvatarBackup;
 }
 
-ULONG CBattle::FindEmptyPosition(PMONSTER_STATUS MSData, BOOL FindEnemyOnly /* = FALSE */)
+ULONG CBattle::FindEmptyPosition(BOOL FindEnemyOnly /* = FALSE */)
 {
-    ULONG_PTR Index, InvalidPosition;
-    PTEB_ACTIVE_FRAME Frame;
+    ULONG_PTR           Index, InvalidPosition;
+    PMONSTER_STATUS     MSData;
+    PTEB_ACTIVE_FRAME   Frame;
 
     Frame = FindThreadFrame(FIND_EMPTY_POSITION_FILTER);
     if (Frame != nullptr)
         return Frame->Data;
 
     Index           = FindEnemyOnly ? 8 : 0;
-    MSData          = MSData - MSData->CharPosition + Index;
+    MSData          = this->GetMonsterStatus() + Index;
     InvalidPosition = 0x78080;
 
     for (; Index != MAXIMUM_CHR_NUMBER_IN_BATTLE; ++MSData, ++Index)
@@ -608,7 +616,7 @@ BOOL CBattle::IsAvatarLoaded(ULONG AvatarIndex)
 
     PMONSTER_STATUS MSData;
 
-    MSData = this->GetMonsterStatus() + AvatarIndex;
+    MSData = this->GetMonsterStatus() + AvatarIndex + 0x14;
     if (FLAG_ON(MSData->State, CHR_FLAG_EMPTY))
         return FALSE;
 
