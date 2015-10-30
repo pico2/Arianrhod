@@ -131,6 +131,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
     WCHAR buf[1000];
     HashTableT<ULONG_PTR> table;
 
+    PrintLocaleDefaultAnsiCodePage();
+
     table.Initialize();
 
     for (ULONG_PTR i = 0; i != 100000000; ++i)

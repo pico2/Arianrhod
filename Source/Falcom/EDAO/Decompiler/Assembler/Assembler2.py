@@ -310,7 +310,8 @@ class Disassembler:
         FormattedBlock      = data.FormattedBlock
         block               = data.Block
 
-        if block.Offset in FormattedBlock: return
+        if block.Offset in FormattedBlock:
+            return []
 
         FormattedBlock[block.Offset] = True
 

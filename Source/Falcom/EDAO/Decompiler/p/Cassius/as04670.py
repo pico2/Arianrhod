@@ -93,7 +93,7 @@ def main():
     Return()
 
     label('Craft_精神分裂')
-    LoadAvatar("ms4670")
+    LoadAvatar("ms90010")
     SendMessage(2)
     Yield()
 

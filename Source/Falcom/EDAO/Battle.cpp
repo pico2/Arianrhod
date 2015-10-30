@@ -560,8 +560,9 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     {
         TargetPos = MSData->SelectedTargetPos;
 
-        if (this->LoadMSData(MSFileIndex, AVATAR_CHR_POSITION) == FALSE)
-            break;
+        GetMonsterStatus()[AVATAR_CHR_POSITION].State = MSData->State;
+        //if (this->LoadMSData(MSFileIndex, AVATAR_CHR_POSITION) == FALSE)
+        //    break;
 
         if (this->CloneMSData(MSData, MSData->CurrentCraftIndex, AIInfo) == FALSE)
             break;
@@ -605,6 +606,9 @@ ULONG CBattle::FindEmptyPosition(BOOL FindEnemyOnly /* = FALSE */)
     MSData          = this->GetMonsterStatus() + Index;
     ValidPosition   = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) |
                       (1 << 8) | (1 << 9) | (1 << 0xA) | (1 << 0xB) | (1 << 0xC) | (1 << 0xD) | (1 << 0xE) | (1 << 0xF);
+
+    if (FindEnemyOnly)
+        ValidPosition = 0xFF00;
 
     for (; Index != MAXIMUM_CHR_NUMBER_IN_BATTLE; ++MSData, ++Index)
     {

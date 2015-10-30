@@ -501,6 +501,8 @@ class CraftState:
 
     QueryMonsterInfo        = 0x51
 
+    State_52                = 0x52
+
     StrSpdUp_Stun           = 0x55
 
     State_5F                = 0x5F

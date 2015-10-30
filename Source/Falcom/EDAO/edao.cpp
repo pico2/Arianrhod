@@ -695,7 +695,7 @@ BOOL Initialize(PVOID BaseAddress)
 
         // avatar
 
-        FunctionCallRva(0x5B7E4B, &CBattle::FindEmptyPosition),
+        FunctionJumpRva(0x273469, &CBattle::FindEmptyPosition),
         //FunctionJumpRva(0x276C81, &CBattle::IsAvatarLoaded),
         MemoryPatchRva((ULONG64)0x9B2AE2, 4, 0x5B2EC0),
 
@@ -720,8 +720,8 @@ BOOL Initialize(PVOID BaseAddress)
 
         // acgn
 
-        //FunctionJumpRva(0x275EFD, &CBattle::LoadMSFile, &CBattle::StubLoadMSFile),  //it3
-        //FunctionJumpRva(0x5D3545, &CBattle::NakedAS_8D_5F),                         //时空大崩坏
+        FunctionJumpRva(0x275EFD, &CBattle::LoadMSFile, &CBattle::StubLoadMSFile),  //it3
+        FunctionJumpRva(0x5D3545, &CBattle::NakedAS_8D_5F),                         //时空大崩坏
 
 
         //FunctionJumpRva(0x275755, &EDAO::Fade, &EDAO::StubFade),
