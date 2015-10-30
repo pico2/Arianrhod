@@ -88,20 +88,13 @@ def main():
 
         label('continue_attack')
 
-        ResetTarget()
+        def damage():
+            Knockback(1)
+            DamageAnime(CraftTarget.TargetChr, 1, 50)
+            DamageCue(CraftTarget.TargetChr)
+            Yield()
 
-        label("神罗天征_next_target")
-
-        ForeachTarget("神罗天征_next_target_end")
-
-        Knockback(1)
-        DamageAnime(CraftTarget.TargetChr, 1, 50)
-        DamageCue(CraftTarget.TargetChr)
-        Yield()
-        NextTarget()
-        Jump("神罗天征_next_target")
-
-        label("神罗天征_next_target_end")
+        ForeachTargetEx(damage)
 
         Sleep(50)
         Jump('continue_attack')

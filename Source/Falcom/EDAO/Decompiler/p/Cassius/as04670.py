@@ -97,17 +97,14 @@ def main():
     SendMessage(2)
     Yield()
 
-    ResetTarget()
-    label("try_walk_avatar")
+    hasAvatar = GenerateUniqueLable()
+    JumpToLabelIfHasTarget(hasAvatar)
+    Return()
 
-    ForeachTarget("try_walk_avatar_end")
+    label(hasAvatar)
+
     TurnDirection(0xFE, 0xFF, 0, 0, 0)
     ShowChr(0xFE, 0)
-    NextTarget()
-    Jump("try_walk_avatar")
-
-    label('try_walk_avatar_end')
-
     Return()
 
     label('stub_craft')
