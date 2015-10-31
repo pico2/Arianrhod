@@ -733,11 +733,13 @@ BOOL Initialize(PVOID BaseAddress)
 
     PatchMemory(p, countof(p), GetExeModuleHandle());
 
-    Turbo = TRUE;
-
 #if D3D9_VER
 
     Ldr::LoadDll(L"ed_ao_ex.dll");
+
+#else
+
+    Turbo = TRUE;
 
 #endif
 

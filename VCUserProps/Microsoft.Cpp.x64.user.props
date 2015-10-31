@@ -2,8 +2,8 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ExecutablePath>D:\Dev\Compiler\VC14\x86_amd64;D:\Dev\Microsoft SDKs\Windows\v7.0\Bin\x64;$(VCInstallDir)bin\x86_amd64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH)</ExecutablePath>
-    <IncludePath>D:\Dev\MyLib\MyLibrary\;D:\Dev\MyLib\MyLibrary\Include;D:\Dev\MyLib\MyLibrary\Source;D:\Dev\MyLib\MyLibrary\Class;D:\Dev\MYLIB;D:\Dev\Windows Kits\8.0\Include\shared;D:\Dev\Windows Kits\8.0\Include\km;D:\Dev\Windows Kits\8.0\Include\um;D:\Dev\WINDDK\7600.16385.1\INC\API;D:\Dev\WINDDK\7600.16385.1\INC\CRT;D:\Dev\WINDDK\7600.16385.1\INC\DDK;D:\Dev\WINDDK\7600.16385.1\INC\MFC42;D:\Dev\WINDDK\7600.16385.1\INC\ATL71;D:\Dev\WINDDK\7600.16385.1\INC\API\CRT\STL60;D:\Dev\Library\DXSDK\Include;D:\Dev\Library\dx9c\Include;D:\Dev\Library\DXSDK\Samples\C++\DXUT\Core;D:\Dev\Library\DXSDK\Samples\C++\DXUT\Optional;D:\Dev\LIBRARY\WTL\INCLUDE;D:\Dev\LIBRARY;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Dev\MyLib\MyLibrary\Library64;D:\Dev\WinDDK\7600.16385.1\lib\win7\amd64;D:\Dev\WinDDK\7600.16385.1\lib\Mfc\amd64;D:\Dev\WINDDK\7600.16385.1\LIB\CRT\amd64;D:\Dev\WINDDK\7600.16385.1\LIB\ATL\amd64;D:\Dev\Library\DXSDK\Lib\x64;D:\Dev\Microsoft SDKs\Windows\v7.0\Lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Dev\MyLib\MyLibrary\;D:\Dev\MyLib\MyLibrary\Include;D:\Dev\MyLib\MyLibrary\Source;D:\Dev\MyLib\MyLibrary\Class;D:\Dev\MYLIB;D:\Dev\Windows Kits\8.0\Include\shared;D:\Dev\Windows Kits\8.0\Include\km;D:\Dev\Windows Kits\8.0\Include\um;D:\Dev\WINDDK\7600.16385.1\INC\API;D:\Dev\WINDDK\7600.16385.1\INC\CRT;D:\Dev\WINDDK\7600.16385.1\INC\DDK;D:\Dev\WINDDK\7600.16385.1\INC\MFC42;D:\Dev\WINDDK\7600.16385.1\INC\ATL71;D:\Dev\WINDDK\7600.16385.1\INC\API\CRT\STL60;D:\Dev\Library\DXSDK\Include;D:\Dev\Library\dx9c\Include;D:\Dev\Library\DXSDK\Samples\C++\DXUT\Core;D:\Dev\Library\DXSDK\Samples\C++\DXUT\Optional;D:\Dev\LIBRARY\WTL\INCLUDE;D:\Dev\LIBRARY;C:\Program Files (x86)\Windows Kits\10\Include\10.0.10150.0\ucrt;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Dev\MyLib\MyLibrary\Library64;D:\Dev\WinDDK\7600.16385.1\lib\win7\amd64;D:\Dev\WinDDK\7600.16385.1\lib\Mfc\amd64;D:\Dev\WINDDK\7600.16385.1\LIB\CRT\amd64;D:\Dev\WINDDK\7600.16385.1\LIB\ATL\amd64;D:\Dev\Library\DXSDK\Lib\x64;D:\Dev\Microsoft SDKs\Windows\v7.0\Lib\x64;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10150.0\ucrt\x64;$(LibraryPath)</LibraryPath>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
     <OutDir>$(SolutionDir)\$(Configuration)\$(Platform)</OutDir>
@@ -31,7 +31,7 @@
     <Link>
       <OutputFile>$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>undoc_ntdll.lib;undoc_k32.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress />
       <DataExecutionPrevention />
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
