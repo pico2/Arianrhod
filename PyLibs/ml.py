@@ -1,11 +1,13 @@
-import sys
+from ouroboros import *
 
-if sys.winver == '2.7':
-    from immdbg import *
-else:
-    from MyPyLibrary import *
+# import sys
 
-    if sys.platform == 'win32':
-        from MyPyLibrary import WinTypes
+# if sys.winver == '2.7':
+#     from immdbg import *
+# else:
+#     from MyPyLibrary import *
 
-sys.dont_write_bytecode = True
+#     if sys.platform == 'win32':
+#         from MyPyLibrary import WinTypes
+
+# sys.dont_write_bytecode = True
