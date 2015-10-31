@@ -63,13 +63,9 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/ChromeUpdater/LATEST_CHANGE
 /TempSync/ChromeUpdater/CHECK
 /Source/Hooks/Crack
-/PyLibs/eric5
-/PyLibs/eric5plugins
-/PyLibs/PyQt4
+/PyLibs/eric5*
+/PyLibs/PyQt*
 /PyLibs/sip.pyd
-/PyLibs/eric5config.py
-/PyLibs/Crypto
-/PyLibs/PIL
 
 /Source/WG/
 /Source/sources/pyv8
@@ -78,7 +74,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 
 /Source/Hooks/ZWEI2Plus/zw/
 
-/PyLibs/PyQt5
 /Source/Hooks/KrKr2Protect
 
 /TempSync/SublimeText Packages/User/Package Control.last-run
@@ -86,8 +81,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 
 /TempSync/SublimeText Packages/User/Package Control.cache
 /TempSync/SublimeText Packages/User/Preferences.sublime-settings
-/PyLibs/*.pth
-/PyLibs/MyPyLibrary/AMFHelper/PyAmfHelper.pyd
 /Source/Project/Glorius
 /Library/qt-everywhere-opensource-src-5.3.0
 /Source/sources/x64_dbg

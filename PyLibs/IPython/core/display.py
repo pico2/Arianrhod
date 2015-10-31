@@ -637,7 +637,9 @@ class Image(DisplayObject):
     _FMT_PNG = u'png'
     _ACCEPTABLE_EMBEDDINGS = [_FMT_JPEG, _FMT_PNG]
 
-    def __init__(self, data=None, url=None, filename=None, format=u'png', embed=None, width=None, height=None, retina=False):
+    def __init__(self, data=None, url=None, filename=None, format=u'png',
+                 embed=None, width=None, height=None, retina=False,
+                 unconfined=False, metadata=None):
         """Create a PNG/JPEG image object given raw data.
 
         When this object is returned by an input cell or passed to the
@@ -678,6 +680,10 @@ class Image(DisplayObject):
             from image data.
             For non-embedded images, you can just set the desired display width
             and height directly.
+        unconfined: bool
+            Set unconfined=True to disable max-width confinement of the image.
+        metadata: dict
+            Specify extra metadata to attach to the image.
 
         Examples
         --------
@@ -728,6 +734,8 @@ class Image(DisplayObject):
         self.width = width
         self.height = height
         self.retina = retina
+        self.unconfined = unconfined
+        self.metadata = metadata
         super(Image, self).__init__(data=data, url=url, filename=filename)
         
         if retina:
@@ -756,12 +764,19 @@ class Image(DisplayObject):
 
     def _repr_html_(self):
         if not self.embed:
-            width = height = ''
+            width = height = klass = ''
             if self.width:
                 width = ' width="%d"' % self.width
             if self.height:
                 height = ' height="%d"' % self.height
-            return u'<img src="%s"%s%s/>' % (self.url, width, height)
+            if self.unconfined:
+                klass = ' class="unconfined"'
+            return u'<img src="{url}"{width}{height}{klass}/>'.format(
+                url=self.url,
+                width=width,
+                height=height,
+                klass=klass,
+            )
 
     def _data_and_metadata(self):
         """shortcut for returning metadata with shape information, if defined"""
@@ -770,6 +785,10 @@ class Image(DisplayObject):
             md['width'] = self.width
         if self.height:
             md['height'] = self.height
+        if self.unconfined:
+            md['unconfined'] = self.unconfined
+        if self.metadata:
+            md.update(self.metadata)
         if md:
             return self.data, md
         else:
@@ -911,9 +930,9 @@ def set_matplotlib_formats(*formats, **kwargs):
     """
     from IPython.core.interactiveshell import InteractiveShell
     from IPython.core.pylabtools import select_figure_formats
-    from IPython.kernel.zmq.pylab.config import InlineBackend
     # build kwargs, starting with InlineBackend config
     kw = {}
+    from ipykernel.pylab.config import InlineBackend
     cfg = InlineBackend.instance()
     kw.update(cfg.print_figure_kwargs)
     kw.update(**kwargs)
@@ -942,7 +961,7 @@ def set_matplotlib_close(close=True):
         Should all matplotlib figures be automatically closed after each cell is
         run?
     """
-    from IPython.kernel.zmq.pylab.config import InlineBackend
+    from ipykernel.pylab.config import InlineBackend
     cfg = InlineBackend.instance()
     cfg.close_figures = close
 

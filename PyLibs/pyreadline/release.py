@@ -23,17 +23,28 @@ name = 'pyreadline'
 
 branch = ''
 
-version = '2.0'
+version = '2.1'
 
 description = "A python implmementation of GNU readline."
 
 long_description = \
 """
 The pyreadline package is a python implementation of GNU readline functionality
-it is based on the ctypes based UNC readline package by Gary Bishop. 
+it is based on the ctypes based UNC readline package by Gary Bishop.
 It is not complete. It has been tested for use with windows 2000 and windows xp.
 
-Version 2.0 runs on Python 2.6, 2.7, and 3.2 using the same code.
+* pyreadline 2.1 <2015-09-16>
+
+  This is a bugfix release to make pyreadline work with python 3.5.
+
+  Contributors to this release:
+
+    - Jörgen Stenarson, maintainer
+    - kivhift, improved error message for running on non windows platforms
+    - zooba, made helpful suggestions to make it work for python 3.5
+
+  Version 2.1 of pyreadline has been verfied for Python 2.7, and 3.4, 3.5.
+
 
 Features:
  *  keyboard text selection and copy/paste
@@ -41,12 +52,12 @@ Features:
  *  Control-c can be used for copy activate with allow_ctrl_c(True) in config file
  *  Double tapping ctrl-c will raise a KeyboardInterrupt, use ctrl_c_tap_time_interval(x)
     where x is your preferred tap time window, default 0.3 s.
- *  paste pastes first line of content on clipboard. 
+ *  paste pastes first line of content on clipboard.
  *  ipython_paste, pastes tab-separated data as list of lists or numpy array if all data is numeric
  *  paste_mulitline_code pastes multi line code, removing any empty lines.
- 
- 
- The latest development version is always available at the IPython subversion
+
+
+ The latest development version is always available at the IPython github
  repository_.
 
 .. _repository: https://github.com/pyreadline/pyreadline.git
@@ -55,11 +66,11 @@ Features:
 license = 'BSD'
 
 authors = {'Jorgen' : ('Jorgen Stenarson','jorgen.stenarson@kroywen.se'),
-           'Gary':    ('Gary Bishop', ''),         
-           'Jack':    ('Jack Trainor', ''),         
+           'Gary':    ('Gary Bishop', ''),
+           'Jack':    ('Jack Trainor', ''),
            }
 
-url = 'http://http://ipython.org/pyreadline.html'
+url = 'http://ipython.org/pyreadline.html'
 download_url = 'https://pypi.python.org/pypi/pyreadline/'
 platforms = ['Windows XP/2000/NT',
              'Windows 95/98/ME']
@@ -71,8 +82,9 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Environment :: Console',
                'Operating System :: Microsoft :: Windows',
                'License :: OSI Approved :: BSD License',
-               'Programming Language :: Python :: 2.6',
                'Programming Language :: Python :: 2.7',
                'Programming Language :: Python :: 3.2',
                'Programming Language :: Python :: 3.3',
+               'Programming Language :: Python :: 3.4',
+               'Programming Language :: Python :: 3.5',
                ]

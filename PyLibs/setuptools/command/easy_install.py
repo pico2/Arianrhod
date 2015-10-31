@@ -152,12 +152,9 @@ class easy_install(Command):
     create_index = PackageIndex
 
     def initialize_options(self):
-        if site.ENABLE_USER_SITE:
-            whereami = os.path.abspath(__file__)
-            self.user = whereami.startswith(site.USER_SITE)
-        else:
-            self.user = 0
-
+        # the --user option seems to be an opt-in one,
+        # so the default should be False.
+        self.user = 0
         self.zip_ok = self.local_snapshots_ok = None
         self.install_dir = self.script_dir = self.exclude_scripts = None
         self.index_url = None
@@ -203,20 +200,34 @@ class easy_install(Command):
         )
 
     def delete_blockers(self, blockers):
-        for filename in blockers:
-            if os.path.exists(filename) or os.path.islink(filename):
-                log.info("Deleting %s", filename)
-                if not self.dry_run:
-                    if (os.path.isdir(filename) and
-                            not os.path.islink(filename)):
-                        rmtree(filename)
-                    else:
-                        os.unlink(filename)
+        extant_blockers = (
+            filename for filename in blockers
+            if os.path.exists(filename) or os.path.islink(filename)
+        )
+        list(map(self._delete_path, extant_blockers))
+
+    def _delete_path(self, path):
+        log.info("Deleting %s", path)
+        if self.dry_run:
+            return
+
+        is_tree = os.path.isdir(path) and not os.path.islink(path)
+        remover = rmtree if is_tree else os.unlink
+        remover(path)
+
+    @staticmethod
+    def _render_version():
+        """
+        Render the Setuptools version and installation details, then exit.
+        """
+        ver = sys.version[:3]
+        dist = get_distribution('setuptools')
+        tmpl = 'setuptools {dist.version} from {dist.location} (Python {ver})'
+        print(tmpl.format(**locals()))
+        raise SystemExit()
 
     def finalize_options(self):
-        if self.version:
-            print('setuptools %s' % get_distribution('setuptools').version)
-            sys.exit()
+        self.version and self._render_version()
 
         py_version = sys.version.split()[0]
         prefix, exec_prefix = get_config_vars('prefix', 'exec_prefix')
@@ -240,18 +251,7 @@ class easy_install(Command):
             self.config_vars['userbase'] = self.install_userbase
             self.config_vars['usersite'] = self.install_usersite
 
-        # fix the install_dir if "--user" was used
-        # XXX: duplicate of the code in the setup command
-        if self.user and site.ENABLE_USER_SITE:
-            self.create_home_path()
-            if self.install_userbase is None:
-                raise DistutilsPlatformError(
-                    "User base directory is not specified")
-            self.install_base = self.install_platbase = self.install_userbase
-            if os.name == 'posix':
-                self.select_scheme("unix_user")
-            else:
-                self.select_scheme(os.name + "_user")
+        self._fix_install_dir_for_user_site()
 
         self.expand_basedirs()
         self.expand_dirs()
@@ -346,6 +346,21 @@ class easy_install(Command):
 
         self.outputs = []
 
+    def _fix_install_dir_for_user_site(self):
+        """
+        Fix the install_dir if "--user" was used.
+        """
+        if not self.user or not site.ENABLE_USER_SITE:
+            return
+
+        self.create_home_path()
+        if self.install_userbase is None:
+            msg = "User base directory is not specified"
+            raise DistutilsPlatformError(msg)
+        self.install_base = self.install_platbase = self.install_userbase
+        scheme_name = os.name.replace('posix', 'unix') + '_user'
+        self.select_scheme(scheme_name)
+
     def _expand_attrs(self, attrs):
         for attr in attrs:
             val = getattr(self, attr)
@@ -438,7 +453,7 @@ class easy_install(Command):
             self.pth_file = None
 
         PYTHONPATH = os.environ.get('PYTHONPATH', '').split(os.pathsep)
-        if instdir not in map(normalize_path, [_f for _f in PYTHONPATH if _f]):
+        if instdir not in map(normalize_path, filter(None, PYTHONPATH)):
             # only PYTHONPATH dirs need a site.py, so pretend it's there
             self.sitepy_installed = True
         elif self.multi_version and not os.path.exists(pth_file):
@@ -703,9 +718,7 @@ class easy_install(Command):
                 [requirement], self.local_index, self.easy_install
             )
         except DistributionNotFound as e:
-            raise DistutilsError(
-                "Could not find required distribution %s" % e.args
-            )
+            raise DistutilsError(str(e))
         except VersionConflict as e:
             raise DistutilsError(e.report())
         if self.always_copy or self.always_copy_from:
@@ -1413,13 +1426,8 @@ def extract_wininst_cfg(dist_filename):
             {'version': '', 'target_version': ''})
         try:
             part = f.read(cfglen)
-            # part is in bytes, but we need to read up to the first null
-            # byte.
-            if sys.version_info >= (2, 6):
-                null_byte = bytes([0])
-            else:
-                null_byte = chr(0)
-            config = part.split(null_byte, 1)[0]
+            # Read up to the first null byte.
+            config = part.split(b'\0', 1)[0]
             # Now the config is in bytes, but for RawConfigParser, it should
             #  be text, so decode it.
             config = config.decode(sys.getfilesystemencoding())
@@ -1531,29 +1539,26 @@ class PthDistributions(Environment):
         if not self.dirty:
             return
 
-        data = '\n'.join(map(self.make_relative, self.paths))
-        if data:
+        rel_paths = list(map(self.make_relative, self.paths))
+        if rel_paths:
             log.debug("Saving %s", self.filename)
-            data = (
-                "import sys; sys.__plen = len(sys.path)\n"
-                "%s\n"
-                "import sys; new=sys.path[sys.__plen:];"
-                " del sys.path[sys.__plen:];"
-                " p=getattr(sys,'__egginsert',0); sys.path[p:p]=new;"
-                " sys.__egginsert = p+len(new)\n"
-            ) % data
+            lines = self._wrap_lines(rel_paths)
+            data = '\n'.join(lines) + '\n'
 
             if os.path.islink(self.filename):
                 os.unlink(self.filename)
-            f = open(self.filename, 'wt')
-            f.write(data)
-            f.close()
+            with open(self.filename, 'wt') as f:
+                f.write(data)
 
         elif os.path.exists(self.filename):
             log.debug("Deleting empty %s", self.filename)
             os.unlink(self.filename)
 
         self.dirty = False
+
+    @staticmethod
+    def _wrap_lines(lines):
+        return lines
 
     def add(self, dist):
         """Add `dist` to the distribution map"""
@@ -1590,6 +1595,34 @@ class PthDistributions(Environment):
             parts.append(last)
         else:
             return path
+
+
+class RewritePthDistributions(PthDistributions):
+
+    @classmethod
+    def _wrap_lines(cls, lines):
+        yield cls.prelude
+        for line in lines:
+            yield line
+        yield cls.postlude
+
+    _inline = lambda text: textwrap.dedent(text).strip().replace('\n', '; ')
+    prelude = _inline("""
+        import sys
+        sys.__plen = len(sys.path)
+        """)
+    postlude = _inline("""
+        import sys
+        new = sys.path[sys.__plen:]
+        del sys.path[sys.__plen:]
+        p = getattr(sys, '__egginsert', 0)
+        sys.path[p:p] = new
+        sys.__egginsert = p + len(new)
+        """)
+
+
+if os.environ.get('SETUPTOOLS_SYS_PATH_TECHNIQUE', 'rewrite') == 'rewrite':
+    PthDistributions = RewritePthDistributions
 
 
 def _first_line_re():
@@ -1945,15 +1978,6 @@ class JythonCommandSpec(CommandSpec):
             __import__('java').lang.System.getProperty('os.name') != 'Linux'
         )
 
-    @classmethod
-    def from_environment(cls):
-        string = '"' + cls._sys_executable() + '"'
-        return cls.from_string(string)
-
-    @classmethod
-    def from_string(cls, string):
-        return cls([string])
-
     def as_header(self):
         """
         Workaround Jython's sys.executable being a .sh (an invalid
@@ -2016,7 +2040,8 @@ class ScriptWriter(object):
     @classmethod
     def get_args(cls, dist, header=None):
         """
-        Yield write_script() argument tuples for a distribution's entrypoints
+        Yield write_script() argument tuples for a distribution's
+        console_scripts and gui_scripts entry points.
         """
         if header is None:
             header = cls.get_header()
@@ -2024,10 +2049,20 @@ class ScriptWriter(object):
         for type_ in 'console', 'gui':
             group = type_ + '_scripts'
             for name, ep in dist.get_entry_map(group).items():
+                cls._ensure_safe_name(name)
                 script_text = cls.template % locals()
-                for res in cls._get_script_args(type_, name, header,
-                        script_text):
+                args = cls._get_script_args(type_, name, header, script_text)
+                for res in args:
                     yield res
+
+    @staticmethod
+    def _ensure_safe_name(name):
+        """
+        Prevent paths in *_scripts entry point names.
+        """
+        has_path_sep = re.search(r'[\\/]', name)
+        if has_path_sep:
+            raise ValueError("Path separators not allowed in script names")
 
     @classmethod
     def get_writer(cls, force_windows):

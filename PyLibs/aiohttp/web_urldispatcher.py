@@ -1,15 +1,14 @@
-__all__ = ('UrlDispatcher', 'UrlMappingMatchInfo',
-           'Route', 'PlainRoute', 'DynamicRoute', 'StaticRoute')
-
 import abc
 import asyncio
 
+import keyword
 import collections
 import mimetypes
 import re
 import os
 import inspect
 
+from collections.abc import Sized, Iterable, Container
 from urllib.parse import urlencode, unquote
 
 from . import hdrs
@@ -18,6 +17,10 @@ from .protocol import HttpVersion11
 from .web_exceptions import HTTPMethodNotAllowed, HTTPNotFound, HTTPNotModified
 from .web_reqrep import StreamResponse
 from .multidict import upstr
+
+
+__all__ = ('UrlDispatcher', 'UrlMappingMatchInfo',
+           'Route', 'PlainRoute', 'DynamicRoute', 'StaticRoute')
 
 
 class UrlMappingMatchInfo(dict, AbstractMatchInfo):
@@ -144,7 +147,7 @@ class StaticRoute(Route):
 
     def __init__(self, name, prefix, directory, *,
                  expect_handler=None, chunk_size=256*1024,
-                 response_factory=None):
+                 response_factory=StreamResponse):
         assert prefix.startswith('/'), prefix
         assert prefix.endswith('/'), prefix
         super().__init__(
@@ -153,10 +156,7 @@ class StaticRoute(Route):
         self._prefix_len = len(self._prefix)
         self._directory = os.path.abspath(directory) + os.sep
         self._chunk_size = chunk_size
-        if response_factory is None:
-            self._response_factory = StreamResponse
-        else:
-            self._response_factory = response_factory
+        self._response_factory = response_factory
 
         if not os.path.isdir(self._directory):
             raise ValueError(
@@ -172,6 +172,88 @@ class StaticRoute(Route):
             filename = filename[1:]
         url = self._prefix + filename
         return self._append_query(url, query)
+
+    def _sendfile_cb(self, fut, out_fd, in_fd, offset, count, loop,
+                     registered):
+        if registered:
+            loop.remove_writer(out_fd)
+        try:
+            n = os.sendfile(out_fd, in_fd, offset, count)
+            if n == 0:  # EOF reached
+                n = count
+        except (BlockingIOError, InterruptedError):
+            n = 0
+        except Exception as exc:
+            fut.set_exception(exc)
+            return
+
+        if n < count:
+            loop.add_writer(out_fd, self._sendfile_cb, fut, out_fd, in_fd,
+                            offset + n, count - n, loop, True)
+        else:
+            fut.set_result(None)
+
+    @asyncio.coroutine
+    def _sendfile_system(self, req, resp, fobj, count):
+        """
+        Write `count` bytes of `fobj` to `resp` starting from `offset` using
+        the ``sendfile`` system call.
+
+        `req` should be a :obj:`aiohttp.web.Request` instance.
+
+        `resp` should be a :obj:`aiohttp.web.StreamResponse` instance.
+
+        `fobj` should be an open file object.
+
+        `offset` should be an integer >= 0.
+
+        `count` should be an integer > 0.
+        """
+        transport = req.transport
+
+        if transport.get_extra_info("sslcontext"):
+            yield from self._sendfile_fallback(req, resp, fobj, count)
+            return
+
+        yield from resp.drain()
+
+        loop = req.app.loop
+        out_fd = transport.get_extra_info("socket").fileno()
+        in_fd = fobj.fileno()
+        fut = asyncio.Future(loop=loop)
+
+        self._sendfile_cb(fut, out_fd, in_fd, 0, count, loop, False)
+
+        yield from fut
+
+    @asyncio.coroutine
+    def _sendfile_fallback(self, req, resp, fobj, count):
+        """
+        Mimic the :meth:`_sendfile_system` method, but without using the
+        ``sendfile`` system call. This should be used on systems that don't
+        support the ``sendfile`` system call.
+
+        To avoid blocking the event loop & to keep memory usage low, `fobj` is
+        transferred in chunks controlled by the `chunk_size` argument to
+        :class:`StaticRoute`.
+        """
+        chunk_size = self._chunk_size
+
+        chunk = fobj.read(chunk_size)
+        while chunk and count > chunk_size:
+            resp.write(chunk)
+            yield from resp.drain()
+            count = count - chunk_size
+            chunk = fobj.read(chunk_size)
+
+        if chunk:
+            resp.write(chunk[:count])
+            yield from resp.drain()
+
+    if hasattr(os, "sendfile"):  # pragma: no cover
+        _sendfile = _sendfile_system
+    else:  # pragma: no cover
+        _sendfile = _sendfile_fallback
 
     @asyncio.coroutine
     def handle(self, request):
@@ -199,20 +281,12 @@ class StaticRoute(Route):
         resp.last_modified = st.st_mtime
 
         file_size = st.st_size
-        single_chunk = file_size < self._chunk_size
 
-        if single_chunk:
-            resp.content_length = file_size
-        resp.start(request)
+        resp.content_length = file_size
+        yield from resp.prepare(request)
 
         with open(filepath, 'rb') as f:
-            chunk = f.read(self._chunk_size)
-            if single_chunk:
-                resp.write(chunk)
-            else:
-                while chunk:
-                    resp.write(chunk)
-                    chunk = f.read(self._chunk_size)
+            yield from self._sendfile(request, resp, f, file_size)
 
         return resp
 
@@ -291,6 +365,23 @@ class _MethodNotAllowedMatchInfo(UrlMappingMatchInfo):
                         ', '.join(sorted(self._allowed_methods))))
 
 
+class RoutesView(Sized, Iterable, Container):
+
+    __slots__ = '_urls'
+
+    def __init__(self, urls):
+        self._urls = urls
+
+    def __len__(self):
+        return len(self._urls)
+
+    def __iter__(self):
+        yield from self._urls
+
+    def __contains__(self, route):
+        return route in self._urls
+
+
 class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
 
     DYN = re.compile(r'^\{(?P<var>[a-zA-Z][_a-zA-Z0-9]*)\}$')
@@ -298,6 +389,7 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
         r'^\{(?P<var>[a-zA-Z][_a-zA-Z0-9]*):(?P<re>.+)\}$')
     GOOD = r'[^{}/]+'
     ROUTE_RE = re.compile(r'(\{[_a-zA-Z][^{}]*(?:\{[^{}]*\}[^{}]*)*\})')
+    NAME_SPLIT_RE = re.compile('[.:]')
 
     METHODS = {hdrs.METH_ANY, hdrs.METH_POST,
                hdrs.METH_GET, hdrs.METH_PUT, hdrs.METH_DELETE,
@@ -345,17 +437,27 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
     def __getitem__(self, name):
         return self._routes[name]
 
+    def routes(self):
+        return RoutesView(self._urls)
+
     def register_route(self, route):
         assert isinstance(route, Route), 'Instance of Route class is required.'
 
         name = route.name
+
         if name is not None:
+            parts = self.NAME_SPLIT_RE.split(name)
+            for part in parts:
+                if not part.isidentifier() or keyword.iskeyword(part):
+                    raise ValueError('Incorrect route name value, '
+                                     'Route name should be a sequence of '
+                                     'python identifiers separated '
+                                     'by dot or column')
             if name in self._routes:
                 raise ValueError('Duplicate {!r}, '
                                  'already handled by {!r}'
                                  .format(name, self._routes[name]))
-            else:
-                self._routes[name] = route
+            self._routes[name] = route
         self._urls.append(route)
 
     def add_route(self, method, path, handler,
@@ -412,7 +514,7 @@ class UrlDispatcher(AbstractRouter, collections.abc.Mapping):
         return route
 
     def add_static(self, prefix, path, *, name=None, expect_handler=None,
-                   chunk_size=256*1024, response_factory=None):
+                   chunk_size=256*1024, response_factory=StreamResponse):
         """
         Adds static files view
         :param prefix - url prefix

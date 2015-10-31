@@ -814,3 +814,4 @@ class Signature(object):
             rendered += ' -> {0}'.format(anno)
 
         return rendered
+

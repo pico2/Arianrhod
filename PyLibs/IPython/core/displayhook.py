@@ -10,12 +10,14 @@ This defines a callable class that IPython uses for `sys.displayhook`.
 from __future__ import print_function
 
 import sys
+import io as _io
+import tokenize
 
 from IPython.core.formatters import _safe_get_formatter_method
-from IPython.config.configurable import Configurable
+from traitlets.config.configurable import Configurable
 from IPython.utils import io
-from IPython.utils.py3compat import builtin_mod
-from IPython.utils.traitlets import Instance, Float
+from IPython.utils.py3compat import builtin_mod, cast_unicode_py2
+from traitlets import Instance, Float
 from IPython.utils.warn import warn
 
 # TODO: Move the various attributes (cache_size, [others now moved]). Some
@@ -29,7 +31,8 @@ class DisplayHook(Configurable):
     that gets called anytime user code returns a value.
     """
 
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC',
+                     allow_none=True)
     exec_result = Instance('IPython.core.interactiveshell.ExecutionResult',
                            allow_none=True)
     cull_fraction = Float(0.2)
@@ -82,12 +85,23 @@ class DisplayHook(Configurable):
     def quiet(self):
         """Should we silence the display hook because of ';'?"""
         # do not print output if input ends in ';'
+        
         try:
-            cell = self.shell.history_manager.input_hist_parsed[self.prompt_count]
-            return cell.rstrip().endswith(';')
+            cell = cast_unicode_py2(self.shell.history_manager.input_hist_parsed[-1])
         except IndexError:
             # some uses of ipshellembed may fail here
             return False
+        
+        sio = _io.StringIO(cell)
+        tokens = list(tokenize.generate_tokens(sio.readline))
+
+        for token in reversed(tokens):
+            if token[0] in (tokenize.ENDMARKER, tokenize.COMMENT):
+                continue
+            if (token[0] == tokenize.OP) and (token[1] == ';'):
+                return True
+            else:
+                return False
 
     def start_displayhook(self):
         """Start the displayhook, initializing resources."""

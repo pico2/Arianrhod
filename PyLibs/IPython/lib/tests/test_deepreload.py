@@ -10,7 +10,7 @@ import os
 import nose.tools as nt
 
 from IPython.testing import decorators as dec
-from IPython.utils.py3compat import builtin_mod_name
+from IPython.utils.py3compat import builtin_mod_name, PY3
 from IPython.utils.syspathcontext import prepended_to_syspath
 from IPython.utils.tempdir import TemporaryDirectory
 from IPython.lib.deepreload import reload as dreload
@@ -23,12 +23,18 @@ from IPython.lib.deepreload import reload as dreload
 def test_deepreload_numpy():
     "Test that NumPy can be deep reloaded."
     import numpy
+    # TODO: Find a way to exclude all standard library modules from reloading.
     exclude = [
         # Standard exclusions:
         'sys', 'os.path', builtin_mod_name, '__main__',
         # Test-related exclusions:
-        'unittest', 'UserDict',
+        'unittest', 'UserDict', '_collections_abc', 'tokenize',
+        'collections', 'collections.abc',
+        'importlib', 'importlib.machinery', '_imp',
+        'importlib._bootstrap', 'importlib._bootstrap_external',
+        '_frozen_importlib', '_frozen_importlib_external',
         ]
+
     dreload(numpy, exclude=exclude)
 
 def test_deepreload():

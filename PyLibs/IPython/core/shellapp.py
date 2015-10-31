@@ -2,23 +2,10 @@
 """
 A mixin for :class:`~IPython.core.application.Application` classes that
 launch InteractiveShell instances, load extensions, etc.
-
-Authors
--------
-
-* Min Ragan-Kelley
 """
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -27,14 +14,14 @@ import glob
 import os
 import sys
 
-from IPython.config.application import boolean_flag
-from IPython.config.configurable import Configurable
-from IPython.config.loader import Config
+from traitlets.config.application import boolean_flag
+from traitlets.config.configurable import Configurable
+from traitlets.config.loader import Config
 from IPython.core import pylabtools
 from IPython.utils import py3compat
 from IPython.utils.contexts import preserve_keys
 from IPython.utils.path import filefind
-from IPython.utils.traitlets import (
+from traitlets import (
     Unicode, Instance, List, Bool, CaselessStrEnum
 )
 from IPython.lib.inputhook import guis
@@ -84,7 +71,7 @@ addflag('color-info', 'InteractiveShell.color_info',
     "Disable using colors for info related things."
 )
 addflag('deep-reload', 'InteractiveShell.deep_reload',
-    """Enable deep (recursive) reloading by default. IPython can use the
+    """ **Deprecated** Enable deep (recursive) reloading by default. IPython can use the
     deep_reload module which reloads changes in modules recursively (it
     replaces the reload() function, so you don't need to change anything to
     use it). deep_reload() forces a full reload of modules whose code may
@@ -146,26 +133,28 @@ class InteractiveShellApp(Configurable):
       - :meth:`init_extensions`
       - :meth:`init_code`
     """
-    extensions = List(Unicode, config=True,
+    extensions = List(Unicode(), config=True,
         help="A list of dotted module names of IPython extensions to load."
     )
     extra_extension = Unicode('', config=True,
         help="dotted module name of an IPython extension to load."
     )
-    def _extra_extension_changed(self, name, old, new):
-        if new:
-            # add to self.extensions
-            self.extensions.append(new)
-    
+
+    reraise_ipython_extension_failures = Bool(
+        False,
+        config=True,
+        help="Reraise exceptions encountered loading IPython extensions?",
+    )
+
     # Extensions that are always loaded (not configurable)
-    default_extensions = List(Unicode, [u'storemagic'], config=False)
+    default_extensions = List(Unicode(), [u'storemagic'], config=False)
     
     hide_initial_ns = Bool(True, config=True,
         help="""Should variables loaded at startup (by startup files, exec_lines, etc.)
         be hidden from tools like %who?"""
     )
 
-    exec_files = List(Unicode, config=True,
+    exec_files = List(Unicode(), config=True,
         help="""List of files to run at IPython startup."""
     )
     exec_PYTHONSTARTUP = Bool(True, config=True,
@@ -175,7 +164,7 @@ class InteractiveShellApp(Configurable):
     file_to_run = Unicode('', config=True,
         help="""A file to be run""")
 
-    exec_lines = List(Unicode, config=True,
+    exec_lines = List(Unicode(), config=True,
         help="""lines of code to run at IPython startup."""
     )
     code_to_run = Unicode('', config=True,
@@ -184,15 +173,15 @@ class InteractiveShellApp(Configurable):
     module_to_run = Unicode('', config=True,
         help="Run the module as a script."
     )
-    gui = CaselessStrEnum(gui_keys, config=True,
+    gui = CaselessStrEnum(gui_keys, config=True, allow_none=True,
         help="Enable GUI event loop integration with any of {0}.".format(gui_keys)
     )
-    matplotlib = CaselessStrEnum(backend_keys,
+    matplotlib = CaselessStrEnum(backend_keys, allow_none=True,
         config=True,
         help="""Configure matplotlib for interactive use with
         the default matplotlib backend."""
     )
-    pylab = CaselessStrEnum(backend_keys,
+    pylab = CaselessStrEnum(backend_keys, allow_none=True,
         config=True,
         help="""Pre-load matplotlib and numpy for interactive use,
         selecting a particular matplotlib backend and loop integration.
@@ -205,7 +194,8 @@ class InteractiveShellApp(Configurable):
         When False, pylab mode should not import any names into the user namespace.
         """
     )
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC',
+                     allow_none=True)
     
     user_ns = Instance(dict, args=None, allow_none=True)
     def _user_ns_changed(self, name, old, new):
@@ -269,11 +259,15 @@ class InteractiveShellApp(Configurable):
         try:
             self.log.debug("Loading IPython extensions...")
             extensions = self.default_extensions + self.extensions
+            if self.extra_extension:
+                extensions.append(self.extra_extension)
             for ext in extensions:
                 try:
                     self.log.info("Loading IPython extension: %s" % ext)
                     self.shell.extension_manager.load_extension(ext)
                 except:
+                    if self.reraise_ipython_extension_failures:
+                        raise
                     msg = ("Error in loading extension: {ext}\n"
                            "Check your config files in {location}".format(
                                ext=ext,
@@ -281,6 +275,8 @@ class InteractiveShellApp(Configurable):
                            ))
                     self.log.warn(msg, exc_info=True)
         except:
+            if self.reraise_ipython_extension_failures:
+                raise
             self.log.warn("Unknown error in loading extensions:", exc_info=True)
 
     def init_code(self):

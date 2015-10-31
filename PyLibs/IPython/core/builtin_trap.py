@@ -18,10 +18,10 @@ Authors:
 # Imports
 #-----------------------------------------------------------------------------
 
-from IPython.config.configurable import Configurable
+from traitlets.config.configurable import Configurable
 
 from IPython.utils.py3compat import builtin_mod, iteritems
-from IPython.utils.traitlets import Instance
+from traitlets import Instance
 
 #-----------------------------------------------------------------------------
 # Classes and functions
@@ -36,7 +36,8 @@ HideBuiltin = __HideBuiltin()
 
 class BuiltinTrap(Configurable):
 
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC',
+                     allow_none=True)
 
     def __init__(self, shell=None):
         super(BuiltinTrap, self).__init__(shell=shell, config=None)
@@ -55,9 +56,11 @@ class BuiltinTrap(Configurable):
         try:
             from IPython.lib import deepreload
             if self.shell.deep_reload:
-                self.auto_builtins['reload'] = deepreload.reload
+                from warnings import warn
+                warn("Automatically replacing builtin `reload` by `deepreload.reload` is deprecated, please import `reload` explicitly from `IPython.lib.deeprelaod", DeprecationWarning)
+                self.auto_builtins['reload'] = deepreload._dreload
             else:
-                self.auto_builtins['dreload']= deepreload.reload
+                self.auto_builtins['dreload']= deepreload._dreload
         except ImportError:
             pass
 

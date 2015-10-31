@@ -11,29 +11,34 @@ and maintain connections.
 import socket
 
 from .models import Response
-from .packages.urllib3 import Retry
 from .packages.urllib3.poolmanager import PoolManager, proxy_from_url
 from .packages.urllib3.response import HTTPResponse
 from .packages.urllib3.util import Timeout as TimeoutSauce
+from .packages.urllib3.util.retry import Retry
 from .compat import urlparse, basestring
 from .utils import (DEFAULT_CA_BUNDLE_PATH, get_encoding_from_headers,
-                    prepend_scheme_if_needed, get_auth_from_url, urldefragauth)
+                    prepend_scheme_if_needed, get_auth_from_url, urldefragauth,
+                    select_proxy)
 from .structures import CaseInsensitiveDict
+from .packages.urllib3.exceptions import ClosedPoolError
 from .packages.urllib3.exceptions import ConnectTimeoutError
 from .packages.urllib3.exceptions import HTTPError as _HTTPError
 from .packages.urllib3.exceptions import MaxRetryError
+from .packages.urllib3.exceptions import NewConnectionError
 from .packages.urllib3.exceptions import ProxyError as _ProxyError
 from .packages.urllib3.exceptions import ProtocolError
 from .packages.urllib3.exceptions import ReadTimeoutError
 from .packages.urllib3.exceptions import SSLError as _SSLError
+from .packages.urllib3.exceptions import ResponseError
 from .cookies import extract_cookies_to_jar
 from .exceptions import (ConnectionError, ConnectTimeout, ReadTimeout, SSLError,
-                         ProxyError)
+                         ProxyError, RetryError)
 from .auth import _basic_auth_str
 
 DEFAULT_POOLBLOCK = False
 DEFAULT_POOLSIZE = 10
 DEFAULT_RETRIES = 0
+DEFAULT_POOL_TIMEOUT = None
 
 
 class BaseAdapter(object):
@@ -60,8 +65,12 @@ class HTTPAdapter(BaseAdapter):
     :param pool_connections: The number of urllib3 connection pools to cache.
     :param pool_maxsize: The maximum number of connections to save in the pool.
     :param int max_retries: The maximum number of retries each connection
-        should attempt. Note, this applies only to failed connections and
-        timeouts, never to requests where the server returns a response.
+        should attempt. Note, this applies only to failed DNS lookups, socket
+        connections and connection timeouts, never to requests where data has
+        made it to the server. By default, Requests does not retry failed
+        connections. If you need granular control over the conditions under
+        which we retry a request, import urllib3's ``Retry`` class and pass
+        that instead.
     :param pool_block: Whether the connection pool should block for connections.
 
     Usage::
@@ -77,7 +86,10 @@ class HTTPAdapter(BaseAdapter):
     def __init__(self, pool_connections=DEFAULT_POOLSIZE,
                  pool_maxsize=DEFAULT_POOLSIZE, max_retries=DEFAULT_RETRIES,
                  pool_block=DEFAULT_POOLBLOCK):
-        self.max_retries = max_retries
+        if max_retries == DEFAULT_RETRIES:
+            self.max_retries = Retry(0, read=False)
+        else:
+            self.max_retries = Retry.from_int(max_retries)
         self.config = {}
         self.proxy_manager = {}
 
@@ -123,7 +135,7 @@ class HTTPAdapter(BaseAdapter):
         self._pool_block = block
 
         self.poolmanager = PoolManager(num_pools=connections, maxsize=maxsize,
-                                       block=block, **pool_kwargs)
+                                       block=block, strict=True, **pool_kwargs)
 
     def proxy_manager_for(self, proxy, **proxy_kwargs):
         """Return urllib3 ProxyManager for the given proxy.
@@ -229,8 +241,7 @@ class HTTPAdapter(BaseAdapter):
         :param url: The URL to connect to.
         :param proxies: (optional) A Requests-style dictionary of proxies used on this request.
         """
-        proxies = proxies or {}
-        proxy = proxies.get(urlparse(url.lower()).scheme)
+        proxy = select_proxy(url, proxies)
 
         if proxy:
             proxy = prepend_scheme_if_needed(proxy, 'http')
@@ -263,12 +274,10 @@ class HTTPAdapter(BaseAdapter):
         :class:`HTTPAdapter <requests.adapters.HTTPAdapter>`.
 
         :param request: The :class:`PreparedRequest <PreparedRequest>` being sent.
-        :param proxies: A dictionary of schemes to proxy URLs.
+        :param proxies: A dictionary of schemes or schemes and hosts to proxy URLs.
         """
-        proxies = proxies or {}
+        proxy = select_proxy(request.url, proxies)
         scheme = urlparse(request.url).scheme
-        proxy = proxies.get(scheme)
-
         if proxy and scheme != 'https':
             url = urldefragauth(request.url)
         else:
@@ -301,7 +310,6 @@ class HTTPAdapter(BaseAdapter):
         :class:`HTTPAdapter <requests.adapters.HTTPAdapter>`.
 
         :param proxies: The url of the proxy being used for this request.
-        :param kwargs: Optional additional keyword arguments.
         """
         headers = {}
         username, password = get_auth_from_url(proxy)
@@ -318,8 +326,8 @@ class HTTPAdapter(BaseAdapter):
         :param request: The :class:`PreparedRequest <PreparedRequest>` being sent.
         :param stream: (optional) Whether to stream the request content.
         :param timeout: (optional) How long to wait for the server to send
-            data before giving up, as a float, or a (`connect timeout, read
-            timeout <user/advanced.html#timeouts>`_) tuple.
+            data before giving up, as a float, or a :ref:`(connect timeout,
+            read timeout) <timeouts>` tuple.
         :type timeout: float or tuple
         :param verify: (optional) Whether to verify SSL certificates.
         :param cert: (optional) Any user-provided SSL certificate to be trusted.
@@ -358,7 +366,7 @@ class HTTPAdapter(BaseAdapter):
                     assert_same_host=False,
                     preload_content=False,
                     decode_content=False,
-                    retries=Retry(self.max_retries, read=False),
+                    retries=self.max_retries,
                     timeout=timeout
                 )
 
@@ -367,7 +375,7 @@ class HTTPAdapter(BaseAdapter):
                 if hasattr(conn, 'proxy_pool'):
                     conn = conn.proxy_pool
 
-                low_conn = conn._get_conn(timeout=timeout)
+                low_conn = conn._get_conn(timeout=DEFAULT_POOL_TIMEOUT)
 
                 try:
                     low_conn.putrequest(request.method,
@@ -399,17 +407,22 @@ class HTTPAdapter(BaseAdapter):
                     # Then, reraise so that we can handle the actual exception.
                     low_conn.close()
                     raise
-                else:
-                    # All is well, return the connection to the pool.
-                    conn._put_conn(low_conn)
 
         except (ProtocolError, socket.error) as err:
             raise ConnectionError(err, request=request)
 
         except MaxRetryError as e:
             if isinstance(e.reason, ConnectTimeoutError):
-                raise ConnectTimeout(e, request=request)
+                # TODO: Remove this in 3.0.0: see #2811
+                if not isinstance(e.reason, NewConnectionError):
+                    raise ConnectTimeout(e, request=request)
 
+            if isinstance(e.reason, ResponseError):
+                raise RetryError(e, request=request)
+
+            raise ConnectionError(e, request=request)
+
+        except ClosedPoolError as e:
             raise ConnectionError(e, request=request)
 
         except _ProxyError as e:

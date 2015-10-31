@@ -3,25 +3,10 @@
 """
 The :class:`~IPython.core.application.Application` object for the command
 line :command:`ipython` program.
-
-Authors
--------
-
-* Brian Granger
-* Fernando Perez
-* Min Ragan-Kelley
 """
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -30,8 +15,8 @@ import logging
 import os
 import sys
 
-from IPython.config.loader import Config
-from IPython.config.application import boolean_flag, catch_config_error, Application
+from traitlets.config.loader import Config
+from traitlets.config.application import boolean_flag, catch_config_error, Application
 from IPython.core import release
 from IPython.core import usage
 from IPython.core.completer import IPCompleter
@@ -49,8 +34,8 @@ from IPython.core.shellapp import (
 from IPython.extensions.storemagic import StoreMagics
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 from IPython.utils import warn
-from IPython.utils.path import get_ipython_dir, check_for_old_config
-from IPython.utils.traitlets import (
+from IPython.paths import get_ipython_dir
+from traitlets import (
     Bool, List, Dict,
 )
 
@@ -171,7 +156,10 @@ frontend_flags['quick']=(
 
 frontend_flags['i'] = (
     {'TerminalIPythonApp' : {'force_interact' : True}},
-    """If running code from the command line, become interactive afterwards."""
+    """If running code from the command line, become interactive afterwards.
+    It is often useful to follow this with `--` to treat remaining flags as
+    script arguments.
+    """
 )
 flags.update(frontend_flags)
 
@@ -222,20 +210,20 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         ]
 
     subcommands = dict(
-        qtconsole=('IPython.qt.console.qtconsoleapp.IPythonQtConsoleApp',
-            """Launch the IPython Qt Console."""
+        qtconsole=('qtconsole.qtconsoleapp.JupyterQtConsoleApp',
+            """DEPRECATD: Launch the Jupyter Qt Console."""
         ),
-        notebook=('IPython.html.notebookapp.NotebookApp',
-            """Launch the IPython HTML Notebook Server."""
+        notebook=('notebook.notebookapp.NotebookApp',
+            """DEPRECATED: Launch the Jupyter HTML Notebook Server."""
         ),
         profile = ("IPython.core.profileapp.ProfileApp",
             "Create and manage IPython profiles."
         ),
-        kernel = ("IPython.kernel.zmq.kernelapp.IPKernelApp",
+        kernel = ("ipykernel.kernelapp.IPKernelApp",
             "Start a kernel without an attached frontend."
         ),
-        console=('IPython.terminal.console.app.ZMQTerminalIPythonApp',
-            """Launch the IPython terminal-based Console."""
+        console=('jupyter_console.app.ZMQTerminalIPythonApp',
+            """DEPRECATED: Launch the Jupyter terminal-based Console."""
         ),
         locate=('IPython.terminal.ipapp.LocateIPythonApp',
             LocateIPythonApp.description
@@ -243,34 +231,30 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         history=('IPython.core.historyapp.HistoryApp',
             "Manage the IPython history database."
         ),
-        nbconvert=('IPython.nbconvert.nbconvertapp.NbConvertApp',
-            "Convert notebooks to/from other formats."
+        nbconvert=('nbconvert.nbconvertapp.NbConvertApp',
+            "DEPRECATED: Convert notebooks to/from other formats."
         ),
-        trust=('IPython.nbformat.sign.TrustNotebookApp',
-            "Sign notebooks to trust their potentially unsafe contents at load."
+        trust=('nbformat.sign.TrustNotebookApp',
+            "DEPRECATED: Sign notebooks to trust their potentially unsafe contents at load."
         ),
-        kernelspec=('IPython.kernel.kernelspecapp.KernelSpecApp',
-            "Manage IPython kernel specifications."
+        kernelspec=('jupyter_client.kernelspecapp.KernelSpecApp',
+            "DEPRECATED: Manage Jupyter kernel specifications."
         ),
     )
     subcommands['install-nbextension'] = (
-        "IPython.html.nbextensions.NBExtensionApp",
-        "Install IPython notebook extension files"
+        "notebook.nbextensions.InstallNBExtensionApp",
+        "DEPRECATED: Install Jupyter notebook extension files"
     )
 
     # *do* autocreate requested profile, but don't create the config file.
     auto_create=Bool(True)
     # configurables
-    ignore_old_config=Bool(False, config=True,
-        help="Suppress warning messages about legacy config files"
-    )
     quick = Bool(False, config=True,
         help="""Start IPython quickly by skipping the loading of config files."""
     )
     def _quick_changed(self, name, old, new):
         if new:
             self.load_config_file = lambda *a, **kw: None
-            self.ignore_old_config=True
 
     display_banner = Bool(True, config=True,
         help="Whether to display a banner upon starting IPython."
@@ -322,8 +306,6 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         if self.subapp is not None:
             # don't bother initializing further, starting subapp
             return
-        if not self.ignore_old_config:
-            check_for_old_config(self.ipython_dir)
         # print self.extra_args
         if self.extra_args and not self.something_to_run:
             self.file_to_run = self.extra_args[0]

@@ -15,6 +15,7 @@
     <SccProjectName />
     <SccLocalPath />
     <ProjectGuid>{8F2E06F6-765A-411F-9930-47CC233EE96F}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -44,7 +45,8 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Test_Con</TargetName>
     <TargetExt>.exe</TargetExt>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files (x86)\Windows Kits\10\Include\10.0.10150.0\ucrt;$(VC_IncludePath);$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10150.0\ucrt\x86;$(VC_LibraryPath_x86);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -89,7 +91,7 @@
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>D:\Desktop\xx\release\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ltcg</AdditionalOptions>
-      <AdditionalDependencies>mylib_nt.lib;ntdll.lib;undoc_k32.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ucrt.lib;mylib.lib;ntdll.lib;undoc_k32.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetName)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>

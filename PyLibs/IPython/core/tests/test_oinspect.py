@@ -16,6 +16,7 @@ from __future__ import print_function
 # Stdlib imports
 import os
 import re
+import sys
 
 # Third-party imports
 import nose.tools as nt
@@ -26,8 +27,10 @@ from IPython.core.magic import (Magics, magics_class, line_magic,
                                 cell_magic, line_cell_magic,
                                 register_line_magic, register_cell_magic,
                                 register_line_cell_magic)
-from IPython.external.decorator import decorator
+from decorator import decorator
 from IPython.testing.decorators import skipif
+from IPython.testing.tools import AssertPrints
+from IPython.utils.path import compress_user
 from IPython.utils import py3compat
 
 
@@ -46,7 +49,7 @@ ip = get_ipython()
 # defined, if any code is inserted above, the following line will need to be
 # updated.  Do NOT insert any whitespace between the next line and the function
 # definition below.
-THIS_LINE_NUMBER = 49  # Put here the actual number of this line
+THIS_LINE_NUMBER = 52  # Put here the actual number of this line
 def test_find_source_lines():
     nt.assert_equal(oinspect.find_source_lines(test_find_source_lines), 
                     THIS_LINE_NUMBER+1)
@@ -88,6 +91,8 @@ def test_find_file_decorated2():
     def noop2(f, *a, **kw):
         return f(*a, **kw)
 
+    @noop2
+    @noop2
     @noop2
     def f(x):
         "My docstring 2"
@@ -201,6 +206,7 @@ def test_calltip_function2():
     check_calltip(g, 'g', 'g(y, z=3, *a, **kw)', '<no docstring>')
 
 
+@skipif(sys.version_info >= (3, 5))
 def test_calltip_builtin():
     check_calltip(sum, 'sum', None, sum.__doc__)
 
@@ -241,7 +247,7 @@ def test_info():
         fname = fname[:-1]
     # case-insensitive comparison needed on some filesystems
     # e.g. Windows:
-    nt.assert_equal(i['file'].lower(), fname.lower())
+    nt.assert_equal(i['file'].lower(), compress_user(fname).lower())
     nt.assert_equal(i['definition'], None)
     nt.assert_equal(i['docstring'], Call.__doc__)
     nt.assert_equal(i['source'], None)
@@ -371,3 +377,10 @@ def test_pinfo_nonascii():
     from . import nonascii2
     ip.user_ns['nonascii2'] = nonascii2
     ip._inspect('pinfo', 'nonascii2', detail_level=1)
+
+def test_pinfo_magic():
+    with AssertPrints('Docstring:'):
+        ip._inspect('pinfo', 'lsmagic', detail_level=0)
+
+    with AssertPrints('Source:'):
+        ip._inspect('pinfo', 'lsmagic', detail_level=1)

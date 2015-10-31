@@ -50,6 +50,9 @@ ip = get_ipython()
 # Tests
 #-----------------------------------------------------------------------------
 
+class DerivedInterrupt(KeyboardInterrupt):
+    pass
+
 class InteractiveShellTestCase(unittest.TestCase):
     def test_naked_string_cells(self):
         """Test that cells with only naked strings are fully executed"""
@@ -502,8 +505,6 @@ class InteractiveShellTestCase(unittest.TestCase):
             msg = ip.get_exception_only()
         self.assertEqual(msg, 'KeyboardInterrupt\n')
 
-        class DerivedInterrupt(KeyboardInterrupt):
-            pass
         try:
             raise DerivedInterrupt("foo")
         except KeyboardInterrupt:
@@ -607,8 +608,8 @@ class TestModules(unittest.TestCase, tt.TempFileMixin):
         """
         self.mktmp("import sys\n"
                    "print('numpy' in sys.modules)\n"
-                   "print('IPython.parallel' in sys.modules)\n"
-                   "print('IPython.kernel.zmq' in sys.modules)\n"
+                   "print('ipyparallel' in sys.modules)\n"
+                   "print('ipykernel' in sys.modules)\n"
                    )
         out = "False\nFalse\nFalse\n"
         tt.ipexec_validate(self.fname, out)
@@ -900,3 +901,44 @@ def test_warning_suppression():
             ip.run_cell("warnings.warn('asdf')")
     finally:
         ip.run_cell("del warnings")
+
+
+def test_deprecation_warning():
+    ip.run_cell("""
+import warnings
+def wrn():
+    warnings.warn(
+        "I AM  A WARNING",
+        DeprecationWarning
+    )
+        """)
+    try:
+        with tt.AssertPrints("I AM  A WARNING", channel="stderr"):
+            ip.run_cell("wrn()")
+    finally:
+        ip.run_cell("del warnings")
+        ip.run_cell("del wrn")
+
+
+class TestImportNoDeprecate(tt.TempFileMixin):
+
+    def setup(self):
+        """Make a valid python temp file."""
+        self.mktmp("""
+import warnings
+def wrn():
+    warnings.warn(
+        "I AM  A WARNING",
+        DeprecationWarning
+    )
+""")
+
+    def test_no_dep(self):
+        """
+        No deprecation warning should be raised from imported functions
+        """
+        ip.run_cell("from {} import wrn".format(self.fname))
+
+        with tt.AssertNotPrints("I AM  A WARNING"):
+            ip.run_cell("wrn()")
+        ip.run_cell("del wrn")

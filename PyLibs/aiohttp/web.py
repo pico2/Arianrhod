@@ -7,13 +7,7 @@ from .web_exceptions import *  # noqa
 from .web_urldispatcher import *  # noqa
 from .web_ws import *  # noqa
 from .protocol import HttpVersion  # noqa
-
-__all__ = (web_reqrep.__all__ +
-           web_exceptions.__all__ +
-           web_urldispatcher.__all__ +
-           web_ws.__all__ +
-           ('Application', 'RequestHandler',
-            'RequestHandlerFactory', 'HttpVersion'))
+from .signals import Signal, PreSignal, PostSignal
 
 
 import asyncio
@@ -22,6 +16,14 @@ from . import hdrs
 from .abc import AbstractRouter, AbstractMatchInfo
 from .log import web_logger
 from .server import ServerHttpProtocol
+
+
+__all__ = (web_reqrep.__all__ +
+           web_exceptions.__all__ +
+           web_urldispatcher.__all__ +
+           web_ws.__all__ +
+           ('Application', 'RequestHandler',
+            'RequestHandlerFactory', 'HttpVersion'))
 
 
 class RequestHandler(ServerHttpProtocol):
@@ -91,7 +93,7 @@ class RequestHandler(ServerHttpProtocol):
         except HTTPException as exc:
             resp = exc
 
-        resp_msg = resp.start(request)
+        resp_msg = yield from resp.prepare(request)
         yield from resp.write_eof()
 
         # notify server about keep-alive
@@ -178,13 +180,14 @@ class Application(dict):
 
     def __init__(self, *, logger=web_logger, loop=None,
                  router=None, handler_factory=RequestHandlerFactory,
-                 middlewares=()):
+                 middlewares=(), debug=False):
         if loop is None:
             loop = asyncio.get_event_loop()
         if router is None:
             router = UrlDispatcher()
         assert isinstance(router, AbstractRouter), router
 
+        self._debug = debug
         self._router = router
         self._handler_factory = handler_factory
         self._finish_callbacks = []
@@ -194,6 +197,26 @@ class Application(dict):
         for factory in middlewares:
             assert asyncio.iscoroutinefunction(factory), factory
         self._middlewares = list(middlewares)
+
+        self._on_pre_signal = PreSignal()
+        self._on_post_signal = PostSignal()
+        self._on_response_prepare = Signal(self)
+
+    @property
+    def debug(self):
+        return self._debug
+
+    @property
+    def on_response_prepare(self):
+        return self._on_response_prepare
+
+    @property
+    def on_pre_signal(self):
+        return self._on_pre_signal
+
+    @property
+    def on_post_signal(self):
+        return self._on_post_signal
 
     @property
     def router(self):

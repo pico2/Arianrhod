@@ -25,14 +25,13 @@ from IPython.core.inputsplitter import IPythonInputSplitter
 from IPython.core.interactiveshell import InteractiveShell, InteractiveShellABC
 from IPython.core.magic import Magics, magics_class, line_magic
 from IPython.lib.clipboard import ClipboardEmpty
-from IPython.testing.skipdoctest import skip_doctest
 from IPython.utils.encoding import get_stream_enc
 from IPython.utils import py3compat
 from IPython.utils.terminal import toggle_set_term_title, set_term_title
 from IPython.utils.process import abbrev_cwd
 from IPython.utils.warn import warn, error
 from IPython.utils.text import num_ini_spaces, SList, strip_email_quotes
-from IPython.utils.traitlets import Integer, CBool, Unicode
+from traitlets import Integer, CBool, Unicode
 
 #-----------------------------------------------------------------------------
 # Utilities
@@ -130,7 +129,6 @@ class TerminalMagics(Magics):
         self.shell.set_autoindent()
         print("Automatic indentation is:",['OFF','ON'][self.shell.autoindent])
 
-    @skip_doctest
     @line_magic
     def cpaste(self, parameter_s=''):
         """Paste & execute a pre-formatted code block from clipboard.
@@ -527,7 +525,7 @@ class TerminalInteractiveShell(InteractiveShell):
         prompt = py3compat.cast_bytes_py2(prompt)
 
         try:
-            line = py3compat.str_to_unicode(self.raw_input_original(prompt))
+            line = py3compat.cast_unicode_py2(self.raw_input_original(prompt))
         except ValueError:
             warn("\n********\nYou or a %run:ed script called sys.stdin.close()"
                  " or sys.stdout.close()!\nExiting IPython!\n")

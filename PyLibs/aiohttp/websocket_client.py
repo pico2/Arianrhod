@@ -174,17 +174,17 @@ class ClientWebSocketResponse:
 
 
 @asyncio.coroutine
-def ws_connect(url, *, protocols=(), timeout=10.0, connector=None,
+def ws_connect(url, *, protocols=(), timeout=10.0, connector=None, auth=None,
                ws_response_class=ClientWebSocketResponse, autoclose=True,
                autoping=True, loop=None):
 
     if loop is None:
-        asyncio.get_event_loop()
+        loop = asyncio.get_event_loop()
 
     if connector is None:
         connector = aiohttp.TCPConnector(loop=loop, force_close=True)
 
-    session = aiohttp.ClientSession(loop=loop, connector=connector,
+    session = aiohttp.ClientSession(loop=loop, connector=connector, auth=auth,
                                     ws_response_class=ws_response_class)
 
     try:

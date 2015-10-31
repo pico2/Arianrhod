@@ -8,11 +8,14 @@ import os
 from shutil import copyfile
 import sys
 
-from IPython.config.configurable import Configurable
+from traitlets.config.configurable import Configurable
 from IPython.utils.path import ensure_dir_exists
-from IPython.utils.traitlets import Instance
-from IPython.utils.py3compat import PY3
-if PY3:
+from traitlets import Instance
+
+try:
+    from importlib import reload
+except ImportError :
+    ## deprecated since 3.4
     from imp import reload
 
 #-----------------------------------------------------------------------------
@@ -46,7 +49,8 @@ class ExtensionManager(Configurable):
     is added to ``sys.path`` automatically.
     """
 
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC',
+                     allow_none=True)
 
     def __init__(self, shell=None, **kwargs):
         super(ExtensionManager, self).__init__(shell=shell, **kwargs)

@@ -19,12 +19,14 @@ import re
 import sys
 import socket
 import struct
+import warnings
 
 from . import __version__
 from . import certs
 from .compat import parse_http_list as _parse_list_header
 from .compat import (quote, urlparse, bytes, str, OrderedDict, unquote, is_py2,
-                     builtin_str, getproxies, proxy_bypass, urlunparse)
+                     builtin_str, getproxies, proxy_bypass, urlunparse,
+                     basestring)
 from .cookies import RequestsCookieJar, cookiejar_from_dict
 from .structures import CaseInsensitiveDict
 from .exceptions import InvalidURL
@@ -65,7 +67,7 @@ def super_len(o):
         return len(o.getvalue())
 
 
-def get_netrc_auth(url):
+def get_netrc_auth(url, raise_errors=False):
     """Returns the Requests tuple auth for a given url from netrc."""
 
     try:
@@ -103,8 +105,9 @@ def get_netrc_auth(url):
                 return (_netrc[login_i], _netrc[2])
         except (NetrcParseError, IOError):
             # If there was a parsing error or a permissions issue reading the file,
-            # we'll just skip netrc auth
-            pass
+            # we'll just skip netrc auth unless explicitly asked to raise errors.
+            if raise_errors:
+                raise
 
     # AppEngine hackiness.
     except (ImportError, AttributeError):
@@ -114,7 +117,8 @@ def get_netrc_auth(url):
 def guess_filename(obj):
     """Tries to guess the filename of the given object."""
     name = getattr(obj, 'name', None)
-    if name and name[0] != '<' and name[-1] != '>':
+    if (name and isinstance(name, basestring) and name[0] != '<' and
+            name[-1] != '>'):
         return os.path.basename(name)
 
 
@@ -287,6 +291,11 @@ def get_encodings_from_content(content):
 
     :param content: bytestring to extract encodings from.
     """
+    warnings.warn((
+        'In requests 3.0, get_encodings_from_content will be removed. For '
+        'more information, please see the discussion on issue #2266. (This'
+        ' warning should only appear once.)'),
+        DeprecationWarning)
 
     charset_re = re.compile(r'<meta.*?charset=["\']*(.+?)["\'>]', flags=re.I)
     pragma_re = re.compile(r'<meta.*?content=["\']*;?charset=(.+?)["\'>]', flags=re.I)
@@ -354,6 +363,11 @@ def get_unicode_from_response(r):
     2. fall back and replace all unicode characters
 
     """
+    warnings.warn((
+        'In requests 3.0, get_unicode_from_response will be removed. For '
+        'more information, please see the discussion on issue #2266. (This'
+        ' warning should only appear once.)'),
+        DeprecationWarning)
 
     tried_encodings = []
 
@@ -407,10 +421,18 @@ def requote_uri(uri):
     This function passes the given URI through an unquote/quote cycle to
     ensure that it is fully and consistently quoted.
     """
-    # Unquote only the unreserved characters
-    # Then quote only illegal characters (do not quote reserved, unreserved,
-    # or '%')
-    return quote(unquote_unreserved(uri), safe="!#$%&'()*+,/:;=?@[]~")
+    safe_with_percent = "!#$%&'()*+,/:;=?@[]~"
+    safe_without_percent = "!#$&'()*+,/:;=?@[]~"
+    try:
+        # Unquote only the unreserved characters
+        # Then quote only illegal characters (do not quote reserved,
+        # unreserved, or '%')
+        return quote(unquote_unreserved(uri), safe=safe_with_percent)
+    except InvalidURL:
+        # We couldn't unquote the given URI, so let's try quoting it, but
+        # there may be unquoted '%'s in the URI. We need to make sure they're
+        # properly quoted so they do not cause issues elsewhere.
+        return quote(uri, safe=safe_without_percent)
 
 
 def address_in_network(ip, net):
@@ -477,7 +499,9 @@ def should_bypass_proxies(url):
     if no_proxy:
         # We need to check whether we match here. We need to see if we match
         # the end of the netloc, both with and without the port.
-        no_proxy = no_proxy.replace(' ', '').split(',')
+        no_proxy = (
+            host for host in no_proxy.replace(' ', '').split(',') if host
+        )
 
         ip = netloc.split(':')[0]
         if is_ipv4_address(ip):
@@ -515,36 +539,22 @@ def get_environ_proxies(url):
     else:
         return getproxies()
 
+def select_proxy(url, proxies):
+    """Select a proxy for the url, if applicable.
+
+    :param url: The url being for the request
+    :param proxies: A dictionary of schemes or schemes and hosts to proxy URLs
+    """
+    proxies = proxies or {}
+    urlparts = urlparse(url)
+    proxy = proxies.get(urlparts.scheme+'://'+urlparts.hostname)
+    if proxy is None:
+        proxy = proxies.get(urlparts.scheme)
+    return proxy
 
 def default_user_agent(name="python-requests"):
     """Return a string representing the default user agent."""
-    _implementation = platform.python_implementation()
-
-    if _implementation == 'CPython':
-        _implementation_version = platform.python_version()
-    elif _implementation == 'PyPy':
-        _implementation_version = '%s.%s.%s' % (sys.pypy_version_info.major,
-                                                sys.pypy_version_info.minor,
-                                                sys.pypy_version_info.micro)
-        if sys.pypy_version_info.releaselevel != 'final':
-            _implementation_version = ''.join([_implementation_version, sys.pypy_version_info.releaselevel])
-    elif _implementation == 'Jython':
-        _implementation_version = platform.python_version()  # Complete Guess
-    elif _implementation == 'IronPython':
-        _implementation_version = platform.python_version()  # Complete Guess
-    else:
-        _implementation_version = 'Unknown'
-
-    try:
-        p_system = platform.system()
-        p_release = platform.release()
-    except IOError:
-        p_system = 'Unknown'
-        p_release = 'Unknown'
-
-    return " ".join(['%s/%s' % (name, __version__),
-                     '%s/%s' % (_implementation, _implementation_version),
-                     '%s/%s' % (p_system, p_release)])
+    return '%s/%s' % (name, __version__)
 
 
 def default_headers():
@@ -567,7 +577,7 @@ def parse_header_links(value):
 
     replace_chars = " '\""
 
-    for val in value.split(","):
+    for val in re.split(", *<", value):
         try:
             url, params = val.split(";", 1)
         except ValueError:

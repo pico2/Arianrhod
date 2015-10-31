@@ -19,6 +19,14 @@ RE_INSERT_VALUES = re.compile(
     re.IGNORECASE | re.DOTALL)
 
 
+try:
+    StopAsyncIteration
+except NameError:
+    class StopAsyncIteration(Exception):
+        """Just stab for StopAsyncIteration from python 3.5"""
+        pass
+
+
 class Cursor:
     """Cursor is used to interact with the database."""
 
@@ -197,6 +205,19 @@ class Cursor:
             # If it's not a dictionary let's try escaping it anyways.
             # Worst case it will throw a Value error
             return conn.escape(args)
+
+    def mogrify(self, query, args=None):
+        """ Returns the exact string that is sent to the database by calling
+        the execute() method. This method follows the extension to the DB
+        API 2.0 followed by Psycopg.
+
+        :param query: ``str`` sql statement
+        :param args: ``tuple`` or ``list`` of arguments for sql query
+        """
+        conn = self._get_db()
+        if args is not None:
+            query = query % self._escape_args(args, conn)
+        return query
 
     @asyncio.coroutine
     def execute(self, query, args=None):
@@ -463,6 +484,27 @@ class Cursor:
     InternalError = InternalError
     ProgrammingError = ProgrammingError
     NotSupportedError = NotSupportedError
+
+    @asyncio.coroutine
+    def __aiter__(self):
+        return self
+
+    @asyncio.coroutine
+    def __anext__(self):
+        ret = yield from self.fetchone()
+        if ret is not None:
+            return ret
+        else:
+            raise StopAsyncIteration
+
+    @asyncio.coroutine
+    def __aenter__(self):
+        return self
+
+    @asyncio.coroutine
+    def __aexit__(self, exc_type, exc_val, exc_tb):
+        yield from self.close()
+        return
 
 
 class _DictCursorMixin:

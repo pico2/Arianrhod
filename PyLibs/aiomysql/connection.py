@@ -7,6 +7,7 @@ import socket
 import hashlib
 import struct
 import sys
+import warnings
 import configparser
 import getpass
 from functools import partial
@@ -33,38 +34,47 @@ from pymysql.connections import MysqlPacket
 from pymysql.connections import FieldDescriptorPacket
 from pymysql.connections import EOFPacketWrapper
 from pymysql.connections import OKPacketWrapper
+from pymysql.connections import LoadLocalPacketWrapper
 
 
 # from aiomysql.utils import _convert_to_str
 from .cursors import Cursor
+from .utils import _ConnectionContextManager, _ContextManager
 # from .log import logger
 
 DEFAULT_USER = getpass.getuser()
+PY_341 = sys.version_info >= (3, 4, 1)
+PY_35 = sys.version_info >= (3, 5, 0)
 sha_new = partial(hashlib.new, 'sha1')
 
 
-@asyncio.coroutine
 def connect(host="localhost", user=None, password="",
             db=None, port=3306, unix_socket=None,
             charset='', sql_mode=None,
             read_default_file=None, conv=decoders, use_unicode=None,
             client_flag=0, cursorclass=Cursor, init_command=None,
             connect_timeout=None, read_default_group=None,
-            no_delay=False, autocommit=False, echo=False, loop=None):
+            no_delay=False, autocommit=False, echo=False,
+            local_infile=False, loop=None):
     """See connections.Connection.__init__() for information about
     defaults."""
+    coro = _connect(host=host, user=user, password=password, db=db,
+                    port=port, unix_socket=unix_socket, charset=charset,
+                    sql_mode=sql_mode, read_default_file=read_default_file,
+                    conv=conv, use_unicode=use_unicode,
+                    client_flag=client_flag, cursorclass=cursorclass,
+                    init_command=init_command,
+                    connect_timeout=connect_timeout,
+                    read_default_group=read_default_group,
+                    no_delay=no_delay, autocommit=autocommit, echo=echo,
+                    local_infile=local_infile, loop=loop)
+    return _ConnectionContextManager(coro)
 
-    conn = Connection(host=host, user=user, password=password,
-                      db=db, port=port, unix_socket=unix_socket,
-                      charset=charset, sql_mode=sql_mode,
-                      read_default_file=read_default_file, conv=conv,
-                      use_unicode=use_unicode, client_flag=client_flag,
-                      cursorclass=cursorclass, init_command=init_command,
-                      connect_timeout=connect_timeout,
-                      read_default_group=read_default_group, no_delay=no_delay,
-                      autocommit=autocommit, echo=echo, loop=loop)
 
-    yield from conn.connect()
+@asyncio.coroutine
+def _connect(*args, **kwargs):
+    conn = Connection(*args, **kwargs)
+    yield from conn._connect()
     return conn
 
 
@@ -81,7 +91,8 @@ class Connection:
                  read_default_file=None, conv=decoders, use_unicode=None,
                  client_flag=0, cursorclass=Cursor, init_command=None,
                  connect_timeout=None, read_default_group=None,
-                 no_delay=False, autocommit=False, echo=False, loop=None):
+                 no_delay=False, autocommit=False, echo=False,
+                 local_infile=False, loop=None):
         """
         Establish a connection to the MySQL database. Accepts several
         arguments:
@@ -113,6 +124,8 @@ class Connection:
         :param no_delay: Disable Nagle's algorithm on the socket
         :param autocommit: Autocommit mode. None means use server default.
             (default: False)
+        :param local_infile: boolean to enable the use of LOAD DATA LOCAL
+            command. (default: False)
         :param loop: asyncio loop
         """
         self._loop = loop or asyncio.get_event_loop()
@@ -135,6 +148,13 @@ class Connection:
             port = int(_config("port", fallback=port))
             charset = _config("default-character-set", fallback=charset)
 
+        # pymysql port
+        if no_delay is not None:
+            warnings.warn("no_delay option is deprecated", DeprecationWarning)
+            no_delay = bool(no_delay)
+        else:
+            no_delay = True
+
         self._host = host
         self._port = port
         self._user = user or DEFAULT_USER
@@ -155,6 +175,9 @@ class Connection:
             self.use_unicode = use_unicode
 
         self._encoding = charset_by_name(self._charset).encoding
+
+        if local_infile:
+            client_flag |= LOCAL_FILES
 
         client_flag |= CAPABILITIES
         client_flag |= MULTI_STATEMENTS
@@ -240,8 +263,11 @@ class Connection:
         self._reader = None
 
     @asyncio.coroutine
-    def wait_closed(self):
+    def ensure_closed(self):
         """Send quit command and then close socket connection"""
+        if self._writer is None:
+            # connection has been closed
+            return
         send_data = struct.pack('<i', 1) + int2byte(COM_QUIT)
         self._writer.write(send_data)
         yield from self._writer.drain()
@@ -340,7 +366,7 @@ class Connection:
         cur = cursor(self, self._echo) if cursor else self.cursorclass(self)
         fut = asyncio.Future(loop=self._loop)
         fut.set_result(cur)
-        return fut
+        return _ContextManager(fut)
 
     # The following methods are INTERNAL USE ONLY (called from Cursor)
     @asyncio.coroutine
@@ -371,7 +397,7 @@ class Connection:
         """Check if the server is alive"""
         if self._writer is None and self._reader is None:
             if reconnect:
-                yield from self.connect()
+                yield from self._connect()
                 reconnect = False
             else:
                 raise Error("Already closed")
@@ -380,7 +406,7 @@ class Connection:
             yield from self._read_ok_packet()
         except Exception:
             if reconnect:
-                yield from self.connect()
+                yield from self._connect()
                 yield from self.ping(False)
             else:
                 raise
@@ -397,7 +423,7 @@ class Connection:
         self._encoding = encoding
 
     @asyncio.coroutine
-    def connect(self):
+    def _connect(self):
         # TODO: Set close callback
         # raise OperationalError(2006,
         # "MySQL server has gone away (%r)" % (e,))
@@ -414,7 +440,8 @@ class Connection:
                                             loop=self._loop)
                 self.host_info = "socket %s:%d" % (self._host, self._port)
 
-            if self._no_delay:
+            # do not set no delay in case of unix_socket
+            if self._no_delay and not self._unix_socket:
                 self._set_nodelay(True)
 
             yield from self._get_server_information()
@@ -431,11 +458,14 @@ class Connection:
 
             if self.autocommit_mode is not None:
                 yield from self.autocommit(self.autocommit_mode)
-        except OSError as e:
-            self._reader, self._writer = None, None
-            raise OperationalError(
-                2003, "Can't connect to MySQL server on %r (%s)"
-                % (self._host, e))
+        except Exception as e:
+            if self._writer:
+                self._writer.transport.close()
+            self._reader = None
+            self._writer = None
+            raise OperationalError(2003,
+                                   "Can't connect to MySQL server on %r" %
+                                   self._host) from e
 
     def _set_nodelay(self, value):
         flag = int(bool(value))
@@ -499,6 +529,18 @@ class Connection:
             return 0
 
     @asyncio.coroutine
+    def __aenter__(self):
+        return self
+
+    @asyncio.coroutine
+    def __aexit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            self.close()
+        else:
+            yield from self.ensure_closed()
+        return
+
+    @asyncio.coroutine
     def _execute_command(self, command, sql):
         if not self._writer:
             raise InterfaceError("(0, 'Not connected')")
@@ -535,7 +577,7 @@ class Connection:
     @asyncio.coroutine
     def _request_authentication(self):
         self.client_flag |= CAPABILITIES
-        if self.server_version.startswith('5'):
+        if int(self.server_version.split('.', 1)[0]) >= 5:
             self.client_flag |= MULTI_RESULTS
 
         if self._user is None:
@@ -639,6 +681,12 @@ class Connection:
     def get_server_info(self):
         return self.server_version
 
+    if PY_341:  # pragma: no branch
+        def __del__(self):
+            if self._writer:
+                warnings.warn("Unclosed connection {!r}".format(self),
+                              ResourceWarning)
+                self.close()
     Warning = Warning
     Error = Error
     InterfaceError = InterfaceError
@@ -667,6 +715,7 @@ class MySQLResult:
         self.rows = None
         self.has_next = None
         self.unbuffered_active = False
+        self.filename = None
 
     @asyncio.coroutine
     def read(self):
@@ -676,6 +725,8 @@ class MySQLResult:
             # TODO: use classes for different packet types?
             if first_packet.is_ok_packet():
                 self._read_ok_packet(first_packet)
+            elif first_packet.is_load_local_packet():
+                yield from self._read_load_local_packet(first_packet)
             else:
                 yield from self._read_result_packet(first_packet)
         finally:
@@ -707,6 +758,33 @@ class MySQLResult:
         self.warning_count = ok_packet.warning_count
         self.message = ok_packet.message
         self.has_next = ok_packet.has_next
+
+    @asyncio.coroutine
+    def _read_load_local_packet(self, first_packet):
+        load_packet = LoadLocalPacketWrapper(first_packet)
+        local_packet = LoadLocalFile(load_packet.filename, self.connection)
+        self.filename = load_packet.filename
+        yield from local_packet.send_data()
+
+        ok_packet = yield from self.connection._read_packet()
+        if not ok_packet.is_ok_packet():
+            raise OperationalError(2014, "Commands Out of Sync")
+        self._read_ok_packet(ok_packet)
+
+        if self.warning_count > 0:
+            yield from self._print_warnings()
+        self.filename = None
+
+    @asyncio.coroutine
+    def _print_warnings(self):
+        yield from self.connection._execute_command(COM_QUERY, 'SHOW WARNINGS')
+        yield from self.read()
+        if self.rows:
+            message = "\n"
+            for db_warning in self.rows:
+                message += "{0} in file '{1}'\n".format(
+                    db_warning[2], self.filename.decode('utf-8'))
+            warnings.warn(message, Warning, 3)
 
     def _check_packet_is_eof(self, packet):
         if packet.is_eof_packet():
@@ -809,3 +887,70 @@ class MySQLResult:
         eof_packet = yield from self.connection._read_packet()
         assert eof_packet.is_eof_packet(), 'Protocol error, expecting EOF'
         self.description = tuple(description)
+
+
+class LoadLocalFile(object):
+    def __init__(self, filename, connection):
+        self.filename = filename
+        self.connection = connection
+        self._loop = connection.loop
+        self._file_object = None
+
+    def _open_file(self):
+
+        def opener(filename):
+            try:
+                self._file_object = open(filename, 'rb')
+            except IOError:
+                raise OperationalError(1017, "Can't find file"
+                                       " '{0}'".format(filename))
+
+        fut = self._loop.run_in_executor(None, opener, self.filename)
+        return fut
+
+    def _file_read(self, chunk_size):
+
+        def freader(chunk_size):
+            try:
+                chunk = self._file_object.read(chunk_size)
+
+                if not chunk:
+                    self._file_object.close()
+                    self._file_object = None
+
+            except Exception as e:
+                self._file_object.close()
+                self._file_object = None
+                raise OperationalError(
+                    1024, "Error reading file {}".format(self.filename)) from e
+            return chunk
+
+        fut = self._loop.run_in_executor(None, freader, chunk_size)
+        return fut
+
+    @asyncio.coroutine
+    def send_data(self):
+        """Send data packets from the local file to the server"""
+        if not self.connection._writer:
+            raise InterfaceError("(0, '')")
+
+        # sequence id is 2 as we already sent a query packet
+        seq_id = 2
+        try:
+            yield from self._open_file()
+            chunk_size = MAX_PACKET_LEN
+            while True:
+                chunk = yield from self._file_read(chunk_size)
+                if not chunk:
+                    break
+                packet = (struct.pack('<i', len(chunk))[:3] +
+                          int2byte(seq_id))
+                format_str = '!{0}s'.format(len(chunk))
+                packet += struct.pack(format_str, chunk)
+                self.connection._write_bytes(packet)
+                seq_id += 1
+
+        finally:
+            # send the empty packet to signify we are done sending data
+            packet = struct.pack('<i', 0)[:3] + int2byte(seq_id)
+            self.connection._write_bytes(packet)

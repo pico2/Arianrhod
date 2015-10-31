@@ -17,23 +17,19 @@ import sys
 import traceback
 import warnings
 
-from IPython.external.decorator import decorator
+from decorator import decorator
 
-from IPython.config.configurable import Configurable
+from traitlets.config.configurable import Configurable
 from IPython.core.getipython import get_ipython
+from IPython.utils.sentinel import Sentinel
 from IPython.lib import pretty
-from IPython.utils.traitlets import (
+from traitlets import (
     Bool, Dict, Integer, Unicode, CUnicode, ObjectName, List,
     ForwardDeclaredInstance,
 )
 from IPython.utils.py3compat import (
-    unicode_to_str, with_metaclass, PY3, string_types, unicode_type,
+    with_metaclass, string_types, unicode_type,
 )
-
-if PY3:
-    from io import StringIO
-else:
-    from StringIO import StringIO
 
 
 #-----------------------------------------------------------------------------
@@ -74,7 +70,7 @@ class DisplayFormatter(Configurable):
         else:
             self.active_types = self.format_types
     
-    active_types = List(Unicode, config=True,
+    active_types = List(Unicode(), config=True,
         help="""List of currently active mime-types to display.
         You can use this to set a white-list for formats to display.
         
@@ -275,7 +271,13 @@ def _get_type(obj):
     """Return the type of an instance (old and new-style)"""
     return getattr(obj, '__class__', None) or type(obj)
 
-_raise_key_error = object()
+
+_raise_key_error = Sentinel('_raise_key_error', __name__, 
+"""
+Special value to raise a KeyError
+
+Raise KeyError in `BaseFormatter.pop` if passed as the default value to `pop`
+""")
 
 
 class BaseFormatter(Configurable):
@@ -681,13 +683,13 @@ class PlainTextFormatter(BaseFormatter):
         if not self.pprint:
             return repr(obj)
         else:
-            # This uses use StringIO, as cStringIO doesn't handle unicode.
-            stream = StringIO()
-            # self.newline.encode() is a quick fix for issue gh-597. We need to
-            # ensure that stream does not get a mix of unicode and bytestrings,
-            # or it will cause trouble.
+            # handle str and unicode on Python 2
+            # io.StringIO only accepts unicode,
+            # cStringIO doesn't handle unicode on py2,
+            # StringIO allows str, unicode but only ascii str
+            stream = pretty.CUnicodeIO()
             printer = pretty.RepresentationPrinter(stream, self.verbose,
-                self.max_width, unicode_to_str(self.newline),
+                self.max_width, self.newline,
                 max_seq_length=self.max_seq_length,
                 singleton_pprinters=self.singleton_printers,
                 type_pprinters=self.type_printers,

@@ -19,13 +19,14 @@ import os
 import shutil
 import sys
 
-from IPython.config.application import Application, catch_config_error
-from IPython.config.loader import ConfigFileNotFound
+from traitlets.config.application import Application, catch_config_error
+from traitlets.config.loader import ConfigFileNotFound, PyFileConfigLoader
 from IPython.core import release, crashhandler
 from IPython.core.profiledir import ProfileDir, ProfileDirError
-from IPython.utils.path import get_ipython_dir, get_ipython_package_dir, ensure_dir_exists
+from IPython.paths import get_ipython_dir, get_ipython_package_dir
+from IPython.utils.path import ensure_dir_exists
 from IPython.utils import py3compat
-from IPython.utils.traitlets import List, Unicode, Type, Bool, Dict, Set, Instance
+from traitlets import List, Unicode, Type, Bool, Dict, Set, Instance, Undefined
 
 if os.name == 'nt':
     programdata = os.environ.get('PROGRAMDATA', None)
@@ -63,6 +64,19 @@ base_flags = dict(
             """)
 )
 
+class ProfileAwareConfigLoader(PyFileConfigLoader):
+    """A Python file config loader that is aware of IPython profiles."""
+    def load_subconfig(self, fname, path=None, profile=None):
+        if profile is not None:
+            try:
+                profile_dir = ProfileDir.find_profile_dir_by_name(
+                        get_ipython_dir(),
+                        profile,
+                )
+            except ProfileDirError:
+                return
+            path = profile_dir.location
+        return super(ProfileAwareConfigLoader, self).load_subconfig(fname, path=path)
 
 class BaseIPythonApplication(Application):
 
@@ -73,6 +87,9 @@ class BaseIPythonApplication(Application):
     aliases = Dict(base_aliases)
     flags = Dict(base_flags)
     classes = List([ProfileDir])
+    
+    # enable `load_subconfig('cfg.py', profile='name')`
+    python_config_loader_class = ProfileAwareConfigLoader
 
     # Track whether the config_file has changed,
     # because some logic happens only if we aren't using the default.
@@ -90,7 +107,7 @@ class BaseIPythonApplication(Application):
         os.path.join(get_ipython_package_dir(), u'config', u'profile', u'default')
     )
     
-    config_file_paths = List(Unicode)
+    config_file_paths = List(Unicode())
     def _config_file_paths_default(self):
         return [py3compat.getcwd()]
 
@@ -130,7 +147,7 @@ class BaseIPythonApplication(Application):
         return d
     
     _in_init_profile_dir = False
-    profile_dir = Instance(ProfileDir)
+    profile_dir = Instance(ProfileDir, allow_none=True)
     def _profile_dir_default(self):
         # avoid recursion
         if self._in_init_profile_dir:
@@ -144,7 +161,7 @@ class BaseIPythonApplication(Application):
     auto_create = Bool(False, config=True,
         help="""Whether to create profile dir if it doesn't exist""")
 
-    config_files = List(Unicode)
+    config_files = List(Unicode())
     def _config_files_default(self):
         return [self.config_file_name]
 
@@ -170,9 +187,9 @@ class BaseIPythonApplication(Application):
         try:
             directory = py3compat.getcwd()
         except:
-            # raise exception
+            # exit if cwd doesn't exist
             self.log.error("Current working directory doesn't exist.")
-            raise
+            self.exit(1)
 
     #-------------------------------------------------------------------------
     # Various stages of Application creation
@@ -199,7 +216,7 @@ class BaseIPythonApplication(Application):
             return crashhandler.crash_handler_lite(etype, evalue, tb)
     
     def _ipython_dir_changed(self, name, old, new):
-        if old is not None:
+        if old is not Undefined:
             str_old = py3compat.cast_bytes_py2(os.path.abspath(old),
                 sys.getfilesystemencoding()
             )
@@ -218,7 +235,7 @@ class BaseIPythonApplication(Application):
             path = os.path.join(new, d)
             try:
                 ensure_dir_exists(path)
-            except OSError:
+            except OSError as e:
                 # this will not be EEXIST
                 self.log.error("couldn't create path %s: %s", path, e)
         self.log.debug("IPYTHONDIR set to: %s" % new)
@@ -263,7 +280,7 @@ class BaseIPythonApplication(Application):
                 else:
                     msg = self.log.debug
                 msg("Config file not found, skipping: %s", config_file_name)
-            except:
+            except Exception:
                 # For testing purposes.
                 if not suppress_errors:
                     raise
@@ -294,7 +311,7 @@ class BaseIPythonApplication(Application):
                     self.log.fatal("Profile %r not found."%self.profile)
                     self.exit(1)
             else:
-                self.log.info("Using existing profile dir: %r"%p.location)
+                self.log.debug("Using existing profile dir: %r"%p.location)
         else:
             location = self.config.ProfileDir.location
             # location is fully specified
@@ -309,7 +326,7 @@ class BaseIPythonApplication(Application):
                         self.log.fatal("Could not create profile directory: %r"%location)
                         self.exit(1)
                     else:
-                        self.log.info("Creating new profile dir: %r"%location)
+                        self.log.debug("Creating new profile dir: %r"%location)
                 else:
                     self.log.fatal("Profile directory %r not found."%location)
                     self.exit(1)
