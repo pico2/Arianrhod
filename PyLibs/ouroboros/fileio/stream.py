@@ -85,168 +85,6 @@ def _WriteFloat(fs, flt, endian = _DEFAULT_ENDIAN):
 def _WriteDouble(fs, db, endian = _DEFAULT_ENDIAN):
     return fs.write(struct.pack(endian + 'd', DOUBLE(float(db)).value))
 
-class BytesStream:
-    def __init__(self):
-        self.stream = None
-        self.endian = _DEFAULT_ENDIAN
-        self.encoding = '936'
-
-    def open(
-            self,
-            file,
-            mode        = 'rb',
-            buffering   = -1,
-            encoding    = None,
-            errors      = None,
-            newline     = None,
-            closefd     = True,
-            opener      = None
-        ):
-        if isinstance(file, bytes) or isinstance(file, bytearray):
-            return self.openmem(file)
-
-        self.stream = open(file, mode, buffering, encoding, errors, newline, closefd, opener)
-        return self
-
-    def openmem(self, buffer = b''):
-        self.stream = io.BytesIO(buffer)
-        return self
-
-    def setendian(self, endian):
-        self.endian = endian
-
-    def getendian(self):
-        return self.endian
-
-    def setencoding(self, encoding):
-        self.encoding = encoding
-
-    def truncate(self, size):
-        return self.stream.truncate(size)
-
-    def seek(self, offset, method = io.SEEK_SET):
-        return self.stream.seek(offset, method)
-
-    @property
-    def position(self):
-        return self.tell()
-
-    @position.setter
-    def position(self, value):
-        self.seek(value, io.SEEK_SET)
-
-    def rewind(self):
-        return self.stream.seek(0)
-
-    def forward(self, length):
-        return self.stream.seek(length, io.SEEK_CUR)
-
-    def read(self, n = -1):
-        return self.stream.read(n)
-
-    def write(self, buf):
-        return self.stream.write(buf)
-
-    def tell(self):
-        return self.stream.tell()
-
-    def flush(self):
-        return self.stream.flush()
-
-    def size(self):
-        pos = self.tell()
-        self.seek(0, io.SEEK_END)
-        stmsize = self.tell()
-        self.seek(pos)
-        return stmsize
-
-    def eof(self):
-        return self.tell() >= self.size()
-
-    def boolean(self):
-        return bool(self.uchar())
-
-    def char(self):
-        return _ReadChar(self.stream, self.endian)
-
-    def uchar(self):
-        return _ReadUChar(self.stream, self.endian)
-
-    def byte(self):
-        return _ReadUChar(self.stream, self.endian)
-
-    def __getitem__(self, offset):
-        if offset >= self.size():
-            raise IndexError('offset larger than file size')
-
-        pos = self.position
-        self.position = offset
-        b = self.byte()
-        self.position = pos
-
-        return b
-
-    def short(self):
-        return _ReadShort(self.stream, self.endian)
-
-    def ushort(self):
-        return _ReadUShort(self.stream, self.endian)
-
-    def long(self):
-        return _ReadLong(self.stream, self.endian)
-
-    def ulong(self):
-        return _ReadULong(self.stream, self.endian)
-
-    def long64(self):
-        return _ReadLong64(self.stream, self.endian)
-
-    def ulong64(self):
-        return _ReadULong64(self.stream, self.endian)
-
-    def float(self):
-        return _ReadFloat(self.stream, self.endian)
-
-    def double(self):
-        return _ReadDouble(self.stream, self.endian)
-
-    def astr(self, cp = None):
-        return _ReadAString(self.stream, self.encoding if cp is None else cp)
-
-    def wstr(self):
-        return _ReadWString(self.stream)
-
-    def wchar(self, b):
-        return _WriteChar(self.stream, b)
-
-    def wbyte(self, b):
-        return _WriteByte(self.stream, b)
-
-    def wshort(self, short):
-        return _WriteShort(self.stream, short, self.endian)
-
-    def wushort(self, ushort):
-        return _WriteUShort(self.stream, ushort, self.endian)
-
-    def wlong(self, l):
-        return _WriteLong(self.stream, l, self.endian)
-
-    def wulong(self, l):
-        return _WriteULong(self.stream, l, self.endian)
-
-    def wlong64(self, l64):
-        return _WriteLong64(self.stream, l, self.endian)
-
-    def wulong64(self, l64):
-        return _WriteULong64(self.stream, l, self.endian)
-
-    def wfloat(self, flt):
-        return _WriteFloat(self.stream, flt, self.endian)
-
-    def wdouble(self, db):
-        return _WriteDouble(self.stream, db, self.endian)
-
-
 class FileStreamPositionHolder:
     def __init__(self, fs):
         self.fs = fs
@@ -323,6 +161,27 @@ class FileStream(object):
     def Close(self):
         self._stream.close()
         self.MemoryFile = False
+
+    def close(self):
+        return self.Close()
+
+    def truncate(self, size):
+        return self.Truncate(size)
+
+    def seek(self, offset, method = io.SEEK_SET):
+        return self.Seek(offset, method)
+
+    def read(self, n = -1):
+        return self.Read(n)
+
+    def write(self, buf):
+        return self.Write(buf)
+
+    def tell(self):
+        return self.Position
+
+    def flush(self):
+        return self.Flush()
 
     def __getitem__(self, args):
         if isinstance(args, tuple):
