@@ -229,6 +229,35 @@ enum
     CHR_FLAG_EMPTY  = 0x8000,
 };
 
+typedef union BattleCtrlData
+{
+    DUMMY_STRUCT(0x31C);
+
+    struct
+    {
+        DUMMY_STRUCT(0x80);
+
+        union
+        {
+            DUMMY_STRUCT(0x60);
+            struct
+            {
+                FLOAT   X;                  // 0x080
+                FLOAT   what;
+                FLOAT   Y;                  // 0x088
+            };
+
+        } PositionData;                     // 0x080
+
+        CHAR    Name[0x20];                 // 0x0E0
+
+        DUMMY_STRUCT(0x68);                 // 0x100
+
+        USHORT  Flags;                      // 0x168
+    };
+
+} BattleCtrlData, *PBattleCtrlData;
+
 typedef union MONSTER_STATUS
 {
     DUMMY_STRUCT(0x2424);
@@ -299,9 +328,11 @@ typedef union MONSTER_STATUS
         BYTE                    SelectedTargetIndex;        // 0x1CB
         COORD                   SelectedTargetPos;          // 0x1CC
 
-        DUMMY_STRUCT(0x234 - 0x1D0);
+        DUMMY_STRUCT(0x22C - 0x1D0);
 
-        CHAR_STATUS ChrStatus[2];                           // 0x234
+        PBattleCtrlData         CtrlData;                   // 0x22C
+        PVOID                   Unknown_230;                // 0x230
+        CHAR_STATUS             ChrStatus[2];               // 0x234
                                                             // 0x268
 
         USHORT MoveSPD;                                     // 0x29C
@@ -627,6 +658,11 @@ public:
     READONLY_PROPERTY(CArtsNameWindow*, ArtsNameWindow)
     {
         return *(CArtsNameWindow **)PtrAdd(this, 0xFF59C);
+    }
+
+    READONLY_PROPERTY(BattleCtrlData*, CtrlData)
+    {
+        return (BattleCtrlData *)PtrAdd(this, 0x660);
     }
 
     CBattleInfoBox* GetBattleInfoBox()

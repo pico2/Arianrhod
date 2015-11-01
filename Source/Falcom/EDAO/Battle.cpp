@@ -536,6 +536,7 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     COORD           TargetPos;
     PCRAFT_AI_INFO  AIInfo;
     MONSTER_STATUS  AvatarBackup;
+    BattleCtrlData  CtrlDataBackup;
 
     if (MSData->SelectedActionType != ACTION_CRAFT)
         return;
@@ -555,12 +556,15 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
 
     AIInfo = &MSData->CraftAiInfo[MSData->CurrentAiIndex];
     AvatarBackup = GetMonsterStatus()[AVATAR_CHR_POSITION];
+    CtrlDataBackup = this->CtrlData[AVATAR_CHR_POSITION];
 
     LOOP_ONCE
     {
         TargetPos = MSData->SelectedTargetPos;
 
         GetMonsterStatus()[AVATAR_CHR_POSITION].State = MSData->State;
+        CLEAR_FLAG(this->CtrlData[AVATAR_CHR_POSITION].Flags, 0x80);
+
         //if (this->LoadMSData(MSFileIndex, AVATAR_CHR_POSITION) == FALSE)
         //    break;
 
@@ -577,8 +581,8 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
         this->SummonX = TargetPos.X;
         this->SummonY = TargetPos.Y;
 
-        *(PFLOAT)(PtrAdd(this, 0x660 + 0x80 + CharPosition * 0x31C)) = TargetPos.X;
-        *(PFLOAT)(PtrAdd(this, 0x668 + 0x80 + CharPosition * 0x31C)) = TargetPos.Y;
+        this->CtrlData[CharPosition].PositionData.X = TargetPos.X;
+        this->CtrlData[CharPosition].PositionData.Y = TargetPos.Y;
 
         GetMonsterStatus()[CharPosition].State = MSData->State;
 
@@ -590,6 +594,7 @@ VOID CBattle::HandleAvatar(PMONSTER_STATUS MSData, PAS_8D_PARAM Parameter)
     }
 
     GetMonsterStatus()[AVATAR_CHR_POSITION] = AvatarBackup;
+    this->CtrlData[AVATAR_CHR_POSITION] = CtrlDataBackup;
 }
 
 ULONG CBattle::FindEmptyPosition(BOOL FindEnemyOnly /* = FALSE */)
