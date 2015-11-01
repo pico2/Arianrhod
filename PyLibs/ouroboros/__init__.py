@@ -17,5 +17,6 @@ from . import console
 from . import dbghelp
 from . import network
 from . import fileio
+from . import cipher
 
-from .dbghelp import Try, TryInvoke
+from .dbghelp import Try, TryInvoke, bp, ibp
