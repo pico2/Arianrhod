@@ -1,6 +1,6 @@
 import os, glob, fnmatch
 
-def walkDirectory(path, filter = '*.*'):
+def getDirectoryFiles(path, filter = '*.*'):
     allfiles = []
     if filter == '*.*':
         filter = '*'
