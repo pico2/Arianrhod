@@ -18,5 +18,6 @@ from . import dbghelp
 from . import network
 from . import fileio
 from . import cipher
+from . import logger
 
 from .dbghelp import Try, TryInvoke, bp, ibp
