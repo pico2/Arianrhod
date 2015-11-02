@@ -1,0 +1,19 @@
+"*":
+  "exception-reporting":
+    userId: "4316e673-89de-30ca-58ba-09582c399910"
+  welcome:
+    showOnStartup: false
+  editor:
+    fontSize: 17
+    invisibles: {}
+    autoIndentOnPaste: false
+    showInvisibles: true
+    showIndentGuide: true
+    tabLength: 4
+  core:
+    autoHideMenuBar: true
+    disabledPackages: [
+      "spell-check"
+    ]
+  build: {}
+  "spell-check": {}
