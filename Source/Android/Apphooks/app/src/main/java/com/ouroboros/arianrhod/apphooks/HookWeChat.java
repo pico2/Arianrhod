@@ -85,7 +85,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "B", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "C", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //                log("what the fuck");
