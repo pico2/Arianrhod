@@ -15,7 +15,7 @@ logging.basicConfig(
 def getLogger(name, *, logPath = None):
     def init(self, *, level = logging.DEBUG, handlerClass = logging.FileHandler):
         logFormatter = logging.Formatter(__FORMAT__)
-        fileHandler = handlerClass(filename = self.getLogFileName(), mode = 'w', encoding = 'UTF8')
+        fileHandler = handlerClass(filename = self.getLogFileName(), mode = 'w', encoding = 'UTF_8_SIG')
         fileHandler.setFormatter(logFormatter)
 
         if handlerClass is not logging.FileHandler:
@@ -34,7 +34,7 @@ def getLogger(name, *, logPath = None):
         t = datetime.datetime.now()
         return os.path.join(path, '[%s][%s][%04d-%02d-%02d %02d.%02d.%02d][%d][%d].txt' % (os.path.basename(sys.argv[0]).rsplit('.', maxsplit = 1)[0], self.name, t.year, t.month, t.day, t.hour, t.minute, t.second, os.getpid(), threading.currentThread().ident))
 
-    def findCaller(stack_info = False):
+    def findCaller(self, stack_info = False):
         """
         Find the stack frame of the caller so that we can note the source
         file name, line number and function name.
@@ -68,7 +68,7 @@ def getLogger(name, *, logPath = None):
         self.debug('\r\n'.join(traceback.format_exception(*sys.exc_info())))
 
     logger = logging.getLogger(name)
-    logger.findCaller = findCaller
+    logger.findCaller = types.MethodType(findCaller, logger)
     logger.init = types.MethodType(init, logger)
     logger.getLogFileName = types.MethodType(getLogFileName, logger)
     logger.logException = types.MethodType(logException, logger)

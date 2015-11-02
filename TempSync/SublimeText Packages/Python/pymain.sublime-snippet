@@ -10,7 +10,7 @@ def main():
     ${1:pass$SELECTION}
 
 if __name__ == '__main__':
-    TryInvoke(main)
+    Try(main)
 
 ]]></content>
 </snippet>
