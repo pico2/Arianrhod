@@ -16,6 +16,11 @@
         ]
     },
 
+    {"keys": ["ctrl+u"], "command": "scroll_lines", "args": {"amount": 15.0}, "context": [{ "key": "setting.command_mode" }]},
+    {"keys": ["ctrl+d"], "command": "scroll_lines", "args": {"amount": -15.0}, "context": [{"key": "setting.command_mode"}]},
+    {"keys": ["ctrl+y"], "command": "scroll_lines", "args": {"amount": -1.0}, "context": [{ "key": "setting.command_mode" }]},
+    {"keys": ["ctrl+e"], "command": "scroll_lines", "args": {"amount": 1.0}, "context": [{"key": "setting.command_mode"}]},
+
     { "keys": ["ctrl+shift+a"], "command": "alignment" },
 
     { "keys": ["ctrl+alt+r"], "command": "anaconda_rename" },

@@ -15,6 +15,7 @@
     showIndentGuide: true
     tabLength: 4
     scrollPastEnd: true
+    fontFamily: "Consolas"
   core:
     disabledPackages: [
       "spell-check"
