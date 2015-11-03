@@ -37,7 +37,7 @@ module.exports =
 
     observer = new ViewRuntimeObserver(@scriptView)
 
-    @runtime = new Runtime(runner, codeContextBuilder, [observer])
+    @runtime = new Runtime(runner, codeContextBuilder, [])
 
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace',

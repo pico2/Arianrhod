@@ -133,7 +133,15 @@ GetAfsyncResponse(
 
             helper.GetDeviceId(&mid, &mid2);
 
-            DebugLog(L"ScInfoPath = %S", ScInfoPath);   
+            // g_hardware_hash
+            *(PULONG)&mid2.deviceId[0] = 0x41907897;
+            *(PUSHORT)&mid2.deviceId[4] = 0x8CD9;
+
+            // g_local_hash
+            *(PULONG)&mid.deviceId[0] = 0x72003B2F;
+            *(PUSHORT)&mid.deviceId[4] = 0x4E90;
+
+            DebugLog(L"ScInfoPath = %S", ScInfoPath);
             status = helper.KbsyncCreateSession(&kbsync, &mid, &mid2, ScInfoPath);
             DebugLog(L"KbsyncCreateSession = %p", status);
             RETURN_IF(status != 0, status);
@@ -246,6 +254,8 @@ AuthorizeDsids(
 
     ath.Connect();
 
+    DebugLog(L"ath connect done");
+
 #if 1
 
     ath.SendPowerAssertion(TRUE);
@@ -309,7 +319,7 @@ AuthorizeDsids(
     DebugLog(L"GetAfsyncResponse = %p", status);
 
     String ml;
-    
+
     GenerateModuleList(ml);
     wprintf(L"%s\n", ml);
 

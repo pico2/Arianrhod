@@ -22,6 +22,8 @@ NTSTATUS iOSATH::Connect()
     auto Udid = CFSTR(device.GetUniqueDeviceID().Encode(CP_UTF8));
 
     this->LibraryID = CFSTR(GetLibraryID().Encode(CP_UTF8));
+    DebugLog(L"GetLibraryID done");
+
     this->Connection = ATHostConnectionCreateWithLibrary(
                             this->LibraryID,
                             Udid,

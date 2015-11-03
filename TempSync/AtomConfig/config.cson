@@ -3,19 +3,34 @@
     userId: "4316e673-89de-30ca-58ba-09582c399910"
   welcome:
     showOnStartup: false
+  "autohide-tree-view":
+    none: 0
   editor:
     fontSize: 17
-    invisibles: {}
+    invisibles:
+      eol: " "
+      cr: " "
     autoIndentOnPaste: false
     showInvisibles: true
     showIndentGuide: true
     tabLength: 4
+    scrollPastEnd: true
   core:
-    autoHideMenuBar: true
     disabledPackages: [
       "spell-check"
+      "atom-terminal"
     ]
+    themes: [
+      "atom-dark-ui"
+      "one-dark-syntax"
+    ]
+    autoHideMenuBar: true
   build: {}
   "spell-check": {}
   "atom-terminal": {}
   "vim-mode": {}
+  "tree-view":
+    showOnRightSide: true
+  "autocomplete-python":
+    pythonPath: "D:\\Dev\\Python"
+    useSnippets: "required"

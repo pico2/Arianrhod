@@ -40,3 +40,6 @@
   'ctrl-r': 'symbols-view:toggle-file-symbols'
 'atom-text-editor.vim-mode.normal-mode':
   'ctrl-r': 'symbols-view:toggle-file-symbols'
+'atom-workspace':
+  'alt--': 'last-cursor-position:previous'
+  'alt-=': 'last-cursor-position:next'
