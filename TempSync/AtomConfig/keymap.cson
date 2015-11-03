@@ -30,9 +30,13 @@
   'f2': 'pane:show-next-item'
   'f4': 'core:close'
   'alt-z': 'pane:reopen-closed-item'
+  'ctrl-shift-T': 'atom-terminal:open'
 'atom-text-editor':
   'f1': 'pane:show-previous-item'
   'f2': 'pane:show-next-item'
   'ctrl-b': 'script:run'
   'alt-f': 'native!'
   'alt-h': 'native!'
+  'ctrl-r': 'symbols-view:toggle-file-symbols'
+'atom-text-editor.vim-mode.normal-mode':
+  'ctrl-r': 'symbols-view:toggle-file-symbols'

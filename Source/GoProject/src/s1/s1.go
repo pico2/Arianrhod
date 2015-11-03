@@ -167,8 +167,7 @@ func do(user, pass String) error {
 
 func readuser() []String {
     usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
-    acc, err := io2.ReadTextToLines(usertxt)
-    RaiseIf(err)
+    acc := io2.ReadTextToLines(usertxt)
 
     if len(acc) < 2 {
         Raise("corrupt user.txt")

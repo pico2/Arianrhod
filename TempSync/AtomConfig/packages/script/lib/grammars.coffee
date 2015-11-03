@@ -346,10 +346,10 @@ module.exports =
 
   Python:
     "Selection Based":
-      command: "python"
+      command: ""
       args: (context)  -> ['-c', context.getCode()]
     "File Based":
-      command: "python"
+      command: ""
       args: (context) -> [context.filepath]
 
   R:

@@ -17,3 +17,5 @@
     ]
   build: {}
   "spell-check": {}
+  "atom-terminal": {}
+  "vim-mode": {}

@@ -14,6 +14,10 @@ logs/
 iTunesDLL/
 local.properties
 
+/TempSync/AtomConfig/compile-cache/
+/TempSync/AtomConfig/.node-gyp/
+/TempSync/AtomConfig/storage/
+
 ImmPyCommands/*.pyc
 ImmPyLibs/*.pyc
 Source/sources/3dlearn
@@ -128,3 +132,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/GoProject/src/AppleIdAuthorizer
 /Source/GoProject/src/AppleIdRegister2
 /Source/GoProject/src/iTunesTool
+

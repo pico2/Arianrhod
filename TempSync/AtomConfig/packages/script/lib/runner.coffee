@@ -1,4 +1,7 @@
 {Emitter, BufferedProcess} = require 'atom'
+exec = require('child_process').exec
+path = require('path')
+platform = require('os').platform
 
 module.exports =
 class Runner
@@ -11,9 +14,22 @@ class Runner
   constructor: (@scriptOptions, @emitter = new Emitter) ->
 
   run: (command, extraArgs, codeContext, inputString = null) ->
+    args = @args(codeContext, extraArgs)
+
+    if platform() == "win32"
+      cmdline = 'cmd.exe /c start "" '
+      if command != ""
+        cmdline += '"' + command + '" '
+
+      if args?.length
+        cmdline += args.map((it) -> '"'+ it + '"').join(' ')
+
+      exec(cmdline)
+
+      return
+
     @startTime = new Date()
 
-    args = @args(codeContext, extraArgs)
     options = @options()
     stdout = @stdoutFunc
     stderr = @stderrFunc
@@ -79,7 +95,7 @@ class Runner
     @emitter.on 'did-not-run', callback
 
   options: ->
-    cwd: @getCwd()
+    # cwd: @getCwd()
     env: @scriptOptions.mergedEnv(process.env)
 
   args: (codeContext, extraArgs) ->

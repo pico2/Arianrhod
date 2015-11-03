@@ -47,7 +47,7 @@ module.exports =
       'script:copy-run-results': => @scriptView.copyResults()
       'script:kill-process': => @runtime.stop()
       'script:run-by-line-number': => @runtime.execute('Line Number Based')
-      'script:run': => @runtime.execute('Selection Based')
+      'script:run': => @runtime.execute('File Based')
 
   deactivate: ->
     @runtime.destroy()
