@@ -10,4 +10,4 @@
 #   editor.onDidSave ->
 #     console.log "Saved! #{editor.getPath()}"
 
-process.env.path = ["D:\\Dev\\Python",process.env.PATH].join(";")
+# process.env.path = ["D:\\Dev\\Python",process.env.PATH].join(";")
