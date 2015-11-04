@@ -26,6 +26,10 @@ def getLogger(name, *, logPath = None):
 
         self.funcNameFilter = ['log', 'info', 'warn', 'debug', 'error']
 
+    def attach(self, obj):
+        for func in ['log', 'info', 'warn', 'debug', 'error']:
+            setattr(obj, func, getattr(self, func))
+
     def getLogFileName(self):
         import threading
 
@@ -68,9 +72,10 @@ def getLogger(name, *, logPath = None):
         self.debug('\r\n'.join(traceback.format_exception(*sys.exc_info())))
 
     logger = logging.getLogger(name)
-    logger.findCaller = types.MethodType(findCaller, logger)
-    logger.init = types.MethodType(init, logger)
+    logger.init           = types.MethodType(init, logger)
+    logger.attach         = types.MethodType(attach, logger)
+    logger.findCaller     = types.MethodType(findCaller, logger)
     logger.getLogFileName = types.MethodType(getLogFileName, logger)
-    logger.logException = types.MethodType(logException, logger)
+    logger.logException   = types.MethodType(logException, logger)
 
     return logger
