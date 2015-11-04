@@ -6,7 +6,7 @@
 #include "ml.h"
 #include <Shlobj.h>
 
-#define USE_ITUNES_MOBILE_DEVICE_DLL    1
+#define USE_ITUNES_MOBILE_DEVICE_DLL    0
 
 #if ML_X86
 

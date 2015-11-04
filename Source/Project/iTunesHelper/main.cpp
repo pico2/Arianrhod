@@ -40,7 +40,7 @@ BOOL Initialize(PVOID BaseAddress)
         FunctionJumpVa(LdrLoadDll, iLdrLoadDll, &StubLdrLoadDll),
     };
 
-    PatchMemory(p, countof(p), BaseAddress);
+    //PatchMemory(p, countof(p), BaseAddress);
 
     return TRUE;
 }

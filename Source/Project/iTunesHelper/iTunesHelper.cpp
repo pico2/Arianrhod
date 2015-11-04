@@ -138,7 +138,7 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
     Rtl::GetModuleDirectory(ExePath, nullptr);
 
-#if 1
+#if 0
 
     Rtl::EnvironmentAppend(PUSTR(L"Path"), PUSTR(L"C:\\Program Files (x86)\\iTunes"));
 
@@ -158,6 +158,18 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     *(PVOID *)&StubRegQueryValueExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), ItRegQueryValueExA);
 
 #endif
+
+    PVOID Address;
+    PLDR_MODULE AirTrafficHost = FindLdrModuleByName(PUSTR(L"AirTrafficHost.dll"));
+
+    if (AirTrafficHost != nullptr)
+    {
+        Address = ItRegOpenKeyExA;
+        Mm::WriteProtectMemory(CurrentProcess, LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA), &Address, sizeof(Address));
+
+        Address = ItRegQueryValueExA;
+        Mm::WriteProtectMemory(CurrentProcess, LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), &Address, sizeof(Address));
+    }
 
     this->LoadiTunesRoutines();
     //CopyStruct(PtrAdd(this->iTunesBase, 0x19DC120), L"iTunes", sizeof(L"iTunes"));
@@ -440,7 +452,7 @@ NTSTATUS
 iTunesHelper::
 AirFairSyncGetAuthorizedAccount(
     HANDLE                      afsyncSession,
-    PFAIR_PLAY_HW_INFO                  fairPlayGuid,
+    PFAIR_PLAY_HW_INFO          fairPlayGuid,
     ULONG_PTR                   deviceType,
     PVOID                       afsyncRequest,
     ULONG_PTR                   requestSize,

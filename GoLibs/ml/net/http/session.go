@@ -270,7 +270,22 @@ func (self *Session) SetCookies(url String, cookies Dict) {
     self.cookie.SetCookies(u, c)
 }
 
+func (self *Session) Headers() gohttp.Header {
+    return self.headers
+}
+
 func (self *Session) SetHeaders(headers Dict) {
+    if len(headers) == 0 {
+        self.ClearHeaders()
+        return
+    }
+
+    for k, v := range headers {
+        self.headers.Set(fmt.Sprintf("%v", k), fmt.Sprintf("%v", v))
+    }
+}
+
+func (self *Session) AddHeaders(headers Dict) {
     if len(headers) == 0 {
         self.ClearHeaders()
         return

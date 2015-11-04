@@ -43,3 +43,8 @@
 'atom-workspace':
   'alt--': 'last-cursor-position:previous'
   'alt-=': 'last-cursor-position:next'
+'atom-text-editor.vim-mode':
+  'ctrl-c': 'core:copy'
+'atom-text-editor.vim-mode:not(.insert-mode)':
+  'ctrl-b': 'script:run'
+  'ctrl-f': 'native!'

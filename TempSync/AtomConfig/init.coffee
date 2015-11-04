@@ -11,3 +11,4 @@
 #     console.log "Saved! #{editor.getPath()}"
 
 # process.env.path = ["D:\\Dev\\Python",process.env.PATH].join(";")
+process.env.path = ["D:\\Dev\\PortableGit\\bin", process.env.PATH].join(";")

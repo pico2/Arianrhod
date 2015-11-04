@@ -131,15 +131,15 @@ GetAfsyncResponse(
             *(PULONG)&mid.deviceId[0] = 0xDE903948;
             *(PUSHORT)&mid.deviceId[4] = 0x8CE8;
 
-            helper.GetDeviceId(&mid, &mid2);
+            //helper.GetDeviceId(&mid, &mid2);
 
             // g_hardware_hash
-            *(PULONG)&mid2.deviceId[0] = 0x41907897;
-            *(PUSHORT)&mid2.deviceId[4] = 0x8CD9;
+            //*(PULONG)&mid2.deviceId[0] = 0x41907897;
+            //*(PUSHORT)&mid2.deviceId[4] = 0x8CD9;
 
             // g_local_hash
-            *(PULONG)&mid.deviceId[0] = 0x72003B2F;
-            *(PUSHORT)&mid.deviceId[4] = 0x4E90;
+            //*(PULONG)&mid.deviceId[0] = 0x72003B2F;
+            //*(PUSHORT)&mid.deviceId[4] = 0x4E90;
 
             DebugLog(L"ScInfoPath = %S", ScInfoPath);
             status = helper.KbsyncCreateSession(&kbsync, &mid, &mid2, ScInfoPath);
@@ -321,7 +321,7 @@ AuthorizeDsids(
     String ml;
 
     GenerateModuleList(ml);
-    wprintf(L"%s\n", ml);
+    //wprintf(L"%s\n", ml);
 
     if (status != STATUS_SUCCESS)
         return status;
