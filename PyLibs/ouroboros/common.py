@@ -8,7 +8,8 @@ import shutil
 import asyncio
 import traceback
 import configparser
-import xml.etree.ElementTree as ET
+# import xml.etree.ElementTree as ET
+import xmltodict
 
 from ctypes.wintypes import *
 from ctypes import windll, cdll, byref, wintypes

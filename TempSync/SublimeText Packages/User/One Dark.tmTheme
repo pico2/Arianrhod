@@ -105,6 +105,19 @@
 		</dict>
 		<dict>
 			<key>name</key>
+			<string>Support</string>
+			<key>scope</key>
+			<string>support</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#E5C17C</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
 			<string>Variables</string>
 			<key>scope</key>
 			<string>variable</string>

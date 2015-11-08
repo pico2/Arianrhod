@@ -24,10 +24,10 @@ def getLogger(name, *, logPath = None):
         self.addHandler(fileHandler)
         self.setLevel(level)
 
-        self.funcNameFilter = ['log', 'info', 'warn', 'debug', 'error']
+        self.funcNameFilter = ['log', 'info', 'warn', 'debug', 'error', 'logException']
 
     def attach(self, obj):
-        for func in ['log', 'info', 'warn', 'debug', 'error']:
+        for func in ['log', 'info', 'warn', 'debug', 'error', 'logException']:
             setattr(obj, func, getattr(self, func))
 
     def getLogFileName(self):
