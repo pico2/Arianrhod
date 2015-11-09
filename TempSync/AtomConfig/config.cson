@@ -34,6 +34,7 @@
     useSmartcaseForSearch: true
   "tree-view":
     showOnRightSide: true
+    hideVcsIgnoredFiles: true
   "autocomplete-python":
     pythonPath: "D:\\Dev\\Python"
     useSnippets: "required"
