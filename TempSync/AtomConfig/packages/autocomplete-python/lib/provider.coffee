@@ -86,10 +86,12 @@ module.exports =
       else
         throw error
 
-    editorSelector = 'atom-text-editor[data-grammar~=python]'
-    commandName = 'autocomplete-python:go-to-definition'
-    atom.commands.add editorSelector, commandName, =>
+    selector = 'atom-text-editor[data-grammar~=python]'
+    atom.commands.add selector, 'autocomplete-python:go-to-definition', =>
       @goToDefinition()
+    atom.commands.add selector, 'autocomplete-python:complete-arguments', =>
+      editor = atom.workspace.getActiveTextEditor()
+      @_completeArguments(editor, editor.getCursorBufferPosition(), true)
 
     atom.workspace.observeTextEditors (editor) =>
       editor.displayBuffer.onDidChangeGrammar (grammar) =>
@@ -97,7 +99,7 @@ module.exports =
         eventId = "#{editor.displayBuffer.id}.#{eventName}"
         if grammar.scopeName == 'source.python'
           disposable = @_addEventListener editor, eventName, (event) =>
-            if event.shiftKey and event.keyCode == 57
+            if event.keyIdentifier == 'U+0028'
               @_completeArguments(editor, editor.getCursorBufferPosition())
           @disposables.add disposable
           @subscriptions[eventId] = disposable
@@ -176,10 +178,11 @@ module.exports =
 
   setSnippetsManager: (@snippetsManager) ->
 
-  _completeArguments: (editor, bufferPosition) ->
-    if atom.config.get('autocomplete-python.useSnippets') == 'none'
+  _completeArguments: (editor, bufferPosition, force) ->
+    useSnippets = atom.config.get('autocomplete-python.useSnippets')
+    if not force and useSnippets == 'none'
       return
-    @_log 'Trying to complete arguments after bracket...'
+    @_log 'Trying to complete arguments after left parenthesis...'
     scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition)
     scopeChain = scopeDescriptor.getScopeChain()
     disableForSelector = Selector.create(@disableForSelector)

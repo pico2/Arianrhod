@@ -48,3 +48,5 @@
 'atom-text-editor.vim-mode:not(.insert-mode)':
   'ctrl-b': 'script:run'
   'ctrl-f': 'native!'
+'atom-text-editor.vim-mode.insert-mode':
+  'ctrl-y': 'core:redo'
