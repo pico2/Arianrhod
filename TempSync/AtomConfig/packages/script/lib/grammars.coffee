@@ -352,6 +352,14 @@ module.exports =
       command: ""
       args: (context) -> [context.filepath]
 
+  MagicPython:
+    "Selection Based":
+      command: ""
+      args: (context)  -> ['-c', context.getCode()]
+    "File Based":
+      command: ""
+      args: (context) -> [context.filepath]
+
   R:
     "File Based":
       command: "Rscript"

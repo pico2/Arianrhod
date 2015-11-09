@@ -49,3 +49,6 @@
     syntaxCheckOnSave: false
   "autocomplete-plus":
     autoActivationDelay: 10
+".python.source":
+  editor:
+    autoIndentOnPaste: true
