@@ -10,7 +10,7 @@ module.exports =
   disableForSelector: '.source.python .comment, .source.python .string'
   inclusionPriority: 1
   suggestionPriority: 2
-  excludeLowerPriority: true
+  excludeLowerPriority: false
 
   _log: (msg...) ->
     if atom.config.get('autocomplete-python.outputDebug')
