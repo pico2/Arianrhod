@@ -135,3 +135,5 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 
 /TempSync/AtomConfig/.apm/_git-remotes/
 /Source/sources
+/PyLibs/lldb/*.pyd
+/PyLibs/lldb/*.exe
