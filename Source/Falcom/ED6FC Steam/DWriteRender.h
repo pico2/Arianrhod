@@ -18,6 +18,8 @@ public:
 protected:
     IDWriteBitmapRenderTarget*  renderTarget;
     IDWriteRenderingParams*     renderingParams;
+    IDWriteFontFace*            fontFace;
+    FLOAT                       fontEmSize;
 };
 
 #endif // _DWRITERENDER_H_e14e1038_3d82_475d_96c6_c38253ae4232_

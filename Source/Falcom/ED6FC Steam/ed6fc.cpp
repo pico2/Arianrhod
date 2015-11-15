@@ -6,6 +6,7 @@
 #include "DWriteRender.h"
 
 #pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "d2d1.lib")
 
 ML_OVERLOAD_NEW
 
@@ -122,7 +123,10 @@ NTSTATUS CDECL GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Co
     DWriteRender*   DWRender;
     ULONG_PTR       FontSize;
 
-    DWRender = DWriteRenders[*(PULONG_PTR)PtrAdd(Render, 0x24)];
+    DWRender = DWriteRenders[*(PULONG_PTR)PtrAdd(FontRender, 0x24)];
+    DWRender->RenderRune(L'ÖÐ', Buffer, 0);
+
+    return 0;
 
     return StubGetGlyphsBitmap2(Text, Buffer, ColorIndex, Stride);
 }
@@ -193,8 +197,15 @@ NTSTATUS InitializeDWrite()
         FOR_EACH_ARRAY(fontSize, FontSizeTable)
         {
             *render = new DWriteRender();
+            if (*render == nullptr)
+            {
+                hr = STATUS_NO_MEMORY;
+                break;
+            }
+
             hr = (*render)->Initialize(L"ºÚÌå", *fontSize);
             FAIL_BREAK(hr);
+            ++render;
         }
     }
 
