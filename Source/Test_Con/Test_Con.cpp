@@ -127,29 +127,14 @@ using ml::HashTableT;
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
+    ML_FIND_DATA wfd;
+    HANDLE handle;
 
-    WCHAR buf[1000];
-    HashTableT<ULONG_PTR> table;
+    Io::QueryFirstFile(&handle, L"D:\\Desktop\\lldb\\build\\lib\\site-packages\\lldb\\_lldb.pyd", &wfd);
+    PrintConsole(L"%X\n", wfd.FileAttributes);
 
-    PrintLocaleDefaultAnsiCodePage();
-
-    table.Initialize();
-
-    for (ULONG_PTR i = 0; i != 100000000; ++i)
-    {
-        if ((i & 0xFFFF) == 0)
-            PrintConsole(L"%d                      \r", i);
-
-        table.Add(i, i);
-    }
-
-    PrintConsole(L"done\n");
-
-    for (ULONG_PTR i = 0; i != 100; ++i)
-    {
-        auto x = GetRandom32Range(0, 10000);
-        PrintConsole(L"%d = %d\n", x, *table.Get(x));
-    }
+    Io::QueryFirstFile(&handle, L"D:\\Desktop\\lldb\\build\\bin\\liblldb.dll", &wfd);
+    PrintConsole(L"%X\n", wfd.FileAttributes);
 
     return;
 

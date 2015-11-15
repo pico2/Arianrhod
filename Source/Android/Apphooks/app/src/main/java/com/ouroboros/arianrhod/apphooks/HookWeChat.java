@@ -27,50 +27,22 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // "error pcm duration %d"
 
-//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.e", pkg.classLoader, "g", AudioEncodHelper, new XC_MethodHook() {
-//           @Override
-//           protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//
-//               //I/Xposed  ( 7423):      at beforeHookedMethod
-//               //I/Xposed  ( 7423):      at handleHookedMethod
-//               //I/Xposed  ( 7423):      at g
-//               //I/Xposed  ( 7423):      at c
-//
-//               Exception e = new Exception();
-//               StackTraceElement[] elements = e.getStackTrace();
-//
-//               // log(elements[3].getClassName());
-//               // log(elements[3].getMethodName());
-//
-//               if (elements[3].getClassName().equals("com.tencent.mm.plugin.sight.encode.a.h") == false) {
-//                   return;
-//               }
-//
-//               if (elements[3].getMethodName().equals("c") == false) {
-//                   return;
-//               }
-//
-//               param.setResult(0);
-//           }
-//       });
-
-
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fPp"), "fPi", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fYX"), "fYQ", 0);
             }
         });
 
         // "ERROR record duration, %dms !!!"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lV", new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lr", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "fTr");
-                Object obj2 = XposedHelpers.getObjectField(obj1, "fTf");
+                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gcZ");
+                Object obj2 = XposedHelpers.getObjectField(obj1, "gcN");
 
-                float v2 = ((Long)XposedHelpers.callMethod(obj2, "aqj")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(obj2, "ari")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
                         XposedHelpers.callMethod(obj1, "z", v2);
@@ -85,10 +57,10 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "C", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "H", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                log("what the fuck");
+//                HookLoadPackage.log("what the fuck");
 
                 if (param.hasThrowable() || param.getResult() == null)
                     return;

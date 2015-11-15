@@ -164,7 +164,7 @@ module.exports =
       command: "babel-node"
       args: (context) -> [context.filepath]
 
-  "JavaScript for Automation":
+  "JavaScript for Automation (JXA)":
     "Selection Based":
       command: "osascript"
       args: (context)  -> ['-l', 'JavaScript', '-e', context.getCode()]
@@ -346,18 +346,18 @@ module.exports =
 
   Python:
     "Selection Based":
-      command: ""
+      command: "python"
       args: (context)  -> ['-c', context.getCode()]
     "File Based":
-      command: ""
+      command: "python"
       args: (context) -> [context.filepath]
 
   MagicPython:
     "Selection Based":
-      command: ""
+      command: "python"
       args: (context)  -> ['-c', context.getCode()]
     "File Based":
-      command: ""
+      command: "python"
       args: (context) -> [context.filepath]
 
   R:
@@ -466,6 +466,14 @@ module.exports =
       command: "fish"
       args: (context) -> [context.filepath]
 
+  "SQL (PostgreSQL)":
+    "Selection Based":
+      command: "psql"
+      args: (context) -> ['-c', context.getCode()]
+    "File Based":
+      command: "psql"
+      args: (context) -> ['-f', context.filepath]
+
   "Standard ML":
     "File Based":
       command: "sml"
@@ -501,3 +509,11 @@ module.exports =
     "File Based":
       command: "dart"
       args: (context) -> [context.filepath]
+
+  Octave:
+    "Selection Based":
+      command: "octave"
+      args: (context) -> ['-p', context.filepath.replace(/[^\/]*$/, ''), '--eval', context.getCode()]
+    "File Based":
+      command: "octave"
+      args: (context) -> ['-p', context.filepath.replace(/[^\/]*$/, ''), context.filepath]

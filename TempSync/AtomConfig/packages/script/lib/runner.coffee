@@ -41,6 +41,7 @@ class Runner
 
     if inputString
       @bufferedProcess.process.stdin.write(inputString)
+      @bufferedProcess.process.stdin.end()
 
     @bufferedProcess.onWillThrowError(@createOnErrorFunc(command))
 
@@ -95,7 +96,7 @@ class Runner
     @emitter.on 'did-not-run', callback
 
   options: ->
-    # cwd: @getCwd()
+    cwd: @getCwd()
     env: @scriptOptions.mergedEnv(process.env)
 
   args: (codeContext, extraArgs) ->

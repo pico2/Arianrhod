@@ -266,12 +266,14 @@ public:
     {
         PrintConsole(L"GetISteamUser\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamGameServer *S_VIRTUAL GetISteamGameServer(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamGameServer\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual void S_VIRTUAL SetLocalIPBinding(ULONG ip, USHORT port)
@@ -283,48 +285,56 @@ public:
     {
         PrintConsole(L"GetISteamFriends\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamUtils *S_VIRTUAL GetISteamUtils(SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamUtils\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamMatchmaking *S_VIRTUAL GetISteamMatchmaking(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamMatchmaking\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamMasterServerUpdater *S_VIRTUAL GetISteamMasterServerUpdater(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamMasterServerUpdater\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamMatchmakingServers *S_VIRTUAL GetISteamMatchmakingServers(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamMatchmakingServers\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual void *S_VIRTUAL GetISteamGenericInterface(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamGenericInterface\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamUserStats *S_VIRTUAL GetISteamUserStats(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamUserStats\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamGameServerStats *S_VIRTUAL GetISteamGameServerStats(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamGameServerStats\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamApps *S_VIRTUAL GetISteamApps(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
@@ -337,12 +347,14 @@ public:
     {
         PrintConsole(L"GetISteamNetworking\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual ISteamRemoteStorage *S_VIRTUAL GetISteamRemoteStorage(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
     {
         PrintConsole(L"GetISteamRemoteStorage\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual void S_VIRTUAL RunFrame()
@@ -371,36 +383,42 @@ public:
     {
         PrintConsole(L"GetISteamHTTP\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual class ISteamUnifiedMessages * S_VIRTUAL GetISteamUnifiedMessages( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
     {
         PrintConsole(L"GetISteamUnifiedMessages\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual class  ISteamController * S_VIRTUAL GetISteamController( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
     {
         PrintConsole(L"GetISteamController\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual class ISteamUGC * S_VIRTUAL GetISteamUGC( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
     {
         PrintConsole(L"GetISteamUGC\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual class ISteamAppList * S_VIRTUAL GetISteamAppList( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
     {
         PrintConsole(L"GetISteamAppList\n");
         DebugBreakPoint();
+        return nullptr;
     }
 
     virtual class ISteamMusic * S_VIRTUAL GetISteamMusic( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
     {
         PrintConsole(L"GetISteamMusic\n");
         DebugBreakPoint();
+        return nullptr;
     }
 };
 
@@ -870,6 +888,15 @@ struct ISteamRemoteStorage
 // export
 //////////////////////////////////////////////////////////////////////////
 
+
+    static ISteamApps apps;
+
+    static ISteamUserStats stat;
+
+    static ISteamClient client;
+
+    static ISteamRemoteStorage storage;
+
 bool S_API SteamAPI_Init()
 {
     PrintConsole(L"SteamAPI_Init\n");
@@ -937,21 +964,18 @@ void S_API SteamAPI_WriteMiniDump(ULONG exceptionCode, PVOID exceptionInfo, ULON
 ISteamApps* S_API SteamApps()
 {
     PrintConsole(L"SteamApps\n");
-    static ISteamApps apps;
     return &apps;
 }
 
 ISteamUserStats* S_API SteamUserStats()
 {
     PrintConsole(L"SteamUserStats\n");
-    static ISteamUserStats stat;
     return &stat;
 }
 
 struct ISteamClient* S_API SteamClient()
 {
     PrintConsole(L"SteamClient\n");
-    static ISteamClient client;
     return &client;
 }
 
@@ -959,18 +983,21 @@ ISteamFriends* S_API SteamFriends()
 {
     PrintConsole(L"SteamFriends\n");
     DebugBreakPoint();
+    return nullptr;
 }
 
 ISteamGameServer* S_API SteamGameServer()
 {
     PrintConsole(L"SteamGameServer\n");
     DebugBreakPoint();
+    return nullptr;
 }
 
 ISteamNetworking* S_API SteamGameServerNetworking()
 {
     PrintConsole(L"SteamGameServerNetworking\n");
     DebugBreakPoint();
+    return nullptr;
 }
 
 ULONG64 S_API SteamGameServer_GetSteamID()
@@ -999,24 +1026,26 @@ ISteamMatchmaking* S_API SteamMatchmaking()
 {
     PrintConsole(L"SteamMatchmaking\n");
     DebugBreakPoint();
+    return nullptr;
 }
 
 ISteamMatchmakingServers* S_API SteamMatchmakingServers()
 {
     PrintConsole(L"SteamMatchmakingServers\n");
     DebugBreakPoint();
+    return nullptr;
 }
 
 ISteamNetworking* S_API SteamNetworking()
 {
     PrintConsole(L"SteamNetworking\n");
     DebugBreakPoint();
+    return nullptr;
 }
 
 ISteamRemoteStorage* S_API SteamRemoteStorage()
 {
     PrintConsole(L"SteamRemoteStorage\n");
-    static ISteamRemoteStorage storage;
     return &storage;
 }
 

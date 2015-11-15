@@ -49,11 +49,19 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 mylib_nt.lib undoc_ntdll.lib ntdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"D:\Game\Falcom\Trails in the Sky FC\steam_api.dll" /ltcg /opt:REF
+# ADD LINK32 mylib.lib undoc_ntdll.lib ntdll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"D:\Game\Steam\steamapps\common\Trails in the Sky FC\ed6fc.dll" /ltcg /opt:REF
 # SUBTRACT LINK32 /pdb:none
 # Begin Target
 
 # Name "ed6fc - Win32 Release"
+# Begin Source File
+
+SOURCE=.\DWriteRender.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\DWriteRender.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\ed6fc.cpp

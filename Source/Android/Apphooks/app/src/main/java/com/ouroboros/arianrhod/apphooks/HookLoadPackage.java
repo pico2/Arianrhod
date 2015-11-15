@@ -37,7 +37,7 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
     public void handleLoadPackage(final LoadPackageParam pkg) throws Throwable {
         switch (pkg.packageName) {
             case "pl.solidexplorer2":
-                new HookSolidExplorer().handleLoadPackage(pkg);
+//                new HookSolidExplorer().handleLoadPackage(pkg);
                 break;
 
             case "com.tencent.mm":
@@ -45,15 +45,15 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
                 break;
 
             case "flar2.exkernelmanager":
-                new HookExkernelManager().handleLoadPackage(pkg);
+//                new HookExkernelManager().handleLoadPackage(pkg);
                 break;
 
             case "com.ceco.lollipop.gravitybox":
-                new HookGravityBox().handleLoadPackage(pkg);
+//                new HookGravityBox().handleLoadPackage(pkg);
                 break;
 
             case "com.android.systemui":
-                new HookSystemUi().handleLoadPackage(pkg);
+//                new HookSystemUi().handleLoadPackage(pkg);
                 break;
 
             case "com.android.mms":

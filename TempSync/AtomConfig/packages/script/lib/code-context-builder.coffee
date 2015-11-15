@@ -20,7 +20,7 @@ class CodeContextBuilder
   # * "File Based"
   #
   # returns a {CodeContext} object
-  buildCodeContext: (editor, argType='File Based') ->
+  buildCodeContext: (editor, argType='Selection Based') ->
     return unless editor?
 
     codeContext = @initCodeContext(editor)
@@ -77,7 +77,7 @@ class CodeContextBuilder
 
   validateLang: (lang) ->
     valid = true
-
+    
     # Determine if no language is selected.
     if lang is 'Null Grammar' or lang is 'Plain Text'
       @emitter.emit 'did-not-specify-language'

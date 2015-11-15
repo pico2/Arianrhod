@@ -3,6 +3,7 @@ if sys.version_info[0] < 3:
     import __builtin__ as builtins
 else:
     import builtins
+    sys.path.append('d:\\dev\\python\\lib\\site-packages')
 
 import code
 import lldb
