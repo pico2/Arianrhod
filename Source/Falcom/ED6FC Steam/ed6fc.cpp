@@ -101,9 +101,13 @@ VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG ColorIndex, U
 VOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
     DWriteRender*   DWRender;
-    ULONG_PTR       FontSize, Color;
+    ULONG_PTR       FontSize, FontIndex, Color;
 
-    DWRender = DWriteRenders[*(PULONG_PTR)PtrAdd(GameFontRender, 0x24)];
+//    return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex);
+
+    FontIndex = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
+    FontSize = FontSizeTable[FontIndex];
+    DWRender = DWriteRenders[FontIndex];
     Color = FontColorTable[ColorIndex];
 
     for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_SHIFTJIS))
@@ -113,8 +117,7 @@ VOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorI
             ;
         }
 
-        Buffer = PtrAdd(Buffer, Stride);
-        break;
+        //Buffer = PtrAdd(Buffer, Stride * FontSize);
     }
 
     //StubGetGlyphsBitmap2(Text, Buffer, ColorIndex, Stride);

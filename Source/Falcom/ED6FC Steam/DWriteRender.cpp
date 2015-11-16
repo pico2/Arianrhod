@@ -227,12 +227,12 @@ VOID DWriteRender::SaveToBmpFile()
     bin.SetEndOfFile();
 }
 
-NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_PTR OutputStride)
+NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_PTR OutputStride)
 {
     UINT32      codePoint;
     UINT16      glyphIndice;
     RECT        blackBox;
-    LONG_PTR    stride, height, x, y, size;
+    LONG_PTR    stride, width, height, x, y, size;
     PBYTE       outline, out, pixels;
     HDC         dc;
     HBITMAP     bitmap;
@@ -266,18 +266,17 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_P
 
     GetDIBits(dc, bitmap, 0, bmp.bmHeight, pixels, &bmi, DIB_RGB_COLORS);
 
+    width = blackBox.right - blackBox.left;
     height = blackBox.bottom - blackBox.top;
-
-    //size = DipsToPixelsY(this->renderTargetSize);
     size = this->fontHeight;
 
-    if (height > size || blackBox.right - blackBox.left > size)
+    if (height > size || width > size)
         DebugBreakPoint();
 
     outline = (PBYTE)AllocStack(size * size);
     ZeroMemory(outline, size * size);
 
-    y = blackBox.top - 2;
+    y = blackBox.top;
     out = outline + y * size + blackBox.left;
     pixels += y * stride;
 
@@ -286,30 +285,36 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_P
         COLORREF* i = (COLORREF *)pixels + blackBox.left;
         PBYTE o = out;
 
-        for (LONG_PTR w = size; w != 0; --w)
+        for (LONG_PTR w = width; w != 0; --w)
         {
             *o++ = FontLumaTable[RGBA_GetRValue(*i++)];
         }
 
         pixels += stride;
         out += size;
+
+        if (o > out)
+            ExceptionBox(L"out of range");
     }
 
-    out = (PBYTE)Buffer;
+    out = (PBYTE)Output;
     for (LONG_PTR h = size; h != 0; --h)
     {
-        PUSHORT o = (PUSHORT)out;
+        PUSHORT o = (PUSHORT)out - 1;
         for (LONG_PTR w = size; w != 0; --w)
         {
             ULONG c = *outline++;
 
+            ++o;
             if (c == 0)
                 continue;
 
-            *o++ = (c << 12) | Color;
+            *o = (c << 12) | Color;
         }
 
         out += OutputStride;
+        if ((PBYTE)o > out)
+            ExceptionBox(L"out of range 2");
     }
 
     return STATUS_SUCCESS;
