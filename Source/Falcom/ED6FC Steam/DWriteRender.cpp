@@ -127,7 +127,7 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
         hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
         FAIL_BREAK(hr);
 
-        this->fontEmSize = PixelsToDipsY(FontSize * 0.8);
+        this->fontEmSize = PixelsToDipsY(FontSize) * 0.9;
         this->fontHeight = FontSize;
         hr = dwrite->GetGdiInterop(&gdiInterop);
         FAIL_BREAK(hr);
@@ -188,7 +188,7 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
 
     FAIL_RETURN(this->renderTarget->DrawGlyphRun(
         (this->renderTargetSize - this->fontEmSize) / 2,
-        this->fontEmSize - 2,
+        this->fontEmSize,
         DWRITE_MEASURING_MODE_NATURAL,
         &run,
         this->renderingParams,
@@ -199,7 +199,7 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
     return STATUS_SUCCESS;
 }
 
-NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_PTR OutputStride)
+NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_PTR OutputStride, PULONG_PTR runeWidth)
 {
     UINT32      codePoint;
     UINT16      glyphIndice;
@@ -212,30 +212,21 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     BITMAPINFO  bmi;
     IMAGE_BITMAP_HEADER header;
 
+    BOOL show = FALSE;
+    if (ch == L"С"[0])
+    {
+        show = TRUE;
+    }
+
     codePoint = ch;
     FAIL_RETURN(this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice));
     FAIL_RETURN(this->DrawRenderTarget(glyphIndice, &blackBox));
-
-    blackBox.left -= 2;
-    blackBox.right += 2;
-    blackBox.top -= 3;
-    blackBox.bottom += 3;
 
     dc = this->renderTarget->GetMemoryDC();
 
     bitmap = (HBITMAP)(HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
     GetObjectW(bitmap, sizeof(bmp), &bmp);
     InitBitmapHeader(&header, bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel, &stride);
-
-    if (ch >= 0x80)
-    {
-        //PrintConsole(L"%c\n", ch);
-        if (ch == L"С"[0])
-        {
-            SaveToBmpFile();
-            PrintConsole(L"%d %d %d %d %d\n", blackBox, stride);
-        }
-    }
 
     pixels = (PBYTE)AllocStack(header.FileSize);
 
@@ -253,6 +244,7 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
 
     width = blackBox.right - blackBox.left;
     height = blackBox.bottom - blackBox.top;
+
     fontSize = this->fontHeight;
 
     if (height > fontSize || width > fontSize)
@@ -263,21 +255,31 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
         //fontSize = ML_MAX(height, ML_MAX(fontSize, width));
     }
 
+    if (show)
+        PrintConsole(L"fontSize = %d\n", fontSize);
+
     outline = (PBYTE)AllocStack(fontSize * fontSize);
     ZeroMemory(outline, fontSize * fontSize);
 
     auto opixels = pixels;
 
-    pixels += (blackBox.bottom - 1) * stride;
-    out = outline + (fontSize - height) / 2 * fontSize;
-    out = outline;
+    pixels += (fontSize - 1) * stride + blackBox.left * sizeof(COLORREF);
+    out = outline + (fontSize - width) / 2;
 
-    for (LONG_PTR h = height; h != 0; --h)
+    *runeWidth = width + blackBox.left;
+
+    if (show)
     {
-        COLORREF* i = (COLORREF *)pixels + blackBox.left;
-        PBYTE o = out + (fontSize - width) / 2;
+        SaveToBmpFile();
+        PrintConsole(L"rc = {%d %d %d %d} stride = %d w = %d h = %d\n", blackBox, stride, width, height);
+    }
 
-        for (LONG_PTR w = width; w != 0; --w)
+    for (LONG_PTR h = blackBox.bottom; h != 0; --h)
+    {
+        COLORREF* i = (COLORREF *)pixels;
+        PBYTE o = out;
+
+        for (LONG_PTR w = blackBox.right; w != 0; --w)
         {
             *o++ = FontLumaTable[RGBA_GetRValue(*i++)];
         }
@@ -290,6 +292,11 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
             ExceptionBox(L"out of range");
             Ps::ExitProcess(0);
         }
+    }
+
+    if (show)
+    {
+        PrintConsole(L"o = %p, p = %p %d\n", opixels, pixels, opixels == pixels - 19 * stride);
     }
 
     out = (PBYTE)Output;

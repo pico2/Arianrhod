@@ -13,7 +13,7 @@ public:
 
 public:
     NTSTATUS Initialize(PCWSTR FaceName, ULONG_PTR FontSize);
-    NTSTATUS DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_PTR OutputStride);
+    NTSTATUS DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_PTR OutputStride, PULONG_PTR runeWidth);
 
     FLOAT PixelsToDipsX(LONG_PTR x);
     FLOAT PixelsToDipsY(LONG_PTR y);

@@ -46,68 +46,6 @@ USHORT FontColorTable[] =
 
 DWriteRender *DWriteRenders[countof(FontSizeTable)];
 
-NTSTATUS GetGlyphBitmap(LONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG ColorIndex, ULONG Stride)
-{
-    PBYTE           Outline, Source;
-    ULONG_PTR       Color;
-
-#if 0
-
-    Color = FontColorTable[ColorIndex];
-
-    bitmap = (FT_BitmapGlyph)glyph;
-    Source = (PBYTE)bitmap->bitmap.buffer;
-
-    if (Source != nullptr)
-    {
-        BYTE LocalOutline[0x2000];
-        ZeroMemory(LocalOutline, FontSize * FontSize);
-
-        Outline = LocalOutline + bitmap->left + (FontSize - ML_MIN(FontSize, bitmap->top + 3)) * FontSize;
-
-        for (ULONG_PTR Height = bitmap->bitmap.rows; Height; --Height)
-        {
-            PBYTE out = Outline;
-
-            for (ULONG_PTR Width = bitmap->bitmap.width; Width; --Width)
-            {
-                *out++ = FontLumaTable[*Source++];
-            }
-
-            Outline += FontSize;
-        }
-
-        PBYTE Surface = (PBYTE)Buffer;
-
-        Source = LocalOutline;
-
-        for (ULONG_PTR Height = FontSize; Height; --Height)
-        {
-            PUSHORT out = (PUSHORT)Surface;
-
-            for (ULONG_PTR Width = FontSize; Width; --Width)
-            {
-                *out++ = *Source != 0 ? ((*Source << 0xC) | Color) : 0;
-                ++Source;
-            }
-
-            Surface += Stride;
-        }
-
-        //Buffer = PtrAdd(Buffer, (bitmap->left + bitmap->bitmap.pitch + bitmap->left) * sizeof(USHORT));
-        Buffer = PtrAdd(Buffer, (Chr >= 0x80 ? FontSize : FontSize / 2) * sizeof(USHORT));
-    }
-    else
-    {
-        //Buffer = PtrAdd(Buffer, Face->glyph->metrics.horiAdvance * 2);
-        Buffer = PtrAdd(Buffer, Chr == ' ' ? FontSize : FontSize * 2);
-    }
-
-#endif
-
-    return STATUS_SUCCESS;
-}
-
 VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
 
 BOOL IsSymbolChar(PCSTR Text)
@@ -128,13 +66,11 @@ BOOL IsSymbolChar(PCSTR Text)
     return FALSE;
 }
 
-VOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
+PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
     DWriteRender*   DWRender;
     ULONG_PTR       FontSize, FontIndex, Color;
     DOUBLE          delta, width;
-
-    //return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex);
 
     FontIndex = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
     FontSize = FontSizeTable[FontIndex];
@@ -162,8 +98,10 @@ VOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorI
         }
         else
         {
-            DWRender->DrawRune(chr, Color, Buffer, Stride);
+            ULONG_PTR runeWidth;
+            DWRender->DrawRune(chr, Color, Buffer, Stride, &runeWidth);
             width = FontSize;
+            width = runeWidth;
             Text += 2;
         }
 
@@ -171,28 +109,14 @@ VOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorI
         Buffer = PtrAdd(Buffer, (LONG_PTR)width * 2);
         delta = width - (LONG_PTR)width;
     }
+
+    return Buffer;
 }
 
-NTSTATUS GetGlyphsBitmap(PVOID Render, PCSTR Text, PVOID Buffer, ULONG ColorIndex, ULONG Stride, PVOID OriginalRoutine)
+PVOID FASTCALL DrawTalkText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, PCSTR Text, ULONG ColorIndex)
 {
-    LONG_PTR FontSize = FontSizeTable[*(PULONG_PTR)PtrAdd(Render, 0x24)];
-    ULONG_PTR Encoding = CP_GB2312;
-
-    SleepFix = 1;
-
-    // FT_Set_Pixel_Sizes(Face, FontSize, FontSize);
-
-    for (auto &chr : String::Decode(Text, StrLengthA(Text), Encoding))
-    {
-        if (NT_FAILED(GetGlyphBitmap(FontSize, chr, Buffer, ColorIndex, Stride)))
-        {
-            WCHAR wcs[] = { chr, 0 };
-            auto mbcs = String(wcs).Encode(Encoding);
-            Buffer = PtrAdd(Buffer, FontSize * 2);
-        }
-    }
-
-    return 0;
+    CHAR tmp[3] = { Text[0], Text[0] < 0 ? Text[1] : 0 };
+    return GetGlyphsBitmap2(tmp, Buffer, Stride * 2, ColorIndex);
 }
 
 /************************************************************************
@@ -329,7 +253,9 @@ BOOL Initialize(PVOID BaseAddress)
             LookupImportTable(GetExeModuleHandle(), nullptr, USER32_SetWindowPos)
         ),
 
+        MemoryPatchVa(0xEBull, 1, 0x485041),
         FunctionJumpVa(Success ? (PVOID)0x4B7C30 : IMAGE_INVALID_VA, GetGlyphsBitmap2, &StubGetGlyphsBitmap2),
+        FunctionJumpVa(Success ? (PVOID)0x484A40 : IMAGE_INVALID_VA, DrawTalkText),
     };
 
     PatchMemory(p, countof(p), BaseAddress);
