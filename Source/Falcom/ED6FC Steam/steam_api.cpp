@@ -439,7 +439,7 @@ struct ISteamUserStats
         return true;
     };
 
-    virtual bool S_VIRTUAL GetStat(PCSTR name, float *data)
+    virtual bool S_VIRTUAL GetStat(PCSTR name, FLOAT *data)
     {
         PrintConsole(L"GetStat\n");
         *data = 0;
@@ -452,13 +452,13 @@ struct ISteamUserStats
         return true;
     }
 
-    virtual bool S_VIRTUAL SetStat(PCSTR name, float data)
+    virtual bool S_VIRTUAL SetStat(PCSTR name, FLOAT data)
     {
         PrintConsole(L"SetStat\n");
         return true;
     }
 
-    virtual bool S_VIRTUAL UpdateAvgRateStat(PCSTR name, float countThisSession,  double sessionLength)
+    virtual bool S_VIRTUAL UpdateAvgRateStat(PCSTR name, FLOAT countThisSession,  double sessionLength)
     {
         PrintConsole(L"UpdateAvgRateStat\n");
         return true;
@@ -540,7 +540,7 @@ struct ISteamUserStats
         return true;
     }
 
-    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, float *data)
+    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, FLOAT *data)
     {
         PrintConsole(L"GetUserStat\n");
         *data = 0;
@@ -661,7 +661,7 @@ struct ISteamUserStats
         return SteamAPICallInvalid;
     }
 
-    virtual int S_VIRTUAL GetMostAchievedAchievementInfo( char *pchName, ULONG unNameBufLen, float *pflPercent, bool *pbAchieved )
+    virtual int S_VIRTUAL GetMostAchievedAchievementInfo( char *pchName, ULONG unNameBufLen, FLOAT *pflPercent, bool *pbAchieved )
     {
         PrintConsole(L"GetMostAchievedAchievementInfo\n");
         *pflPercent = 100;
@@ -669,7 +669,7 @@ struct ISteamUserStats
         return 0;
     }
 
-    virtual int S_VIRTUAL GetNextMostAchievedAchievementInfo( int iIteratorPrevious, char *pchName, ULONG unNameBufLen, float *pflPercent, bool *pbAchieved )
+    virtual int S_VIRTUAL GetNextMostAchievedAchievementInfo( int iIteratorPrevious, char *pchName, ULONG unNameBufLen, FLOAT *pflPercent, bool *pbAchieved )
     {
         PrintConsole(L"GetNextMostAchievedAchievementInfo\n");
         ZeroMemory(pchName, unNameBufLen);
@@ -678,7 +678,7 @@ struct ISteamUserStats
         return 0;
     }
 
-    virtual bool S_VIRTUAL GetAchievementAchievedPercent( PCSTR pchName, float *pflPercent )
+    virtual bool S_VIRTUAL GetAchievementAchievedPercent( PCSTR pchName, FLOAT *pflPercent )
     {
         PrintConsole(L"GetAchievementAchievedPercent\n");
         *pflPercent = 100;
