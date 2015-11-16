@@ -26,6 +26,18 @@ BYTE FontSizeTable[] =
     0x80, 0x90, 0xa0, 0xc0,
 };
 
+BYTE LetterWidthTable[] =
+{
+    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+    0x0A, 0x06, 0x08, 0x0C, 0x0B, 0x0F, 0x0D, 0x05, 0x08, 0x07, 0x09, 0x0C, 0x06, 0x08, 0x06, 0x09,
+    0x0B, 0x09, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x06, 0x06, 0x0B, 0x0C, 0x0B, 0x0A,
+    0x10, 0x0D, 0x0C, 0x0D, 0x0D, 0x0C, 0x0B, 0x0D, 0x0D, 0x07, 0x09, 0x0D, 0x0B, 0x10, 0x0D, 0x0E,
+    0x0C, 0x0E, 0x0C, 0x0B, 0x0C, 0x0D, 0x0D, 0x10, 0x0C, 0x0C, 0x0C, 0x08, 0x09, 0x07, 0x0B, 0x0C,
+    0x07, 0x0A, 0x0B, 0x0A, 0x0B, 0x0A, 0x09, 0x0B, 0x0B, 0x06, 0x06, 0x0B, 0x06, 0x0F, 0x0B, 0x0B,
+    0x0B, 0x0B, 0x09, 0x09, 0x07, 0x0B, 0x0B, 0x0E, 0x0A, 0x0A, 0x09, 0x08, 0x07, 0x08, 0x0C, 0x0A,
+};
+
 USHORT FontColorTable[] =
 {
     0x0fff, 0x0fc7, 0x0f52, 0x08cf, 0x0fb4, 0x08fa, 0x0888, 0x0fee, 0x0853, 0x0333,
@@ -96,31 +108,69 @@ NTSTATUS GetGlyphBitmap(LONG_PTR FontSize, WCHAR Chr, PVOID& Buffer, ULONG Color
     return STATUS_SUCCESS;
 }
 
-VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG ColorIndex, ULONG Stride);
+VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
+
+BOOL IsSymbolChar(PCSTR Text)
+{
+    if (Text[0] >= 0)
+        return FALSE;
+
+    switch (*(PUSHORT)Text)
+    {
+        case 0xA181:
+        case 0x9F81:
+        case 0xAA84:
+        case 0x4081:
+            return TRUE;
+    }
+
+    //return (BYTE)Text[0] >= 0x80 && ((BYTE)Text[0] < 0xA0 || (BYTE)Text[0] >= 0xE0);
+    return FALSE;
+}
 
 VOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
     DWriteRender*   DWRender;
     ULONG_PTR       FontSize, FontIndex, Color;
+    DOUBLE          delta, width;
 
-//    return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex);
+    //return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex);
 
     FontIndex = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
     FontSize = FontSizeTable[FontIndex];
     DWRender = DWriteRenders[FontIndex];
     Color = FontColorTable[ColorIndex];
+    delta = 0;
 
-    for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_SHIFTJIS))
+    for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GB2312))
     {
-        if (NT_FAILED(DWRender->DrawRune(chr, Color, Buffer, Stride)))
+        CHAR ansi = Text[0];
+
+        if (ansi >= 0)
         {
-            ;
+            CHAR tmp[2] = { ansi };
+            StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
+            width = (LetterWidthTable[ansi] + 2) * FontSize * 0.03125;
+            ++Text;
+        }
+        else if (IsSymbolChar(Text))
+        {
+            CHAR tmp[3] = { Text[0], Text[1] };
+            StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
+            width = FontSize;
+            Text += 2;
+        }
+        else
+        {
+            DWRender->DrawRune(chr, Color, Buffer, Stride);
+            width = FontSize;
+            Text += 2;
         }
 
-        //Buffer = PtrAdd(Buffer, Stride * FontSize);
+        width += delta;
+        Buffer = PtrAdd(Buffer, (LONG_PTR)width * 2);
+        delta = width - (LONG_PTR)width;
     }
-
-    //StubGetGlyphsBitmap2(Text, Buffer, ColorIndex, Stride);
 }
 
 NTSTATUS GetGlyphsBitmap(PVOID Render, PCSTR Text, PVOID Buffer, ULONG ColorIndex, ULONG Stride, PVOID OriginalRoutine)
@@ -195,7 +245,7 @@ NTSTATUS InitializeDWrite()
                 break;
             }
 
-            hr = (*render)->Initialize(L"Microsoft YaHei UI", *fontSize);
+            hr = (*render)->Initialize(L"font.ttf", *fontSize);
             FAIL_BREAK(hr);
             ++render;
         }
@@ -242,6 +292,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     Rtl::SetExeDirectoryAsCurrent();
 
+    AddFontResourceExW(L"user.ttf", FR_PRIVATE, nullptr);
+
     Success = FindFontRender(BaseAddress) != IMAGE_INVALID_VA;
 
     using namespace Mp;
@@ -282,7 +334,8 @@ BOOL Initialize(PVOID BaseAddress)
 
     PatchMemory(p, countof(p), BaseAddress);
 
-    //DWriteRenders[9]->DrawRune(L"ά"[0], FontColorTable[0], 0, 0), Ps::ExitProcess(0);
+    AllocConsole();
+    //DWriteRenders[9]->DrawRune(L"e"[0], FontColorTable[0], 0, 0), Ps::ExitProcess(0);
 
     return TRUE;
 }

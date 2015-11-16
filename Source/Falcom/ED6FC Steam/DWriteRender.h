@@ -28,8 +28,9 @@ protected:
     IDWriteBitmapRenderTarget*  renderTarget;
     IDWriteRenderingParams*     renderingParams;
     IDWriteFontFace*            fontFace;
+    LONG_PTR                    fontHeight;
     FLOAT                       fontEmSize;
-    FLOAT                       fontHeight;
+    FLOAT                       maxFontEmSize;
     FLOAT                       renderTargetSize;
     FLOAT                       dpiX, dpiY;
 };
