@@ -254,6 +254,7 @@ BOOL Initialize(PVOID BaseAddress)
         ),
 
         MemoryPatchVa(0xEBull, 1, 0x485041),
+        MemoryPatchVa(0x0404ull, 2, 0x4850FE),
         FunctionJumpVa(Success ? (PVOID)0x4B7C30 : IMAGE_INVALID_VA, GetGlyphsBitmap2, &StubGetGlyphsBitmap2),
         FunctionJumpVa(Success ? (PVOID)0x484A40 : IMAGE_INVALID_VA, DrawTalkText),
     };

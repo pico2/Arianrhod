@@ -127,7 +127,7 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
         hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
         FAIL_BREAK(hr);
 
-        this->fontEmSize = PixelsToDipsY(FontSize) * 0.9;
+        this->fontEmSize = PixelsToDipsY(FontSize) * 0.92;
         this->fontHeight = FontSize;
         hr = dwrite->GetGdiInterop(&gdiInterop);
         FAIL_BREAK(hr);
@@ -263,10 +263,10 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
 
     auto opixels = pixels;
 
-    pixels += (fontSize - 1) * stride + blackBox.left * sizeof(COLORREF);
-    out = outline + (fontSize - width) / 2;
+    pixels += (fontSize - 1) * stride;// + blackBox.left * sizeof(COLORREF);
+    out = outline;// + (fontSize - width) / 2;
 
-    *runeWidth = width + blackBox.left;
+    *runeWidth = fontSize;
 
     if (show)
     {
