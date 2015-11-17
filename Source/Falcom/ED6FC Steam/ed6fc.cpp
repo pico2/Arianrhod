@@ -295,7 +295,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     PatchMemory(p, countof(p), BaseAddress);
 
-    //AllocConsole();
+    AllocConsole();
     //DWriteRenders[9]->DrawRune(L"e"[0], FontColorTable[0], 0, 0), Ps::ExitProcess(0);
 
     return TRUE;

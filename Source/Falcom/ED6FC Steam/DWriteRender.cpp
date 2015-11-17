@@ -55,31 +55,6 @@ VOID DWriteRender::SaveToBmpFile()
     bin.SetEndOfFile();
 }
 
-//
-// Conversions between pixels and DIPs.
-//
-FLOAT DWriteRender::PixelsToDipsX(LONG_PTR x)
-{
-    return x * 96.0f / this->dpiX;
-}
-
-FLOAT DWriteRender::PixelsToDipsY(LONG_PTR y)
-{
-    return y * 96.0f / this->dpiY;
-}
-
-LONG_PTR DWriteRender::DipsToPixelsX(FLOAT x)
-{
-    FLOAT pixels = x * this->dpiX * (1 / 96.0f);
-    return (LONG_PTR)((pixels + 0.5f));
-}
-
-LONG_PTR DWriteRender::DipsToPixelsY(FLOAT y)
-{
-    FLOAT pixels = y * this->dpiY * (1 / 96.0f);
-    return (LONG_PTR)((pixels + 0.5f));
-}
-
 DWriteRender::DWriteRender()
 {
     this->renderTarget = nullptr;
@@ -127,7 +102,7 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
         hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
         FAIL_BREAK(hr);
 
-        this->fontEmSize = PixelsToDipsY(FontSize) * 0.9;
+        this->fontEmSize = PixelsToDipsY(FontSize);
         this->fontHeight = FontSize;
         hr = dwrite->GetGdiInterop(&gdiInterop);
         FAIL_BREAK(hr);
@@ -136,9 +111,10 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
 
         FLOAT ratio = this->fontEmSize / fontMetric.designUnitsPerEm;
         this->maxFontEmSize = (fontMetric.ascent + fontMetric.descent + fontMetric.lineGap) * ratio;
-        this->renderTargetSize = FontSize;
+        this->renderTargetSize = this->maxFontEmSize;
+        this->baselineY = fontMetric.ascent * ratio;
 
-        hr = gdiInterop->CreateBitmapRenderTarget(nullptr, FontSize, FontSize, &this->renderTarget);
+        hr = gdiInterop->CreateBitmapRenderTarget(nullptr, this->maxFontEmSize, this->maxFontEmSize, &this->renderTarget);
         FAIL_BREAK(hr);
 
         hr = dwrite->CreateRenderingParams(&renderingParams);
@@ -188,7 +164,7 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
 
     FAIL_RETURN(this->renderTarget->DrawGlyphRun(
         (this->renderTargetSize - this->fontEmSize) / 2,
-        this->fontEmSize,
+        this->baselineY,
         DWRITE_MEASURING_MODE_NATURAL,
         &run,
         this->renderingParams,
@@ -213,9 +189,9 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     IMAGE_BITMAP_HEADER header;
 
     BOOL show = FALSE;
-    if (ch == L"Ð¡"[0])
+    if (ch == L"µÄ"[0])
     {
-        //show = TRUE;
+        show = TRUE;
     }
 
     codePoint = ch;
@@ -263,23 +239,26 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
 
     auto opixels = pixels;
 
-    pixels += (fontSize - 1) * stride;// + blackBox.left * sizeof(COLORREF);
-    out = outline;// + (fontSize - width) / 2;
+    pixels += (bmp.bmHeight - blackBox.top - 1) * stride;// + blackBox.left * sizeof(COLORREF);
+    out = outline + blackBox.top * fontSize + (LONG_PTR)((fontSize - width) / 2.f + 0.5);
+
+    if (show)
+        PrintConsole(L"x = %d\n", (LONG_PTR)((fontSize - width) / 2.f + 0.5));
 
     *runeWidth = fontSize;
 
     if (show)
     {
         SaveToBmpFile();
-        PrintConsole(L"rc = {%d %d %d %d} stride = %d w = %d h = %d\n", blackBox, stride, width, height);
+        PrintConsole(L"rc = {%d %d %d %d} stride = %d w = %d h = %d fs = %d\n", blackBox, stride, width, height, fontSize);
     }
 
-    for (LONG_PTR h = blackBox.bottom; h != 0; --h)
+    for (LONG_PTR h = height; h != 0; --h)
     {
-        COLORREF* i = (COLORREF *)pixels;
+        COLORREF* i = (COLORREF *)pixels + blackBox.left;
         PBYTE o = out;
 
-        for (LONG_PTR w = blackBox.right; w != 0; --w)
+        for (LONG_PTR w = width; w != 0; --w)
         {
             *o++ = FontLumaTable[RGBA_GetRValue(*i++)];
         }

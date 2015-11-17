@@ -15,10 +15,29 @@ public:
     NTSTATUS Initialize(PCWSTR FaceName, ULONG_PTR FontSize);
     NTSTATUS DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_PTR OutputStride, PULONG_PTR runeWidth);
 
-    FLOAT PixelsToDipsX(LONG_PTR x);
-    FLOAT PixelsToDipsY(LONG_PTR y);
-    LONG_PTR DipsToPixelsX(FLOAT x);
-    LONG_PTR DipsToPixelsY(FLOAT y);
+    template <typename T>
+    FLOAT PixelsToDipsX(T x)
+    {
+        return x * 96.0f / this->dpiX;
+    }
+
+    template <typename T>
+    FLOAT PixelsToDipsY(T y)
+    {
+        return y * 96.0f / this->dpiY;
+    }
+
+    LONG_PTR DipsToPixelsX(FLOAT x)
+    {
+        FLOAT pixels = x * this->dpiX * (1 / 96.0f);
+        return (LONG_PTR)((pixels + 0.5f));
+    }
+
+    LONG_PTR DipsToPixelsY(FLOAT y)
+    {
+        FLOAT pixels = y * this->dpiY * (1 / 96.0f);
+        return (LONG_PTR)((pixels + 0.5f));
+    }
 
 protected:
     NTSTATUS DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox);
@@ -29,6 +48,7 @@ protected:
     IDWriteRenderingParams*     renderingParams;
     IDWriteFontFace*            fontFace;
     LONG_PTR                    fontHeight;
+    FLOAT                       baselineY;
     FLOAT                       fontEmSize;
     FLOAT                       maxFontEmSize;
     FLOAT                       renderTargetSize;
