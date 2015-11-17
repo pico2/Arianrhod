@@ -1,7 +1,10 @@
+// this file must be compiled under zh-CN locale
+
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
+#include "ed6fc.h"
 #include "ml.cpp"
 #include "DWriteRender.h"
 
@@ -48,22 +51,51 @@ DWriteRender *DWriteRenders[countof(FontSizeTable)];
 
 VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
 
-BOOL IsSymbolChar(PCSTR Text)
+BOOL TranslateChar(PCSTR Text, USHORT& translated)
 {
-    if (Text[0] >= 0)
-        return FALSE;
+    USHORT ch;
 
-    switch (*(PUSHORT)Text)
+    ch = *(PUSHORT)Text;
+    switch (ch)
     {
-        case 0xA181:
-        case 0x9F81:
-        case 0xAA84:
-        case 0x4081:
+        case 0xA181:    // ¡
+        case 0x9F81:    // Ÿ
+        case 0xAA84:    // „ª
+        case 0x4081:    // @
+            translated = ch;
+            return TRUE;
+
+        case 0xA1A1:    // full width space
+            translated = 0x4081;
             return TRUE;
     }
 
-    //return (BYTE)Text[0] >= 0x80 && ((BYTE)Text[0] < 0xA0 || (BYTE)Text[0] >= 0xE0);
+    if (ch >= 0x80)
+        ch = SWAP2(ch);
+
     return FALSE;
+/*
+    if (ch >= '£°' && ch <= '£¹')
+    {
+        ch = ch - '£°' + '‚O';
+    }
+    else if (ch >= '£Á' && ch <= '£Ú')
+    {
+        ch = ch - '£Á' + '‚`';
+    }
+    else if (ch >= '£á' && ch <= '£ú')
+    {
+        ch = ch - '£á' + '‚';
+    }
+    else
+    {
+        return FALSE;
+    }
+
+    translated = SWAP2(ch);
+
+    return TRUE;
+*/
 }
 
 PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
@@ -80,6 +112,7 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
 
     for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GB2312))
     {
+        USHORT translated;
         CHAR ansi = Text[0];
 
         if (ansi >= 0)
@@ -89,9 +122,10 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
             width = (LetterWidthTable[ansi] + 2) * FontSize * 0.03125;
             ++Text;
         }
-        else if (IsSymbolChar(Text))
+        else if (TranslateChar(Text, translated))
         {
-            CHAR tmp[3] = { Text[0], Text[1] };
+            CHAR tmp[3] = { translated & 0xFF, translated >> 8 }; 
+
             StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
             width = FontSize;
             Text += 2;
@@ -194,9 +228,11 @@ BOOL Initialize(PVOID BaseAddress)
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
-    InitializeDWrite();
 
     BaseAddress = GetExeModuleHandle();
+
+    InitializeDWrite();
+    InitializeTextPatcher(BaseAddress);
 
     //
     // 4A12E0
@@ -215,8 +251,6 @@ BOOL Initialize(PVOID BaseAddress)
     //
 
     Rtl::SetExeDirectoryAsCurrent();
-
-    AddFontResourceExW(L"user.ttf", FR_PRIVATE, nullptr);
 
     Success = FindFontRender(BaseAddress) != IMAGE_INVALID_VA;
 
@@ -261,7 +295,7 @@ BOOL Initialize(PVOID BaseAddress)
 
     PatchMemory(p, countof(p), BaseAddress);
 
-    AllocConsole();
+    //AllocConsole();
     //DWriteRenders[9]->DrawRune(L"e"[0], FontColorTable[0], 0, 0), Ps::ExitProcess(0);
 
     return TRUE;

@@ -1,0 +1,7847 @@
+﻿[
+  {
+    "rva": "00147570",
+    "original": "hpKB",
+    "translation": ""
+  },
+  {
+    "rva": "001498F8",
+    "original": "ID3DXMeshOptimize: Cannot do AttributeSort because %d vertex needs to be moved and either IgnoreVerts or ShareVB is set\n",
+    "translation": ""
+  },
+  {
+    "rva": "00149AA8",
+    "original": "xof 0303txt 0032        template FVFData         {             <B6E70A0E-8EF9-4e83-94AD-ECC8B0C04897>             DWORD dwFVF;             DWORD nDWords;             array DWORD data[nDWords];         }         template PMAttributeRange         {             <917E0427-C61E-4a14-9C64-AFE65F9E9844>             DWORD iFaceOffset;             DWORD nFacesMin;             DWORD nFacesMax;             DWORD iVertexOffset;             DWORD nVerticesMin;             DWORD nVerticesMax;         }         template PMVSplitRecord         {             <574CCC14-F0B3-4333-822D-93E8A8A08E4C>             DWORD iFaceCLW;             DWORD iVlrOffset;             DWORD iCode;         }         template PMInfo         {             <B6C3E656-EC8B-4b92-9B62-681659522947>             DWORD nAttributes;             array PMAttributeRange attributeRanges[nAttributes];             DWORD nMaxValence;             DWORD nMinLogicalVertices;             DWORD nMaxLogicalVertices;             DWORD nVSplits;             array PMVSplitRecord splitRecords[nVSplits];             DWORD nAttributeMispredicts;             array DWORD attributeMispredicts[nAttributeMispredicts];         } ",
+    "translation": ""
+  },
+  {
+    "rva": "00149F40",
+    "original": "xof 0303txt 0032        template XSkinMeshHeader         {             <3CF169CE-FF7C-44ab-93C0-F78F62D172E2>             WORD nMaxSkinWeightsPerVertex;             WORD nMaxSkinWeightsPerFace;             WORD nBones;         }         template VertexDuplicationIndices         {             <B8D65549-D7C9-4995-89CF-53A9A8B031E3>             DWORD nIndices;             DWORD nOriginalVertices;             array DWORD indices[nIndices];         }         template FaceAdjacency         {             <A64C844A-E282-4756-8B80-250CDE04398C>             DWORD nIndices;             array DWORD indices[nIndices];         }         template SkinWeights         {             <6F0D123B-BAD2-4167-A0D0-80224F25FABB>             STRING transformNodeName;            DWORD nWeights;             array DWORD vertexIndices[nWeights];             array float weights[nWeights];             Matrix4x4 matrixOffset;         }         template Patch         {             <A3EB5D44-FC22-429D-9AFB-3221CB9719A6>             DWORD nControlIndices;             array DWORD controlIndices[nControlIndices];         }         template PatchMesh         {             <D02C95CC-EDBA-4305-9B5D-1820D7704BBF>             DWORD nVertices;             array Vector vertices[nVertices];             DWORD nPatches;             array Patch patches[nPatches];             [ ... ]         } ",
+    "translation": ""
+  },
+  {
+    "rva": "0014A498",
+    "original": "DirectXFileCreate",
+    "translation": ""
+  },
+  {
+    "rva": "0014A4AC",
+    "original": "d3dxof.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0014AB54",
+    "original": "Software\\Microsoft\\Direct3D",
+    "translation": ""
+  },
+  {
+    "rva": "0014AB70",
+    "original": "DisableMMX",
+    "translation": ""
+  },
+  {
+    "rva": "0014AB7C",
+    "original": "GenuineIntel",
+    "translation": ""
+  },
+  {
+    "rva": "0014AB8C",
+    "original": "DisableD3DXPSGP",
+    "translation": ""
+  },
+  {
+    "rva": "0014ABF0",
+    "original": "d3d8d.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0014ABFC",
+    "original": "DebugSetMute",
+    "translation": ""
+  },
+  {
+    "rva": "0014AC0C",
+    "original": "d3d8.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0014AC38",
+    "original": "%s(%d) : (Assembly Error) %s",
+    "translation": ""
+  },
+  {
+    "rva": "0014AC58",
+    "original": "%s(%d) : (Assembly Error) statement incomplete",
+    "translation": ""
+  },
+  {
+    "rva": "0014AC88",
+    "original": "%s(%d) : (Assembly Error) constant definition in shader body",
+    "translation": ""
+  },
+  {
+    "rva": "0014ACCC",
+    "original": "%s(%d) : (Assembly Error) shader version expected",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD00",
+    "original": "syntax error",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD28",
+    "original": "logp",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD30",
+    "original": "expp",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD38",
+    "original": "m3x2",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD40",
+    "original": "m3x3",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD48",
+    "original": "m3x4",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD50",
+    "original": "m4x3",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD58",
+    "original": "m4x4",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD8C",
+    "original": "texld",
+    "translation": ""
+  },
+  {
+    "rva": "0014AD94",
+    "original": "texdepth",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADA0",
+    "original": "texcrd",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADA8",
+    "original": "phase",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADB0",
+    "original": "texdp3tex",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADBC",
+    "original": "texm3x3",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADC4",
+    "original": "texreg2rgb",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADD0",
+    "original": "texdp3",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADD8",
+    "original": "texm3x2depth",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADE8",
+    "original": "texm3x3vspec",
+    "translation": ""
+  },
+  {
+    "rva": "0014ADF8",
+    "original": "texm3x3spec",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE04",
+    "original": "texm3x3tex",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE10",
+    "original": "texm3x3pad",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE1C",
+    "original": "texm3x2tex",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE28",
+    "original": "texm3x2pad",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE34",
+    "original": "texreg2gb",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE40",
+    "original": "texreg2ar",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE4C",
+    "original": "texbeml",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE54",
+    "original": "texbem",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE60",
+    "original": "texkill",
+    "translation": ""
+  },
+  {
+    "rva": "0014AE68",
+    "original": "texcoord",
+    "translation": ""
+  },
+  {
+    "rva": "0014AEA8",
+    "original": "invalid mask '%s'",
+    "translation": ""
+  },
+  {
+    "rva": "0014AEBC",
+    "original": "invalid swizzle '%s'",
+    "translation": ""
+  },
+  {
+    "rva": "0014AED4",
+    "original": "invalid register '%s[%d]'",
+    "translation": ""
+  },
+  {
+    "rva": "0014AEF0",
+    "original": "invalid register '%s[a0.x + %d]'",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF14",
+    "original": "invalid register '%s'",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF38",
+    "original": "oFog",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF40",
+    "original": "oPts",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF48",
+    "original": "oPos",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF70",
+    "original": "_bx2",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF78",
+    "original": "_bias",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF80",
+    "original": "invalid constant",
+    "translation": ""
+  },
+  {
+    "rva": "0014AF9C",
+    "original": "comment extends past end-of-file",
+    "translation": ""
+  },
+  {
+    "rva": "0014AFC0",
+    "original": "preprocessor directives are not supported",
+    "translation": ""
+  },
+  {
+    "rva": "0014AFEC",
+    "original": "#line",
+    "translation": ""
+  },
+  {
+    "rva": "0014AFF4",
+    "original": "Internal assembler error! %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014B018",
+    "original": "coissue not supported in vertex shaders",
+    "translation": ""
+  },
+  {
+    "rva": "0014B040",
+    "original": "a0.x can only appear once in an index expression",
+    "translation": ""
+  },
+  {
+    "rva": "0014B074",
+    "original": "illegal register number",
+    "translation": ""
+  },
+  {
+    "rva": "0014B08C",
+    "original": "illegal register in index expression",
+    "translation": ""
+  },
+  {
+    "rva": "0014B0B4",
+    "original": "complement cannot be used with other modifiers",
+    "translation": ""
+  },
+  {
+    "rva": "0014B0E4",
+    "original": "complement not supported in vertex shaders",
+    "translation": ""
+  },
+  {
+    "rva": "0014B110",
+    "original": "negate and divide modifiers cannot be combined",
+    "translation": ""
+  },
+  {
+    "rva": "0014B140",
+    "original": "constant modifiers not supported in ps.1.4",
+    "translation": ""
+  },
+  {
+    "rva": "0014B16C",
+    "original": "invalid version",
+    "translation": ""
+  },
+  {
+    "rva": "0014B17C",
+    "original": "yacc stack overflow",
+    "translation": ""
+  },
+  {
+    "rva": "0014B190",
+    "original": "statement expected",
+    "translation": ""
+  },
+  {
+    "rva": "0014B1A4",
+    "original": "ValidateVertexShader",
+    "translation": ""
+  },
+  {
+    "rva": "0014B1BC",
+    "original": "ValidatePixelShader",
+    "translation": ""
+  },
+  {
+    "rva": "0014B1D0",
+    "original": "LoadDebugRuntime",
+    "translation": ""
+  },
+  {
+    "rva": "0014B1E4",
+    "original": "SOFTWARE\\Microsoft\\Direct3D",
+    "translation": ""
+  },
+  {
+    "rva": "0014B200",
+    "original": "D3DX8 Shader Assembler Version 0.91",
+    "translation": ""
+  },
+  {
+    "rva": "0014B224",
+    "original": "read error",
+    "translation": ""
+  },
+  {
+    "rva": "0014B248",
+    "original": "1.0.5",
+    "translation": ""
+  },
+  {
+    "rva": "0014B610",
+    "original": "囮Y>t$7?*ｩ=",
+    "translation": ""
+  },
+  {
+    "rva": "0014B620",
+    "original": "AuthenticAMD",
+    "translation": ""
+  },
+  {
+    "rva": "0014B630",
+    "original": "UnknownVendr",
+    "translation": ""
+  },
+  {
+    "rva": "0014B824",
+    "original": "Application transferred too many scanlines",
+    "translation": ""
+  },
+  {
+    "rva": "0014B850",
+    "original": "Invalid SOS parameters for sequential JPEG",
+    "translation": ""
+  },
+  {
+    "rva": "0014B87C",
+    "original": "Corrupt JPEG data: found marker 0x%02x instead of RST%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014B8B4",
+    "original": "Premature end of JPEG file",
+    "translation": ""
+  },
+  {
+    "rva": "0014B8D0",
+    "original": "Warning: unknown JFIF revision number %d.%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0014B900",
+    "original": "Corrupt JPEG data: bad Huffman code",
+    "translation": ""
+  },
+  {
+    "rva": "0014B924",
+    "original": "Corrupt JPEG data: premature end of data segment",
+    "translation": ""
+  },
+  {
+    "rva": "0014B958",
+    "original": "Corrupt JPEG data: %u extraneous bytes before marker 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014B998",
+    "original": "Inconsistent progression sequence for component %d coefficient %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014B9DC",
+    "original": "Unknown Adobe color transform code %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BA04",
+    "original": "Obtained XMS handle %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BA1C",
+    "original": "Freed XMS handle %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BA30",
+    "original": "Unrecognized component IDs %d %d %d, assuming YCbCr",
+    "translation": ""
+  },
+  {
+    "rva": "0014BA64",
+    "original": "Opened temporary file %s",
+    "translation": ""
+  },
+  {
+    "rva": "0014BA80",
+    "original": "Closed temporary file %s",
+    "translation": ""
+  },
+  {
+    "rva": "0014BA9C",
+    "original": "  Ss=%d, Se=%d, Ah=%d, Al=%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BABC",
+    "original": "    Component %d: dc=%d ac=%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BADC",
+    "original": "Start Of Scan: %d components",
+    "translation": ""
+  },
+  {
+    "rva": "0014BAFC",
+    "original": "Start of Image",
+    "translation": ""
+  },
+  {
+    "rva": "0014BB0C",
+    "original": "    Component %d: %dhx%dv q=%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BB2C",
+    "original": "Start Of Frame 0x%02x: width=%u, height=%u, components=%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BB68",
+    "original": "Smoothing not supported with nonstandard sampling ratios",
+    "translation": ""
+  },
+  {
+    "rva": "0014BBA4",
+    "original": "RST%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BBAC",
+    "original": "At marker 0x%02x, recovery action %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BBD4",
+    "original": "Selected %d colors for quantization",
+    "translation": ""
+  },
+  {
+    "rva": "0014BBF8",
+    "original": "Quantizing to %d colors",
+    "translation": ""
+  },
+  {
+    "rva": "0014BC10",
+    "original": "Quantizing to %d = %d*%d*%d colors",
+    "translation": ""
+  },
+  {
+    "rva": "0014BC34",
+    "original": "        %4u %4u %4u %4u %4u %4u %4u %4u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BC5C",
+    "original": "Unexpected marker 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014BC78",
+    "original": "Skipping marker 0x%02x, length %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BC9C",
+    "original": "    with %d x %d thumbnail image",
+    "translation": ""
+  },
+  {
+    "rva": "0014BCC0",
+    "original": "Unknown JFIF minor revision number %d.%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BCEC",
+    "original": "Warning: thumbnail image size does not match data length %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BD28",
+    "original": "JFIF APP0 marker, density %dx%d  %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BD4C",
+    "original": "        %3d %3d %3d %3d %3d %3d %3d %3d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BD74",
+    "original": "End Of Image",
+    "translation": ""
+  },
+  {
+    "rva": "0014BD84",
+    "original": "Obtained EMS handle %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BD9C",
+    "original": "Freed EMS handle %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BDB0",
+    "original": "Define Restart Interval %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BDCC",
+    "original": "Define Quantization Table %d  precision %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BDF8",
+    "original": "Define Huffman Table 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014BE14",
+    "original": "Define Arithmetic Table 0x%02x: 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014BE3C",
+    "original": "Unknown APP14 marker (not Adobe), length %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BE68",
+    "original": "Unknown APP0 marker (not JFIF), length %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014BE98",
+    "original": "Adobe APP14 marker: version %d, flags 0x%04x 0x%04x, transform %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014BEDC",
+    "original": "Caution: quantization tables are too coarse for baseline JPEG",
+    "translation": ""
+  },
+  {
+    "rva": "0014BF1C",
+    "original": "6a  7-Feb-96",
+    "translation": ""
+  },
+  {
+    "rva": "0014BF2C",
+    "original": "Copyright (C) 1996, Thomas G. Lane",
+    "translation": ""
+  },
+  {
+    "rva": "0014BF50",
+    "original": "Write to XMS failed",
+    "translation": ""
+  },
+  {
+    "rva": "0014BF64",
+    "original": "Read from XMS failed",
+    "translation": ""
+  },
+  {
+    "rva": "0014BF7C",
+    "original": "Image too wide for this implementation",
+    "translation": ""
+  },
+  {
+    "rva": "0014BFA4",
+    "original": "Virtual array controller messed up",
+    "translation": ""
+  },
+  {
+    "rva": "0014BFC8",
+    "original": "Unsupported marker type 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014BFE8",
+    "original": "Application transferred too few scanlines",
+    "translation": ""
+  },
+  {
+    "rva": "0014C014",
+    "original": "Write failed on temporary file --- out of disk space?",
+    "translation": ""
+  },
+  {
+    "rva": "0014C04C",
+    "original": "Seek failed on temporary file",
+    "translation": ""
+  },
+  {
+    "rva": "0014C06C",
+    "original": "Read failed on temporary file",
+    "translation": ""
+  },
+  {
+    "rva": "0014C08C",
+    "original": "Failed to create temporary file %s",
+    "translation": ""
+  },
+  {
+    "rva": "0014C0B0",
+    "original": "Invalid JPEG file structure: SOS before SOF",
+    "translation": ""
+  },
+  {
+    "rva": "0014C0DC",
+    "original": "Invalid JPEG file structure: two SOI markers",
+    "translation": ""
+  },
+  {
+    "rva": "0014C10C",
+    "original": "Unsupported JPEG process: SOF type 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014C138",
+    "original": "Invalid JPEG file structure: missing SOS marker",
+    "translation": ""
+  },
+  {
+    "rva": "0014C168",
+    "original": "Invalid JPEG file structure: two SOF markers",
+    "translation": ""
+  },
+  {
+    "rva": "0014C198",
+    "original": "Cannot quantize to more than %d colors",
+    "translation": ""
+  },
+  {
+    "rva": "0014C1C0",
+    "original": "Cannot quantize to fewer than %d colors",
+    "translation": ""
+  },
+  {
+    "rva": "0014C1E8",
+    "original": "Cannot quantize more than %d color components",
+    "translation": ""
+  },
+  {
+    "rva": "0014C218",
+    "original": "Insufficient memory (case %d)",
+    "translation": ""
+  },
+  {
+    "rva": "0014C238",
+    "original": "Not a JPEG file: starts with 0x%02x 0x%02x",
+    "translation": ""
+  },
+  {
+    "rva": "0014C264",
+    "original": "Quantization table 0x%02x was not defined",
+    "translation": ""
+  },
+  {
+    "rva": "0014C290",
+    "original": "JPEG datastream contains no image",
+    "translation": ""
+  },
+  {
+    "rva": "0014C2B4",
+    "original": "Huffman table 0x%02x was not defined",
+    "translation": ""
+  },
+  {
+    "rva": "0014C2DC",
+    "original": "Backing store not supported",
+    "translation": ""
+  },
+  {
+    "rva": "0014C2F8",
+    "original": "Requested feature was omitted at compile time",
+    "translation": ""
+  },
+  {
+    "rva": "0014C328",
+    "original": "Not implemented yet",
+    "translation": ""
+  },
+  {
+    "rva": "0014C33C",
+    "original": "Invalid color quantization mode change",
+    "translation": ""
+  },
+  {
+    "rva": "0014C364",
+    "original": "Scan script does not transmit all data",
+    "translation": ""
+  },
+  {
+    "rva": "0014C38C",
+    "original": "Cannot transcode due to multiple use of quantization table %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C3CC",
+    "original": "Premature end of input file",
+    "translation": ""
+  },
+  {
+    "rva": "0014C3E8",
+    "original": "Empty input file",
+    "translation": ""
+  },
+  {
+    "rva": "0014C3FC",
+    "original": "Maximum supported image dimension is %u pixels",
+    "translation": ""
+  },
+  {
+    "rva": "0014C42C",
+    "original": "Missing Huffman code table entry",
+    "translation": ""
+  },
+  {
+    "rva": "0014C450",
+    "original": "Huffman code size table overflow",
+    "translation": ""
+  },
+  {
+    "rva": "0014C474",
+    "original": "Fractional sampling not implemented yet",
+    "translation": ""
+  },
+  {
+    "rva": "0014C49C",
+    "original": "Output file write error --- out of disk space?",
+    "translation": ""
+  },
+  {
+    "rva": "0014C4CC",
+    "original": "Input file read error",
+    "translation": ""
+  },
+  {
+    "rva": "0014C4E4",
+    "original": "Didn't expect more than one scan",
+    "translation": ""
+  },
+  {
+    "rva": "0014C508",
+    "original": "Write to EMS failed",
+    "translation": ""
+  },
+  {
+    "rva": "0014C51C",
+    "original": "Read from EMS failed",
+    "translation": ""
+  },
+  {
+    "rva": "0014C534",
+    "original": "Empty JPEG image (DNL not supported)",
+    "translation": ""
+  },
+  {
+    "rva": "0014C55C",
+    "original": "Bogus DQT index %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C570",
+    "original": "Bogus DHT index %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C584",
+    "original": "Bogus DHT counts",
+    "translation": ""
+  },
+  {
+    "rva": "0014C598",
+    "original": "Bogus DAC value 0x%x",
+    "translation": ""
+  },
+  {
+    "rva": "0014C5B0",
+    "original": "Bogus DAC index %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C5C4",
+    "original": "Unsupported color conversion request",
+    "translation": ""
+  },
+  {
+    "rva": "0014C5EC",
+    "original": "Too many color components: %d, max %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C614",
+    "original": "CCIR601 sampling not implemented yet",
+    "translation": ""
+  },
+  {
+    "rva": "0014C63C",
+    "original": "Suspension not allowed here",
+    "translation": ""
+  },
+  {
+    "rva": "0014C658",
+    "original": "Buffer passed to JPEG library is too small",
+    "translation": ""
+  },
+  {
+    "rva": "0014C684",
+    "original": "Bogus virtual array access",
+    "translation": ""
+  },
+  {
+    "rva": "0014C6A0",
+    "original": "JPEG parameter struct mismatch: library thinks size is %u, caller expects %u",
+    "translation": ""
+  },
+  {
+    "rva": "0014C6F0",
+    "original": "Improper call to JPEG library in state %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C71C",
+    "original": "Invalid scan script at entry %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C73C",
+    "original": "Bogus sampling factors",
+    "translation": ""
+  },
+  {
+    "rva": "0014C754",
+    "original": "Invalid progressive parameters at scan script entry %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C78C",
+    "original": "Invalid progressive parameters Ss=%d Se=%d Ah=%d Al=%d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C7C4",
+    "original": "Unsupported JPEG data precision %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C7E8",
+    "original": "Invalid memory pool code %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C804",
+    "original": "Sampling factors too large for interleaved scan",
+    "translation": ""
+  },
+  {
+    "rva": "0014C834",
+    "original": "Wrong JPEG library version: library is %d, caller expects %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C874",
+    "original": "Bogus marker length",
+    "translation": ""
+  },
+  {
+    "rva": "0014C888",
+    "original": "Bogus JPEG colorspace",
+    "translation": ""
+  },
+  {
+    "rva": "0014C8A0",
+    "original": "Bogus input colorspace",
+    "translation": ""
+  },
+  {
+    "rva": "0014C8B8",
+    "original": "IDCT output block size %d not supported",
+    "translation": ""
+  },
+  {
+    "rva": "0014C8E0",
+    "original": "Invalid component ID %d in SOS",
+    "translation": ""
+  },
+  {
+    "rva": "0014C900",
+    "original": "Bogus buffer control mode",
+    "translation": ""
+  },
+  {
+    "rva": "0014C91C",
+    "original": "MAX_ALLOC_CHUNK is wrong, please fix",
+    "translation": ""
+  },
+  {
+    "rva": "0014C944",
+    "original": "ALIGN_TYPE is wrong, please fix",
+    "translation": ""
+  },
+  {
+    "rva": "0014C964",
+    "original": "Sorry, there are legal restrictions on arithmetic coding",
+    "translation": ""
+  },
+  {
+    "rva": "0014C9A0",
+    "original": "Bogus message code %d",
+    "translation": ""
+  },
+  {
+    "rva": "0014C9B9",
+    "original": "123456789ABCDEF1.0.5",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA0C",
+    "original": "IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA14",
+    "original": "IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA1C",
+    "original": "IEND",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA24",
+    "original": "PLTE",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA2C",
+    "original": "gAMA",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA34",
+    "original": "sRGB",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA3C",
+    "original": "tRNS",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA44",
+    "original": "zlib version error",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA58",
+    "original": "zlib memory error",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA6C",
+    "original": "Unknown zlib error",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA80",
+    "original": "1.1.3",
+    "translation": ""
+  },
+  {
+    "rva": "0014CA88",
+    "original": "Incompatible libpng version in application and library",
+    "translation": ""
+  },
+  {
+    "rva": "0014CAC0",
+    "original": "Missing PLTE before IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014CADC",
+    "original": "Missing IHDR before IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014CAF8",
+    "original": "PNG file corrupted by ASCII conversion",
+    "translation": ""
+  },
+  {
+    "rva": "0014CB20",
+    "original": "Not a PNG file",
+    "translation": ""
+  },
+  {
+    "rva": "0014CB30",
+    "original": "Extra compressed data",
+    "translation": ""
+  },
+  {
+    "rva": "0014CB48",
+    "original": "Decompression error",
+    "translation": ""
+  },
+  {
+    "rva": "0014CB5C",
+    "original": "Not enough image data",
+    "translation": ""
+  },
+  {
+    "rva": "0014CB74",
+    "original": "Invalid attempt to read row data",
+    "translation": ""
+  },
+  {
+    "rva": "0014CB98",
+    "original": "Width too large for libpng to process image data.",
+    "translation": ""
+  },
+  {
+    "rva": "0014CBE8",
+    "original": "png_do_dither returned rowbytes=0",
+    "translation": ""
+  },
+  {
+    "rva": "0014CC0C",
+    "original": "NULL row buffer",
+    "translation": ""
+  },
+  {
+    "rva": "0014CC1C",
+    "original": "Width too large to process image data; rowbytes will overflow.",
+    "translation": ""
+  },
+  {
+    "rva": "0014CC68",
+    "original": "Call to NULL read function",
+    "translation": ""
+  },
+  {
+    "rva": "0014CC84",
+    "original": "same structure.  Resetting write_data_fn to NULL.",
+    "translation": ""
+  },
+  {
+    "rva": "0014CCB8",
+    "original": "It's an error to set both read_data_fn and write_data_fn in the ",
+    "translation": ""
+  },
+  {
+    "rva": "0014D078",
+    "original": "need dictionary",
+    "translation": ""
+  },
+  {
+    "rva": "0014D088",
+    "original": "incorrect data check",
+    "translation": ""
+  },
+  {
+    "rva": "0014D0A0",
+    "original": "incorrect header check",
+    "translation": ""
+  },
+  {
+    "rva": "0014D0B8",
+    "original": "invalid window size",
+    "translation": ""
+  },
+  {
+    "rva": "0014D0CC",
+    "original": "unknown compression method",
+    "translation": ""
+  },
+  {
+    "rva": "0014D0E8",
+    "original": "Out of Memory",
+    "translation": ""
+  },
+  {
+    "rva": "0014D168",
+    "original": "IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014D170",
+    "original": "invalid chunk type",
+    "translation": ""
+  },
+  {
+    "rva": "0014D184",
+    "original": "Ignoring bad adaptive filter type",
+    "translation": ""
+  },
+  {
+    "rva": "0014D1A8",
+    "original": "CRC error",
+    "translation": ""
+  },
+  {
+    "rva": "0014D1B4",
+    "original": "Unknown filter method in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D1D4",
+    "original": "Unknown compression method in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D1F8",
+    "original": "Unknown interlace method in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D21C",
+    "original": "Invalid color type/bit depth combination in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D250",
+    "original": "Invalid color type in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D26C",
+    "original": "Invalid bit depth in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D288",
+    "original": "Invalid image size in IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D2A4",
+    "original": "Invalid IHDR chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D2B8",
+    "original": "Out of place IHDR",
+    "translation": ""
+  },
+  {
+    "rva": "0014D2CC",
+    "original": "Truncating incorrect tRNS chunk length",
+    "translation": ""
+  },
+  {
+    "rva": "0014D2F4",
+    "original": "Invalid palette chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D30C",
+    "original": "Duplicate PLTE chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D324",
+    "original": "Invalid PLTE after IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014D33C",
+    "original": "Missing IHDR before PLTE",
+    "translation": ""
+  },
+  {
+    "rva": "0014D358",
+    "original": "Incorrect IEND chunk length",
+    "translation": ""
+  },
+  {
+    "rva": "0014D374",
+    "original": "No image in file",
+    "translation": ""
+  },
+  {
+    "rva": "0014D388",
+    "original": "Ignoring incorrect gAMA value when sRGB is also present",
+    "translation": ""
+  },
+  {
+    "rva": "0014D3C8",
+    "original": "Duplicate gAMA chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D3E0",
+    "original": "Out of place gAMA chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D3F8",
+    "original": "Invalid gAMA after IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014D410",
+    "original": "Incorrect gAMA chunk length",
+    "translation": ""
+  },
+  {
+    "rva": "0014D42C",
+    "original": "Missing IHDR before gAMA",
+    "translation": ""
+  },
+  {
+    "rva": "0014D448",
+    "original": "Unknown sRGB intent",
+    "translation": ""
+  },
+  {
+    "rva": "0014D45C",
+    "original": "Duplicate sRGB chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D474",
+    "original": "Out of place sRGB chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D48C",
+    "original": "Invalid sRGB after IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014D4A4",
+    "original": "Incorrect sRGB chunk length",
+    "translation": ""
+  },
+  {
+    "rva": "0014D4C0",
+    "original": "Missing IHDR before sRGB",
+    "translation": ""
+  },
+  {
+    "rva": "0014D4DC",
+    "original": "tRNS chunk not allowed with alpha channel",
+    "translation": ""
+  },
+  {
+    "rva": "0014D508",
+    "original": "Incorrect tRNS chunk length",
+    "translation": ""
+  },
+  {
+    "rva": "0014D524",
+    "original": "Duplicate tRNS chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D53C",
+    "original": "Invalid tRNS after IDAT",
+    "translation": ""
+  },
+  {
+    "rva": "0014D554",
+    "original": "Zero length tRNS chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D56C",
+    "original": "Missing PLTE before tRNS",
+    "translation": ""
+  },
+  {
+    "rva": "0014D588",
+    "original": "Missing IHDR before tRNS",
+    "translation": ""
+  },
+  {
+    "rva": "0014D5A4",
+    "original": "unknown critical chunk",
+    "translation": ""
+  },
+  {
+    "rva": "0014D5BC",
+    "original": "Extra compression data",
+    "translation": ""
+  },
+  {
+    "rva": "0014D5D4",
+    "original": "Decompression Error",
+    "translation": ""
+  },
+  {
+    "rva": "0014DD84",
+    "original": "invalid bit length repeat",
+    "translation": ""
+  },
+  {
+    "rva": "0014DDA0",
+    "original": "too many length or distance symbols",
+    "translation": ""
+  },
+  {
+    "rva": "0014DDC4",
+    "original": "invalid stored block lengths",
+    "translation": ""
+  },
+  {
+    "rva": "0014DDE4",
+    "original": "invalid block type",
+    "translation": ""
+  },
+  {
+    "rva": "0014DDF8",
+    "original": "incompatible version",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE10",
+    "original": "buffer error",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE20",
+    "original": "insufficient memory",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE34",
+    "original": "data error",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE40",
+    "original": "stream error",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE50",
+    "original": "file error",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE5C",
+    "original": "stream end",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE78",
+    "original": "invalid distance code",
+    "translation": ""
+  },
+  {
+    "rva": "0014DE90",
+    "original": "invalid literal/length code",
+    "translation": ""
+  },
+  {
+    "rva": "0014E0A0",
+    "original": "incomplete dynamic bit lengths tree",
+    "translation": ""
+  },
+  {
+    "rva": "0014E0C4",
+    "original": "oversubscribed dynamic bit lengths tree",
+    "translation": ""
+  },
+  {
+    "rva": "0014E0EC",
+    "original": "incomplete literal/length tree",
+    "translation": ""
+  },
+  {
+    "rva": "0014E10C",
+    "original": "oversubscribed literal/length tree",
+    "translation": ""
+  },
+  {
+    "rva": "0014E130",
+    "original": "empty distance tree with lengths",
+    "translation": ""
+  },
+  {
+    "rva": "0014E154",
+    "original": "incomplete distance tree",
+    "translation": ""
+  },
+  {
+    "rva": "0014E170",
+    "original": "oversubscribed distance tree",
+    "translation": ""
+  },
+  {
+    "rva": "0014E944",
+    "original": "1yｿ:H｢Mｪ兢d6",
+    "translation": ""
+  },
+  {
+    "rva": "0014EAC4",
+    "original": "string too long",
+    "translation": ""
+  },
+  {
+    "rva": "0014EAD4",
+    "original": "invalid string position",
+    "translation": ""
+  },
+  {
+    "rva": "0014EB00",
+    "original": "Unknown exception",
+    "translation": ""
+  },
+  {
+    "rva": "0014EBA8",
+    "original": "CorExitProcess",
+    "translation": ""
+  },
+  {
+    "rva": "0014EBD0",
+    "original": "LC_TIME",
+    "translation": ""
+  },
+  {
+    "rva": "0014EBD8",
+    "original": "LC_NUMERIC",
+    "translation": ""
+  },
+  {
+    "rva": "0014EBE4",
+    "original": "LC_MONETARY",
+    "translation": ""
+  },
+  {
+    "rva": "0014EBF0",
+    "original": "LC_CTYPE",
+    "translation": ""
+  },
+  {
+    "rva": "0014EBFC",
+    "original": "LC_COLLATE",
+    "translation": ""
+  },
+  {
+    "rva": "0014EC08",
+    "original": "LC_ALL",
+    "translation": ""
+  },
+  {
+    "rva": "0014ED88",
+    "original": "(null)",
+    "translation": ""
+  },
+  {
+    "rva": "0014EDEC",
+    "original": "EncodePointer",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE18",
+    "original": "DecodePointer",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE28",
+    "original": "FlsFree",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE30",
+    "original": "FlsSetValue",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE3C",
+    "original": "FlsGetValue",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE48",
+    "original": "FlsAlloc",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE54",
+    "original": "_nextafter",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE60",
+    "original": "_logb",
+    "translation": ""
+  },
+  {
+    "rva": "0014EE9C",
+    "original": "modf",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEA4",
+    "original": "fabs",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEAC",
+    "original": "floor",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEB4",
+    "original": "ceil",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEC8",
+    "original": "sqrt",
+    "translation": ""
+  },
+  {
+    "rva": "0014EED0",
+    "original": "atan2",
+    "translation": ""
+  },
+  {
+    "rva": "0014EED8",
+    "original": "atan",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEE0",
+    "original": "acos",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEE8",
+    "original": "asin",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEF0",
+    "original": "tanh",
+    "translation": ""
+  },
+  {
+    "rva": "0014EEF8",
+    "original": "cosh",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF00",
+    "original": "sinh",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF08",
+    "original": "log10",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF18",
+    "original": "UTF-8",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF20",
+    "original": "UTF-16LE",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF2C",
+    "original": "UNICODE",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF38",
+    "original": "SunMonTueWedThuFriSat",
+    "translation": ""
+  },
+  {
+    "rva": "0014EF50",
+    "original": "JanFebMarAprMayJunJulAugSepOctNovDec",
+    "translation": ""
+  },
+  {
+    "rva": "0014EFE0",
+    "original": "exp10",
+    "translation": ""
+  },
+  {
+    "rva": "0014EFE8",
+    "original": "runtime error ",
+    "translation": ""
+  },
+  {
+    "rva": "0014EFFC",
+    "original": "TLOSS error\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F00C",
+    "original": "SING error\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F01C",
+    "original": "DOMAIN error\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F030",
+    "original": "R6034\r\nAn application has made an attempt to load the C runtime library incorrectly.\nPlease contact the application's support team for more information.\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F0D0",
+    "original": "R6033\r\n- Attempt to use MSIL code from this assembly during native code initialization\nThis indicates a bug in your application. It is most likely the result of calling an MSIL-compiled (/clr) function from a native constructor or from DllMain.\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F1C8",
+    "original": "R6032\r\n- not enough space for locale information\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F200",
+    "original": "R6031\r\n- Attempt to initialize the CRT more than once.\nThis indicates a bug in your application.\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F264",
+    "original": "R6030\r\n- CRT not initialized\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F284",
+    "original": "R6028\r\n- unable to initialize heap\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F2AC",
+    "original": "R6027\r\n- not enough space for lowio initialization\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F2E4",
+    "original": "R6026\r\n- not enough space for stdio initialization\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F31C",
+    "original": "R6025\r\n- pure virtual function call\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F344",
+    "original": "R6024\r\n- not enough space for _onexit/atexit table\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F37C",
+    "original": "R6019\r\n- unable to open console device\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F3A8",
+    "original": "R6018\r\n- unexpected heap error\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F3CC",
+    "original": "R6017\r\n- unexpected multithread lock error\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F3FC",
+    "original": "R6016\r\n- not enough space for thread data\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F428",
+    "original": "\r\nThis application has requested the Runtime to terminate it in an unusual way.\nPlease contact the application's support team for more information.\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F4C0",
+    "original": "R6009\r\n- not enough space for environment\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F4EC",
+    "original": "R6008\r\n- not enough space for arguments\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F518",
+    "original": "R6002\r\n- floating point support not loaded\r\n",
+    "translation": ""
+  },
+  {
+    "rva": "0014F548",
+    "original": "Microsoft Visual C++ Runtime Library",
+    "translation": ""
+  },
+  {
+    "rva": "0014F578",
+    "original": "<program name unknown>",
+    "translation": ""
+  },
+  {
+    "rva": "0014F590",
+    "original": "Runtime Error!\n\nProgram: ",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE30",
+    "original": "HH:mm:ss",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE3C",
+    "original": "dddd, MMMM dd, yyyy",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE50",
+    "original": "MM/dd/yy",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE64",
+    "original": "December",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE70",
+    "original": "November",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE7C",
+    "original": "October",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE84",
+    "original": "September",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE90",
+    "original": "August",
+    "translation": ""
+  },
+  {
+    "rva": "0014FE98",
+    "original": "July",
+    "translation": ""
+  },
+  {
+    "rva": "0014FEA0",
+    "original": "June",
+    "translation": ""
+  },
+  {
+    "rva": "0014FEA8",
+    "original": "April",
+    "translation": ""
+  },
+  {
+    "rva": "0014FEB0",
+    "original": "March",
+    "translation": ""
+  },
+  {
+    "rva": "0014FEB8",
+    "original": "February",
+    "translation": ""
+  },
+  {
+    "rva": "0014FEC4",
+    "original": "January",
+    "translation": ""
+  },
+  {
+    "rva": "0014FEFC",
+    "original": "Saturday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF08",
+    "original": "Friday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF10",
+    "original": "Thursday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF1C",
+    "original": "Wednesday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF28",
+    "original": "Tuesday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF30",
+    "original": "Monday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF38",
+    "original": "Sunday",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF5C",
+    "original": "united-states",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF6C",
+    "original": "united-kingdom",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF7C",
+    "original": "trinidad & tobago",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF90",
+    "original": "south-korea",
+    "translation": ""
+  },
+  {
+    "rva": "0014FF9C",
+    "original": "south-africa",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFAC",
+    "original": "south korea",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFB8",
+    "original": "south africa",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFC8",
+    "original": "slovak",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFD0",
+    "original": "puerto-rico",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFDC",
+    "original": "pr-china",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFE8",
+    "original": "pr china",
+    "translation": ""
+  },
+  {
+    "rva": "0014FFF8",
+    "original": "new-zealand",
+    "translation": ""
+  },
+  {
+    "rva": "00150004",
+    "original": "hong-kong",
+    "translation": ""
+  },
+  {
+    "rva": "00150010",
+    "original": "holland",
+    "translation": ""
+  },
+  {
+    "rva": "00150018",
+    "original": "great britain",
+    "translation": ""
+  },
+  {
+    "rva": "00150028",
+    "original": "england",
+    "translation": ""
+  },
+  {
+    "rva": "00150030",
+    "original": "czech",
+    "translation": ""
+  },
+  {
+    "rva": "00150038",
+    "original": "china",
+    "translation": ""
+  },
+  {
+    "rva": "00150040",
+    "original": "britain",
+    "translation": ""
+  },
+  {
+    "rva": "00150048",
+    "original": "america",
+    "translation": ""
+  },
+  {
+    "rva": "0015005C",
+    "original": "swiss",
+    "translation": ""
+  },
+  {
+    "rva": "00150064",
+    "original": "swedish-finland",
+    "translation": ""
+  },
+  {
+    "rva": "00150074",
+    "original": "spanish-venezuela",
+    "translation": ""
+  },
+  {
+    "rva": "00150088",
+    "original": "spanish-uruguay",
+    "translation": ""
+  },
+  {
+    "rva": "00150098",
+    "original": "spanish-puerto rico",
+    "translation": ""
+  },
+  {
+    "rva": "001500AC",
+    "original": "spanish-peru",
+    "translation": ""
+  },
+  {
+    "rva": "001500BC",
+    "original": "spanish-paraguay",
+    "translation": ""
+  },
+  {
+    "rva": "001500D0",
+    "original": "spanish-panama",
+    "translation": ""
+  },
+  {
+    "rva": "001500E0",
+    "original": "spanish-nicaragua",
+    "translation": ""
+  },
+  {
+    "rva": "001500F4",
+    "original": "spanish-modern",
+    "translation": ""
+  },
+  {
+    "rva": "00150104",
+    "original": "spanish-mexican",
+    "translation": ""
+  },
+  {
+    "rva": "00150114",
+    "original": "spanish-honduras",
+    "translation": ""
+  },
+  {
+    "rva": "00150128",
+    "original": "spanish-guatemala",
+    "translation": ""
+  },
+  {
+    "rva": "0015013C",
+    "original": "spanish-el salvador",
+    "translation": ""
+  },
+  {
+    "rva": "00150150",
+    "original": "spanish-ecuador",
+    "translation": ""
+  },
+  {
+    "rva": "00150160",
+    "original": "spanish-dominican republic",
+    "translation": ""
+  },
+  {
+    "rva": "0015017C",
+    "original": "spanish-costa rica",
+    "translation": ""
+  },
+  {
+    "rva": "00150190",
+    "original": "spanish-colombia",
+    "translation": ""
+  },
+  {
+    "rva": "001501A4",
+    "original": "spanish-chile",
+    "translation": ""
+  },
+  {
+    "rva": "001501B4",
+    "original": "spanish-bolivia",
+    "translation": ""
+  },
+  {
+    "rva": "001501C4",
+    "original": "spanish-argentina",
+    "translation": ""
+  },
+  {
+    "rva": "001501D8",
+    "original": "portuguese-brazilian",
+    "translation": ""
+  },
+  {
+    "rva": "001501F0",
+    "original": "norwegian-nynorsk",
+    "translation": ""
+  },
+  {
+    "rva": "00150204",
+    "original": "norwegian-bokmal",
+    "translation": ""
+  },
+  {
+    "rva": "00150218",
+    "original": "norwegian",
+    "translation": ""
+  },
+  {
+    "rva": "00150224",
+    "original": "italian-swiss",
+    "translation": ""
+  },
+  {
+    "rva": "00150234",
+    "original": "irish-english",
+    "translation": ""
+  },
+  {
+    "rva": "00150244",
+    "original": "german-swiss",
+    "translation": ""
+  },
+  {
+    "rva": "00150254",
+    "original": "german-luxembourg",
+    "translation": ""
+  },
+  {
+    "rva": "00150268",
+    "original": "german-lichtenstein",
+    "translation": ""
+  },
+  {
+    "rva": "0015027C",
+    "original": "german-austrian",
+    "translation": ""
+  },
+  {
+    "rva": "0015028C",
+    "original": "french-swiss",
+    "translation": ""
+  },
+  {
+    "rva": "0015029C",
+    "original": "french-luxembourg",
+    "translation": ""
+  },
+  {
+    "rva": "001502B0",
+    "original": "french-canadian",
+    "translation": ""
+  },
+  {
+    "rva": "001502C0",
+    "original": "french-belgian",
+    "translation": ""
+  },
+  {
+    "rva": "001502D0",
+    "original": "english-usa",
+    "translation": ""
+  },
+  {
+    "rva": "001502DC",
+    "original": "english-us",
+    "translation": ""
+  },
+  {
+    "rva": "001502E8",
+    "original": "english-uk",
+    "translation": ""
+  },
+  {
+    "rva": "001502F4",
+    "original": "english-trinidad y tobago",
+    "translation": ""
+  },
+  {
+    "rva": "00150310",
+    "original": "english-south africa",
+    "translation": ""
+  },
+  {
+    "rva": "00150328",
+    "original": "english-nz",
+    "translation": ""
+  },
+  {
+    "rva": "00150334",
+    "original": "english-jamaica",
+    "translation": ""
+  },
+  {
+    "rva": "00150344",
+    "original": "english-ire",
+    "translation": ""
+  },
+  {
+    "rva": "00150350",
+    "original": "english-caribbean",
+    "translation": ""
+  },
+  {
+    "rva": "00150364",
+    "original": "english-can",
+    "translation": ""
+  },
+  {
+    "rva": "00150370",
+    "original": "english-belize",
+    "translation": ""
+  },
+  {
+    "rva": "00150380",
+    "original": "english-aus",
+    "translation": ""
+  },
+  {
+    "rva": "0015038C",
+    "original": "english-american",
+    "translation": ""
+  },
+  {
+    "rva": "001503A0",
+    "original": "dutch-belgian",
+    "translation": ""
+  },
+  {
+    "rva": "001503B0",
+    "original": "chinese-traditional",
+    "translation": ""
+  },
+  {
+    "rva": "001503C4",
+    "original": "chinese-singapore",
+    "translation": ""
+  },
+  {
+    "rva": "001503D8",
+    "original": "chinese-simplified",
+    "translation": ""
+  },
+  {
+    "rva": "001503EC",
+    "original": "chinese-hongkong",
+    "translation": ""
+  },
+  {
+    "rva": "00150400",
+    "original": "chinese",
+    "translation": ""
+  },
+  {
+    "rva": "00150410",
+    "original": "canadian",
+    "translation": ""
+  },
+  {
+    "rva": "0015041C",
+    "original": "belgian",
+    "translation": ""
+  },
+  {
+    "rva": "00150424",
+    "original": "australian",
+    "translation": ""
+  },
+  {
+    "rva": "00150430",
+    "original": "american-english",
+    "translation": ""
+  },
+  {
+    "rva": "00150444",
+    "original": "american english",
+    "translation": ""
+  },
+  {
+    "rva": "00150458",
+    "original": "american",
+    "translation": ""
+  },
+  {
+    "rva": "00150748",
+    "original": "Norwegian-Nynorsk",
+    "translation": ""
+  },
+  {
+    "rva": "0015075C",
+    "original": "e+000",
+    "translation": ""
+  },
+  {
+    "rva": "00150778",
+    "original": "IsProcessorFeaturePresent",
+    "translation": ""
+  },
+  {
+    "rva": "00150794",
+    "original": "KERNEL32",
+    "translation": ""
+  },
+  {
+    "rva": "00152014",
+    "original": "bad exception",
+    "translation": ""
+  },
+  {
+    "rva": "001560E0",
+    "original": "GetProcessWindowStation",
+    "translation": ""
+  },
+  {
+    "rva": "001560F8",
+    "original": "GetUserObjectInformationA",
+    "translation": ""
+  },
+  {
+    "rva": "00156114",
+    "original": "GetLastActivePopup",
+    "translation": ""
+  },
+  {
+    "rva": "00156128",
+    "original": "GetActiveWindow",
+    "translation": ""
+  },
+  {
+    "rva": "00156138",
+    "original": "MessageBoxA",
+    "translation": ""
+  },
+  {
+    "rva": "00156144",
+    "original": "USER32.DLL",
+    "translation": ""
+  },
+  {
+    "rva": "00156150",
+    "original": "CONOUT$",
+    "translation": ""
+  },
+  {
+    "rva": "00156158",
+    "original": "1#QNAN",
+    "translation": ""
+  },
+  {
+    "rva": "00156160",
+    "original": "1#INF",
+    "translation": ""
+  },
+  {
+    "rva": "00156168",
+    "original": "1#IND",
+    "translation": ""
+  },
+  {
+    "rva": "00156170",
+    "original": "1#SNAN",
+    "translation": ""
+  },
+  {
+    "rva": "0015617C",
+    "original": "bad allocation",
+    "translation": ""
+  },
+  {
+    "rva": "0015618C",
+    "original": "Surprise attack!",
+    "translation": ""
+  },
+  {
+    "rva": "001561A0",
+    "original": "背後をとられた！",
+    "translation": ""
+  },
+  {
+    "rva": "001561B4",
+    "original": "Preemptive attack!",
+    "translation": ""
+  },
+  {
+    "rva": "001561C8",
+    "original": "先制攻撃！",
+    "translation": ""
+  },
+  {
+    "rva": "001561D4",
+    "original": "Battle Entry Failed\n.",
+    "translation": ""
+  },
+  {
+    "rva": "001561EC",
+    "original": "Move",
+    "translation": ""
+  },
+  {
+    "rva": "001561F4",
+    "original": "   移  動   ",
+    "translation": ""
+  },
+  {
+    "rva": "00156204",
+    "original": "Attack",
+    "translation": ""
+  },
+  {
+    "rva": "0015620C",
+    "original": "　 攻　撃 　",
+    "translation": ""
+  },
+  {
+    "rva": "0015621C",
+    "original": "ATT GUARD",
+    "translation": ""
+  },
+  {
+    "rva": "00156228",
+    "original": "CRITICAL",
+    "translation": ""
+  },
+  {
+    "rva": "00156234",
+    "original": "Party was defeated...",
+    "translation": ""
+  },
+  {
+    "rva": "0015624C",
+    "original": "パーティは全滅しました・・・",
+    "translation": ""
+  },
+  {
+    "rva": "0015626C",
+    "original": "Enemy fled...",
+    "translation": ""
+  },
+  {
+    "rva": "0015627C",
+    "original": "敵に逃げられました・・・",
+    "translation": ""
+  },
+  {
+    "rva": "00156298",
+    "original": "Party fled...",
+    "translation": ""
+  },
+  {
+    "rva": "001562A8",
+    "original": "パーティは退却しました・・・",
+    "translation": ""
+  },
+  {
+    "rva": "001562C8",
+    "original": "Arts",
+    "translation": ""
+  },
+  {
+    "rva": "001562D0",
+    "original": "   アーツ   ",
+    "translation": ""
+  },
+  {
+    "rva": "001562E0",
+    "original": "Crafts",
+    "translation": ""
+  },
+  {
+    "rva": "001562E8",
+    "original": "  クラフト  ",
+    "translation": ""
+  },
+  {
+    "rva": "001562F8",
+    "original": "Items",
+    "translation": ""
+  },
+  {
+    "rva": "00156300",
+    "original": "   道  具   ",
+    "translation": ""
+  },
+  {
+    "rva": "00156310",
+    "original": "Set %c%c%s%c%c as S-Break?",
+    "translation": ""
+  },
+  {
+    "rva": "0015632C",
+    "original": "%c%c%s%c%cをＳブレイク用に設定しますか？",
+    "translation": ""
+  },
+  {
+    "rva": "00156358",
+    "original": "Tactics",
+    "translation": ""
+  },
+  {
+    "rva": "00156360",
+    "original": "Set %c%c%s%c%c as S-Break.\n\t\t\t\t\t\t\tSelect [%c%c%s%c%c] in main menu to change S-Break.",
+    "translation": ""
+  },
+  {
+    "rva": "001563B8",
+    "original": "%c%c%s%c%cをＳブレイク用に設定しました。\n\t\t\t\t\t\t\t\tキャンプ画面の[%c%c%s%c%c]で変更出来ます。",
+    "translation": ""
+  },
+  {
+    "rva": "00156418",
+    "original": "%s._CH",
+    "translation": ""
+  },
+  {
+    "rva": "00156420",
+    "original": "%s is preparing to use arts.\n",
+    "translation": ""
+  },
+  {
+    "rva": "00156440",
+    "original": "%sはアーツを使う準備をしている。\n",
+    "translation": ""
+  },
+  {
+    "rva": "00156464",
+    "original": "%s fled.",
+    "translation": ""
+  },
+  {
+    "rva": "00156470",
+    "original": "%sは逃げ出した。",
+    "translation": ""
+  },
+  {
+    "rva": "00156484",
+    "original": "ALLACHIEVEMENTS",
+    "translation": ""
+  },
+  {
+    "rva": "00156494",
+    "original": "LASTBOSSNOSCRAFT",
+    "translation": ""
+  },
+  {
+    "rva": "001564A8",
+    "original": "CHOOSEBOYS",
+    "translation": ""
+  },
+  {
+    "rva": "001564B4",
+    "original": "CHOOSEGIRLS",
+    "translation": ""
+  },
+  {
+    "rva": "001564C0",
+    "original": "DEFEATLORENCE",
+    "translation": ""
+  },
+  {
+    "rva": "001564D0",
+    "original": "CLEARCHAPTER4",
+    "translation": ""
+  },
+  {
+    "rva": "001564E0",
+    "original": "CLEARCHAPTER3",
+    "translation": ""
+  },
+  {
+    "rva": "001564F0",
+    "original": "CLEARCHAPTER2",
+    "translation": ""
+  },
+  {
+    "rva": "00156500",
+    "original": "CLEARCHAPTER1",
+    "translation": ""
+  },
+  {
+    "rva": "00156510",
+    "original": "CLEARPROLOGUE",
+    "translation": ""
+  },
+  {
+    "rva": "00156520",
+    "original": "MAXBRACERRANK",
+    "translation": ""
+  },
+  {
+    "rva": "00156530",
+    "original": "ALLTREASURETALKS",
+    "translation": ""
+  },
+  {
+    "rva": "00156544",
+    "original": "BABYSITTER",
+    "translation": ""
+  },
+  {
+    "rva": "00156550",
+    "original": "ALLFISHING",
+    "translation": ""
+  },
+  {
+    "rva": "0015655C",
+    "original": "SEPITH10K",
+    "translation": ""
+  },
+  {
+    "rva": "00156568",
+    "original": "SEPITH1K",
+    "translation": ""
+  },
+  {
+    "rva": "00156574",
+    "original": "ALLQUARTZ",
+    "translation": ""
+  },
+  {
+    "rva": "00156580",
+    "original": "ALLLIBERLNEWSREAD",
+    "translation": ""
+  },
+  {
+    "rva": "00156594",
+    "original": "ALLCARNELIAREAD",
+    "translation": ""
+  },
+  {
+    "rva": "001565A4",
+    "original": "ALLARMOR",
+    "translation": ""
+  },
+  {
+    "rva": "001565B0",
+    "original": "ALLWEAPONS",
+    "translation": ""
+  },
+  {
+    "rva": "001565BC",
+    "original": "ALLORBMENTSLOTS",
+    "translation": ""
+  },
+  {
+    "rva": "001565CC",
+    "original": "COMPLETEALLREQUESTS",
+    "translation": ""
+  },
+  {
+    "rva": "001565E0",
+    "original": "KILLALLBIGMONSTERS",
+    "translation": ""
+  },
+  {
+    "rva": "001565F4",
+    "original": "ALLSCHOOLQUESTS",
+    "translation": ""
+  },
+  {
+    "rva": "00156604",
+    "original": "FULLRECIPEBOOK",
+    "translation": ""
+  },
+  {
+    "rva": "00156614",
+    "original": "SHININGPOM",
+    "translation": ""
+  },
+  {
+    "rva": "00156620",
+    "original": "RESIST",
+    "translation": ""
+  },
+  {
+    "rva": "00156628",
+    "original": "DEF DOWN",
+    "translation": ""
+  },
+  {
+    "rva": "00156634",
+    "original": "MOV UP",
+    "translation": ""
+  },
+  {
+    "rva": "0015663C",
+    "original": "ARTS GUARD",
+    "translation": ""
+  },
+  {
+    "rva": "00156648",
+    "original": "CRAFT GUARD",
+    "translation": ""
+  },
+  {
+    "rva": "00156654",
+    "original": "STR DOWN",
+    "translation": ""
+  },
+  {
+    "rva": "00156660",
+    "original": "STR UP",
+    "translation": ""
+  },
+  {
+    "rva": "00156668",
+    "original": "DEF UP",
+    "translation": ""
+  },
+  {
+    "rva": "00156670",
+    "original": "SPD UP",
+    "translation": ""
+  },
+  {
+    "rva": "00156678",
+    "original": "SPD DOWN",
+    "translation": ""
+  },
+  {
+    "rva": "00156684",
+    "original": "DEX UP",
+    "translation": ""
+  },
+  {
+    "rva": "0015668C",
+    "original": "DEX DOWN",
+    "translation": ""
+  },
+  {
+    "rva": "00156698",
+    "original": "AGL UP",
+    "translation": ""
+  },
+  {
+    "rva": "001566A0",
+    "original": "AGL DOWN",
+    "translation": ""
+  },
+  {
+    "rva": "001566AC",
+    "original": "MAX GUARD",
+    "translation": ""
+  },
+  {
+    "rva": "001566B8",
+    "original": "%smonster\\%s",
+    "translation": ""
+  },
+  {
+    "rva": "001566C8",
+    "original": "Battle: Failed to read map file.",
+    "translation": ""
+  },
+  {
+    "rva": "001566EC",
+    "original": "%s._MH",
+    "translation": ""
+  },
+  {
+    "rva": "001566F4",
+    "original": "%smap\\x-file\\%s\\%s.bmh",
+    "translation": ""
+  },
+  {
+    "rva": "0015670C",
+    "original": "　%s　",
+    "translation": ""
+  },
+  {
+    "rva": "00156714",
+    "original": "GUARD",
+    "translation": ""
+  },
+  {
+    "rva": "0015671C",
+    "original": "AT DELAY",
+    "translation": ""
+  },
+  {
+    "rva": "00156728",
+    "original": "AT ADVANCE",
+    "translation": ""
+  },
+  {
+    "rva": "00156734",
+    "original": "%s was destroyed!\n",
+    "translation": ""
+  },
+  {
+    "rva": "00156748",
+    "original": "アイテム「%s」を壊された！\n",
+    "translation": ""
+  },
+  {
+    "rva": "00156764",
+    "original": "#5P#050W#%dA%s",
+    "translation": ""
+  },
+  {
+    "rva": "001567D4",
+    "original": "magic\\mgmirr01.eff",
+    "translation": ""
+  },
+  {
+    "rva": "001567E8",
+    "original": "magic\\mgresure.eff",
+    "translation": ""
+  },
+  {
+    "rva": "001567FC",
+    "original": "Battle Order Bar:",
+    "translation": ""
+  },
+  {
+    "rva": "00156810",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tIndicates who attacks first.\n\t\t\t\t\t\t\t\t\tIt starts from the top and moves down.",
+    "translation": ""
+  },
+  {
+    "rva": "00156874",
+    "original": "ＡＴ(Action Time)バー:",
+    "translation": ""
+  },
+  {
+    "rva": "00156890",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t行動順を表すバーです。\n\t\t\t\t\t\t\t\t\t上から順に行動が回ってきます。",
+    "translation": ""
+  },
+  {
+    "rva": "001568E4",
+    "original": "Attack:",
+    "translation": ""
+  },
+  {
+    "rva": "001568F0",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tAttack an enemy.\n\t\t\t\t\t\t\t\t\tYou may also use it to move, if you are\n\t\t\t\t\t\t\t\t\tusing a mouse and click an empty location.",
+    "translation": ""
+  },
+  {
+    "rva": "0015697C",
+    "original": "攻撃：",
+    "translation": ""
+  },
+  {
+    "rva": "00156988",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t敵を攻撃します。\n\t\t\t\t\t\t\t\t\t敵のいない場所をクリックすると\n\t\t\t\t\t\t\t\t\tそこまで移動することができます（マウス操作時）。",
+    "translation": ""
+  },
+  {
+    "rva": "00156A10",
+    "original": "The highlighted area indicates the distance\n\t\t\t\t\t\t\t\t\ta character can move. Selecting a target in\n\t\t\t\t\t\t\t\t\tthis area will move the character to attack.",
+    "translation": ""
+  },
+  {
+    "rva": "00156AA8",
+    "original": "#0C表示される範囲は移動攻撃の届く距離です。\n\t\t\t\t\t\t\t\t\tこの範囲内にいる目標を選択すると\n\t\t\t\t\t\t\t\t\t自動的に移動して攻撃をしかけます。",
+    "translation": ""
+  },
+  {
+    "rva": "00156B30",
+    "original": "When an enemy is out of range,\n\t\t\t\t\t\t\t\t\t\tan     icon will appear on your cursor.\n\t\t\t\t\t\t\t\t\t\tSelecting an out of range target will\n\t\t\t\t\t\t\t\t\t\twill move the character as close to it as\n\t\t\t\t\t\t\t\t\t\tas possible, but no attack will be performed.",
+    "translation": ""
+  },
+  {
+    "rva": "00156C20",
+    "original": "#0Cカーソルを重ねたときに\n\t\t\t\t\t\t\t\t\t　　が表示される目標は攻撃範囲外です。\n\t\t\t\t\t\t\t\t\t選択すると最も接近できる地点まで\n\t\t\t\t\t\t\t\t\t移動しますが、攻撃はできません。",
+    "translation": ""
+  },
+  {
+    "rva": "00156CC0",
+    "original": "Battle Order Bonus:",
+    "translation": ""
+  },
+  {
+    "rva": "00156CD8",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tThese icons indicate the bonuses alloted\n\t\t\t\t\t\t\t\t\tto the battle order. If a bonus icon appears\n\t\t\t\t\t\t\t\t\tnext to a character's icon, they will receive\n\t\t\t\t\t\t\t\t\tthat bonus.",
+    "translation": ""
+  },
+  {
+    "rva": "00156D98",
+    "original": "ＡＴボーナス(行動順ボーナス)：",
+    "translation": ""
+  },
+  {
+    "rva": "00156DB8",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t　行動順についたボーナスを示すアイコンです。\n\t\t\t\t\t\t\t\t\t　これらのアイコンがあるときに\n\t\t\t\t\t\t\t\t\t　行動順が回ってくると各種のボーナスがつきます。",
+    "translation": ""
+  },
+  {
+    "rva": "00156E60",
+    "original": "  : Heal HP,    : Sepith Up, etc.\n\t\t\t\t\t\t\t\t\tindicate the effects of each icon.",
+    "translation": ""
+  },
+  {
+    "rva": "00156EB0",
+    "original": "#0C   ：ＨＰ回復、   ：セピスボーナスなど\n\t\t\t\t\t\t\t\t\tアイコンごとに特定の効果があります。",
+    "translation": ""
+  },
+  {
+    "rva": "00156F08",
+    "original": "Arts:",
+    "translation": ""
+  },
+  {
+    "rva": "00156F10",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tArts are effective against foes which\n\t\t\t\t\t\t\t\t\tare difficult to hit with a weapon or those\n\t\t\t\t\t\t\t\t\ton which physical attacks have little effect.",
+    "translation": ""
+  },
+  {
+    "rva": "00156FB8",
+    "original": "アーツ：",
+    "translation": ""
+  },
+  {
+    "rva": "00156FC8",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t武器による攻撃が当たりにくい敵や\n\t\t\t\t\t\t\t\t\t攻撃の効果が薄い敵にはアーツが有効です。",
+    "translation": ""
+  },
+  {
+    "rva": "00157038",
+    "original": "It takes time before %c%c%s%c%c can be cast.\n\t\t\t\t\t\t\t\t\tAlso, %c%c%s%c%c is consumed when arts are cast.",
+    "translation": ""
+  },
+  {
+    "rva": "001570A0",
+    "original": "アーツ",
+    "translation": ""
+  },
+  {
+    "rva": "001570A8",
+    "original": "%c%c%s%c%cは発動までに時間（駆動時間）が掛かります。\n\t\t\t\t\t\t\t\t\tまた、使用すると%c%c%s%c%cを消費します。",
+    "translation": ""
+  },
+  {
+    "rva": "00157110",
+    "original": "Element",
+    "translation": ""
+  },
+  {
+    "rva": "00157118",
+    "original": "All %c%c%s%c%c have an %c%c%s%c%c. Determine the element\n\t\t\t\t\t\t\t\t\tmost effective against your foe and use it.",
+    "translation": ""
+  },
+  {
+    "rva": "00157188",
+    "original": "属性",
+    "translation": ""
+  },
+  {
+    "rva": "00157190",
+    "original": "%c%c%s%c%cには%c%c%s%c%cがあります。\n\t\t\t\t\t\t\t\t\t相手に有効な属性を見極めて使いましょう。",
+    "translation": ""
+  },
+  {
+    "rva": "001571E8",
+    "original": "Crafts:",
+    "translation": ""
+  },
+  {
+    "rva": "001571F0",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tCrafts are character-specific skills which not\n\t\t\t\t\t\t\t\t\tonly deal out damage, but also have a broad range\n\t\t\t\t\t\t\t\t\tof effects.",
+    "translation": ""
+  },
+  {
+    "rva": "00157284",
+    "original": "クラフト：",
+    "translation": ""
+  },
+  {
+    "rva": "00157290",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tクラフトはキャラクターごとに固有の技です。\n\t\t\t\t\t\t\t\t\t攻撃だけでなく、様々な効果のものがあります。",
+    "translation": ""
+  },
+  {
+    "rva": "0015730C",
+    "original": "crafts",
+    "translation": ""
+  },
+  {
+    "rva": "00157318",
+    "original": "Using %c%c%s%c%c consumes %c%c%s%c%c.\n\t\t\t\t\t\t\t\t\t%c%c%s%c%c is gradually gained by dealing out\n\t\t\t\t\t\t\t\t\tor receiving damage in battle.",
+    "translation": ""
+  },
+  {
+    "rva": "001573A0",
+    "original": "クラフト",
+    "translation": ""
+  },
+  {
+    "rva": "001573B0",
+    "original": "%c%c%s%c%cを使うと%c%c%s%c%cを消費します。\n\t\t\t\t\t\t\t\t\t%c%c%s%c%cは攻撃したり、ダメージを受けたりすることで\n\t\t\t\t\t\t\t\t\t戦闘中に少しずつ溜まっていきます。",
+    "translation": ""
+  },
+  {
+    "rva": "00157448",
+    "original": "S-Crafts",
+    "translation": ""
+  },
+  {
+    "rva": "00157454",
+    "original": "S-Breaks:",
+    "translation": ""
+  },
+  {
+    "rva": "00157460",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tThese are actions which allow %c%c%s%c%c to be\n\t\t\t\t\t\t\t\t\timmediately unleashed while ignoring the battle\n\t\t\t\t\t\t\t\t\torder once the %c%c%s%c%c gauge has reached 0.",
+    "translation": ""
+  },
+  {
+    "rva": "00157514",
+    "original": "Ｓブレイク",
+    "translation": ""
+  },
+  {
+    "rva": "00157520",
+    "original": "Ｓクラフト",
+    "translation": ""
+  },
+  {
+    "rva": "0015752C",
+    "original": "Ｓブレイク：",
+    "translation": ""
+  },
+  {
+    "rva": "00157540",
+    "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t%c%c%s%c%cが100以上溜まると、ＡＴバー（行動順）を\n\t\t\t\t\t\t\t\t\t無視して%c%c%s%c%cを使用することが出来ます。\n\t\t\t\t\t\t\t\t\tこれが%c%c%s%c%cです。",
+    "translation": ""
+  },
+  {
+    "rva": "001575DC",
+    "original": "S-Breaks",
+    "translation": ""
+  },
+  {
+    "rva": "001575E8",
+    "original": "%c%c%s%c%c which will be used as %c%c%s%c%c can be changed by\n\t\t\t\t\t\t\t\t\tgoing to [Tactics] and then [Set S-Break] within the\n\t\t\t\t\t\t\t\t\tmain menu.",
+    "translation": ""
+  },
+  {
+    "rva": "00157678",
+    "original": "%c%c%s%c%cとして発動する%c%c%s%c%cの変更は\n\t\t\t\t\t\t\t\t\tキャンプ[Tactics]内の［Ｓブレイク登録］で行います。",
+    "translation": ""
+  },
+  {
+    "rva": "001576E0",
+    "original": "S-Break",
+    "translation": ""
+  },
+  {
+    "rva": "001576E8",
+    "original": "Break Button",
+    "translation": ""
+  },
+  {
+    "rva": "001576F8",
+    "original": "Press the        %c%c%s%c%c to unleash an %c%c%s%c%c.\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\tAn S-Break cannot be unleashed\n\t\t\t\t\t\t\t\t\tunder the        condition.",
+    "translation": ""
+  },
+  {
+    "rva": "00157788",
+    "original": "ブレイクボタン",
+    "translation": ""
+  },
+  {
+    "rva": "00157798",
+    "original": "%c%c%s%c%c　　　をクリックすると%c%c%s%c%cが発動します。\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t※ブレイクボタンが　　　になっている間は\n\t\t\t\t\t\t\t\t\t  Ｓブレイクを発動することはできません。",
+    "translation": ""
+  },
+  {
+    "rva": "00157840",
+    "original": "Now, press the         %c%c%s%c%c and try unleashing an %c%c%s%c%c.\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\tIf you are using a keyboard, you may use the 1-4 number\n\t\t\t\t\t\t\t\t\tkeys, or the arrow keys to select it before unleashing it.",
+    "translation": ""
+  },
+  {
+    "rva": "00157918",
+    "original": "#0Cでは、実際に%c%c%s%c%c　　　をクリックし\n\t\t\t\t\t\t\t\t\t%c%c%s%c%cを発動してみましょう。\n\t\t\t\t\t\t\t\t\t※キーボード操作の場合は\n\t\t\t\t\t\t\t\t\t　パーティメンバーに対応した[1][2][3][4]キーを押すか\n\t\t\t\t\t\t\t\t\t　矢印キーの左右[←][→]で選択します。",
+    "translation": ""
+  },
+  {
+    "rva": "00157A00",
+    "original": "Protect all NPCs!",
+    "translation": ""
+  },
+  {
+    "rva": "00157A14",
+    "original": "#0CNPCを守れ！",
+    "translation": ""
+  },
+  {
+    "rva": "00157A24",
+    "original": "If an NPC's HP reaches 0, the game is over.",
+    "translation": ""
+  },
+  {
+    "rva": "00157A50",
+    "original": "#0CNPCのHPが0になるとゲームオーバーになります。",
+    "translation": ""
+  },
+  {
+    "rva": "00157A80",
+    "original": "MISS",
+    "translation": ""
+  },
+  {
+    "rva": "00157A88",
+    "original": "DEAD",
+    "translation": ""
+  },
+  {
+    "rva": "00157A90",
+    "original": "LEVEL UP",
+    "translation": ""
+  },
+  {
+    "rva": "00157A9C",
+    "original": "effect\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157AA4",
+    "original": "._EF",
+    "translation": ""
+  },
+  {
+    "rva": "00157AAC",
+    "original": "mpfog._ef",
+    "translation": ""
+  },
+  {
+    "rva": "00157AB8",
+    "original": "mpfog",
+    "translation": ""
+  },
+  {
+    "rva": "00157AC0",
+    "original": "texture\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157ACC",
+    "original": "map\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157AD4",
+    "original": "battle\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157ADC",
+    "original": "magic\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157AE4",
+    "original": "scraft\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157AEC",
+    "original": "craft\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157AF4",
+    "original": "monster\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157B00",
+    "original": "condition\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157B0C",
+    "original": "._DS",
+    "translation": ""
+  },
+  {
+    "rva": "00157B14",
+    "original": "%seffect\\%s",
+    "translation": ""
+  },
+  {
+    "rva": "00157B20",
+    "original": "%s._X2",
+    "translation": ""
+  },
+  {
+    "rva": "00157B28",
+    "original": "%seffect\\%s\\",
+    "translation": ""
+  },
+  {
+    "rva": "00157B38",
+    "original": "%s._EP",
+    "translation": ""
+  },
+  {
+    "rva": "00157B40",
+    "original": "%seffect\\eps\\%s.eps",
+    "translation": ""
+  },
+  {
+    "rva": "00157B58",
+    "original": "battle",
+    "translation": ""
+  },
+  {
+    "rva": "00157B60",
+    "original": "battle\\damage0.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157B74",
+    "original": "battle\\damage1.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157B88",
+    "original": "screen\\sbkopen2.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157B9C",
+    "original": "battle\\sysheal0.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157BB0",
+    "original": "battle\\exok.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157BC0",
+    "original": "battle\\itemuse.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157BD4",
+    "original": "map\\snddst0.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157BE4",
+    "original": "map\\snddst1.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157BF4",
+    "original": "battle\\encount.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C08",
+    "original": "battle\\mgBlood.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C1C",
+    "original": "map\\sibuki0.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C2C",
+    "original": "condition\\stone.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C40",
+    "original": "condition\\freeze.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C58",
+    "original": "condition\\paralyze.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C70",
+    "original": "condition\\poison.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C88",
+    "original": "condition\\blind.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157C9C",
+    "original": "condition\\death.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157CB0",
+    "original": "battle\\sepith00.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157CC4",
+    "original": "battle\\sepith01.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157CD8",
+    "original": "battle\\sepith02.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157CEC",
+    "original": "battle\\sepith03.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D00",
+    "original": "battle\\sepith06.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D14",
+    "original": "battle\\sepith04.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D28",
+    "original": "battle\\sepith05.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D3C",
+    "original": "battle\\sepith10.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D50",
+    "original": "battle\\sepith11.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D64",
+    "original": "battle\\sepith12.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D78",
+    "original": "battle\\sepith13.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157D8C",
+    "original": "battle\\sepith16.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157DA0",
+    "original": "battle\\sepith14.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157DB4",
+    "original": "battle\\sepith15.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157DC8",
+    "original": "battle\\sepith20.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157DDC",
+    "original": "battle\\sepith21.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157DF0",
+    "original": "battle\\sepith22.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E04",
+    "original": "battle\\sepith23.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E18",
+    "original": "battle\\sepith26.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E2C",
+    "original": "battle\\sepith24.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E40",
+    "original": "battle\\sepith25.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E54",
+    "original": "battle\\range0.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E68",
+    "original": "battle\\range1.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E7C",
+    "original": "battle\\range2.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157E90",
+    "original": "battle\\range0b.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157EA4",
+    "original": "battle\\range1b.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157EB8",
+    "original": "battle\\levelup.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157ECC",
+    "original": "battle\\getitem.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157EE0",
+    "original": "screen\\sbkopen.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157EF4",
+    "original": "screen\\sbkicon.eff",
+    "translation": ""
+  },
+  {
+    "rva": "00157F08",
+    "original": " % 3d",
+    "translation": ""
+  },
+  {
+    "rva": "00157F20",
+    "original": " % 7d",
+    "translation": ""
+  },
+  {
+    "rva": "00157F28",
+    "original": "Displays all items.",
+    "translation": ""
+  },
+  {
+    "rva": "00157F5C",
+    "original": "Displays weapons.",
+    "translation": ""
+  },
+  {
+    "rva": "00157F84",
+    "original": "Displays armor.",
+    "translation": ""
+  },
+  {
+    "rva": "00157FB8",
+    "original": "Displays medicine.",
+    "translation": ""
+  },
+  {
+    "rva": "00157FE8",
+    "original": "Displays quartz.",
+    "translation": ""
+  },
+  {
+    "rva": "00158014",
+    "original": "Displays key items.",
+    "translation": ""
+  },
+  {
+    "rva": "00158048",
+    "original": "Displays ingredients.",
+    "translation": ""
+  },
+  {
+    "rva": "00158074",
+    "original": "Displays books.",
+    "translation": ""
+  },
+  {
+    "rva": "00158098",
+    "original": "Removes equipment.",
+    "translation": ""
+  },
+  {
+    "rva": "001580C0",
+    "original": "Quartz can be installed.",
+    "translation": ""
+  },
+  {
+    "rva": "001580DC",
+    "original": "クオーツを装着できます。",
+    "translation": ""
+  },
+  {
+    "rva": "001580F8",
+    "original": "Weapon can be equipped.",
+    "translation": ""
+  },
+  {
+    "rva": "00158128",
+    "original": "Clothing can be equipped.",
+    "translation": ""
+  },
+  {
+    "rva": "0015815C",
+    "original": "Footwear can be equipped.",
+    "translation": ""
+  },
+  {
+    "rva": "0015818C",
+    "original": "Accessory can be equipped.",
+    "translation": ""
+  },
+  {
+    "rva": "001582C0",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "001582FC",
+    "original": "Next",
+    "translation": ""
+  },
+  {
+    "rva": "00158304",
+    "original": " -----",
+    "translation": ""
+  },
+  {
+    "rva": "0015830C",
+    "original": "  Item",
+    "translation": ""
+  },
+  {
+    "rva": "00158318",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "00158370",
+    "original": "%s x%d",
+    "translation": ""
+  },
+  {
+    "rva": "00158378",
+    "original": "Got ",
+    "translation": ""
+  },
+  {
+    "rva": "00158394",
+    "original": "  Craft",
+    "translation": ""
+  },
+  {
+    "rva": "0015839C",
+    "original": "  S-Craft",
+    "translation": ""
+  },
+  {
+    "rva": "001583A8",
+    "original": "  SCraft",
+    "translation": ""
+  },
+  {
+    "rva": "001583B4",
+    "original": "%s learned ",
+    "translation": ""
+  },
+  {
+    "rva": "001583C4",
+    "original": "%sは ",
+    "translation": ""
+  },
+  {
+    "rva": "001583DC",
+    "original": "  Sepith",
+    "translation": ""
+  },
+  {
+    "rva": "001583E8",
+    "original": "◆━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "00158564",
+    "original": "◆━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015858C",
+    "original": "         %5d／%5d",
+    "translation": ""
+  },
+  {
+    "rva": "001585A0",
+    "original": "    ?????／?????",
+    "translation": ""
+  },
+  {
+    "rva": "001585B4",
+    "original": "Condition:",
+    "translation": ""
+  },
+  {
+    "rva": "001585C0",
+    "original": "Elemental Efficacy (%):",
+    "translation": ""
+  },
+  {
+    "rva": "001585F4",
+    "original": "              %3d／  %3d",
+    "translation": ""
+  },
+  {
+    "rva": "00158610",
+    "original": "Exp:",
+    "translation": ""
+  },
+  {
+    "rva": "00158618",
+    "original": "                 %4d",
+    "translation": ""
+  },
+  {
+    "rva": "00158630",
+    "original": "Sepith:",
+    "translation": ""
+  },
+  {
+    "rva": "00158638",
+    "original": " %2d  %2d  %2d  %2d  %2d  %2d  %2d",
+    "translation": ""
+  },
+  {
+    "rva": "0015865C",
+    "original": " ?? ?? ?? ?? ?? ??",
+    "translation": ""
+  },
+  {
+    "rva": "00158670",
+    "original": "Item:",
+    "translation": ""
+  },
+  {
+    "rva": "00158794",
+    "original": "Title Screen",
+    "translation": ""
+  },
+  {
+    "rva": "001587A4",
+    "original": "Retry",
+    "translation": ""
+  },
+  {
+    "rva": "001587AC",
+    "original": "タイトルに戻る",
+    "translation": ""
+  },
+  {
+    "rva": "001587BC",
+    "original": "リトライ",
+    "translation": ""
+  },
+  {
+    "rva": "001587C8",
+    "original": ".clm",
+    "translation": ""
+  },
+  {
+    "rva": "001587D0",
+    "original": "._LM",
+    "translation": ""
+  },
+  {
+    "rva": "001587D8",
+    "original": "CD3DFile_Root",
+    "translation": ""
+  },
+  {
+    "rva": "001587E8",
+    "original": "Map\\Texture\\",
+    "translation": ""
+  },
+  {
+    "rva": "001587F8",
+    "original": "map20",
+    "translation": ""
+  },
+  {
+    "rva": "00158800",
+    "original": "map21",
+    "translation": ""
+  },
+  {
+    "rva": "00158808",
+    "original": "map22",
+    "translation": ""
+  },
+  {
+    "rva": "00158810",
+    "original": "map23",
+    "translation": ""
+  },
+  {
+    "rva": "00158818",
+    "original": "map24",
+    "translation": ""
+  },
+  {
+    "rva": "00158820",
+    "original": "map25",
+    "translation": ""
+  },
+  {
+    "rva": "00158828",
+    "original": "map30",
+    "translation": ""
+  },
+  {
+    "rva": "00158830",
+    "original": "map31",
+    "translation": ""
+  },
+  {
+    "rva": "00158838",
+    "original": "map32",
+    "translation": ""
+  },
+  {
+    "rva": "00158840",
+    "original": "map33",
+    "translation": ""
+  },
+  {
+    "rva": "00158848",
+    "original": "map26",
+    "translation": ""
+  },
+  {
+    "rva": "00158850",
+    "original": "map27",
+    "translation": ""
+  },
+  {
+    "rva": "00158858",
+    "original": "%s.png",
+    "translation": ""
+  },
+  {
+    "rva": "00158860",
+    "original": "%s.bmp",
+    "translation": ""
+  },
+  {
+    "rva": "00158868",
+    "original": "%s%s",
+    "translation": ""
+  },
+  {
+    "rva": "00158870",
+    "original": "atari.bmp",
+    "translation": ""
+  },
+  {
+    "rva": "0015887C",
+    "original": ".bmp",
+    "translation": ""
+  },
+  {
+    "rva": "00158884",
+    "original": ".png",
+    "translation": ""
+  },
+  {
+    "rva": "0015888C",
+    "original": "._X2",
+    "translation": ""
+  },
+  {
+    "rva": "00158898",
+    "original": ".col",
+    "translation": ""
+  },
+  {
+    "rva": "001588A0",
+    "original": ".mat",
+    "translation": ""
+  },
+  {
+    "rva": "001588A8",
+    "original": "CD3DFile_Mesh",
+    "translation": ""
+  },
+  {
+    "rva": "001588B8",
+    "original": "%s%s%s.col",
+    "translation": ""
+  },
+  {
+    "rva": "001588C4",
+    "original": "%s%s%s%s",
+    "translation": ""
+  },
+  {
+    "rva": "001588D0",
+    "original": "Divide Start\n",
+    "translation": ""
+  },
+  {
+    "rva": "001588E0",
+    "original": "vector<T> too long",
+    "translation": ""
+  },
+  {
+    "rva": "00158B2C",
+    "original": "chr._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B34",
+    "original": "chrspot._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B40",
+    "original": "chrspots._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B50",
+    "original": "map._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B58",
+    "original": "mapspot._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B64",
+    "original": "skn._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B6C",
+    "original": "sknspot._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B78",
+    "original": "mapenv._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B84",
+    "original": "chrgrad._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B90",
+    "original": "mapshd._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158B9C",
+    "original": "sknshd._vs",
+    "translation": ""
+  },
+  {
+    "rva": "00158EA0",
+    "original": "S0n0ﾗ00ｰ000o0D",
+    "translation": ""
+  },
+  {
+    "rva": "00158F1C",
+    "original": ".oct",
+    "translation": ""
+  },
+  {
+    "rva": "00158F24",
+    "original": "_move.x",
+    "translation": ""
+  },
+  {
+    "rva": "00158F2C",
+    "original": ".shd",
+    "translation": ""
+  },
+  {
+    "rva": "00158F38",
+    "original": "%s_shd.x",
+    "translation": ""
+  },
+  {
+    "rva": "00158F44",
+    "original": "._HD",
+    "translation": ""
+  },
+  {
+    "rva": "00158F4C",
+    "original": "._CT",
+    "translation": ""
+  },
+  {
+    "rva": "00158F54",
+    "original": ".scl",
+    "translation": ""
+  },
+  {
+    "rva": "00158F5C",
+    "original": "_scr",
+    "translation": ""
+  },
+  {
+    "rva": "00158F64",
+    "original": "._CL",
+    "translation": ""
+  },
+  {
+    "rva": "00158F6C",
+    "original": "map\\x-file\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158F78",
+    "original": "map20\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158F80",
+    "original": "map21\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158F88",
+    "original": "map22\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158F90",
+    "original": "map23\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158F98",
+    "original": "map24\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FA0",
+    "original": "map25\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FA8",
+    "original": "map30\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FB0",
+    "original": "map31\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FB8",
+    "original": "map32\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FC0",
+    "original": "map33\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FC8",
+    "original": "map26\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FD0",
+    "original": "map27\\",
+    "translation": ""
+  },
+  {
+    "rva": "00158FD8",
+    "original": "_scr.x",
+    "translation": ""
+  },
+  {
+    "rva": "00158FE0",
+    "original": "GenerateFace OK\n",
+    "translation": ""
+  },
+  {
+    "rva": "00159008",
+    "original": "BGM\\%s.ogg",
+    "translation": ""
+  },
+  {
+    "rva": "00159014",
+    "original": "BGM\\%s.WAV",
+    "translation": ""
+  },
+  {
+    "rva": "00159094",
+    "original": "LOOPSTART=",
+    "translation": ""
+  },
+  {
+    "rva": "001590A0",
+    "original": "LOOPLENGTH=",
+    "translation": ""
+  },
+  {
+    "rva": "00159120",
+    "original": "ov_clear",
+    "translation": ""
+  },
+  {
+    "rva": "0015912C",
+    "original": "ov_pcm_total",
+    "translation": ""
+  },
+  {
+    "rva": "0015913C",
+    "original": "ov_pcm_seek",
+    "translation": ""
+  },
+  {
+    "rva": "00159148",
+    "original": "ov_info",
+    "translation": ""
+  },
+  {
+    "rva": "00159150",
+    "original": "ov_comment",
+    "translation": ""
+  },
+  {
+    "rva": "0015915C",
+    "original": "ov_open_callbacks",
+    "translation": ""
+  },
+  {
+    "rva": "00159170",
+    "original": "ov_read",
+    "translation": ""
+  },
+  {
+    "rva": "001591B8",
+    "original": "GetUserPath",
+    "translation": ""
+  },
+  {
+    "rva": "00159470",
+    "original": "SHGetKnownFolderPath",
+    "translation": ""
+  },
+  {
+    "rva": "0015949C",
+    "original": "ED6_DT%02x.DAT",
+    "translation": ""
+  },
+  {
+    "rva": "001594AC",
+    "original": "ED6_DT%02x.DIR",
+    "translation": ""
+  },
+  {
+    "rva": "001594CC",
+    "original": "FC\\%ls",
+    "translation": ""
+  },
+  {
+    "rva": "001594DC",
+    "original": "%s%s\\",
+    "translation": ""
+  },
+  {
+    "rva": "00159518",
+    "original": "Learned recipe for [%s].",
+    "translation": ""
+  },
+  {
+    "rva": "00159534",
+    "original": "『%s』のレシピを覚えた。",
+    "translation": ""
+  },
+  {
+    "rva": "001595AC",
+    "original": "Discard",
+    "translation": ""
+  },
+  {
+    "rva": "001595B8",
+    "original": "　捨てる　",
+    "translation": ""
+  },
+  {
+    "rva": "001595C4",
+    "original": "　使　う　",
+    "translation": ""
+  },
+  {
+    "rva": "001595D4",
+    "original": "Select a save file.",
+    "translation": ""
+  },
+  {
+    "rva": "001595E8",
+    "original": "Select a file to load.",
+    "translation": ""
+  },
+  {
+    "rva": "00159600",
+    "original": "Erase save data.",
+    "translation": ""
+  },
+  {
+    "rva": "00159614",
+    "original": "Exit game.",
+    "translation": ""
+  },
+  {
+    "rva": "00159620",
+    "original": "セーブするファイルを選んでください。",
+    "translation": ""
+  },
+  {
+    "rva": "00159648",
+    "original": "ロードするファイルを選んでください。",
+    "translation": ""
+  },
+  {
+    "rva": "00159670",
+    "original": "削除するファイルを選んでください。",
+    "translation": ""
+  },
+  {
+    "rva": "00159694",
+    "original": "ゲームを終了します。",
+    "translation": ""
+  },
+  {
+    "rva": "001596AC",
+    "original": "%cTactics mode cannot currently be utilized.",
+    "translation": ""
+  },
+  {
+    "rva": "001596DC",
+    "original": "%cPosition cannot currently be changed.",
+    "translation": ""
+  },
+  {
+    "rva": "0015973C",
+    "original": "%cAuto Save slot. Slot cannot be used.",
+    "translation": ""
+  },
+  {
+    "rva": "00159764",
+    "original": "Overwrite?",
+    "translation": ""
+  },
+  {
+    "rva": "00159770",
+    "original": "Load clear\ndata file?",
+    "translation": ""
+  },
+  {
+    "rva": "00159788",
+    "original": "Load file?",
+    "translation": ""
+  },
+  {
+    "rva": "00159794",
+    "original": "Delete this file?",
+    "translation": ""
+  },
+  {
+    "rva": "001597A8",
+    "original": "Select who will use the item.",
+    "translation": ""
+  },
+  {
+    "rva": "001597C8",
+    "original": "アイテムを使う相手を選んでください。",
+    "translation": ""
+  },
+  {
+    "rva": "001597F0",
+    "original": "Discard this item?",
+    "translation": ""
+  },
+  {
+    "rva": "00159820",
+    "original": "Select on whom the arts will be used.",
+    "translation": ""
+  },
+  {
+    "rva": "00159848",
+    "original": "アーツを使う相手を選んでください。",
+    "translation": ""
+  },
+  {
+    "rva": "0015986C",
+    "original": "◆━━━━",
+    "translation": ""
+  },
+  {
+    "rva": "00159878",
+    "original": "━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "00159884",
+    "original": "◆━━━",
+    "translation": ""
+  },
+  {
+    "rva": "00159890",
+    "original": "━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015989C",
+    "original": "      Crafts",
+    "translation": ""
+  },
+  {
+    "rva": "001598AC",
+    "original": "◆━━━            ━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "001598CC",
+    "original": "     S-Crafts",
+    "translation": ""
+  },
+  {
+    "rva": "001598DC",
+    "original": "◆━━                ━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "00159FA0",
+    "original": "HP      /%4d",
+    "translation": ""
+  },
+  {
+    "rva": "00159FB0",
+    "original": "    %4d",
+    "translation": ""
+  },
+  {
+    "rva": "00159FB8",
+    "original": "EP  %4d/%4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A068",
+    "original": "Name",
+    "translation": ""
+  },
+  {
+    "rva": "0015A070",
+    "original": "Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015A078",
+    "original": "Level",
+    "translation": ""
+  },
+  {
+    "rva": "0015A084",
+    "original": "       %4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A090",
+    "original": "   %4d/",
+    "translation": ""
+  },
+  {
+    "rva": "0015A098",
+    "original": "             %3d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0AC",
+    "original": "Parameters",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0B8",
+    "original": "◆━━",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0C0",
+    "original": "━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0C8",
+    "original": "      Name",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0D4",
+    "original": "◆━━━        ━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0F0",
+    "original": "     Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015A0FC",
+    "original": "◆━                ━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A118",
+    "original": "   Parameter",
+    "translation": ""
+  },
+  {
+    "rva": "0015A150",
+    "original": "        %4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A15C",
+    "original": "Experience",
+    "translation": ""
+  },
+  {
+    "rva": "0015A168",
+    "original": "   Experience",
+    "translation": ""
+  },
+  {
+    "rva": "0015A17C",
+    "original": "NEXT",
+    "translation": ""
+  },
+  {
+    "rva": "0015A184",
+    "original": "         %6d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A194",
+    "original": "          -----",
+    "translation": ""
+  },
+  {
+    "rva": "0015A204",
+    "original": "Equipment",
+    "translation": ""
+  },
+  {
+    "rva": "0015A210",
+    "original": "      Equips",
+    "translation": ""
+  },
+  {
+    "rva": "0015A220",
+    "original": "Unequip",
+    "translation": ""
+  },
+  {
+    "rva": "0015A32C",
+    "original": "Autosave",
+    "translation": ""
+  },
+  {
+    "rva": "0015A338",
+    "original": "Page %2d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A344",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A384",
+    "original": "Auto%01d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A390",
+    "original": "%03d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A398",
+    "original": "----/--/-- --:--:--",
+    "translation": ""
+  },
+  {
+    "rva": "0015A3AC",
+    "original": "Auto%01d %6s: %-24s",
+    "translation": ""
+  },
+  {
+    "rva": "0015A3C0",
+    "original": "Auto%01d %6s %-24s",
+    "translation": ""
+  },
+  {
+    "rva": "0015A3D4",
+    "original": "%03d %6s: %-24s",
+    "translation": ""
+  },
+  {
+    "rva": "0015A3E4",
+    "original": "%03d %6s %-24s",
+    "translation": ""
+  },
+  {
+    "rva": "0015A3F4",
+    "original": "Clear Data - Trails in the Sky",
+    "translation": ""
+  },
+  {
+    "rva": "0015A430",
+    "original": "%03d %6s",
+    "translation": ""
+  },
+  {
+    "rva": "0015A43C",
+    "original": "ノーマル",
+    "translation": ""
+  },
+  {
+    "rva": "0015A448",
+    "original": "ハード",
+    "translation": ""
+  },
+  {
+    "rva": "0015A450",
+    "original": "ナイトメア",
+    "translation": ""
+  },
+  {
+    "rva": "0015A45C",
+    "original": "イージー",
+    "translation": ""
+  },
+  {
+    "rva": "0015A468",
+    "original": "Normal",
+    "translation": ""
+  },
+  {
+    "rva": "0015A470",
+    "original": "Hard",
+    "translation": ""
+  },
+  {
+    "rva": "0015A478",
+    "original": "Nightmare",
+    "translation": ""
+  },
+  {
+    "rva": "0015A484",
+    "original": "Easy",
+    "translation": ""
+  },
+  {
+    "rva": "0015A48C",
+    "original": "Unknown",
+    "translation": ""
+  },
+  {
+    "rva": "0015A494",
+    "original": "？？？",
+    "translation": ""
+  },
+  {
+    "rva": "0015A49C",
+    "original": "%s (%s)",
+    "translation": ""
+  },
+  {
+    "rva": "0015A4A4",
+    "original": "%4d/%2d/%2d %02d:%02d:%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A4C0",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A500",
+    "original": "SaveTime: ",
+    "translation": ""
+  },
+  {
+    "rva": "0015A50C",
+    "original": "SaveTime：",
+    "translation": ""
+  },
+  {
+    "rva": "0015A518",
+    "original": "PlayTime: ",
+    "translation": ""
+  },
+  {
+    "rva": "0015A524",
+    "original": "PlayTime：",
+    "translation": ""
+  },
+  {
+    "rva": "0015A530",
+    "original": "Unknown:",
+    "translation": ""
+  },
+  {
+    "rva": "0015A53C",
+    "original": "%s (%s: %d)",
+    "translation": ""
+  },
+  {
+    "rva": "0015A548",
+    "original": "           %2d:%02d:%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A564",
+    "original": "              %2d:%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A57C",
+    "original": "                 %2d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A594",
+    "original": "----/--/--",
+    "translation": ""
+  },
+  {
+    "rva": "0015A5A0",
+    "original": "           --:--:--",
+    "translation": ""
+  },
+  {
+    "rva": "0015A5B4",
+    "original": "Are you sure\nyou wish to finish\nsaving Clear Data?",
+    "translation": ""
+  },
+  {
+    "rva": "0015A5E8",
+    "original": "%cAuto save slot.\nYou can't save here.",
+    "translation": ""
+  },
+  {
+    "rva": "0015A610",
+    "original": "Overwrite file?",
+    "translation": ""
+  },
+  {
+    "rva": "0015A7C0",
+    "original": "%04d",
+    "translation": ""
+  },
+  {
+    "rva": "0015A7D0",
+    "original": "CANCEL",
+    "translation": ""
+  },
+  {
+    "rva": "0015A87C",
+    "original": "Set S-Break",
+    "translation": ""
+  },
+  {
+    "rva": "0015A888",
+    "original": "Battle Position",
+    "translation": ""
+  },
+  {
+    "rva": "0015A898",
+    "original": "Character Position",
+    "translation": ""
+  },
+  {
+    "rva": "0015A8AC",
+    "original": "Ｓブレイク登録",
+    "translation": ""
+  },
+  {
+    "rva": "0015A8DC",
+    "original": "Change character position.",
+    "translation": ""
+  },
+  {
+    "rva": "0015A914",
+    "original": "Change battle formation.",
+    "translation": ""
+  },
+  {
+    "rva": "0015A94C",
+    "original": "Set S-Break.",
+    "translation": ""
+  },
+  {
+    "rva": "0015A978",
+    "original": "◆━━━━━",
+    "translation": ""
+  },
+  {
+    "rva": "0015A988",
+    "original": "━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A998",
+    "original": "Party Order",
+    "translation": ""
+  },
+  {
+    "rva": "0015A9A4",
+    "original": "◆━━━━                   ━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015A9CC",
+    "original": "        Walk Place",
+    "translation": ""
+  },
+  {
+    "rva": "0015A9E0",
+    "original": "◆━━━━━━━━━━━",
+    "translation": ""
+  },
+  {
+    "rva": "0015A9FC",
+    "original": "━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015AA18",
+    "original": "◆━━━━━━━━━                   ━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015AA54",
+    "original": "                S-Break",
+    "translation": ""
+  },
+  {
+    "rva": "0015AA6C",
+    "original": "−−−−−−−−−−−−",
+    "translation": ""
+  },
+  {
+    "rva": "0015AA88",
+    "original": "Formation",
+    "translation": ""
+  },
+  {
+    "rva": "0015AA94",
+    "original": "               Formation",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD31",
+    "original": "sbwlBWL%.$dD",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD4C",
+    "original": "Cafe",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD54",
+    "original": "Septian Church",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD64",
+    "original": "Restaurant/Inn",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD74",
+    "original": "Orbment Factory",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD84",
+    "original": "Bracer Guild",
+    "translation": ""
+  },
+  {
+    "rva": "0015AD94",
+    "original": "Lodgings",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADA0",
+    "original": "General Goods",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADB0",
+    "original": "Arms & Guards",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADC0",
+    "original": "-----",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADD4",
+    "original": "七耀教会",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADE0",
+    "original": "食事・休憩",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADEC",
+    "original": "オーブメント",
+    "translation": ""
+  },
+  {
+    "rva": "0015ADFC",
+    "original": "遊撃士協会",
+    "translation": ""
+  },
+  {
+    "rva": "0015AE08",
+    "original": "休憩・宿泊",
+    "translation": ""
+  },
+  {
+    "rva": "0015AE24",
+    "original": "武器・防具",
+    "translation": ""
+  },
+  {
+    "rva": "0015AEEC",
+    "original": "■Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015AEF8",
+    "original": "■ステータス",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF08",
+    "original": "Visible",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF10",
+    "original": "表示する",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF1C",
+    "original": "Invisible",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF28",
+    "original": "表示しない",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF34",
+    "original": "■Mini Map",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF40",
+    "original": "■ミニマップ",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF50",
+    "original": "Fixed north",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF6C",
+    "original": "Rotate",
+    "translation": ""
+  },
+  {
+    "rva": "0015AF84",
+    "original": "■Camera",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFA0",
+    "original": "45 degree",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFAC",
+    "original": "45度単位",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFB8",
+    "original": "Free rotation",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFD4",
+    "original": "■Menu Button",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFE4",
+    "original": "■ボタン機能",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFF4",
+    "original": "Click",
+    "translation": ""
+  },
+  {
+    "rva": "0015AFFC",
+    "original": "クリック",
+    "translation": ""
+  },
+  {
+    "rva": "0015B008",
+    "original": "Double click",
+    "translation": ""
+  },
+  {
+    "rva": "0015B018",
+    "original": "ダブルクリック",
+    "translation": ""
+  },
+  {
+    "rva": "0015B02C",
+    "original": "なし",
+    "translation": ""
+  },
+  {
+    "rva": "0015B038",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015B07C",
+    "original": "■Frame Rate",
+    "translation": ""
+  },
+  {
+    "rva": "0015B08C",
+    "original": "■フレームレート",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0A0",
+    "original": "30 FPS Limit",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0B0",
+    "original": "30FPS固定",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0BC",
+    "original": "Automatic",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0C8",
+    "original": "自動",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0D0",
+    "original": "■Transparency",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0E0",
+    "original": "■キャラ透過",
+    "translation": ""
+  },
+  {
+    "rva": "0015B0F4",
+    "original": "透過する",
+    "translation": ""
+  },
+  {
+    "rva": "0015B100",
+    "original": "透過しない",
+    "translation": ""
+  },
+  {
+    "rva": "0015B10C",
+    "original": "■Background Music",
+    "translation": ""
+  },
+  {
+    "rva": "0015B120",
+    "original": "■ＢＧＭ",
+    "translation": ""
+  },
+  {
+    "rva": "0015B12C",
+    "original": "オフ",
+    "translation": ""
+  },
+  {
+    "rva": "0015B134",
+    "original": "オン",
+    "translation": ""
+  },
+  {
+    "rva": "0015B13C",
+    "original": "　BGM Volume",
+    "translation": "　ＢＧＭ音量"
+  },
+  {
+    "rva": "0015B14C",
+    "original": "　ＢＧＭ音量",
+    "translation": ""
+  },
+  {
+    "rva": "0015B15C",
+    "original": "■Sound Effects",
+    "translation": ""
+  },
+  {
+    "rva": "0015B178",
+    "original": "　SE Volume",
+    "translation": ""
+  },
+  {
+    "rva": "0015B194",
+    "original": "■Voices",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1A0",
+    "original": "■戦闘ボイス",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1B0",
+    "original": "Japanese",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1C4",
+    "original": "English",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1CC",
+    "original": "英語",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1D4",
+    "original": "■Retry Offset",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1E4",
+    "original": "■リトライ補正",
+    "translation": ""
+  },
+  {
+    "rva": "0015B1F4",
+    "original": "補正しない",
+    "translation": ""
+  },
+  {
+    "rva": "0015B200",
+    "original": "補正する",
+    "translation": ""
+  },
+  {
+    "rva": "0015B20C",
+    "original": "Change status display shown on the game screen.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B26C",
+    "original": "Change mini map display shown on the game screen.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B2D0",
+    "original": "Change game camera settings.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B31C",
+    "original": "Change main menu button.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B35C",
+    "original": "Change frame rate.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B398",
+    "original": "Change character transparency.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B3DC",
+    "original": "Turn background music on or off.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B428",
+    "original": "Change background music volume.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B464",
+    "original": "Turn sound effects on or off.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B4AC",
+    "original": "Change sound effect volume.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B4E4",
+    "original": "Change battle voice language.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B504",
+    "original": "Turn battle voices on or off.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B550",
+    "original": "Enemies become weaker based on number of retries.\nFeel free to use this function if you can't win a battle.",
+    "translation": ""
+  },
+  {
+    "rva": "0015B610",
+    "original": "◆━━━━━━━━",
+    "translation": ""
+  },
+  {
+    "rva": "0015B624",
+    "original": "━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015B638",
+    "original": "Slots",
+    "translation": ""
+  },
+  {
+    "rva": "0015B640",
+    "original": "◆━━━━━━              ━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015B66C",
+    "original": "           Slots",
+    "translation": ""
+  },
+  {
+    "rva": "0015B680",
+    "original": "◆━━━━━━",
+    "translation": ""
+  },
+  {
+    "rva": "0015B690",
+    "original": "━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015B6A0",
+    "original": "Orbal Arts",
+    "translation": ""
+  },
+  {
+    "rva": "0015B6AC",
+    "original": "◆━━━━━                  ━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015B6D8",
+    "original": "         Orbal Arts",
+    "translation": ""
+  },
+  {
+    "rva": "0015B6EC",
+    "original": "%3dEP",
+    "translation": ""
+  },
+  {
+    "rva": "0015B6F4",
+    "original": "Remove quartz",
+    "translation": ""
+  },
+  {
+    "rva": "0015B718",
+    "original": "Line%d",
+    "translation": ""
+  },
+  {
+    "rva": "0015B8BC",
+    "original": "Mira",
+    "translation": ""
+  },
+  {
+    "rva": "0015B8C4",
+    "original": "PlayTime",
+    "translation": ""
+  },
+  {
+    "rva": "0015B8D0",
+    "original": "%d:%02d:%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0015B8E0",
+    "original": "%d:%02d",
+    "translation": ""
+  },
+  {
+    "rva": "0015B8E8",
+    "original": "     Mira  ",
+    "translation": ""
+  },
+  {
+    "rva": "0015B8F4",
+    "original": "◆━━            ━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015B910",
+    "original": "%10d",
+    "translation": ""
+  },
+  {
+    "rva": "0015B918",
+    "original": "   PlayTime",
+    "translation": ""
+  },
+  {
+    "rva": "0015B924",
+    "original": "%3d:%2d:%2d",
+    "translation": ""
+  },
+  {
+    "rva": "0015B930",
+    "original": "    Mira  ",
+    "translation": ""
+  },
+  {
+    "rva": "0015B93C",
+    "original": "◆━          ━◆",
+    "translation": ""
+  },
+  {
+    "rva": "80186230",
+    "original": "[Nightmare] It's your funeral. May Aidios be with you.",
+    "translation": "「噩梦」"
+  },
+  {
+    "rva": "8018622C",
+    "original": "[Hard] A difficult setting. For those who find normal a bit lacking.",
+    "translation": "「困难」"
+  },
+  {
+    "rva": "80186228",
+    "original": "[Normal] Average difficulty. For those wanting a little challenge.",
+    "translation": "「普通」"
+  },
+  {
+    "rva": "0015BC84",
+    "original": "ed6_op.avi",
+    "translation": ""
+  },
+  {
+    "rva": "0015BC90",
+    "original": "ed6_dt17.dat",
+    "translation": ""
+  },
+  {
+    "rva": "0015BCA0",
+    "original": "ed6_dt18.dat",
+    "translation": ""
+  },
+  {
+    "rva": "0015BD50",
+    "original": "% 30s",
+    "translation": ""
+  },
+  {
+    "rva": "0015BD58",
+    "original": "　 Bracer Guild\n　 Lodgings\n　 Orbal Factory\n　 Septian Church\n　 Various Shops",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF04",
+    "original": "Mirage sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF14",
+    "original": "Space sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF24",
+    "original": "Time sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF30",
+    "original": "Wind sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF3C",
+    "original": "Fire sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF48",
+    "original": "Water sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF58",
+    "original": "Earth sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF68",
+    "original": "幻のセピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF80",
+    "original": "時のセピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF8C",
+    "original": "風のセピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015BF98",
+    "original": "火のセピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFA4",
+    "original": "水のセピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFB0",
+    "original": "地のセピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFBC",
+    "original": "Quit",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFC4",
+    "original": "Trade",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFCC",
+    "original": "Quartz",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFD4",
+    "original": "Slot",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFDC",
+    "original": "や め る",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFE8",
+    "original": "換    金",
+    "translation": ""
+  },
+  {
+    "rva": "0015BFF4",
+    "original": "クオーツ",
+    "translation": ""
+  },
+  {
+    "rva": "0015C000",
+    "original": "スロット",
+    "translation": ""
+  },
+  {
+    "rva": "0015C00C",
+    "original": "Open a slot.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C038",
+    "original": "Synthesize quartz.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C068",
+    "original": "Exchange sepith for mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0A0",
+    "original": "End transaction.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0C4",
+    "original": "開封済み",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0D0",
+    "original": "開封可能",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0DC",
+    "original": "開封不可",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0E8",
+    "original": "未開封",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0F0",
+    "original": "--------",
+    "translation": ""
+  },
+  {
+    "rva": "0015C0FC",
+    "original": "Already Open",
+    "translation": ""
+  },
+  {
+    "rva": "0015C10C",
+    "original": "Openable",
+    "translation": ""
+  },
+  {
+    "rva": "0015C118",
+    "original": "Not Openable",
+    "translation": ""
+  },
+  {
+    "rva": "0015C128",
+    "original": "%cOpened slot [%d].",
+    "translation": ""
+  },
+  {
+    "rva": "0015C13C",
+    "original": "%cスロット[ %d ]を開封しました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C160",
+    "original": "%cInsufficient sepith.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C178",
+    "original": "%cセピスが足りません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C190",
+    "original": "%c#0CSynthesize #3C%s#0C?",
+    "translation": ""
+  },
+  {
+    "rva": "0015C1AC",
+    "original": "%c#3C%s#0Cを合成します。よろしいですか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015C1D8",
+    "original": "%c#0CSynthesized #3C%s#0C.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C1F4",
+    "original": "%c#3C%s#0Cを合成しました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C210",
+    "original": "%cTrade sepith for %d mira?",
+    "translation": ""
+  },
+  {
+    "rva": "0015C22C",
+    "original": "%cセピスを%dミラに換金します。よろしいですか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015C25C",
+    "original": "%cTraded sepith for %d mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C27C",
+    "original": "%cセピスを%dミラに換金しました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C2A0",
+    "original": "Choose a slot to open.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C2B8",
+    "original": "開封したいスロットを選択してください。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C2E0",
+    "original": "Slot [%d] can be opened.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C300",
+    "original": "Slot [%d] cannot be opened because the circuit\nis not connected.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C344",
+    "original": "Slot [%d] has already been opened.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C3D0",
+    "original": "スロット[ %d ]はすでに開封済みです。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C3F8",
+    "original": "Select a character.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C430",
+    "original": "Inventory: ------",
+    "translation": ""
+  },
+  {
+    "rva": "0015C444",
+    "original": "現在の所持数：------",
+    "translation": ""
+  },
+  {
+    "rva": "0015C45C",
+    "original": "Choose a quartz to synthesize.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C47C",
+    "original": "合成したいクオーツを選択してください。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C4A4",
+    "original": "Inventory: %4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015C4B4",
+    "original": "現在の所持数：%4d個",
+    "translation": ""
+  },
+  {
+    "rva": "0015C4C8",
+    "original": "Select the sepith to trade.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C50C",
+    "original": "Trade %s for mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C534",
+    "original": "Trade sepith for mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C54C",
+    "original": "セピスの換金を行います。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C568",
+    "original": "Trade %d sepith for %d mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C588",
+    "original": "%d個を%dミラに換金します。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5A4",
+    "original": "Sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5AC",
+    "original": "◆━",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5B4",
+    "original": "━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5BC",
+    "original": "◆            ◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5D0",
+    "original": "Sepith - Rate",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5E0",
+    "original": " Sepith - Rate",
+    "translation": ""
+  },
+  {
+    "rva": "0015C5F0",
+    "original": "◆                     ◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015C60C",
+    "original": "Sepith - Cost",
+    "translation": ""
+  },
+  {
+    "rva": "0015C61C",
+    "original": " Sepith - Cost",
+    "translation": ""
+  },
+  {
+    "rva": "0015C62C",
+    "original": "(    )",
+    "translation": ""
+  },
+  {
+    "rva": "0015C634",
+    "original": " %4d ",
+    "translation": ""
+  },
+  {
+    "rva": "0015C63C",
+    "original": " ---- ",
+    "translation": ""
+  },
+  {
+    "rva": "0015C644",
+    "original": "-   0 =      0",
+    "translation": ""
+  },
+  {
+    "rva": "0015C654",
+    "original": "-     =",
+    "translation": ""
+  },
+  {
+    "rva": "0015C65C",
+    "original": "Total",
+    "translation": ""
+  },
+  {
+    "rva": "0015C664",
+    "original": "Trade sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015C674",
+    "original": "合計",
+    "translation": ""
+  },
+  {
+    "rva": "0015C790",
+    "original": "Rest",
+    "translation": ""
+  },
+  {
+    "rva": "0015C798",
+    "original": " 休　む",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7A0",
+    "original": "Convert",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7A8",
+    "original": "Sell",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7B4",
+    "original": " やめる",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7BC",
+    "original": " 換  金",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7C4",
+    "original": " 売  却",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7D4",
+    "original": "Buy items.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C7F4",
+    "original": "Sell items.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C818",
+    "original": "Cash in Sepith.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C828",
+    "original": "Leave shop.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C844",
+    "original": "What will you do?",
+    "translation": ""
+  },
+  {
+    "rva": "0015C858",
+    "original": "What will you purchase?",
+    "translation": ""
+  },
+  {
+    "rva": "0015C884",
+    "original": "Sale price: ------------------",
+    "translation": ""
+  },
+  {
+    "rva": "0015C8A4",
+    "original": "売却価格：------------------",
+    "translation": ""
+  },
+  {
+    "rva": "0015C8C4",
+    "original": "What will you sell?",
+    "translation": ""
+  },
+  {
+    "rva": "0015C8EC",
+    "original": "Sale price: %5dx%2d = %7d",
+    "translation": ""
+  },
+  {
+    "rva": "0015C908",
+    "original": "売却価格：%5dx%2d = %7d",
+    "translation": ""
+  },
+  {
+    "rva": "0015C920",
+    "original": "Buy %d for %d mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C934",
+    "original": "%d個を%dミラで購入します。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C950",
+    "original": "Sell %d for %d mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C968",
+    "original": "%d個を%dミラで売却します。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C984",
+    "original": "%c#0CCannot carry any more #1C%s#0C.",
+    "translation": ""
+  },
+  {
+    "rva": "0015C9AC",
+    "original": "%c#1C%s#0Cは、もうこれ以上持つことはできません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015C9E0",
+    "original": "%c#0CBuy %d #1C%s#0C for %d mira?",
+    "translation": ""
+  },
+  {
+    "rva": "0015CA04",
+    "original": "%c#1C%s#0Cを%d個、%dミラで購入します。よろしいですか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015CA3C",
+    "original": "%c#0CBought %d #1C%s#0C for %d mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015CA64",
+    "original": "%c#1C%s#0Cを%d個、%dミラで購入しました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015CA90",
+    "original": "%cInsufficient mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015CAA8",
+    "original": "%cミラが足りません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015CAC0",
+    "original": "%c#0CSell %d #1C%s#0C for %d mira?",
+    "translation": ""
+  },
+  {
+    "rva": "0015CAE4",
+    "original": "%c#1C%s#0Cを%d個、%dミラで売却します。よろしいですか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015CB1C",
+    "original": "%c#0CSold %d #1C%s#0C for %d mira.",
+    "translation": ""
+  },
+  {
+    "rva": "0015CB40",
+    "original": "%c#1C%s#0Cを%d個、%dミラで売却しました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015CB6C",
+    "original": "Rest and recover.",
+    "translation": ""
+  },
+  {
+    "rva": "0015CB98",
+    "original": "Select an option.",
+    "translation": ""
+  },
+  {
+    "rva": "0015CBB0",
+    "original": "%c#0CIt will be #3C%d#0C for the night.\nWill you spend the night?",
+    "translation": ""
+  },
+  {
+    "rva": "0015CBF4",
+    "original": "%c#0C宿泊料は#3C%dミラ#0Cとなります。よろしいですか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC2C",
+    "original": "Equip Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC3C",
+    "original": "◆━                        ━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC60",
+    "original": "     Equip Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC74",
+    "original": "Ingredients",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC80",
+    "original": "材料一覧",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC8C",
+    "original": "x%2d",
+    "translation": ""
+  },
+  {
+    "rva": "0015CC94",
+    "original": "Recipe not learned",
+    "translation": ""
+  },
+  {
+    "rva": "0015CCA8",
+    "original": "未修得",
+    "translation": ""
+  },
+  {
+    "rva": "0015CCB0",
+    "original": "Used in:",
+    "translation": ""
+  },
+  {
+    "rva": "0015CCBC",
+    "original": "以下の料理で使用",
+    "translation": ""
+  },
+  {
+    "rva": "0015CCD0",
+    "original": "(Need %2d)",
+    "translation": ""
+  },
+  {
+    "rva": "0015CCDC",
+    "original": "(x%2d)",
+    "translation": ""
+  },
+  {
+    "rva": "0015CD2C",
+    "original": "Bracer Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015CD3C",
+    "original": "Rank: Junior Bracer - %s Class",
+    "translation": ""
+  },
+  {
+    "rva": "0015CD5C",
+    "original": "Total BP: %4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015CD6C",
+    "original": "Jobs Completed: %4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015CD80",
+    "original": "◆━━                        ━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015CDA8",
+    "original": "     Bracer Status",
+    "translation": ""
+  },
+  {
+    "rva": "0015CDBC",
+    "original": "ランク    準遊撃士・%s級",
+    "translation": ""
+  },
+  {
+    "rva": "0015CDD8",
+    "original": "獲得累積ＢＰ        % 4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015CDF4",
+    "original": "依頼達成数          % 4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015CE10",
+    "original": "Guild Bonus",
+    "translation": ""
+  },
+  {
+    "rva": "0015CE1C",
+    "original": "      Guild Bonus",
+    "translation": ""
+  },
+  {
+    "rva": "0015CE30",
+    "original": "Report",
+    "translation": ""
+  },
+  {
+    "rva": "0015CE38",
+    "original": "依頼の報告",
+    "translation": ""
+  },
+  {
+    "rva": "0015CE44",
+    "original": "Received payment for [%c%c%s%c%c].",
+    "translation": ""
+  },
+  {
+    "rva": "0015CE68",
+    "original": "Reported results for [%c%c%s%c%c].",
+    "translation": ""
+  },
+  {
+    "rva": "0015CEB4",
+    "original": "『%c%c%s%c%c』の報告を行いました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015CED8",
+    "original": "%cPayment in mira: %c%c%5d (%+5d)%c%c\nGained BP: %c%c%5d (%+5d)%c%c",
+    "translation": ""
+  },
+  {
+    "rva": "0015CF20",
+    "original": "%c取得ミラ  ：  %c%c%5d (%+5d)%c%c\n取得ＢＰ  ：  %c%c%5d (%+5d)%c%c",
+    "translation": ""
+  },
+  {
+    "rva": "0015CF64",
+    "original": "Currently, there is nothing to report.",
+    "translation": ""
+  },
+  {
+    "rva": "0015CFB0",
+    "original": "Rank status",
+    "translation": ""
+  },
+  {
+    "rva": "0015CFBC",
+    "original": "ランクの確認",
+    "translation": ""
+  },
+  {
+    "rva": "0015CFCC",
+    "original": "Rank advancement to [Junior Bracer - %s Class].",
+    "translation": ""
+  },
+  {
+    "rva": "0015CFFC",
+    "original": "ランクが『準遊撃士・%s級』に上がりました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015D028",
+    "original": "Received [%c%c%s%c%c] quartz as a perk.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D088",
+    "original": "Received [%c%c%s%c%c] accessory as a perk.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D0B4",
+    "original": "特典として、装備品『%c%c%s%c%c』#5Cをもらいました。",
+    "translation": ""
+  },
+  {
+    "rva": "0015D0E8",
+    "original": "Current rank is [Junior Bracer - %s Class].",
+    "translation": ""
+  },
+  {
+    "rva": "0015D114",
+    "original": "現在のランクは『準遊撃士・%s級』です。",
+    "translation": ""
+  },
+  {
+    "rva": "0015D2FD",
+    "original": "OUSE    ,",
+    "translation": ""
+  },
+  {
+    "rva": "0015D308",
+    "original": "%.3f",
+    "translation": ""
+  },
+  {
+    "rva": "0015D310",
+    "original": "Cannot hold any more.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D340",
+    "original": "%cGot %d of #2C[%s]#0C.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D358",
+    "original": "%c#2C【%s】#5Cを、%d個手に入れた。",
+    "translation": ""
+  },
+  {
+    "rva": "0015D37C",
+    "original": "%cCooked and ate #2C[%s]#0C.\n%s got #2Cfood-poisoning#0C.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D400",
+    "original": "%cCooked and ate #2C[%s]#0C.\nEveryone recovered #12C%d#0C HP and #12C%d#0C CP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D450",
+    "original": "%c#2C【%s】#5Cを料理して食べた。\n全員のＨＰが%d#5C、ＣＰが%d#5C回復した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015D49C",
+    "original": "%cCooked and ate #2C[%s]#0C.\nEveryone recovered #12C%d#0C HP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D4DC",
+    "original": "%c#2C【%s】#5Cを料理して食べた。\n全員のＨＰが%d#5C回復した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015D51C",
+    "original": "Can't hold any more.",
+    "translation": ""
+  },
+  {
+    "rva": "0015D534",
+    "original": "Make how many #2C[%s]#0C?",
+    "translation": ""
+  },
+  {
+    "rva": "0015D550",
+    "original": "#2C【%s】#0Cを、何個作りますか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015D574",
+    "original": "Make #2C[%s]#0C?",
+    "translation": ""
+  },
+  {
+    "rva": "0015D588",
+    "original": "#2C【%s】#0Cを作りますか？",
+    "translation": ""
+  },
+  {
+    "rva": "0015D5A4",
+    "original": "%d / %d",
+    "translation": ""
+  },
+  {
+    "rva": "0015D5AC",
+    "original": "――――――――――――",
+    "translation": ""
+  },
+  {
+    "rva": "0015D5CC",
+    "original": "????",
+    "translation": ""
+  },
+  {
+    "rva": "0015D794",
+    "original": "DllGetClassObject",
+    "translation": ""
+  },
+  {
+    "rva": "0015D7A8",
+    "original": "xvid",
+    "translation": ""
+  },
+  {
+    "rva": "0015D80C",
+    "original": "ed6_logo.avi",
+    "translation": ""
+  },
+  {
+    "rva": "0015D81C",
+    "original": "C_Wipe00._ds",
+    "translation": ""
+  },
+  {
+    "rva": "0015D82C",
+    "original": "C_Wipe01._ds",
+    "translation": ""
+  },
+  {
+    "rva": "0015D83C",
+    "original": "C_Wipe02._ds",
+    "translation": ""
+  },
+  {
+    "rva": "0015D850",
+    "original": "BattleNo",
+    "translation": ""
+  },
+  {
+    "rva": "0015D85C",
+    "original": "ENTRY",
+    "translation": ""
+  },
+  {
+    "rva": "0015D864",
+    "original": "POS_X",
+    "translation": ""
+  },
+  {
+    "rva": "0015D86C",
+    "original": "POS_Y",
+    "translation": ""
+  },
+  {
+    "rva": "0015D874",
+    "original": "POS_Z",
+    "translation": ""
+  },
+  {
+    "rva": "0015D87C",
+    "original": "P_VEC",
+    "translation": ""
+  },
+  {
+    "rva": "0015D884",
+    "original": "ANIME",
+    "translation": ""
+  },
+  {
+    "rva": "0015D88C",
+    "original": "MakeTexture",
+    "translation": ""
+  },
+  {
+    "rva": "0015D89C",
+    "original": "CAM_X",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8A4",
+    "original": "CAM_Y",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8AC",
+    "original": "CAM_Z",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8B4",
+    "original": "CAM_WX",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8BC",
+    "original": "CAM_WY",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8C4",
+    "original": "CAM_WZ",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8CC",
+    "original": "CAM_AX",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8D4",
+    "original": "CAM_AY",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8DC",
+    "original": "CAM_AZ",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8E4",
+    "original": "CAM_DEG",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8EC",
+    "original": "CAM_ZOM",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8F4",
+    "original": "CAM_PER",
+    "translation": ""
+  },
+  {
+    "rva": "0015D8FC",
+    "original": "CAM_VZDEF",
+    "translation": ""
+  },
+  {
+    "rva": "0015D908",
+    "original": "ESTELLE_SPEED",
+    "translation": ""
+  },
+  {
+    "rva": "0015D918",
+    "original": "Polygon       /      +",
+    "translation": ""
+  },
+  {
+    "rva": "0015D930",
+    "original": "Vertex        /      +",
+    "translation": ""
+  },
+  {
+    "rva": "0015D948",
+    "original": "ZSort         /",
+    "translation": ""
+  },
+  {
+    "rva": "0015D958",
+    "original": "SetTexture",
+    "translation": ""
+  },
+  {
+    "rva": "0015D964",
+    "original": "TextureNum       (   M)",
+    "translation": ""
+  },
+  {
+    "rva": "0015D97C",
+    "original": "FreeTexMem       M",
+    "translation": ""
+  },
+  {
+    "rva": "0015D990",
+    "original": "DrawPrimitive",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9A0",
+    "original": "SetVertexShad",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9B0",
+    "original": "SetVSConstant",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9C0",
+    "original": "SetRS",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9C8",
+    "original": "SetTS",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9D0",
+    "original": "SetStream",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9DC",
+    "original": "SetIndices",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9E8",
+    "original": "Effect",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9F0",
+    "original": "Particle",
+    "translation": ""
+  },
+  {
+    "rva": "0015D9FC",
+    "original": "ChrChip            /",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA14",
+    "original": "SetRenderTarget",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA24",
+    "original": "Bulr:   Gradate: ",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA38",
+    "original": "PAGE 4 [TEXTURE-MODE]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA50",
+    "original": "[+][-] COUNT 1",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA60",
+    "original": "[*][/] COUNT 10",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA70",
+    "original": "NO.=     /",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA7C",
+    "original": "PAGE 5 [FOG EDIT-MODE]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DA94",
+    "original": "FOGSTART   [/*]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DAA4",
+    "original": "FOGEND     [-+]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DAB4",
+    "original": "FOGDENSITY [79]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DAC4",
+    "original": "FOG_R [INS DEL]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DAD4",
+    "original": "FOG_G [HOM END]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DAE4",
+    "original": "FOG_B [UP DOWN]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DAF4",
+    "original": "PAGE 6 [MAPCOLOR_EDIT-MODE]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB10",
+    "original": "SpotRadius  [-+]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB24",
+    "original": "R [INS DEL]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB30",
+    "original": "G [HOM END]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB3C",
+    "original": "B [UP DOWN]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB48",
+    "original": "PAGE 7 [CAMERA INFO]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB60",
+    "original": "CAMERA UP/DOWN [PAGE UP/DOWN]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB80",
+    "original": "PERSPECTIVE    [* /]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DB98",
+    "original": "ZOOM           [INS/DEL]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DBB4",
+    "original": "STOP           [C]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DBC8",
+    "original": "  MOVE L/R/U/D [4682]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DBE0",
+    "original": "CHANGE AXIS    [BACK]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DBF8",
+    "original": "CAM_AUTO   TRUE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC08",
+    "original": "CAM_AUTO   FALSE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC1C",
+    "original": "CAM_MOVE   FALSE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC30",
+    "original": "CAM_MOVE   TRUE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC40",
+    "original": "CAM_AXIS   ABSOLUTE MODE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC5C",
+    "original": "CAM_AXIS   RELATIVE MODE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC78",
+    "original": "PAGE 8 [FLAG]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC88",
+    "original": "SYSTEM FLAG",
+    "translation": ""
+  },
+  {
+    "rva": "0015DC94",
+    "original": "BT COUNT",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCA0",
+    "original": "BT WIN",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCA8",
+    "original": "BT LOSE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCB0",
+    "original": "BT RUNAWAY",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCBC",
+    "original": "BT DIE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCC4",
+    "original": "BT RESULT",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCD0",
+    "original": "PAGE 9 [WIND_EDIT_MODE]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCE8",
+    "original": "SPEED",
+    "translation": ""
+  },
+  {
+    "rva": "0015DCF0",
+    "original": "PAGE 10 [SUN_EDIT_MODE]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD10",
+    "original": "PAGE 11 [BATTLE_INFO]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD28",
+    "original": "MODE     STEP",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD38",
+    "original": "m_nSelect",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD44",
+    "original": "DISTANCE(MVP+DIST)",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD58",
+    "original": "RANGE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD60",
+    "original": "PAGE 12 [DEBUG_MODE]",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD78",
+    "original": "[L]SPOT      [D]CAMERA FREE",
+    "translation": ""
+  },
+  {
+    "rva": "0015DD94",
+    "original": "[K]KYOUKAI   [O]ATARI",
+    "translation": ""
+  },
+  {
+    "rva": "0015DDAC",
+    "original": "[J]JUMP      [B]BUNCHIN",
+    "translation": ""
+  },
+  {
+    "rva": "0015DDC4",
+    "original": "[W]WIRE      ",
+    "translation": ""
+  },
+  {
+    "rva": "0015DDD4",
+    "original": "[S]NO-TEX",
+    "translation": ""
+  },
+  {
+    "rva": "0015DDE0",
+    "original": "[F]FOG",
+    "translation": ""
+  },
+  {
+    "rva": "0015DDE8",
+    "original": "%sMap\\x-file\\Objects\\%s",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE00",
+    "original": "%s._op",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE08",
+    "original": "%sops\\%s.ops",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE18",
+    "original": "LoadCompass Data\n",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE2C",
+    "original": "LoadCompass Err\n",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE40",
+    "original": "Emotion Init : ",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE50",
+    "original": "LoadDataBZ is failed!\n",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE68",
+    "original": "Success!\n",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE74",
+    "original": "font8._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE80",
+    "original": "font12._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE8C",
+    "original": "font16._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DE98",
+    "original": "font20._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEA4",
+    "original": "font24._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEB0",
+    "original": "font32._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEBC",
+    "original": "font18._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEC8",
+    "original": "font26._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DED4",
+    "original": "font30._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEE0",
+    "original": "font36._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEEC",
+    "original": "font40._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DEF8",
+    "original": "font44._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF04",
+    "original": "font48._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF10",
+    "original": "font50._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF1C",
+    "original": "font54._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF28",
+    "original": "font60._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF34",
+    "original": "font64._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF40",
+    "original": "font72._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF4C",
+    "original": "font80._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF58",
+    "original": "font96._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF64",
+    "original": "font128._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF70",
+    "original": "font144._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF7C",
+    "original": "font160._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015DF88",
+    "original": "font192._da",
+    "translation": ""
+  },
+  {
+    "rva": "0015E4F8",
+    "original": "\\ED6_DT1A.dat",
+    "translation": ""
+  },
+  {
+    "rva": "0015E508",
+    "original": "\\ED6_DT08.dat",
+    "translation": ""
+  },
+  {
+    "rva": "0015E518",
+    "original": "\\ED6_DT1B.dat",
+    "translation": ""
+  },
+  {
+    "rva": "0015E528",
+    "original": "C_LOAD00._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E538",
+    "original": "C_LOAD01._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E548",
+    "original": "C_LOAD02._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E558",
+    "original": "C_LOAD03._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E568",
+    "original": "C_LOAD04._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E578",
+    "original": "C_LOAD05._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E588",
+    "original": "C_LOAD06._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E598",
+    "original": "C_LOAD07._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E5A8",
+    "original": "C_LOAD11._CH",
+    "translation": ""
+  },
+  {
+    "rva": "0015E73C",
+    "original": "data\\",
+    "translation": ""
+  },
+  {
+    "rva": "0015E75C",
+    "original": "%cCannot hold any more of this equipment so cannot unequip.",
+    "translation": ""
+  },
+  {
+    "rva": "0015E798",
+    "original": "%c現在の装備品をこれ以上持てないので、装備をはずせません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015E7D4",
+    "original": "%cCannot hold any more of this equipment so cannot change.",
+    "translation": ""
+  },
+  {
+    "rva": "0015E810",
+    "original": "%c現在の装備品をこれ以上持てないので、装備を変更できません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015E850",
+    "original": "%cCannot hold any more of this quartz so cannot remove.",
+    "translation": ""
+  },
+  {
+    "rva": "0015E888",
+    "original": "%c装備しているクオーツをこれ以上持てないので、\nオーブメントからはずせません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015E8D8",
+    "original": "%cCannot install two of the same type of quartz.",
+    "translation": ""
+  },
+  {
+    "rva": "0015E90C",
+    "original": "%c同系統のクオーツは、同時に装備できません。",
+    "translation": ""
+  },
+  {
+    "rva": "0015E93C",
+    "original": "%cQuartz does not match elemental slot so cannot install.",
+    "translation": ""
+  },
+  {
+    "rva": "0015E9B8",
+    "original": "%c%s recovered %d HP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015E9D0",
+    "original": "%c%8sのＨＰを、%4d回復した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015E9F0",
+    "original": "%c%s recovered %d HP.\n%8s recovered %d HP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015EA1C",
+    "original": "%c%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015EA58",
+    "original": "%c%s recovered %d HP.\n%8s recovered %d HP.\n%8s recovered %d HP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015EA98",
+    "original": "%c%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015EAF0",
+    "original": "%c%s recovered %d HP.\n%8s recovered %d HP.\n%8s recovered %d HP.\n%8s recovered %d HP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015EB48",
+    "original": "%c%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015EBB8",
+    "original": "Charged %d EP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015EBE0",
+    "original": "Restored %d CP.",
+    "translation": ""
+  },
+  {
+    "rva": "0015EBF0",
+    "original": "%dＣＰが上昇した。",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC04",
+    "original": "Learned recipe for \"%s\".",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC20",
+    "original": "Japanese_Japan.932",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC34",
+    "original": "/WINDOW_MODE",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC4C",
+    "original": "/LOG",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC54",
+    "original": "/RESET",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC68",
+    "original": "japanese",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC78",
+    "original": "dll\\lang_jpn.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC8C",
+    "original": "Ending",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC94",
+    "original": "Opening",
+    "translation": ""
+  },
+  {
+    "rva": "0015EC9C",
+    "original": " ＮＥＸＴ",
+    "translation": ""
+  },
+  {
+    "rva": "0015ECA8",
+    "original": " ＥＮＤＩＮＧ ",
+    "translation": ""
+  },
+  {
+    "rva": "0015ECB8",
+    "original": " ＯＰＥＮＩＮＧ ",
+    "translation": ""
+  },
+  {
+    "rva": "0015ECCC",
+    "original": "Mirage quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ECE0",
+    "original": "Space quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ECF4",
+    "original": "Time quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED08",
+    "original": "Wind quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED1C",
+    "original": "Fire quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED30",
+    "original": "Water quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED44",
+    "original": "Earth quartz only",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED58",
+    "original": "All quartz OK",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED68",
+    "original": "幻属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED88",
+    "original": "時属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015ED98",
+    "original": "風属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015EDA8",
+    "original": "火属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015EDB8",
+    "original": "水属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015EDC8",
+    "original": "地属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015EDD8",
+    "original": "全属性装着可",
+    "translation": ""
+  },
+  {
+    "rva": "0015EDE8",
+    "original": "Slot is sealed",
+    "translation": ""
+  },
+  {
+    "rva": "0015EDF8",
+    "original": "Slot cannot be opened",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE10",
+    "original": "Slot can be opened",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE24",
+    "original": "Slot already open",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE38",
+    "original": "捨てる",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE40",
+    "original": "使  う",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE48",
+    "original": "Exit Game",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE54",
+    "original": "Return to Title",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE78",
+    "original": "  タイトルに戻る   ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE8C",
+    "original": "Exit",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE94",
+    "original": "Erase",
+    "translation": ""
+  },
+  {
+    "rva": "0015EE9C",
+    "original": "Load",
+    "translation": ""
+  },
+  {
+    "rva": "0015EEA4",
+    "original": "Save",
+    "translation": ""
+  },
+  {
+    "rva": "0015EEAC",
+    "original": " ＥＸＩＴ  ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EEB8",
+    "original": " ＥＲＡＳＥ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EEC4",
+    "original": " ＬＯＡＤ  ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EED0",
+    "original": " ＳＡＶＥ  ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EEDC",
+    "original": "Turmoil in the Royal City",
+    "translation": ""
+  },
+  {
+    "rva": "0015EEF8",
+    "original": "The Black Orbment",
+    "translation": ""
+  },
+  {
+    "rva": "0015EF0C",
+    "original": "Madrigal of the White Magnolia",
+    "translation": ""
+  },
+  {
+    "rva": "0015EF2C",
+    "original": "Disappearance of the Linde",
+    "translation": ""
+  },
+  {
+    "rva": "0015EF48",
+    "original": "A Father's Love, a New Beginning",
+    "translation": ""
+  },
+  {
+    "rva": "0015EF6C",
+    "original": "　 　王都撩乱     ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EF80",
+    "original": " 黒のオーブメント ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EF94",
+    "original": "白き花のマドリガル",
+    "translation": ""
+  },
+  {
+    "rva": "0015EFBC",
+    "original": "　　父、旅立つ    ",
+    "translation": ""
+  },
+  {
+    "rva": "0015EFD0",
+    "original": "Clear Data",
+    "translation": ""
+  },
+  {
+    "rva": "0015EFDC",
+    "original": "Final Chapter",
+    "translation": ""
+  },
+  {
+    "rva": "0015EFEC",
+    "original": "Chapter 3",
+    "translation": ""
+  },
+  {
+    "rva": "0015EFF8",
+    "original": "Chapter 2",
+    "translation": ""
+  },
+  {
+    "rva": "0015F004",
+    "original": "Chapter 1",
+    "translation": ""
+  },
+  {
+    "rva": "0015F010",
+    "original": "Prologue",
+    "translation": ""
+  },
+  {
+    "rva": "0015F01C",
+    "original": "クリアデータ",
+    "translation": ""
+  },
+  {
+    "rva": "0015F02C",
+    "original": "終  章",
+    "translation": ""
+  },
+  {
+    "rva": "0015F034",
+    "original": "第三章",
+    "translation": ""
+  },
+  {
+    "rva": "0015F044",
+    "original": "第一章",
+    "translation": ""
+  },
+  {
+    "rva": "0015F04C",
+    "original": "序  章",
+    "translation": ""
+  },
+  {
+    "rva": "0015F10C",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015F144",
+    "original": "―――――――――――――",
+    "translation": ""
+  },
+  {
+    "rva": "0015F160",
+    "original": "　Mira:",
+    "translation": ""
+  },
+  {
+    "rva": "0015F168",
+    "original": "　BP:",
+    "translation": ""
+  },
+  {
+    "rva": "0015F170",
+    "original": "　Status:",
+    "translation": ""
+  },
+  {
+    "rva": "0015F17C",
+    "original": "　取得ミラ：",
+    "translation": ""
+  },
+  {
+    "rva": "0015F18C",
+    "original": "　取得ＢＰ：",
+    "translation": ""
+  },
+  {
+    "rva": "0015F1AC",
+    "original": "　　　　　  %d",
+    "translation": ""
+  },
+  {
+    "rva": "0015F1BC",
+    "original": "　　　　　　 --------",
+    "translation": ""
+  },
+  {
+    "rva": "0015F1D4",
+    "original": " 　　　　　 %d",
+    "translation": ""
+  },
+  {
+    "rva": "0015F1E4",
+    "original": " 　　　　　 %d (%+d)",
+    "translation": ""
+  },
+  {
+    "rva": "0015F1FC",
+    "original": "Reported",
+    "translation": ""
+  },
+  {
+    "rva": "0015F208",
+    "original": "Finished",
+    "translation": ""
+  },
+  {
+    "rva": "0015F214",
+    "original": "Expired",
+    "translation": ""
+  },
+  {
+    "rva": "0015F21C",
+    "original": "In Progress",
+    "translation": ""
+  },
+  {
+    "rva": "0015F234",
+    "original": "達成済み",
+    "translation": ""
+  },
+  {
+    "rva": "0015F24C",
+    "original": "請負中",
+    "translation": ""
+  },
+  {
+    "rva": "0015F254",
+    "original": "◆━━━━━━━━━━━━━━━━━━━━━━━◆",
+    "translation": ""
+  },
+  {
+    "rva": "0015F288",
+    "original": "new!",
+    "translation": ""
+  },
+  {
+    "rva": "0015F290",
+    "original": "Reported!",
+    "translation": ""
+  },
+  {
+    "rva": "0015F29C",
+    "original": "Report!",
+    "translation": ""
+  },
+  {
+    "rva": "0015F2A4",
+    "original": "Clear!",
+    "translation": ""
+  },
+  {
+    "rva": "0015F2AC",
+    "original": "Term (Short)",
+    "translation": ""
+  },
+  {
+    "rva": "0015F2BC",
+    "original": "Term (Medium)",
+    "translation": ""
+  },
+  {
+    "rva": "0015F2CC",
+    "original": "Term (Long)",
+    "translation": ""
+  },
+  {
+    "rva": "0015F2FC",
+    "original": "Term (Failed)",
+    "translation": ""
+  },
+  {
+    "rva": "0015F30C",
+    "original": "Junior Bracer - %s Class",
+    "translation": ""
+  },
+  {
+    "rva": "0015F328",
+    "original": "準遊撃士・%s級",
+    "translation": ""
+  },
+  {
+    "rva": "0015F338",
+    "original": "% 4d",
+    "translation": ""
+  },
+  {
+    "rva": "0015F4FC",
+    "original": "sc000_10.png",
+    "translation": ""
+  },
+  {
+    "rva": "0015F50C",
+    "original": "sc001_01.png",
+    "translation": ""
+  },
+  {
+    "rva": "0015F51C",
+    "original": "sc006_00.png",
+    "translation": ""
+  },
+  {
+    "rva": "0015F52C",
+    "original": "scrneff0.bmp",
+    "translation": ""
+  },
+  {
+    "rva": "0015F53C",
+    "original": "sc000_13",
+    "translation": ""
+  },
+  {
+    "rva": "0015F548",
+    "original": "sc001_09",
+    "translation": ""
+  },
+  {
+    "rva": "0015F554",
+    "original": "sc002_09",
+    "translation": ""
+  },
+  {
+    "rva": "0015F560",
+    "original": "sc004_00",
+    "translation": ""
+  },
+  {
+    "rva": "0015F570",
+    "original": "%s._en",
+    "translation": ""
+  },
+  {
+    "rva": "0015F578",
+    "original": "%sEntry\\%s.ent",
+    "translation": ""
+  },
+  {
+    "rva": "0015F588",
+    "original": "Mira/Sepith",
+    "translation": ""
+  },
+  {
+    "rva": "0015F594",
+    "original": "ミラ・セピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015F5A4",
+    "original": "Carry over",
+    "translation": ""
+  },
+  {
+    "rva": "0015F5BC",
+    "original": "Don't carry over",
+    "translation": ""
+  },
+  {
+    "rva": "0015F5E0",
+    "original": "アイテム",
+    "translation": ""
+  },
+  {
+    "rva": "0015F5F4",
+    "original": "Information",
+    "translation": ""
+  },
+  {
+    "rva": "0015F600",
+    "original": "手帳",
+    "translation": ""
+  },
+  {
+    "rva": "0015F608",
+    "original": "ステータス",
+    "translation": ""
+  },
+  {
+    "rva": "0015F614",
+    "original": "Enemy Strength",
+    "translation": ""
+  },
+  {
+    "rva": "0015F624",
+    "original": "敵の強さ",
+    "translation": ""
+  },
+  {
+    "rva": "0015F630",
+    "original": "Decide",
+    "translation": ""
+  },
+  {
+    "rva": "0015F638",
+    "original": "決定",
+    "translation": ""
+  },
+  {
+    "rva": "0015F640",
+    "original": "Carry over mira and sepith.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F65C",
+    "original": "ミラとセピスとメダルを引き継ぎます。",
+    "translation": ""
+  },
+  {
+    "rva": "0015F684",
+    "original": "Carry over usable inventory items.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F6E0",
+    "original": "Carry over equipment and quartz (~10 per).\n※Quest-related items not included.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F788",
+    "original": "Carry over recipe book and monster guide.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F7EC",
+    "original": "Carry over levels and opened orbment slots.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F848",
+    "original": "Set enemy difficulty.\n[Normal] Average difficulty. For those wanting a little challenge.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F8A8",
+    "original": "Set enemy difficulty.\n[Hard] A difficult setting. For those who find normal a bit lacking.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F908",
+    "original": "Set enemy difficulty.\n[Nightmare] It's your funeral. May Aidios be with you.",
+    "translation": ""
+  },
+  {
+    "rva": "0015F958",
+    "original": "Set enemy difficulty.\n[Easy] A gentle balance for easy progression. For beginners.",
+    "translation": ""
+  },
+  {
+    "rva": "0015FB2C",
+    "original": "Start game with the above settings.",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC18",
+    "original": "LoadDT1 Err\n",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC28",
+    "original": "LoadDT2 Err\n",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC44",
+    "original": "Lv.%d  HP:%d",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC54",
+    "original": "STR:%3d  DEF:%3d",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC68",
+    "original": "ATS:%3d  ADF:%3d",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC7C",
+    "original": "SPD:%3d  EXP:%3d",
+    "translation": ""
+  },
+  {
+    "rva": "0015FC90",
+    "original": "STR:???  DEF:???",
+    "translation": ""
+  },
+  {
+    "rva": "0015FCA4",
+    "original": "ATS:???  ADF:???",
+    "translation": ""
+  },
+  {
+    "rva": "0015FCB8",
+    "original": "SPD:???  EXP:???",
+    "translation": ""
+  },
+  {
+    "rva": "0015FCCC",
+    "original": "    ???    ",
+    "translation": ""
+  },
+  {
+    "rva": "0015FCD8",
+    "original": "　　　　？？？　　　　",
+    "translation": ""
+  },
+  {
+    "rva": "0015FCF0",
+    "original": "Elemental",
+    "translation": ""
+  },
+  {
+    "rva": "0015FCFC",
+    "original": "Efficacy (%)",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD0C",
+    "original": "属性攻撃",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD24",
+    "original": "Item",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD34",
+    "original": "StatGuard",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD40",
+    "original": "異常耐性",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD4C",
+    "original": "セピス",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD54",
+    "original": "Location",
+    "translation": ""
+  },
+  {
+    "rva": "0015FD60",
+    "original": "出現場所",
+    "translation": ""
+  },
+  {
+    "rva": "0015FE10",
+    "original": "STAT_%s",
+    "translation": ""
+  },
+  {
+    "rva": "0015FE18",
+    "original": "TRACK_%s",
+    "translation": ""
+  },
+  {
+    "rva": "0015FE24",
+    "original": "TRACK%0d_%s",
+    "translation": ""
+  },
+  {
+    "rva": "00169668",
+    "original": "d3dxof.dll",
+    "translation": ""
+  },
+  {
+    "rva": "00169686",
+    "original": "d3d8.dll",
+    "translation": ""
+  },
+  {
+    "rva": "001696A6",
+    "original": "DINPUT8.dll",
+    "translation": ""
+  },
+  {
+    "rva": "001696B2",
+    "original": "DSOUND.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0016974C",
+    "original": "WINMM.dll",
+    "translation": ""
+  },
+  {
+    "rva": "00169798",
+    "original": "VERSION.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0016984C",
+    "original": "ed6fc.dll",
+    "translation": ""
+  },
+  {
+    "rva": "00169CC8",
+    "original": "KERNEL32.dll",
+    "translation": ""
+  },
+  {
+    "rva": "00169F6C",
+    "original": "USER32.dll",
+    "translation": ""
+  },
+  {
+    "rva": "00169FB8",
+    "original": "ADVAPI32.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0016A00A",
+    "original": "SHELL32.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0016A05C",
+    "original": "ole32.dll",
+    "translation": ""
+  },
+  {
+    "rva": "0016E0A0",
+    "original": "檪ｰ檪ｰ檪ｰ檪ｰ",
+    "translation": ""
+  },
+  {
+    "rva": "00170C70",
+    "original": "acos",
+    "translation": ""
+  },
+  {
+    "rva": "00171394",
+    "original": "`Ｚ!",
+    "translation": ""
+  },
+  {
+    "rva": "00172854",
+    "original": " は  い",
+    "translation": ""
+  },
+  {
+    "rva": "0017285C",
+    "original": " いいえ",
+    "translation": ""
+  },
+  {
+    "rva": "0017286C",
+    "original": " Yes",
+    "translation": ""
+  },
+  {
+    "rva": "00185CD8",
+    "original": ".?AVCD3DMesh@@",
+    "translation": ""
+  },
+  {
+    "rva": "00185CF0",
+    "original": ".?AVlength_error@std@@",
+    "translation": ""
+  },
+  {
+    "rva": "00185D10",
+    "original": ".?AVlogic_error@std@@",
+    "translation": ""
+  },
+  {
+    "rva": "00185D30",
+    "original": ".?AVexception@std@@",
+    "translation": ""
+  },
+  {
+    "rva": "00186438",
+    "original": ".?AVCNotePlate@@",
+    "translation": ""
+  },
+  {
+    "rva": "001864E0",
+    "original": "atan",
+    "translation": ""
+  },
+  {
+    "rva": "001864F0",
+    "original": "asin",
+    "translation": ""
+  },
+  {
+    "rva": "00186520",
+    "original": "sqrt",
+    "translation": ""
+  }
+]
