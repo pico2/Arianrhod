@@ -127,14 +127,8 @@ using ml::HashTableT;
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
-    ML_FIND_DATA wfd;
-    HANDLE handle;
 
-    Io::QueryFirstFile(&handle, L"D:\\Desktop\\lldb\\build\\lib\\site-packages\\lldb\\_lldb.pyd", &wfd);
-    PrintConsole(L"%X\n", wfd.FileAttributes);
-
-    Io::QueryFirstFile(&handle, L"D:\\Desktop\\lldb\\build\\bin\\liblldb.dll", &wfd);
-    PrintConsole(L"%X\n", wfd.FileAttributes);
+    PrintConsole(L"%S\n", setlocale(LC_ALL, ".936"));
 
     return;
 

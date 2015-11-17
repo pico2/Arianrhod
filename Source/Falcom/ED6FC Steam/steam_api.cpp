@@ -127,13 +127,13 @@ public:
     virtual PCSTR S_VIRTUAL GetCurrentGameLanguage()
     {
         PrintConsole(L"GetCurrentGameLanguage\n");
-        return "english";
+        return "japanese";
     }
 
     virtual PCSTR S_VIRTUAL GetAvailableGameLanguages()
     {
         PrintConsole(L"GetAvailableGameLanguages\n");
-        return "english";
+        return "japanese";
     }
 
     virtual bool S_VIRTUAL BIsSubscribedApp(ULONG appID)
@@ -888,14 +888,10 @@ struct ISteamRemoteStorage
 // export
 //////////////////////////////////////////////////////////////////////////
 
-
-    static ISteamApps apps;
-
-    static ISteamUserStats stat;
-
-    static ISteamClient client;
-
-    static ISteamRemoteStorage storage;
+static ISteamApps apps;
+static ISteamUserStats stat;
+static ISteamClient client;
+static ISteamRemoteStorage storage;
 
 bool S_API SteamAPI_Init()
 {

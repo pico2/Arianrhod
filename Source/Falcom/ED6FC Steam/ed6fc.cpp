@@ -59,14 +59,22 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
     switch (ch)
     {
         case 0xA181:    // 仭
-        case 0x9F81:    // 仧
-        case 0xAA84:    // 劒
-        case 0x4081:    // 丂
+        case 0x9F81:    // 仧   菱形
+        case 0xAA84:    // 劒   横杠
+        case 0x4081:    // 丂   空格
             translated = ch;
             return TRUE;
 
         case 0xA1A1:    // full width space
             translated = 0x4081;
+            return TRUE;
+
+        case 0x5AA9:    // ㈱ 心形
+            translated = 0x8A87;    // TAG2('噴');
+            return TRUE;
+
+        case 0xD1A1:    // ⊙ 音符
+            translated = 0xF481;  // TAG2('侓');
             return TRUE;
     }
 
@@ -104,27 +112,34 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
     ULONG_PTR       FontSize, FontIndex, Color;
     DOUBLE          delta, width;
 
+    //return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex), 0;
+
     FontIndex = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
     FontSize = FontSizeTable[FontIndex];
     DWRender = DWriteRenders[FontIndex];
     Color = FontColorTable[ColorIndex];
     delta = 0;
 
-    for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GB2312))
+    for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GBK))
     {
         USHORT translated;
         CHAR ansi = Text[0];
 
         if (ansi >= 0)
         {
-            CHAR tmp[2] = { ansi };
-            StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
-            width = (LetterWidthTable[ansi] + 2) * FontSize * 0.03125;
+            //CHAR tmp[2] = { ansi };
+            //StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
+            //width = (LetterWidthTable[ansi] + 2) * FontSize * 0.03125;
+
+            ULONG_PTR runeWidth;
+            DWRender->DrawRune(chr, Color, Buffer, Stride, &runeWidth);
+            width = FontSize / 2;
+
             ++Text;
         }
         else if (TranslateChar(Text, translated))
         {
-            CHAR tmp[3] = { translated & 0xFF, translated >> 8 }; 
+            CHAR tmp[3] = { translated & 0xFF, translated >> 8 };
 
             StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
             width = FontSize;
@@ -135,7 +150,6 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
             ULONG_PTR runeWidth;
             DWRender->DrawRune(chr, Color, Buffer, Stride, &runeWidth);
             width = FontSize;
-            width = runeWidth;
             Text += 2;
         }
 
@@ -231,9 +245,6 @@ BOOL Initialize(PVOID BaseAddress)
 
     BaseAddress = GetExeModuleHandle();
 
-    InitializeDWrite();
-    InitializeTextPatcher(BaseAddress);
-
     //
     // 4A12E0
     // check ascii range
@@ -252,20 +263,23 @@ BOOL Initialize(PVOID BaseAddress)
 
     Rtl::SetExeDirectoryAsCurrent();
 
-    Success = FindFontRender(BaseAddress) != IMAGE_INVALID_VA;
+    //AllocConsole();
+    Success = NT_SUCCESS(InitializeDWrite());
+    InitializeTextPatcher(BaseAddress);
+
+    Success = Success && FindFontRender(BaseAddress) != IMAGE_INVALID_VA;
 
     using namespace Mp;
 
+    auto sleep = [] (ULONG ms) -> VOID
+    {
+        Ps::Sleep(1);
+    };
+
     PATCH_MEMORY_DATA p[] =
     {
-        MemoryPatchVa(
-            (ULONG64)(API_POINTER(::Sleep))[] (ULONG ms) -> VOID
-            {
-                Ps::Sleep(ms == 0 ? SleepFix : ms);
-            },
-            sizeof(PVOID),
-            LookupImportTable(GetExeModuleHandle(), nullptr, KERNEL32_Sleep)
-        ),
+        FunctionCallVa((PVOID)0x4BE533, (ULONG64)(API_POINTER(::Sleep))sleep),
+        FunctionCallVa((PVOID)0x47CF77, (ULONG64)(API_POINTER(::Sleep))sleep),
 
         MemoryPatchVa(
             (ULONG64)(API_POINTER(SetWindowPos))[](HWND Wnd, HWND InsertAfter, int X, int Y, int cx, int cy, UINT Flags) -> BOOL
@@ -295,7 +309,6 @@ BOOL Initialize(PVOID BaseAddress)
 
     PatchMemory(p, countof(p), BaseAddress);
 
-    AllocConsole();
     //DWriteRenders[9]->DrawRune(L"e"[0], FontColorTable[0], 0, 0), Ps::ExitProcess(0);
 
     return TRUE;

@@ -2,10 +2,19 @@
 
 using ml::String;
 
-NTSTATUS PatchAllReference(PVOID startAddress, ULONG_PTR searchRange, PVOID textVa, PCSTR newText, ULONG_PTR length)
+NTSTATUS
+PatchAllReference(
+    PVOID       startAddress,
+    ULONG_PTR   searchRange,
+    PVOID       textVa,
+    PCSTR       newText,
+    ULONG_PTR   length,
+    BOOL        isDataSection
+)
 {
     PVOID endAddress;
     PBYTE reference;
+    BOOL patched = FALSE;
 
     SEARCH_PATTERN_DATA stub[] =
     {
@@ -22,37 +31,67 @@ NTSTATUS PatchAllReference(PVOID startAddress, ULONG_PTR searchRange, PVOID text
 
         // mov r32, const
         // push const
-        if ((reference[-1] & 0xF0) == 0xB0 || reference[-1] == 0x68)
+        if (isDataSection == TRUE || (reference[-1] & 0xF0) == 0xB0 || reference[-1] == 0x68)
         {
             *(PCSTR *)reference = newText;
+            patched = TRUE;
         }
 
         startAddress = reference + sizeof(PVOID);
     }
 
-    return STATUS_SUCCESS;
+    return patched ? STATUS_SUCCESS : STATUS_NOT_FOUND;
 }
 
 NTSTATUS InitializeTextPatcher(PVOID BaseAddress)
 {
     NTSTATUS        status;
-    ULONG           count, protection;
+    ULONG           count, textProtection, dataProtection;
     PBYTE           buffer;
-    PVOID           startAddress;
-    ULONG_PTR       searchRange;
+    PVOID           startAddress, dataAddress;
+    ULONG_PTR       searchRange, dataRange;
     NtFileMemory*   textbin;
 
-    auto textSection = IMAGE_FIRST_SECTION(ImageNtHeadersFast(BaseAddress));
+    PIMAGE_NT_HEADERS     ntHeaders   = ImageNtHeadersFast(BaseAddress);
+    PIMAGE_SECTION_HEADER textSection = IMAGE_FIRST_SECTION(ntHeaders);
+    PIMAGE_SECTION_HEADER dataSection = nullptr;
+
+    static CHAR dataSectionName[sizeof(dataSection->Name)] = ".data";
 
     startAddress = PtrAdd(BaseAddress, textSection->VirtualAddress);
-    searchRange = textSection->Misc.VirtualSize;
+    searchRange = textSection->SizeOfRawData;
 
-    status = Mm::ProtectMemory(CurrentProcess, startAddress, searchRange, PAGE_EXECUTE_READWRITE, &protection);
+    dataAddress = 0;
+    dataRange = 0;
+
+    ++textSection;
+    for (ULONG_PTR n = ntHeaders->FileHeader.NumberOfSections - 1; n; ++textSection, --n)
+    {
+        if (textSection->Characteristics == (IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE) ||
+            RtlCompareMemory(textSection->Name, dataSectionName, sizeof(dataSectionName)) == sizeof(dataSectionName))
+        {
+            dataSection = textSection;
+            dataAddress = PtrAdd(BaseAddress, dataSection->VirtualAddress);
+            dataRange = dataSection->SizeOfRawData;
+            break;
+        }
+    }
+
+    status = Mm::ProtectMemory(CurrentProcess, startAddress, searchRange, PAGE_EXECUTE_READWRITE, &textProtection);
     FAIL_RETURN(status);
 
     SCOPE_EXIT
     {
-        Mm::ProtectMemory(CurrentProcess, startAddress, searchRange, protection);
+        Mm::ProtectMemory(CurrentProcess, startAddress, searchRange, textProtection);
+    }
+    SCOPE_EXIT_END;
+
+    status = Mm::ProtectMemory(CurrentProcess, dataAddress, dataRange, PAGE_EXECUTE_READWRITE, &dataProtection);
+    FAIL_RETURN(status);
+
+    SCOPE_EXIT
+    {
+        Mm::ProtectMemory(CurrentProcess, dataAddress, dataRange, dataProtection);
     }
     SCOPE_EXIT_END;
 
@@ -75,7 +114,7 @@ NTSTATUS InitializeTextPatcher(PVOID BaseAddress)
     while (count--)
     {
         ULONG_PTR rva, length;
-        
+
         rva = *(PULONG)buffer;
         buffer += sizeof(ULONG);
 
@@ -88,13 +127,26 @@ NTSTATUS InitializeTextPatcher(PVOID BaseAddress)
         }
         else
         {
-            status = PatchAllReference(
-                        startAddress,
-                        searchRange,
-                        PtrAdd(BaseAddress, rva),
-                        (PCSTR)buffer,
-                        length
-                    );
+            PatchAllReference(
+                startAddress,
+                searchRange,
+                PtrAdd(BaseAddress, rva),
+                (PCSTR)buffer,
+                length,
+                FALSE
+            );
+
+            if (dataSection != nullptr)
+            {
+                PatchAllReference(
+                    dataAddress,
+                    dataRange,
+                    PtrAdd(BaseAddress, rva),
+                    (PCSTR)buffer,
+                    length,
+                    TRUE
+                );
+            }
         }
 
         buffer += length;

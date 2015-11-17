@@ -100,6 +100,10 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
         FAIL_BREAK(hr);
 
         hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
+        if (hr == DWRITE_E_FILEFORMAT)
+        {
+            hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE_COLLECTION, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
+        }
         FAIL_BREAK(hr);
 
         this->fontEmSize = PixelsToDipsY(FontSize);
@@ -146,7 +150,7 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
     SIZE size;
 
     run.fontFace        = this->fontFace;
-    run.fontEmSize      = this->fontEmSize;
+    run.fontEmSize      = this->fontEmSize - PixelsToDipsY(1);
     run.glyphCount      = 1;
     run.glyphIndices    = &glyphIndice;
     run.glyphAdvances   = nullptr;
@@ -185,18 +189,22 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     HDC         dc;
     HBITMAP     bitmap;
     BITMAP      bmp;
-    BITMAPINFO  bmi;
     IMAGE_BITMAP_HEADER header;
 
     BOOL show = FALSE;
-    if (ch == L"µÄ"[0])
+    if (ch == L'½Ç')
     {
-        show = TRUE;
+        //show = TRUE;
     }
 
     codePoint = ch;
     FAIL_RETURN(this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice));
     FAIL_RETURN(this->DrawRenderTarget(glyphIndice, &blackBox));
+
+    if (show)
+    {
+        PrintConsole(L"rawrc = {%d %d %d %d}\n", blackBox);
+    }
 
     dc = this->renderTarget->GetMemoryDC();
 
@@ -206,46 +214,33 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
 
     pixels = (PBYTE)AllocStack(header.FileSize);
 
-    bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-    bmi.bmiHeader.biWidth = bmp.bmWidth;
-    bmi.bmiHeader.biHeight = bmp.bmHeight;
-    bmi.bmiHeader.biPlanes = bmp.bmPlanes;
-    bmi.bmiHeader.biBitCount = bmp.bmBitsPixel;
-    bmi.bmiHeader.biClrUsed = 0;
-    bmi.bmiHeader.biCompression = BI_RGB;
-    bmi.bmiHeader.biSizeImage = header.FileSize;
-    bmi.bmiHeader.biClrImportant = 0;
+    GetDIBits(dc, bitmap, 0, bmp.bmHeight, pixels, (PBITMAPINFO)&header.Info, DIB_RGB_COLORS);
 
-    GetDIBits(dc, bitmap, 0, bmp.bmHeight, pixels, &bmi, DIB_RGB_COLORS);
+    blackBox.top = ML_MAX(0, blackBox.top);
+    blackBox.left = ML_MAX(0, blackBox.left);
+    blackBox.right = ML_MIN(blackBox.right, header.Info.Width);
+    blackBox.bottom = ML_MIN(blackBox.bottom, header.Info.Height);
 
     width = blackBox.right - blackBox.left;
     height = blackBox.bottom - blackBox.top;
 
+    *runeWidth = blackBox.right + blackBox.left;
+
     fontSize = this->fontHeight;
 
-    if (height > fontSize || width > fontSize)
+    if (width > fontSize)
     {
-        ExceptionBox(L"size strange");
-        //height = ML_MIN(fontSize, height);
-        //width = ML_MIN(fontSize, height);
-        //fontSize = ML_MAX(height, ML_MAX(fontSize, width));
+        ExceptionBox(L"width strange");
+        blackBox.left += width - fontSize;
+        width = blackBox.right - blackBox.left;
     }
 
-    if (show)
-        PrintConsole(L"fontSize = %d\n", fontSize);
-
-    outline = (PBYTE)AllocStack(fontSize * fontSize);
-    ZeroMemory(outline, fontSize * fontSize);
-
-    auto opixels = pixels;
-
-    pixels += (bmp.bmHeight - blackBox.top - 1) * stride;// + blackBox.left * sizeof(COLORREF);
-    out = outline + blackBox.top * fontSize + (LONG_PTR)((fontSize - width) / 2.f + 0.5);
-
-    if (show)
-        PrintConsole(L"x = %d\n", (LONG_PTR)((fontSize - width) / 2.f + 0.5));
-
-    *runeWidth = fontSize;
+    if (height > fontSize)
+    {
+        ExceptionBox(L"height strange");
+        blackBox.top += height - fontSize;
+        height = blackBox.bottom - blackBox.top;
+    }
 
     if (show)
     {
@@ -253,9 +248,20 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
         PrintConsole(L"rc = {%d %d %d %d} stride = %d w = %d h = %d fs = %d\n", blackBox, stride, width, height, fontSize);
     }
 
+    outline = (PBYTE)AllocStack(fontSize * fontSize * 2);
+    ZeroMemory(outline, fontSize * fontSize);
+
+    auto opixels = pixels;
+
+    pixels += (bmp.bmHeight - blackBox.top - 1) * stride + blackBox.left * sizeof(COLORREF);
+    out = outline + blackBox.left;
+
+    if (blackBox.top + height <= fontSize)
+        out += blackBox.top * fontSize;
+
     for (LONG_PTR h = height; h != 0; --h)
     {
-        COLORREF* i = (COLORREF *)pixels + blackBox.left;
+        COLORREF* i = (COLORREF *)pixels;
         PBYTE o = out;
 
         for (LONG_PTR w = width; w != 0; --w)
@@ -271,11 +277,6 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
             ExceptionBox(L"out of range");
             Ps::ExitProcess(0);
         }
-    }
-
-    if (show)
-    {
-        PrintConsole(L"o = %p, p = %p %d\n", opixels, pixels, opixels == pixels - 19 * stride);
     }
 
     out = (PBYTE)Output;

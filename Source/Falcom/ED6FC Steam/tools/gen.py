@@ -24,7 +24,5 @@ def main():
         fs.WriteUShort(len(text))
         fs.Write(text)
 
-    console.pause('done')
-
 if __name__ == '__main__':
     Try(main)
