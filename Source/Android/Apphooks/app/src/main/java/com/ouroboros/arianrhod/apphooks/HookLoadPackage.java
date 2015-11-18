@@ -48,8 +48,8 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 //                new HookExkernelManager().handleLoadPackage(pkg);
                 break;
 
-            case "com.ceco.lollipop.gravitybox":
-//                new HookGravityBox().handleLoadPackage(pkg);
+            case "com.ceco.marshmallow.gravitybox":
+                new HookGravityBox().handleLoadPackage(pkg);
                 break;
 
             case "com.android.systemui":

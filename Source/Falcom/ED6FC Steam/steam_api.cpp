@@ -514,7 +514,7 @@ struct ISteamUserStats
     virtual bool S_VIRTUAL IndicateAchievementProgress(PCSTR name, ULONG curProgress, ULONG maxProgress)
     {
         PrintConsole(L"IndicateAchievementProgress\n");
-        return true;
+        return false;
     }
 
     virtual ULONG S_VIRTUAL GetNumAchievements()
