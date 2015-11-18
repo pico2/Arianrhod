@@ -25,7 +25,7 @@ type Client struct {
 // Dial creates an unsecured connection to the POP3 server at the given address
 // and returns the corresponding Client.
 func Dial(addr string) (*Client, error) {
-    conn, err := net.Dial("tcp", addr)
+    conn, err := net.DialTimeout("tcp", addr, time.Second * 10)
     if err != nil {
         return nil, err
     }
@@ -35,7 +35,13 @@ func Dial(addr string) (*Client, error) {
 // DialTLS creates a TLS-secured connection to the POP3 server at the given
 // address and returns the corresponding Client.
 func DialTLS(addr string) (*Client, error) {
-    conn, err := tls.Dial("tcp", addr, &tls.Config{InsecureSkipVerify: true})
+    conn, err := tls.DialWithDialer(
+        &net.Dialer{Timeout: time.Second * 10},
+        "tcp",
+        addr,
+        &tls.Config{InsecureSkipVerify: true},
+    )
+
     if err != nil {
         return nil, err
     }
