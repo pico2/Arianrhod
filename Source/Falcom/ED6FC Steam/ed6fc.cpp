@@ -47,7 +47,8 @@ USHORT FontColorTable[] =
     0x0ca8, 0x0fdb, 0x0ace, 0x0cff, 0x056b, 0x0632, 0x0135, 0x0357, 0x0bbb,
 };
 
-DWriteRender *DWriteRenders[countof(FontSizeTable)];
+DWriteRender *DWriteMBCSRenders[countof(FontSizeTable)];
+DWriteRender *DWriteAnsiRenders[countof(FontSizeTable)];
 
 VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
 
@@ -65,7 +66,7 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
             translated = ch;
             return TRUE;
 
-        case 0xA1A1:    // full width space
+        case 0xA1A1:    // È«½Ç¿Õ¸ñ
             translated = 0x4081;
             return TRUE;
 
@@ -75,6 +76,10 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
 
         case 0xD1A1:    // ¡Ñ Òô·û
             translated = 0xF481;  // TAG2('ô');
+            return TRUE;
+
+        case 0xF6A1:    // ¡ö ·½¿é
+            translated = 0xA181;
             return TRUE;
     }
 
@@ -108,33 +113,34 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
 
 PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
-    DWriteRender*   DWRender;
-    ULONG_PTR       FontSize, FontIndex, Color;
+    DWriteRender    *mbcsRender, *ansiRender;
+    ULONG_PTR       fontSize, fontIndex, color;
     DOUBLE          delta, width;
 
     //return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex), 0;
 
-    FontIndex = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
-    FontSize = FontSizeTable[FontIndex];
-    DWRender = DWriteRenders[FontIndex];
-    Color = FontColorTable[ColorIndex];
-    delta = 0;
+    fontIndex   = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
+    fontSize    = FontSizeTable[fontIndex];
+    mbcsRender  = DWriteMBCSRenders[fontIndex];
+    ansiRender  = DWriteAnsiRenders[fontIndex];
+    color       = FontColorTable[ColorIndex];
+    delta       = 0;
 
     for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GBK))
     {
         USHORT translated;
         CHAR ansi = Text[0];
 
-        if (ansi >= 0)
+        if (ansi == ' ')
         {
-            //CHAR tmp[2] = { ansi };
-            //StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
-            //width = (LetterWidthTable[ansi] + 2) * FontSize * 0.03125;
-
+            width = fontSize / 2;
+            ++Text;
+        }
+        else if (ansi > 0)
+        {
             ULONG_PTR runeWidth;
-            DWRender->DrawRune(chr, Color, Buffer, Stride, &runeWidth);
-            width = FontSize / 2;
-
+            ansiRender->DrawRune(chr, color, Buffer, Stride, &runeWidth);
+            width = fontSize / 2;
             ++Text;
         }
         else if (TranslateChar(Text, translated))
@@ -142,14 +148,14 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
             CHAR tmp[3] = { translated & 0xFF, translated >> 8 };
 
             StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
-            width = FontSize;
+            width = fontSize;
             Text += 2;
         }
         else
         {
             ULONG_PTR runeWidth;
-            DWRender->DrawRune(chr, Color, Buffer, Stride, &runeWidth);
-            width = FontSize;
+            mbcsRender->DrawRune(chr, color, Buffer, Stride, &runeWidth);
+            width = fontSize;
             Text += 2;
         }
 
@@ -206,20 +212,32 @@ NTSTATUS InitializeDWrite()
     LOOP_ONCE
     {
         PBYTE           fontSize;
-        DWriteRender**  render = DWriteRenders;
+        DWriteRender**  mbcsRender = DWriteMBCSRenders;
+        DWriteRender**  ansiRender = DWriteAnsiRenders;
 
         FOR_EACH_ARRAY(fontSize, FontSizeTable)
         {
-            *render = new DWriteRender();
-            if (*render == nullptr)
+            *mbcsRender = new DWriteRender();
+            if (*mbcsRender == nullptr)
             {
                 hr = STATUS_NO_MEMORY;
                 break;
             }
 
-            hr = (*render)->Initialize(L"font.ttf", *fontSize);
+            hr = (*mbcsRender)->Initialize(L"font.ttf", nullptr, *fontSize);
             FAIL_BREAK(hr);
-            ++render;
+            ++mbcsRender;
+
+            *ansiRender = new DWriteRender();
+            if (*ansiRender == nullptr)
+            {
+                hr = STATUS_NO_MEMORY;
+                break;
+            }
+
+            hr = (*ansiRender)->Initialize(nullptr, L"SIMHEI", *fontSize);
+            FAIL_BREAK(hr);
+            ++ansiRender;
         }
     }
 
@@ -267,6 +285,8 @@ BOOL Initialize(PVOID BaseAddress)
     Success = NT_SUCCESS(InitializeDWrite());
     InitializeTextPatcher(BaseAddress);
 
+    //DWriteRenders[9]->DrawRune(L'P', FontColorTable[0], 0, 0, 0), Ps::ExitProcess(0);
+
     Success = Success && FindFontRender(BaseAddress) != IMAGE_INVALID_VA;
 
     using namespace Mp;
@@ -308,8 +328,6 @@ BOOL Initialize(PVOID BaseAddress)
     };
 
     PatchMemory(p, countof(p), BaseAddress);
-
-    //DWriteRenders[9]->DrawRune(L"e"[0], FontColorTable[0], 0, 0), Ps::ExitProcess(0);
 
     return TRUE;
 }

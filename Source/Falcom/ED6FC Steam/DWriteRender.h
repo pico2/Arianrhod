@@ -12,31 +12,31 @@ public:
     ~DWriteRender();
 
 public:
-    NTSTATUS Initialize(PCWSTR FaceName, ULONG_PTR FontSize);
+    NTSTATUS Initialize(PCWSTR FontPath, PCWSTR FaceName, ULONG_PTR FontSize);
     NTSTATUS DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Buffer, ULONG_PTR OutputStride, PULONG_PTR runeWidth);
 
     template <typename T>
     FLOAT PixelsToDipsX(T x)
     {
-        return x * 96.0f / this->dpiX;
+        return x * 96.0 / this->dpiX;
     }
 
     template <typename T>
     FLOAT PixelsToDipsY(T y)
     {
-        return y * 96.0f / this->dpiY;
+        return y * 96.0 / this->dpiY;
     }
 
     LONG_PTR DipsToPixelsX(FLOAT x)
     {
-        FLOAT pixels = x * this->dpiX * (1 / 96.0f);
-        return (LONG_PTR)((pixels + 0.5f));
+        FLOAT pixels = x * this->dpiX * (1 / 96.0);
+        return (LONG_PTR)((pixels + 0.5));
     }
 
     LONG_PTR DipsToPixelsY(FLOAT y)
     {
-        FLOAT pixels = y * this->dpiY * (1 / 96.0f);
-        return (LONG_PTR)((pixels + 0.5f));
+        FLOAT pixels = y * this->dpiY * (1 / 96.0);
+        return (LONG_PTR)((pixels + 0.5));
     }
 
 protected:
@@ -47,11 +47,11 @@ protected:
     IDWriteBitmapRenderTarget*  renderTarget;
     IDWriteRenderingParams*     renderingParams;
     IDWriteFontFace*            fontFace;
+    DWRITE_FONT_METRICS         fontMetrics;
+    DWRITE_GLYPH_METRICS        glyphMetrics;
     LONG_PTR                    fontHeight;
-    FLOAT                       baselineY;
+    FLOAT                       ratio;
     FLOAT                       fontEmSize;
-    FLOAT                       maxFontEmSize;
-    FLOAT                       renderTargetSize;
     FLOAT                       dpiX, dpiY;
 };
 

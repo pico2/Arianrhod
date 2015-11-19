@@ -69,20 +69,23 @@ DWriteRender::~DWriteRender()
     SafeReleaseT(this->fontFace);
 }
 
-NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
+NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, PCWSTR FaceName, ULONG_PTR FontSize)
 {
     NTSTATUS                hr;
+    UINT16                  glyphIndice;
+    UINT32                  codePoint;
     ID2D1Factory*           factory;
     IDWriteFactory*         dwrite;
     IDWriteGdiInterop*      gdiInterop;
     IDWriteRenderingParams* renderingParams;
+    IDWriteFont*            font;
     IDWriteFontFile*        fontFile;
-    DWRITE_FONT_METRICS     fontMetric;
 
     factory         = nullptr;
     dwrite          = nullptr;
     gdiInterop      = nullptr;
     fontFile        = nullptr;
+    font            = nullptr;
 
     hr = S_OK;
 
@@ -96,29 +99,48 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
         hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown **)&dwrite);
         FAIL_BREAK(hr);
 
-        hr = dwrite->CreateFontFileReference(FontPath, nullptr, &fontFile);
-        FAIL_BREAK(hr);
-
-        hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
-        if (hr == DWRITE_E_FILEFORMAT)
-        {
-            hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE_COLLECTION, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &fontFace);
-        }
-        FAIL_BREAK(hr);
-
-        this->fontEmSize = PixelsToDipsY(FontSize);
-        this->fontHeight = FontSize;
         hr = dwrite->GetGdiInterop(&gdiInterop);
         FAIL_BREAK(hr);
 
-        fontFace->GetMetrics(&fontMetric);
+        if (FaceName != nullptr)
+        {
+            LOGFONTW lf;
 
-        FLOAT ratio = this->fontEmSize / fontMetric.designUnitsPerEm;
-        this->maxFontEmSize = (fontMetric.ascent + fontMetric.descent + fontMetric.lineGap) * ratio;
-        this->renderTargetSize = this->maxFontEmSize;
-        this->baselineY = fontMetric.ascent * ratio;
+            ZeroMemory(&lf, sizeof(lf));
 
-        hr = gdiInterop->CreateBitmapRenderTarget(nullptr, this->maxFontEmSize, this->maxFontEmSize, &this->renderTarget);
+            lf.lfHeight = -PixelsToDipsY(FontSize);
+            CopyMemory(lf.lfFaceName, FaceName, sizeof(lf.lfFaceName));
+
+            hr = gdiInterop->CreateFontFromLOGFONT(&lf, &font);
+            FAIL_BREAK(hr);
+
+            hr = font->CreateFontFace(&this->fontFace);
+            FAIL_BREAK(hr);
+        }
+        else
+        {
+            hr = dwrite->CreateFontFileReference(FontPath, nullptr, &fontFile);
+            FAIL_BREAK(hr);
+
+            hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &this->fontFace);
+            if (hr == DWRITE_E_FILEFORMAT)
+            {
+                hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE_COLLECTION, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &this->fontFace);
+            }
+            FAIL_BREAK(hr);
+        }
+
+        this->fontEmSize = PixelsToDipsY(FontSize);
+        this->fontHeight = FontSize;
+
+        this->fontFace->GetMetrics(&this->fontMetrics);
+        this->ratio = this->fontEmSize / this->fontMetrics.designUnitsPerEm;
+
+        codePoint = L' D';
+        this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice);
+        this->fontFace->GetDesignGlyphMetrics(&glyphIndice, 1, &this->glyphMetrics, FALSE);
+
+        hr = gdiInterop->CreateBitmapRenderTarget(nullptr, FontSize, FontSize * 2, &this->renderTarget);
         FAIL_BREAK(hr);
 
         hr = dwrite->CreateRenderingParams(&renderingParams);
@@ -139,21 +161,28 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, ULONG_PTR FontSize)
     SafeReleaseT(factory);
     SafeReleaseT(dwrite);
     SafeReleaseT(gdiInterop);
+    SafeReleaseT(font);
 
     return hr;
 }
 
 NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
 {
-    DWRITE_GLYPH_RUN run;
-    HDC dc;
-    SIZE size;
+    DWRITE_GLYPH_RUN        run;
+    HDC                     dc;
+    SIZE                    size;
+    FLOAT                   advance;
+    DWRITE_GLYPH_METRICS    glyphMetrics;
+
+    this->fontFace->GetDesignGlyphMetrics(&glyphIndice, 1, &glyphMetrics, FALSE);
+
+    advance = glyphMetrics.advanceWidth * this->ratio;
 
     run.fontFace        = this->fontFace;
-    run.fontEmSize      = this->fontEmSize - PixelsToDipsY(1);
+    run.fontEmSize      = this->fontEmSize;
     run.glyphCount      = 1;
     run.glyphIndices    = &glyphIndice;
-    run.glyphAdvances   = nullptr;
+    run.glyphAdvances   = &advance;
     run.glyphOffsets    = nullptr;
     run.isSideways      = FALSE;
     run.bidiLevel       = 0;
@@ -167,8 +196,8 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
     Rectangle(dc, 0, 0, size.cx + 1, size.cy + 1);
 
     FAIL_RETURN(this->renderTarget->DrawGlyphRun(
-        (this->renderTargetSize - this->fontEmSize) / 2,
-        this->baselineY,
+        0,
+        this->glyphMetrics.verticalOriginY * this->ratio,
         DWRITE_MEASURING_MODE_NATURAL,
         &run,
         this->renderingParams,
@@ -192,14 +221,15 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     IMAGE_BITMAP_HEADER header;
 
     BOOL show = FALSE;
-    if (ch == L'½Ç')
-    {
-        //show = TRUE;
-    }
+
+    //ch = L'¡£';
 
     codePoint = ch;
     FAIL_RETURN(this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice));
     FAIL_RETURN(this->DrawRenderTarget(glyphIndice, &blackBox));
+
+    //SaveToBmpFile();
+    //return 0;
 
     if (show)
     {
@@ -216,31 +246,18 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
 
     GetDIBits(dc, bitmap, 0, bmp.bmHeight, pixels, (PBITMAPINFO)&header.Info, DIB_RGB_COLORS);
 
-    blackBox.top = ML_MAX(0, blackBox.top);
-    blackBox.left = ML_MAX(0, blackBox.left);
+    //blackBox.top = ML_MAX(0, blackBox.top);
+    //blackBox.left = ML_MAX(0, blackBox.left);
     blackBox.right = ML_MIN(blackBox.right, header.Info.Width);
     blackBox.bottom = ML_MIN(blackBox.bottom, header.Info.Height);
 
     width = blackBox.right - blackBox.left;
     height = blackBox.bottom - blackBox.top;
 
-    *runeWidth = blackBox.right + blackBox.left;
+    *runeWidth = blackBox.right + abs(blackBox.left);
+    *runeWidth = width;
 
     fontSize = this->fontHeight;
-
-    if (width > fontSize)
-    {
-        ExceptionBox(L"width strange");
-        blackBox.left += width - fontSize;
-        width = blackBox.right - blackBox.left;
-    }
-
-    if (height > fontSize)
-    {
-        ExceptionBox(L"height strange");
-        blackBox.top += height - fontSize;
-        height = blackBox.bottom - blackBox.top;
-    }
 
     if (show)
     {
@@ -251,22 +268,25 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     outline = (PBYTE)AllocStack(fontSize * fontSize * 2);
     ZeroMemory(outline, fontSize * fontSize);
 
-    auto opixels = pixels;
+    pixels += (bmp.bmHeight - 1) * stride;
+    out = outline;
 
-    pixels += (bmp.bmHeight - blackBox.top - 1) * stride + blackBox.left * sizeof(COLORREF);
-    out = outline + blackBox.left;
+    width = fontSize;
+    height = fontSize;
 
-    if (blackBox.top + height <= fontSize)
-        out += blackBox.top * fontSize;
+    if (blackBox.bottom > fontSize)
+    {
+        //pixels -= (blackBox.bottom - fontSize) * stride;
+    }
 
     for (LONG_PTR h = height; h != 0; --h)
     {
         COLORREF* i = (COLORREF *)pixels;
         PBYTE o = out;
 
-        for (LONG_PTR w = width; w != 0; --w)
+        for (LONG_PTR w = width; w != 0; ++i, --w)
         {
-            *o++ = FontLumaTable[RGBA_GetRValue(*i++)];
+            *o++ = FontLumaTable[(RGBA_GetRValue(*i) + RGBA_GetGValue(*i) + RGBA_GetBValue(*i)) / 3];
         }
 
         pixels -= stride;
