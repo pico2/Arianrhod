@@ -514,7 +514,7 @@ struct ISteamUserStats
     virtual bool S_VIRTUAL IndicateAchievementProgress(PCSTR name, ULONG curProgress, ULONG maxProgress)
     {
         PrintConsole(L"IndicateAchievementProgress\n");
-        return false;
+        return true;
     }
 
     virtual ULONG S_VIRTUAL GetNumAchievements()
@@ -721,7 +721,7 @@ struct ISteamRemoteStorage
     virtual bool S_VIRTUAL FileWrite(PCSTR FileName, PVOID Data, LONG Size)
     {
         PrintConsole(L"FileWrite: %S\n", FileName);
-        return true;
+        return false;
     }
 
     virtual LONG S_VIRTUAL FileRead(PCSTR FileName, PVOID Data, LONG Size)

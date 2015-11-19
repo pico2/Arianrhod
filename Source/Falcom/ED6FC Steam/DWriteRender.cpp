@@ -136,7 +136,7 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, PCWSTR FaceName, ULONG_PTR Fo
         this->fontFace->GetMetrics(&this->fontMetrics);
         this->ratio = this->fontEmSize / this->fontMetrics.designUnitsPerEm;
 
-        codePoint = L' D';
+        codePoint = L'¹ú';
         this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice);
         this->fontFace->GetDesignGlyphMetrics(&glyphIndice, 1, &this->glyphMetrics, FALSE);
 

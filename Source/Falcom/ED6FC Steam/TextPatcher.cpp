@@ -111,15 +111,15 @@ NTSTATUS InitializeTextPatcher(PVOID BaseAddress)
     count = *(PULONG)buffer;
     buffer += sizeof(count);
 
-    while (count--)
+    for (; count; count--)
     {
         ULONG_PTR rva, length;
 
         rva = *(PULONG)buffer;
         buffer += sizeof(ULONG);
 
-        length = *(PUSHORT)buffer;
-        buffer += sizeof(USHORT);
+        length = *(PULONG)buffer;
+        buffer += sizeof(PULONG);
 
         if (rva & 0x80000000)
         {
@@ -149,7 +149,7 @@ NTSTATUS InitializeTextPatcher(PVOID BaseAddress)
             }
         }
 
-        buffer += length;
+        buffer += (length + 3) & ~3;
     }
 
     return status;

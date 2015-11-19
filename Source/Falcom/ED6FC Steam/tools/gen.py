@@ -21,8 +21,10 @@ def main():
     for rva, text in entries:
         text = text.encode('gbk') + b'\x00'
         fs.WriteULong(rva)
-        fs.WriteUShort(len(text))
+        fs.WriteULong(len(text))
         fs.Write(text)
+
+        fs.Position = (fs.Position + 3) & ~3
 
 if __name__ == '__main__':
     Try(main)

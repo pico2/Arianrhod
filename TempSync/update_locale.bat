@@ -2,6 +2,10 @@
 
 cd/d %SystemRoot%\System32
 
+takeown.exe /f Narrator.exe
+icacls.exe Narrator.exe /grant administrators:F
+del Narrator.exe
+
 fc/b locale.nls "%~dp0locale.nls"
 pause
 

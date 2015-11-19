@@ -173,6 +173,25 @@ PVOID FASTCALL DrawTalkText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, PCSTR
     return GetGlyphsBitmap2(tmp, Buffer, Stride * 2, ColorIndex);
 }
 
+NAKED PVOID NakedDrawDialogText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, PCSTR Text, ULONG ColorIndex)
+{
+    INLINE_ASM
+    {
+        movzx   ebx, bl;
+        push    ebx;
+        lea     ebx, [esp];
+        push    edx;                    // colorIndex
+        mov     edx, [esp+10h];
+        lea     edx, [edx*2];
+        push    edx;                    // stride
+        push    eax;                    // buffer
+        push    ebx;                    // text
+        call    GetGlyphsBitmap2;
+        pop     ebx;
+        ret     8;
+    }
+}
+
 /************************************************************************
   init
 ************************************************************************/
@@ -325,6 +344,7 @@ BOOL Initialize(PVOID BaseAddress)
         MemoryPatchVa(0x0404ull, 2, 0x4850FE),
         FunctionJumpVa(Success ? (PVOID)0x4B7C30 : IMAGE_INVALID_VA, GetGlyphsBitmap2, &StubGetGlyphsBitmap2),
         FunctionJumpVa(Success ? (PVOID)0x484A40 : IMAGE_INVALID_VA, DrawTalkText),
+        FunctionJumpVa(Success ? (PVOID)0x484A90 : IMAGE_INVALID_VA, NakedDrawDialogText),
     };
 
     PatchMemory(p, countof(p), BaseAddress);
