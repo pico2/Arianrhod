@@ -83,4 +83,4 @@ def main():
         itc.WriteULong(info)
 
 if __name__ == '__main__':
-    TryInvoke(main)
+    Try(main)

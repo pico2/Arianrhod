@@ -127,4 +127,4 @@ def main():
     PauseConsole('done')
 
 if __name__ == '__main__':
-    TryInvoke(main)
+    Try(main)

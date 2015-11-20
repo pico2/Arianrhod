@@ -48,7 +48,7 @@ class ScenarioChipInfo:
             self.ChipIndex = fs
 
         else:
-            self.ChipIndex = fs.ulong()
+            self.ChipIndex = fs.ReadULong()
 
     def __str__(self):
         chiptype = self.ChipIndex >> 20

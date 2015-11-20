@@ -1,4 +1,5 @@
 from ..common import *
+from ..otypes.wintypes import *
 import io
 
 _DEFAULT_ENDIAN = '<'
