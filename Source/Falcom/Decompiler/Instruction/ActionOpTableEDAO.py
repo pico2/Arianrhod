@@ -619,5 +619,5 @@ if __name__ == '__main__':
             valid += 1
     print('known: %d (%d%%)' % (valid, valid / len(edao_as_op_list) * 100))
     print('total: %d' % len(edao_as_op_list))
-    input()
+    console.pause()
 

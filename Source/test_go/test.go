@@ -7,6 +7,7 @@ import (
     "./pinyin"
     "ml/random"
     "os"
+    "time"
     "io/ioutil"
     "github.com/PuerkitoBio/goquery"
     "ml/uuid"
@@ -69,5 +70,14 @@ func genacc() {
 }
 
 func main() {
-    genacc()
+    monthValue := String("October")
+
+    for m := time.January; m <= time.December; m++ {
+        if String(m.String()).ToLower() == monthValue.ToLower() {
+            monthValue = String(Sprintf("%d", m))
+            break
+        }
+    }
+
+    Println(monthValue)
 }
