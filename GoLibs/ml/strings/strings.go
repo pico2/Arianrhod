@@ -8,6 +8,7 @@ import (
     "bytes"
     "text/template"
     "strings"
+    "strconv"
     "unicode/utf8"
 )
 
@@ -36,6 +37,11 @@ func (self String) Length() int {
 
 func (self String) IsEmpty() bool {
     return len(self) == 0
+}
+
+func (self String) IsDigit() bool {
+    _, err := strconv.ParseInt(self.String(), 10, 64)
+    return err == nil
 }
 
 func (self String) Format(params Dict) String {
