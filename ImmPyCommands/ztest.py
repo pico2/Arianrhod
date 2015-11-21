@@ -152,7 +152,7 @@ def comfunc(base, prefix):
     #functbl = Register(0xBE0E10)
 
     try:
-        for i in range(0x100):
+        for i in range(0x394 / 4):
             func = functbl + i * 4
             func = func.u32()
             if func == 0:
@@ -178,8 +178,8 @@ def main(args):
 
     debugger.pyreset()
 
-    comfunc(0xBE1460, 'AS')
-    comfunc(0xBE0E10, 'SCP')
+    # comfunc(0xBE1460, 'AS')
+    comfunc(0x572450, 'SCP')
 
     return ''
 

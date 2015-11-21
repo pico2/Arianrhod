@@ -16,8 +16,8 @@ ML_OVERLOAD_NEW
 using ml::String;
 using ml::GrowableArray;
 
-ULONG       SleepFix;
-PVOID       GameFontRender;
+ULONG SleepFix;
+PED6_FC_FONT_RENDER GameFontRender;
 
 BYTE FontSizeTable[] =
 {
@@ -63,6 +63,8 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
         case 0x9F81:    // Ÿ   ÁâÐÎ
         case 0xAA84:    // „ª   ºá¸Ü
         case 0x4081:    // @   ¿Õ¸ñ
+        case 0x5C81:    // \   ºá¸Ü
+        case 0x9A81:    // š   ¡ï
             translated = ch;
             return TRUE;
 
@@ -114,17 +116,13 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
 PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
     DWriteRender    *mbcsRender, *ansiRender;
-    ULONG_PTR       fontSize, fontIndex, color;
-    DOUBLE          delta, width;
+    ULONG_PTR       fontSize, fontIndex, color, width;
 
-    //return StubGetGlyphsBitmap2(Text, Buffer, Stride, ColorIndex), 0;
-
-    fontIndex   = *(PULONG_PTR)PtrAdd(GameFontRender, 0x24);
+    fontIndex   = GameFontRender->FontSizeIndex;
     fontSize    = FontSizeTable[fontIndex];
     mbcsRender  = DWriteMBCSRenders[fontIndex];
     ansiRender  = DWriteAnsiRenders[fontIndex];
     color       = FontColorTable[ColorIndex];
-    delta       = 0;
 
     for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GBK))
     {
@@ -159,9 +157,7 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
             Text += 2;
         }
 
-        width += delta;
         Buffer = PtrAdd(Buffer, (LONG_PTR)width * 2);
-        delta = width - (LONG_PTR)width;
     }
 
     return Buffer;
@@ -192,21 +188,38 @@ NAKED PVOID NakedDrawDialogText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, P
     }
 }
 
+NAKED VOID NakedCalcBookTextWidth()
+{
+    INLINE_ASM
+    {
+        movzx   edx, [eax];
+        mov     ecx, GameFontRender;
+        mov     ecx, [ecx]ED6_FC_FONT_RENDER.FontSizeIndex;
+        movzx   ecx, FontSizeTable[ecx];
+        mov     eax, ecx;
+        shr     eax, 1;
+        cmp     edx, 80h;
+        cmovae  eax, ecx;
+        push    eax;
+        fild    dword ptr [esp];
+        pop     eax;
+        ret;
+    }
+}
+
 /************************************************************************
   init
 ************************************************************************/
 
-PVOID FindFontRender(PVOID BaseAddress)
+PED6_FC_FONT_RENDER FindFontRender(PVOID BaseAddress)
 {
     PVOID p;
 
      p = SearchPatternSafe(L"81 3D ?? ?? ?? ?? BC 02 00 00", BaseAddress, ImageNtHeaders(BaseAddress)->OptionalHeader.SizeOfImage);
      if (p == nullptr)
-         return IMAGE_INVALID_VA;
+         return nullptr;
 
-     GameFontRender = PtrSub(*(PVOID *)PtrAdd(p, 2), 0x28);
-
-     return GameFontRender;
+     return FIELD_BASE(*(PVOID *)PtrAdd(p, 2), ED6_FC_FONT_RENDER, FontWeight);
 }
 
 template<typename... ARGS>
@@ -306,7 +319,11 @@ BOOL Initialize(PVOID BaseAddress)
 
     //DWriteRenders[9]->DrawRune(L'P', FontColorTable[0], 0, 0, 0), Ps::ExitProcess(0);
 
-    Success = Success && FindFontRender(BaseAddress) != IMAGE_INVALID_VA;
+    if (Success)
+    {
+        GameFontRender = FindFontRender(BaseAddress);
+        Success = GameFontRender != nullptr;
+    }
 
     using namespace Mp;
 
@@ -340,11 +357,31 @@ BOOL Initialize(PVOID BaseAddress)
             LookupImportTable(GetExeModuleHandle(), nullptr, USER32_SetWindowPos)
         ),
 
+        // cmp r8, 80
         MemoryPatchVa(0xEBull, 1, 0x485041),
+        MemoryPatchVa(0xEBull, 1, 0x469C52),
+        MemoryPatchVa(0xEBull, 1, 0x4794B7),
+        MemoryPatchVa(0xEBull, 1, 0x47B131),
+        MemoryPatchVa(0xEBull, 1, 0x484B0B),
+        MemoryPatchVa(0xEBull, 1, 0x488015),
+        MemoryPatchVa(0x00ull, 1, 0x48819D),
+        MemoryPatchVa(0xEBull, 1, 0x488567),
+        MemoryPatchVa(0xEBull, 1, 0x4B78D1),
+        MemoryPatchVa(0xEBull, 1, 0x4B7934),
+        MemoryPatchVa(0xEBull, 1, 0x4B79B5),
+        MemoryPatchVa(0xEBull, 1, 0x4B7A4D),
+        MemoryPatchVa(0xEBull, 1, 0x4B7BFC),
+        MemoryPatchVa(0xEBull, 1, 0x4B7C6C),
+        MemoryPatchVa(0xEBull, 1, 0x4B7D1B),
+        MemoryPatchVa(0xEBull, 1, 0x4D9F4D),
+
+        // ctrl code
         MemoryPatchVa(0x0404ull, 2, 0x4850FE),
+
         FunctionJumpVa(Success ? (PVOID)0x4B7C30 : IMAGE_INVALID_VA, GetGlyphsBitmap2, &StubGetGlyphsBitmap2),
         FunctionJumpVa(Success ? (PVOID)0x484A40 : IMAGE_INVALID_VA, DrawTalkText),
         FunctionJumpVa(Success ? (PVOID)0x484A90 : IMAGE_INVALID_VA, NakedDrawDialogText),
+        FunctionJumpVa(Success ? (PVOID)0x4B7920 : IMAGE_INVALID_VA, NakedCalcBookTextWidth),
     };
 
     PatchMemory(p, countof(p), BaseAddress);
