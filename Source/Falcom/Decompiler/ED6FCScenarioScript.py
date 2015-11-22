@@ -896,6 +896,9 @@ class ScenarioInfo:
 
         fs = fileio.FileStream(scenafile)
 
+        if fs.Length == 0:
+            return False
+
         # file header
 
         self.MapName            = fs.read(0xA).decode(CODE_PAGE).split('\x00', 1)[0]
@@ -1393,8 +1396,8 @@ def procfile(file):
     console.setTitle(os.path.basename(file))
     print('disasm %s' % file)
     scena = ScenarioInfo()
-    scena.open(file)
-    scena.SaveToFile(file + '.py')
+    if scena.open(file) is not False:
+        scena.SaveToFile(file + '.py')
 
 def main():
     if len(sys.argv) == 1:

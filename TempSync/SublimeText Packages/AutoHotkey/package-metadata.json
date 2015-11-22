@@ -1,0 +1,1 @@
+{"version": "1.5.0", "sublime_text": "*", "platforms": ["windows"], "description": "AutoHotkey AHK language package for SublimeText including syntax highlighting, comments toggling, auto-completions, build system definitions, commands for ahkrun, ahkcompile, ahkrunpiped.", "url": "https://github.com/ahkscript/SublimeAutoHotkey", "dependencies": []}
