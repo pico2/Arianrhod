@@ -7,7 +7,7 @@
   {
     "rva": "001561A0",
     "original": "背後をとられた！",
-    "translation": ""
+    "translation": "被偷袭了！"
   },
   {
     "rva": "001561B4",
@@ -17,7 +17,7 @@
   {
     "rva": "001561C8",
     "original": "先制攻撃！",
-    "translation": "先发制人"
+    "translation": "先发制人！"
   },
   {
     "rva": "001561EC",
@@ -27,7 +27,7 @@
   {
     "rva": "001561F4",
     "original": "   移  動   ",
-    "translation": "   移  动   "
+    "translation": "　 移  动 　"
   },
   {
     "rva": "00156204",
@@ -40,16 +40,6 @@
     "translation": "　 攻　击 　"
   },
   {
-    "rva": "0015621C",
-    "original": "ATT GUARD",
-    "translation": ""
-  },
-  {
-    "rva": "00156228",
-    "original": "CRITICAL",
-    "translation": ""
-  },
-  {
     "rva": "00156234",
     "original": "Party was defeated...",
     "translation": ""
@@ -57,7 +47,7 @@
   {
     "rva": "0015624C",
     "original": "パーティは全滅しました・・・",
-    "translation": ""
+    "translation": "队伍全灭……"
   },
   {
     "rva": "0015626C",
@@ -67,7 +57,7 @@
   {
     "rva": "0015627C",
     "original": "敵に逃げられました・・・",
-    "translation": ""
+    "translation": "敌人逃跑了……"
   },
   {
     "rva": "00156298",
@@ -77,7 +67,7 @@
   {
     "rva": "001562A8",
     "original": "パーティは退却しました・・・",
-    "translation": ""
+    "translation": "队伍撤退了……"
   },
   {
     "rva": "001562C8",
@@ -87,7 +77,7 @@
   {
     "rva": "001562D0",
     "original": "   アーツ   ",
-    "translation": ""
+    "translation": "　魔　法　"
   },
   {
     "rva": "001562E0",
@@ -97,7 +87,7 @@
   {
     "rva": "001562E8",
     "original": "  クラフト  ",
-    "translation": ""
+    "translation": "　战　技　"
   },
   {
     "rva": "001562F8",
@@ -107,7 +97,7 @@
   {
     "rva": "00156300",
     "original": "   道  具   ",
-    "translation": ""
+    "translation": "　道　具　"
   },
   {
     "rva": "00156310",
@@ -117,12 +107,7 @@
   {
     "rva": "0015632C",
     "original": "%c%c%s%c%cをＳブレイク用に設定しますか？",
-    "translation": ""
-  },
-  {
-    "rva": "00156358",
-    "original": "Tactics",
-    "translation": ""
+    "translation": "%c%c%s%c%c设定为Ｓ爆发技吗？"
   },
   {
     "rva": "00156360",
@@ -132,7 +117,7 @@
   {
     "rva": "001563B8",
     "original": "%c%c%s%c%cをＳブレイク用に設定しました。\n\t\t\t\t\t\t\t\tキャンプ画面の[%c%c%s%c%c]で変更出来ます。",
-    "translation": ""
+    "translation": "%c%c%s%c%c设定为Ｓ爆发技了。\n可以在Camp画面的[%c%c%s%c%c]进行变更。"
   },
   {
     "rva": "00156420",
@@ -142,7 +127,7 @@
   {
     "rva": "00156440",
     "original": "%sはアーツを使う準備をしている。\n",
-    "translation": ""
+    "translation": "%s准备使用魔法。\n"
   },
   {
     "rva": "00156464",
@@ -152,7 +137,7 @@
   {
     "rva": "00156470",
     "original": "%sは逃げ出した。",
-    "translation": ""
+    "translation": "%s逃跑了。"
   },
   {
     "rva": "00156734",
@@ -162,22 +147,7 @@
   {
     "rva": "00156748",
     "original": "アイテム「%s」を壊された！\n",
-    "translation": ""
-  },
-  {
-    "rva": "00156764",
-    "original": "#5P#050W#%dA%s",
-    "translation": ""
-  },
-  {
-    "rva": "001567D4",
-    "original": "magic\\mgmirr01.eff",
-    "translation": ""
-  },
-  {
-    "rva": "001567E8",
-    "original": "magic\\mgresure.eff",
-    "translation": ""
+    "translation": "道具「%s」被破坏了！\n"
   },
   {
     "rva": "001567FC",
@@ -192,12 +162,12 @@
   {
     "rva": "00156874",
     "original": "ＡＴ(Action Time)バー:",
-    "translation": ""
+    "translation": "ＡＴ(Action Time)栏:"
   },
   {
     "rva": "00156890",
     "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t行動順を表すバーです。\n\t\t\t\t\t\t\t\t\t上から順に行動が回ってきます。",
-    "translation": ""
+    "translation": "%c%c%s%c%c\n表示行动顺序的槽。\n战斗角色由上到下地依次循环行动。"
   },
   {
     "rva": "001568E4",
@@ -212,12 +182,12 @@
   {
     "rva": "0015697C",
     "original": "攻撃：",
-    "translation": ""
+    "translation": "攻击："
   },
   {
     "rva": "00156988",
     "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t敵を攻撃します。\n\t\t\t\t\t\t\t\t\t敵のいない場所をクリックすると\n\t\t\t\t\t\t\t\t\tそこまで移動することができます（マウス操作時）。",
-    "translation": ""
+    "translation": "%c%c%s%c%c\n攻击敌人。\n点击没有敌人的地方，\n就会移动到所点击的地方（鼠标操作时）。"
   },
   {
     "rva": "00156A10",
@@ -227,7 +197,7 @@
   {
     "rva": "00156AA8",
     "original": "#0C表示される範囲は移動攻撃の届く距離です。\n\t\t\t\t\t\t\t\t\tこの範囲内にいる目標を選択すると\n\t\t\t\t\t\t\t\t\t自動的に移動して攻撃をしかけます。",
-    "translation": ""
+    "translation": "所表示的范围是移动攻击可以到达的距离。\n只要选择这个范围内的目标，\n人物就能自动移动并采取攻击。"
   },
   {
     "rva": "00156B30",
@@ -237,7 +207,7 @@
   {
     "rva": "00156C20",
     "original": "#0Cカーソルを重ねたときに\n\t\t\t\t\t\t\t\t\t　　が表示される目標は攻撃範囲外です。\n\t\t\t\t\t\t\t\t\t選択すると最も接近できる地点まで\n\t\t\t\t\t\t\t\t\t移動しますが、攻撃はできません。",
-    "translation": ""
+    "translation": "如鼠标指针与目标重合时出现\n\t\t\t\t\t\t\t\t　　则表示的目标在攻击范围之外。\n选择目标之后将移动至最接近目标的地点，\n但无法对目标进行攻击。"
   },
   {
     "rva": "00156CC0",
@@ -252,12 +222,12 @@
   {
     "rva": "00156D98",
     "original": "ＡＴボーナス(行動順ボーナス)：",
-    "translation": ""
+    "translation": "ＡＴ奖励（行动顺序奖励）："
   },
   {
     "rva": "00156DB8",
     "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t　行動順についたボーナスを示すアイコンです。\n\t\t\t\t\t\t\t\t\t　これらのアイコンがあるときに\n\t\t\t\t\t\t\t\t\t　行動順が回ってくると各種のボーナスがつきます。",
-    "translation": ""
+    "translation": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t　这是附在行动顺序上表示奖励的图标。\n\t\t\t\t\t\t\t\t　当这些图标存在的时候，\n\t\t\t\t\t\t\t\t　在轮到其行动的时候得到其相应的奖励。"
   },
   {
     "rva": "00156E60",
@@ -267,7 +237,7 @@
   {
     "rva": "00156EB0",
     "original": "#0C   ：ＨＰ回復、   ：セピスボーナスなど\n\t\t\t\t\t\t\t\t\tアイコンごとに特定の効果があります。",
-    "translation": ""
+    "translation": "   ：ＨＰ回复、   ：耀晶片增加\n每种图标均表示效果不同的奖励。"
   },
   {
     "rva": "00156F08",
@@ -282,12 +252,12 @@
   {
     "rva": "00156FB8",
     "original": "アーツ：",
-    "translation": ""
+    "translation": "魔法："
   },
   {
     "rva": "00156FC8",
     "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t武器による攻撃が当たりにくい敵や\n\t\t\t\t\t\t\t\t\t攻撃の効果が薄い敵にはアーツが有効です。",
-    "translation": ""
+    "translation": "%c%c%s%c%c\n当武器很难攻击到敌人\n或攻击效果很弱时，魔法就很有效。"
   },
   {
     "rva": "00157038",
@@ -297,12 +267,12 @@
   {
     "rva": "001570A0",
     "original": "アーツ",
-    "translation": ""
+    "translation": "魔法"
   },
   {
     "rva": "001570A8",
     "original": "%c%c%s%c%cは発動までに時間（駆動時間）が掛かります。\n\t\t\t\t\t\t\t\t\tまた、使用すると%c%c%s%c%cを消費します。",
-    "translation": ""
+    "translation": "%c%c%s%c%c在发动之前需要消耗时间（驱动时间），\n此外，使用魔法时候也需要消耗一定的%c%c%s%c%c值。"
   },
   {
     "rva": "00157110",
@@ -337,12 +307,12 @@
   {
     "rva": "00157284",
     "original": "クラフト：",
-    "translation": ""
+    "translation": "战技："
   },
   {
     "rva": "00157290",
     "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\tクラフトはキャラクターごとに固有の技です。\n\t\t\t\t\t\t\t\t\t攻撃だけでなく、様々な効果のものがあります。",
-    "translation": ""
+    "translation": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t战技是每位角色固有的技能。\n不仅可以攻击，还会有各种各样的效果。"
   },
   {
     "rva": "0015730C",
@@ -357,12 +327,12 @@
   {
     "rva": "001573A0",
     "original": "クラフト",
-    "translation": ""
+    "translation": "战技"
   },
   {
     "rva": "001573B0",
     "original": "%c%c%s%c%cを使うと%c%c%s%c%cを消費します。\n\t\t\t\t\t\t\t\t\t%c%c%s%c%cは攻撃したり、ダメージを受けたりすることで\n\t\t\t\t\t\t\t\t\t戦闘中に少しずつ溜まっていきます。",
-    "translation": ""
+    "translation": "%c%c%s%c%c发出的话，会消耗一定的%c%c%s%c%c值。\n\t\t\t\t\t\t\t\t%c%c%s%c%c会在每位角色攻击敌人\n或被敌人攻击的时候自动积蓄起来。"
   },
   {
     "rva": "00157448",
@@ -382,22 +352,22 @@
   {
     "rva": "00157514",
     "original": "Ｓブレイク",
-    "translation": ""
+    "translation": "Ｓ爆发技"
   },
   {
     "rva": "00157520",
     "original": "Ｓクラフト",
-    "translation": ""
+    "translation": "Ｓ战技"
   },
   {
     "rva": "0015752C",
     "original": "Ｓブレイク：",
-    "translation": ""
+    "translation": "Ｓ爆发技："
   },
   {
     "rva": "00157540",
     "original": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t\t%c%c%s%c%cが100以上溜まると、ＡＴバー（行動順）を\n\t\t\t\t\t\t\t\t\t無視して%c%c%s%c%cを使用することが出来ます。\n\t\t\t\t\t\t\t\t\tこれが%c%c%s%c%cです。",
-    "translation": ""
+    "translation": "%c%c%s%c%c\n\t\t\t\t\t\t\t\t%c%c%s%c%c积蓄到100以上时，\n无视ＡＴ栏（行动顺序）而发动的%c%c%s%c%c。\n这就是%c%c%s%c%c。"
   },
   {
     "rva": "001575DC",
@@ -412,7 +382,7 @@
   {
     "rva": "00157678",
     "original": "%c%c%s%c%cとして発動する%c%c%s%c%cの変更は\n\t\t\t\t\t\t\t\t\tキャンプ[Tactics]内の［Ｓブレイク登録］で行います。",
-    "translation": ""
+    "translation": "%c%c%s%c%c对应发动的%c%c%s%c%c的变更方法\n可以在Camp的[Tactics]-[Ｓ爆发技登记]中实施。"
   },
   {
     "rva": "001576E0",
@@ -432,12 +402,12 @@
   {
     "rva": "00157788",
     "original": "ブレイクボタン",
-    "translation": ""
+    "translation": "爆发按钮"
   },
   {
     "rva": "00157798",
     "original": "%c%c%s%c%c　　　をクリックすると%c%c%s%c%cが発動します。\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t※ブレイクボタンが　　　になっている間は\n\t\t\t\t\t\t\t\t\t  Ｓブレイクを発動することはできません。",
-    "translation": ""
+    "translation": "%c%c%s%c%c　　　单击后，%c%c%s%c%c即可发动。\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t※注意，爆发按钮为　　　的时候，\n\t\t\t\t\t\t\t\t  将无法发动Ｓ爆发技。"
   },
   {
     "rva": "00157840",
@@ -447,7 +417,7 @@
   {
     "rva": "00157918",
     "original": "#0Cでは、実際に%c%c%s%c%c　　　をクリックし\n\t\t\t\t\t\t\t\t\t%c%c%s%c%cを発動してみましょう。\n\t\t\t\t\t\t\t\t\t※キーボード操作の場合は\n\t\t\t\t\t\t\t\t\t　パーティメンバーに対応した[1][2][3][4]キーを押すか\n\t\t\t\t\t\t\t\t\t　矢印キーの左右[←][→]で選択します。",
-    "translation": ""
+    "translation": "接下来，就动手按动%c%c%s%c%c　　　试试看吧\n\t\t\t\t\t\t\t\t%c%c%s%c%c会给敌人会心一击。\n※用键盘操作时，\n\t\t\t\t\t\t\t\t　对我方队友可以通过使用对应的[1][2][3][4]键\n\t\t\t\t\t\t\t\t　或方向键的左右键[←][→]来选择。"
   },
   {
     "rva": "00157A00",
@@ -457,7 +427,7 @@
   {
     "rva": "00157A14",
     "original": "#0CNPCを守れ！",
-    "translation": ""
+    "translation": "守护NPC！"
   },
   {
     "rva": "00157A24",
@@ -467,32 +437,7 @@
   {
     "rva": "00157A50",
     "original": "#0CNPCのHPが0になるとゲームオーバーになります。",
-    "translation": ""
-  },
-  {
-    "rva": "00157A80",
-    "original": "MISS",
-    "translation": ""
-  },
-  {
-    "rva": "00157A88",
-    "original": "DEAD",
-    "translation": ""
-  },
-  {
-    "rva": "00157A90",
-    "original": "LEVEL UP",
-    "translation": ""
-  },
-  {
-    "rva": "00157F08",
-    "original": " % 3d",
-    "translation": ""
-  },
-  {
-    "rva": "00157F20",
-    "original": " % 7d",
-    "translation": ""
+    "translation": "NPC的HP为0的时候就会被视为战斗失败。"
   },
   {
     "rva": "00157F28",
@@ -500,9 +445,19 @@
     "translation": ""
   },
   {
+    "rva": "00157F3C",
+    "original": "全てのアイテムを表示します。",
+    "translation": "显示所有的道具。"
+  },
+  {
     "rva": "00157F5C",
     "original": "Displays weapons.",
     "translation": ""
+  },
+  {
+    "rva": "00157F70",
+    "original": "武器を表示します。",
+    "translation": "显示武器。"
   },
   {
     "rva": "00157F84",
@@ -510,9 +465,19 @@
     "translation": ""
   },
   {
+    "rva": "00157F94",
+    "original": "防具とアクセサリーを表示します。",
+    "translation": "显示防具。"
+  },
+  {
     "rva": "00157FB8",
     "original": "Displays medicine.",
     "translation": ""
+  },
+  {
+    "rva": "00157FCC",
+    "original": "薬と携帯食糧を表示します。",
+    "translation": "显示药品。"
   },
   {
     "rva": "00157FE8",
@@ -520,9 +485,19 @@
     "translation": ""
   },
   {
+    "rva": "00157FFC",
+    "original": "クオーツを表示します。",
+    "translation": "显示结晶回路。"
+  },
+  {
     "rva": "00158014",
     "original": "Displays key items.",
     "translation": ""
+  },
+  {
+    "rva": "00158028",
+    "original": "イベントアイテムを表示します。",
+    "translation": "显示事件道具。"
   },
   {
     "rva": "00158048",
@@ -530,14 +505,29 @@
     "translation": ""
   },
   {
+    "rva": "00158060",
+    "original": "食材を表示します。",
+    "translation": "显示食材。"
+  },
+  {
     "rva": "00158074",
     "original": "Displays books.",
     "translation": ""
   },
   {
+    "rva": "00158084",
+    "original": "書物を表示します。",
+    "translation": "显示书本。"
+  },
+  {
     "rva": "00158098",
     "original": "Removes equipment.",
     "translation": ""
+  },
+  {
+    "rva": "001580AC",
+    "original": "装備をはずします。",
+    "translation": "卸掉装备。"
   },
   {
     "rva": "001580C0",
@@ -547,7 +537,7 @@
   {
     "rva": "001580DC",
     "original": "クオーツを装着できます。",
-    "translation": ""
+    "translation": "可以装备结晶回路。"
   },
   {
     "rva": "001580F8",
@@ -555,9 +545,19 @@
     "translation": ""
   },
   {
+    "rva": "00158110",
+    "original": "武器を装備できます。",
+    "translation": "可以装备武器。"
+  },
+  {
     "rva": "00158128",
     "original": "Clothing can be equipped.",
     "translation": ""
+  },
+  {
+    "rva": "00158144",
+    "original": "衣服を装備できます。",
+    "translation": "可以装备衣服。"
   },
   {
     "rva": "0015815C",
@@ -565,9 +565,19 @@
     "translation": ""
   },
   {
+    "rva": "00158178",
+    "original": "靴を装備できます。",
+    "translation": "可以装备靴子。"
+  },
+  {
     "rva": "0015818C",
     "original": "Accessory can be equipped.",
     "translation": ""
+  },
+  {
+    "rva": "001581A8",
+    "original": "装飾品を装備できます。",
+    "translation": "可以装备装饰品。"
   },
   {
     "rva": "001582C0",
@@ -605,6 +615,11 @@
     "translation": ""
   },
   {
+    "rva": "00158384",
+    "original": " を手に入れた",
+    "translation": "得到了"
+  },
+  {
     "rva": "00158394",
     "original": "  Craft",
     "translation": ""
@@ -628,6 +643,11 @@
     "rva": "001583C4",
     "original": "%sは ",
     "translation": ""
+  },
+  {
+    "rva": "001583CC",
+    "original": " を習得した。",
+    "translation": "学会了"
   },
   {
     "rva": "001583DC",
@@ -663,6 +683,11 @@
     "rva": "001585C0",
     "original": "Elemental Efficacy (%):",
     "translation": ""
+  },
+  {
+    "rva": "001585D8",
+    "original": "属性攻撃有効率(%):",
+    "translation": "属性攻击有效率(%):"
   },
   {
     "rva": "001585F4",
@@ -712,22 +737,12 @@
   {
     "rva": "001587AC",
     "original": "タイトルに戻る",
-    "translation": ""
+    "translation": "回到标题画面"
   },
   {
     "rva": "001587BC",
     "original": "リトライ",
-    "translation": ""
-  },
-  {
-    "rva": "001588C4",
-    "original": "%s%s%s%s",
-    "translation": ""
-  },
-  {
-    "rva": "001588D0",
-    "original": "Divide Start\n",
-    "translation": ""
+    "translation": "重新战斗"
   },
   {
     "rva": "00159518",
@@ -737,7 +752,7 @@
   {
     "rva": "00159534",
     "original": "『%s』のレシピを覚えた。",
-    "translation": ""
+    "translation": "学会了『%s』的做法。"
   },
   {
     "rva": "001595AC",
@@ -747,12 +762,12 @@
   {
     "rva": "001595B8",
     "original": "　捨てる　",
-    "translation": ""
+    "translation": "　丢　弃"
   },
   {
     "rva": "001595C4",
     "original": "　使　う　",
-    "translation": ""
+    "translation": "　使　用"
   },
   {
     "rva": "001595D4",
@@ -777,37 +792,37 @@
   {
     "rva": "00159620",
     "original": "セーブするファイルを選んでください。",
-    "translation": ""
+    "translation": "请选择当前进度保存的位置。"
   },
   {
     "rva": "00159648",
     "original": "ロードするファイルを選んでください。",
-    "translation": ""
+    "translation": "请选择要读取的进度。"
   },
   {
     "rva": "00159670",
     "original": "削除するファイルを選んでください。",
-    "translation": ""
+    "translation": "请选择要删除的进度。"
   },
   {
     "rva": "00159694",
     "original": "ゲームを終了します。",
-    "translation": ""
+    "translation": "结束游戏。"
   },
   {
     "rva": "001596AC",
     "original": "%cTactics mode cannot currently be utilized.",
-    "translation": ""
+    "translation": "%c现在不能使用战术模式。"
   },
   {
     "rva": "001596DC",
     "original": "%cPosition cannot currently be changed.",
-    "translation": ""
+    "translation": "%c现在不能改变队列。"
   },
   {
     "rva": "0015973C",
     "original": "%cAuto Save slot. Slot cannot be used.",
-    "translation": ""
+    "translation": "%c这个进度用于自动保存。不能保存在这里。"
   },
   {
     "rva": "00159764",
@@ -817,17 +832,17 @@
   {
     "rva": "00159770",
     "original": "Load clear\ndata file?",
-    "translation": ""
+    "translation": "读取该通关存档吗？"
   },
   {
     "rva": "00159788",
     "original": "Load file?",
-    "translation": ""
+    "translation": "读取此进度吗？"
   },
   {
     "rva": "00159794",
     "original": "Delete this file?",
-    "translation": ""
+    "translation": "删除此进度吗？"
   },
   {
     "rva": "001597A8",
@@ -837,12 +852,17 @@
   {
     "rva": "001597C8",
     "original": "アイテムを使う相手を選んでください。",
-    "translation": ""
+    "translation": "请选择道具使用的对象。"
   },
   {
     "rva": "001597F0",
     "original": "Discard this item?",
     "translation": ""
+  },
+  {
+    "rva": "00159804",
+    "original": "このアイテムを捨てますか？",
+    "translation": "丢弃这个道具吗？"
   },
   {
     "rva": "00159820",
@@ -852,7 +872,7 @@
   {
     "rva": "00159848",
     "original": "アーツを使う相手を選んでください。",
-    "translation": ""
+    "translation": "请选择魔法使用的对象。"
   },
   {
     "rva": "0015986C",
@@ -1022,7 +1042,7 @@
   {
     "rva": "0015A220",
     "original": "Unequip",
-    "translation": ""
+    "translation": "卸下装备"
   },
   {
     "rva": "0015A32C",
@@ -1080,6 +1100,11 @@
     "translation": ""
   },
   {
+    "rva": "0015A414",
+    "original": "クリアデータ 空の軌跡ＦＣ",
+    "translation": "通关存档 空之轨迹ＦＣ"
+  },
+  {
     "rva": "0015A430",
     "original": "%03d %6s",
     "translation": ""
@@ -1087,22 +1112,22 @@
   {
     "rva": "0015A43C",
     "original": "ノーマル",
-    "translation": ""
+    "translation": "普通"
   },
   {
     "rva": "0015A448",
     "original": "ハード",
-    "translation": ""
+    "translation": "困难"
   },
   {
     "rva": "0015A450",
     "original": "ナイトメア",
-    "translation": ""
+    "translation": "噩梦"
   },
   {
     "rva": "0015A45C",
     "original": "イージー",
-    "translation": ""
+    "translation": "简单"
   },
   {
     "rva": "0015A468",
@@ -1152,7 +1177,7 @@
   {
     "rva": "0015A500",
     "original": "SaveTime: ",
-    "translation": "SaveTime: "
+    "translation": ""
   },
   {
     "rva": "0015A50C",
@@ -1162,7 +1187,7 @@
   {
     "rva": "0015A518",
     "original": "PlayTime: ",
-    "translation": "PlayTime: "
+    "translation": ""
   },
   {
     "rva": "0015A524",
@@ -1207,17 +1232,17 @@
   {
     "rva": "0015A5B4",
     "original": "Are you sure\nyou wish to finish\nsaving Clear Data?",
-    "translation": ""
+    "translation": "确定保存这个通关存档吗？"
   },
   {
     "rva": "0015A5E8",
     "original": "%cAuto save slot.\nYou can't save here.",
-    "translation": ""
+    "translation": "%c这个进度用于自动保存。不能保存在这里。"
   },
   {
     "rva": "0015A610",
     "original": "Overwrite file?",
-    "translation": ""
+    "translation": "覆盖此进度吗？"
   },
   {
     "rva": "0015A7C0",
@@ -1247,7 +1272,17 @@
   {
     "rva": "0015A8AC",
     "original": "Ｓブレイク登録",
-    "translation": ""
+    "translation": "Ｓ爆发技登记"
+  },
+  {
+    "rva": "0015A8BC",
+    "original": "戦闘隊列変更",
+    "translation": "改变战斗队形"
+  },
+  {
+    "rva": "0015A8CC",
+    "original": "移動隊列変更",
+    "translation": "改变移动队列"
   },
   {
     "rva": "0015A8DC",
@@ -1255,14 +1290,29 @@
     "translation": ""
   },
   {
+    "rva": "0015A8F8",
+    "original": "移動時の隊列を変更します。",
+    "translation": "改变在地图中移动时的队列。"
+  },
+  {
     "rva": "0015A914",
     "original": "Change battle formation.",
     "translation": ""
   },
   {
+    "rva": "0015A930",
+    "original": "戦闘用の隊列を変更します。",
+    "translation": "改变战斗中的队形。"
+  },
+  {
     "rva": "0015A94C",
     "original": "Set S-Break.",
     "translation": ""
+  },
+  {
+    "rva": "0015A95C",
+    "original": "Ｓブレイクの登録をします。",
+    "translation": "登记Ｓ爆发技。"
   },
   {
     "rva": "0015A978",
@@ -1324,11 +1374,7 @@
     "original": "               Formation",
     "translation": ""
   },
-  {
-    "rva": "0015AD31",
-    "original": "sbwlBWL%.$dD",
-    "translation": ""
-  },
+
   {
     "rva": "0015AD4C",
     "original": "Cafe",
@@ -1375,34 +1421,44 @@
     "translation": ""
   },
   {
+    "rva": "0015ADC8",
+    "original": "飲食・喫茶",
+    "translation": "饮食·品茶"
+  },
+  {
     "rva": "0015ADD4",
     "original": "七耀教会",
-    "translation": ""
+    "translation": "七耀教会"
   },
   {
     "rva": "0015ADE0",
     "original": "食事・休憩",
-    "translation": ""
+    "translation": "吃饭·休息"
   },
   {
     "rva": "0015ADEC",
     "original": "オーブメント",
-    "translation": ""
+    "translation": "导力器"
   },
   {
     "rva": "0015ADFC",
     "original": "遊撃士協会",
-    "translation": ""
+    "translation": "游击士协会"
   },
   {
     "rva": "0015AE08",
     "original": "休憩・宿泊",
-    "translation": ""
+    "translation": "休息·住宿"
+  },
+  {
+    "rva": "0015AE14",
+    "original": "薬・雑貨・食材",
+    "translation": "药·杂货·食材"
   },
   {
     "rva": "0015AE24",
     "original": "武器・防具",
-    "translation": ""
+    "translation": "武器·防具"
   },
   {
     "rva": "0015AEEC",
@@ -1445,9 +1501,19 @@
     "translation": "■小地图"
   },
   {
+    "rva": "0015AF50",
+    "original": "Fixed north",
+    "translation": ""
+  },
+  {
     "rva": "0015AF5C",
     "original": "北を上で固定",
     "translation": "固定为上北下南"
+  },
+  {
+    "rva": "0015AF6C",
+    "original": "Rotate",
+    "translation": ""
   },
   {
     "rva": "0015AF74",
@@ -1455,9 +1521,19 @@
     "translation": "和视角旋转一致"
   },
   {
+    "rva": "0015AF84",
+    "original": "■Camera",
+    "translation": ""
+  },
+  {
     "rva": "0015AF90",
     "original": "■カメラ回転",
     "translation": "■视角旋转"
+  },
+  {
+    "rva": "0015AFA0",
+    "original": "45 degree",
+    "translation": ""
   },
   {
     "rva": "0015AFAC",
@@ -1465,14 +1541,19 @@
     "translation": "45度角旋转"
   },
   {
+    "rva": "0015AFB8",
+    "original": "Free rotation",
+    "translation": ""
+  },
+  {
     "rva": "0015AFC8",
     "original": "フリー回転",
     "translation": "自由旋转"
   },
   {
-    "rva": "0015B02C",
-    "original": "なし",
-    "translation": "无"
+    "rva": "0015AFD4",
+    "original": "■Menu Button",
+    "translation": ""
   },
   {
     "rva": "0015AFE4",
@@ -1480,9 +1561,19 @@
     "translation": "■按键功能"
   },
   {
+    "rva": "0015AFF4",
+    "original": "Click",
+    "translation": ""
+  },
+  {
     "rva": "0015AFFC",
     "original": "クリック",
     "translation": "单击"
+  },
+  {
+    "rva": "0015B008",
+    "original": "Double click",
+    "translation": ""
   },
   {
     "rva": "0015B018",
@@ -1500,9 +1591,19 @@
     "translation": ""
   },
   {
+    "rva": "0015B07C",
+    "original": "■Frame Rate",
+    "translation": ""
+  },
+  {
     "rva": "0015B08C",
     "original": "■フレームレート",
     "translation": "■帧数"
+  },
+  {
+    "rva": "0015B0A0",
+    "original": "30 FPS Limit",
+    "translation": ""
   },
   {
     "rva": "0015B0B0",
@@ -1510,9 +1611,19 @@
     "translation": "固定为30FPS"
   },
   {
+    "rva": "0015B0BC",
+    "original": "Automatic",
+    "translation": ""
+  },
+  {
     "rva": "0015B0C8",
     "original": "自動",
     "translation": "自动调整"
+  },
+  {
+    "rva": "0015B0D0",
+    "original": "■Transparency",
+    "translation": ""
   },
   {
     "rva": "0015B0E0",
@@ -1530,6 +1641,11 @@
     "translation": "不显示"
   },
   {
+    "rva": "0015B10C",
+    "original": "■Background Music",
+    "translation": ""
+  },
+  {
     "rva": "0015B120",
     "original": "■ＢＧＭ",
     "translation": "■ＢＧＭ"
@@ -1545,9 +1661,19 @@
     "translation": "开"
   },
   {
+    "rva": "0015B13C",
+    "original": "　BGM Volume",
+    "translation": ""
+  },
+  {
     "rva": "0015B14C",
     "original": "　ＢＧＭ音量",
     "translation": "　ＢＧＭ音量"
+  },
+  {
+    "rva": "0015B15C",
+    "original": "■Sound Effects",
+    "translation": ""
   },
   {
     "rva": "0015B16C",
@@ -1555,9 +1681,19 @@
     "translation": "■音效"
   },
   {
+    "rva": "0015B178",
+    "original": "　SE Volume",
+    "translation": ""
+  },
+  {
     "rva": "0015B184",
     "original": "　効果音音量",
     "translation": "　音效音量"
+  },
+  {
+    "rva": "0015B194",
+    "original": "■Voices",
+    "translation": ""
   },
   {
     "rva": "0015B1A0",
@@ -1565,14 +1701,29 @@
     "translation": "■战斗语音"
   },
   {
+    "rva": "0015B1B0",
+    "original": "Japanese",
+    "translation": ""
+  },
+  {
     "rva": "0015B1BC",
     "original": "日本語",
     "translation": "日语"
   },
   {
+    "rva": "0015B1C4",
+    "original": "English",
+    "translation": ""
+  },
+  {
     "rva": "0015B1CC",
     "original": "英語",
-    "translation": "英文"
+    "translation": "英语"
+  },
+  {
+    "rva": "0015B1D4",
+    "original": "■Retry Offset",
+    "translation": ""
   },
   {
     "rva": "0015B1E4",
@@ -1590,74 +1741,129 @@
     "translation": "修正"
   },
   {
-    "rva": "0015B5C0",
-    "original": "戦闘をリトライした回数に応じて敵が弱体化します。\nどうしても勝てない時にどうぞ。",
-    "translation": "敌人会根据重新战斗的次数有所弱化。\n怎么都打不过的时候可以利用这一点。"
+    "rva": "0015B20C",
+    "original": "Change status display shown on the game screen.",
+    "translation": ""
   },
   {
     "rva": "0015B23C",
     "original": "ゲーム画面のステータス表示の切り替えをします。",
-    "translation": "切换画面下方的状态栏显示。"
+    "translation": "切换游戏画面的状态显示。"
+  },
+  {
+    "rva": "0015B26C",
+    "original": "Change mini map display shown on the game screen.",
+    "translation": ""
   },
   {
     "rva": "0015B2A0",
     "original": "ゲーム画面のミニマップ表示の切り替えをします。",
-    "translation": "切换画面右上的小地图显示。"
+    "translation": "切换游戏画面的小地图显示。"
+  },
+  {
+    "rva": "0015B2D0",
+    "original": "Change game camera settings.",
+    "translation": ""
   },
   {
     "rva": "0015B2F0",
     "original": "ゲーム画面の回転方式の切り替えをします。",
-    "translation": "切换视角旋转设置。"
+    "translation": "改变游戏画面的旋转方式。"
+  },
+  {
+    "rva": "0015B31C",
+    "original": "Change main menu button.",
+    "translation": ""
   },
   {
     "rva": "0015B338",
     "original": "キャンプボタンの切り替えをします。",
-    "translation": "更改按键设置。"
+    "translation": "改变Camp按键。"
+  },
+  {
+    "rva": "0015B35C",
+    "original": "Change frame rate.",
+    "translation": ""
   },
   {
     "rva": "0015B370",
     "original": "フレームレートの固定化を切り替えます。",
-    "translation": "切换帧率是否固定。"
+    "translation": "改变帧数控制。"
+  },
+  {
+    "rva": "0015B398",
+    "original": "Change character transparency.",
+    "translation": ""
   },
   {
     "rva": "0015B3B8",
     "original": "キャラの透過処理を切り替えます。",
-    "translation": "更改角色遮挡设置。"
+    "translation": "改变被遮挡角色的显示方式。"
+  },
+  {
+    "rva": "0015B3DC",
+    "original": "Turn background music on or off.",
+    "translation": ""
   },
   {
     "rva": "0015B400",
     "original": "ＢＧＭのＯＮ／ＯＦＦを切り替えます。",
-    "translation": "打开／关闭ＢＧＭ。"
+    "translation": "切换ＢＧＭ的开关。"
+  },
+  {
+    "rva": "0015B428",
+    "original": "Change background music volume.",
+    "translation": ""
   },
   {
     "rva": "0015B448",
     "original": "ＢＧＭの音量を変更します。",
-    "translation": "更改ＢＧＭ音量。"
+    "translation": "改变ＢＧＭ的音量。"
+  },
+  {
+    "rva": "0015B464",
+    "original": "Turn sound effects on or off.",
+    "translation": ""
   },
   {
     "rva": "0015B484",
     "original": "効果音のＯＮ／ＯＦＦを切り替えます。",
-    "translation": "打开／关闭音效。"
+    "translation": "切换音效的开关。"
+  },
+  {
+    "rva": "0015B4AC",
+    "original": "Change sound effect volume.",
+    "translation": ""
   },
   {
     "rva": "0015B4C8",
     "original": "効果音の音量を変更します。",
-    "translation": "更改音效音量。"
+    "translation": "改变音效的音量。"
   },
   {
     "rva": "0015B4E4",
     "original": "Change battle voice language.",
-    "translation": "更改战斗时语音的语言。"
+    "translation": "改变战斗语音的语言。"
+  },
+  {
+    "rva": "0015B504",
+    "original": "Turn battle voices on or off.",
+    "translation": ""
   },
   {
     "rva": "0015B524",
     "original": "戦闘ボイスオンオフの切り替えをします。",
-    "translation": "打开／关闭战斗时的语音。"
+    "translation": "切换战斗语音的开关。"
   },
   {
     "rva": "0015B550",
     "original": "Enemies become weaker based on number of retries.\nFeel free to use this function if you can't win a battle.",
     "translation": ""
+  },
+  {
+    "rva": "0015B5C0",
+    "original": "戦闘をリトライした回数に応じて敵が弱体化します。\nどうしても勝てない時にどうぞ。",
+    "translation": "敌人会根据重新战斗的次数有所弱化。\n怎么都打不过的时候可以利用这一点。"
   },
   {
     "rva": "0015B610",
@@ -1720,6 +1926,11 @@
     "translation": ""
   },
   {
+    "rva": "0015B704",
+    "original": "クオーツをはずす",
+    "translation": "卸掉结晶回路"
+  },
+  {
     "rva": "0015B718",
     "original": "Line%d",
     "translation": ""
@@ -1780,9 +1991,24 @@
     "translation": ""
   },
   {
-    "rva": "0015BC44",
-    "original": "【ノーマル】標準的なバランスです。適度な刺激を楽しみたい方に。",
-    "translation": "【普通】标准的难度，适合喜欢适当刺激的人。"
+    "rva": "0015BAEC",
+    "original": "[Nightmare] It's your funeral. May Aidios be with you.",
+    "translation": ""
+  },
+  {
+    "rva": "0015BB28",
+    "original": "[Hard] A difficult setting. For those who find normal a bit lacking.",
+    "translation": ""
+  },
+  {
+    "rva": "0015BB70",
+    "original": "[Normal] Average difficulty. For those wanting a little challenge.",
+    "translation": ""
+  },
+  {
+    "rva": "0015BBB8",
+    "original": "【ナイトメア】まさに悪夢。各種データを引き継がないと厳しいバランスです。",
+    "translation": "【噩梦】不继承很难打得过。"
   },
   {
     "rva": "0015BC04",
@@ -1790,9 +2016,9 @@
     "translation": "【困难】有点难，适合觉得玩普通还不满足的人。"
   },
   {
-    "rva": "0015BBB8",
-    "original": "【ナイトメア】まさに悪夢。各種データを引き継がないと厳しいバランスです。",
-    "translation": "【噩梦】不继承很难打得过。"
+    "rva": "0015BC44",
+    "original": "【ノーマル】標準的なバランスです。適度な刺激を楽しみたい方に。",
+    "translation": "【普通】标准的难度，适合喜欢适当刺激的人。"
   },
   {
     "rva": "0015BD50",
@@ -1802,7 +2028,7 @@
   {
     "rva": "0015BD58",
     "original": "　 Bracer Guild\n　 Lodgings\n　 Orbal Factory\n　 Septian Church\n　 Various Shops",
-    "translation": ""
+    "translation": "　 游击士协会\n　 旅馆、酒店\n　 导力器工房\n　 七耀教会\n　 各种商店"
   },
   {
     "rva": "0015BF04",
@@ -1842,32 +2068,37 @@
   {
     "rva": "0015BF68",
     "original": "幻のセピス",
-    "translation": ""
+    "translation": "幻之耀晶片"
+  },
+  {
+    "rva": "0015BF74",
+    "original": "空のセピス",
+    "translation": "空之耀晶片"
   },
   {
     "rva": "0015BF80",
     "original": "時のセピス",
-    "translation": ""
+    "translation": "时之耀晶片"
   },
   {
     "rva": "0015BF8C",
     "original": "風のセピス",
-    "translation": ""
+    "translation": "风之耀晶片"
   },
   {
     "rva": "0015BF98",
     "original": "火のセピス",
-    "translation": ""
+    "translation": "火之耀晶片"
   },
   {
     "rva": "0015BFA4",
     "original": "水のセピス",
-    "translation": ""
+    "translation": "水之耀晶片"
   },
   {
     "rva": "0015BFB0",
     "original": "地のセピス",
-    "translation": ""
+    "translation": "地之耀晶片"
   },
   {
     "rva": "0015BFBC",
@@ -1892,22 +2123,22 @@
   {
     "rva": "0015BFDC",
     "original": "や め る",
-    "translation": ""
+    "translation": "离　　开"
   },
   {
     "rva": "0015BFE8",
     "original": "換    金",
-    "translation": ""
+    "translation": "换　　钱"
   },
   {
     "rva": "0015BFF4",
     "original": "クオーツ",
-    "translation": ""
+    "translation": "结晶回路"
   },
   {
     "rva": "0015C000",
     "original": "スロット",
-    "translation": ""
+    "translation": "结 晶 孔"
   },
   {
     "rva": "0015C00C",
@@ -1915,9 +2146,19 @@
     "translation": ""
   },
   {
+    "rva": "0015C01C",
+    "original": "スロットの開封をします。",
+    "translation": "给结晶孔开封。"
+  },
+  {
     "rva": "0015C038",
     "original": "Synthesize quartz.",
     "translation": ""
+  },
+  {
+    "rva": "0015C04C",
+    "original": "クオーツの合成をします。",
+    "translation": "合成结晶回路。"
   },
   {
     "rva": "0015C068",
@@ -1925,29 +2166,39 @@
     "translation": ""
   },
   {
+    "rva": "0015C084",
+    "original": "セピスをお金に換金します。",
+    "translation": "用耀晶片换钱。"
+  },
+  {
     "rva": "0015C0A0",
     "original": "End transaction.",
     "translation": ""
   },
   {
+    "rva": "0015C0B4",
+    "original": "何をしますか？",
+    "translation": "做什么呢？"
+  },
+  {
     "rva": "0015C0C4",
     "original": "開封済み",
-    "translation": ""
+    "translation": "已经开封"
   },
   {
     "rva": "0015C0D0",
     "original": "開封可能",
-    "translation": ""
+    "translation": "可以开封"
   },
   {
     "rva": "0015C0DC",
     "original": "開封不可",
-    "translation": ""
+    "translation": "不能开封"
   },
   {
     "rva": "0015C0E8",
     "original": "未開封",
-    "translation": ""
+    "translation": "未开封"
   },
   {
     "rva": "0015C0F0",
@@ -1977,7 +2228,7 @@
   {
     "rva": "0015C13C",
     "original": "%cスロット[ %d ]を開封しました。",
-    "translation": ""
+    "translation": "%c结晶孔[ %d ]已经打开。"
   },
   {
     "rva": "0015C160",
@@ -1987,7 +2238,7 @@
   {
     "rva": "0015C178",
     "original": "%cセピスが足りません。",
-    "translation": ""
+    "translation": "%c耀晶片数量不够。"
   },
   {
     "rva": "0015C190",
@@ -1997,7 +2248,7 @@
   {
     "rva": "0015C1AC",
     "original": "%c#3C%s#0Cを合成します。よろしいですか？",
-    "translation": ""
+    "translation": "%c#3C%s#0C即将被合成。可以吗？"
   },
   {
     "rva": "0015C1D8",
@@ -2007,7 +2258,7 @@
   {
     "rva": "0015C1F4",
     "original": "%c#3C%s#0Cを合成しました。",
-    "translation": ""
+    "translation": "%c#3C%s#0C合成完毕。"
   },
   {
     "rva": "0015C210",
@@ -2017,7 +2268,7 @@
   {
     "rva": "0015C22C",
     "original": "%cセピスを%dミラに換金します。よろしいですか？",
-    "translation": ""
+    "translation": "%c耀晶片换成%d米拉。可以吗？"
   },
   {
     "rva": "0015C25C",
@@ -2027,7 +2278,7 @@
   {
     "rva": "0015C27C",
     "original": "%cセピスを%dミラに換金しました。",
-    "translation": ""
+    "translation": "%c耀晶片换成了%d米拉。"
   },
   {
     "rva": "0015C2A0",
@@ -2037,7 +2288,7 @@
   {
     "rva": "0015C2B8",
     "original": "開封したいスロットを選択してください。",
-    "translation": ""
+    "translation": "请选择想要开封的结晶孔。"
   },
   {
     "rva": "0015C2E0",
@@ -2055,14 +2306,29 @@
     "translation": ""
   },
   {
+    "rva": "0015C368",
+    "original": "スロット[ %d ]の開封を行えます。",
+    "translation": "结晶孔[ %d ]可以开封。"
+  },
+  {
+    "rva": "0015C390",
+    "original": "スロット[ %d ]は動力回路が接続していないため、\n開封できません。",
+    "translation": "结晶孔[ %d ]没有联接动力回路，\n现在不能开封。"
+  },
+  {
     "rva": "0015C3D0",
     "original": "スロット[ %d ]はすでに開封済みです。",
-    "translation": ""
+    "translation": "结晶孔[ %d ]已经被打开。"
   },
   {
     "rva": "0015C3F8",
     "original": "Select a character.",
     "translation": ""
+  },
+  {
+    "rva": "0015C40C",
+    "original": "キャラクターを選択してください。",
+    "translation": "请选择角色。"
   },
   {
     "rva": "0015C430",
@@ -2072,7 +2338,7 @@
   {
     "rva": "0015C444",
     "original": "現在の所持数：------",
-    "translation": ""
+    "translation": "现在所有数量：------"
   },
   {
     "rva": "0015C45C",
@@ -2082,7 +2348,7 @@
   {
     "rva": "0015C47C",
     "original": "合成したいクオーツを選択してください。",
-    "translation": ""
+    "translation": "请选择要合成的结晶回路。"
   },
   {
     "rva": "0015C4A4",
@@ -2092,7 +2358,7 @@
   {
     "rva": "0015C4B4",
     "original": "現在の所持数：%4d個",
-    "translation": ""
+    "translation": "现在所有数量：%4d个"
   },
   {
     "rva": "0015C4C8",
@@ -2100,9 +2366,19 @@
     "translation": ""
   },
   {
+    "rva": "0015C4E4",
+    "original": "換金したいセピスを選択してください。",
+    "translation": "请选择要换成米拉的耀晶片。"
+  },
+  {
     "rva": "0015C50C",
     "original": "Trade %s for mira.",
     "translation": ""
+  },
+  {
+    "rva": "0015C520",
+    "original": "%sを、換金します。",
+    "translation": "把%s换成米拉。"
   },
   {
     "rva": "0015C534",
@@ -2112,7 +2388,7 @@
   {
     "rva": "0015C54C",
     "original": "セピスの換金を行います。",
-    "translation": ""
+    "translation": "把耀晶片换成米拉。"
   },
   {
     "rva": "0015C568",
@@ -2122,7 +2398,7 @@
   {
     "rva": "0015C588",
     "original": "%d個を%dミラに換金します。",
-    "translation": ""
+    "translation": "把%d个换成%d米拉。"
   },
   {
     "rva": "0015C5A4",
@@ -2207,6 +2483,11 @@
   {
     "rva": "0015C674",
     "original": "合計",
+    "translation": "合计"
+  },
+  {
+    "rva": "0015C67C",
+    "original": "セピスを換金する",
     "translation": ""
   },
   {
@@ -2217,7 +2498,7 @@
   {
     "rva": "0015C798",
     "original": " 休　む",
-    "translation": ""
+    "translation": " 休　息"
   },
   {
     "rva": "0015C7A0",
@@ -2232,17 +2513,22 @@
   {
     "rva": "0015C7B4",
     "original": " やめる",
-    "translation": ""
+    "translation": " 离　开"
   },
   {
     "rva": "0015C7BC",
     "original": " 換  金",
-    "translation": ""
+    "translation": " 换　钱"
   },
   {
     "rva": "0015C7C4",
     "original": " 売  却",
-    "translation": ""
+    "translation": " 贩　卖"
+  },
+  {
+    "rva": "0015C7CC",
+    "original": " 購  入",
+    "translation": " 购　买"
   },
   {
     "rva": "0015C7D4",
@@ -2250,9 +2536,19 @@
     "translation": ""
   },
   {
+    "rva": "0015C7E0",
+    "original": "商品を購入します。",
+    "translation": "购买商品。"
+  },
+  {
     "rva": "0015C7F4",
     "original": "Sell items.",
     "translation": ""
+  },
+  {
+    "rva": "0015C800",
+    "original": "所持品を売却します。",
+    "translation": "卖掉所持道具。"
   },
   {
     "rva": "0015C818",
@@ -2265,6 +2561,11 @@
     "translation": ""
   },
   {
+    "rva": "0015C834",
+    "original": "お店を出ます。",
+    "translation": "离开商店。"
+  },
+  {
     "rva": "0015C844",
     "original": "What will you do?",
     "translation": ""
@@ -2275,6 +2576,11 @@
     "translation": ""
   },
   {
+    "rva": "0015C870",
+    "original": "何を購入しますか？",
+    "translation": "想买什么呢？"
+  },
+  {
     "rva": "0015C884",
     "original": "Sale price: ------------------",
     "translation": ""
@@ -2282,12 +2588,17 @@
   {
     "rva": "0015C8A4",
     "original": "売却価格：------------------",
-    "translation": ""
+    "translation": "贩卖价格：------------------"
   },
   {
     "rva": "0015C8C4",
     "original": "What will you sell?",
     "translation": ""
+  },
+  {
+    "rva": "0015C8D8",
+    "original": "何を売却しますか？",
+    "translation": "想卖掉什么呢？"
   },
   {
     "rva": "0015C8EC",
@@ -2297,7 +2608,7 @@
   {
     "rva": "0015C908",
     "original": "売却価格：%5dx%2d = %7d",
-    "translation": ""
+    "translation": "贩卖价格：%5dx%2d = %7d"
   },
   {
     "rva": "0015C920",
@@ -2307,7 +2618,7 @@
   {
     "rva": "0015C934",
     "original": "%d個を%dミラで購入します。",
-    "translation": ""
+    "translation": "%d个用%d米拉的价格购买。"
   },
   {
     "rva": "0015C950",
@@ -2317,7 +2628,7 @@
   {
     "rva": "0015C968",
     "original": "%d個を%dミラで売却します。",
-    "translation": ""
+    "translation": "%d个用%d米拉的价格卖出。"
   },
   {
     "rva": "0015C984",
@@ -2327,7 +2638,7 @@
   {
     "rva": "0015C9AC",
     "original": "%c#1C%s#0Cは、もうこれ以上持つことはできません。",
-    "translation": ""
+    "translation": "%c#1C%s#0C已经不能再拿了。"
   },
   {
     "rva": "0015C9E0",
@@ -2337,7 +2648,7 @@
   {
     "rva": "0015CA04",
     "original": "%c#1C%s#0Cを%d個、%dミラで購入します。よろしいですか？",
-    "translation": ""
+    "translation": "%c#1C%s#0C共计%d个，用%d米拉的价格购买，可以吗？"
   },
   {
     "rva": "0015CA3C",
@@ -2347,7 +2658,7 @@
   {
     "rva": "0015CA64",
     "original": "%c#1C%s#0Cを%d個、%dミラで購入しました。",
-    "translation": ""
+    "translation": "%c#1C%s#0C共计%d个，用%d米拉的价格买下了。"
   },
   {
     "rva": "0015CA90",
@@ -2357,7 +2668,7 @@
   {
     "rva": "0015CAA8",
     "original": "%cミラが足りません。",
-    "translation": ""
+    "translation": "%c没有足够的米拉。"
   },
   {
     "rva": "0015CAC0",
@@ -2367,7 +2678,7 @@
   {
     "rva": "0015CAE4",
     "original": "%c#1C%s#0Cを%d個、%dミラで売却します。よろしいですか？",
-    "translation": ""
+    "translation": "%c#1C%s#0C共计%d个，用%d米拉的价格卖出，可以吗？"
   },
   {
     "rva": "0015CB1C",
@@ -2377,12 +2688,17 @@
   {
     "rva": "0015CB40",
     "original": "%c#1C%s#0Cを%d個、%dミラで売却しました。",
-    "translation": ""
+    "translation": "%c#1C%s#0C共计%d个，用%d米拉的价格卖掉了。"
   },
   {
     "rva": "0015CB6C",
     "original": "Rest and recover.",
     "translation": ""
+  },
+  {
+    "rva": "0015CB80",
+    "original": "休憩して回復をします。",
+    "translation": "休息，恢复体力。"
   },
   {
     "rva": "0015CB98",
@@ -2397,7 +2713,7 @@
   {
     "rva": "0015CBF4",
     "original": "%c#0C宿泊料は#3C%dミラ#0Cとなります。よろしいですか？",
-    "translation": ""
+    "translation": "%c休息一次要#3C%d米拉#0C。可以吗？"
   },
   {
     "rva": "0015CC2C",
@@ -2422,7 +2738,7 @@
   {
     "rva": "0015CC80",
     "original": "材料一覧",
-    "translation": ""
+    "translation": "材料一览"
   },
   {
     "rva": "0015CC8C",
@@ -2437,7 +2753,7 @@
   {
     "rva": "0015CCA8",
     "original": "未修得",
-    "translation": ""
+    "translation": "没有学会"
   },
   {
     "rva": "0015CCB0",
@@ -2447,7 +2763,7 @@
   {
     "rva": "0015CCBC",
     "original": "以下の料理で使用",
-    "translation": ""
+    "translation": "以下料理使用"
   },
   {
     "rva": "0015CCD0",
@@ -2492,17 +2808,17 @@
   {
     "rva": "0015CDBC",
     "original": "ランク    準遊撃士・%s級",
-    "translation": ""
+    "translation": "等　级    准游击士·%s级"
   },
   {
     "rva": "0015CDD8",
     "original": "獲得累積ＢＰ        % 4d",
-    "translation": ""
+    "translation": "获得累计ＢＰ        % 4d"
   },
   {
     "rva": "0015CDF4",
     "original": "依頼達成数          % 4d",
-    "translation": ""
+    "translation": "委托达成数          % 4d"
   },
   {
     "rva": "0015CE10",
@@ -2522,7 +2838,7 @@
   {
     "rva": "0015CE38",
     "original": "依頼の報告",
-    "translation": ""
+    "translation": "委托的报告"
   },
   {
     "rva": "0015CE44",
@@ -2535,9 +2851,14 @@
     "translation": ""
   },
   {
+    "rva": "0015CE8C",
+    "original": "『%c%c%s%c%c』の報酬を取得しました。",
+    "translation": "取得了『%c%c%s%c%c』的报酬。"
+  },
+  {
     "rva": "0015CEB4",
     "original": "『%c%c%s%c%c』の報告を行いました。",
-    "translation": ""
+    "translation": "关于『%c%c%s%c%c』的报告进行完毕。"
   },
   {
     "rva": "0015CED8",
@@ -2547,12 +2868,17 @@
   {
     "rva": "0015CF20",
     "original": "%c取得ミラ  ：  %c%c%5d (%+5d)%c%c\n取得ＢＰ  ：  %c%c%5d (%+5d)%c%c",
-    "translation": ""
+    "translation": "%c取得米拉  ：  %c%c%5d (%+5d)%c%c\n取得ＢＰ  ：  %c%c%5d (%+5d)%c%c"
   },
   {
     "rva": "0015CF64",
     "original": "Currently, there is nothing to report.",
     "translation": ""
+  },
+  {
+    "rva": "0015CF8C",
+    "original": "報告できる依頼は特にありません。",
+    "translation": "现在没有可以报告的委托。"
   },
   {
     "rva": "0015CFB0",
@@ -2562,7 +2888,7 @@
   {
     "rva": "0015CFBC",
     "original": "ランクの確認",
-    "translation": ""
+    "translation": "等级的确认"
   },
   {
     "rva": "0015CFCC",
@@ -2572,12 +2898,17 @@
   {
     "rva": "0015CFFC",
     "original": "ランクが『準遊撃士・%s級』に上がりました。",
-    "translation": ""
+    "translation": "等级上升为『准游击士·%s级』"
   },
   {
     "rva": "0015D028",
     "original": "Received [%c%c%s%c%c] quartz as a perk.",
     "translation": ""
+  },
+  {
+    "rva": "0015D050",
+    "original": "特典として『%c%c%s%c%c』#5Cのクオーツをもらいました。",
+    "translation": "作为奖励，得到了『%c%c%s%c%c』的结晶回路。"
   },
   {
     "rva": "0015D088",
@@ -2587,7 +2918,7 @@
   {
     "rva": "0015D0B4",
     "original": "特典として、装備品『%c%c%s%c%c』#5Cをもらいました。",
-    "translation": ""
+    "translation": "作为奖励，得到了装备『%c%c%s%c%c』。"
   },
   {
     "rva": "0015D0E8",
@@ -2597,22 +2928,17 @@
   {
     "rva": "0015D114",
     "original": "現在のランクは『準遊撃士・%s級』です。",
-    "translation": ""
-  },
-  {
-    "rva": "0015D2FD",
-    "original": "OUSE    ,",
-    "translation": ""
-  },
-  {
-    "rva": "0015D308",
-    "original": "%.3f",
-    "translation": ""
+    "translation": "现在的等级是『准游击士·%s级』。"
   },
   {
     "rva": "0015D310",
     "original": "Cannot hold any more.",
     "translation": ""
+  },
+  {
+    "rva": "0015D328",
+    "original": "これ以上持てません。",
+    "translation": "不能再多拿了。"
   },
   {
     "rva": "0015D340",
@@ -2622,12 +2948,17 @@
   {
     "rva": "0015D358",
     "original": "%c#2C【%s】#5Cを、%d個手に入れた。",
-    "translation": ""
+    "translation": "%c得到了#2C【%s】#0C%d个。"
   },
   {
     "rva": "0015D37C",
     "original": "%cCooked and ate #2C[%s]#0C.\n%s got #2Cfood-poisoning#0C.",
     "translation": ""
+  },
+  {
+    "rva": "0015D3B8",
+    "original": "%c#2C【%s】#0Cを料理して食べた。\n%sは#2Cアタリ#0Cを引いてしまった。",
+    "translation": "%c制作并且吃掉了#2C【%s】#0C。\n%s的#2C极限力量#0C被激发出来了。"
   },
   {
     "rva": "0015D400",
@@ -2637,7 +2968,7 @@
   {
     "rva": "0015D450",
     "original": "%c#2C【%s】#5Cを料理して食べた。\n全員のＨＰが%d#5C、ＣＰが%d#5C回復した。",
-    "translation": ""
+    "translation": "%c制作并且吃掉了#2C【%s】#0C。\n全员的HP回复了#12C%d#0C，CP回复了#12C%d#0C。"
   },
   {
     "rva": "0015D49C",
@@ -2647,7 +2978,7 @@
   {
     "rva": "0015D4DC",
     "original": "%c#2C【%s】#5Cを料理して食べた。\n全員のＨＰが%d#5C回復した。",
-    "translation": ""
+    "translation": "%c制作并且吃掉了#2C【%s】#0C。\n全员的HP回复了#12C%d#0C。"
   },
   {
     "rva": "0015D51C",
@@ -2662,7 +2993,7 @@
   {
     "rva": "0015D550",
     "original": "#2C【%s】#0Cを、何個作りますか？",
-    "translation": ""
+    "translation": "要制作几个#2C【%s】#0C呢？"
   },
   {
     "rva": "0015D574",
@@ -2672,7 +3003,7 @@
   {
     "rva": "0015D588",
     "original": "#2C【%s】#0Cを作りますか？",
-    "translation": ""
+    "translation": "要制作#2C【%s】#0C吗？"
   },
   {
     "rva": "0015D5A4",
@@ -2690,721 +3021,6 @@
     "translation": ""
   },
   {
-    "rva": "0015D794",
-    "original": "DllGetClassObject",
-    "translation": ""
-  },
-  {
-    "rva": "0015D7A8",
-    "original": "xvid",
-    "translation": ""
-  },
-  {
-    "rva": "0015D80C",
-    "original": "ed6_logo.avi",
-    "translation": ""
-  },
-  {
-    "rva": "0015D81C",
-    "original": "C_Wipe00._ds",
-    "translation": ""
-  },
-  {
-    "rva": "0015D82C",
-    "original": "C_Wipe01._ds",
-    "translation": ""
-  },
-  {
-    "rva": "0015D83C",
-    "original": "C_Wipe02._ds",
-    "translation": ""
-  },
-  {
-    "rva": "0015D850",
-    "original": "BattleNo",
-    "translation": ""
-  },
-  {
-    "rva": "0015D85C",
-    "original": "ENTRY",
-    "translation": ""
-  },
-  {
-    "rva": "0015D864",
-    "original": "POS_X",
-    "translation": ""
-  },
-  {
-    "rva": "0015D86C",
-    "original": "POS_Y",
-    "translation": ""
-  },
-  {
-    "rva": "0015D874",
-    "original": "POS_Z",
-    "translation": ""
-  },
-  {
-    "rva": "0015D87C",
-    "original": "P_VEC",
-    "translation": ""
-  },
-  {
-    "rva": "0015D884",
-    "original": "ANIME",
-    "translation": ""
-  },
-  {
-    "rva": "0015D88C",
-    "original": "MakeTexture",
-    "translation": ""
-  },
-  {
-    "rva": "0015D89C",
-    "original": "CAM_X",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8A4",
-    "original": "CAM_Y",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8AC",
-    "original": "CAM_Z",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8B4",
-    "original": "CAM_WX",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8BC",
-    "original": "CAM_WY",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8C4",
-    "original": "CAM_WZ",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8CC",
-    "original": "CAM_AX",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8D4",
-    "original": "CAM_AY",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8DC",
-    "original": "CAM_AZ",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8E4",
-    "original": "CAM_DEG",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8EC",
-    "original": "CAM_ZOM",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8F4",
-    "original": "CAM_PER",
-    "translation": ""
-  },
-  {
-    "rva": "0015D8FC",
-    "original": "CAM_VZDEF",
-    "translation": ""
-  },
-  {
-    "rva": "0015D908",
-    "original": "ESTELLE_SPEED",
-    "translation": ""
-  },
-  {
-    "rva": "0015D918",
-    "original": "Polygon       /      +",
-    "translation": ""
-  },
-  {
-    "rva": "0015D930",
-    "original": "Vertex        /      +",
-    "translation": ""
-  },
-  {
-    "rva": "0015D948",
-    "original": "ZSort         /",
-    "translation": ""
-  },
-  {
-    "rva": "0015D958",
-    "original": "SetTexture",
-    "translation": ""
-  },
-  {
-    "rva": "0015D964",
-    "original": "TextureNum       (   M)",
-    "translation": ""
-  },
-  {
-    "rva": "0015D97C",
-    "original": "FreeTexMem       M",
-    "translation": ""
-  },
-  {
-    "rva": "0015D990",
-    "original": "DrawPrimitive",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9A0",
-    "original": "SetVertexShad",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9B0",
-    "original": "SetVSConstant",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9C0",
-    "original": "SetRS",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9C8",
-    "original": "SetTS",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9D0",
-    "original": "SetStream",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9DC",
-    "original": "SetIndices",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9E8",
-    "original": "Effect",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9F0",
-    "original": "Particle",
-    "translation": ""
-  },
-  {
-    "rva": "0015D9FC",
-    "original": "ChrChip            /",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA14",
-    "original": "SetRenderTarget",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA24",
-    "original": "Bulr:   Gradate: ",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA38",
-    "original": "PAGE 4 [TEXTURE-MODE]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA50",
-    "original": "[+][-] COUNT 1",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA60",
-    "original": "[*][/] COUNT 10",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA70",
-    "original": "NO.=     /",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA7C",
-    "original": "PAGE 5 [FOG EDIT-MODE]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DA94",
-    "original": "FOGSTART   [/*]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DAA4",
-    "original": "FOGEND     [-+]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DAB4",
-    "original": "FOGDENSITY [79]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DAC4",
-    "original": "FOG_R [INS DEL]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DAD4",
-    "original": "FOG_G [HOM END]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DAE4",
-    "original": "FOG_B [UP DOWN]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DAF4",
-    "original": "PAGE 6 [MAPCOLOR_EDIT-MODE]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB10",
-    "original": "SpotRadius  [-+]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB24",
-    "original": "R [INS DEL]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB30",
-    "original": "G [HOM END]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB3C",
-    "original": "B [UP DOWN]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB48",
-    "original": "PAGE 7 [CAMERA INFO]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB60",
-    "original": "CAMERA UP/DOWN [PAGE UP/DOWN]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB80",
-    "original": "PERSPECTIVE    [* /]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DB98",
-    "original": "ZOOM           [INS/DEL]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DBB4",
-    "original": "STOP           [C]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DBC8",
-    "original": "  MOVE L/R/U/D [4682]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DBE0",
-    "original": "CHANGE AXIS    [BACK]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DBF8",
-    "original": "CAM_AUTO   TRUE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC08",
-    "original": "CAM_AUTO   FALSE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC1C",
-    "original": "CAM_MOVE   FALSE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC30",
-    "original": "CAM_MOVE   TRUE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC40",
-    "original": "CAM_AXIS   ABSOLUTE MODE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC5C",
-    "original": "CAM_AXIS   RELATIVE MODE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC78",
-    "original": "PAGE 8 [FLAG]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC88",
-    "original": "SYSTEM FLAG",
-    "translation": ""
-  },
-  {
-    "rva": "0015DC94",
-    "original": "BT COUNT",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCA0",
-    "original": "BT WIN",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCA8",
-    "original": "BT LOSE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCB0",
-    "original": "BT RUNAWAY",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCBC",
-    "original": "BT DIE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCC4",
-    "original": "BT RESULT",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCD0",
-    "original": "PAGE 9 [WIND_EDIT_MODE]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCE8",
-    "original": "SPEED",
-    "translation": ""
-  },
-  {
-    "rva": "0015DCF0",
-    "original": "PAGE 10 [SUN_EDIT_MODE]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD10",
-    "original": "PAGE 11 [BATTLE_INFO]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD28",
-    "original": "MODE     STEP",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD38",
-    "original": "m_nSelect",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD44",
-    "original": "DISTANCE(MVP+DIST)",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD58",
-    "original": "RANGE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD60",
-    "original": "PAGE 12 [DEBUG_MODE]",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD78",
-    "original": "[L]SPOT      [D]CAMERA FREE",
-    "translation": ""
-  },
-  {
-    "rva": "0015DD94",
-    "original": "[K]KYOUKAI   [O]ATARI",
-    "translation": ""
-  },
-  {
-    "rva": "0015DDAC",
-    "original": "[J]JUMP      [B]BUNCHIN",
-    "translation": ""
-  },
-  {
-    "rva": "0015DDC4",
-    "original": "[W]WIRE      ",
-    "translation": ""
-  },
-  {
-    "rva": "0015DDD4",
-    "original": "[S]NO-TEX",
-    "translation": ""
-  },
-  {
-    "rva": "0015DDE0",
-    "original": "[F]FOG",
-    "translation": ""
-  },
-  {
-    "rva": "0015DDE8",
-    "original": "%sMap\\x-file\\Objects\\%s",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE00",
-    "original": "%s._op",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE08",
-    "original": "%sops\\%s.ops",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE18",
-    "original": "LoadCompass Data\n",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE2C",
-    "original": "LoadCompass Err\n",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE40",
-    "original": "Emotion Init : ",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE50",
-    "original": "LoadDataBZ is failed!\n",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE68",
-    "original": "Success!\n",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE74",
-    "original": "font8._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE80",
-    "original": "font12._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE8C",
-    "original": "font16._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DE98",
-    "original": "font20._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEA4",
-    "original": "font24._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEB0",
-    "original": "font32._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEBC",
-    "original": "font18._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEC8",
-    "original": "font26._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DED4",
-    "original": "font30._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEE0",
-    "original": "font36._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEEC",
-    "original": "font40._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DEF8",
-    "original": "font44._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF04",
-    "original": "font48._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF10",
-    "original": "font50._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF1C",
-    "original": "font54._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF28",
-    "original": "font60._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF34",
-    "original": "font64._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF40",
-    "original": "font72._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF4C",
-    "original": "font80._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF58",
-    "original": "font96._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF64",
-    "original": "font128._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF70",
-    "original": "font144._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF7C",
-    "original": "font160._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015DF88",
-    "original": "font192._da",
-    "translation": ""
-  },
-  {
-    "rva": "0015E4F8",
-    "original": "\\ED6_DT1A.dat",
-    "translation": ""
-  },
-  {
-    "rva": "0015E508",
-    "original": "\\ED6_DT08.dat",
-    "translation": ""
-  },
-  {
-    "rva": "0015E518",
-    "original": "\\ED6_DT1B.dat",
-    "translation": ""
-  },
-  {
-    "rva": "0015E528",
-    "original": "C_LOAD00._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E538",
-    "original": "C_LOAD01._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E548",
-    "original": "C_LOAD02._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E558",
-    "original": "C_LOAD03._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E568",
-    "original": "C_LOAD04._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E578",
-    "original": "C_LOAD05._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E588",
-    "original": "C_LOAD06._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E598",
-    "original": "C_LOAD07._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E5A8",
-    "original": "C_LOAD11._CH",
-    "translation": ""
-  },
-  {
-    "rva": "0015E73C",
-    "original": "data\\",
-    "translation": ""
-  },
-  {
     "rva": "0015E75C",
     "original": "%cCannot hold any more of this equipment so cannot unequip.",
     "translation": ""
@@ -3412,7 +3028,7 @@
   {
     "rva": "0015E798",
     "original": "%c現在の装備品をこれ以上持てないので、装備をはずせません。",
-    "translation": ""
+    "translation": "%c这个装备品已经不能再多拿了，所以不能卸下装备。"
   },
   {
     "rva": "0015E7D4",
@@ -3422,7 +3038,7 @@
   {
     "rva": "0015E810",
     "original": "%c現在の装備品をこれ以上持てないので、装備を変更できません。",
-    "translation": ""
+    "translation": "%c这个装备品已经不能再多拿了，所以不能改变装备。"
   },
   {
     "rva": "0015E850",
@@ -3432,7 +3048,7 @@
   {
     "rva": "0015E888",
     "original": "%c装備しているクオーツをこれ以上持てないので、\nオーブメントからはずせません。",
-    "translation": ""
+    "translation": "%c装备中的这种结晶回路已经不能再多拿了，\n所以不能从导力器上卸下。"
   },
   {
     "rva": "0015E8D8",
@@ -3442,12 +3058,17 @@
   {
     "rva": "0015E90C",
     "original": "%c同系統のクオーツは、同時に装備できません。",
-    "translation": ""
+    "translation": "%c同系统的结晶回路不能同时装备。"
   },
   {
     "rva": "0015E93C",
     "original": "%cQuartz does not match elemental slot so cannot install.",
     "translation": ""
+  },
+  {
+    "rva": "0015E978",
+    "original": "%cそのクオーツは、スロットの属性と合わないため装備できません。",
+    "translation": "%c这个结晶回路和该结晶孔属性不合，无法装备。"
   },
   {
     "rva": "0015E9B8",
@@ -3457,7 +3078,7 @@
   {
     "rva": "0015E9D0",
     "original": "%c%8sのＨＰを、%4d回復した。",
-    "translation": ""
+    "translation": "ＨＰ回复了%4d。"
   },
   {
     "rva": "0015E9F0",
@@ -3467,7 +3088,7 @@
   {
     "rva": "0015EA1C",
     "original": "%c%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。",
-    "translation": ""
+    "translation": "%c%8s的ＨＰ回复了%4d。\n%8s的ＨＰ回复了%4d。"
   },
   {
     "rva": "0015EA58",
@@ -3477,7 +3098,7 @@
   {
     "rva": "0015EA98",
     "original": "%c%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。",
-    "translation": ""
+    "translation": "%c%8s的ＨＰ回复了%4d。\n%8s的ＨＰ回复了%4d。\n%8s的ＨＰ回复了%4d。"
   },
   {
     "rva": "0015EAF0",
@@ -3487,12 +3108,17 @@
   {
     "rva": "0015EB48",
     "original": "%c%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。\n%8sのＨＰを、%4d回復した。",
-    "translation": ""
+    "translation": "%c%8s的ＨＰ回复了%4d。\n%8s的ＨＰ回复了%4d。\n%8s的ＨＰ回复了%4d。\n%8s的ＨＰ回复了%4d。"
   },
   {
     "rva": "0015EBB8",
     "original": "Charged %d EP.",
     "translation": ""
+  },
+  {
+    "rva": "0015EBC8",
+    "original": "%dＥＰをチャージした。",
+    "translation": "ＥＰ补充了%d。"
   },
   {
     "rva": "0015EBE0",
@@ -3502,7 +3128,7 @@
   {
     "rva": "0015EBF0",
     "original": "%dＣＰが上昇した。",
-    "translation": ""
+    "translation": "ＣＰ上升了%d。"
   },
   {
     "rva": "0015EC04",
@@ -3513,31 +3139,6 @@
     "rva": "0015EC20",
     "original": "Japanese_Japan.932",
     "translation": "Chinese_People's Republic of China.936"
-  },
-  {
-    "rva": "0015EC34",
-    "original": "/WINDOW_MODE",
-    "translation": ""
-  },
-  {
-    "rva": "0015EC4C",
-    "original": "/LOG",
-    "translation": ""
-  },
-  {
-    "rva": "0015EC54",
-    "original": "/RESET",
-    "translation": ""
-  },
-  {
-    "rva": "0015EC68",
-    "original": "japanese",
-    "translation": ""
-  },
-  {
-    "rva": "0015EC78",
-    "original": "dll\\lang_jpn.dll",
-    "translation": ""
   },
   {
     "rva": "0015EC8C",
@@ -3552,17 +3153,17 @@
   {
     "rva": "0015EC9C",
     "original": " ＮＥＸＴ",
-    "translation": ""
+    "translation": " ＮＥＸＴ"
   },
   {
     "rva": "0015ECA8",
     "original": " ＥＮＤＩＮＧ ",
-    "translation": ""
+    "translation": " ＥＮＤＩＮＧ "
   },
   {
     "rva": "0015ECB8",
     "original": " ＯＰＥＮＩＮＧ ",
-    "translation": ""
+    "translation": " ＯＰＥＮＩＮＧ "
   },
   {
     "rva": "0015ECCC",
@@ -3607,37 +3208,42 @@
   {
     "rva": "0015ED68",
     "original": "幻属性装着可",
-    "translation": ""
+    "translation": "可装入幻属性"
+  },
+  {
+    "rva": "0015ED78",
+    "original": "空属性装着可",
+    "translation": "可装入空属性"
   },
   {
     "rva": "0015ED88",
     "original": "時属性装着可",
-    "translation": ""
+    "translation": "可装入时属性"
   },
   {
     "rva": "0015ED98",
     "original": "風属性装着可",
-    "translation": ""
+    "translation": "可装入风属性"
   },
   {
     "rva": "0015EDA8",
     "original": "火属性装着可",
-    "translation": ""
+    "translation": "可装入火属性"
   },
   {
     "rva": "0015EDB8",
     "original": "水属性装着可",
-    "translation": ""
+    "translation": "可装入水属性"
   },
   {
     "rva": "0015EDC8",
     "original": "地属性装着可",
-    "translation": ""
+    "translation": "可装入地属性"
   },
   {
     "rva": "0015EDD8",
     "original": "全属性装着可",
-    "translation": ""
+    "translation": "可装入全属性"
   },
   {
     "rva": "0015EDE8",
@@ -3662,12 +3268,12 @@
   {
     "rva": "0015EE38",
     "original": "捨てる",
-    "translation": ""
+    "translation": "丢　弃"
   },
   {
     "rva": "0015EE40",
     "original": "使  う",
-    "translation": ""
+    "translation": "使　用"
   },
   {
     "rva": "0015EE48",
@@ -3680,9 +3286,14 @@
     "translation": ""
   },
   {
+    "rva": "0015EE64",
+    "original": " ゲームを終了する  ",
+    "translation": "     结束游戏     "
+  },
+  {
     "rva": "0015EE78",
     "original": "  タイトルに戻る   ",
-    "translation": "  タイトルに戻る   "
+    "translation": "   回到标题画面   "
   },
   {
     "rva": "0015EE8C",
@@ -3752,22 +3363,27 @@
   {
     "rva": "0015EF6C",
     "original": "　 　王都撩乱     ",
-    "translation": "　 　王都撩乱     "
+    "translation": "     王都缭乱     "
   },
   {
     "rva": "0015EF80",
     "original": " 黒のオーブメント ",
-    "translation": " 黒のオーブメント "
+    "translation": "    黑色导力器    "
   },
   {
     "rva": "0015EF94",
     "original": "白き花のマドリガル",
-    "translation": "白き花のマドリガル"
+    "translation": "     白花恋诗     "
+  },
+  {
+    "rva": "0015EFA8",
+    "original": "  消えた飛行客船  ",
+    "translation": "   消失的定期船   "
   },
   {
     "rva": "0015EFBC",
     "original": "　　父、旅立つ    ",
-    "translation": "　　父、旅立つ    "
+    "translation": "　　父亲、起程　　"
   },
   {
     "rva": "0015EFD0",
@@ -3802,7 +3418,7 @@
   {
     "rva": "0015F01C",
     "original": "クリアデータ",
-    "translation": "クリアデータ"
+    "translation": "通关存档"
   },
   {
     "rva": "0015F02C",
@@ -3813,6 +3429,11 @@
     "rva": "0015F034",
     "original": "第三章",
     "translation": "第三章"
+  },
+  {
+    "rva": "0015F03C",
+    "original": "第二章",
+    "translation": "第二章"
   },
   {
     "rva": "0015F044",
@@ -3852,12 +3473,17 @@
   {
     "rva": "0015F17C",
     "original": "　取得ミラ：",
-    "translation": ""
+    "translation": "　取得米拉："
   },
   {
     "rva": "0015F18C",
     "original": "　取得ＢＰ：",
     "translation": "　取得ＢＰ："
+  },
+  {
+    "rva": "0015F19C",
+    "original": "　状況　　：",
+    "translation": "　状况　　："
   },
   {
     "rva": "0015F1AC",
@@ -3900,14 +3526,24 @@
     "translation": ""
   },
   {
+    "rva": "0015F228",
+    "original": "報告済み",
+    "translation": "报告完成"
+  },
+  {
     "rva": "0015F234",
     "original": "達成済み",
-    "translation": ""
+    "translation": "任务完成"
+  },
+  {
+    "rva": "0015F240",
+    "original": "期限切れ",
+    "translation": "期限已过"
   },
   {
     "rva": "0015F24C",
     "original": "請負中",
-    "translation": ""
+    "translation": "委托中"
   },
   {
     "rva": "0015F254",
@@ -3950,6 +3586,21 @@
     "translation": ""
   },
   {
+    "rva": "0015F2D8",
+    "original": "期限(短)",
+    "translation": "期限(短)"
+  },
+  {
+    "rva": "0015F2E4",
+    "original": "期限(中)",
+    "translation": "期限(中)"
+  },
+  {
+    "rva": "0015F2F0",
+    "original": "期限(長)",
+    "translation": "期限(长)"
+  },
+  {
     "rva": "0015F2FC",
     "original": "Term (Failed)",
     "translation": ""
@@ -3962,61 +3613,11 @@
   {
     "rva": "0015F328",
     "original": "準遊撃士・%s級",
-    "translation": ""
+    "translation": "准游击士·%s级"
   },
   {
     "rva": "0015F338",
     "original": "% 4d",
-    "translation": ""
-  },
-  {
-    "rva": "0015F4FC",
-    "original": "sc000_10.png",
-    "translation": ""
-  },
-  {
-    "rva": "0015F50C",
-    "original": "sc001_01.png",
-    "translation": ""
-  },
-  {
-    "rva": "0015F51C",
-    "original": "sc006_00.png",
-    "translation": ""
-  },
-  {
-    "rva": "0015F52C",
-    "original": "scrneff0.bmp",
-    "translation": ""
-  },
-  {
-    "rva": "0015F53C",
-    "original": "sc000_13",
-    "translation": ""
-  },
-  {
-    "rva": "0015F548",
-    "original": "sc001_09",
-    "translation": ""
-  },
-  {
-    "rva": "0015F554",
-    "original": "sc002_09",
-    "translation": ""
-  },
-  {
-    "rva": "0015F560",
-    "original": "sc004_00",
-    "translation": ""
-  },
-  {
-    "rva": "0015F570",
-    "original": "%s._en",
-    "translation": ""
-  },
-  {
-    "rva": "0015F578",
-    "original": "%sEntry\\%s.ent",
     "translation": ""
   },
   {
@@ -4027,7 +3628,7 @@
   {
     "rva": "0015F594",
     "original": "ミラ・セピス",
-    "translation": ""
+    "translation": "米拉·耀晶片"
   },
   {
     "rva": "0015F5A4",
@@ -4035,14 +3636,29 @@
     "translation": ""
   },
   {
+    "rva": "0015F5B0",
+    "original": "引き継ぐ",
+    "translation": "继承"
+  },
+  {
     "rva": "0015F5BC",
     "original": "Don't carry over",
     "translation": ""
   },
   {
+    "rva": "0015F5D0",
+    "original": "引き継がない",
+    "translation": "不继承"
+  },
+  {
     "rva": "0015F5E0",
     "original": "アイテム",
-    "translation": ""
+    "translation": "道具"
+  },
+  {
+    "rva": "0015F5EC",
+    "original": "装備品",
+    "translation": "装备"
   },
   {
     "rva": "0015F5F4",
@@ -4052,12 +3668,12 @@
   {
     "rva": "0015F600",
     "original": "手帳",
-    "translation": ""
+    "translation": "手册"
   },
   {
     "rva": "0015F608",
     "original": "ステータス",
-    "translation": ""
+    "translation": "人物状态"
   },
   {
     "rva": "0015F614",
@@ -4067,7 +3683,7 @@
   {
     "rva": "0015F624",
     "original": "敵の強さ",
-    "translation": ""
+    "translation": "敌人强度"
   },
   {
     "rva": "0015F630",
@@ -4077,7 +3693,7 @@
   {
     "rva": "0015F638",
     "original": "決定",
-    "translation": ""
+    "translation": "确定"
   },
   {
     "rva": "0015F640",
@@ -4087,7 +3703,7 @@
   {
     "rva": "0015F65C",
     "original": "ミラとセピスとメダルを引き継ぎます。",
-    "translation": ""
+    "translation": "继承耀晶片和米拉。"
   },
   {
     "rva": "0015F684",
@@ -4095,9 +3711,19 @@
     "translation": ""
   },
   {
+    "rva": "0015F6A8",
+    "original": "各種アイテム(回復、食材、本、釣具など)を引き継ぎます。",
+    "translation": "继承各种道具（比如药、食材、书、钓竿）。"
+  },
+  {
     "rva": "0015F6E0",
     "original": "Carry over equipment and quartz (~10 per).\n※Quest-related items not included.",
     "translation": ""
+  },
+  {
+    "rva": "0015F730",
+    "original": "装備品とクオーツを引き継ぎます(各アイテム10個まで)。\n※クエスト関連アイテムを除きます。",
+    "translation": "继承装备和结晶回路（每种最多各10个）\n※任务相关的道具除外。"
   },
   {
     "rva": "0015F788",
@@ -4105,9 +3731,19 @@
     "translation": ""
   },
   {
+    "rva": "0015F7B4",
+    "original": "レシピ手帳、魔獣手帳、\n王国地図の内容を引き継ぎます。",
+    "translation": "继承料理手册、魔兽手册、王国地图的内容。"
+  },
+  {
     "rva": "0015F7EC",
     "original": "Carry over levels and opened orbment slots.",
     "translation": ""
+  },
+  {
+    "rva": "0015F818",
+    "original": "レベルとスロットの強化状況を引き継ぎます。",
+    "translation": "继承人物的等级和结晶孔状态。"
   },
   {
     "rva": "0015F848",
@@ -4130,9 +3766,34 @@
     "translation": ""
   },
   {
+    "rva": "0015F9B0",
+    "original": "敵の強さを変更できます。\n【ノーマル】標準的なバランスです。適度な刺激を楽しみたい方に。",
+    "translation": "重新设置敌人强度。\n【普通】标准的难度，适合喜欢适当刺激的人。"
+  },
+  {
+    "rva": "0015FA08",
+    "original": "敵の強さを変更できます。\n【ハード】やや厳しいバランスです。ノーマルでは物足りない方に。",
+    "translation": "重新设置敌人强度。\n有点难，适合觉得玩普通还不满足的人。"
+  },
+  {
+    "rva": "0015FA60",
+    "original": "敵の強さを変更できます。\n【ナイトメア】まさに悪夢。各種データを引き継がないと厳しいバランスです。",
+    "translation": "重新设置敌人强度。\n【噩梦】不继承很难打得过。"
+  },
+  {
+    "rva": "0015FAC8",
+    "original": "敵の強さを変更できます。\n【イージー】サクサク進める易しいバランスです。時間のない方や初心者向け。",
+    "translation": "重新设置敌人强度。\n【简单】推进流程很容易，适合新手和没有太多时间的玩家。"
+  },
+  {
     "rva": "0015FB2C",
     "original": "Start game with the above settings.",
     "translation": ""
+  },
+  {
+    "rva": "0015FB50",
+    "original": "以上の設定でゲームを開始します。",
+    "translation": "以上述设定开始游戏。"
   },
   {
     "rva": "0015FC44",
@@ -4192,7 +3853,12 @@
   {
     "rva": "0015FD0C",
     "original": "属性攻撃",
-    "translation": ""
+    "translation": "属性攻击"
+  },
+  {
+    "rva": "0015FD18",
+    "original": "有効率(％)",
+    "translation": "有效率(%)"
   },
   {
     "rva": "0015FD24",
@@ -4207,12 +3873,12 @@
   {
     "rva": "0015FD40",
     "original": "異常耐性",
-    "translation": ""
+    "translation": "异常状态抗性"
   },
   {
     "rva": "0015FD4C",
     "original": "セピス",
-    "translation": ""
+    "translation": "耀晶片"
   },
   {
     "rva": "0015FD54",
@@ -4222,27 +3888,17 @@
   {
     "rva": "0015FD60",
     "original": "出現場所",
-    "translation": ""
-  },
-  {
-    "rva": "0016E0A0",
-    "original": "檪ｰ檪ｰ檪ｰ檪ｰ",
-    "translation": ""
-  },
-  {
-    "rva": "00171394",
-    "original": "`Ｚ!",
-    "translation": ""
+    "translation": "出现地点"
   },
   {
     "rva": "00172854",
     "original": " は  い",
-    "translation": ""
+    "translation": "   是   "
   },
   {
     "rva": "0017285C",
     "original": " いいえ",
-    "translation": ""
+    "translation": "   否   "
   },
   {
     "rva": "0017286C",

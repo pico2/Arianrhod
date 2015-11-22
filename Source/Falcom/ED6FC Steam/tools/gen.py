@@ -4,7 +4,7 @@ def iterable(text):
     return text if isinstance(text, (list, tuple)) else [text]
 
 def main():
-    ed6_fc_text = json.loads(open('ed6_fc_text2.json', 'rb').read().decode('utf-8-sig'))
+    ed6_fc_text = json.loads(open('ed6_fc_text.json', 'rb').read().decode('utf-8-sig'))
 
     entries = []
     for text in ed6_fc_text:
