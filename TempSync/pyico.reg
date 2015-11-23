@@ -1,0 +1,16 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Python.NoConFile\DefaultIcon]
+@="D:\\Dev\\Python\\DLLs\\py.ico"
+
+[HKEY_CLASSES_ROOT\Python.NoConArchiveFile\DefaultIcon]
+@="D:\\Dev\\Python\\DLLs\\pyc.ico"
+
+[HKEY_CLASSES_ROOT\Python.File\DefaultIcon]
+@="D:\\Dev\\Python\\DLLs\\py.ico"
+
+[HKEY_CLASSES_ROOT\Python.CompiledFile\DefaultIcon]
+@="D:\\Dev\\Python\\DLLs\\pyc.ico"
+
+[HKEY_CLASSES_ROOT\Python.ArchiveFile\DefaultIcon]
+@="D:\\Dev\\Python\\DLLs\\pyc.ico"
