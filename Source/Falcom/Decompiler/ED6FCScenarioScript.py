@@ -47,55 +47,36 @@ class ScenarioNpcInfo:
     def params(self):
         align = 20
         p = [
-            '%s %d,' % (alignFormatKw(align, 'X'),                  LONG(self.X).value),
-            '%s %d,' % (alignFormatKw(align, 'Z'),                  LONG(self.Z).value),
-            '%s %d,' % (alignFormatKw(align, 'Y'),                  LONG(self.Y).value),
-            '%s %d,' % (alignFormatKw(align, 'Direction'),          LONG(self.Direction).value),
-            '%s %s,' % (alignFormatKw(align, 'Unknown2'),           SHORT(self.Unknown2).value),
-            '%s %s,' % (alignFormatKw(align, 'Unknown3'),           LONG(self.Unknown3).value),
+            '%s %d,'   % (alignFormatKw(align, 'X'),                  LONG(self.X).value),
+            '%s %d,'   % (alignFormatKw(align, 'Z'),                  LONG(self.Z).value),
+            '%s %d,'   % (alignFormatKw(align, 'Y'),                  LONG(self.Y).value),
+            '%s %d,'   % (alignFormatKw(align, 'Direction'),          LONG(self.Direction).value),
+            '%s %s,'   % (alignFormatKw(align, 'Unknown2'),           SHORT(self.Unknown2).value),
+            '%s %s,'   % (alignFormatKw(align, 'Unknown3'),           LONG(self.Unknown3).value),
             '%s 0x%X,' % (alignFormatKw(align, 'ChipIndex'),        SHORT(self.ChipIndex).value),
             '%s 0x%X,' % (alignFormatKw(align, 'NpcIndex'),         SHORT(self.NpcIndex).value),
-            '%s %s,' % (alignFormatKw(align, 'InitFunctionIndex'),  SHORT(self.InitFunctionIndex).value),
-            '%s %s,' % (alignFormatKw(align, 'InitScenaIndex'),     SHORT(self.InitScenaIndex).value),
-            '%s %s,' % (alignFormatKw(align, 'TalkFunctionIndex'),  SHORT(self.TalkFunctionIndex).value),
-            '%s %s,' % (alignFormatKw(align, 'TalkScenaIndex'),     SHORT(self.TalkScenaIndex).value),
+            '%s %s,'   % (alignFormatKw(align, 'InitFunctionIndex'),  SHORT(self.InitFunctionIndex).value),
+            '%s %s,'   % (alignFormatKw(align, 'InitScenaIndex'),     SHORT(self.InitScenaIndex).value),
+            '%s %s,'   % (alignFormatKw(align, 'TalkFunctionIndex'),  SHORT(self.TalkFunctionIndex).value),
+            '%s %s,'   % (alignFormatKw(align, 'TalkScenaIndex'),     SHORT(self.TalkScenaIndex).value),
         ]
 
         return p
-
-    def param(self):
-        p = '%d, %d, %d, %d, %d, %d, 0x%X, %d, %d, %d, %d, %d' % (
-                    LONG(self.X).value,
-                    LONG(self.Z).value,
-                    LONG(self.Y).value,
-                    LONG(self.Direction).value,
-                    SHORT(self.Unknown2).value,
-                    LONG(self.Unknown3).value,
-                    SHORT(self.ChipIndex).value,
-                    SHORT(self.NpcIndex).value,
-                    SHORT(self.InitFunctionIndex).value,
-                    SHORT(self.InitScenaIndex).value,
-                    SHORT(self.TalkFunctionIndex).value,
-                    SHORT(self.TalkScenaIndex).value,
-                )
-
-        space = [9, 9, 9, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6]
-        return AdjustParam(p, space)
 
     def binary(self):
         return struct.pack('<LLLHHLHHHHHH',
                     ULONG(self.X).value,
                     ULONG(self.Z).value,
                     ULONG(self.Y).value,
-                    ULONG(self.Direction).value,
-                    ULONG(self.Unknown2).value,
+                    USHORT(self.Direction).value,
+                    USHORT(self.Unknown2).value,
                     ULONG(self.Unknown3).value,
-                    ULONG(self.ChipIndex).value,
-                    ULONG(self.NpcIndex).value,
-                    ULONG(self.InitFunctionIndex).value,
-                    ULONG(self.InitScenaIndex).value,
-                    ULONG(self.TalkFunctionIndex).value,
-                    ULONG(self.TalkScenaIndex).value,
+                    USHORT(self.ChipIndex).value,
+                    USHORT(self.NpcIndex).value,
+                    USHORT(self.InitFunctionIndex).value,
+                    USHORT(self.InitScenaIndex).value,
+                    USHORT(self.TalkFunctionIndex).value,
+                    USHORT(self.TalkScenaIndex).value,
                 )
 
 class ScenarioMonsterInfo:
@@ -103,18 +84,19 @@ class ScenarioMonsterInfo:
         if fs == None:
             return
 
-        # size = 0x20
+        # size = 0x1C
 
         self.X                      = fs.ReadLong()
         self.Z                      = fs.ReadLong()
         self.Y                      = fs.ReadLong()
-        self.Unknown_0C             = fs.ReadULong()
+        self.Unknown_0C             = fs.ReadUShort()
+        self.Unknown_0E             = fs.ReadUShort()
         self.Unknown_10             = fs.ReadByte()
         self.Unknown_11             = fs.ReadByte()
         self.Unknown_12             = fs.ReadULong()
-        self.Unknown_16             = fs.ReadUShort()
-        self.Unknown_18             = fs.ReadULong()
-        self.Unknown_2C             = fs.ReadULong()
+        self.BattleIndex            = fs.ReadUShort()
+        self.Unknown_18             = fs.ReadUShort()
+        self.Unknown_1A             = fs.ReadUShort()
 
     def __str__(self):
         return str(self.binary())
@@ -125,27 +107,29 @@ class ScenarioMonsterInfo:
             '%s %d,'   % (alignFormatKw(align, 'X'),           self.X),
             '%s %d,'   % (alignFormatKw(align, 'Z'),           self.Z),
             '%s %d,'   % (alignFormatKw(align, 'Y'),           self.Y),
-            '%s 0x%X,' % (alignFormatKw(align, 'Unknown_0C'),  self.Unknown_0C),
-            '%s 0x%X,' % (alignFormatKw(align, 'Unknown_10'),  self.Unknown_10),
-            '%s 0x%X,' % (alignFormatKw(align, 'Unknown_11'),  self.Unknown_11),
+            '%s %d,'   % (alignFormatKw(align, 'Unknown_0C'),  self.Unknown_0C),
+            '%s %d,'   % (alignFormatKw(align, 'Unknown_0E'),  self.Unknown_0E),
+            '%s %d,'   % (alignFormatKw(align, 'Unknown_10'),  self.Unknown_10),
+            '%s %d,'   % (alignFormatKw(align, 'Unknown_11'),  self.Unknown_11),
             '%s 0x%X,' % (alignFormatKw(align, 'Unknown_12'),  self.Unknown_12),
-            '%s %d,'   % (alignFormatKw(align, 'Unknown_16'),  self.Unknown_16),
+            '%s 0x%X,' % (alignFormatKw(align, 'BattleIndex'), self.BattleIndex),
             '%s %d,'   % (alignFormatKw(align, 'Unknown_18'),  self.Unknown_18),
-            '%s %d,'   % (alignFormatKw(align, 'Unknown_2C'),  self.Unknown_2C),
+            '%s %d,'   % (alignFormatKw(align, 'Unknown_1A'),  self.Unknown_1A),
         ]
 
     def binary(self):
-        return struct.pack('<LLLLBBLHLL',
+        return struct.pack('<LLLHHBBLHHH',
                     ULONG(self.X).value,
                     ULONG(self.Z).value,
                     ULONG(self.Y).value,
-                    ULONG(self.Unknown_0C).value,
-                    ULONG(self.Unknown_10).value,
-                    ULONG(self.Unknown_11).value,
+                    USHORT(self.Unknown_0C).value,
+                    USHORT(self.Unknown_0E).value,
+                    BYTE(self.Unknown_10).value,
+                    BYTE(self.Unknown_11).value,
                     ULONG(self.Unknown_12).value,
-                    ULONG(self.Unknown_16).value,
-                    ULONG(self.Unknown_18).value,
-                    ULONG(self.Unknown_2C).value,
+                    USHORT(self.BattleIndex).value,
+                    USHORT(self.Unknown_18).value,
+                    USHORT(self.Unknown_1A).value,
                 )
 
 class ScenarioEventInfo:
@@ -428,60 +412,33 @@ class ScenarioInfo:
             #self.ScnInfoNumber.append(0)
 
     def binary(self):
-        MapName = self.MapName.encode(CODE_PAGE)
-        if len(MapName) < 0xA:
-            MapName += b'\x00' * (0xA - len(MapName))
-        elif len(MapName) > 0xA:
-            MapName = MapName[:0xA]
+        buffer = fileio.FileStream(b'')
 
-        Location = self.Location.encode(CODE_PAGE)
-        if len(Location) < 0xA:
-            Location += b'\x00' * (0xA - len(Location))
-        elif len(Location) > 0xA:
-            Location = Location[:0xA]
+        buffer.Write(self.MapName.encode(CODE_PAGE).ljust(0xA, b'\x00')[:0xA])
+        buffer.Write(self.Location.encode(CODE_PAGE).ljust(0xE, b'\x00')[:0xE])
+        buffer.WriteUShort(self.MapIndex)
+        buffer.WriteUShort(self.MapDefaultBGM.Index())
+        buffer.WriteUShort(self.Flags)
+        buffer.WriteUShort(self.EntryFunctionIndex)
 
-        MapIndex = struct.pack('<H', self.MapIndex)
-        MapDefaultBGM = struct.pack('<h', self.MapDefaultBGM.Index())
-        Flags = struct.pack('<L', self.Flags)
-
-        IncludedScenario = b''
         for inc in self.IncludedScenario:
-            IncludedScenario += struct.pack('<L', inc)
+            buffer.WriteULong(inc)
 
-        StringTableOffset = struct.pack('<L', self.StringTableOffset)
+        buffer.WriteUShort(self.Reserved)
 
-        ScnInfoOffset = b''
-        ScnInfoNumber = b''
-        for i in range(len(self.ScnInfoNumber)):
-            ScnInfoOffset += struct.pack('<H', self.ScnInfoOffset[i])
-            ScnInfoNumber += struct.pack('<B', self.ScnInfoNumber[i])
+        for i in range(len(self.ScnInfoOffset)):
+            buffer.WriteUShort(self.ScnInfoOffset[i])
+            buffer.WriteUShort(self.ScnInfoNumber[i])
 
-        ScenaFunctionTable = struct.pack('<HH', self.ScenaFunctionTable.Offset, self.ScenaFunctionTable.Size)
+        buffer.WriteUShort(self.StringTableOffset)
+        buffer.WriteULong(self.HeaderEndOffset)
 
-        ChipFrameInfoOffset = struct.pack('<H', self.ChipFrameInfoOffset)
+        buffer.WriteUShort(self.ScenaFunctionTable.Offset)
+        buffer.WriteUShort(self.ScenaFunctionTable.Size)
 
-        PlaceNameOffset = struct.pack('<H', self.PlaceNameOffset)
-        PlaceNameNumber = struct.pack('<B', self.PlaceNameNumber)
+        buffer.Position = 0
 
-        PreInitFunctionIndex = struct.pack('<B', self.PreInitFunctionIndex)
-
-        Information = self.InitData.binary()
-
-        return MapName + \
-                Location + \
-                MapIndex + MapDefaultBGM + \
-                Flags + \
-                IncludedScenario + \
-                StringTableOffset + \
-                ScnInfoOffset + \
-                ScenaFunctionTable + \
-                ChipFrameInfoOffset + \
-                PlaceNameOffset + \
-                PlaceNameNumber + \
-                PreInitFunctionIndex + \
-                ScnInfoNumber + \
-                Unknown_51 + \
-                Information
+        return buffer.Read()
 
     def open(self, scenafile):
 

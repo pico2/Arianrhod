@@ -37,36 +37,37 @@ def CreateScenaFile(
         Reserved,
         IncludedScenario,
     ):
+
     scena.MapName               = MapName
     scena.Location              = Location
     scena.MapIndex              = MapIndex
     scena.MapDefaultBGM         = BGMFileIndex(MapDefaultBGM)
     scena.Flags                 = Flags
-    scena.IncludedScenario      = list(IncludeList)
-    scena.PreInitFunctionIndex  = PreInitFunctionIndex
+    scena.EntryFunctionIndex    = EntryFunctionIndex
+    scena.Reserved              = Reserved
 
-    if len(IncludeList) > NUMBER_OF_INCLUDE_FILE:
+    if len(IncludedScenario) > NUMBER_OF_INCLUDE_FILE:
         raise Exception('incorrect include list length')
 
-    while len(IncludeList) < NUMBER_OF_INCLUDE_FILE:
-        IncludeList.append('')
+    while len(IncludedScenario) < NUMBER_OF_INCLUDE_FILE:
+        IncludedScenario.append('')
 
-    for i in range(len(IncludeList)):
-        scena.IncludedScenario[i] = ScenarioFileIndex(IncludeList[i]).Index()
+    scena.IncludedScenario = [ScenarioFileIndex(scp).Index() for scp in IncludedScenario]
 
     scena.fs = fileio.FileStream(FileName, 'wb+')
     scena.fs.seek(0x64)
 
     pos = scena.fs.tell()
 
-    scena.ChipFrameInfoOffset = pos
-    scena.PlaceNameOffset = pos
+    scena.fs.write(b'\x00' * 0x44)
 
     for i in range(SCN_INFO_MAXIMUM):
         scena.ScnInfoOffset[i] = pos
         scena.ScnInfoNumber[i] = 0
 
-def BuildStringList(strlist):
+    scena.HeaderEndOffset = scena.fs.tell()
+
+def BuildStringList(*strlist):
     scena.StringTable = list(strlist)
 
 def AddStringToStringList(string, offset):
@@ -195,16 +196,23 @@ def BattleInfo(name, Flags, Level, Unknown_04, Vision, MoveRange, CanMove, MoveS
 
         scena.fs.write(btmoninfo.binary())
 
-def AddCharChip(chipindexlist):
-
-    VerifyTupleOrList(chipindexlist)
-
+def AddCharChip(*chips):
     scena.ScnInfoOffset[SCN_INFO_CHIP] = scena.fs.tell()
-    scena.ScnInfoNumber[SCN_INFO_CHIP] = len(chipindexlist)
+    scena.ScnInfoNumber[SCN_INFO_CHIP] = len(chips)
 
     plog('chip index: %X' % scena.fs.tell())
 
-    for chip in chipindexlist:
+    for chip in chips:
+        chip = ScenarioChipInfo(chip)
+        scena.fs.write(chip.binary())
+
+def AddCharChipPat(*pats):
+    scena.ScnInfoOffset[SCN_INFO_CHIP_PAT] = scena.fs.tell()
+    scena.ScnInfoNumber[SCN_INFO_CHIP_PAT] = len(pats)
+
+    plog('chip index: %X' % scena.fs.tell())
+
+    for chip in pats:
         chip = ScenarioChipInfo(chip)
         scena.fs.write(chip.binary())
 
@@ -241,17 +249,20 @@ def DeclNpc(
 
     scena.fs.Write(npcinfo.binary())
 
+    scena.HeaderEndOffset = scena.fs.tell()
+
 def DeclMonster(
         X,
         Z,
         Y,
         Unknown_0C,
+        Unknown_0E,
         Unknown_10,
         Unknown_11,
         Unknown_12,
-        Unknown_16,
+        BattleIndex,
         Unknown_18,
-        Unknown_2C,
+        Unknown_1A,
     ):
 
     AddScnInfo(SCN_INFO_MONSTER)
@@ -261,14 +272,17 @@ def DeclMonster(
     m.Z             = Z
     m.Y             = Y
     m.Unknown_0C    = Unknown_0C
+    m.Unknown_0E    = Unknown_0E
     m.Unknown_10    = Unknown_10
     m.Unknown_11    = Unknown_11
     m.Unknown_12    = Unknown_12
-    m.Unknown_16    = Unknown_16
+    m.BattleIndex   = BattleIndex
     m.Unknown_18    = Unknown_18
-    m.Unknown_2C    = Unknown_2C
+    m.Unknown_1A    = Unknown_1A
 
     scena.fs.Write(m.binary())
+
+    scena.HeaderEndOffset = scena.fs.tell()
 
 def DeclEvent(
         X,
@@ -295,6 +309,8 @@ def DeclEvent(
     e.Unknown_1C    = Unknown_1C
 
     scena.fs.Write(e.binary())
+
+    scena.HeaderEndOffset = scena.fs.tell()
 
 def DeclActor(
         TriggerX,
@@ -328,18 +344,16 @@ def DeclActor(
 
     scena.fs.Write(actor.binary())
 
-def ScpFunction(FunctionList):
-    if not IsTupleOrList(FunctionList):
-        raise Exception('accept function list only')
+    scena.HeaderEndOffset = scena.fs.tell()
 
+def ScpFunction(*FunctionList):
     scena.ScenaFunctionTable.Offset = scena.fs.tell()
     scena.ScenaFunctionTable.Size += len(FunctionList) * 4
 
     for func in FunctionList:
-        scena.DelayFixLabels.append(LabelEntry(func, scena.fs.tell()))
+        # scena.DelayFixLabels.append(LabelEntry(func, scena.fs.tell()))
         scena.ScpFunctionList.append(func)
-        scena.fs.write(struct.pack('<I', INVALID_OFFSET))
-
+        # scena.fs.write(struct.pack('<I', INVALID_OFFSET))
 
 def GetFuntionId(FunctionLabel):
     return scena.ScpFunctionList.index(FunctionLabel)
@@ -474,26 +488,30 @@ def SaveToFile():
 
     fs.write(b'\x00' * (16 - fs.tell() % 16))
 
-    scena.StringTableOffset = fs.tell()
-    for string in scena.StringTable:
-        plog('%s <--> %X' % (string, fs.tell()))
+    scena.ScenaFunctionTable.Offset = fs.tell()
+    scena.ScenaFunctionTable.Size = len(scena.ScpFunctionList) * 2
 
-        scena.StringListTable[string] = fs.tell()
-        fs.write(string.encode(CODE_PAGE) + b'\x00')
+    for func in scena.ScpFunctionList:
+        fs.WriteUShort(getlabel(func))
+
+    scena.StringTableOffset = fs.tell()
+
+    fs.Write('\x00'.join(scena.StringTable).encode(CODE_PAGE) + b'\x00\x00')
 
     zerostr = fs.tell() - 1
 
     for lb in scena.DelayFixLabels:
         fs.seek(lb.Offset)
-        fs.WriteULong(getlabel(lb.Label))
+        fs.WriteUShort(getlabel(lb.Label))
 
     for lb in scena.DelayFixString:
+        raise
         fs.seek(lb.Offset)
         pos = zerostr if lb.Label == '' else scena.StringListTable[lb.Label]
 
         plog('%X -> %X : %s' % (lb.Offset, pos, lb.Label))
 
-        fs.WriteULong(pos)
+        fs.WriteUShort(pos)
 
     for i in range(len(scena.ScnInfoOffset)):
         plog('%04X : %02X' % (scena.ScnInfoOffset[i], scena.ScnInfoNumber[i]))
