@@ -886,7 +886,7 @@ def procfile(file):
 def main():
     if len(sys.argv) == 1:
         sys.argv.append(r"T0001   ._SN")
-    iterlib.forEachFile(procfile, sys.argv[1:], '*._SN')
+    iterlib.forEachFileMP(procfile, sys.argv[1:], '*._SN')
 
 if __name__ == '__main__':
     Try(main)

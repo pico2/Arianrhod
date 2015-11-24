@@ -85,7 +85,7 @@ InstructionNames[0x45]  = 'QueueWorkItem'
 InstructionNames[0x46]  = 'QueueWorkItem2'
 InstructionNames[0x47]  = 'WaitChrThread'
 InstructionNames[0x48]  = 'OP_48'
-InstructionNames[0x49]  = 'OP_49'
+InstructionNames[0x49]  = 'Event'
 InstructionNames[0x4A]  = 'OP_4A'
 InstructionNames[0x4B]  = 'OP_4B'
 InstructionNames[0x4C]  = 'OP_4C'
@@ -139,18 +139,18 @@ InstructionNames[0x7B]  = 'OP_7B'
 InstructionNames[0x7C]  = 'OP_7C'
 InstructionNames[0x7D]  = 'OP_7D'
 InstructionNames[0x7E]  = 'OP_7E'
-InstructionNames[0x7F]  = 'OP_7F'
-InstructionNames[0x80]  = 'OP_80'
+InstructionNames[0x7F]  = 'LoadEffect'
+InstructionNames[0x80]  = 'PlayEffect'
 InstructionNames[0x81]  = 'OP_81'
 InstructionNames[0x82]  = 'OP_82'
 InstructionNames[0x83]  = 'OP_83'
 InstructionNames[0x84]  = 'OP_84'
 InstructionNames[0x85]  = 'OP_85'
-InstructionNames[0x86]  = 'OP_86'
-InstructionNames[0x87]  = 'OP_87'
-InstructionNames[0x88]  = 'OP_88'
+InstructionNames[0x86]  = 'SetChrChipByIndex'
+InstructionNames[0x87]  = 'SetChrSubChip'
+InstructionNames[0x88]  = 'SetChrPos'
 InstructionNames[0x89]  = 'OP_89'
-InstructionNames[0x8A]  = 'OP_8A'
+InstructionNames[0x8A]  = 'TurnDirection'
 InstructionNames[0x8B]  = 'OP_8B'
 InstructionNames[0x8C]  = 'OP_8C'
 InstructionNames[0x8D]  = 'OP_8D'
@@ -166,10 +166,10 @@ InstructionNames[0x96]  = 'OP_96'
 InstructionNames[0x97]  = 'OP_97'
 InstructionNames[0x98]  = 'OP_98'
 InstructionNames[0x99]  = 'OP_99'
-InstructionNames[0x9A]  = 'OP_9A'
-InstructionNames[0x9B]  = 'OP_9B'
-InstructionNames[0x9C]  = 'OP_9C'
-InstructionNames[0x9D]  = 'OP_9D'
+InstructionNames[0x9A]  = 'SetChrFlags'
+InstructionNames[0x9B]  = 'ClearChrFlags'
+InstructionNames[0x9C]  = 'SetChrBattleFlags'
+InstructionNames[0x9D]  = 'ClearChrBattleFlags'
 InstructionNames[0x9E]  = 'OP_9E'
 InstructionNames[0x9F]  = 'OP_9F'
 InstructionNames[0xA0]  = 'OP_A0'
@@ -1310,7 +1310,7 @@ ed6fc_op_list = \
     inst(Call,                      'CH'),          # Call(scp index, func index)
     inst(NewScene,                  NO_OPERAND,             0,                          scp_new_scene),
     inst(IdleLoop),
-    inst(Sleep,                     'L'),
+    inst(Sleep,                     'I'),
     inst(SetMapFlags,               'L'),
     inst(ClearMapFlags,             'L'),
     inst(FadeToDark,                'iic'),
@@ -1375,7 +1375,7 @@ ed6fc_op_list = \
     inst(QueueWorkItem2,            NO_OPERAND,     0,                                  scp_QueueWorkItem2),
     inst(WaitChrThread,             'WW'),
     inst(OP_48),
-    inst(OP_49,                     'BW'),
+    inst(Event,                     'CH'),
     inst(OP_4A,                     'WC'),
     inst(OP_4B,                     'WC'),
     inst(OP_4C),
@@ -1429,18 +1429,18 @@ ed6fc_op_list = \
     inst(OP_7C,                     'LLLL'),
     inst(OP_7D,                     'B'),
     inst(OP_7E,                     'WWWBL'),
-    inst(OP_7F,                     'BS'),
-    inst(OP_80,                     'BBWLLLWWWLLLWLLLL'),
+    inst(LoadEffect,                'BS'),
+    inst(PlayEffect,                'BBWiiihhhiiiwiiii'),
     inst(OP_81,                     'BBBSLLLWWWLLLL'),
     inst(OP_82,                     'BB'),
     inst(OP_83,                     'BB'),
     inst(OP_84,                     'B'),
     inst(OP_85,                     'W'),
-    inst(OP_86,                     'WW'),
-    inst(OP_87,                     'WW'),
-    inst(OP_88,                     'WLLLW'),
-    inst(OP_89,                     'WLLLW'),
-    inst(OP_8A,                     'WWW'),
+    inst(SetChrChipByIndex,         'WH'),
+    inst(SetChrSubChip,             'WH'),
+    inst(SetChrPos,                 'Wiiih'),
+    inst(OP_89,                     'Wiiih'),
+    inst(TurnDirection,             'WWH'),
     inst(OP_8B,                     'WLLW'),
     inst(OP_8C,                     'Whh'),
     inst(OP_8D,                     'Wiiiii'),
@@ -1456,10 +1456,10 @@ ed6fc_op_list = \
     inst(OP_97,                     'WLLLLW'),
     inst(OP_98,                     'WLLLL'),
     inst(OP_99,                     'WBBL'),
-    inst(OP_9A,                     'WW'),
-    inst(OP_9B,                     'WW'),
-    inst(OP_9C,                     'WW'),
-    inst(OP_9D,                     'WW'),
+    inst(SetChrFlags,               'WW'),
+    inst(ClearChrFlags,             'WW'),
+    inst(SetChrBattleFlags,         'WW'),
+    inst(ClearChrBattleFlags,       'WW'),
     inst(OP_9E,                     'WLLLL'),
     inst(OP_9F,                     'WBBBBL'),
     inst(OP_A0,                     'WBBBL'),
