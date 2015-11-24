@@ -141,7 +141,7 @@ InstructionNames[0x7D]  = 'OP_7D'
 InstructionNames[0x7E]  = 'OP_7E'
 InstructionNames[0x7F]  = 'LoadEffect'
 InstructionNames[0x80]  = 'PlayEffect'
-InstructionNames[0x81]  = 'OP_81'
+InstructionNames[0x81]  = 'Play3DEffect'
 InstructionNames[0x82]  = 'OP_82'
 InstructionNames[0x83]  = 'OP_83'
 InstructionNames[0x84]  = 'OP_84'
@@ -191,7 +191,7 @@ InstructionNames[0xAF]  = 'OP_AF'
 InstructionNames[0xB0]  = 'OP_B0'
 InstructionNames[0xB1]  = 'OP_B1'
 InstructionNames[0xB2]  = 'OP_B2'
-InstructionNames[0xB3]  = 'OP_B3'
+InstructionNames[0xB3]  = 'PlayMovie'
 InstructionNames[0xB4]  = 'OP_B4'
 InstructionNames[0xB5]  = 'OP_B5'
 InstructionNames[0xB6]  = 'OP_B6'
@@ -211,7 +211,7 @@ for op, name in InstructionNames.items():
 def GetItemName(id):
     return ItemNameMap[id] if id in ItemNameMap else '0x%X' % id
 
-def GetItemTrueName(id):
+def GetItemDisplayName(id):
     return '\'%s\'' % ItemTrueNameMap[id] if id in ItemTrueNameMap else '0x%X' % id
 
 
@@ -241,6 +241,12 @@ class ScpString:
     def binary(self):
         pass
 
+    def dump(self):
+        return {
+            'CtrlCode': self.CtrlCode,
+            'Value': self.Value
+        }
+
     def __str__(self):
         if self.CtrlCode == SCPSTR_CODE_STRING:
             return '"%s"' % self.Value
@@ -251,27 +257,21 @@ class ScpString:
         if value == None:
             return 'scpstr(%s)' % code
 
-        value = GetItemTrueName(value) if self.CtrlCode == SCPSTR_CODE_ITEM else '0x%X' % value
+        value = GetItemDisplayName(value) if self.CtrlCode == SCPSTR_CODE_ITEM else '0x%X' % value
 
         return 'scpstr(%s, %s)' % (code, value)
+
+    __repr__ = __str__
 
 def BuildStringListFromObjectList(strlist):
     s = []
     laststrindex = None
     for x in strlist:
-        if  x.CtrlCode == SCPSTR_CODE_LINE_FEED or \
-            x.CtrlCode == SCPSTR_CODE_ENTER     or \
-            x.CtrlCode == SCPSTR_CODE_CLEAR     or \
-            x.CtrlCode == SCPSTR_CODE_05        or \
-            x.CtrlCode == SCPSTR_CODE_COLOR     or \
-            x.CtrlCode == SCPSTR_CODE_09:
-
+        if x.CtrlCode in [SCPSTR_CODE_LINE_FEED, SCPSTR_CODE_ENTER, SCPSTR_CODE_CLEAR, SCPSTR_CODE_05, SCPSTR_CODE_COLOR, SCPSTR_CODE_09]:
             if len(s) != laststrindex:
-
                 s.append(str(x))
 
             else:
-
                 if x.CtrlCode == SCPSTR_CODE_COLOR:
                     tmp = '\\x%02X\\x%02X' % (x.CtrlCode, x.Value)
                 else:
@@ -409,7 +409,7 @@ class ED6FCScenaInstructionTableEntry(InstructionTableEntry):
             'E' : lambda : FormatExpressionList(value),
             'S' : lambda : formatstr(value),
             'M' : lambda : BGMFileIndex(value).param(),
-            'T' : lambda : GetItemTrueName(value),
+            'T' : lambda : GetItemDisplayName(value),
         }
 
         return oprtype[opr]() if opr in oprtype else super().FormatOperand(param)
@@ -767,8 +767,6 @@ def scp_switch(data):
         defaultoffset = fs.ReadUShort()
 
         ins.BranchTargets.insert(0, defaultoffset)
-
-        if 0x10A in ins.BranchTargets: ibp()
 
         ins.Operand.append(expr)
         ins.Operand.append(options)
@@ -1431,7 +1429,7 @@ ed6fc_op_list = \
     inst(OP_7E,                     'WWWBL'),
     inst(LoadEffect,                'BS'),
     inst(PlayEffect,                'BBWiiihhhiiiwiiii'),
-    inst(OP_81,                     'BBBSLLLWWWLLLL'),
+    inst(Play3DEffect,              'BBBSLLLWWWLLLL'),
     inst(OP_82,                     'BB'),
     inst(OP_83,                     'BB'),
     inst(OP_84,                     'B'),
@@ -1481,7 +1479,7 @@ ed6fc_op_list = \
     inst(OP_B0,                     'WB'),
     inst(OP_B1,                     'S'),
     inst(OP_B2,                     'BBW'),
-    inst(OP_B3,                     'BS'),
+    inst(PlayMovie,                 'BS'),
     inst(OP_B4,                     'B'),
     inst(OP_B5,                     'WB'),
     inst(OP_B6,                     'B'),

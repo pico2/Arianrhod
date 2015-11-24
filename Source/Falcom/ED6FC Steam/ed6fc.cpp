@@ -3,6 +3,7 @@
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
+#pragma comment(linker, "/EXPORT:DirectInput8Create=DINPUT8.DirectInput8Create")
 
 #include "ed6fc.h"
 #include "ml.cpp"
@@ -13,7 +14,7 @@
 
 ML_OVERLOAD_NEW
 
-ULONG SleepFix;
+BOOL SleepFix;
 PED6_FC_FONT_RENDER GameFontRender;
 
 BYTE FontSizeTable[] =
@@ -198,6 +199,8 @@ BOOL NTAPI LoadFileFromDat(PVOID buffer, ULONG datIndex, ULONG datOffset, ULONG 
 
     if (NT_SUCCESS(dat.Open(path + String::Format(L"DAT\\ED6_DT%02X\\%.*S", datIndex, sizeof(entry->FileName), entry->FileName))))
     {
+        //PrintConsoleW(L"%S\n", entry->FileName);
+
         *(PULONG)PtrAdd(buffer, 0) = fileSize;
         *(PULONG)PtrAdd(buffer, 4) = RAW_FILE_MAGIC;
         *(PULONG)PtrAdd(buffer, 8) = dat.GetSize32();
@@ -255,6 +258,24 @@ UNCOMPRESSED:
         dec     eax;
         ret;
     }
+}
+
+/************************************************************************
+  cpu usage
+************************************************************************/
+
+WNDPROC OrigGameWindowProc;
+
+LRESULT NTAPI GameWindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_ACTIVATEAPP:
+            SleepFix = wParam == FALSE;
+            break;
+    }
+
+    return OrigGameWindowProc(hwnd, message, wParam, lParam);
 }
 
 /************************************************************************
@@ -343,6 +364,8 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
+    //AllocConsole();
+
     BaseAddress = GetExeModuleHandle();
 
     //
@@ -363,7 +386,6 @@ BOOL Initialize(PVOID BaseAddress)
 
     Rtl::SetExeDirectoryAsCurrent();
 
-    //AllocConsole();
     Success = NT_SUCCESS(InitializeDWrite());
     InitializeTextPatcher(BaseAddress);
 
@@ -379,13 +401,18 @@ BOOL Initialize(PVOID BaseAddress)
 
     auto sleep = [] (ULONG ms) -> VOID
     {
-        Ps::Sleep(1);
+        Ps::Sleep(SleepFix ? 1 : ms);
     };
 
     PATCH_MEMORY_DATA p[] =
     {
-        FunctionCallVa((PVOID)0x4BE533, (ULONG64)(API_POINTER(::Sleep))sleep),
-        FunctionCallVa((PVOID)0x47CF77, (ULONG64)(API_POINTER(::Sleep))sleep),
+        MemoryPatchVa(
+            (ULONG64)(API_POINTER(::Sleep))[] (ULONG ms) -> VOID
+            {
+                Ps::Sleep(SleepFix ? ms == 0 ? 1 : ms : ms);
+            },
+            sizeof(PVOID), LookupImportTable(BaseAddress, nullptr, KERNEL32_Sleep)
+        ),
 
         MemoryPatchVa(
             (ULONG64)(API_POINTER(SetWindowPos))[](HWND Wnd, HWND InsertAfter, int X, int Y, int cx, int cy, UINT Flags) -> BOOL
@@ -399,6 +426,8 @@ BOOL Initialize(PVOID BaseAddress)
                     Y = ((WorkArea.bottom - WorkArea.top) - cy) / 2;
 
                     CLEAR_FLAG(Flags, SWP_NOMOVE);
+
+                    OrigGameWindowProc = (WNDPROC)SetWindowLongPtrW(Wnd, GWLP_WNDPROC, (LONG_PTR)GameWindowProc);
                 }
 
                 return SetWindowPos(Wnd, InsertAfter, X, Y, cx, cy, Flags);

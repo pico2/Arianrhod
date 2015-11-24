@@ -98,6 +98,8 @@ def AddCharChip(*chips):
         chip = ScenarioChipInfo(chip)
         scena.fs.write(chip.binary())
 
+    scena.fs.WriteByte(0xFF)
+
 def AddCharChipPat(*pats):
     scena.ScnInfoOffset[SCN_INFO_CHIP_PAT] = scena.fs.tell()
     scena.ScnInfoNumber[SCN_INFO_CHIP_PAT] = len(pats)
@@ -107,6 +109,8 @@ def AddCharChipPat(*pats):
     for chip in pats:
         chip = ScenarioChipInfo(chip)
         scena.fs.write(chip.binary())
+
+    scena.fs.WriteByte(0xFF)
 
 def declImpl(type, kwargs):
     obj = type()
@@ -240,7 +244,7 @@ def scpstr(ctrlcode, value = None):
 def SaveToFile():
     fs = scena.fs
 
-    fs.write(b'\x00' * (16 - fs.tell() % 16))
+    # fs.write(b'\x00' * (16 - fs.tell() % 16))
 
     scena.ScenaFunctionTable.Offset = fs.tell()
     scena.ScenaFunctionTable.Size = len(scena.ScpFunctionList) * 2
