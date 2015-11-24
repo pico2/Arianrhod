@@ -19,12 +19,97 @@ class ScenarioEntry:
         self.Offset = offset
         self.Size = size
 
+class ScenarioEntryPoint:
+    def __init__(self, fs = None):
+        # size = 0x44
+
+        if fs is None:
+            fs = fileio.FileStream(b'\x00' * 0x44)
+
+        self.Unknown_00         = fs.ReadLong()
+        self.Unknown_04         = fs.ReadLong()
+        self.Unknown_08         = fs.ReadLong()
+        self.Unknown_0C         = fs.ReadUShort()
+        self.Unknown_0E         = fs.ReadUShort()
+        self.Unknown_10         = fs.ReadLong()
+        self.Unknown_14         = fs.ReadLong()
+        self.Unknown_18         = fs.ReadLong()
+        self.Unknown_1C         = fs.ReadLong()
+        self.Unknown_20         = fs.ReadLong()
+        self.Unknown_24         = fs.ReadLong()
+        self.Unknown_28         = fs.ReadLong()
+        self.Unknown_2C         = fs.ReadLong()
+        self.Unknown_30         = fs.ReadUShort()
+        self.Unknown_32         = fs.ReadUShort()
+        self.Unknown_34         = fs.ReadUShort()
+        self.Unknown_36         = fs.ReadUShort()
+        self.Unknown_38         = fs.ReadUShort()
+        self.Unknown_3A         = fs.ReadUShort()
+        self.InitScenaIndex     = fs.ReadUShort()
+        self.InitFunctionIndex  = fs.ReadUShort()        # byte
+        self.EntryScenaIndex    = fs.ReadUShort()
+        self.EntryFunctionIndex = fs.ReadUShort()       # byte
+
+    def params(self):
+        align = 24
+        return [
+            '%s %s,' % (alignFormatKw(align, 'Unknown_00'),         self.Unknown_00),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_04'),         self.Unknown_04),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_08'),         self.Unknown_08),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_0C'),         self.Unknown_0C),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_0E'),         self.Unknown_0E),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_10'),         self.Unknown_10),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_14'),         self.Unknown_14),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_18'),         self.Unknown_18),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_1C'),         self.Unknown_1C),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_20'),         self.Unknown_20),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_24'),         self.Unknown_24),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_28'),         self.Unknown_28),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_2C'),         self.Unknown_2C),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_30'),         self.Unknown_30),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_32'),         self.Unknown_32),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_34'),         self.Unknown_34),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_36'),         self.Unknown_36),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_38'),         self.Unknown_38),
+            '%s %s,' % (alignFormatKw(align, 'Unknown_3A'),         self.Unknown_3A),
+            '%s %s,' % (alignFormatKw(align, 'InitScenaIndex'),     self.InitScenaIndex),
+            '%s %s,' % (alignFormatKw(align, 'InitFunctionIndex'),  self.InitFunctionIndex),
+            '%s %s,' % (alignFormatKw(align, 'EntryScenaIndex'),    self.EntryScenaIndex),
+            '%s %s,' % (alignFormatKw(align, 'EntryFunctionIndex'), self.EntryFunctionIndex),
+        ]
+
+    def binary(self):
+        return struct.pack('<LLLHHLLLLLLLLHHHHHHHHHH',
+                    ULONG(self.Unknown_00).value,
+                    ULONG(self.Unknown_04).value,
+                    ULONG(self.Unknown_08).value,
+                    USHORT(self.Unknown_0C).value,
+                    USHORT(self.Unknown_0E).value,
+                    ULONG(self.Unknown_10).value,
+                    ULONG(self.Unknown_14).value,
+                    ULONG(self.Unknown_18).value,
+                    ULONG(self.Unknown_1C).value,
+                    ULONG(self.Unknown_20).value,
+                    ULONG(self.Unknown_24).value,
+                    ULONG(self.Unknown_28).value,
+                    ULONG(self.Unknown_2C).value,
+                    USHORT(self.Unknown_30).value,
+                    USHORT(self.Unknown_32).value,
+                    USHORT(self.Unknown_34).value,
+                    USHORT(self.Unknown_36).value,
+                    USHORT(self.Unknown_38).value,
+                    USHORT(self.Unknown_3A).value,
+                    USHORT(self.InitScenaIndex).value,
+                    USHORT(self.InitFunctionIndex).value,
+                    USHORT(self.EntryScenaIndex).value,
+                    USHORT(self.EntryFunctionIndex).value,
+                )
+
 class ScenarioNpcInfo:
     def __init__(self, fs = None):
-        if fs == None:
-            return
-
         # size = 0x20
+        if fs is None:
+            fs = fileio.FileStream(b'\x00' * 0x20)
 
         self.X                  = fs.ReadULong()
         self.Z                  = fs.ReadULong()
@@ -46,7 +131,7 @@ class ScenarioNpcInfo:
 
     def params(self):
         align = 20
-        p = [
+        return [
             '%s %d,'   % (alignFormatKw(align, 'X'),                  LONG(self.X).value),
             '%s %d,'   % (alignFormatKw(align, 'Z'),                  LONG(self.Z).value),
             '%s %d,'   % (alignFormatKw(align, 'Y'),                  LONG(self.Y).value),
@@ -60,8 +145,6 @@ class ScenarioNpcInfo:
             '%s %s,'   % (alignFormatKw(align, 'TalkFunctionIndex'),  SHORT(self.TalkFunctionIndex).value),
             '%s %s,'   % (alignFormatKw(align, 'TalkScenaIndex'),     SHORT(self.TalkScenaIndex).value),
         ]
-
-        return p
 
     def binary(self):
         return struct.pack('<LLLHHLHHHHHH',
@@ -81,10 +164,9 @@ class ScenarioNpcInfo:
 
 class ScenarioMonsterInfo:
     def __init__(self, fs = None):
-        if fs == None:
-            return
-
         # size = 0x1C
+        if fs is None:
+            fs = fileio.FileStream(b'\x00' * 0x1C)
 
         self.X                      = fs.ReadLong()
         self.Z                      = fs.ReadLong()
@@ -133,11 +215,11 @@ class ScenarioMonsterInfo:
                 )
 
 class ScenarioEventInfo:
-    # 0x20 bytes
-
     def __init__(self, fs = None):
-        if fs == None:
-            return
+        # size = 0x20
+
+        if fs is None:
+            fs = fileio.FileStream(b'\x00' * 0x20)
 
         self.X              = fs.ReadLong()
         self.Y              = fs.ReadLong()
@@ -178,10 +260,9 @@ class ScenarioEventInfo:
 
 class ScenarioActorInfo:
     def __init__(self, fs = None):
-        if fs == None:
-            return
-
         # size = 0x24
+        if fs is None:
+            fs = fileio.FileStream(b'\x00' * 0x24)
 
         self.TriggerX           = fs.ReadULong()
         self.TriggerZ           = fs.ReadULong()
@@ -250,35 +331,6 @@ class ScenarioActorInfo:
                     USHORT(self.TalkFunctionIndex).value,
                     USHORT(self.Unknown_22).value
                 )
-
-class ScenarioPlaceNameInfo:
-
-    # size = 0x14
-
-    def __init__(self, fs = None):
-        if fs == None:
-            return
-
-        self.X          = fs.ReadFloat()
-        self.Z          = fs.ReadFloat()
-        self.Y          = fs.ReadFloat()
-        self.Flags1     = fs.ReadUShort()
-        self.Flags2     = fs.ReadUShort()
-        self.NameOffset = fs.ReadULong()
-
-        pos = fs.tell()
-        fs.seek(self.NameOffset)
-
-        self.Name = fs.ReadMultiByte(CODE_PAGE)
-
-        fs.seek(pos)
-
-    def param(self):
-        return '%s, %s, %s, 0x%04X, 0x%04X, "%s"' % (self.X, self.Z, self.Y, self.Flags1, self.Flags2, self.Name)
-
-    def binary(self):
-        return struct.pack('<fffHHL', self.X, self.Z, self.Y, self.Flags1, self.Flags2, self.NameOffset)
-
 
 class ScenarioInitData:
 
@@ -463,6 +515,8 @@ class ScenarioInfo:
         self.ScenaFunctionTable = ScenarioEntry(fs.ReadUShort(), fs.ReadUShort())
 
         self.IncludedScenario.index(0xFFFFFFFF)
+
+        self.EntryPoint = [ScenarioEntryPoint(fs) for i in range((self.ScnInfoOffset[0].Offset - fs.Position) // 0x44)]
 
         # file header end
 
@@ -651,7 +705,25 @@ class ScenarioInfo:
         hdr.append('')
 
         hdr += self.GenerateStringList()
-        # hdr += self.GenerateBattleInfo()
+
+        def AppendScpInfo(info, func):
+            if len(info) == 0:
+                return
+
+            for i in info:
+                if hasattr(i, 'params'):
+                    params = i.params()
+                    hdr.append('%s(' % func)
+                    hdr.extend(['    ' + p for p in params])
+                    hdr.append(')')
+                else:
+                    hdr.append('%s(%s)' % (func, i.param()))
+
+                hdr.append('')
+
+            hdr.append('')
+
+        AppendScpInfo(self.EntryPoint, 'DeclEntryPoint')
 
         if len(self.ScnInfo[SCN_INFO_CHIP]) != 0:
             hdr.append('AddCharChip(')
@@ -677,23 +749,6 @@ class ScenarioInfo:
                 index += 1
 
             hdr.append(')')
-            hdr.append('')
-
-        def AppendScpInfo(info, func):
-            if len(info) == 0:
-                return
-
-            for i in info:
-                if hasattr(i, 'params'):
-                    params = i.params()
-                    hdr.append('%s(' % func)
-                    hdr.extend(['    ' + p for p in params])
-                    hdr.append(')')
-                else:
-                    hdr.append('%s(%s)' % (func, i.param()))
-
-                hdr.append('')
-
             hdr.append('')
 
         AppendScpInfo(self.ScnInfo[SCN_INFO_NPC],       'DeclNpc')
@@ -742,14 +797,14 @@ class ScenarioInfo:
         lines.append('Try(main)')
         lines.append('')
 
-        filename = '%s.%s' % (basename, ext)
+        filename = '%s%s' % (basename, ext)
 
         if append_place_name:
             debugmap = ['a0000', 'map1', 'a0002']
             if self.MapName.lower() not in debugmap:
                 mapname = self.GetMapNameByIndex(self.MapIndex)
                 if mapname != '':
-                    filename = '%s.%s.%s' % (basename, mapname, ext)
+                    filename = '%s.%s%s' % (basename, mapname, ext)
 
         fs = open(filename, 'wb')
         fs.write(''.encode('utf_8_sig'))

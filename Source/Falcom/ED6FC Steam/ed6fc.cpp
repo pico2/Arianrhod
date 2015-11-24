@@ -13,9 +13,6 @@
 
 ML_OVERLOAD_NEW
 
-using ml::String;
-using ml::GrowableArray;
-
 ULONG SleepFix;
 PED6_FC_FONT_RENDER GameFontRender;
 
@@ -29,18 +26,6 @@ BYTE FontSizeTable[] =
     0x80, 0x90, 0xa0, 0xc0,
 };
 
-BYTE LetterWidthTable[] =
-{
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x0A, 0x06, 0x08, 0x0C, 0x0B, 0x0F, 0x0D, 0x05, 0x08, 0x07, 0x09, 0x0C, 0x06, 0x08, 0x06, 0x09,
-    0x0B, 0x09, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x06, 0x06, 0x0B, 0x0C, 0x0B, 0x0A,
-    0x10, 0x0D, 0x0C, 0x0D, 0x0D, 0x0C, 0x0B, 0x0D, 0x0D, 0x07, 0x09, 0x0D, 0x0B, 0x10, 0x0D, 0x0E,
-    0x0C, 0x0E, 0x0C, 0x0B, 0x0C, 0x0D, 0x0D, 0x10, 0x0C, 0x0C, 0x0C, 0x08, 0x09, 0x07, 0x0B, 0x0C,
-    0x07, 0x0A, 0x0B, 0x0A, 0x0B, 0x0A, 0x09, 0x0B, 0x0B, 0x06, 0x06, 0x0B, 0x06, 0x0F, 0x0B, 0x0B,
-    0x0B, 0x0B, 0x09, 0x09, 0x07, 0x0B, 0x0B, 0x0E, 0x0A, 0x0A, 0x09, 0x08, 0x07, 0x08, 0x0C, 0x0A,
-};
-
 USHORT FontColorTable[] =
 {
     0x0fff, 0x0fc7, 0x0f52, 0x08cf, 0x0fb4, 0x08fa, 0x0888, 0x0fee, 0x0853, 0x0333,
@@ -50,7 +35,7 @@ USHORT FontColorTable[] =
 DWriteRender *DWriteMBCSRenders[countof(FontSizeTable)];
 DWriteRender *DWriteAnsiRenders[countof(FontSizeTable)];
 
-VOID (NTAPI *StubGetGlyphsBitmap2)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
+VOID (NTAPI *StubGetGlyphsBitmap)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
 
 BOOL TranslateChar(PCSTR Text, USHORT& translated)
 {
@@ -83,37 +68,16 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
         case 0xF6A1:    // ■ 方块
             translated = 0xA181;
             return TRUE;
-    }
 
-    if (ch >= 0x80)
-        ch = SWAP2(ch);
+        case 0xADA1:    // … 中文省略号
+            translated = 0x6381;
+            return TRUE;
+    }
 
     return FALSE;
-/*
-    if (ch >= '０' && ch <= '９')
-    {
-        ch = ch - '０' + '侽';
-    }
-    else if (ch >= 'Ａ' && ch <= 'Ｚ')
-    {
-        ch = ch - 'Ａ' + '俙';
-    }
-    else if (ch >= 'ａ' && ch <= 'ｚ')
-    {
-        ch = ch - 'ａ' + '倎';
-    }
-    else
-    {
-        return FALSE;
-    }
-
-    translated = SWAP2(ch);
-
-    return TRUE;
-*/
 }
 
-PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
+PVOID NTAPI GetGlyphsBitmap(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
     DWriteRender    *mbcsRender, *ansiRender;
     ULONG_PTR       fontSize, fontIndex, color, width;
@@ -145,7 +109,7 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
         {
             CHAR tmp[3] = { translated & 0xFF, translated >> 8 };
 
-            StubGetGlyphsBitmap2(tmp, Buffer, Stride, ColorIndex);
+            StubGetGlyphsBitmap(tmp, Buffer, Stride, ColorIndex);
             width = fontSize;
             Text += 2;
         }
@@ -166,7 +130,7 @@ PVOID NTAPI GetGlyphsBitmap2(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG Color
 PVOID FASTCALL DrawTalkText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, PCSTR Text, ULONG ColorIndex)
 {
     CHAR tmp[3] = { Text[0], Text[0] < 0 ? Text[1] : 0 };
-    return GetGlyphsBitmap2(tmp, Buffer, Stride * 2, ColorIndex);
+    return GetGlyphsBitmap(tmp, Buffer, Stride * 2, ColorIndex);
 }
 
 NAKED PVOID NakedDrawDialogText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, PCSTR Text, ULONG ColorIndex)
@@ -182,7 +146,7 @@ NAKED PVOID NakedDrawDialogText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, P
         push    edx;                    // stride
         push    eax;                    // buffer
         push    ebx;                    // text
-        call    GetGlyphsBitmap2;
+        call    GetGlyphsBitmap;
         pop     ebx;
         ret     8;
     }
@@ -203,6 +167,92 @@ NAKED VOID NakedCalcBookTextWidth()
         push    eax;
         fild    dword ptr [esp];
         pop     eax;
+        ret;
+    }
+}
+
+/************************************************************************
+  load file
+************************************************************************/
+
+BOOL NTAPI LoadFileFromDat(PVOID buffer, ULONG datIndex, ULONG datOffset, ULONG fileSize)
+{
+    PED6_DIR_ENTRY entry;
+
+    entry = DirCacheTable[datIndex];
+    if (entry == nullptr)
+        return FALSE;
+
+    LOOP_FOREVER
+    {
+        if (entry->Offset == datOffset && entry->Size == fileSize)
+            break;
+
+        ++entry;
+    }
+
+    String path;
+    NtFileDisk dat;
+
+    GetModuleDirectory(path, nullptr);
+
+    if (NT_SUCCESS(dat.Open(path + String::Format(L"DAT\\ED6_DT%02X\\%.*S", datIndex, sizeof(entry->FileName), entry->FileName))))
+    {
+        *(PULONG)PtrAdd(buffer, 0) = fileSize;
+        *(PULONG)PtrAdd(buffer, 4) = RAW_FILE_MAGIC;
+        *(PULONG)PtrAdd(buffer, 8) = dat.GetSize32();
+        return NT_SUCCESS(dat.Read(PtrAdd(buffer, 12)));
+    }
+
+    if (NT_FAILED(dat.Open(path + String::Format(L"ED6_DT%02X.dat", datIndex))))
+        return FALSE;
+
+    dat.Seek(datOffset);
+    return NT_SUCCESS(dat.Read(buffer, fileSize));
+}
+
+ULONG_PTR NTAPI DecompressData(PBYTE& compressed, PBYTE& uncompressed)
+{
+    if (*(PULONG)&compressed[4] != RAW_FILE_MAGIC)
+        return ~0u;
+
+    ULONG size = *(PULONG)(compressed + 8);
+    CopyMemory(uncompressed, compressed + 12, size);
+
+    compressed += size + 12;
+    uncompressed += size;
+
+    return size;
+}
+
+NAKED VOID CDECL NakedLoadFileFromDat()
+{
+    INLINE_ASM
+    {
+        push    [esp + 0Ch];
+        push    [esp + 0Ch];
+        push    [esp + 0Ch];
+        push    edi;
+        call    LoadFileFromDat;
+        ret;
+    }
+}
+
+PVOID StubNakedDecompressData;
+
+NAKED VOID NakedDecompressData()
+{
+    INLINE_ASM
+    {
+        push    ebx;
+        push    edi;
+        call    DecompressData;
+        inc     eax;
+        jnz     UNCOMPRESSED;
+        jmp     [StubNakedDecompressData];
+
+UNCOMPRESSED:
+        dec     eax;
         ret;
     }
 }
@@ -378,10 +428,13 @@ BOOL Initialize(PVOID BaseAddress)
         // ctrl code
         MemoryPatchVa(0x0404ull, 2, 0x4850FE),
 
-        FunctionJumpVa(Success ? (PVOID)0x4B7C30 : IMAGE_INVALID_VA, GetGlyphsBitmap2, &StubGetGlyphsBitmap2),
-        FunctionJumpVa(Success ? (PVOID)0x484A40 : IMAGE_INVALID_VA, DrawTalkText),
-        FunctionJumpVa(Success ? (PVOID)0x484A90 : IMAGE_INVALID_VA, NakedDrawDialogText),
-        FunctionJumpVa(Success ? (PVOID)0x4B7920 : IMAGE_INVALID_VA, NakedCalcBookTextWidth),
+        FunctionJumpVa(Success ? GET_GLYPHS_BITMAP_VA       : IMAGE_INVALID_VA, GetGlyphsBitmap, &StubGetGlyphsBitmap),
+        FunctionJumpVa(Success ? DRAW_TALK_TEXT_VA          : IMAGE_INVALID_VA, DrawTalkText),
+        FunctionJumpVa(Success ? DRAW_DIALOG_TEXT_VA        : IMAGE_INVALID_VA, NakedDrawDialogText),
+        FunctionJumpVa(Success ? CACL_BOOK_TEXT_WIDTH_VA    : IMAGE_INVALID_VA, NakedCalcBookTextWidth),
+
+        FunctionJumpVa(LOAD_FILE_FROM_DAT_VA,   NakedLoadFileFromDat),
+        FunctionJumpVa(DECOMPRESS_DATA_VA,      NakedDecompressData, &StubNakedDecompressData),
     };
 
     PatchMemory(p, countof(p), BaseAddress);
