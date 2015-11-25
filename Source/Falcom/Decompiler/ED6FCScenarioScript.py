@@ -16,7 +16,7 @@ SCN_INFO_ACTOR          = 5
 SCN_INFO_MAXIMUM        = 6
 
 textPosTable = OrderedDict()
-ExtractText = True
+ExtractText = not True
 
 class ScenarioEntry:
     def __init__(self, offset = 0, size = 0):
@@ -449,12 +449,21 @@ class ScenarioInfo:
 
             for offset in offsetlist:
                 town.seek(offset)
-                self.MapNameList.append(town.ReadMultiByte(CODE_PAGE))
+                self.MapNameList.append(town.ReadMultiByte('GBK'))
 
         except:
             self.MapNameList = []
 
     def GetMapNameByIndex(self, index):
+        if index == 1:
+            return {
+                'Rolent'    : '洛连特',
+                'Zeiss'     : '蔡斯',
+                'Grancel'   : '格兰赛尔',
+                'Ruan'      : '卢安',
+                'Bose'      : '柏斯',
+            }.get(self.MapName, '')
+
         if index >= len(self.MapNameList):
             return ''
 
