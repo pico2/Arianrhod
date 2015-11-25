@@ -2,6 +2,7 @@ from Assembler.Assembler2 import *
 from Base.ED6FCBase import *
 import Instruction.ScenaOpTableED6FC as ed6fc
 
+ExtractText = not True
 # ed6fc.CODE_PAGE = '932'
 CODE_PAGE = ed6fc.CODE_PAGE
 
@@ -16,7 +17,7 @@ SCN_INFO_ACTOR          = 5
 SCN_INFO_MAXIMUM        = 6
 
 textPosTable = OrderedDict()
-ExtractText = not True
+replaceOption = {}
 
 class ScenarioEntry:
     def __init__(self, offset = 0, size = 0):
@@ -406,7 +407,7 @@ class ScenarioInfo:
 
         self.InitMapNameList(scenafile)
 
-        self.scenaName = os.path.splitext(os.path.basename(scenafile))[0].strip()
+        self.scenaName = os.path.splitext(os.path.basename(scenafile))[0].strip().upper()
         self.scenaTextIndex = 1
 
         # file header
@@ -440,7 +441,7 @@ class ScenarioInfo:
         self.MapNameList = []
 
         try:
-            t_town = os.path.abspath(os.path.join(GAME_PATH, '/ED6_DT02/T_TOWN  ._DT'))
+            t_town = os.path.abspath(os.path.join(GAME_PATH, 'ED6_DT02\\T_TOWN  ._DT'))
             town = fileio.FileStream(t_town)
 
             offsetlist = []
@@ -460,12 +461,12 @@ class ScenarioInfo:
 
         if index == 1:
             return {
-                'Rolent'    : '洛连特',
-                'Zeiss'     : '蔡斯',
-                'Grancel'   : '格兰赛尔',
-                'Ruan'      : '卢安',
-                'Bose'      : '柏斯',
-            }.get(self.MapName, '')
+                'rolent'    : '洛连特',
+                'zeiss'     : '蔡斯',
+                'grancel'   : '格兰赛尔',
+                'ruan'      : '卢安',
+                'bose'      : '柏斯',
+            }.get(self.MapName.lower(), '')
 
         if index >= len(self.MapNameList):
             return ''
@@ -522,6 +523,15 @@ class ScenarioInfo:
         if inst.OpCode == ed6fc.SetPlaceName:
             self.PlaceName = self.GetMapNameByIndex(inst.Operand[0])
 
+        if inst.OpCode not in [
+                ed6fc.ChrTalk,
+                ed6fc.AnonymousTalk,
+                ed6fc.NpcTalk,
+                ed6fc.Menu,
+                ed6fc.SetChrName
+            ]:
+            return
+
         if ExtractText:
             if inst.OpCode == ed6fc.ChrTalk:
                 text = inst.Operand[1]
@@ -545,22 +555,49 @@ class ScenarioInfo:
             except KeyError:
                 return
 
+            try:
+                ignoreText = replaceOption[self.scenaName]['text']
+            except KeyError:
+                ignoreText = None
+
+            def checkIgnore(oprlist):
+                if ignoreText is None:
+                    return
+
+                for i in oprlist:
+                    for string in inst.Operand[i]:
+                        string = str(string)
+                        for t in ignoreText:
+                            if t in string:
+                                return True
+
+                return False
+
             if inst.OpCode == ed6fc.ChrTalk:
+                if checkIgnore([1]):
+                    return
+
                 inst.Operand[1] = self.loadScpStringList(cntext[self.scenaTextIndex])
 
             elif inst.OpCode == ed6fc.AnonymousTalk:
+                if checkIgnore([0]):
+                    return
+
                 inst.Operand[0] = self.loadScpStringList(cntext[self.scenaTextIndex])
 
             elif inst.OpCode == ed6fc.NpcTalk:
+                if checkIgnore([1, 2]):
+                    return
+
                 inst.Operand[1] = self.loadScpStringList(cntext[self.scenaTextIndex])
                 inst.Operand[2] = self.loadScpStringList(cntext[self.scenaTextIndex + 1])
                 self.scenaTextIndex += 1
 
             elif inst.OpCode in [ed6fc.Menu, ed6fc.SetChrName]:
-                inst.Operand[-1] = self.loadScpStringList(cntext[self.scenaTextIndex])
+                if checkIgnore([-1]):
+                    return
 
-            else:
-                return
+                inst.Operand[-1] = self.loadScpStringList(cntext[self.scenaTextIndex])
 
             self.scenaTextIndex += 1
 
@@ -863,19 +900,20 @@ def procfile(file):
         scena.SaveToFile(os.path.splitext(file)[0] + '.py')
 
 def main():
-    global textPosTable
+    global textPosTable, replaceOption
 
     os.chdir(os.path.dirname(__file__))
 
     if not ExtractText:
-        textPosTable = json.load(open('text_pos_final.json', 'r', encoding = 'utf-8-sig'))
+        textPosTable = json.load(open('fc_sn_text_final.json', 'r', encoding = 'utf-8-sig'))
+        replaceOption = json.load(open('replace_option.json', 'r', encoding = 'utf-8-sig'))
 
     if len(sys.argv) == 1:
         sys.argv.append(r"T0001   ._SN")
     iterlib.forEachFile(procfile, sys.argv[1:], '*._SN')
 
     if ExtractText:
-        open('text_pos.json', 'wb').write(json.dumps(textPosTable, indent = 2, ensure_ascii = False).encode('utf_8_sig'))
+        open('fc_sn_text.json', 'wb').write(json.dumps(textPosTable, indent = 2, ensure_ascii = False).encode('utf_8_sig'))
 
 if __name__ == '__main__':
     Try(main)
