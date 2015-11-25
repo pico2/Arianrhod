@@ -358,7 +358,7 @@ class ScenarioInfo:
         # file header end
 
         self.ScenaFunctions     = []
-        self.PlaceName          = []
+        self.PlaceName          = ''
         self.StringTable        = []
         self.ScnInfo            = []
         self.CodeBlocks         = []
@@ -404,6 +404,8 @@ class ScenarioInfo:
         if fs.Length == 0:
             return False
 
+        self.InitMapNameList(scenafile)
+
         self.scenaName = os.path.splitext(os.path.basename(scenafile))[0].strip()
         self.scenaTextIndex = 1
 
@@ -433,8 +435,6 @@ class ScenarioInfo:
 
         self.CodeBlocks = self.DisassembleBlocks(fs)
 
-        self.InitMapNameList(scenafile)
-
 
     def InitMapNameList(self, scenafile):
         self.MapNameList = []
@@ -455,6 +455,9 @@ class ScenarioInfo:
             self.MapNameList = []
 
     def GetMapNameByIndex(self, index):
+        if self.MapName.startswith('map'):
+            return '调试地图'
+
         if index == 1:
             return {
                 'Rolent'    : '洛连特',
@@ -517,8 +520,7 @@ class ScenarioInfo:
         inst, fs = data.Instruction, data.FileStream
 
         if inst.OpCode == ed6fc.SetPlaceName:
-            ibp()
-            self.mapDisplayName = self.GetMapNameByIndex(inst.Operand[1])
+            self.PlaceName = self.GetMapNameByIndex(inst.Operand[0])
 
         if ExtractText:
             if inst.OpCode == ed6fc.ChrTalk:
@@ -604,7 +606,8 @@ class ScenarioInfo:
         return l
 
     def FormatInstructionCallback(self, data, text):
-        pass
+        if data.Instruction.OpCode == ed6fc.SetPlaceName and self.PlaceName:
+            return [text[0] + ' # ' + self.PlaceName]
 
     def FormatCodeBlocks(self):
         ed6fc.ed6fc_op_table.FunctionLabelList = self.GenerateFunctionLabelList(self.CodeBlocks)
@@ -653,7 +656,7 @@ class ScenarioInfo:
     def GenerateHeader(self, filename):
         filename = os.path.splitext(os.path.splitext(os.path.basename(filename))[0])[0] + '._SN'
 
-        mapname = self.GetMapNameByIndex(self.MapIndex)
+        mapname = self.PlaceName or self.GetMapNameByIndex(self.MapIndex)
 
         align = 20
 
@@ -776,11 +779,11 @@ class ScenarioInfo:
         filename = '%s%s' % (basename, ext)
 
         if append_place_name:
-            debugmap = ['a0000', 'map1', 'a0002']
-            if self.MapName.lower() not in debugmap:
-                mapname = self.GetMapNameByIndex(self.MapIndex)
-                if mapname != '':
-                    filename = '%s.%s%s' % (basename, mapname, ext)
+            if not self.PlaceName:
+                self.PlaceName = self.GetMapNameByIndex(self.MapIndex)
+
+            if self.PlaceName:
+                filename = '%s.%s%s' % (basename, self.PlaceName, ext)
 
         fs = open(filename, 'wb')
         fs.write(''.encode('utf_8_sig'))

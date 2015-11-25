@@ -1411,7 +1411,7 @@ ed6fc_op_list = \
     inst(OP_6C,                     'ii'),
     inst(OP_6D,                     'iiii'),
     inst(OP_6E,                     'ii'),
-    inst(OP_6F,                     'WL'),
+    inst(OP_6F,                     'Wi'),
     inst(OP_70,                     'WL'),
     inst(OP_71,                     'WW'),
     inst(OP_72,                     'WW'),

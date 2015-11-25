@@ -57,7 +57,7 @@ def CreateScenaFile(
     scena.fs = fileio.FileStream(FileName, 'wb+')
     scena.fs.seek(0x64)
 
-    scena.HeaderEndOffset = scena.fs.tell()
+    updateScnInfoOffset(-1)
 
 def BuildStringList(*strlist):
     scena.StringTable = list(strlist)
@@ -127,16 +127,12 @@ def declImpl(type, kwargs):
 
 def updateScnInfoOffset(current):
     scena.HeaderEndOffset = scena.fs.tell()
-
-    if current is None:
-        return
-
     for i in range(current + 1, SCN_INFO_MAXIMUM):
         scena.ScnInfoOffset[i] = scena.HeaderEndOffset
 
 def DeclEntryPoint(**kwargs):
     declImpl(ScenarioEntryPoint, kwargs)
-    updateScnInfoOffset(None)
+    updateScnInfoOffset(-1)
 
 def DeclNpc(**kwargs):
     AddScnInfo(SCN_INFO_NPC)
