@@ -357,6 +357,8 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    using namespace Mp;
+
     BOOL        Success;
     ULONG_PTR   SizeOfImage;
     PVOID       FaceBuffer;
@@ -369,15 +371,6 @@ BOOL Initialize(PVOID BaseAddress)
     BaseAddress = GetExeModuleHandle();
 
     //
-    // 4A12E0
-    // check ascii range
-    //
-    // 4A0DE0
-    // check sjis range
-    //
-    // 4A1300
-    // char outline
-    //
     // FT_Load_Glyph
     // FT_Get_Glyph
     // FT_Render_Glyph
@@ -387,7 +380,7 @@ BOOL Initialize(PVOID BaseAddress)
     Rtl::SetExeDirectoryAsCurrent();
 
     Success = NT_SUCCESS(InitializeDWrite());
-    InitializeTextPatcher(BaseAddress);
+    PatchExeText(BaseAddress);
 
     //DWriteRenders[9]->DrawRune(L'P', FontColorTable[0], 0, 0, 0), Ps::ExitProcess(0);
 
@@ -396,13 +389,6 @@ BOOL Initialize(PVOID BaseAddress)
         GameFontRender = FindFontRender(BaseAddress);
         Success = GameFontRender != nullptr;
     }
-
-    using namespace Mp;
-
-    auto sleep = [] (ULONG ms) -> VOID
-    {
-        Ps::Sleep(SleepFix ? 1 : ms);
-    };
 
     PATCH_MEMORY_DATA p[] =
     {

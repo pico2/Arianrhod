@@ -168,7 +168,7 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, PCWSTR FaceName, ULONG_PTR Fo
 
 NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
 {
-    DWRITE_GLYPH_RUN        run;
+    DWRITE_GLYPH_RUN        rune;
     HDC                     dc;
     SIZE                    size;
     FLOAT                   advance;
@@ -178,14 +178,14 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
 
     advance = glyphMetrics.advanceWidth * this->ratio;
 
-    run.fontFace        = this->fontFace;
-    run.fontEmSize      = this->fontEmSize;
-    run.glyphCount      = 1;
-    run.glyphIndices    = &glyphIndice;
-    run.glyphAdvances   = &advance;
-    run.glyphOffsets    = nullptr;
-    run.isSideways      = FALSE;
-    run.bidiLevel       = 0;
+    rune.fontFace       = this->fontFace;
+    rune.fontEmSize     = this->fontEmSize;
+    rune.glyphCount     = 1;
+    rune.glyphIndices   = &glyphIndice;
+    rune.glyphAdvances  = &advance;
+    rune.glyphOffsets   = nullptr;
+    rune.isSideways     = FALSE;
+    rune.bidiLevel      = 0;
 
     dc = this->renderTarget->GetMemoryDC();
     this->renderTarget->GetSize(&size);
@@ -199,7 +199,7 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
         0,
         this->glyphMetrics.verticalOriginY * this->ratio,
         DWRITE_MEASURING_MODE_NATURAL,
-        &run,
+        &rune,
         this->renderingParams,
         RGB(255, 255, 255),
         blackBox
@@ -208,7 +208,15 @@ NTSTATUS DWriteRender::DrawRenderTarget(UINT16 glyphIndice, PRECT blackBox)
     return STATUS_SUCCESS;
 }
 
-NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_PTR OutputStride, PULONG_PTR runeWidth)
+NTSTATUS
+DWriteRender::
+DrawRune(
+    WCHAR       ch,
+    ULONG_PTR   color,
+    PVOID       output,
+    ULONG_PTR   outputStride,
+    PULONG_PTR  runeWidth
+)
 {
     UINT32      codePoint;
     UINT16      glyphIndice;
@@ -220,7 +228,7 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     BITMAP      bmp;
     IMAGE_BITMAP_HEADER header;
 
-    BOOL show = FALSE;
+    BOOL dbg = FALSE;
 
     //ch = L'¡£';
 
@@ -231,7 +239,7 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
     //SaveToBmpFile();
     //return 0;
 
-    if (show)
+    if (dbg)
     {
         PrintConsole(L"rawrc = {%d %d %d %d}\n", blackBox);
     }
@@ -259,7 +267,7 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
 
     fontSize = this->fontHeight;
 
-    if (show)
+    if (dbg)
     {
         SaveToBmpFile();
         PrintConsole(L"rc = {%d %d %d %d} stride = %d w = %d h = %d fs = %d\n", blackBox, stride, width, height, fontSize);
@@ -299,7 +307,7 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
         }
     }
 
-    out = (PBYTE)Output;
+    out = (PBYTE)output;
     for (LONG_PTR h = fontSize; h != 0; --h)
     {
         PUSHORT o = (PUSHORT)out - 1;
@@ -311,10 +319,10 @@ NTSTATUS DWriteRender::DrawRune(WCHAR ch, ULONG_PTR Color, PVOID Output, ULONG_P
             if (c == 0)
                 continue;
 
-            *o = (c << 12) | Color;
+            *o = (c << 12) | color;
         }
 
-        out += OutputStride;
+        out += outputStride;
         if ((PBYTE)o > out)
         {
             ExceptionBox(L"out of range 2");

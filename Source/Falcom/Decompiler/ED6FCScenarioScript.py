@@ -440,7 +440,7 @@ class ScenarioInfo:
         self.MapNameList = []
 
         try:
-            t_town = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(scenafile)), '../ED6_DT02/T_TOWN  ._DT'))
+            t_town = os.path.abspath(os.path.join(GAME_PATH, '/ED6_DT02/T_TOWN  ._DT'))
             town = fileio.FileStream(t_town)
 
             offsetlist = []

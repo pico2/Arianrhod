@@ -43,7 +43,7 @@ PatchAllReference(
     return patched ? STATUS_SUCCESS : STATUS_NOT_FOUND;
 }
 
-NTSTATUS InitializeTextPatcher(PVOID BaseAddress)
+NTSTATUS PatchExeText(PVOID BaseAddress)
 {
     NTSTATUS        status;
     ULONG           count, textProtection, dataProtection;

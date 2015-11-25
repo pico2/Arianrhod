@@ -24,7 +24,7 @@ typedef struct
 
 } ED6_FC_FONT_RENDER, *PED6_FC_FONT_RENDER;
 
-NTSTATUS InitializeTextPatcher(PVOID BaseAddress);
+NTSTATUS PatchExeText(PVOID BaseAddress);
 
 #define GET_GLYPHS_BITMAP_VA    (PVOID)0x4B7C30
 #define DRAW_TALK_TEXT_VA       (PVOID)0x484A40
