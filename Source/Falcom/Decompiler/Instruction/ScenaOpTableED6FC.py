@@ -31,7 +31,7 @@ InstructionNames[0x0F]  = 'Battle'
 InstructionNames[0x10]  = 'OP_10'
 InstructionNames[0x11]  = 'OP_11'
 InstructionNames[0x12]  = 'StopSound'
-InstructionNames[0x13]  = 'OP_13'
+InstructionNames[0x13]  = 'SetPlaceName'
 InstructionNames[0x14]  = 'BlurSwitch'
 InstructionNames[0x15]  = 'OP_15'
 InstructionNames[0x16]  = 'OP_16'
@@ -1319,7 +1319,7 @@ ed6fc_op_list = \
     inst(OP_10,                     'BB'),
     inst(OP_11,                     'BBBLLL'),
     inst(StopSound,                 'LLL'),
-    inst(OP_13,                     'W'),   # poswnd
+    inst(SetPlaceName,              'W'),
     inst(BlurSwitch),
     inst(OP_15),
     inst(OP_16,                     NO_OPERAND,             0,                          scp_16),

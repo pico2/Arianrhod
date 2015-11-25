@@ -516,6 +516,10 @@ class ScenarioInfo:
 
         inst, fs = data.Instruction, data.FileStream
 
+        if inst.OpCode == ed6fc.SetPlaceName:
+            ibp()
+            self.mapDisplayName = self.GetMapNameByIndex(inst.Operand[1])
+
         if ExtractText:
             if inst.OpCode == ed6fc.ChrTalk:
                 text = inst.Operand[1]
