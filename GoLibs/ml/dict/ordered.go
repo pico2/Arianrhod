@@ -10,6 +10,11 @@ type orderedDict struct {
     keys Array
 }
 
+type orderedDictItem struct {
+    Key     interface{}
+    Value   interface{}
+}
+
 type OrderedDict struct {
     *orderedDict
 }
@@ -98,4 +103,14 @@ func (self *orderedDict) Values() Array {
     }
 
     return values
+}
+
+func (self *orderedDict) Items() []orderedDictItem {
+    items := []orderedDictItem{}
+
+    for _, key := range self.keys {
+        items = append(items, self.Get(key))
+    }
+
+    return items
 }
