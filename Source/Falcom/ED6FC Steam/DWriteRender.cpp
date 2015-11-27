@@ -119,14 +119,24 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, PCWSTR FaceName, ULONG_PTR Fo
         }
         else
         {
+            BOOL isSupportedFontType;
+            UINT faceCount;
+            DWRITE_FONT_FILE_TYPE fontType;
+            DWRITE_FONT_FACE_TYPE faceType;
+
             hr = dwrite->CreateFontFileReference(FontPath, nullptr, &fontFile);
             FAIL_BREAK(hr);
 
-            hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &this->fontFace);
-            if (hr == DWRITE_E_FILEFORMAT)
+            hr = fontFile->Analyze(&isSupportedFontType, &fontType, &faceType, &faceCount);
+            FAIL_BREAK(hr);
+
+            if (isSupportedFontType == FALSE)
             {
-                hr = dwrite->CreateFontFace(DWRITE_FONT_FACE_TYPE_TRUETYPE_COLLECTION, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &this->fontFace);
+                hr = DWRITE_E_FILEFORMAT;
+                break;
             }
+
+            hr = dwrite->CreateFontFace(faceType, 1, &fontFile, 0, DWRITE_FONT_SIMULATIONS_NONE, &this->fontFace);
             FAIL_BREAK(hr);
         }
 

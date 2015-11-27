@@ -200,7 +200,7 @@ InstructionNames[0xB8]  = 'OP_B8'
 InstructionNames[0xB9]  = 'OP_B9'
 InstructionNames[0xBA]  = 'OP_BA'
 InstructionNames[0xBB]  = 'OP_BB'
-InstructionNames[0xDE]  = 'OP_DE'
+InstructionNames[0xDE]  = 'SaveClearData'
 
 
 for op, name in InstructionNames.items():
@@ -1488,7 +1488,7 @@ ed6fc_op_list = \
     inst(OP_B9,                     'WW'),
     inst(OP_BA,                     'BW'),
     inst(OP_BB,                     'BB'),
-    inst(OP_DE),
+    inst(SaveClearData),
 ]
 
 del inst

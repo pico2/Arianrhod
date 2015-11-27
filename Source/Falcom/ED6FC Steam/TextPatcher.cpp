@@ -31,7 +31,11 @@ PatchAllReference(
 
         // mov r32, const
         // push const
-        if (isDataSection == TRUE || (reference[-1] & 0xF0) == 0xB0 || reference[-1] == 0x68)
+        // mov dword ptr [r32+const], const
+        if (isDataSection == TRUE ||
+            (reference[-1] & 0xF0) == 0xB0 ||
+            reference[-1] == 0x68 ||
+            *(PUSHORT)&reference[-4] == 0x44C7)
         {
             *(PCSTR *)reference = newText;
             patched = TRUE;

@@ -51,6 +51,8 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
         case 0x4081:    // 丂   空格
         case 0x5C81:    // 乗   横杠
         case 0x9A81:    // 仛   ★
+        case 0x4C87:    // 圆圈13
+        case 0x4D87:    // 圆圈14
             translated = ch;
             return TRUE;
 
@@ -72,6 +74,10 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
 
         case 0xADA1:    // … 中文省略号
             translated = 0x6381;
+            return TRUE;
+
+        case 0xA4A1:    // 中点
+            translated = 0x4581;
             return TRUE;
     }
 
@@ -199,7 +205,9 @@ BOOL NTAPI LoadFileFromDat(PVOID buffer, ULONG datIndex, ULONG datOffset, ULONG 
 
     if (NT_SUCCESS(dat.Open(path + String::Format(L"DAT\\ED6_DT%02X\\%.*S", datIndex, sizeof(entry->FileName), entry->FileName))))
     {
-        //PrintConsoleW(L"%S\n", entry->FileName);
+#if DBG
+        PrintConsoleW(L"%S\n", entry->FileName);
+#endif
 
         *(PULONG)PtrAdd(buffer, 0) = fileSize;
         *(PULONG)PtrAdd(buffer, 4) = RAW_FILE_MAGIC;
@@ -352,6 +360,10 @@ NTSTATUS InitializeDWrite()
 
 BOOL UnInitialize(PVOID BaseAddress)
 {
+#if DBG
+    PauseConsole(L"any key");
+#endif
+
     return FALSE;
 }
 
@@ -366,7 +378,11 @@ BOOL Initialize(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    //AllocConsole();
+#if DBG
+
+    AllocConsole();
+
+#endif
 
     BaseAddress = GetExeModuleHandle();
 

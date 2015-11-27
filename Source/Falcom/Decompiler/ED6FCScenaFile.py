@@ -24,7 +24,7 @@ class ScenarioInfoPort(ScenarioInfo):
 
         self.ScpFunctionList    = []
 
-scena = ScenarioInfoPort()
+scena = None
 
 def CreateScenaFile(
         FileName,
@@ -37,6 +37,10 @@ def CreateScenaFile(
         Reserved,
         IncludedScenario,
     ):
+
+    global scena
+
+    scena = ScenarioInfoPort()
 
     scena.MapName               = MapName
     scena.Location              = Location
@@ -285,6 +289,8 @@ def SaveToFile():
 
     fs.seek(0)
     fs.write(scena.binary())
+
+    fs.close()
 
     print('done')
 

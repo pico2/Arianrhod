@@ -14,7 +14,6 @@ def main():
             print(k.ljust(10), len(v) - len(en[k]))
 
     open('fc_sn_text_final.json', 'wb').write(json.dumps(cn2, indent = 2, ensure_ascii = False).encode('utf-8-sig'))
-    console.pause('done')
 
 if __name__ == '__main__':
     Try(main)

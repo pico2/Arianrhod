@@ -103,13 +103,13 @@ PVOID FASTCALL GetLicenseManager(PVOID This)
     PWSTR               BufferW;
     PLICENSE_MANAGER    Manager;
 
-    Manager = *(PLICENSE_MANAGER *)PtrAdd(This, 0x24);
+    Manager = *(PLICENSE_MANAGER *)PtrAdd(This, 0x28);
     if (Manager != nullptr)
         return Manager;
 
     StubGetLicenseManager(This);
 
-    Manager = *(PLICENSE_MANAGER *)PtrAdd(This, 0x24);
+    Manager = *(PLICENSE_MANAGER *)PtrAdd(This, 0x28);
     Manager->LicenseData = &LicenseData;
 
     Buffer = LicenseData.UserNameLower;
