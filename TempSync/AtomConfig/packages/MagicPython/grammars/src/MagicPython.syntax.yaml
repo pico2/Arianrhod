@@ -267,7 +267,15 @@ repository:
 
   member-access:
     begin: \.\s*(?!\.)
-    end: (?<=\S)(?=\W)|$
+    end: |
+      (?x)
+        # stop when you've just read non-whitespace followed by non-word
+        # i.e. when finished reading an identifier or function call
+        (?<=\S)(?=\W) |
+        # stop when seeing the start of something that's not a word,
+        # i.e. when seeing a non-identifier
+        (^|(?<=\s))(?=[^\\\w\s]) |
+        $
     patterns:
       - include: '#function-call'
       - include: '#member-access-base'
@@ -1077,7 +1085,7 @@ repository:
         match: |
           (?x)
             (?<!\.) \b(
-              __import__ | abs | all | any | apply | ascii | bin | callable
+              __import__ | abs | all | any | ascii | bin | callable
               | chr | compile | copyright | credits | delattr | dir | divmod
               | enumerate | eval | exec | exit | filter | format | getattr
               | globals | hasattr | hash | help | hex | id | input

@@ -1,4 +1,4 @@
-.PHONY: all test release devenv
+.PHONY: all test release devenv publish
 
 all: devenv release
 
@@ -16,7 +16,7 @@ test: release
 		then echo "Error: package.version != git.tag" && exit 1 ; fi
 
 devenv:
-	npm install syntaxdev@0.0.9
+	npm install syntaxdev@0.0.10
 
 release:
 	./node_modules/.bin/syntaxdev build-plist --in grammars/src/MagicPython.syntax.yaml --out grammars/MagicPython.tmLanguage
@@ -26,3 +26,7 @@ release:
 	./node_modules/.bin/syntaxdev build-cson --in grammars/src/MagicRegExp.syntax.yaml --out grammars/MagicRegExp.cson
 
 	./node_modules/.bin/syntaxdev scopes --syntax grammars/src/MagicPython.syntax.yaml > misc/scopes
+
+publish: test
+	apm publish patch
+	vsce publish

@@ -10,7 +10,7 @@ module.exports =
   disableForSelector: '.source.python .comment, .source.python .string'
   inclusionPriority: 1
   suggestionPriority: 2
-  excludeLowerPriority: false
+  excludeLowerPriority: true
 
   _log: (msg...) ->
     if atom.config.get('autocomplete-python.outputDebug')
@@ -85,6 +85,12 @@ module.exports =
         handle()
       else
         throw error
+
+    setTimeout =>
+      @_log 'Killing python process after timeout...'
+      if @provider and @provider.process
+        @provider.process.kill()
+    , 60 * 30 * 1000
 
     selector = 'atom-text-editor[data-grammar~=python]'
     atom.commands.add selector, 'autocomplete-python:go-to-definition', =>
@@ -250,12 +256,14 @@ module.exports =
     return new Promise (resolve) =>
       @requests[payload.id] = resolve
 
-  goToDefinition: ->
+  goToDefinition: (editor, bufferPosition) ->
+    if not editor
+      editor = atom.workspace.getActiveTextEditor()
+    if not bufferPosition
+      bufferPosition = editor.getCursorBufferPosition()
     if @definitionsView
       @definitionsView.destroy()
     @definitionsView = new DefinitionsView()
-    editor = atom.workspace.getActiveTextEditor()
-    bufferPosition = editor.getCursorBufferPosition()
     @getDefinitions(editor, bufferPosition).then (results) =>
       @definitionsView.setItems(results)
       if results.length == 1
