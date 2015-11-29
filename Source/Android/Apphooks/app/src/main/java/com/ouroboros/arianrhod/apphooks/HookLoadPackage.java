@@ -44,6 +44,10 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
                 new HookWeChat().handleLoadPackage(pkg);
                 break;
 
+            case "com.tencent.mobileqq":
+                new HookMobileQQ().handleLoadPackage(pkg);
+                break;
+
             case "flar2.exkernelmanager":
 //                new HookExkernelManager().handleLoadPackage(pkg);
                 break;

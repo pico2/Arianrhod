@@ -159,25 +159,6 @@ NAKED PVOID NakedDrawDialogText(PVOID thiz, PVOID, PVOID Buffer, ULONG Stride, P
     }
 }
 
-NAKED VOID NakedCalcBookTextWidth()
-{
-    INLINE_ASM
-    {
-        movzx   edx, [eax];
-        mov     ecx, GameFontRender;
-        mov     ecx, [ecx]ED6_FC_FONT_RENDER.FontSizeIndex;
-        movzx   ecx, FontSizeTable[ecx];
-        mov     eax, ecx;
-        shr     eax, 1;
-        cmp     edx, 80h;
-        cmovae  eax, ecx;
-        push    eax;
-        fild    dword ptr [esp];
-        pop     eax;
-        ret;
-    }
-}
-
 /************************************************************************
   load file
 ************************************************************************/
@@ -456,13 +437,39 @@ BOOL Initialize(PVOID BaseAddress)
         MemoryPatchVa(0xEBull, 1, 0x4B7D1B),
         MemoryPatchVa(0xEBull, 1, 0x4D9F4D),
 
+        /************************************************************************
+         calc ansi char width
+
+        004B7926    .  8D51 E0             lea     edx, dword ptr [ecx-0x20]
+        004B7929    .  83FA 5F             cmp     edx, 0x5F
+        004B792C       76 40               jbe     short 0x4B796E                   <--
+        004B792E    .  3C 80               cmp     al, 0x80
+        004B7930    .  72 08               jb      short 0x4B793A
+        004B7932    .  3C A0               cmp     al, 0xA0
+        004B7934    .  EB 23               jmp     short 0x4B7959                   <==
+        004B7936    .  3C E0               cmp     al, 0xE0
+        004B7938    .  73 1F               jnb     short 0x4B7959
+        ************************************************************************/
+        MemoryPatchVa(0xCull, 1, 0x4B78CA),
+        MemoryPatchVa(0xCull, 1, 0x4B792D),
+        MemoryPatchVa(0xCull, 1, 0x4B79AE),
+        MemoryPatchVa(0xCull, 1, 0x4B7A46),
+        MemoryPatchVa(0xCull, 1, 0x4B7D14),
+
+        // 物品已有个数窗口位置
+        // CWindow::CWindow(104, 14, ...)
+        MemoryPatchVa(0x104ull, 4, 0x4973BA),  // x
+        MemoryPatchVa(0x14ull,  4, 0x4973CE),  // width
+        MemoryPatchVa(0x104ull, 4, 0x49AADB),  // x
+        MemoryPatchVa(0x14ull,  4, 0x49AAEF),  // width
+
         // ctrl code
         MemoryPatchVa(0x0404ull, 2, 0x4850FE),
 
         FunctionJumpVa(Success ? GET_GLYPHS_BITMAP_VA       : IMAGE_INVALID_VA, GetGlyphsBitmap, &StubGetGlyphsBitmap),
         FunctionJumpVa(Success ? DRAW_TALK_TEXT_VA          : IMAGE_INVALID_VA, DrawTalkText),
         FunctionJumpVa(Success ? DRAW_DIALOG_TEXT_VA        : IMAGE_INVALID_VA, NakedDrawDialogText),
-        FunctionJumpVa(Success ? CACL_BOOK_TEXT_WIDTH_VA    : IMAGE_INVALID_VA, NakedCalcBookTextWidth),
+        //FunctionJumpVa(Success ? CACL_BOOK_TEXT_WIDTH_VA    : IMAGE_INVALID_VA, NakedCalcBookTextWidth),
 
         FunctionJumpVa(LOAD_FILE_FROM_DAT_VA,   NakedLoadFileFromDat),
         FunctionJumpVa(DECOMPRESS_DATA_VA,      NakedDecompressData, &StubNakedDecompressData),
