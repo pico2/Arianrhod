@@ -151,19 +151,29 @@ func (self *File) Write(args ...interface{}) int {
             buffer = append(buffer, b.(byte))
 
         case int16, uint16:
-            self.Endian.PutUint16(buffer, b.(uint16))
+            buf := [8]byte{}
+            self.Endian.PutUint16(buf[:], b.(uint16))
+            buffer = buf[:2]
 
         case int32, uint32:
-            self.Endian.PutUint32(buffer, b.(uint32))
+            buf := [8]byte{}
+            self.Endian.PutUint32(buf[:], b.(uint32))
+            buffer = buf[:4]
 
         case int64, uint64:
-            self.Endian.PutUint64(buffer, b.(uint64))
+            buf := [8]byte{}
+            self.Endian.PutUint64(buf[:], b.(uint64))
+            buffer = buf[:8]
 
         case float32:
-            self.Endian.PutUint32(buffer, math.Float32bits(b))
+            buf := [8]byte{}
+            self.Endian.PutUint32(buf[:], math.Float32bits(b))
+            buffer = buf[:4]
 
         case float64:
-            self.Endian.PutUint64(buffer, math.Float64bits(b))
+            buf := [8]byte{}
+            self.Endian.PutUint64(buf[:], math.Float64bits(b))
+            buffer = buf[:8]
 
         case []byte:
             buffer = b
@@ -192,7 +202,12 @@ func (self *File) Write(args ...interface{}) int {
 }
 
 func (self *File) ReadAll() (data []byte) {
-    length := self.Length()
+    self.SetPosition(0)
+    return self.ReadRemaining()
+}
+
+func (self *File) ReadRemaining() (data []byte) {
+    length := self.Remaining()
 
     for length > 0 {
         read := self.Read(int(length))

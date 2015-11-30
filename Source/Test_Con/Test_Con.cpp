@@ -124,11 +124,23 @@ void quick_sort(int *array, int count)
 
 using ml::HashTableT;
 
+int foo(INT n)
+{
+    return 1;
+}
+
+int foo(UINT n)
+{
+    return 2;
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintConsole(L"%S\n", setlocale(LC_ALL, ".936"));
+    PrintConsole(L"%d\n", foo(0x7FFFFFFF));
+    PrintConsole(L"%d\n", foo(0x7FFFFFFF + 1));
+    PrintConsole(L"%d\n", foo(0x80000000 + 1));
 
     return;
 

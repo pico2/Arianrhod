@@ -3,6 +3,11 @@ package dict
 import (
     . "fmt"
     . "ml/array"
+    . "ml/trace"
+
+    "encoding/json"
+
+    "ml/io2/filestream"
 )
 
 type orderedDict struct {
@@ -79,6 +84,10 @@ func (self *orderedDict) String() string {
     // return self.dict.String()
 }
 
+func (self *orderedDict) Length() int {
+    return len(self.keys)
+}
+
 func (self *orderedDict) Set(key, value interface{}) {
     if self.keys.Contain(key) == false {
         self.keys.Append(key)
@@ -109,8 +118,43 @@ func (self *orderedDict) Items() []orderedDictItem {
     items := []orderedDictItem{}
 
     for _, key := range self.keys {
-        items = append(items, self.Get(key))
+        items = append(items, orderedDictItem{Key: key, Value: self.Get(key)})
     }
 
     return items
+}
+
+func (self *orderedDict) MarshalJSON() ([]byte, error) {
+    buffer := filestream.CreateMemory()
+
+    buffer.Write("{")
+
+    for i, item := range self.Items() {
+        if i != 0 {
+            buffer.Write(byte(','))
+        }
+
+        buffer.Write(Sprintf("%q:", item.Key))
+        data, err := json.Marshal(item.Value)
+        RaiseIf(err)
+        buffer.Write(data)
+    }
+
+    buffer.Write("}")
+
+    return buffer.ReadAll(), nil
+}
+
+func (self *orderedDict) JsonIndent(indent string) []byte {
+    data, err := json.MarshalIndent(self, "", indent)
+    RaiseIf(err)
+
+    return data
+}
+
+func (self *orderedDict) Json() []byte {
+    data, err := json.Marshal(self)
+    RaiseIf(err)
+
+    return data
 }

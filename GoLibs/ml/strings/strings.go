@@ -2,7 +2,7 @@ package strings
 
 import (
     . "fmt"
-    . "ml/dict"
+    // . "ml/dict"
     . "ml/trace"
 
     "bytes"
@@ -14,7 +14,7 @@ import (
 
 type String string
 
-func Format(format interface{}, params Dict) String {
+func Format(format interface{}, params interface{}) String {
     t := template.Must(template.New("").Parse(Sprintf("%v", format)))
     b := bytes.NewBufferString("")
 
@@ -44,7 +44,7 @@ func (self String) IsDigit() bool {
     return err == nil
 }
 
-func (self String) Format(params Dict) String {
+func (self String) Format(params interface{}) String {
     return Format(self, params)
 }
 

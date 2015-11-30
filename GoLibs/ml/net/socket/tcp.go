@@ -59,8 +59,14 @@ func (self *TcpSocket) Write(buf []byte) (n int) {
         self.conn.SetWriteDeadline(time.Now().Add(self.WriteTimeout))
     }
 
-    n, err := self.conn.Write(buf)
-    RaiseSocketError(err)
+    var err error
+
+    for n != len(buf) {
+        sent := 0
+        sent, err = self.conn.Write(buf)
+        RaiseSocketError(err)
+        n += sent
+    }
 
     return n
 }

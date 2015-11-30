@@ -6,9 +6,6 @@ import (
     "bytes"
 )
 
-var BigEndian = binary.BigEndian
-var LittleEndian = binary.LittleEndian
-
 func IntToBytes(data interface{}, length int, byteOrder binary.ByteOrder) []byte {
     w := bytes.NewBuffer(nil)
     err := binary.Write(w, byteOrder, data)
