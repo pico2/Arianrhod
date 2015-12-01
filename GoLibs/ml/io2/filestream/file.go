@@ -41,8 +41,15 @@ func Create(name string) *File {
     return CreateFile(name, READWRITE)
 }
 
-func CreateMemory() *File {
-    return &File{newBytesIO(), LittleEndian}
+func CreateMemory(buffer ...[]byte) *File {
+    buf := &File{newBytesIO(), LittleEndian}
+
+    if len(buffer) != 0 {
+        buf.Write(buffer[0])
+        buf.SetPosition(0)
+    }
+
+    return buf
 }
 
 func CreateFile(name string, mode int) *File {
@@ -272,6 +279,21 @@ func (self *File) ReadFloat() float32 {
 
 func (self *File) ReadDouble() float64 {
     return math.Float64frombits(self.ReadULong64())
+}
+
+func (self *File) ReadUVarint() (ret uint64) {
+    buf := [binary.MaxVarintLen64]byte{}
+
+    var b byte = 0x80
+
+    for i := 0; b >= 0x80; i++ {
+        b = byte(self.ReadByte())
+        buf[i] = b
+    }
+
+    ret, _ = binary.Uvarint(buf[:])
+
+    return
 }
 
 func (self *File) ReadMultiByte(encoding ...Encoding) String {

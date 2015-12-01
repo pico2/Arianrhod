@@ -42,6 +42,10 @@ func (self *TcpSocket) Connect(host string, port int, timeout time.Duration) {
 func (self *TcpSocket) Read(n int) (buf []byte) {
     var err error
 
+    if n == 0 {
+        return
+    }
+
     buf = make([]byte, n)
 
     if self.ReadTimeout > 0 {
@@ -55,6 +59,10 @@ func (self *TcpSocket) Read(n int) (buf []byte) {
 }
 
 func (self *TcpSocket) Write(buf []byte) (n int) {
+    if len(buf) == 0 {
+        return 0
+    }
+
     if self.WriteTimeout > 0 {
         self.conn.SetWriteDeadline(time.Now().Add(self.WriteTimeout))
     }

@@ -49,7 +49,6 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
         case 0x9F81:    // Åü   ¡‚–Œ
         case 0xAA84:    // Ñ™   ∫·∏‹
         case 0x4081:    // Å@   ø’∏Ò
-        case 0x5C81:    // Å\   ∫·∏‹
         case 0x9A81:    // Åö   °Ô
         case 0x4C87:    // ‘≤»¶13
         case 0x4D87:    // ‘≤»¶14
@@ -58,6 +57,10 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
 
         case 0xA1A1:    // »´Ω«ø’∏Ò
             translated = 0x4081;
+            return TRUE;
+
+        case 0x5C81:    // Å\   ∫·∏‹
+            translated = 0x9F84;
             return TRUE;
 
         case 0x5AA9:    // ©Z –ƒ–Œ

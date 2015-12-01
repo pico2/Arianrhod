@@ -44,6 +44,16 @@ func (self String) IsDigit() bool {
     return err == nil
 }
 
+func (self *String) ToInteger(base ...int) int64 {
+    if len(base) == 0 {
+        base = append(base, 10)
+    }
+
+    val, err := strconv.ParseInt(self.String(), base[0], 64)
+    RaiseIf(err)
+    return val
+}
+
 func (self String) Format(params interface{}) String {
     return Format(self, params)
 }
