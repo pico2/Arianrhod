@@ -273,7 +273,7 @@ def calltip(fn, src, pos, quiet, f):
 		res = gs.dval(res.get('Candidates'), [])
 		f(res, err)
 
-	return acall('gocode_calltip', _complete_opts(fn, src, pos, True), cb)
+	return acall('gocode_calltip', _complete_opts(fn, src, pos, True, alwaysInstall = True), cb)
 
 def complete(fn, src, pos):
 	builtins = (gs.setting('autocomplete_builtins') is True or gs.setting('complete_builtins') is True)
@@ -281,7 +281,7 @@ def complete(fn, src, pos):
 	res = gs.dval(res.get('Candidates'), [])
 	return res, err
 
-def _complete_opts(fn, src, pos, builtins):
+def _complete_opts(fn, src, pos, builtins, *, alwaysInstall = False):
 	nv = sh.env()
 	return {
 		'Dir': gs.basedir_or_cwd(fn),
@@ -297,6 +297,7 @@ def _complete_opts(fn, src, pos, builtins):
 			'GOPATH': nv.get('GOPATH', ''),
 			'TEMP': nv.get('TEMP', ''),
 			'TMP': nv.get('TMP', ''),
+			'ALWAYS_INSTALL': str(int(alwaysInstall)),
 		},
 	}
 

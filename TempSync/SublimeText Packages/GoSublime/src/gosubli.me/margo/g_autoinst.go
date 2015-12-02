@@ -60,6 +60,8 @@ func (a *AutoInstOptions) install() {
 	}
 
 	roots := []string{}
+	alwaysInstall := a.Env["ALWAYS_INSTALL"] == "1"
+	goSrc := a.Env["GOROOT"] + "/src/"
 
 	if p := a.Env["GOROOT"]; p != "" {
 		roots = append(roots, filepath.Join(p, "pkg", osArchSfx))
@@ -128,7 +130,12 @@ func (a *AutoInstOptions) install() {
 			fn = fn[len(bestPath):]
 		}
 
-		if !archiveOk(fn) {
+		if _, err := os.Stat(goSrc + path); err == nil {
+			os.IsNotExist(err)
+			continue
+		}
+
+		if alwaysInstall || !archiveOk(fn) {
 			var cmd *exec.Cmd
 			if sfx == "" {
 				cmd = exec.Command("go", "install", path)
@@ -140,7 +147,7 @@ func (a *AutoInstOptions) install() {
 			cmd.Stdout = ioutil.Discard
 			cmd.Run()
 
-			if archiveOk(fn) {
+			if alwaysInstall == false && archiveOk(fn) {
 				installed = append(installed, path)
 			}
 		}

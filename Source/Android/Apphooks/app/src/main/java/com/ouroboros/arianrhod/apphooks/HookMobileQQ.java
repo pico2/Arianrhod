@@ -8,14 +8,19 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 import android.hardware.SensorEventListener;
 import java.lang.reflect.Constructor;
 
 class StepCounterListener implements SensorEventListener {
+    private SensorManager mSensorManager;
     private SensorEventListener mListener;
+    private int mCount;
 
-    public StepCounterListener(SensorEventListener listener) {
+    public StepCounterListener(SensorManager sensorManager, SensorEventListener listener) {
+        mSensorManager = sensorManager;
         mListener = listener;
+        mCount = 0;
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -23,10 +28,14 @@ class StepCounterListener implements SensorEventListener {
     }
 
     public void onSensorChanged(SensorEvent event) {
-        HookLoadPackage.log("step %f", event.values[0]);
-        event.values[0] = event.values[0] * 100.f;
+        event.values[0] = event.values[0] + 1000000.f;
         HookLoadPackage.log("step 2 %f", event.values[0]);
         mListener.onSensorChanged(event);
+
+        if (++mCount == 100) {
+            mSensorManager.unregisterListener(this);
+            HookLoadPackage.log("unregisterListener");
+        }
     }
 }
 
@@ -36,44 +45,22 @@ public class HookMobileQQ implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("android.hardware.SensorManager", pkg.classLoader, "registerListener", SensorEventListener.class, Sensor.class, Integer.TYPE, Integer.TYPE, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
+                final SensorManager sensorManager = (SensorManager)param.thisObject;
                 final SensorEventListener listener = (SensorEventListener)param.args[0];
                 final Sensor sensor = (Sensor)param.args[1];
                 final int interval = (int)param.args[3] / 1000;
-                if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                    Constructor<SensorEvent> constructor = SensorEvent.class.getDeclaredConstructor(int.class);
-                    constructor.setAccessible(true);
-                    SensorEvent sensorEvent = constructor.newInstance(1);
-                    sensorEvent.values[0] = 100 * 10000.f;
-                    listener.onSensorChanged(sensorEvent);
 
-//                    param.args[0] = new StepCounterListener(listener);
+                if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+//                    Constructor<SensorEvent> constructor = SensorEvent.class.getDeclaredConstructor(int.class);
+//                    constructor.setAccessible(true);
+//                    SensorEvent sensorEvent = constructor.newInstance(1);
+//                    sensorEvent.values[0] = 100 * 10000.f;
+//                    listener.onSensorChanged(sensorEvent);
+
+                    param.args[0] = new StepCounterListener(sensorManager, listener);
 //                    param.args[3] = 1800 * 1000 * 1000;
 
-//                    new Thread() {
-//                        @Override
-//                        public void run() {
-//                            float step = 100.f;
-//                            while (true) {
-//                                try {
-//                                    Constructor<SensorEvent> constructor = SensorEvent.class.getDeclaredConstructor(int.class);
-//                                    constructor.setAccessible(true);
-//                                    SensorEvent sensorEvent = constructor.newInstance(1);
-//                                    sensorEvent.values[0] = step;
-//                                    HookLoadPackage.log("step: %f", step);
-//                                    listener.onSensorChanged(sensorEvent);
-//                                    step += 1000.f;
-//
-//                                    if (step > 30000.f) {
-//                                        step = 1.f;
-//                                    }
-//
-//                                    Thread.sleep(1000);
-//                                } catch (java.lang.Exception e) {
-//                                    HookLoadPackage.log(e);
-//                                }
-//                            }
-//                        }
-//                    }.start();
+//                    thread(param);
 //                    param.setResult(true);
                 }
             }
@@ -87,5 +74,35 @@ public class HookMobileQQ implements IXposedHookLoadPackage {
 //                }
 //            }
 //        });
+    }
+
+    private void thread(final XC_MethodHook.MethodHookParam param) {
+        final SensorEventListener listener = (SensorEventListener)param.args[0];
+        final Sensor sensor = (Sensor)param.args[1];
+        final int interval = (int)param.args[3] / 1000;
+        new Thread() {
+            @Override
+            public void run() {
+                float step = 30000.f;
+                while (true) {
+                    try {
+                        Constructor<SensorEvent> constructor = SensorEvent.class.getDeclaredConstructor(int.class);
+                        constructor.setAccessible(true);
+                        SensorEvent sensorEvent = constructor.newInstance(1);
+
+                        for (int i = 0; i != 20; i++) {
+                            sensorEvent.values[0] = step++;
+                            HookLoadPackage.log("step: %f", sensorEvent.values[0]);
+                            listener.onSensorChanged(sensorEvent);
+                        }
+
+                        Thread.sleep(10000);
+                    } catch (java.lang.Exception e) {
+                        HookLoadPackage.log(e);
+                        break;
+                    }
+                }
+            }
+        }.start();
     }
 }
