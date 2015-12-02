@@ -261,6 +261,8 @@ def install(aso_install_vesion, force_install):
 		except Exception:
 			report_x()
 
+lastInstallTime = time.time()
+
 def calltip(fn, src, pos, quiet, f):
 	tid = ''
 	if not quiet:
@@ -273,7 +275,14 @@ def calltip(fn, src, pos, quiet, f):
 		res = gs.dval(res.get('Candidates'), [])
 		f(res, err)
 
-	return acall('gocode_calltip', _complete_opts(fn, src, pos, True, alwaysInstall = True), cb)
+	global lastInstallTime
+
+	alwaysInstall = False
+	if time.time() - lastInstallTime > 30:
+		lastInstallTime = time.time()
+		alwaysInstall = True
+
+	return acall('gocode_calltip', _complete_opts(fn, src, pos, True, alwaysInstall = alwaysInstall), cb)
 
 def complete(fn, src, pos):
 	builtins = (gs.setting('autocomplete_builtins') is True or gs.setting('complete_builtins') is True)
