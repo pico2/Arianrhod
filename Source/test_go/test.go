@@ -11,6 +11,7 @@ import (
     "io/ioutil"
     "github.com/PuerkitoBio/goquery"
     "ml/uuid"
+    "ml/encoding/binary"
 )
 
 func genacc() {
@@ -70,14 +71,6 @@ func genacc() {
 }
 
 func main() {
-    monthValue := String("October")
-
-    for m := time.January; m <= time.December; m++ {
-        if String(m.String()).ToLower() == monthValue.ToLower() {
-            monthValue = String(Sprintf("%d", m))
-            break
-        }
-    }
-
-    Println(monthValue)
+    Printf("LE %x\n", binary.IntToBytes(0, 3, binary.LittleEndian))
+    Printf("BE %x\n", binary.IntToBytes(0, 3, binary.BigEndian))
 }

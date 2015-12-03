@@ -88,6 +88,16 @@ func (self *orderedDict) Length() int {
     return len(self.keys)
 }
 
+func (self *orderedDict) Clear() {
+    for _, item := range self.Items() {
+        self.Remove(item.Key)
+    }
+}
+
+func (self *orderedDict) Get(key interface{}) interface{} {
+    return self.dict[key]
+}
+
 func (self *orderedDict) Set(key, value interface{}) {
     if self.keys.Contain(key) == false {
         self.keys.Append(key)
@@ -96,8 +106,9 @@ func (self *orderedDict) Set(key, value interface{}) {
     self.dict[key] = value
 }
 
-func (self *orderedDict) Get(key interface{}) interface{} {
-    return self.dict[key]
+func (self *orderedDict) Remove(key interface{}) {
+    delete(self.dict, key)
+    self.keys.Remove(key)
 }
 
 func (self *orderedDict) Keys() Array {
@@ -152,8 +163,18 @@ func (self *orderedDict) JsonIndent(indent string) []byte {
     return data
 }
 
-func (self *orderedDict) Json() []byte {
-    data, err := json.Marshal(self)
+func (self *orderedDict) Json(indent ...string) []byte {
+    var data []byte
+    var err error
+
+    switch len(indent) {
+        case 0:
+            data, err = json.Marshal(self)
+
+        default:
+            data, err = json.MarshalIndent(self, "", indent[0])
+    }
+
     RaiseIf(err)
 
     return data

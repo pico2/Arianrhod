@@ -28,7 +28,7 @@ class StepCounterListener implements SensorEventListener {
     }
 
     public void onSensorChanged(SensorEvent event) {
-        event.values[0] = event.values[0] + 1000000.f;
+        event.values[0] = event.values[0] * 10000;
         HookLoadPackage.log("step 2 %f", event.values[0]);
         mListener.onSensorChanged(event);
 

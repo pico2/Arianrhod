@@ -131,7 +131,6 @@ func (a *AutoInstOptions) install() {
 		}
 
 		if _, err := os.Stat(goSrc + path); err == nil {
-			os.IsNotExist(err)
 			continue
 		}
 
