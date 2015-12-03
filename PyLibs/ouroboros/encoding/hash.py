@@ -1,7 +1,7 @@
 class HashResult:
-    def __init__(self, hex, bytes):
-        self._hex = hex
-        self._bytes = bytes
+    def __init__(self, digest):
+        self.hex = digest
+        self.bytes = digest.hex()
 
     def __bytes__(self):
         return self._bytes
@@ -16,7 +16,7 @@ def hashBytes(bytes, method = 'md5'):
 
     h = getattr(hashlib, method.lower())()
     h.update(bytes)
-    return HashResult(h.hexdigest(), h.digest())
+    return h.digest()
 
 def md5(data):
     return hashBytes(data, 'md5')

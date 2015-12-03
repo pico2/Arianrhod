@@ -1,5 +1,6 @@
 from ..common import *
 from ..otypes import *
+from ..dbghelp import *
 import aiohttp
 import asyncio
 import http.cookies
@@ -127,7 +128,7 @@ class _ClientRequest(aiohttp.client.ClientRequest):
 
         self.headers['Cookie'] = c.output(header='', sep=';', attrs = {}).strip()
 
-    def update_headers(self, headers):
+    def update_headers2(self, headers):
         """Update request headers."""
         self.headers = _CaseInsensitiveDict()
 
