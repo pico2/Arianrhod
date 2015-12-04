@@ -68,8 +68,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/ChromeUpdater/CHECK
 /Source/Hooks/Crack
 /PyLibs/eric5*
-/PyLibs/PyQt*
-/PyLibs/sip.pyd
 
 /Source/WG/
 /Source/sources/pyv8

@@ -2,6 +2,7 @@ package filestream
 
 import (
     "os"
+    "io"
     "time"
 )
 
@@ -88,6 +89,10 @@ func (self *bytesIO) Seek(offset int64, whence int) (int64, error) {
 }
 
 func (self *bytesIO) Read(b []byte) (int, error) {
+    if self.position == self.length() {
+        return 0, io.EOF
+    }
+
     n := copy(b, self.buffer[self.position:])
     self.position += int64(n)
     return n, nil
