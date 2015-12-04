@@ -8,6 +8,7 @@ import (
 type Socket interface {
     Connect(host string, port int, timeout time.Duration)
     Read(n int) (buf []byte)
+    ReadAll(n int) (buf []byte)
     Write(buf []byte) (n int)
     Close()
 

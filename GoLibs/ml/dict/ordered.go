@@ -48,7 +48,7 @@ func (self *orderedDict) toString(depth int) string {
 
         switch t := k.(type) {
             case string:
-                key = Sprintf("'%v'", t)
+                key = Sprintf("%q", t)
 
             default:
                 key = Sprintf("%v", t)
@@ -65,7 +65,7 @@ func (self *orderedDict) toString(depth int) string {
                 value = obj.toString(depth + 1)
 
             case string:
-                value = Sprintf("'%v'", obj)
+                value = Sprintf("%q", obj)
 
             default:
                 value = Sprintf("%+v", obj)

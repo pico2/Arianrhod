@@ -58,6 +58,25 @@ func (self *TcpSocket) Read(n int) (buf []byte) {
     return buf[:n]
 }
 
+func (self *TcpSocket) ReadAll(n int) (buf []byte) {
+    if n == 0 {
+        return
+    }
+
+    blockSize := 0x1000
+    for n > 0 {
+        if n < 0x1000 {
+            blockSize = n
+        }
+
+        block := self.Read(blockSize)
+        buf = append(buf, block...)
+        n -= len(block)
+    }
+
+    return buf
+}
+
 func (self *TcpSocket) Write(buf []byte) (n int) {
     if len(buf) == 0 {
         return 0
