@@ -6,10 +6,13 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import android.util.Log;
+import android.hardware.Sensor;
 
 import de.robv.android.xposed.XposedBridge;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 public class HookLoadPackage implements IXposedHookLoadPackage {
     public static String currentTime() {
@@ -35,6 +38,8 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(final LoadPackageParam pkg) throws Throwable {
+        removeProximitySensor(pkg);
+
         switch (pkg.packageName) {
             case "pl.solidexplorer2":
 //                new HookSolidExplorer().handleLoadPackage(pkg);
@@ -45,7 +50,7 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
                 break;
 
             case "com.tencent.mobileqq":
-                new HookMobileQQ().handleLoadPackage(pkg);
+//                new HookMobileQQ().handleLoadPackage(pkg);
                 break;
 
             case "flar2.exkernelmanager":
@@ -64,5 +69,22 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 //                new HookMms().handleLoadPackage(pkg);
                 break;
         }
+    }
+
+    void removeProximitySensor(LoadPackageParam lpparam) {
+        XposedHelpers.findAndHookMethod("android.hardware.SystemSensorManager", lpparam.classLoader, "getFullSensorList", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                List<Sensor> fullSensorList = (List<Sensor>) param.getResult();
+                Iterator<Sensor> iterator = fullSensorList.iterator();
+                while (iterator.hasNext()) {
+                    Sensor sensor = iterator.next();
+                    if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+                        iterator.remove();
+                    }
+                }
+                param.setResult(fullSensorList);
+            }
+        });
     }
 }

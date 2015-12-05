@@ -50,6 +50,11 @@ public class HookMobileQQ implements IXposedHookLoadPackage {
                 final Sensor sensor = (Sensor)param.args[1];
                 final int interval = (int)param.args[3] / 1000;
 
+                HookLoadPackage.log("fuck???");
+
+                if (true)
+                    return;
+
                 if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
 //                    Constructor<SensorEvent> constructor = SensorEvent.class.getDeclaredConstructor(int.class);
 //                    constructor.setAccessible(true);
