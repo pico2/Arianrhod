@@ -287,7 +287,7 @@ VOID FuckDisableNewAvatarMenu(PLDR_MODULE chrome)
     PVOID push, firstCall, secondCall;
 
     push = SearchStringReference(chrome, text, sizeof(text));
-    if (push == IMAGE_INVALID_VA)
+    if (push == nullptr)
         return;
 
     push = PtrAdd(push, sizeof(push));

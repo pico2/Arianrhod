@@ -28,14 +28,9 @@ class StepCounterListener implements SensorEventListener {
     }
 
     public void onSensorChanged(SensorEvent event) {
-        event.values[0] = event.values[0] * 1000;
+        event.values[0] = event.values[0] * 100;
         HookLoadPackage.log("step 2 %f", event.values[0]);
         mListener.onSensorChanged(event);
-
-        if (++mCount == 1000) {
-            mSensorManager.unregisterListener(this);
-            HookLoadPackage.log("unregisterListener");
-        }
     }
 }
 
@@ -49,11 +44,6 @@ public class HookMobileQQ implements IXposedHookLoadPackage {
                 final SensorEventListener listener = (SensorEventListener)param.args[0];
                 final Sensor sensor = (Sensor)param.args[1];
                 final int interval = (int)param.args[3] / 1000;
-
-                HookLoadPackage.log("fuck???");
-
-                if (true)
-                    return;
 
                 if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
 //                    Constructor<SensorEvent> constructor = SensorEvent.class.getDeclaredConstructor(int.class);
