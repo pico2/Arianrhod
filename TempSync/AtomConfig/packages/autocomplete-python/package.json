@@ -1,7 +1,7 @@
 {
   "name": "autocomplete-python",
   "main": "./lib/main",
-  "version": "0.10.7",
+  "version": "1.2.0",
   "description": "Python packages, variables, methods and functions with their arguments autocompletion powered by Jedi",
   "activationCommands": {},
   "repository": {
@@ -15,8 +15,8 @@
   "dependencies": {
     "atom-slick": "^2.0.0",
     "atom-space-pen-views": "~2.1.0",
-    "selector-kit": "^0.1",
-    "fuzzaldrin": "~2.1.0"
+    "fuzzaldrin-plus": "^0.3.1",
+    "selector-kit": "^0.1"
   },
   "package-dependencies": {},
   "providedServices": {
@@ -52,13 +52,13 @@
     "autocomplete",
     "jedi"
   ],
-  "readme": "# Python Autocomplete Package [![Build Status](https://travis-ci.org/sadovnychyi/autocomplete-python.svg?branch=master)](https://travis-ci.org/sadovnychyi/autocomplete-python)\n\nPython packages, variables, methods and functions with their arguments autocompletion in [Atom](http://atom.io) powered by [Jedi](https://github.com/davidhalter/jedi).\n\n![Demo](https://cloud.githubusercontent.com/assets/193864/7394244/e6906980-eec4-11e4-9ee2-8749d16ff468.gif)\n\n# Features\n\n* Works with :apple: Mac OSX, :penguin: Linux and :checkered_flag: Windows\n* Works with both :snake: Python 2 and 3\n* Watches whole package of the file you're currently editing\n* Configurable additional PATHs to include for completions (global for now)\n* You can include project specific folders by using $PROJECT variable in PATH configuration\n* Prints first N characters of statement value while completing variables\n* Prints function arguments while completing functions\n* Go-to-definition functionality, by default on `Alt+Cmd+G`/`Ctrl+Alt+G` (thanks to [@patrys](https://github.com/patrys))\n* If you have [Hyperclick](https://atom.io/packages/hyperclick) installed – you can click on anything to go-to-definition\n![sample](https://cloud.githubusercontent.com/assets/193864/10814177/17fb8bce-7e5f-11e5-8285-6b0100b3a0f8.gif)\n\n# Configuration\n\n* If using a [virtualenv](https://virtualenv.pypa.io/en/latest/) with third-party packages, use the \"Extra PATH\" configuration option to specify the virtualenv's site-packages. Or launch Atom from the [activated virtualenv](https://virtualenv.pypa.io/en/latest/userguide.html#activate-script) to get completion for your third-party packages\n* If you're on Windows:\n  * Install [python](https://www.python.org/downloads/)\n  * Make Sure that python is available in your PATH: `echo %PATH%`. If it's not, add it and restart your system: `set PATH=%PATH%;C:\\Python27`\n* Be sure to check package settings and adjust them. Please read them carefully before creating any new issues\n  * Set path to python directory if package cannot find your python executable\n  * Set extra path if package cannot autocomplete external python libraries\n  * Select one of autocomplete function parameters if you want function arguments to be completed\n\n  ![image](https://cloud.githubusercontent.com/assets/193864/10657279/540d39f4-78bb-11e5-9bbf-283fb67c9fd4.png)\n\n\n# Common problems\n\n* \"Error: spawn UNKNOWN\" on Windows\n  * Solution: Find your python executable and uncheck the \"Run this program as an administrator\". See issue [#22](https://github.com/sadovnychyi/autocomplete-python/issues/22)\n",
+  "readme": "# Python Autocomplete Package [![Build Status](https://travis-ci.org/sadovnychyi/autocomplete-python.svg?branch=master)](https://travis-ci.org/sadovnychyi/autocomplete-python)\n\nPython packages, variables, methods and functions with their arguments autocompletion in [Atom](http://atom.io) powered by [Jedi](https://github.com/davidhalter/jedi).\n\n![Demo](https://cloud.githubusercontent.com/assets/193864/7394244/e6906980-eec4-11e4-9ee2-8749d16ff468.gif)\n\n# Features\n\n* Works with :apple: Mac OSX, :penguin: Linux and :checkered_flag: Windows\n* Works with both :snake: Python 2 and 3\n* Automatic lookup of virtual environments inside of your projects\n* Configurable additional packages to include for completions\n* Prints first N characters of statement value while completing variables\n* Prints function arguments while completing functions\n* Go-to-definition functionality, by default on `Alt+Cmd+G`/`Ctrl+Alt+G` (thanks to [@patrys](https://github.com/patrys))\n* If you have [Hyperclick](https://atom.io/packages/hyperclick) installed – you can click on anything to go-to-definition\n![sample](https://cloud.githubusercontent.com/assets/193864/10814177/17fb8bce-7e5f-11e5-8285-6b0100b3a0f8.gif)\n\n# Configuration\n\n* If using a [virtualenv](https://virtualenv.pypa.io/en/latest/) with third-party packages, everything should \"just work\", but if it's not – use the `Python Executable Paths` and/or `Extra Paths For Packages` configuration options to specify the virtualenv's site-packages. Or launch Atom from the [activated virtualenv](https://virtualenv.pypa.io/en/latest/userguide.html#activate-script) to get completion for your third-party packages\n* If you're on Windows:\n  * Install [python](https://www.python.org/downloads/)\n  * Make Sure that python is available in your PATH: `echo %PATH%`. If it's not, add it and restart your system: `set PATH=%PATH%;C:\\Python27`\n* Be sure to check package settings and adjust them. Please read them carefully before creating any new issues\n  * Set path to python directory if package cannot find your python executable\n  * Set extra path if package cannot autocomplete external python libraries\n  * Select one of autocomplete function parameters if you want function arguments to be completed\n\n  ![image](https://cloud.githubusercontent.com/assets/193864/10657279/540d39f4-78bb-11e5-9bbf-283fb67c9fd4.png)\n\n\n# Common problems\n\n* \"Error: spawn UNKNOWN\" on Windows\n  * Solution: Find your python executable and uncheck the \"Run this program as an administrator\". See issue [#22](https://github.com/sadovnychyi/autocomplete-python/issues/22)\n",
   "readmeFilename": "README.md",
   "homepage": "https://github.com/sadovnychyi/autocomplete-python#readme",
-  "_id": "autocomplete-python@0.10.7",
-  "_shasum": "b8e81f7f0d77a69fbbe6695ea55cfe38ddc0a20e",
-  "_resolved": "file:..\\d-115111-7704-11h9o5y\\package.tgz",
-  "_from": "..\\d-115111-7704-11h9o5y\\package.tgz",
+  "_id": "autocomplete-python@1.2.0",
+  "_shasum": "527b57444237987648cdc9316012b6f33ddfcd4c",
+  "_resolved": "file:..\\d-115117-7196-14nbwoe\\package.tgz",
+  "_from": "..\\d-115117-7196-14nbwoe\\package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -71,6 +71,11 @@
         "name": "atom-space-pen-views",
         "version": "2.1.0",
         "path": "node_modules\\atom-space-pen-views\\lib\\main.js"
+      },
+      {
+        "name": "fuzzaldrin",
+        "version": "2.1.0",
+        "path": "node_modules\\atom-space-pen-views\\node_modules\\fuzzaldrin\\lib\\fuzzaldrin.js"
       },
       {
         "name": "space-pen",
@@ -99,7 +104,7 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.8",
+        "version": "0.10.9",
         "path": "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\index.js"
       },
       {
@@ -148,9 +153,9 @@
         "path": "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\underscore-plus\\node_modules\\underscore\\underscore.js"
       },
       {
-        "name": "fuzzaldrin",
-        "version": "2.1.0",
-        "path": "node_modules\\fuzzaldrin\\lib\\fuzzaldrin.js"
+        "name": "fuzzaldrin-plus",
+        "version": "0.3.1",
+        "path": "node_modules\\fuzzaldrin-plus\\lib\\fuzzaldrin.js"
       },
       {
         "name": "selector-kit",
@@ -162,6 +167,8 @@
       ".coffee": [
         "lib\\definitions-view.coffee",
         "lib\\hyperclickProvider.coffee",
+        "lib\\interpreters-lookup.coffee",
+        "lib\\log.coffee",
         "lib\\main.coffee",
         "lib\\provider.coffee",
         "lib\\scope-helpers.coffee"
@@ -174,6 +181,10 @@
         "node_modules\\atom-space-pen-views\\lib\\scroll-view.js",
         "node_modules\\atom-space-pen-views\\lib\\select-list-view.js",
         "node_modules\\atom-space-pen-views\\lib\\text-editor-view.js",
+        "node_modules\\atom-space-pen-views\\node_modules\\fuzzaldrin\\lib\\filter.js",
+        "node_modules\\atom-space-pen-views\\node_modules\\fuzzaldrin\\lib\\fuzzaldrin.js",
+        "node_modules\\atom-space-pen-views\\node_modules\\fuzzaldrin\\lib\\matcher.js",
+        "node_modules\\atom-space-pen-views\\node_modules\\fuzzaldrin\\lib\\scorer.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\lib\\space-pen.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\lib\\deprecation.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\lib\\grim.js",
@@ -459,6 +470,8 @@
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\copy.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\count.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\create.js",
+        "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\ensure-natural-number-value.js",
+        "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\ensure-natural-number.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\eq.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\every.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\object\\filter.js",
@@ -692,15 +705,17 @@
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\underscore-plus\\lib\\underscore-plus.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\underscore-plus\\node_modules\\underscore\\underscore-min.js",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\underscore-plus\\node_modules\\underscore\\underscore.js",
-        "node_modules\\fuzzaldrin\\lib\\filter.js",
-        "node_modules\\fuzzaldrin\\lib\\fuzzaldrin.js",
-        "node_modules\\fuzzaldrin\\lib\\matcher.js",
-        "node_modules\\fuzzaldrin\\lib\\scorer.js",
+        "node_modules\\fuzzaldrin-plus\\lib\\filter.js",
+        "node_modules\\fuzzaldrin-plus\\lib\\fuzzaldrin.js",
+        "node_modules\\fuzzaldrin-plus\\lib\\legacy.js",
+        "node_modules\\fuzzaldrin-plus\\lib\\matcher.js",
+        "node_modules\\fuzzaldrin-plus\\lib\\scorer.js",
         "node_modules\\selector-kit\\lib\\selector-kit.js",
         "node_modules\\selector-kit\\lib\\selector.js"
       ],
       ".json": [
         "node_modules\\atom-slick\\package.json",
+        "node_modules\\atom-space-pen-views\\node_modules\\fuzzaldrin\\package.json",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\api.json",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\d\\package.json",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\grim\\node_modules\\emissary\\node_modules\\es6-weak-map\\node_modules\\es5-ext\\node_modules\\es6-iterator\\package.json",
@@ -719,7 +734,7 @@
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\node_modules\\underscore-plus\\package.json",
         "node_modules\\atom-space-pen-views\\node_modules\\space-pen\\package.json",
         "node_modules\\atom-space-pen-views\\package.json",
-        "node_modules\\fuzzaldrin\\package.json",
+        "node_modules\\fuzzaldrin-plus\\package.json",
         "node_modules\\selector-kit\\package.json",
         "package.json"
       ]
@@ -734,8 +749,8 @@
         "dependencies": {
           "atom-slick": "^2.0.0",
           "atom-space-pen-views": "~2.1.0",
-          "selector-kit": "^0.1",
-          "fuzzaldrin": "~2.1.0"
+          "fuzzaldrin-plus": "^0.3.1",
+          "selector-kit": "^0.1"
         }
       },
       {
@@ -958,7 +973,7 @@
         ],
         "dependencies": {
           "es6-iterator": "2",
-          "es6-symbol": "3"
+          "es6-symbol": "~3.0.1"
         }
       },
       {

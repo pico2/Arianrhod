@@ -1,7 +1,7 @@
 {
   "name": "activate-power-mode",
   "main": "./lib/activate-power-mode",
-  "version": "0.3.2",
+  "version": "0.4.1",
   "description": "Activate POWER MODE to write your code in style.",
   "keywords": [],
   "activationCommands": {
@@ -11,26 +11,47 @@
     "type": "git",
     "url": "git+https://github.com/JoelBesada/activate-power-mode.git"
   },
+  "author": {
+    "name": "Joel Besada",
+    "email": "joel@joelb.me",
+    "url": "http://joelb.me"
+  },
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
+    "lodash.random": "^3.0.1",
     "lodash.throttle": "^3.0.4"
   },
-  "readme": "# activate-power-mode atom package\nA work in progress package for Atom to replicate https://github.com/codeinthedark/editor/pull/1 by popular demand.\n\nActivate with `ctrl-alt-o` or through the command panel with `Activate Power Mode: Toggle`. In this\nearly version it only affects the current tab, to run it in a new tab you need to run `Window: Reload` first.\n\n**NOTE THAT THIS VERSION IS VERY BUGGY RIGHT NOW**\n\n![activate-power-mode](https://cloud.githubusercontent.com/assets/688415/11453297/b8f249ec-9605-11e5-978c-eb3bb21eecd8.gif)\n",
+  "readme": "# activate-power-mode atom package\nA package for Atom to replicate the effects from [codeinthedark/editor](https://github.com/codeinthedark/editor). Available through the Atom package installer (https://atom.io/packages/activate-power-mode). \n\nActivate with <kbd>Ctrl</kbd>-<kbd>Alt</kbd>-<kbd>O</kbd> or through the command panel with `Activate Power Mode: Toggle`. Use the command again to deactivate. \n\n![activate-power-mode-0 4 0](https://cloud.githubusercontent.com/assets/688415/11615565/10f16456-9c65-11e5-8af4-265f01fc83a0.gif)\n\n**For a list of power mode packages to other editors, check out [codeinthedark/awesome-power-mode](https://github.com/codeinthedark/awesome-power-mode).**\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/JoelBesada/activate-power-mode/issues"
   },
   "homepage": "https://github.com/JoelBesada/activate-power-mode#readme",
-  "_id": "activate-power-mode@0.3.2",
-  "_shasum": "4f832638f75311688cdf4912b46a9af9048dc0df",
-  "_resolved": "file:..\\d-1151029-14292-1w7le2w\\package.tgz",
-  "_from": "..\\d-1151029-14292-1w7le2w\\package.tgz",
+  "_id": "activate-power-mode@0.4.1",
+  "_shasum": "789843c394c691010b8ef399b174cb4d8c5ce07d",
+  "_resolved": "file:..\\d-115117-6340-jhxhip\\package.tgz",
+  "_from": "..\\d-115117-6340-jhxhip\\package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
+      {
+        "name": "lodash.random",
+        "version": "3.0.1",
+        "path": "node_modules\\lodash.random\\index.js"
+      },
+      {
+        "name": "lodash._baserandom",
+        "version": "3.0.1",
+        "path": "node_modules\\lodash.random\\node_modules\\lodash._baserandom\\index.js"
+      },
+      {
+        "name": "lodash._isiterateecall",
+        "version": "3.0.9",
+        "path": "node_modules\\lodash.random\\node_modules\\lodash._isiterateecall\\index.js"
+      },
       {
         "name": "lodash.throttle",
         "version": "3.0.4",
@@ -49,14 +70,21 @@
     ],
     "extensions": {
       ".coffee": [
-        "lib\\activate-power-mode.coffee"
+        "lib\\activate-power-mode.coffee",
+        "lib\\config-schema.coffee"
       ],
       ".js": [
+        "node_modules\\lodash.random\\index.js",
+        "node_modules\\lodash.random\\node_modules\\lodash._baserandom\\index.js",
+        "node_modules\\lodash.random\\node_modules\\lodash._isiterateecall\\index.js",
         "node_modules\\lodash.throttle\\index.js",
         "node_modules\\lodash.throttle\\node_modules\\lodash.debounce\\index.js",
         "node_modules\\lodash.throttle\\node_modules\\lodash.debounce\\node_modules\\lodash._getnative\\index.js"
       ],
       ".json": [
+        "node_modules\\lodash.random\\node_modules\\lodash._baserandom\\package.json",
+        "node_modules\\lodash.random\\node_modules\\lodash._isiterateecall\\package.json",
+        "node_modules\\lodash.random\\package.json",
         "node_modules\\lodash.throttle\\node_modules\\lodash.debounce\\node_modules\\lodash._getnative\\package.json",
         "node_modules\\lodash.throttle\\node_modules\\lodash.debounce\\package.json",
         "node_modules\\lodash.throttle\\package.json",
@@ -67,11 +95,20 @@
       {
         "paths": [
           "lib",
-          "",
-          "spec"
+          ""
         ],
         "dependencies": {
+          "lodash.random": "^3.0.1",
           "lodash.throttle": "^3.0.4"
+        }
+      },
+      {
+        "paths": [
+          "node_modules\\lodash.random"
+        ],
+        "dependencies": {
+          "lodash._baserandom": "^3.0.0",
+          "lodash._isiterateecall": "^3.0.0"
         }
       },
       {

@@ -49,7 +49,7 @@ module.exports =
   CoffeeScript:
     "Selection Based":
       command: "coffee"
-      args: (context)  -> ['-e', context.getCode()]
+      args: (context)  -> ['-e', '--cli', context.getCode()]
     "File Based":
       command: "coffee"
       args: (context) -> [context.filepath]
@@ -57,7 +57,7 @@ module.exports =
   'CoffeeScript (Literate)':
     "Selection Based":
       command: "coffee"
-      args: (context)  -> ['-e', context.getCode()]
+      args: (context)  -> ['-e', '--cli', context.getCode()]
     "File Based":
       command: "coffee"
       args: (context) -> [context.filepath]
@@ -423,6 +423,14 @@ module.exports =
     "File Based":
       command: "make"
       args: (context) -> ['-f', context.filepath]
+
+  Sage:
+    "Selection Based":
+      command: "sage"
+      args: (context) -> ['-c', context.getCode()]
+    "File Based":
+      command: "sage"
+      args: (context) -> [context.filepath]
 
   Sass:
     "File Based":
