@@ -14,6 +14,7 @@ import (
     "bytes"
     "io"
     "time"
+    "io/ioutil"
 )
 
 type Session struct {
@@ -103,6 +104,7 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
 
 func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response) {
     var bodyReader  io.Reader
+    var bodyData    []byte
     var params      Dict
     var encoding    Encoding
     var queryString string
@@ -133,22 +135,26 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     switch body := params["body"].(type) {
         case string:
             b := String(body)
-            bodyReader = bytes.NewBuffer(b.Encode(encoding))
+            bodyData = b.Encode(encoding)
 
         case String:
-            bodyReader = bytes.NewBuffer(body.Encode(encoding))
+            bodyData = body.Encode(encoding)
 
         case []byte:
-            bodyReader = bytes.NewBuffer(body)
+            bodyData = body
 
         case Dict:
-            bodyReader = bytes.NewBufferString(dictToValues(body, encoding).Encode())
+            bodyData = String(dictToValues(body, encoding).Encode()).Encode(encoding)
 
         default:
             bodyReader = nil
     }
 
-    request, err := gohttp.NewRequest(string(method), string(url), bodyReader)
+    if bodyData != nil {
+        bodyReader = bytes.NewBuffer(bodyData)
+    }
+
+    request, err := gohttp.NewRequest(method.String(), url.String(), bodyReader)
     RaiseHttpError(err)
 
     switch query := params["params"].(type) {
@@ -176,6 +182,13 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     self.client.CheckRedirect = func(request *gohttp.Request, via []*gohttp.Request) error {
         if len(via) >= 10 {
             Raise(NewHttpError(HTTP_ERROR_TOO_MANY_REDIRECT, method, url, "stopped after 10 redirects"))
+        }
+
+        request.Method = method.String()
+
+        if bodyData != nil {
+            request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyData))
+            request.ContentLength = int64(len(bodyData))
         }
 
         applyHeadersToRequest(request, &self.headers, extraHeaders)
