@@ -230,6 +230,13 @@ public:
     NTSTATUS    FreeSessionData(PVOID data);
     BOOL        GetDeviceId(PFAIR_PLAY_HW_INFO deviceId, PFAIR_PLAY_HW_INFO deviceId2);
 
+
+    /*++
+
+        keybag sync
+
+    --*/
+
     NTSTATUS    KbsyncCreateSession(PHANDLE kbsyncSession, PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO machineId2, PCSTR ScInfoPath);
     NTSTATUS    KbsyncCloseSession(HANDLE session);
 

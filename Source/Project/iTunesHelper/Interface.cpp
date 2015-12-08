@@ -28,6 +28,9 @@
 #pragma comment(linker, "/EXPORT:SapExchangeData=_SapExchangeData@28")
 #pragma comment(linker, "/EXPORT:SapSignData=_SapSignData@20")
 
+#pragma comment(linker, "/EXPORT:KbsyncCreateSession=_KbsyncCreateSession@16")
+#pragma comment(linker, "/EXPORT:KbsyncCloseSession=_KbsyncCloseSession@4")
+
 iTunesHelper *helper;
 
 EXTC NTSTATUS NTAPI Initialize()
@@ -248,4 +251,43 @@ SapSignData(
 )
 {
     return helper->SapSignData(SapSession, Data, DataSize, Signature, SignatureSize);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+KbsyncCreateSession(
+    PHANDLE             kbsyncSession,
+    PFAIR_PLAY_HW_INFO  machineId,
+    PFAIR_PLAY_HW_INFO  machineId2,
+    PCSTR               scInfoPath
+)
+{
+    FAIR_PLAY_HW_INFO localMachineId[2];
+
+    if (machineId == nullptr && machineId2 != nullptr)
+        return STATUS_INVALID_PARAMETER;
+
+    if (machineId != nullptr && machineId2 == nullptr)
+        return STATUS_INVALID_PARAMETER;
+
+    if (machineId == nullptr && machineId2 == nullptr)
+    {
+        machineId = &localMachineId[0];
+        machineId2 = &localMachineId[1];
+        
+        helper->GetDeviceId(machineId, machineId2);
+    }
+
+    return helper->KbsyncCreateSession(kbsyncSession, machineId, machineId2, scInfoPath);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+KbsyncCloseSession(
+    HANDLE session
+)
+{
+    return helper->KbsyncCloseSession(session);
 }

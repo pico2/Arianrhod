@@ -10,9 +10,12 @@ import android.hardware.Sensor;
 
 import de.robv.android.xposed.XposedBridge;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class HookLoadPackage implements IXposedHookLoadPackage {
     public static String currentTime() {
@@ -38,7 +41,7 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(final LoadPackageParam pkg) throws Throwable {
-        removeProximitySensor(pkg);
+        removeStupidSensors(pkg);
 
         switch (pkg.packageName) {
             case "pl.solidexplorer2":
@@ -71,7 +74,14 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
         }
     }
 
-    void removeProximitySensor(LoadPackageParam lpparam) {
+    private static final Set<Integer> SENSORS = new HashSet<>(Arrays.asList(
+        new Integer[]{
+            Sensor.TYPE_STEP_COUNTER,
+            Sensor.TYPE_STEP_DETECTOR,
+        }
+    ));
+
+    void removeStupidSensors(LoadPackageParam lpparam) {
         XposedHelpers.findAndHookMethod("android.hardware.SystemSensorManager", lpparam.classLoader, "getFullSensorList", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -79,7 +89,7 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
                 Iterator<Sensor> iterator = fullSensorList.iterator();
                 while (iterator.hasNext()) {
                     Sensor sensor = iterator.next();
-                    if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+                    if (SENSORS.contains(sensor.getType())) {
                         iterator.remove();
                     }
                 }
