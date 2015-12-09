@@ -50,17 +50,26 @@ typedef struct
 
 } AIR_FAIR_AUTHORIZED_DSID, *PAIR_FAIR_AUTHORIZED_DSID;
 
+enum KeybagSyncType
+{
+    Buy     = 1,
+    Default = 2,
+    Upgrade = 5,
+    Update  = 0xB,
+};
+
 typedef struct
 {
     NTSTATUS (CDECL*    freeSessionData)(PVOID data);
     BOOLEAN  (FASTCALL* getDeviceId)(PFAIR_PLAY_HW_INFO deviceId);
     BOOLEAN  (FASTCALL* getDeviceId2)(PFAIR_PLAY_HW_INFO deviceId);
 
-    NTSTATUS (CDECL*    loadCoreFP)(PVOID);
-    NTSTATUS (FASTCALL* initScInfo)(BOOLEAN _False, PKBSYNC_SESSION *kbsyncSession, ULONG64 Zero);  // CDECL+FASTCALL
+    //NTSTATUS (CDECL*    loadCoreFP)(PVOID);
+    //NTSTATUS (FASTCALL* initScInfo)(BOOLEAN _False, PKBSYNC_SESSION *kbsyncSession, ULONG64 Zero);  // CDECL+FASTCALL
 
-    NTSTATUS (CDECL*    kbsyncCreateSession)(PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO whatId, PCSTR ScInfoPath, PHANDLE kbsyncSession, ...);
-    NTSTATUS (CDECL*    kbsyncInitSomething)(HANDLE kbsyncSession, ULONG_PTR unknown1, ULONG_PTR unknown2);
+    NTSTATUS (CDECL*    kbsyncCreateSession)(PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO whatId, PCSTR ScInfoPath, PHANDLE kbsyncSession);
+    NTSTATUS (CDECL*    kbsyncInitSomething)(HANDLE kbsyncSession, ULONG64 dsid);
+    NTSTATUS (CDECL*    kbsyncGetData)(HANDLE kbsyncSession, ULONG64 dsid, ULONG quickTimeVersion, ULONG syncType, PVOID *output, PULONG_PTR outputSize);
     NTSTATUS (CDECL*    KbsyncAuthorizeDsid)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved);
     NTSTATUS (CDECL*    KbsyncDsidBindMachine)(HANDLE kbsyncSesstion, PFAIR_PLAY_HW_INFO machineId2, ULONG64 dsid);
     NTSTATUS (CDECL*    kbsyncCloseSession)(HANDLE session);

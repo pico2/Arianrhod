@@ -12,6 +12,7 @@ API_POINTER(RegQueryValueExW)           StubRegQueryValueExW;
 
 WCHAR GlobalRegistryDb[0x20];
 WCHAR GlobalHistoryDb[countof(GlobalRegistryDb)];
+WCHAR GlobalPerfreDb[countof(GlobalRegistryDb)];
 
 BOOL InitializeUin()
 {
@@ -39,6 +40,7 @@ BOOL InitializeUin()
 
     swprintf(GlobalRegistryDb, L"Registry_%.*s.db", Length, QQUIN);
     swprintf(GlobalHistoryDb, L"History_%.*s.db", Length, QQUIN);
+    swprintf(GlobalPerfreDb, L"Perfre_%.*s.db", Length, QQUIN);
 
     return TRUE;
 }
@@ -61,8 +63,9 @@ NTSTATUS GetRedirectFile(PUNICODE_STRING Redirected, PUNICODE_STRING Original)
 
     static REDIRECT_ENTRY RedirectEntries[] =
     {
-        { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\History.db"),  CONST_STRLEN(L"History.db") * sizeof(WCHAR), GlobalHistoryDb },
+        { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\History.db"),  CONST_STRLEN(L"History.db")  * sizeof(WCHAR), GlobalHistoryDb },
         { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\Registry.db"), CONST_STRLEN(L"Registry.db") * sizeof(WCHAR), GlobalRegistryDb },
+        { RTL_CONSTANT_STRING(L"\\All Users\\QQ\\Perfre.db"),   CONST_STRLEN(L"Perfre.db")   * sizeof(WCHAR), GlobalPerfreDb },
         //{ RTL_CONSTANT_STRING(L"QQProtect.exe"),                CONST_STRLEN(L"QQProtect.exe") * sizeof(WCHAR), NULL },
     };
 
