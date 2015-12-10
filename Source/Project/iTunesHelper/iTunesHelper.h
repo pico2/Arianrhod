@@ -52,10 +52,11 @@ typedef struct
 
 enum KeybagSyncType
 {
-    Buy     = 1,
-    Default = 2,
-    Upgrade = 5,
-    Update  = 0xB,
+    Buy         = 1,
+    Default     = 2,
+    Upgrade     = 5,
+    Update      = 11,
+    LoginiOS    = 0x135,
 };
 
 typedef struct
@@ -246,8 +247,28 @@ public:
 
     --*/
 
-    NTSTATUS    KbsyncCreateSession(PHANDLE kbsyncSession, PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO machineId2, PCSTR ScInfoPath);
-    NTSTATUS    KbsyncCloseSession(HANDLE session);
+    NTSTATUS
+    KbsyncCreateSession(
+        PHANDLE             kbsyncSession,
+        PFAIR_PLAY_HW_INFO  machineId,
+        PFAIR_PLAY_HW_INFO  machineId2,
+        PCSTR               scInfoPath
+    );
+
+    NTSTATUS
+    KbsyncGetData(
+        HANDLE      kbsyncSession,
+        ULONG64     dsid,
+        ULONG       quickTimeVersion,
+        ULONG       syncType,
+        PVOID*      output,
+        PULONG_PTR  outputSize
+    );
+
+    NTSTATUS
+    KbsyncCloseSession(
+        HANDLE session
+    );
 
     /*++
 

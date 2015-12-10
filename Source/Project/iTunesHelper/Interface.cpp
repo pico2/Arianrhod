@@ -18,6 +18,7 @@
 #pragma comment(linker, "/EXPORT:iOSDeviceGetCpuArchitecture=_iOSDeviceGetCpuArchitecture@8")
 #pragma comment(linker, "/EXPORT:iOSDeviceGetActivationState=_iOSDeviceGetActivationState@8")
 #pragma comment(linker, "/EXPORT:iOSDeviceGetUniqueDeviceID=_iOSDeviceGetUniqueDeviceID@8")
+#pragma comment(linker, "/EXPORT:iOSDeviceGetUniqueDeviceIDData=_iOSDeviceGetUniqueDeviceIDData@12")
 #pragma comment(linker, "/EXPORT:iOSDeviceIsJailBroken=_iOSDeviceIsJailBroken@4")
 #pragma comment(linker, "/EXPORT:iOSDeviceAuthorizeDsids=_iOSDeviceAuthorizeDsids@24")
 
@@ -29,6 +30,7 @@
 #pragma comment(linker, "/EXPORT:SapSignData=_SapSignData@20")
 
 #pragma comment(linker, "/EXPORT:KbsyncCreateSession=_KbsyncCreateSession@16")
+#pragma comment(linker, "/EXPORT:KbsyncGetData=_KbsyncGetData@28")
 #pragma comment(linker, "/EXPORT:KbsyncCloseSession=_KbsyncCloseSession@4")
 
 iTunesHelper *helper;
@@ -116,7 +118,7 @@ NTSTATUS iOSDeviceGetStringValue(iOSDevice &Device, String (iOSDevice::*func)(),
     if (*Output != nullptr)
         CopyMemory(*Output, productType.GetData(), productType.GetSize());
 
-#if 1
+#if 0
 
     iOSService house_arrest(Device);
     house_arrest.Start("com.apple.mobile.house_arrest");
@@ -130,24 +132,36 @@ NTSTATUS iOSDeviceGetStringValue(iOSDevice &Device, String (iOSDevice::*func)(),
     return *Output == nullptr ? STATUS_NO_MEMORY : STATUS_SUCCESS;
 }
 
-EXTC NTSTATUS NTAPI iOSDeviceGetProductType(iOSDevice &Device, PSTR *DeviceType)
+NTSTATUS iOSDeviceGetDataValue(iOSDevice &Device, CFData (iOSDevice::*func)(), PVOID *Output, PULONG_PTR OutputSize)
 {
-    return iOSDeviceGetStringValue(Device, &iOSDevice::GetProductType, DeviceType);
+    CFData data = (&Device->*func)();
+
+    *OutputSize = CFDataGetLength(data);
+    *Output = (PSTR)AllocateMemoryP(*OutputSize);
+    if (*Output != nullptr)
+        CopyMemory(*Output, CFDataGetBytePtr(data), *OutputSize);
+
+    return *Output == nullptr ? STATUS_NO_MEMORY : STATUS_SUCCESS;
 }
 
-EXTC NTSTATUS NTAPI iOSDeviceGetDeviceName(iOSDevice &Device, PSTR *DeviceType)
+EXTC NTSTATUS NTAPI iOSDeviceGetProductType(iOSDevice &Device, PSTR *ProductType)
 {
-    return iOSDeviceGetStringValue(Device, &iOSDevice::GetDeviceName, DeviceType);
+    return iOSDeviceGetStringValue(Device, &iOSDevice::GetProductType, ProductType);
 }
 
-EXTC NTSTATUS NTAPI iOSDeviceGetDeviceClass(iOSDevice &Device, PSTR *DeviceType)
+EXTC NTSTATUS NTAPI iOSDeviceGetDeviceName(iOSDevice &Device, PSTR *DeviceName)
 {
-    return iOSDeviceGetStringValue(Device, &iOSDevice::GetDeviceClass, DeviceType);
+    return iOSDeviceGetStringValue(Device, &iOSDevice::GetDeviceName, DeviceName);
 }
 
-EXTC NTSTATUS NTAPI iOSDeviceGetProductVersion(iOSDevice &Device, PSTR *DeviceType)
+EXTC NTSTATUS NTAPI iOSDeviceGetDeviceClass(iOSDevice &Device, PSTR *DeviceClass)
 {
-    return iOSDeviceGetStringValue(Device, &iOSDevice::GetProductVersion, DeviceType);
+    return iOSDeviceGetStringValue(Device, &iOSDevice::GetDeviceClass, DeviceClass);
+}
+
+EXTC NTSTATUS NTAPI iOSDeviceGetProductVersion(iOSDevice &Device, PSTR *ProductVersion)
+{
+    return iOSDeviceGetStringValue(Device, &iOSDevice::GetProductVersion, ProductVersion);
 }
 
 EXTC NTSTATUS NTAPI iOSDeviceGetCpuArchitecture(iOSDevice &Device, PSTR *DeviceType)
@@ -155,14 +169,19 @@ EXTC NTSTATUS NTAPI iOSDeviceGetCpuArchitecture(iOSDevice &Device, PSTR *DeviceT
     return iOSDeviceGetStringValue(Device, &iOSDevice::GetCPUArchitecture, DeviceType);
 }
 
-EXTC NTSTATUS NTAPI iOSDeviceGetActivationState(iOSDevice &Device, PSTR *DeviceType)
+EXTC NTSTATUS NTAPI iOSDeviceGetActivationState(iOSDevice &Device, PSTR *ActivationState)
 {
-    return iOSDeviceGetStringValue(Device, &iOSDevice::GetActivationState, DeviceType);
+    return iOSDeviceGetStringValue(Device, &iOSDevice::GetActivationState, ActivationState);
 }
 
-EXTC NTSTATUS NTAPI iOSDeviceGetUniqueDeviceID(iOSDevice &Device, PSTR *DeviceType)
+EXTC NTSTATUS NTAPI iOSDeviceGetUniqueDeviceID(iOSDevice &Device, PSTR *DeviceID)
 {
-    return iOSDeviceGetStringValue(Device, &iOSDevice::GetUniqueDeviceID, DeviceType);
+    return iOSDeviceGetStringValue(Device, &iOSDevice::GetUniqueDeviceID, DeviceID);
+}
+
+EXTC NTSTATUS NTAPI iOSDeviceGetUniqueDeviceIDData(iOSDevice &Device, PVOID* Output, PULONG_PTR OutputSize)
+{
+    return iOSDeviceGetDataValue(Device, &iOSDevice::GetUniqueDeviceIDData, Output, OutputSize);
 }
 
 EXTC BOOL NTAPI iOSDeviceIsJailBroken(iOSDevice &Device)
@@ -265,21 +284,34 @@ KbsyncCreateSession(
 {
     FAIR_PLAY_HW_INFO localMachineId[2];
 
-    if (machineId == nullptr && machineId2 != nullptr)
-        return STATUS_INVALID_PARAMETER;
-
-    if (machineId != nullptr && machineId2 == nullptr)
-        return STATUS_INVALID_PARAMETER;
-
     if (machineId == nullptr && machineId2 == nullptr)
     {
         machineId = &localMachineId[0];
         machineId2 = &localMachineId[1];
-        
+
         helper->GetDeviceId(machineId, machineId2);
     }
+    //else if (machineId == nullptr || machineId2 == nullptr)
+    //{
+    //    return STATUS_INVALID_PARAMETER;
+    //}
 
     return helper->KbsyncCreateSession(kbsyncSession, machineId, machineId2, scInfoPath);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+KbsyncGetData(
+    HANDLE      kbsyncSession,
+    ULONG64     dsid,
+    ULONG       quickTimeVersion,
+    ULONG       syncType,
+    PVOID*      output,
+    PULONG_PTR  outputSize
+)
+{
+    return helper->KbsyncGetData(kbsyncSession, dsid, quickTimeVersion, syncType, output, outputSize);
 }
 
 EXTC

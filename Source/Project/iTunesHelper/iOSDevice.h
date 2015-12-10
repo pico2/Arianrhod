@@ -175,6 +175,7 @@ public:
 
 #define DefineStringPropertyGetter(prop, ...) NoInline String Get##prop() { return GetDeviceValueString(#prop, __VA_ARGS__); }
 #define DefineObjectPropertyGetter(prop, ...) NoInline CFObject Get##prop() { return GetDeviceValue(#prop, __VA_ARGS__); }
+#define DefineDataPropertyGetter(prop, ...) NoInline CFData Get##prop() { return *(CFData *)&GetDeviceValue(#prop, __VA_ARGS__); }
 
     DefineStringPropertyGetter(CPUArchitecture);
     DefineStringPropertyGetter(DeviceName);
@@ -188,6 +189,7 @@ public:
     DefineStringPropertyGetter(ProductVersion);
     DefineStringPropertyGetter(PhoneNumber);
     DefineStringPropertyGetter(UniqueDeviceID);
+    DefineDataPropertyGetter  (UniqueDeviceIDData);
     DefineStringPropertyGetter(BasebandVersion);
     DefineStringPropertyGetter(BasebandBootloaderVersion);
     DefineObjectPropertyGetter(FairPlayCertificate,     "com.apple.mobile.iTunes");

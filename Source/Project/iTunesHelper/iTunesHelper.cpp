@@ -354,6 +354,10 @@ BOOL iTunesHelper::GetDeviceId(PFAIR_PLAY_HW_INFO deviceId, PFAIR_PLAY_HW_INFO d
     return TRUE;
 }
 
+/************************************************************************
+  kbsync
+************************************************************************/
+
 NTSTATUS iTunesHelper::KbsyncCreateSession(PHANDLE kbsyncSession, PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO machineId2, PCSTR ScInfoPath)
 {
     *kbsyncSession = nullptr;
@@ -382,6 +386,20 @@ NTSTATUS iTunesHelper::KbsyncCreateSession(PHANDLE kbsyncSession, PFAIR_PLAY_HW_
     return st;
 }
 
+NTSTATUS
+iTunesHelper::
+KbsyncGetData(
+    HANDLE      kbsyncSession,
+    ULONG64     dsid,
+    ULONG       quickTimeVersion,
+    ULONG       syncType,
+    PVOID*      output,
+    PULONG_PTR  outputSize
+)
+{
+    return this->iTunes.kbsyncGetData(kbsyncSession, dsid, quickTimeVersion, syncType, output, outputSize);
+}
+
 NTSTATUS iTunesHelper::KbsyncCloseSession(HANDLE session)
 {
     if (session == nullptr)
@@ -389,6 +407,10 @@ NTSTATUS iTunesHelper::KbsyncCloseSession(HANDLE session)
 
     return this->iTunes.kbsyncCloseSession(session);
 }
+
+/************************************************************************
+  sap
+************************************************************************/
 
 NTSTATUS iTunesHelper::SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO deviceId)
 {

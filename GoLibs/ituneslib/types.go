@@ -5,7 +5,7 @@ import (
 )
 
 type FairPlayHWInfo struct {
-    Length  uint32
+    Length  int32
     Id      [20]byte
 }
 

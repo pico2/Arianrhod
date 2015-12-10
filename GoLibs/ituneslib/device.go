@@ -71,9 +71,25 @@ func (self *IosDevice) getStringValue(proc *syscall.Proc) string {
         return Sprintf("<call '%q' failed: %08X>", proc, status)
     }
 
-    defer itunes.FreeMemory.Call(uintptr(unsafe.Pointer(buffer)))
+    defer FreeMemory(buffer)
 
     return toString(buffer)
+}
+
+func (self *IosDevice) getBytesValue(proc *syscall.Proc) []byte {
+    var buffer *byte
+    var size int
+    var status int32
+
+    st, _, _ := proc.Call(self.ptr, uintptr(unsafe.Pointer(&buffer)), uintptr(unsafe.Pointer(&size)))
+    status = int32(st)
+    if status != 0 {
+        return []byte(Sprintf("<call '%q' failed: %08X>", proc, status))
+    }
+
+    defer FreeMemory(buffer)
+
+    return toBytes(buffer, size)
 }
 
 func (self *IosDevice) GetProductType() string {
@@ -119,5 +135,10 @@ func (self *IosDevice) GetCpuArchitecture() string {
 
 func (self *IosDevice) GetUniqueDeviceId() string {
     self.UniqueDeviceId = self.getStringValue(itunes.iOSDeviceGetUniqueDeviceID)
+    return self.UniqueDeviceId
+}
+
+func (self *IosDevice) GetUniqueDeviceIDData() string {
+    self.UniqueDeviceId = self.getStringValue(itunes.iOSDeviceGetUniqueDeviceIDData)
     return self.UniqueDeviceId
 }

@@ -24,6 +24,7 @@ type iTunesHelper struct {
     iOSDeviceGetCpuArchitecture             *syscall.Proc
     iOSDeviceGetActivationState             *syscall.Proc
     iOSDeviceGetUniqueDeviceID              *syscall.Proc
+    iOSDeviceGetUniqueDeviceIDData          *syscall.Proc
     iOSDeviceIsJailBroken                   *syscall.Proc
     iOSDeviceAuthorizeDsids                 *syscall.Proc
 
@@ -35,6 +36,7 @@ type iTunesHelper struct {
     SapSignData                             *syscall.Proc
 
     KbsyncCreateSession                     *syscall.Proc
+    KbsyncGetData                           *syscall.Proc
     KbsyncCloseSession                      *syscall.Proc
 }
 

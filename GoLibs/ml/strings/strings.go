@@ -10,6 +10,7 @@ import (
     "strings"
     "strconv"
     "unicode/utf8"
+    "encoding/hex"
 )
 
 type String string
@@ -44,7 +45,7 @@ func (self String) IsDigit() bool {
     return err == nil
 }
 
-func (self *String) ToInteger(base ...int) int64 {
+func (self String) ToInteger(base ...int) int64 {
     if len(base) == 0 {
         base = append(base, 10)
     }
@@ -52,6 +53,12 @@ func (self *String) ToInteger(base ...int) int64 {
     val, err := strconv.ParseInt(self.String(), base[0], 64)
     RaiseIf(err)
     return val
+}
+
+func (self String) HexStringToBytes() []byte {
+    data, err := hex.DecodeString(self.String())
+    RaiseIf(err)
+    return data
 }
 
 func (self String) Format(params interface{}) String {

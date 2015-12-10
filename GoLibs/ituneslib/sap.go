@@ -55,7 +55,7 @@ func (self *SapSession) CreatePrimeSignature() []byte {
             return self.primeSignature
         }
 
-        defer itunes.iTunesFreeMemory.Call(uintptr(unsafe.Pointer(buf)))
+        defer FreeSessionData(buf)
         self.primeSignature = toBytes(buf, size)
     }
 
@@ -86,7 +86,7 @@ func (self *SapSession) ExchangeData(sapType SapCertType, data []byte) (cert []b
         return
     }
 
-    defer itunes.iTunesFreeMemory.Call(uintptr(unsafe.Pointer(buf)))
+    defer FreeSessionData(buf)
     cert = toBytes(buf, size)
 
     return
@@ -125,7 +125,7 @@ func (self *SapSession) SignData(data []byte) (signature []byte) {
         Raise(newiTunesHelperErrorf("SapSignData return %X", uint32(status)))
     }
 
-    defer itunes.iTunesFreeMemory.Call(uintptr(unsafe.Pointer(buf)))
+    defer FreeSessionData(buf)
     signature = toBytes(buf, size)
 
     return
