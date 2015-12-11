@@ -10,11 +10,13 @@ import (
 type KeybagSyncType int
 
 const (
-    Keybag_Buy      = KeybagSyncType(1)
-    Keybag_Default  = KeybagSyncType(2)
-    Keybag_Upgrade  = KeybagSyncType(5)
-    Keybag_Update   = KeybagSyncType(11)
-    Keybag_LoginiOS = KeybagSyncType(0x135)
+    Keybag_Buy          = KeybagSyncType(1)
+    Keybag_Refetch      = KeybagSyncType(1)
+    Keybag_Default      = KeybagSyncType(2)
+    Keybag_Upgrade      = KeybagSyncType(5)
+    Keybag_Authorize    = KeybagSyncType(8)
+    Keybag_Update       = KeybagSyncType(11)
+    Keybag_LoginiOS     = KeybagSyncType(0x135)
 )
 
 type KeybagSession struct {
@@ -28,12 +30,17 @@ func NewKeybagSession(uniqueDeviceID []byte) *KeybagSession {
     // scinfo := []byte(`C:\ProgramData\Apple Computer\iTunes\SC Info`)
 
     scinfo := []byte(filepath.Join(os2.ExecutablePath(), "SC Info"))
-    udid := &FairPlayHWInfo{
-        Length: int32(len(uniqueDeviceID)),
-    }
 
-    copy(udid.Id[:], uniqueDeviceID)
-    udid.Length = 6
+    var udid *FairPlayHWInfo = nil
+
+    if uniqueDeviceID != nil {
+        udid = &FairPlayHWInfo{
+            Length: int32(len(uniqueDeviceID)),
+        }
+
+        copy(udid.Id[:], uniqueDeviceID)
+        udid.Length = 6
+    }
 
     st, _, _ := itunes.KbsyncCreateSession.Call(
                     uintptr(unsafe.Pointer(&kbsyncSession)),
