@@ -30,24 +30,24 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "fYX"), "fYQ", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "ggW"), "ggP", 0);
             }
         });
 
         // "ERROR record duration, %dms !!!"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lr", new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lg", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gcZ");
-                Object obj2 = XposedHelpers.getObjectField(obj1, "gcN");
+                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gkX");
+                Object obj2 = XposedHelpers.getObjectField(obj1, "gkL");
 
-                float v2 = ((Long)XposedHelpers.callMethod(obj2, "ari")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(obj2, "asW")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
-                        XposedHelpers.callMethod(obj1, "z", v2);
+                        XposedHelpers.callMethod(obj1, "A", v2);
                     } else {
-                        XposedHelpers.callMethod(obj1, "z", 1f);
+                        XposedHelpers.callMethod(obj1, "A", 1f);
                     }
                 }
 
@@ -57,7 +57,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "H", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "I", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //                HookLoadPackage.log("what the fuck");
