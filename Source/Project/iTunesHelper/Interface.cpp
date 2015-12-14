@@ -44,9 +44,12 @@ EXTC NTSTATUS NTAPI Initialize()
 
     helper = new iTunesHelper;
 
+    DebugLog(L"create iTunesHelper");
+
     //Rtl::SetExeDirectoryAsCurrent();
 
     status = helper->iTunesInitialize();
+    DebugLog(L"iTunesInitialize return %p", status);
     if (NT_FAILED(status))
     {
         ExceptionBox(L"init iTunes failed");

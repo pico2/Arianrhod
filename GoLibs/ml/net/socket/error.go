@@ -2,10 +2,16 @@ package socket
 
 import (
     . "ml/trace"
+    . "fmt"
+    "net"
 )
 
 type SocketError struct {
     Message string
+}
+
+type SocketTimeoutError struct {
+    *SocketError
 }
 
 func RaiseSocketError(err error) {
@@ -13,11 +19,20 @@ func RaiseSocketError(err error) {
         return
     }
 
-    Raise(NewSocketError(err.Error()))
+    e := err.(*net.OpError)
+    if e.Timeout() {
+        Raise(NewSocketTimeoutError(e.Error()))
+    }
+
+    Raise(NewSocketError(e.Error()))
 }
 
 func NewSocketError(msg string) *SocketError {
     return &SocketError{msg}
+}
+
+func NewSocketTimeoutError(msg string) *SocketTimeoutError {
+    return &SocketTimeoutError{SocketError: NewSocketError(msg)}
 }
 
 func (self *SocketError) String() string {

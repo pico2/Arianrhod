@@ -3,6 +3,7 @@ package main
 import (
     . "fmt"
     . "ml/strings"
+    . "ml/trace"
     "encoding/json"
     "./pinyin"
     "ml/random"
@@ -12,6 +13,7 @@ import (
     "github.com/PuerkitoBio/goquery"
     "ml/uuid"
     "ml/encoding/binary"
+    "ml/net/socket"
 )
 
 func genacc() {
@@ -71,6 +73,10 @@ func genacc() {
 }
 
 func main() {
-    Printf("LE %x\n", binary.IntToBytes(0, 3, binary.LittleEndian))
-    Printf("BE %x\n", binary.IntToBytes(0, 3, binary.BigEndian))
+    e := Try(func () {
+        sock := socket.NewTcpSocket()
+        sock.Connect("localhost", 6789, 1)
+    })
+
+    Println(e)
 }

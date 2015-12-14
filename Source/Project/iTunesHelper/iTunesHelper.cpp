@@ -132,6 +132,7 @@ NTSTATUS iTunesHelper::iTunesInitialize()
         return status;
 
     status = iTunesApi::Initialize();
+    DebugLog(L"iTunesApi::Initialize return %p", status);
     FAIL_RETURN(status);
 
     String ExePath;
@@ -147,9 +148,13 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
 #else
 
+    DebugLog(L"env len = %p", CurrentPeb()->ProcessParameters->EnvironmentSize);
     status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH);
+    DebugLog(L"env len = %p", CurrentPeb()->ProcessParameters->EnvironmentSize);
+    DebugLog(L"set path: %p", status);
 
     status = Ldr::LoadPeImage(ExePath + ITUNES_DLL_PATH L"\\iTunesCore.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
+    DebugLog(L"load iTunesCore.dll: %p", status);
     FAIL_RETURN(status);
 
     ((PIMAGE_TLS_CALLBACK)PtrAdd(this->iTunesBase, ImageNtHeaders(this->iTunesBase)->OptionalHeader.AddressOfEntryPoint))(this->iTunesBase, DLL_PROCESS_ATTACH, nullptr);
@@ -161,6 +166,8 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
     PVOID Address;
     PLDR_MODULE AirTrafficHost = FindLdrModuleByName(PUSTR(L"AirTrafficHost.dll"));
+
+    DebugLog(L"fuck AirTrafficHost: %p", AirTrafficHost);
 
     if (AirTrafficHost != nullptr)
     {
