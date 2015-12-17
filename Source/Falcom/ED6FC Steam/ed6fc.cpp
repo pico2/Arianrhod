@@ -57,6 +57,10 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
             translated = L'■';
             break;
 
+        case 0x4881:
+            translated = L'？';
+            break;
+
         case 0x9F81:
             translated = L'◆';
             break;
