@@ -1,4 +1,4 @@
-#include "DWriteRender.h"
+ï»¿#include "DWriteRender.h"
 
 static BYTE FontLumaTable[] =
 {
@@ -146,7 +146,7 @@ NTSTATUS DWriteRender::Initialize(PCWSTR FontPath, PCWSTR FaceName, ULONG_PTR Fo
         this->fontFace->GetMetrics(&this->fontMetrics);
         this->ratio = this->fontEmSize / this->fontMetrics.designUnitsPerEm;
 
-        codePoint = L'¹ú';
+        codePoint = L'å›½';
         this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice);
         this->fontFace->GetDesignGlyphMetrics(&glyphIndice, 1, &this->glyphMetrics, FALSE);
 
@@ -240,7 +240,7 @@ DrawRune(
 
     BOOL dbg = FALSE;
 
-    //ch = L'¡£';
+    //ch = L'ã€‚';
 
     codePoint = ch;
     FAIL_RETURN(this->fontFace->GetGlyphIndices(&codePoint, 1, &glyphIndice));

@@ -1,4 +1,4 @@
-// this file must be compiled under zh-CN locale
+ï»¿// this file must be compiled under zh-CN locale
 
 #pragma comment(linker, "/ENTRY:DllMain")
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text /MERGE:.text1=.text /SECTION:.idata,ERW")
@@ -35,6 +35,7 @@ USHORT FontColorTable[] =
 
 DWriteRender *DWriteMBCSRenders[countof(FontSizeTable)];
 DWriteRender *DWriteAnsiRenders[countof(FontSizeTable)];
+DWriteRender *DWriteSJISRenders[countof(FontSizeTable)];
 
 VOID (NTAPI *StubGetGlyphsBitmap)(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex);
 
@@ -43,59 +44,127 @@ BOOL TranslateChar(PCSTR Text, USHORT& translated)
     USHORT ch;
 
     ch = *(PUSHORT)Text;
+
+#if 1
+
     switch (ch)
     {
-        case 0xA181:    // ¡
-        case 0x9F81:    // Ÿ   ÁâĞÎ
-        case 0xAA84:    // „ª   ºá¸Ü
-        case 0x4081:    // @   ¿Õ¸ñ
-        case 0x9A81:    // š   ¡ï
-        case 0x4C87:    // Ô²È¦13
-        case 0x4D87:    // Ô²È¦14
-            translated = ch;
-            return TRUE;
+        default:
+            return FALSE;
 
-        case 0xA1A1:    // È«½Ç¿Õ¸ñ
-            translated = 0x4081;
-            return TRUE;
+        case 0xA181:
+        case 0xF6A1:
+            translated = L'â– ';
+            break;
 
-        case 0x5C81:    // \   ºá¸Ü
-            translated = 0x9F84;
-            return TRUE;
+        case 0x9F81:
+            translated = L'â—†';
+            break;
 
-        case 0x5AA9:    // ©Z ĞÄĞÎ
-            translated = 0x8A87;    // TAG2('‡Š');
-            return TRUE;
+        case 0xAA84:
+            translated = L'â”';
+            break;
 
-        case 0xD1A1:    // ¡Ñ Òô·û
-            translated = 0xF481;  // TAG2('ô');
-            return TRUE;
+        case 0x4081:
+        case 0xA1A1:
+            translated = L'ã€€';
+            break;
 
-        case 0xF6A1:    // ¡ö ·½¿é
-            translated = 0xA181;
-            return TRUE;
+        case 0x9A81:
+            translated = L'â˜…';
+            break;
 
-        case 0xADA1:    // ¡­ ÖĞÎÄÊ¡ÂÔºÅ
-            translated = 0x6381;
-            return TRUE;
+        case 0x4C87:
+            translated = L'â‘¬';
+            break;
 
-        case 0xA4A1:    // ÖĞµã
-            translated = 0x4581;
-            return TRUE;
+        case 0x4D87:
+            translated = L'â‘­';
+            break;
+
+        case 0x5C81:    // æ‰‹å†Œ
+            // translated = 0x9F84;
+            translated = L'â€•';
+            break;
+
+        case 0x5AA9:
+            translated = L'â™¥';
+            break;
+
+        case 0xD1A1:
+            translated = L'â™ª';
+            break;
+
+        case 0xADA1:
+            translated = L'â€¦';
+            break;
+
+        case 0xA4A1:
+            translated = L'ãƒ»';
+            break;
     }
 
-    return FALSE;
+#else
+
+    switch (ch)
+    {
+        default:
+            return FALSE;
+
+        case 0xA181:    // ä»­
+        case 0x9F81:    // ä»§   è±å½¢
+        case 0xAA84:    // åŠ’   æ¨ªæ 
+        case 0x4081:    // ä¸‚   ç©ºæ ¼
+        case 0x9A81:    // ä»›   â˜…
+        case 0x4C87:    // åœ†åœˆ13
+        case 0x4D87:    // åœ†åœˆ14
+            translated = ch;
+            break;
+
+        case 0xA1A1:    // å…¨è§’ç©ºæ ¼
+            translated = 0x4081;
+            break;
+
+        case 0x5C81:    // ä¹—   æ¨ªæ 
+            translated = 0x9F84;
+            break;
+
+        case 0x5AA9:    // ãˆ± å¿ƒå½¢
+            translated = 0x8A87;    // TAG2('å™´');
+            break;
+
+        case 0xD1A1:    // âŠ™ éŸ³ç¬¦
+            translated = 0xF481;  // TAG2('ä¾“');
+            break;
+
+        case 0xF6A1:    // â–  æ–¹å—
+            translated = 0xA181;
+            break;
+
+        case 0xADA1:    // â€¦ ä¸­æ–‡çœç•¥å·
+            translated = 0x6381;
+            break;
+
+        case 0xA4A1:    // ä¸­ç‚¹
+            translated = 0x4581;
+            break;
+    }
+
+#endif
+
+    return TRUE;
 }
 
 PVOID NTAPI GetGlyphsBitmap(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorIndex)
 {
-    DWriteRender    *mbcsRender, *ansiRender;
-    ULONG_PTR       fontSize, fontIndex, color, width;
+    DWriteRender    *mbcsRender, *ansiRender, *sjisRender;
+    ULONG_PTR       fontSize, fontIndex, color, width, runeWidth;
 
     fontIndex   = GameFontRender->FontSizeIndex;
     fontSize    = FontSizeTable[fontIndex];
     mbcsRender  = DWriteMBCSRenders[fontIndex];
     ansiRender  = DWriteAnsiRenders[fontIndex];
+    sjisRender  = DWriteSJISRenders[fontIndex];
     color       = FontColorTable[ColorIndex];
 
     for (auto &chr : String::Decode(Text, StrLengthA(Text), CP_GBK))
@@ -110,7 +179,6 @@ PVOID NTAPI GetGlyphsBitmap(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorI
         }
         else if (ansi > 0)
         {
-            ULONG_PTR runeWidth;
             ansiRender->DrawRune(chr, color, Buffer, Stride, &runeWidth);
             width = fontSize / 2;
             ++Text;
@@ -118,14 +186,14 @@ PVOID NTAPI GetGlyphsBitmap(PCSTR Text, PVOID Buffer, ULONG Stride, ULONG ColorI
         else if (TranslateChar(Text, translated))
         {
             CHAR tmp[3] = { translated & 0xFF, translated >> 8 };
+            //StubGetGlyphsBitmap(tmp, Buffer, Stride, ColorIndex);
 
-            StubGetGlyphsBitmap(tmp, Buffer, Stride, ColorIndex);
+            sjisRender->DrawRune(translated, color, Buffer, Stride, &runeWidth);
             width = fontSize;
             Text += 2;
         }
         else
         {
-            ULONG_PTR runeWidth;
             mbcsRender->DrawRune(chr, color, Buffer, Stride, &runeWidth);
             width = fontSize;
             Text += 2;
@@ -309,30 +377,27 @@ NTSTATUS InitializeDWrite()
         PBYTE           fontSize;
         DWriteRender**  mbcsRender = DWriteMBCSRenders;
         DWriteRender**  ansiRender = DWriteAnsiRenders;
+        DWriteRender**  sjisRender = DWriteSJISRenders;
+
+        auto createRender = [](DWriteRender**& render, PCWSTR fontPath, PCWSTR faceName, ULONG_PTR fontSize)
+        {
+            *render = new DWriteRender();
+            if (*render == nullptr)
+                return STATUS_NO_MEMORY;
+
+            return (*render++)->Initialize(fontPath, faceName, fontSize);
+        };
 
         FOR_EACH_ARRAY(fontSize, FontSizeTable)
         {
-            *mbcsRender = new DWriteRender();
-            if (*mbcsRender == nullptr)
-            {
-                hr = STATUS_NO_MEMORY;
-                break;
-            }
-
-            hr = (*mbcsRender)->Initialize(L"font.ttf", nullptr, *fontSize);
+            hr = createRender(mbcsRender, L"font.ttf", nullptr, *fontSize);
             FAIL_BREAK(hr);
-            ++mbcsRender;
 
-            *ansiRender = new DWriteRender();
-            if (*ansiRender == nullptr)
-            {
-                hr = STATUS_NO_MEMORY;
-                break;
-            }
-
-            hr = (*ansiRender)->Initialize(nullptr, L"SIMHEI", *fontSize);
+            hr = createRender(ansiRender, nullptr, L"SIMHEI", *fontSize);
             FAIL_BREAK(hr);
-            ++ansiRender;
+
+            hr = createRender(sjisRender, L"jpfont.ttf", nullptr, *fontSize);
+            FAIL_BREAK(hr);
         }
     }
 
@@ -459,7 +524,7 @@ BOOL Initialize(PVOID BaseAddress)
         MemoryPatchVa(0xCull, 1, 0x4B7A46),
         MemoryPatchVa(0xCull, 1, 0x4B7D14),
 
-        // ÎïÆ·ÒÑÓĞ¸öÊı´°¿ÚÎ»ÖÃ
+        // ç‰©å“å·²æœ‰ä¸ªæ•°çª—å£ä½ç½®
         // CWindow::CWindow(104, 14, ...)
         MemoryPatchVa(0x104ull, 4, 0x4973BA),  // x
         MemoryPatchVa(0x14ull,  4, 0x4973CE),  // width

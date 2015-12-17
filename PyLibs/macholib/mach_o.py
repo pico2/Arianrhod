@@ -423,7 +423,7 @@ class segment_command(Structure):
     def describe(self):
         segname = self.segname
         s = {}
-        s['segname'] = self.segname.rstrip('\x00')
+        s['segname'] = self.segname.rstrip(b'\x00')
         s['vmaddr'] = int(self.vmaddr)
         s['vmsize'] = int(self.vmsize)
         s['fileoff'] = int(self.fileoff)
@@ -475,7 +475,7 @@ class segment_command_64(Structure):
 
     def describe(self):
         s = {}
-        s['segname'] = self.segname.rstrip('\x00')
+        s['segname'] = self.segname.rstrip(b'\x00')
         s['vmaddr'] = int(self.vmaddr)
         s['vmsize'] = int(self.vmsize)
         s['fileoff'] = int(self.fileoff)
@@ -1015,7 +1015,7 @@ class uuid_command (Structure):
     )
 
     def describe(self):
-        return {'uuid': self.uuid.rstrip('\x00')}
+        return {'uuid': self.uuid}
 
 class rpath_command (Structure):
     _fields_ = (

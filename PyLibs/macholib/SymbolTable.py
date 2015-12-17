@@ -13,9 +13,9 @@ class SymbolTable(object):
         if openfile is None:
             openfile = open
         self.macho = macho.headers[0]
-        self.symtab = macho.getSymbolTableCommand()
-        self.dysymtab = macho.getDynamicSymbolTableCommand()
-        fh = openfile(self.macho.filename, 'rb')
+        self.symtab = self.macho.getSymbolTableCommand()
+        self.dysymtab = self.macho.getDynamicSymbolTableCommand()
+        fh = openfile(macho.filename, 'rb')
         try:
             if self.symtab is not None:
                 self.readSymbolTable(fh)
@@ -30,12 +30,12 @@ class SymbolTable(object):
         strtab = fh.read(cmd.strsize)
         fh.seek(cmd.symoff)
         nlists = []
-        for i in xrange(cmd.nsyms):
-            cmd = nlist.from_fileobj(fh)
+        for i in range(cmd.nsyms):
+            cmd = nlist.from_fileobj(fh, _endian_ = self.macho.endian)
             if cmd.n_un == 0:
                 nlists.append((cmd, ''))
             else:
-                nlists.append((cmd, strtab[cmd.n_un:strtab.find(b'\x00', cmd.n_un)]))
+                nlists.append((cmd, strtab[cmd.n_un:strtab.find(b'\x00', cmd.n_un)].decode('UTF8')))
         self.nlists = nlists
 
     def readDynamicSymbolTable(self, fh):
@@ -72,19 +72,19 @@ class SymbolTable(object):
     def readtoc(self, fh, off, n):
         #print 'toc', off, n
         fh.seek(off)
-        return [dylib_table_of_contents.from_fileobj(fh) for i in xrange(n)]
+        return [dylib_table_of_contents.from_fileobj(fh, _endian_ = self.macho.endian) for i in range(n)]
 
     def readmodtab(self, fh, off, n):
         #print 'modtab', off, n
         fh.seek(off)
-        return [dylib_module.from_fileobj(fh) for i in xrange(n)]
+        return [dylib_module.from_fileobj(fh, _endian_ = self.macho.endian) for i in range(n)]
 
     def readsym(self, fh, off, n):
         #print 'sym', off, n
         fh.seek(off)
         refs = []
-        for i in xrange(n):
-            ref = dylib_reference.from_fileobj(fh)
+        for i in range(n):
+            ref = dylib_reference.from_fileobj(fh, _endian_ = self.macho.endian)
             isym, flags = divmod(ref.isym_flags, 256)
             refs.append((self.nlists[isym], flags))
         return refs
@@ -92,4 +92,4 @@ class SymbolTable(object):
     def readrel(self, fh, off, n):
         #print 'rel', off, n
         fh.seek(off)
-        return [relocation_info.from_fileobj(fh) for i in xrange(n)]
+        return [relocation_info.from_fileobj(fh, _endian_ = self.macho.endian) for i in range(n)]
