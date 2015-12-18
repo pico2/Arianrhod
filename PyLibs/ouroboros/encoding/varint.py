@@ -25,7 +25,7 @@ def decodeVarint(buffer, mask = (1 << 64) - 1):
         if not (b & 0x80):
             buffer
             result &= mask
-            return (result, pos)
+            return result, pos
 
         shift += 7
         if shift >= 64:
