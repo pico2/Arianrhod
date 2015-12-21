@@ -5,6 +5,9 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.Log;
 import android.hardware.Sensor;
 
@@ -16,6 +19,29 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+
+class StepCounterListener implements SensorEventListener {
+    private SensorManager mSensorManager;
+    private SensorEventListener mListener;
+    private int mCount;
+
+    public StepCounterListener(SensorManager sensorManager, SensorEventListener listener) {
+        mSensorManager = sensorManager;
+        mListener = listener;
+        mCount = 0;
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        mListener.onAccuracyChanged(sensor, accuracy);
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        event.values[0] = 40000.f + event.values[0];
+        HookLoadPackage.log("step 2 %f", event.values[0]);
+        mListener.onSensorChanged(event);
+    }
+}
 
 public class HookLoadPackage implements IXposedHookLoadPackage {
     public static String currentTime() {
@@ -50,9 +76,11 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 
             case "com.tencent.mm":
                 new HookWeChat().handleLoadPackage(pkg);
+//                fakeStepCounter(pkg);
                 break;
 
             case "com.tencent.mobileqq":
+//                fakeStepCounter(pkg);
 //                new HookMobileQQ().handleLoadPackage(pkg);
                 break;
 
@@ -72,6 +100,22 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 //                new HookMms().handleLoadPackage(pkg);
                 break;
         }
+    }
+
+    private void fakeStepCounter(final LoadPackageParam pkg) {
+        XposedHelpers.findAndHookMethod("android.hardware.SensorManager", pkg.classLoader, "registerListener", SensorEventListener.class, Sensor.class, Integer.TYPE, Integer.TYPE, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
+                final SensorManager sensorManager = (SensorManager)param.thisObject;
+                final SensorEventListener listener = (SensorEventListener)param.args[0];
+                final Sensor sensor = (Sensor)param.args[1];
+                final int interval = (int)param.args[3] / 1000;
+
+                if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+                    param.args[0] = new StepCounterListener(sensorManager, listener);
+                }
+            }
+        });
     }
 
     private static final Set<Integer> SENSORS = new HashSet<>(Arrays.asList(

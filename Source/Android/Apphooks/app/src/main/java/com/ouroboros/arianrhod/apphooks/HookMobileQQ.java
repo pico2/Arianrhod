@@ -12,28 +12,6 @@ import android.hardware.SensorManager;
 import android.hardware.SensorEventListener;
 import java.lang.reflect.Constructor;
 
-class StepCounterListener implements SensorEventListener {
-    private SensorManager mSensorManager;
-    private SensorEventListener mListener;
-    private int mCount;
-
-    public StepCounterListener(SensorManager sensorManager, SensorEventListener listener) {
-        mSensorManager = sensorManager;
-        mListener = listener;
-        mCount = 0;
-    }
-
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        mListener.onAccuracyChanged(sensor, accuracy);
-    }
-
-    public void onSensorChanged(SensorEvent event) {
-        event.values[0] = event.values[0] * 100;
-        HookLoadPackage.log("step 2 %f", event.values[0]);
-        mListener.onSensorChanged(event);
-    }
-}
-
 public class HookMobileQQ implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final LoadPackageParam pkg) throws Throwable {
