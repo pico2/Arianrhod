@@ -128,10 +128,13 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    UNICODE_STRING wd;
+    IMAGE_BITMAP_HEADER bh;
 
-    GetWorkingDirectory(&wd);
-    PrintConsole(L"%wZ\n", &wd);
+    InitBitmapHeader(&bh, 640, 480, 32);
+    NtFileDisk f;
+
+    f.Create(L"D:\\Desktop\\fuck.bmp");
+    f.Write(&bh, sizeof(bh));
 
     return;
 
