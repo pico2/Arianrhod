@@ -5,6 +5,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
+import android.content.Context;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -98,6 +99,18 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
 
             case "com.android.mms":
 //                new HookMms().handleLoadPackage(pkg);
+                break;
+
+            case "eu.chainfire.lumen":
+                XposedHelpers.findAndHookMethod("android.app.ApplicationPackageManager", pkg.classLoader, "getPackageInfo", String.class, int.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        String packageName = (String)param.args[0];
+                        if (packageName.equals("eu.chainfire.lumen.pro")) {
+                            param.args[0] = "com.android.systemui";
+                        }
+                    }
+                });
                 break;
         }
     }

@@ -1,6 +1,7 @@
 {
 	"extensions":
 	[
-		"tjs"
+		"tjs",
+		"cy"
 	]
 }
