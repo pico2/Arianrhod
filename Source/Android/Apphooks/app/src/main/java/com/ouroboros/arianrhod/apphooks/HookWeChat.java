@@ -1,7 +1,9 @@
 package com.ouroboros.arianrhod.apphooks;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 
@@ -140,24 +142,40 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod(WakeLock, "release", nop);
         XposedHelpers.findAndHookMethod(WakeLock, "release", int.class, nop);
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.jni.platformcomm.Alarm", pkg.classLoader, "a", long.class, int.class, Context.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                HookLoadPackage.log("fuck alarm");
-                param.setResult(true);
-            }
-        });
+//        XposedHelpers.findAndHookMethod("com.tencent.mm.jni.platformcomm.Alarm", pkg.classLoader, "a", long.class, int.class, Context.class, new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                HookLoadPackage.log("fuck alarm");
+//                param.setResult(true);
+//            }
+//        });
 
         XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-            IntentFilter filter = (IntentFilter)param.args[1];
-            String action = filter.getAction(0);
+                IntentFilter filter = (IntentFilter)param.args[1];
+                String action = filter.getAction(0);
 
-            if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-                HookLoadPackage.log("fuck alarm %s", action);
-                param.setResult(null);
+                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                    HookLoadPackage.log("fuck alarm 1 %s", action);
+                    param.setResult(null);
+                }
             }
+        });
+
+        XposedHelpers.findAndHookMethod("android.app.AlarmManager", pkg.classLoader, "set", int.class, long.class, PendingIntent.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                PendingIntent pendingIntent = (PendingIntent)param.args[2];
+
+                Method getIntent = PendingIntent.class.getDeclaredMethod("getIntent");
+                Intent intent = (Intent)getIntent.invoke(pendingIntent);
+                String action = intent.getAction();
+
+                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                    HookLoadPackage.log("fuck alarm 2 %s", action);
+                    param.setResult(null);
+                }
             }
         });
 
@@ -168,7 +186,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
                 String action = filter.getAction(0);
 
                 if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-                    HookLoadPackage.log("fuck alarm %s", action);
+                    HookLoadPackage.log("fuck alarm 3 %s", action);
                     param.setResult(null);
                 }
             }
