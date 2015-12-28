@@ -1,15 +1,61 @@
 package com.ouroboros.arianrhod.apphooks;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.os.Handler;
+
 import java.util.Map;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.XC_MethodHook;
+import java.lang.reflect.Method;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
+
+class WeChatWakerLock {
+    public WeChatWakerLock(Context arg7) {
+    }
+
+    protected void finalize() {
+    }
+
+    private String getCallerStack() {
+        return "<native>";
+    }
+
+    public String getCreatePosStackLine() {
+        return "";
+    }
+
+    public int innerWakeLockHashCode() {
+        return 0;
+    }
+
+    public boolean isLocking() {
+        return false;
+    }
+
+    public void lock() {
+    }
+
+    public void lock(String arg8) {
+    }
+
+    public void lock(long arg2) {
+    }
+
+    public void lock(long arg8, String arg10) {
+    }
+
+    public void unLock() {
+    }
+}
 
 public class HookWeChat implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(LoadPackageParam pkg) throws Throwable {
+        hookWakerLock(pkg);
 
 //        XposedHelpers.findAndHookMethod("java.lang.System", pkg.classLoader, "load", String.class, new XC_MethodHook() {
 //            @Override
@@ -74,6 +120,57 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
                 if (type != null && type.equals("revokemsg"))
                     result.put(".sysmsg.$type",  "disabled_" + type);
+            }
+        });
+    }
+
+    private void hookWakerLock(LoadPackageParam pkg) {
+//        Class<?> WakerLock = XposedHelpers.findClass("com.tencent.mm.jni.platformcomm.WakerLock", pkg);
+        Class<?> WakeLock = XposedHelpers.findClass("android.os.PowerManager.WakeLock", pkg.classLoader);
+
+        XC_MethodHook nop = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(null);
+            }
+        };
+
+        XposedHelpers.findAndHookMethod(WakeLock, "acquire", nop);
+        XposedHelpers.findAndHookMethod(WakeLock, "acquire", long.class, nop);
+        XposedHelpers.findAndHookMethod(WakeLock, "release", nop);
+        XposedHelpers.findAndHookMethod(WakeLock, "release", int.class, nop);
+
+        XposedHelpers.findAndHookMethod("com.tencent.mm.jni.platformcomm.Alarm", pkg.classLoader, "a", long.class, int.class, Context.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                HookLoadPackage.log("fuck alarm");
+                param.setResult(true);
+            }
+        });
+
+        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+            IntentFilter filter = (IntentFilter)param.args[1];
+            String action = filter.getAction(0);
+
+            if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                HookLoadPackage.log("fuck alarm %s", action);
+                param.setResult(null);
+            }
+            }
+        });
+
+        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, String.class, Handler.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                IntentFilter filter = (IntentFilter)param.args[1];
+                String action = filter.getAction(0);
+
+                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                    HookLoadPackage.log("fuck alarm %s", action);
+                    param.setResult(null);
+                }
             }
         });
     }

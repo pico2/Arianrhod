@@ -71,47 +71,47 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
         removeStupidSensors(pkg);
 
         switch (pkg.packageName) {
-            case "pl.solidexplorer2":
+//            case "pl.solidexplorer2":
 //                new HookSolidExplorer().handleLoadPackage(pkg);
-                break;
+//                break;
 
             case "com.tencent.mm":
                 new HookWeChat().handleLoadPackage(pkg);
 //                fakeStepCounter(pkg);
                 break;
 
-            case "com.tencent.mobileqq":
+//            case "com.tencent.mobileqq":
 //                fakeStepCounter(pkg);
 //                new HookMobileQQ().handleLoadPackage(pkg);
-                break;
+//                break;
 
-            case "flar2.exkernelmanager":
+//            case "flar2.exkernelmanager":
 //                new HookExkernelManager().handleLoadPackage(pkg);
-                break;
+//                break;
 
             case "com.ceco.marshmallow.gravitybox":
                 new HookGravityBox().handleLoadPackage(pkg);
                 break;
 
-            case "com.android.systemui":
+//            case "com.android.systemui":
 //                new HookSystemUi().handleLoadPackage(pkg);
-                break;
+//                break;
 
-            case "com.android.mms":
+//            case "com.android.mms":
 //                new HookMms().handleLoadPackage(pkg);
-                break;
+//                break;
 
-            case "eu.chainfire.lumen":
-                XposedHelpers.findAndHookMethod("android.app.ApplicationPackageManager", pkg.classLoader, "getPackageInfo", String.class, int.class, new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        String packageName = (String)param.args[0];
-                        if (packageName.equals("eu.chainfire.lumen.pro")) {
-                            param.args[0] = "com.android.systemui";
-                        }
-                    }
-                });
-                break;
+//            case "eu.chainfire.lumen":
+//                XposedHelpers.findAndHookMethod("android.app.ApplicationPackageManager", pkg.classLoader, "getPackageInfo", String.class, int.class, new XC_MethodHook() {
+//                    @Override
+//                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                        String packageName = (String)param.args[0];
+//                        if (packageName.equals("eu.chainfire.lumen.pro")) {
+//                            param.args[0] = "com.android.systemui";
+//                        }
+//                    }
+//                });
+//                break;
         }
     }
 
@@ -138,19 +138,19 @@ public class HookLoadPackage implements IXposedHookLoadPackage {
         }
     ));
 
-    void removeStupidSensors(LoadPackageParam lpparam) {
-        XposedHelpers.findAndHookMethod("android.hardware.SystemSensorManager", lpparam.classLoader, "getFullSensorList", new XC_MethodHook() {
+    void removeStupidSensors(LoadPackageParam pkg) {
+        XposedHelpers.findAndHookMethod("android.hardware.SystemSensorManager", pkg.classLoader, "getFullSensorList", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                List<Sensor> fullSensorList = (List<Sensor>) param.getResult();
-                Iterator<Sensor> iterator = fullSensorList.iterator();
-                while (iterator.hasNext()) {
-                    Sensor sensor = iterator.next();
-                    if (SENSORS.contains(sensor.getType())) {
-                        iterator.remove();
-                    }
+            List<Sensor> fullSensorList = (List<Sensor>) param.getResult();
+            Iterator<Sensor> iterator = fullSensorList.iterator();
+            while (iterator.hasNext()) {
+                Sensor sensor = iterator.next();
+                if (SENSORS.contains(sensor.getType())) {
+                    iterator.remove();
                 }
-                param.setResult(fullSensorList);
+            }
+            param.setResult(fullSensorList);
             }
         });
     }
