@@ -133,7 +133,7 @@ GetAfsyncResponse(
 
             //helper.GetDeviceId(&mid, &mid2);
 
-#if 0
+#if 1
 
             // g_hardware_hash
             *(PULONG)&mid2.deviceId[0] = 0x41907897;
@@ -186,28 +186,26 @@ GetAfsyncResponse(
 
         helper.FreeSessionData(authed);
 
-        //static ULONG64 dsids[] =
-        //{
-        //    8306210101,
-        //    8306210340,
-        //};
-
         for (ULONG_PTR i = 0; i != DsidToAuth.GetSize(); ++i)
         {
-            helper.AirFairSyncAddAccount(kbsync, &mid2, afsync, DsidToAuth[i]);
+            status = helper.AirFairSyncAddAccount(kbsync, &mid2, afsync, DsidToAuth[i]);
+            DebugLog(L"add dsid %I64u: %p", DsidToAuth[i], status);
+            if (status == kAMDSuccess)
+                DsidAuthed.Add(DsidToAuth[i]);
         }
-
+/*
         helper.AirFairSyncGetAuthorizedAccount(afsync, FairPlayGuid, DeviceInfo->deviceType, nullptr, 0, &authed, &count);
 
         for (ULONG_PTR i = 0; i != count; ++i)
         {
             ULONG64 dsid = authed->at(i);
-            if (DsidToAuth.IndexOf(dsid) != DsidToAuth.kInvalidIndex)
-                DsidAuthed.Add(dsid);
+            DebugLog(L"authed: %I64u", dsid);
+            //if (DsidToAuth.IndexOf(dsid) != DsidToAuth.kInvalidIndex)
+            //    DsidAuthed.Add(dsid);
         }
 
         helper.FreeSessionData(authed);
-
+*/
         PVOID rs;
         ULONG rssize;
 
