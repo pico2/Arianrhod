@@ -128,13 +128,8 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    IMAGE_BITMAP_HEADER bh;
-
-    InitBitmapHeader(&bh, 640, 480, 32);
-    NtFileDisk f;
-
-    f.Create(L"D:\\Desktop\\fuck.bmp");
-    f.Write(&bh, sizeof(bh));
+    Rtl::EnvironmentAppend(PUSTR(L"PATH"), PUSTR(LR"(D:\Desktop\Source\GoProject\src\AppleIdAuthorizer\bin\iTunesDLL)"));
+    LoadDll(L"CoreFP.dll");
 
     return;
 

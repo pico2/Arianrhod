@@ -59,20 +59,6 @@ public class HookWeChat implements IXposedHookLoadPackage {
     public void handleLoadPackage(LoadPackageParam pkg) throws Throwable {
         hookWakerLock(pkg);
 
-//        XposedHelpers.findAndHookMethod("java.lang.System", pkg.classLoader, "load", String.class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                log(param.args[0]);
-//            }
-//        });
-
-//        initClasses(pkg);
-
-//        for (String method : new String[] {"c", "d", "e", "f", "g", "i", "v", "w"})
-//        {
-//            XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, method, String.class, String.class, Object[].class, hook);
-//        }
-
         // "error pcm duration %d"
 
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
@@ -108,20 +94,20 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.r", pkg.classLoader, "I", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                HookLoadPackage.log("what the fuck");
+//            HookLoadPackage.log("what the fuck");
 
-                if (param.hasThrowable() || param.getResult() == null)
-                    return;
+            if (param.hasThrowable() || param.getResult() == null)
+                return;
 
-                @SuppressWarnings("unchecked")
-                Map<String, String> result = (Map<String, String>)param.getResult();
+            @SuppressWarnings("unchecked")
+            Map<String, String> result = (Map<String, String>)param.getResult();
 
-                String type = result.get(".sysmsg.$type");
+            String type = result.get(".sysmsg.$type");
 
-//               log("type = " + type);
+//           log("type = " + type);
 
-                if (type != null && type.equals("revokemsg"))
-                    result.put(".sysmsg.$type",  "disabled_" + type);
+            if (type != null && type.equals("revokemsg"))
+                result.put(".sysmsg.$type",  "disabled_" + type);
             }
         });
     }
@@ -130,6 +116,16 @@ public class HookWeChat implements IXposedHookLoadPackage {
 //        Class<?> WakerLock = XposedHelpers.findClass("com.tencent.mm.jni.platformcomm.WakerLock", pkg);
         Class<?> WakeLock = XposedHelpers.findClass("android.os.PowerManager.WakeLock", pkg.classLoader);
 
+        XposedHelpers.findAndHookMethod("android.os.PowerManager", pkg.classLoader, "newWakeLock", int.class, String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                String tag = (String)param.args[1];
+                if (tag.startsWith("WakerLock:")) {
+                    param.args[1] = "WakerLock:WeChat";
+                }
+            }
+        });
+
         XC_MethodHook nop = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -137,10 +133,10 @@ public class HookWeChat implements IXposedHookLoadPackage {
             }
         };
 
-        XposedHelpers.findAndHookMethod(WakeLock, "acquire", nop);
-        XposedHelpers.findAndHookMethod(WakeLock, "acquire", long.class, nop);
-        XposedHelpers.findAndHookMethod(WakeLock, "release", nop);
-        XposedHelpers.findAndHookMethod(WakeLock, "release", int.class, nop);
+//        XposedHelpers.findAndHookMethod(WakeLock, "acquire", nop);
+//        XposedHelpers.findAndHookMethod(WakeLock, "acquire", long.class, nop);
+//        XposedHelpers.findAndHookMethod(WakeLock, "release", nop);
+//        XposedHelpers.findAndHookMethod(WakeLock, "release", int.class, nop);
 
 //        XposedHelpers.findAndHookMethod("com.tencent.mm.jni.platformcomm.Alarm", pkg.classLoader, "a", long.class, int.class, Context.class, new XC_MethodHook() {
 //            @Override
@@ -150,46 +146,46 @@ public class HookWeChat implements IXposedHookLoadPackage {
 //            }
 //        });
 
-        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                IntentFilter filter = (IntentFilter)param.args[1];
-                String action = filter.getAction(0);
-
-                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-                    HookLoadPackage.log("fuck alarm 1 %s", action);
-                    param.setResult(null);
-                }
-            }
-        });
-
-        XposedHelpers.findAndHookMethod("android.app.AlarmManager", pkg.classLoader, "set", int.class, long.class, PendingIntent.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                PendingIntent pendingIntent = (PendingIntent)param.args[2];
-
-                Method getIntent = PendingIntent.class.getDeclaredMethod("getIntent");
-                Intent intent = (Intent)getIntent.invoke(pendingIntent);
-                String action = intent.getAction();
-
-                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-                    HookLoadPackage.log("fuck alarm 2 %s", action);
-                    param.setResult(null);
-                }
-            }
-        });
-
-        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, String.class, Handler.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                IntentFilter filter = (IntentFilter)param.args[1];
-                String action = filter.getAction(0);
-
-                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-                    HookLoadPackage.log("fuck alarm 3 %s", action);
-                    param.setResult(null);
-                }
-            }
-        });
+//        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                IntentFilter filter = (IntentFilter)param.args[1];
+//                String action = filter.getAction(0);
+//
+//                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+//                    HookLoadPackage.log("fuck alarm 1 %s", action);
+//                    param.setResult(null);
+//                }
+//            }
+//        });
+//
+//        XposedHelpers.findAndHookMethod("android.app.AlarmManager", pkg.classLoader, "set", int.class, long.class, PendingIntent.class, new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                PendingIntent pendingIntent = (PendingIntent)param.args[2];
+//
+//                Method getIntent = PendingIntent.class.getDeclaredMethod("getIntent");
+//                Intent intent = (Intent)getIntent.invoke(pendingIntent);
+//                String action = intent.getAction();
+//
+//                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+//                    HookLoadPackage.log("fuck alarm 2 %s", action);
+//                    param.setResult(null);
+//                }
+//            }
+//        });
+//
+//        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, String.class, Handler.class, new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                IntentFilter filter = (IntentFilter)param.args[1];
+//                String action = filter.getAction(0);
+//
+//                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+//                    HookLoadPackage.log("fuck alarm 3 %s", action);
+//                    param.setResult(null);
+//                }
+//            }
+//        });
     }
 }

@@ -180,10 +180,10 @@ NTSTATUS iOSATH::SendSyncRequest()
 
     SyncedDataclasses.AppendValue(CFSTR("Data"));
 
-    HostInfo.SetValue(CFSTR("LibraryID"), LibraryID);
+    HostInfo.SetValue(CFSTR("LibraryID"), this->LibraryID);
     HostInfo.SetValue(CFSTR("SyncHostName"), CFSTR("OUROBOROS"));
     HostInfo.SetValue(CFSTR("SyncedDataclasses"), SyncedDataclasses);
-    HostInfo.SetValue(CFSTR("Version"), CFSTR("12.0.1.71"));
+    HostInfo.SetValue(CFSTR("Version"), CFSTR("12.3.1.23"));
     HostInfo.SetValue(CFSTR("Wakeable"), CFNumberCreate(nullptr, kCFNumberIntType, &Weakable));
 
     DataclassAnchors.SetValue(CFSTR("Media"), CFSTR("0"));

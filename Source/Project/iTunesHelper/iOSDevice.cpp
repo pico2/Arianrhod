@@ -133,13 +133,17 @@ GetAfsyncResponse(
 
             //helper.GetDeviceId(&mid, &mid2);
 
+#if 0
+
             // g_hardware_hash
-            //*(PULONG)&mid2.deviceId[0] = 0x41907897;
-            //*(PUSHORT)&mid2.deviceId[4] = 0x8CD9;
+            *(PULONG)&mid2.deviceId[0] = 0x41907897;
+            *(PUSHORT)&mid2.deviceId[4] = 0x8CD9;
 
             // g_local_hash
-            //*(PULONG)&mid.deviceId[0] = 0x72003B2F;
-            //*(PUSHORT)&mid.deviceId[4] = 0x4E90;
+            *(PULONG)&mid.deviceId[0] = 0x72003B2F;
+            *(PUSHORT)&mid.deviceId[4] = 0x4E90;
+
+#endif
 
             DebugLog(L"ScInfoPath = %S", ScInfoPath);
             status = helper.KbsyncCreateSession(&kbsync, &mid, &mid2, ScInfoPath);
@@ -197,7 +201,9 @@ GetAfsyncResponse(
 
         for (ULONG_PTR i = 0; i != count; ++i)
         {
-            DsidAuthed.Add(authed->at(i));
+            ULONG64 dsid = authed->at(i);
+            if (DsidToAuth.IndexOf(dsid) != DsidToAuth.kInvalidIndex)
+                DsidAuthed.Add(dsid);
         }
 
         helper.FreeSessionData(authed);

@@ -77,8 +77,8 @@ ItRegQueryValueExA(
         String DllPath;
         Rtl::GetModuleDirectory(DllPath, nullptr);
 
-        DllPath += ITUNES_DLL_PATH;
-        DllPath += L"\\CoreFP.dll";
+        //DllPath += ITUNES_DLL_PATH;
+        //DllPath += L"\\CoreFP.dll";
         DllPath = L"CoreFP.dll";
 
         auto CoreFPPath = DllPath.Encode(CP_ACP);
@@ -148,8 +148,10 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
 #else
 
+    DebugLog(L"append %s", ExePath + ITUNES_DLL_PATH);
+
     DebugLog(L"env len = %p", CurrentPeb()->ProcessParameters->EnvironmentSize);
-    status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH);
+    status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH + L";");
     DebugLog(L"env len = %p", CurrentPeb()->ProcessParameters->EnvironmentSize);
     DebugLog(L"set path: %p", status);
 
@@ -171,16 +173,23 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
     if (AirTrafficHost != nullptr)
     {
-        Address = ItRegOpenKeyExA;
-        Mm::WriteProtectMemory(CurrentProcess, LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA), &Address, sizeof(Address));
+        using namespace Mp;
 
-        Address = ItRegQueryValueExA;
-        Mm::WriteProtectMemory(CurrentProcess, LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), &Address, sizeof(Address));
+        PATCH_MEMORY_DATA p[] = 
+        {
+            FunctionJumpVa(
+                GetRoutineAddress(AirTrafficHost->DllBase, "ATAddAppleSearchPathsToEnvironmentFromReg"),
+                (API_POINTER(NtTestAlert))[]() -> NTSTATUS { return 0; }
+            ),
+
+            MemoryPatchVa((ULONG64)ItRegOpenKeyExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA)),
+            MemoryPatchVa((ULONG64)ItRegQueryValueExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA)),
+        };
+
+        PatchMemory(p, countof(p), nullptr);
     }
 
     this->LoadiTunesRoutines();
-    //CopyStruct(PtrAdd(this->iTunesBase, 0x19DC120), L"iTunes", sizeof(L"iTunes"));
-    //this->InitScInfo();
 
     this->Initialized = TRUE;
 

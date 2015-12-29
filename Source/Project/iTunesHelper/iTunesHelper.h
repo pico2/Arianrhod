@@ -39,6 +39,7 @@ typedef struct
 
     ULONG64 operator[](int index)
     {
+        //return this[index].LowPart;
         ULARGE_INTEGER dsid = { (ULONG32)this[index].LowPart, (ULONG32)this[index].HighPart };
         return dsid.QuadPart;
     }

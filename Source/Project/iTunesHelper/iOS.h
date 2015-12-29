@@ -6,7 +6,7 @@
 using ml::ByteArray;
 using ml::String;
 
-#if 0
+#if 1
     #define DebugLog(...) (PrintConsole(L"[%S:%d] ", __FUNCTION__, __LINE__), PrintConsole(__VA_ARGS__), PrintConsole(L"\n"))
 #else
     #define DebugLog(...)
