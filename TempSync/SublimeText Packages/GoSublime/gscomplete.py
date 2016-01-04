@@ -82,7 +82,6 @@ def resolve_snippets(ctx):
 class GoSublime(sublime_plugin.EventListener):
 	gocode_set = False
 	def on_query_completions(self, view, prefix, locations):
-		AC_OPTS = 0
 		pos = locations[0]
 		scopes = view.scope_name(pos).split()
 		if ('source.go' not in scopes) or (gs.setting('gscomplete_enabled', False) is not True):
@@ -150,7 +149,6 @@ class GoSublime(sublime_plugin.EventListener):
 				ctx['global'] = False
 				ctx['local'] = True
 				cl.extend(resolve_snippets(ctx))
-
 		return (cl, AC_OPTS)
 
 	def find_end_pt(self, view, pat, start, end, flags=sublime.LITERAL):
@@ -278,7 +276,7 @@ def _ct_poller():
 	except Exception:
 		pass
 
-	sublime.set_timeout(_ct_poller, 2000)
+	sublime.set_timeout(_ct_poller, 1000)
 
 class GsShowCallTip(sublime_plugin.TextCommand):
 	def is_enabled(self):
