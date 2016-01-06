@@ -536,7 +536,10 @@ BOOL Initialize(PVOID BaseAddress)
         MemoryPatchVa(0x14ull,  4, 0x49AAEF),  // width
 
         // ctrl code
-        MemoryPatchVa(0x0404ull, 2, 0x4850FE),
+        MemoryPatchVa(0x0404ull,    2, 0x4850FE),
+
+        // jp font size limit
+        MemoryPatchVa(0xEBull,      1, 0x4DC6A4),
 
         FunctionJumpVa(Success ? GET_GLYPHS_BITMAP_VA       : IMAGE_INVALID_VA, GetGlyphsBitmap, &StubGetGlyphsBitmap),
         FunctionJumpVa(Success ? DRAW_TALK_TEXT_VA          : IMAGE_INVALID_VA, DrawTalkText),
