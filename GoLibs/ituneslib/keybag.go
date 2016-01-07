@@ -3,6 +3,7 @@ package ituneslib
 import (
     . "ml/trace"
     "unsafe"
+    "os"
     "ml/os2"
     "path/filepath"
 )
@@ -34,10 +35,10 @@ func NewKeybagSession(uniqueDeviceID []byte) *KeybagSession {
 func (self *KeybagSession) initialize(uniqueDeviceID []byte) {
     self.uniqueDeviceID = uniqueDeviceID
 
-    // scinfo := String(`C:\ProgramData\Apple Computer\iTunes\SC Info`).Encode(CP_UTF8)
-    // scinfo := []byte(`C:\ProgramData\Apple Computer\iTunes\SC Info`)
+    scinfoPath := filepath.Join(os2.ExecutablePath(), "SC Info")
+    scinfo := []byte(scinfoPath)
 
-    scinfo := []byte(filepath.Join(os2.ExecutablePath(), "SC Info"))
+    os.MkdirAll(scinfoPath, os.ModeDir)
 
     var udid *FairPlayHWInfo = nil
 
