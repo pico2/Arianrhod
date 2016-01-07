@@ -82,6 +82,7 @@ def resolve_snippets(ctx):
 class GoSublime(sublime_plugin.EventListener):
 	gocode_set = False
 	def on_query_completions(self, view, prefix, locations):
+		AC_OPTS = 0
 		pos = locations[0]
 		scopes = view.scope_name(pos).split()
 		if ('source.go' not in scopes) or (gs.setting('gscomplete_enabled', False) is not True):
@@ -276,7 +277,7 @@ def _ct_poller():
 	except Exception:
 		pass
 
-	sublime.set_timeout(_ct_poller, 1000)
+	sublime.set_timeout(_ct_poller, 2000)
 
 class GsShowCallTip(sublime_plugin.TextCommand):
 	def is_enabled(self):

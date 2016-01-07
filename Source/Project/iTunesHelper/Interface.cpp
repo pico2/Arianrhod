@@ -30,8 +30,11 @@
 #pragma comment(linker, "/EXPORT:SapSignData=_SapSignData@20")
 
 #pragma comment(linker, "/EXPORT:KbsyncCreateSession=_KbsyncCreateSession@16")
+#pragma comment(linker, "/EXPORT:KbsyncValidate=_KbsyncValidate@4")
 #pragma comment(linker, "/EXPORT:KbsyncGetData=_KbsyncGetData@28")
+#pragma comment(linker, "/EXPORT:KbsyncImport=_KbsyncImport@12")
 #pragma comment(linker, "/EXPORT:KbsyncCloseSession=_KbsyncCloseSession@4")
+#pragma comment(linker, "/EXPORT:KbsyncSaveDsid=_KbsyncSaveDsid@12")
 
 iTunesHelper *helper;
 
@@ -305,6 +308,16 @@ KbsyncCreateSession(
 EXTC
 NTSTATUS
 NTAPI
+KbsyncValidate(
+    HANDLE kbsyncSession
+)
+{
+    return helper->KbsyncValidate(kbsyncSession);
+}
+
+EXTC
+NTSTATUS
+NTAPI
 KbsyncGetData(
     HANDLE      kbsyncSession,
     ULONG64     dsid,
@@ -315,6 +328,29 @@ KbsyncGetData(
 )
 {
     return helper->KbsyncGetData(kbsyncSession, dsid, quickTimeVersion, syncType, output, outputSize);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+KbsyncSaveDsid(
+    HANDLE      kbsyncSession,
+    ULONG64     dsid
+)
+{
+    return helper->KbsyncSaveDsid(kbsyncSession, dsid);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+KbsyncImport(
+    HANDLE      kbsyncSession,
+    PVOID       keybag,
+    ULONG_PTR   size
+)
+{
+    return helper->KbsyncImport(kbsyncSession, keybag, size);
 }
 
 EXTC

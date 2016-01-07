@@ -25,3 +25,7 @@ func toString(buf *byte) string {
 
     return string(p[:length])
 }
+
+func getStatus(status uintptr) int {
+    return int(int32(status))
+}

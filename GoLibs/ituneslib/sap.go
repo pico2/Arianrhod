@@ -43,14 +43,13 @@ func (self *SapSession) CreatePrimeSignature() []byte {
     if len(self.primeSignature) == 0 {
         var buf *byte
         var size int
-        var status int32
 
         st, _, _ := itunes.SapCreatePrimeSignature.Call(
                             self.session,
                             uintptr(unsafe.Pointer(&buf)),
                             uintptr(unsafe.Pointer(&size)),
                         )
-        status = int32(st)
+        status := getStatus(st)
         if status != 0 {
             return self.primeSignature
         }
@@ -65,7 +64,6 @@ func (self *SapSession) CreatePrimeSignature() []byte {
 func (self *SapSession) ExchangeData(sapType SapCertType, data []byte) (cert []byte) {
     var buf *byte
     var size int
-    var status int32
 
     st, _, _ := itunes.SapExchangeData.Call(
                         self.session,
@@ -77,7 +75,7 @@ func (self *SapSession) ExchangeData(sapType SapCertType, data []byte) (cert []b
                         uintptr(unsafe.Pointer(&size)),
                     )
 
-    status = int32(st)
+    status := getStatus(st)
     if status != 0 {
         Raise(newiTunesHelperErrorf("SapExchangeData return %X", uint32(status)))
     }
@@ -93,15 +91,13 @@ func (self *SapSession) ExchangeData(sapType SapCertType, data []byte) (cert []b
 }
 
 func (self *SapSession) VerifyPrimeSignature(signature []byte) {
-    var status int32
-
     st, _, _ := itunes.SapVerifyPrimeSignature.Call(
                         self.session,
                         uintptr(unsafe.Pointer(&signature[0])),
                         uintptr(len(signature)),
                     )
 
-    status = int32(st)
+    status := getStatus(st)
     if status != 0 {
         Raise(newiTunesHelperErrorf("SapVerifyPrimeSignature return %X", uint32(status)))
     }
@@ -110,7 +106,6 @@ func (self *SapSession) VerifyPrimeSignature(signature []byte) {
 func (self *SapSession) SignData(data []byte) (signature []byte) {
     var buf *byte
     var size int
-    var status int32
 
     st, _, _ := itunes.SapSignData.Call(
                         self.session,
@@ -120,7 +115,7 @@ func (self *SapSession) SignData(data []byte) (signature []byte) {
                         uintptr(unsafe.Pointer(&size)),
                     )
 
-    status = int32(st)
+    status := getStatus(st)
     if status != 0 {
         Raise(newiTunesHelperErrorf("SapSignData return %X", uint32(status)))
     }

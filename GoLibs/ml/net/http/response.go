@@ -29,10 +29,10 @@ type Response struct {
     resp        *gohttp.Response
 }
 
-func NewResponse(resp *gohttp.Response) (response *Response) {
+func NewResponse(resp *gohttp.Response, options RequestOptions) (response *Response) {
     var content []byte
 
-    if resp.Body != nil {
+    if options.DontReadResponseBody == false && resp.Body != nil {
         defer resp.Body.Close()
         content = readBody(resp)
     }

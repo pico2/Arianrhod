@@ -148,13 +148,7 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
 #else
 
-    DebugLog(L"append %s", ExePath + ITUNES_DLL_PATH);
-
-    DebugLog(L"env len = %p", CurrentPeb()->ProcessParameters->EnvironmentSize);
     status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH + L";");
-    DebugLog(L"env len = %p", CurrentPeb()->ProcessParameters->EnvironmentSize);
-    DebugLog(L"set path: %p", status);
-
     status = Ldr::LoadPeImage(ExePath + ITUNES_DLL_PATH L"\\iTunesCore.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
     DebugLog(L"load iTunesCore.dll: %p", status);
     FAIL_RETURN(status);
@@ -175,7 +169,7 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     {
         using namespace Mp;
 
-        PATCH_MEMORY_DATA p[] = 
+        PATCH_MEMORY_DATA p[] =
         {
             FunctionJumpVa(
                 GetRoutineAddress(AirTrafficHost->DllBase, "ATAddAppleSearchPathsToEnvironmentFromReg"),
@@ -286,11 +280,15 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x004B8C70,     // getDeviceId2
 
         0x000ABA50,     // kbsyncCreateSession
+        0x00090760,     // kbsyncValidate
         0x00093D50,     // kbsyncInitSomething
         0x0001CF80,     // kbsyncGetData
+        0x0005F650,     // kbsyncImport
         0x0000A880,     // KbsyncAuthorizeDsid
         0x00072730,     // KbsyncDsidBindMachine
         0x00075D40,     // kbsyncCloseSession
+        0x00056240,     // kbsyncAuthorizeDsid2
+        0x0003F4C0,     // kbsyncAuthorizeDsid3
 
         0x00065FA0,     // sapCreateSession
         0x000321A0,     // sapCloseSession
@@ -404,6 +402,15 @@ NTSTATUS iTunesHelper::KbsyncCreateSession(PHANDLE kbsyncSession, PFAIR_PLAY_HW_
 
 NTSTATUS
 iTunesHelper::
+KbsyncValidate(
+    HANDLE kbsyncSession
+)
+{
+    return this->iTunes.kbsyncValidate(kbsyncSession);
+}
+
+NTSTATUS
+iTunesHelper::
 KbsyncGetData(
     HANDLE      kbsyncSession,
     ULONG64     dsid,
@@ -414,6 +421,29 @@ KbsyncGetData(
 )
 {
     return this->iTunes.kbsyncGetData(kbsyncSession, dsid, quickTimeVersion, syncType, output, outputSize);
+}
+
+NTSTATUS
+iTunesHelper::
+KbsyncSaveDsid(
+    HANDLE      kbsyncSession,
+    ULONG64     dsid
+)
+{
+    BYTE buf[0x1000];
+    this->iTunes.kbsyncAuthorizeDsid2(kbsyncSession, dsid, 0, buf);
+    return this->iTunes.kbsyncAuthorizeDsid3(kbsyncSession, dsid, 0);
+}
+
+NTSTATUS
+iTunesHelper::
+KbsyncImport(
+    HANDLE      kbsyncSession,
+    PVOID       keybag,
+    ULONG_PTR   size
+)
+{
+    return this->iTunes.kbsyncImport(kbsyncSession, keybag, size);
 }
 
 NTSTATUS iTunesHelper::KbsyncCloseSession(HANDLE session)

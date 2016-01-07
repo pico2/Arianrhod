@@ -36,8 +36,11 @@ type iTunesHelper struct {
     SapSignData                             *syscall.Proc
 
     KbsyncCreateSession                     *syscall.Proc
+    KbsyncValidate                          *syscall.Proc
     KbsyncGetData                           *syscall.Proc
+    KbsyncImport                            *syscall.Proc
     KbsyncCloseSession                      *syscall.Proc
+    KbsyncSaveDsid                          *syscall.Proc
 }
 
 var lock = sync.Mutex{}

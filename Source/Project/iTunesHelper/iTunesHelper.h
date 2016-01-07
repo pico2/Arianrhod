@@ -70,11 +70,15 @@ typedef struct
     //NTSTATUS (FASTCALL* initScInfo)(BOOLEAN _False, PKBSYNC_SESSION *kbsyncSession, ULONG64 Zero);  // CDECL+FASTCALL
 
     NTSTATUS (CDECL*    kbsyncCreateSession)(PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO whatId, PCSTR ScInfoPath, PHANDLE kbsyncSession);
+    NTSTATUS (CDECL*    kbsyncValidate)(HANDLE kbsyncSession);
     NTSTATUS (CDECL*    kbsyncInitSomething)(HANDLE kbsyncSession, ULONG64 dsid);
     NTSTATUS (CDECL*    kbsyncGetData)(HANDLE kbsyncSession, ULONG64 dsid, ULONG quickTimeVersion, ULONG syncType, PVOID *output, PULONG_PTR outputSize);
+    NTSTATUS (CDECL*    kbsyncImport)(HANDLE kbsyncSession, PVOID keybag, ULONG_PTR size);
     NTSTATUS (CDECL*    kbsyncAuthorizeDsid)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved);
     NTSTATUS (CDECL*    kbsyncDsidBindMachine)(HANDLE kbsyncSesstion, PFAIR_PLAY_HW_INFO machineId2, ULONG64 dsid);
     NTSTATUS (CDECL*    kbsyncCloseSession)(HANDLE session);
+    NTSTATUS (CDECL*    kbsyncAuthorizeDsid2)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved, PVOID unknown);
+    NTSTATUS (CDECL*    kbsyncAuthorizeDsid3)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved);
 
     NTSTATUS (CDECL*    sapCreateSession)(PHANDLE sapSession, PFAIR_PLAY_HW_INFO deviceId);
     NTSTATUS (CDECL*    sapCloseSession)(HANDLE sapSession);
@@ -257,6 +261,11 @@ public:
     );
 
     NTSTATUS
+    KbsyncValidate(
+        HANDLE kbsyncSession
+    );
+
+    NTSTATUS
     KbsyncGetData(
         HANDLE      kbsyncSession,
         ULONG64     dsid,
@@ -264,6 +273,19 @@ public:
         ULONG       syncType,
         PVOID*      output,
         PULONG_PTR  outputSize
+    );
+
+    NTSTATUS
+    KbsyncSaveDsid(
+        HANDLE      kbsyncSession,
+        ULONG64     dsid
+    );
+
+    NTSTATUS
+    KbsyncImport(
+        HANDLE      kbsyncSession,
+        PVOID       keybag,
+        ULONG_PTR   size
     );
 
     NTSTATUS

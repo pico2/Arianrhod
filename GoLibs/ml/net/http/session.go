@@ -68,11 +68,11 @@ func toString(value interface{}) String {
         case String:
             return v
 
-        case int:
+        case int, uint, int8, int16, int32, int64, uint8, uint16, uint32, uint64:
             return String(fmt.Sprintf("%v", v))
 
         default:
-            fmt.Printf("%v\n", value)
+            fmt.Printf("unknown value type %v\n", value)
             return String(v.(string))
     }
 }
@@ -109,6 +109,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     var encoding    Encoding
     var queryString string
     var err         error
+    var options     RequestOptions
 
     method := toString(methodi)
     url := toString(urli)
@@ -130,6 +131,14 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
         default:
             encoding = CP_UTF8
+    }
+
+    switch opt := params["options"].(type) {
+        case RequestOptions:
+            options = opt
+
+        case *RequestOptions:
+            options = *opt
     }
 
     switch body := params["body"].(type) {
@@ -251,7 +260,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
             }
     }
 
-    return NewResponse(resp)
+    return NewResponse(resp, options)
 }
 
 func (self *Session) Get(url interface{}, params ...Dict) (resp *Response) {
@@ -350,6 +359,6 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
     return
 }
 
-func (self *Session) SetTimeout(second float64) {
-    self.client.Timeout = time.Duration(second * 1000) * time.Millisecond
+func (self *Session) SetTimeout(timeout time.Duration) {
+    self.client.Timeout = timeout
 }

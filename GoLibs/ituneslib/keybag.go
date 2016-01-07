@@ -20,11 +20,19 @@ const (
 )
 
 type KeybagSession struct {
-    session uintptr
+    session         uintptr
+    uniqueDeviceID  []byte
 }
 
 func NewKeybagSession(uniqueDeviceID []byte) *KeybagSession {
-    var kbsyncSession uintptr
+    session := &KeybagSession{}
+    session.initialize(uniqueDeviceID)
+
+    return session
+}
+
+func (self *KeybagSession) initialize(uniqueDeviceID []byte) {
+    self.uniqueDeviceID = uniqueDeviceID
 
     // scinfo := String(`C:\ProgramData\Apple Computer\iTunes\SC Info`).Encode(CP_UTF8)
     // scinfo := []byte(`C:\ProgramData\Apple Computer\iTunes\SC Info`)
@@ -42,22 +50,18 @@ func NewKeybagSession(uniqueDeviceID []byte) *KeybagSession {
         udid.Length = 6
     }
 
+    self.Close()
+
     st, _, _ := itunes.KbsyncCreateSession.Call(
-                    uintptr(unsafe.Pointer(&kbsyncSession)),
+                    uintptr(unsafe.Pointer(&self.session)),
                     uintptr(unsafe.Pointer(udid)),
                     0,
                     uintptr(unsafe.Pointer(&scinfo[0])),
                 )
 
     if int32(st) != 0 {
-        Raise(newiTunesHelperErrorf("NewKeybagSession failed: %X", uint32(st)))
+        Raise(newiTunesHelperErrorf("KeybagSession.initialize failed: %X", uint32(st)))
     }
-
-    session := &KeybagSession{
-        session : kbsyncSession,
-    }
-
-    return session
 }
 
 func (self *KeybagSession) Close() {
@@ -69,11 +73,16 @@ func (self *KeybagSession) Close() {
     self.session = 0
 }
 
+func (self *KeybagSession) validate() int {
+    status, _, _ := itunes.KbsyncValidate.Call(self.session)
+    return getStatus(status)
+}
+
 func (self *KeybagSession) GetData(dsid int64, syncType KeybagSyncType) []byte {
     var buf *byte
     var size int
 
-    var status uint32
+    var status int
 
     switch unsafe.Sizeof(uintptr(0)) {
         case 4:
@@ -86,7 +95,7 @@ func (self *KeybagSession) GetData(dsid int64, syncType KeybagSyncType) []byte {
                             uintptr(unsafe.Pointer(&buf)),
                             uintptr(unsafe.Pointer(&size)),
                         )
-            status = uint32(st)
+            status = getStatus(st)
 
         case 8:
             st, _, _ := itunes.KbsyncGetData.Call(
@@ -97,14 +106,63 @@ func (self *KeybagSession) GetData(dsid int64, syncType KeybagSyncType) []byte {
                             uintptr(unsafe.Pointer(&buf)),
                             uintptr(unsafe.Pointer(&size)),
                         )
-            status = uint32(st)
+            status = getStatus(st)
     }
 
     if status != 0 {
-        Raise(newiTunesHelperErrorf("Keybag.GetData failed: %X", status))
+        Raise(newiTunesHelperErrorf("Keybag.GetData failed: %X", uint(status)))
     }
 
     defer FreeSessionData(buf)
 
     return toBytes(buf, size)
+}
+
+func (self *KeybagSession) Import(keybag []byte) {
+    status := self.importKeybag(keybag)
+
+    switch status {
+        case -42001, -42003:
+            status = self.validate()
+            if status == -42153 {
+                self.Close()
+                self.initialize(self.uniqueDeviceID)
+            }
+
+            status = self.importKeybag(keybag)
+    }
+
+    if status != 0 {
+        Raise(newiTunesHelperErrorf("Keybag.Import failed: %d", status))
+    }
+}
+
+func (self *KeybagSession) SaveDsid(dsid int64) {
+    var status int
+
+    switch unsafe.Sizeof(uintptr(0)) {
+        case 4:
+            st, _, _ := itunes.KbsyncSaveDsid.Call(
+                            self.session,
+                            uintptr(dsid & 0xFFFFFFFF),
+                            uintptr((dsid >> 32) & 0xFFFFFFFF),
+                        )
+            status = getStatus(st)
+
+        case 8:
+            st, _, _ := itunes.KbsyncSaveDsid.Call(
+                            self.session,
+                            uintptr(dsid),
+                        )
+            status = getStatus(st)
+    }
+
+    if status != 0 {
+        Raise(newiTunesHelperErrorf("Keybag.SaveDsid failed: %d", status))
+    }
+}
+
+func (self *KeybagSession) importKeybag(keybag []byte) int {
+    st, _, _ := itunes.KbsyncImport.Call(self.session, uintptr(unsafe.Pointer(&keybag[0])), uintptr(len(keybag)))
+    return getStatus(st)
 }
