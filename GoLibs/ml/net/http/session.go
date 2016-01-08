@@ -4,10 +4,11 @@ import (
     . "ml/strings"
     . "ml/dict"
     . "ml/trace"
+    . "ml/array"
 
-    gourl "net/url"
-    gohttp "net/http"
-    gonet "net"
+    urllib "net/url"
+    httplib "net/http"
+    netlib "net"
 
     "net/http/cookiejar"
     "fmt"
@@ -19,8 +20,8 @@ import (
 
 type Session struct {
     cookie             *cookiejar.Jar
-    client             *gohttp.Client
-    headers             gohttp.Header
+    client             *httplib.Client
+    headers             httplib.Header
     defaultTransport   *Transport
 }
 
@@ -30,10 +31,10 @@ func NewSession() *Session {
         RaiseHttpError(err)
     }
 
-    defaultTransport := newTransport(&gohttp.Transport{
+    defaultTransport := newTransport(&httplib.Transport{
         Proxy               : nil,
         // DisableKeepAlives   : true,
-        Dial                : (&gonet.Dialer{
+        Dial                : (&netlib.Dialer{
                                     Timeout     : 30 * time.Second,
                                     KeepAlive   : 30 * time.Second,
                                 }).Dial,
@@ -41,7 +42,7 @@ func NewSession() *Session {
         TLSHandshakeTimeout : 10 * time.Second,
     })
 
-    client := &gohttp.Client{
+    client := &httplib.Client{
         CheckRedirect   : nil,
         Jar             : jar,
         Timeout         : 30 * time.Second,
@@ -51,7 +52,7 @@ func NewSession() *Session {
     return &Session{
                 cookie              : jar,
                 client              : client,
-                headers             : make(gohttp.Header),
+                headers             : make(httplib.Header),
                 defaultTransport    : defaultTransport,
             }
 }
@@ -77,8 +78,8 @@ func toString(value interface{}) String {
     }
 }
 
-func dictToValues(d Dict, encoding Encoding) gourl.Values {
-    values := gourl.Values{}
+func dictToValues(d Dict, encoding Encoding) urllib.Values {
+    values := urllib.Values{}
     for k, v := range d {
 
         key := toString(k)
@@ -90,8 +91,8 @@ func dictToValues(d Dict, encoding Encoding) gourl.Values {
     return values
 }
 
-func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Header, extraHeaders Dict) {
-    for k, vs := range *defaultHeaders {
+func applyHeadersToRequest(request *httplib.Request, defaultHeaders httplib.Header, extraHeaders Dict) {
+    for k, vs := range defaultHeaders {
         for _, v := range vs {
             request.Header.Add(k, v)
         }
@@ -103,16 +104,30 @@ func applyHeadersToRequest(request *gohttp.Request, defaultHeaders *gohttp.Heade
 }
 
 func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response) {
-    var bodyReader  io.Reader
-    var bodyData    []byte
-    var params      Dict
-    var encoding    Encoding
-    var queryString string
-    var err         error
-    var options     RequestOptions
+    var bodyReader      io.Reader
+    var bodyData        []byte
+    var params          Dict
+    var encoding        Encoding
+    var err             error
+    var options         RequestOptions
 
     method := toString(methodi)
     url := toString(urli)
+    requestParams := urllib.Values{}
+
+    {
+        u, err := urllib.Parse(url.String())
+        RaiseHttpError(err)
+        query, err := urllib.ParseQuery(u.RawQuery)
+        RaiseHttpError(err)
+
+
+        for k, vs := range query {
+            for _, v := range vs {
+                requestParams.Add(k, v)
+            }
+        }
+    }
 
     switch (len(params_)) {
         case 1:
@@ -163,13 +178,14 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
         bodyReader = bytes.NewBuffer(bodyData)
     }
 
-    request, err := gohttp.NewRequest(method.String(), url.String(), bodyReader)
+    request, err := httplib.NewRequest(method.String(), url.String(), bodyReader)
     RaiseHttpError(err)
 
     switch query := params["params"].(type) {
         case Dict:
-            values := dictToValues(query, encoding)
-            queryString = values.Encode()
+            for k, v := range query {
+                requestParams.Add(string(toString(k).Encode(encoding)), string(toString(v).Encode(encoding)))
+            }
     }
 
     extraHeaders := Dict{}
@@ -179,16 +195,41 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
             extraHeaders = headers
     }
 
-    applyHeadersToRequest(request, &self.headers, extraHeaders)
+    switch options.OverwriteHeaders {
+        case true:
+            applyHeadersToRequest(request, nil, extraHeaders)
 
-    if len(queryString) != 0 {
+        case false:
+            applyHeadersToRequest(request, self.headers, extraHeaders)
+    }
+
+    if len(requestParams) != 0 {
+        queryString := ""
+
+        ignoreEncodeKeys := options.IgnoreEncodeKeys
+        if ignoreEncodeKeys == nil {
+            ignoreEncodeKeys = Array{}
+        }
+
+        for k, vs := range requestParams {
+            for _, v := range vs {
+                if len(queryString) != 0 {
+                    queryString += "&"
+                }
+
+                if ignoreEncodeKeys.Contain(k) == false {
+                    k = urllib.QueryEscape(k)
+                    v = urllib.QueryEscape(v)
+                }
+
+                queryString += fmt.Sprintf("%s=%s", k, v)
+            }
+        }
+
         request.URL.RawQuery = queryString
     }
 
-    // fmt.Printf("query string = %v\n", queryString)
-    // fmt.Printf("uri = %v\n", request.URL.String())
-
-    self.client.CheckRedirect = func(request *gohttp.Request, via []*gohttp.Request) error {
+    self.client.CheckRedirect = func(request *httplib.Request, via []*httplib.Request) error {
         if len(via) >= 10 {
             Raise(NewHttpError(HTTP_ERROR_TOO_MANY_REDIRECT, method, url, "stopped after 10 redirects"))
         }
@@ -200,7 +241,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
             request.ContentLength = int64(len(bodyData))
         }
 
-        applyHeadersToRequest(request, &self.headers, extraHeaders)
+        applyHeadersToRequest(request, self.headers, extraHeaders)
         return nil
     }
 
@@ -215,7 +256,7 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     if err != nil {
         self.defaultTransport.CancelRequest(request)
 
-        uerr := err.(*gourl.Error)
+        uerr := err.(*urllib.Error)
         herr := &HttpError{
                     Op      : uerr.Op,
                     URL     : uerr.URL,
@@ -272,17 +313,17 @@ func (self *Session) Post(url interface{}, params ...Dict) (resp *Response) {
 }
 
 func (self *Session) ClearHeaders() {
-    self.headers = gohttp.Header{}
+    self.headers = httplib.Header{}
 }
 
 func (self *Session) SetCookies(url String, cookies Dict) {
-    u, err := gourl.Parse(url.String())
+    u, err := urllib.Parse(url.String())
     RaiseHttpError(err)
 
-    c := []*gohttp.Cookie{}
+    c := []*httplib.Cookie{}
 
     for k, v := range cookies {
-        c = append(c, &gohttp.Cookie{
+        c = append(c, &httplib.Cookie{
                 Name    : fmt.Sprintf("%v", k),
                 Value   : fmt.Sprintf("%v", v),
             },
@@ -292,7 +333,7 @@ func (self *Session) SetCookies(url String, cookies Dict) {
     self.cookie.SetCookies(u, c)
 }
 
-func (self *Session) Headers() gohttp.Header {
+func (self *Session) Headers() httplib.Header {
     return self.headers
 }
 
@@ -323,14 +364,14 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
         self.defaultTransport.Proxy = nil
 
     } else {
-        var proxyUrl *gourl.URL
+        var proxyUrl *urllib.URL
         var user, pass String
 
         switch len(userAndPassword) {
             case 2:
                 user, pass = userAndPassword[0], userAndPassword[1]
                 if user.IsEmpty() == false && pass.IsEmpty() == false {
-                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%s@%s:%d", user, pass, host, port))
+                    proxyUrl, err = urllib.Parse(fmt.Sprintf("http://%s:%s@%s:%d", user, pass, host, port))
                     break
                 }
 
@@ -339,21 +380,21 @@ func (self *Session) SetProxy(host String, port int, userAndPassword ...String) 
             case 1:
                 user = userAndPassword[0]
                 if user.IsEmpty() == false {
-                    proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s@%s:%d", user, host, port))
+                    proxyUrl, err = urllib.Parse(fmt.Sprintf("http://%s@%s:%d", user, host, port))
                     break
                 }
 
                 fallthrough
 
             default:
-                proxyUrl, err = gourl.Parse(fmt.Sprintf("http://%s:%d", host, port))
+                proxyUrl, err = urllib.Parse(fmt.Sprintf("http://%s:%d", host, port))
         }
 
         if err != nil {
             return
         }
 
-        self.defaultTransport.Proxy = gohttp.ProxyURL(proxyUrl)
+        self.defaultTransport.Proxy = httplib.ProxyURL(proxyUrl)
     }
 
     return

@@ -47,3 +47,11 @@ func (self Dict) toString(depth int) string {
 func (self Dict) String() string {
     return self.toString(0)
 }
+
+func (self Dict) MergeFrom(other Dict) Dict {
+    for k, v := range other {
+        self[k] = v
+    }
+
+    return self
+}

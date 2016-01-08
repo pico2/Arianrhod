@@ -4,6 +4,7 @@ import (
     . "fmt"
     . "ml/strings"
     . "ml/trace"
+    . "ml/dict"
     "encoding/json"
     "./pinyin"
     "ml/random"
@@ -13,6 +14,7 @@ import (
     "github.com/PuerkitoBio/goquery"
     "ml/uuid"
     "ml/encoding/binary"
+    json2 "ml/encoding/json"
     "ml/net/socket"
 )
 
@@ -73,10 +75,7 @@ func genacc() {
 }
 
 func main() {
-    e := Try(func () {
-        sock := socket.NewTcpSocket()
-        sock.Connect("localhost", 6789, 1)
+    json2.Marshal(JsonDict{
+        "claim-type"            : 2,
     })
-
-    Println(e)
 }
