@@ -36,6 +36,10 @@
 #pragma comment(linker, "/EXPORT:KbsyncCloseSession=_KbsyncCloseSession@4")
 #pragma comment(linker, "/EXPORT:KbsyncSaveDsid=_KbsyncSaveDsid@12")
 
+#pragma comment(linker, "/EXPORT:MachineDataProvisioning=_MachineDataProvisioning@28")
+#pragma comment(linker, "/EXPORT:MachineDataFinishProvisioning=_MachineDataFinishProvisioning@20")
+#pragma comment(linker, "/EXPORT:MachineDataClose=_MachineDataClose@4")
+
 iTunesHelper *helper;
 
 EXTC NTSTATUS NTAPI Initialize()
@@ -222,11 +226,9 @@ EXTC NTSTATUS NTAPI iOSDeviceAuthorizeDsids(iOSDevice &Device, PCSTR SCInfoPath,
     return status;
 }
 
-/*++
-
-    sap
-
---*/
+/************************************************************************
+  sap
+************************************************************************/
 
 EXTC NTSTATUS NTAPI SapCreateSession(PHANDLE SapSession, PFAIR_PLAY_HW_INFO DeviceId)
 {
@@ -277,6 +279,10 @@ SapSignData(
 {
     return helper->SapSignData(SapSession, Data, DataSize, Signature, SignatureSize);
 }
+
+/************************************************************************
+  kbsync
+************************************************************************/
 
 EXTC
 NTSTATUS
@@ -361,4 +367,42 @@ KbsyncCloseSession(
 )
 {
     return helper->KbsyncCloseSession(session);
+}
+
+/************************************************************************
+  machine data
+************************************************************************/
+
+EXTC
+NTSTATUS
+NTAPI
+MachineDataProvisioning(
+    ULONG64     dsid,
+    PVOID       data,
+    ULONG_PTR   dataSize,
+    PVOID*      clientData,
+    PULONG_PTR  clientDataSize,
+    PHANDLE     sessionId
+)
+{
+    return helper->MachineDataProvisioning(dsid, data, dataSize, clientData, clientDataSize, sessionId);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+MachineDataFinishProvisioning(
+    HANDLE      sessionId,
+    PVOID       settingInfo,
+    ULONG_PTR   settingInfoSize,
+    PVOID       transportKey,
+    ULONG_PTR   transportKeySize
+)
+{
+    return helper->MachineDataFinishProvisioning(sessionId, settingInfo, settingInfoSize, transportKey, transportKeySize);
+}
+
+EXTC NTSTATUS NTAPI MachineDataClose(HANDLE sessionId)
+{
+    return helper->MachineDataClose(sessionId);
 }

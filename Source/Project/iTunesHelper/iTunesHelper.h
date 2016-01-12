@@ -80,6 +80,10 @@ typedef struct
     NTSTATUS (CDECL*    kbsyncAuthorizeDsid2)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved, PVOID unknown);
     NTSTATUS (CDECL*    kbsyncAuthorizeDsid3)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved);
 
+    NTSTATUS (CDECL*    machineDataProvisioning)(ULONG64 dsid, PVOID data, ULONG_PTR dataSize, PVOID *clientData, PULONG_PTR clientDataSize, PHANDLE sessionId);
+    NTSTATUS (CDECL*    machineDataFinishProvisioning)(HANDLE sessionId, PVOID settingInfo, ULONG_PTR settingInfoSize, PVOID transportKey, ULONG_PTR transportKeySize);
+    NTSTATUS (CDECL*    machineDataClose)(HANDLE sessionId);
+
     NTSTATUS (CDECL*    sapCreateSession)(PHANDLE sapSession, PFAIR_PLAY_HW_INFO deviceId);
     NTSTATUS (CDECL*    sapCloseSession)(HANDLE sapSession);
 
@@ -292,6 +296,33 @@ public:
     KbsyncCloseSession(
         HANDLE session
     );
+
+    /*++
+    
+        machine data
+    
+    --*/
+
+    NTSTATUS
+    MachineDataProvisioning(
+        ULONG64     dsid,
+        PVOID       data,
+        ULONG_PTR   dataSize,
+        PVOID*      clientData,
+        PULONG_PTR  clientDataSize,
+        PHANDLE     sessionId
+    );
+
+    NTSTATUS
+    MachineDataFinishProvisioning(
+        HANDLE      sessionId,
+        PVOID       settingInfo,
+        ULONG_PTR   settingInfoSize,
+        PVOID       transportKey,
+        ULONG_PTR   transportKeySize
+    );
+
+    NTSTATUS MachineDataClose(HANDLE sessionId);
 
     /*++
 

@@ -290,6 +290,10 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x00056240,     // kbsyncAuthorizeDsid2
         0x0003F4C0,     // kbsyncAuthorizeDsid3
 
+        0x000D84B0,     // machineDataProvisioning
+        0x000D7970,     // machineDataFinishProvisioning
+        0x000D7880,     // machineDataClose
+
         0x00065FA0,     // sapCreateSession
         0x000321A0,     // sapCloseSession
         0x000A8920,     // sapExchangeData
@@ -453,6 +457,44 @@ NTSTATUS iTunesHelper::KbsyncCloseSession(HANDLE session)
 
     return this->iTunes.kbsyncCloseSession(session);
 }
+
+/************************************************************************
+  machine data
+************************************************************************/
+
+
+NTSTATUS
+iTunesHelper::
+MachineDataProvisioning(
+    ULONG64     dsid,
+    PVOID       data,
+    ULONG_PTR   dataSize,
+    PVOID*      clientData,
+    PULONG_PTR  clientDataSize,
+    PHANDLE     sessionId
+)
+{
+    return this->iTunes.machineDataProvisioning(dsid, data, dataSize, clientData, clientDataSize, sessionId);
+}
+
+NTSTATUS
+iTunesHelper::
+MachineDataFinishProvisioning(
+    HANDLE      sessionId,
+    PVOID       settingInfo,
+    ULONG_PTR   settingInfoSize,
+    PVOID       transportKey,
+    ULONG_PTR   transportKeySize
+)
+{
+    return this->iTunes.machineDataFinishProvisioning(sessionId, settingInfo, settingInfoSize, transportKey, transportKeySize);
+}
+
+NTSTATUS iTunesHelper::MachineDataClose(HANDLE sessionId)
+{
+    return this->iTunes.machineDataClose(sessionId);
+}
+
 
 /************************************************************************
   sap
