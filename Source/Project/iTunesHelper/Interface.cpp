@@ -36,9 +36,11 @@
 #pragma comment(linker, "/EXPORT:KbsyncCloseSession=_KbsyncCloseSession@4")
 #pragma comment(linker, "/EXPORT:KbsyncSaveDsid=_KbsyncSaveDsid@12")
 
-#pragma comment(linker, "/EXPORT:MachineDataProvisioning=_MachineDataProvisioning@28")
+#pragma comment(linker, "/EXPORT:MachineDataStartProvisioning=_MachineDataStartProvisioning@28")
 #pragma comment(linker, "/EXPORT:MachineDataFinishProvisioning=_MachineDataFinishProvisioning@20")
+#pragma comment(linker, "/EXPORT:MachineDataFree=_MachineDataFree@4")
 #pragma comment(linker, "/EXPORT:MachineDataClose=_MachineDataClose@4")
+#pragma comment(linker, "/EXPORT:MachineDataGetData=_MachineDataGetData@24")
 
 iTunesHelper *helper;
 
@@ -376,7 +378,7 @@ KbsyncCloseSession(
 EXTC
 NTSTATUS
 NTAPI
-MachineDataProvisioning(
+MachineDataStartProvisioning(
     ULONG64     dsid,
     PVOID       data,
     ULONG_PTR   dataSize,
@@ -385,7 +387,7 @@ MachineDataProvisioning(
     PHANDLE     sessionId
 )
 {
-    return helper->MachineDataProvisioning(dsid, data, dataSize, clientData, clientDataSize, sessionId);
+    return helper->MachineDataStartProvisioning(dsid, data, dataSize, clientData, clientDataSize, sessionId);
 }
 
 EXTC
@@ -402,7 +404,26 @@ MachineDataFinishProvisioning(
     return helper->MachineDataFinishProvisioning(sessionId, settingInfo, settingInfoSize, transportKey, transportKeySize);
 }
 
+EXTC NTSTATUS NTAPI MachineDataFree(PVOID data)
+{
+    return helper->MachineDataFree(data);
+}
+
 EXTC NTSTATUS NTAPI MachineDataClose(HANDLE sessionId)
 {
     return helper->MachineDataClose(sessionId);
+}
+
+EXTC
+NTSTATUS
+NTAPI
+MachineDataGetData(
+    ULONG64     dsid,
+    PVOID*      data,
+    PULONG_PTR  dataSize,
+    PVOID*      signature,
+    PULONG_PTR  signatureSize
+)
+{
+    return helper->MachineDataGetData(dsid, data, dataSize, signature, signatureSize);
 }

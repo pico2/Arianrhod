@@ -15,6 +15,10 @@ func FreeSessionData(ptr interface{}) {
     itunes.iTunesFreeMemory.Call(reflect.ValueOf(ptr).Pointer())
 }
 
+func freeMachineData(ptr interface{}) {
+    itunes.MachineDataFree.Call(reflect.ValueOf(ptr).Pointer())
+}
+
 func FreeMemory(ptr interface{}) {
     itunes.FreeMemory.Call(reflect.ValueOf(ptr).Pointer())
 }

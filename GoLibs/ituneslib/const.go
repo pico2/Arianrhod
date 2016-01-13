@@ -6,6 +6,10 @@ const (
     STATE_UNSUBSCRIBE   = 3
 )
 
+const (
+    AnonymousDsid   = int64(-1)
+)
+
 var productTypeToName = map[string]string{
     "iPad1,1"     : "iPad 1",
     "iPad2,1"     : "iPad 2 WiFi",

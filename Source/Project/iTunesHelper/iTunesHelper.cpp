@@ -290,9 +290,11 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x00056240,     // kbsyncAuthorizeDsid2
         0x0003F4C0,     // kbsyncAuthorizeDsid3
 
-        0x000D84B0,     // machineDataProvisioning
+        0x000D84B0,     // machineDataStartProvisioning
         0x000D7970,     // machineDataFinishProvisioning
+        0x000D8A00,     // machineDataFree
         0x000D7880,     // machineDataClose
+        0x000D8A80,     // machineDataGetData
 
         0x00065FA0,     // sapCreateSession
         0x000321A0,     // sapCloseSession
@@ -462,10 +464,9 @@ NTSTATUS iTunesHelper::KbsyncCloseSession(HANDLE session)
   machine data
 ************************************************************************/
 
-
 NTSTATUS
 iTunesHelper::
-MachineDataProvisioning(
+MachineDataStartProvisioning(
     ULONG64     dsid,
     PVOID       data,
     ULONG_PTR   dataSize,
@@ -474,7 +475,7 @@ MachineDataProvisioning(
     PHANDLE     sessionId
 )
 {
-    return this->iTunes.machineDataProvisioning(dsid, data, dataSize, clientData, clientDataSize, sessionId);
+    return this->iTunes.machineDataStartProvisioning(dsid, data, dataSize, clientData, clientDataSize, sessionId);
 }
 
 NTSTATUS
@@ -490,11 +491,28 @@ MachineDataFinishProvisioning(
     return this->iTunes.machineDataFinishProvisioning(sessionId, settingInfo, settingInfoSize, transportKey, transportKeySize);
 }
 
+NTSTATUS iTunesHelper::MachineDataFree(PVOID data)
+{
+    return this->iTunes.machineDataFree(data);
+}
+
 NTSTATUS iTunesHelper::MachineDataClose(HANDLE sessionId)
 {
     return this->iTunes.machineDataClose(sessionId);
 }
 
+NTSTATUS
+iTunesHelper::
+MachineDataGetData(
+    ULONG64     dsid,
+    PVOID*      data,
+    PULONG_PTR  dataSize,
+    PVOID*      signature,
+    PULONG_PTR  signatureSize
+)
+{
+    return this->iTunes.machineDataGetData(dsid, data, dataSize, signature, signatureSize);
+}
 
 /************************************************************************
   sap
@@ -519,6 +537,10 @@ NTSTATUS iTunesHelper::SapVerifyPrimeSignature(HANDLE sapSession, PVOID signatur
 {
     return this->iTunes.sapVerifyPrimeSignature(sapSession, signature, signatureSize, nullptr, nullptr);
 }
+
+/************************************************************************
+  afsync
+************************************************************************/
 
 NTSTATUS
 iTunesHelper::

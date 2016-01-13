@@ -2,6 +2,7 @@ package os2
 
 import (
     "path/filepath"
+    "strconv"
 )
 
 func Executable() string {
@@ -15,4 +16,13 @@ func ExecutableName() string {
 
 func ExecutablePath() string {
     return filepath.Dir(Executable())
+}
+
+const (
+    PtrSize_32bits  = 32
+    PtrSize_64bits  = 64
+)
+
+func PtrSize() int {
+    return strconv.IntSize
 }

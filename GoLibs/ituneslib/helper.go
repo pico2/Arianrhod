@@ -4,6 +4,14 @@ import (
     "unsafe"
 )
 
+func bytesPtr(data []byte) uintptr {
+    return uintptr(unsafe.Pointer(&data[0]))
+}
+
+func bytesLen(data []byte) uintptr {
+    return uintptr(len(data))
+}
+
 func toBytes(buf *byte, size int) []byte {
     data := make([]byte, size)
 

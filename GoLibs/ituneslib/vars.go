@@ -41,6 +41,12 @@ type iTunesHelper struct {
     KbsyncImport                            *syscall.Proc
     KbsyncCloseSession                      *syscall.Proc
     KbsyncSaveDsid                          *syscall.Proc
+
+    MachineDataStartProvisioning            *syscall.Proc
+    MachineDataFinishProvisioning           *syscall.Proc
+    MachineDataFree                         *syscall.Proc
+    MachineDataClose                        *syscall.Proc
+    MachineDataGetData                      *syscall.Proc
 }
 
 var lock = sync.Mutex{}

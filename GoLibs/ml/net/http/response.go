@@ -11,7 +11,7 @@ import (
     "net/url"
     "mime"
     "plistlib"
-    gohttp "net/http"
+    httplib "net/http"
 )
 
 type Response struct {
@@ -20,16 +20,16 @@ type Response struct {
     Proto       String // e.g. "HTTP/1.0"
     ProtoMajor  int    // e.g. 1
     ProtoMinor  int    // e.g. 0
-    Header      gohttp.Header
+    Header      httplib.Header
     Content     []byte
-    Request     *gohttp.Request
+    Request     *httplib.Request
     Encoding    Encoding
     URL         *url.URL
 
-    resp        *gohttp.Response
+    resp        *httplib.Response
 }
 
-func NewResponse(resp *gohttp.Response, options RequestOptions) (response *Response) {
+func NewResponse(resp *httplib.Response, options RequestOptions) (response *Response) {
     var content []byte
 
     if options.DontReadResponseBody == false && resp.Body != nil {
@@ -76,7 +76,7 @@ func (self *Response) Plist(v interface{}) {
     RaiseHttpError(plistlib.Unmarshal(self.Content, v))
 }
 
-func (self *Response) Cookies() []*gohttp.Cookie {
+func (self *Response) Cookies() []*httplib.Cookie {
     return self.resp.Cookies()
 }
 
@@ -86,7 +86,7 @@ func (self *Response) Location() (*url.URL) {
     return u
 }
 
-func raise(resp *gohttp.Response, err error) {
+func raise(resp *httplib.Response, err error) {
     if err == nil {
         return
     }
@@ -120,7 +120,7 @@ func raise(resp *gohttp.Response, err error) {
     }
 }
 
-func readBody(resp *gohttp.Response) (body []byte) {
+func readBody(resp *httplib.Response) (body []byte) {
     var reader io.ReadCloser
     var err error
 
@@ -145,7 +145,7 @@ func readBody(resp *gohttp.Response) (body []byte) {
     return
 }
 
-func getEncoding(resp *gohttp.Response, body []byte) Encoding {
+func getEncoding(resp *httplib.Response, body []byte) Encoding {
     charsetTable := map[string]Encoding{
         "gb18030"   : CP_GBK,
         "gb2312"    : CP_GBK,

@@ -69,6 +69,12 @@ typedef struct
     //NTSTATUS (CDECL*    loadCoreFP)(PVOID);
     //NTSTATUS (FASTCALL* initScInfo)(BOOLEAN _False, PKBSYNC_SESSION *kbsyncSession, ULONG64 Zero);  // CDECL+FASTCALL
 
+    /*++
+
+        kbsync
+
+    --*/
+
     NTSTATUS (CDECL*    kbsyncCreateSession)(PFAIR_PLAY_HW_INFO machineId, PFAIR_PLAY_HW_INFO whatId, PCSTR ScInfoPath, PHANDLE kbsyncSession);
     NTSTATUS (CDECL*    kbsyncValidate)(HANDLE kbsyncSession);
     NTSTATUS (CDECL*    kbsyncInitSomething)(HANDLE kbsyncSession, ULONG64 dsid);
@@ -80,9 +86,23 @@ typedef struct
     NTSTATUS (CDECL*    kbsyncAuthorizeDsid2)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved, PVOID unknown);
     NTSTATUS (CDECL*    kbsyncAuthorizeDsid3)(HANDLE kbsyncSession, ULONG64 dsid, ULONG_PTR reserved);
 
-    NTSTATUS (CDECL*    machineDataProvisioning)(ULONG64 dsid, PVOID data, ULONG_PTR dataSize, PVOID *clientData, PULONG_PTR clientDataSize, PHANDLE sessionId);
+    /*++
+
+        machine data
+
+    --*/
+
+    NTSTATUS (CDECL*    machineDataStartProvisioning)(ULONG64 dsid, PVOID data, ULONG_PTR dataSize, PVOID *clientData, PULONG_PTR clientDataSize, PHANDLE sessionId);
     NTSTATUS (CDECL*    machineDataFinishProvisioning)(HANDLE sessionId, PVOID settingInfo, ULONG_PTR settingInfoSize, PVOID transportKey, ULONG_PTR transportKeySize);
+    NTSTATUS (CDECL*    machineDataFree)(PVOID data);
     NTSTATUS (CDECL*    machineDataClose)(HANDLE sessionId);
+    NTSTATUS (CDECL*    machineDataGetData)(ULONG64 dsid, PVOID* data, PULONG_PTR dataSize, PVOID* signature, PULONG_PTR signatureSize);
+
+    /*++
+
+        sap
+
+    --*/
 
     NTSTATUS (CDECL*    sapCreateSession)(PHANDLE sapSession, PFAIR_PLAY_HW_INFO deviceId);
     NTSTATUS (CDECL*    sapCloseSession)(HANDLE sapSession);
@@ -129,6 +149,13 @@ typedef struct
         PVOID*      signature,
         PULONG_PTR  signatureSize
     );
+
+
+    /*++
+
+        afsync
+
+    --*/
 
     NTSTATUS
     (CDECL*
@@ -298,13 +325,13 @@ public:
     );
 
     /*++
-    
+
         machine data
-    
+
     --*/
 
     NTSTATUS
-    MachineDataProvisioning(
+    MachineDataStartProvisioning(
         ULONG64     dsid,
         PVOID       data,
         ULONG_PTR   dataSize,
@@ -322,7 +349,17 @@ public:
         ULONG_PTR   transportKeySize
     );
 
+    NTSTATUS MachineDataFree(PVOID data);
     NTSTATUS MachineDataClose(HANDLE sessionId);
+
+    NTSTATUS
+    MachineDataGetData(
+        ULONG64     dsid,
+        PVOID*      data,
+        PULONG_PTR  dataSize,
+        PVOID*      signature,
+        PULONG_PTR  signatureSize
+    );
 
     /*++
 
