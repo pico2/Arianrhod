@@ -6,6 +6,7 @@ import (
     "os"
     "ml/os2"
     "path/filepath"
+    "encoding/hex"
 )
 
 type KeybagSyncType int
@@ -35,7 +36,7 @@ func NewKeybagSession(uniqueDeviceID []byte) *KeybagSession {
 func (self *KeybagSession) initialize(uniqueDeviceID []byte) {
     self.uniqueDeviceID = uniqueDeviceID
 
-    scinfoPath := filepath.Join(os2.ExecutablePath(), "SC Info")
+    scinfoPath := filepath.Join(os2.ExecutablePath(), "SC Info", hex.EncodeToString(uniqueDeviceID))
     scinfo := []byte(scinfoPath)
 
     os.MkdirAll(scinfoPath, os.ModeDir)
@@ -110,7 +111,7 @@ func (self *KeybagSession) GetData(dsid int64, syncType KeybagSyncType) []byte {
     }
 
     if status != 0 {
-        Raise(newiTunesHelperErrorf("Keybag.GetData failed: %X", uint(status)))
+        Raise(newiTunesHelperErrorf("Keybag.GetData failed: %d", status))
     }
 
     defer FreeSessionData(buf)
