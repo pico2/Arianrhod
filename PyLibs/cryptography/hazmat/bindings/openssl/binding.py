@@ -8,11 +8,11 @@ import collections
 import os
 import threading
 import types
+import warnings
 
 from cryptography.exceptions import InternalError
 from cryptography.hazmat.bindings._openssl import ffi, lib
 from cryptography.hazmat.bindings.openssl._conditional import CONDITIONAL_NAMES
-
 
 _OpenSSLError = collections.namedtuple("_OpenSSLError",
                                        ["code", "lib", "func", "reason"])
@@ -39,12 +39,33 @@ def _openssl_assert(lib, ok):
         raise InternalError(
             "Unknown OpenSSL error. Please file an issue at https://github.com"
             "/pyca/cryptography/issues with information on how to reproduce "
-            "this.",
+            "this. ({0!r})".format(errors),
             errors
         )
 
 
-@ffi.callback("int (*)(unsigned char *, int)", error=-1)
+def ffi_callback(signature, name, **kwargs):
+    """Callback dispatcher
+
+    The ffi_callback() dispatcher keeps callbacks compatible between dynamic
+    and static callbacks.
+    """
+    def wrapper(func):
+        if lib.Cryptography_STATIC_CALLBACKS:
+            # def_extern() returns a decorator that sets the internal
+            # function pointer and returns the original function unmodified.
+            ffi.def_extern(name=name, **kwargs)(func)
+            callback = getattr(lib, name)
+        else:
+            # callback() wraps the function in a cdata function.
+            callback = ffi.callback(signature, **kwargs)(func)
+        return callback
+    return wrapper
+
+
+@ffi_callback("int (*)(unsigned char *, int)",
+              name="Cryptography_rand_bytes",
+              error=-1)
 def _osrandom_rand_bytes(buf, size):
     signed = ffi.cast("char *", buf)
     result = os.urandom(size)
@@ -52,7 +73,7 @@ def _osrandom_rand_bytes(buf, size):
     return 1
 
 
-@ffi.callback("int (*)(void)")
+@ffi_callback("int (*)(void)", name="Cryptography_rand_status")
 def _osrandom_rand_status():
     return 1
 
@@ -87,7 +108,8 @@ class Binding(object):
     _osrandom_engine_name = ffi.new("const char[]", b"osrandom_engine")
     _osrandom_method = ffi.new(
         "RAND_METHOD *",
-        dict(bytes=_osrandom_rand_bytes, pseudorand=_osrandom_rand_bytes,
+        dict(bytes=_osrandom_rand_bytes,
+             pseudorand=_osrandom_rand_bytes,
              status=_osrandom_rand_status)
     )
 
@@ -139,10 +161,11 @@ class Binding(object):
             cls._ensure_ffi_initialized()
 
             if not cls._lock_cb_handle:
-                cls._lock_cb_handle = cls.ffi.callback(
+                wrapper = ffi_callback(
                     "void(int, int, const char *, int)",
-                    cls._lock_cb
+                    name="Cryptography_locking_cb",
                 )
+                cls._lock_cb_handle = wrapper(cls._lock_cb)
 
             # Use Python's implementation if available, importing _ssl triggers
             # the setup for this.
@@ -180,3 +203,11 @@ class Binding(object):
 # condition registering the OpenSSL locks. On Python 3.4+ the import lock
 # is per module so this approach will not work.
 Binding.init_static_locks()
+
+if Binding.lib.SSLeay() < 0x10001000:
+    warnings.warn(
+        "OpenSSL versions less than 1.0.1 are no longer supported by the "
+        "OpenSSL project, please upgrade. A future version of cryptography "
+        "will drop support for these versions.",
+        DeprecationWarning
+    )

@@ -20,7 +20,7 @@ from . import hdrs
 
 
 __all__ = ('ClientSession', 'request', 'get', 'options', 'head',
-           'delete', 'post', 'put', 'patch')
+           'delete', 'post', 'put', 'patch', 'ws_connect')
 
 PY_35 = sys.version_info >= (3, 5)
 
@@ -141,6 +141,7 @@ class ClientSession:
             raise RuntimeError('Session is closed')
 
         redirects = 0
+        history = []
         if not isinstance(method, upstr):
             method = upstr(method)
 
@@ -176,7 +177,7 @@ class ClientSession:
                 try:
                     yield from resp.start(conn, read_until_eof)
                 except:
-                    resp.close(force=True)
+                    resp.close()
                     conn.close()
                     raise
             except (aiohttp.HttpProcessingError,
@@ -193,8 +194,9 @@ class ClientSession:
             # redirects
             if resp.status in (301, 302, 303, 307) and allow_redirects:
                 redirects += 1
+                history.append(resp)
                 if max_redirects and redirects >= max_redirects:
-                    resp.close(force=True)
+                    resp.close()
                     break
 
                 # For 301 and 302, mimic IE behaviour, now changed in RFC.
@@ -210,7 +212,7 @@ class ClientSession:
 
                 scheme = urllib.parse.urlsplit(r_url)[0]
                 if scheme not in ('http', 'https', ''):
-                    resp.close(force=True)
+                    resp.close()
                     raise ValueError('Can redirect only to http or https')
                 elif not scheme:
                     r_url = urllib.parse.urljoin(url, r_url)
@@ -221,16 +223,34 @@ class ClientSession:
 
             break
 
+        resp._history = tuple(history)
         return resp
 
-    @asyncio.coroutine
     def ws_connect(self, url, *,
                    protocols=(),
                    timeout=10.0,
                    autoclose=True,
                    autoping=True,
-                   auth=None):
+                   auth=None,
+                   origin=None):
         """Initiate websocket connection."""
+        return _WSRequestContextManager(
+            self._ws_connect(url,
+                             protocols=protocols,
+                             timeout=timeout,
+                             autoclose=autoclose,
+                             autoping=autoping,
+                             auth=auth,
+                             origin=origin))
+
+    @asyncio.coroutine
+    def _ws_connect(self, url, *,
+                    protocols=(),
+                    timeout=10.0,
+                    autoclose=True,
+                    autoping=True,
+                    auth=None,
+                    origin=None):
 
         sec_key = base64.b64encode(os.urandom(16))
 
@@ -242,52 +262,70 @@ class ClientSession:
         }
         if protocols:
             headers[hdrs.SEC_WEBSOCKET_PROTOCOL] = ','.join(protocols)
+        if origin is not None:
+            headers[hdrs.ORIGIN] = origin
 
         # send request
-        resp = yield from self.request('get', url, headers=headers,
-                                       read_until_eof=False,
-                                       auth=auth)
+        resp = yield from self.get(url, headers=headers,
+                                   read_until_eof=False,
+                                   auth=auth)
 
-        # check handshake
-        if resp.status != 101:
-            raise WSServerHandshakeError('Invalid response status')
+        try:
+            # check handshake
+            if resp.status != 101:
+                raise WSServerHandshakeError(
+                    message='Invalid response status',
+                    code=resp.status,
+                    headers=resp.headers)
 
-        if resp.headers.get(hdrs.UPGRADE, '').lower() != 'websocket':
-            raise WSServerHandshakeError('Invalid upgrade header')
+            if resp.headers.get(hdrs.UPGRADE, '').lower() != 'websocket':
+                raise WSServerHandshakeError(
+                    message='Invalid upgrade header',
+                    code=resp.status,
+                    headers=resp.headers)
 
-        if resp.headers.get(hdrs.CONNECTION, '').lower() != 'upgrade':
-            raise WSServerHandshakeError('Invalid connection header')
+            if resp.headers.get(hdrs.CONNECTION, '').lower() != 'upgrade':
+                raise WSServerHandshakeError(
+                    message='Invalid connection header',
+                    code=resp.status,
+                    headers=resp.headers)
 
-        # key calculation
-        key = resp.headers.get(hdrs.SEC_WEBSOCKET_ACCEPT, '')
-        match = base64.b64encode(
-            hashlib.sha1(sec_key + WS_KEY).digest()).decode()
-        if key != match:
-            raise WSServerHandshakeError('Invalid challenge response')
+            # key calculation
+            key = resp.headers.get(hdrs.SEC_WEBSOCKET_ACCEPT, '')
+            match = base64.b64encode(
+                hashlib.sha1(sec_key + WS_KEY).digest()).decode()
+            if key != match:
+                raise WSServerHandshakeError(
+                    message='Invalid challenge response',
+                    code=resp.status,
+                    headers=resp.headers)
 
-        # websocket protocol
-        protocol = None
-        if protocols and hdrs.SEC_WEBSOCKET_PROTOCOL in resp.headers:
-            resp_protocols = [
-                proto.strip() for proto in
-                resp.headers[hdrs.SEC_WEBSOCKET_PROTOCOL].split(',')]
+            # websocket protocol
+            protocol = None
+            if protocols and hdrs.SEC_WEBSOCKET_PROTOCOL in resp.headers:
+                resp_protocols = [
+                    proto.strip() for proto in
+                    resp.headers[hdrs.SEC_WEBSOCKET_PROTOCOL].split(',')]
 
-            for proto in resp_protocols:
-                if proto in protocols:
-                    protocol = proto
-                    break
+                for proto in resp_protocols:
+                    if proto in protocols:
+                        protocol = proto
+                        break
 
-        reader = resp.connection.reader.set_parser(WebSocketParser)
-        writer = WebSocketWriter(resp.connection.writer, use_mask=True)
-
-        return self._ws_response_class(reader,
-                                       writer,
-                                       protocol,
-                                       resp,
-                                       timeout,
-                                       autoclose,
-                                       autoping,
-                                       self._loop)
+            reader = resp.connection.reader.set_parser(WebSocketParser)
+            writer = WebSocketWriter(resp.connection.writer, use_mask=True)
+        except Exception:
+            resp.close()
+            raise
+        else:
+            return self._ws_response_class(reader,
+                                           writer,
+                                           protocol,
+                                           resp,
+                                           timeout,
+                                           autoclose,
+                                           autoping,
+                                           self._loop)
 
     def _update_cookies(self, cookies):
         """Update shared cookies."""
@@ -414,7 +452,7 @@ else:
     base = object
 
 
-class _RequestContextManager(base):
+class _BaseRequestContextManager(base):
 
     __slots__ = ('_coro', '_resp')
 
@@ -466,6 +504,17 @@ class _RequestContextManager(base):
             self._resp = yield from self._coro
             return self._resp
 
+
+if not PY_35:
+    try:
+        from asyncio import coroutines
+        coroutines._COROUTINE_TYPES += (_BaseRequestContextManager,)
+    except:
+        pass
+
+
+class _RequestContextManager(_BaseRequestContextManager):
+    if PY_35:
         @asyncio.coroutine
         def __aexit__(self, exc_type, exc, tb):
             if exc_type is not None:
@@ -474,17 +523,44 @@ class _RequestContextManager(base):
                 yield from self._resp.release()
 
 
-if not PY_35:
-    try:
-        from asyncio import coroutines
-        coroutines._COROUTINE_TYPES += (_RequestContextManager,)
-    except:
-        pass
+class _WSRequestContextManager(_BaseRequestContextManager):
+    if PY_35:
+        @asyncio.coroutine
+        def __aexit__(self, exc_type, exc, tb):
+            yield from self._resp.close()
 
 
 class _DetachedRequestContextManager(_RequestContextManager):
 
     __slots__ = _RequestContextManager.__slots__ + ('_session', )
+
+    def __init__(self, coro, session):
+        super().__init__(coro)
+        self._session = session
+
+    @asyncio.coroutine
+    def __iter__(self):
+        try:
+            return (yield from self._coro)
+        except:
+            self._session.close()
+            raise
+
+    if PY_35:
+        def __await__(self):
+            try:
+                return (yield from self._coro)
+            except:
+                self._session.close()
+                raise
+
+    def __del__(self):
+        self._session.detach()
+
+
+class _DetachedWSRequestContextManager(_WSRequestContextManager):
+
+    __slots__ = _WSRequestContextManager.__slots__ + ('_session', )
 
     def __init__(self, coro, session):
         super().__init__(coro)
@@ -612,3 +688,27 @@ def patch(url, **kwargs):
 
 def delete(url, **kwargs):
     return request(hdrs.METH_DELETE, url, **kwargs)
+
+
+def ws_connect(url, *, protocols=(), timeout=10.0, connector=None, auth=None,
+               ws_response_class=ClientWebSocketResponse, autoclose=True,
+               autoping=True, loop=None, origin=None, headers=None):
+
+    if loop is None:
+        loop = asyncio.get_event_loop()
+
+    if connector is None:
+        connector = aiohttp.TCPConnector(loop=loop, force_close=True)
+
+    session = aiohttp.ClientSession(loop=loop, connector=connector, auth=auth,
+                                    ws_response_class=ws_response_class,
+                                    headers=headers)
+
+    return _DetachedWSRequestContextManager(
+        session._ws_connect(url,
+                            protocols=protocols,
+                            timeout=timeout,
+                            autoclose=autoclose,
+                            autoping=autoping,
+                            origin=origin),
+        session=session)

@@ -2,7 +2,7 @@
 # The Python Imaging Library
 # $Id$
 #
-# screen grabber (windows only)
+# screen grabber (OS X and Windows only)
 #
 # History:
 # 2001-04-26 fl  created
@@ -22,13 +22,7 @@ if sys.platform not in ["win32", "darwin"]:
     raise ImportError("ImageGrab is OS X and Windows only")
 
 if sys.platform == "win32":
-    try:
-        # built-in driver (1.1.3 and later)
-        grabber = Image.core.grabscreen
-    except AttributeError:
-        # stand-alone driver (pil plus)
-        import _grabscreen
-        grabber = _grabscreen.grab
+    grabber = Image.core.grabscreen
 elif sys.platform == "darwin":
     import os
     import tempfile

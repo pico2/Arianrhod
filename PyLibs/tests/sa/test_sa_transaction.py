@@ -101,6 +101,23 @@ class TestTransaction(unittest.TestCase):
 
         self.loop.run_until_complete(go())
 
+    def test_connection_attr2(self):
+        @asyncio.coroutine
+        def go():
+            conn = yield from self.connect()
+            raw_conn = conn._connection
+            self.assertFalse(raw_conn.get_transaction_status())
+            with self.assertRaises(asyncio.CancelledError):
+                f = asyncio.async(conn.begin(), loop=self.loop)
+                yield from asyncio.sleep(0, loop=self.loop)
+                f.cancel()
+                yield from f
+            self.assertIs(conn._transaction, None)
+            self.assertFalse(raw_conn.get_transaction_status())
+            yield from conn.close()
+
+        self.loop.run_until_complete(go())
+
     def test_root_transaction(self):
         @asyncio.coroutine
         def go():
@@ -452,8 +469,15 @@ class TestTransaction(unittest.TestCase):
             yield from conn.execute(tbl.insert().values(name='b'))
             res2 = yield from conn.scalar(tbl.count())
             self.assertEqual(2, res2)
+            yield from tr2.rollback()
+            self.assertIsNone(conn._transaction)
 
-            yield from tr2.commit()
+            tr3 = yield from conn.begin()
+            self.assertIs(tr3, conn._transaction)
+            yield from conn.execute(tbl.insert().values(name='b'))
+            res3 = yield from conn.scalar(tbl.count())
+            self.assertEqual(2, res3)
+            yield from tr3.commit()
             self.assertIsNone(conn._transaction)
             yield from conn.close()
 

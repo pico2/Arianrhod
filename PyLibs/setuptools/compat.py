@@ -7,7 +7,7 @@ PY2 = not PY3
 if PY2:
     basestring = basestring
     import __builtin__ as builtins
-    import ConfigParser
+    import ConfigParser as configparser
     from StringIO import StringIO
     BytesIO = StringIO
     func_code = lambda o: o.func_code
@@ -29,6 +29,8 @@ if PY2:
     from urllib2 import urlopen, HTTPError, URLError, unquote, splituser
     from urlparse import urlparse, urlunparse, urljoin, urlsplit, urlunsplit
     filterfalse = itertools.ifilterfalse
+    filter = itertools.ifilter
+    map = itertools.imap
 
     exec("""def reraise(tp, value, tb=None):
     raise tp, value, tb""")
@@ -36,7 +38,7 @@ if PY2:
 if PY3:
     basestring = str
     import builtins
-    import configparser as ConfigParser
+    import configparser
     from io import StringIO, BytesIO
     func_code = lambda o: o.__code__
     func_globals = lambda o: o.__globals__
@@ -59,6 +61,8 @@ if PY3:
         urlunsplit, splittag,
     )
     filterfalse = itertools.filterfalse
+    filter = filter
+    map = map
 
     def reraise(tp, value, tb=None):
         if value.__traceback__ is not tb:

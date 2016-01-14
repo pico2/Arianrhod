@@ -12,8 +12,10 @@ import sys
 import warnings
 
 
-DeprecatedIn09 = DeprecationWarning
-DeprecatedIn10 = PendingDeprecationWarning
+# the functions deprecated in 1.0 are on an arbitrarily extended deprecation
+# cycle and should not be removed until we agree on when that cycle ends.
+DeprecatedIn10 = DeprecationWarning
+DeprecatedIn12 = PendingDeprecationWarning
 
 
 def read_only_property(name):

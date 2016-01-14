@@ -153,8 +153,15 @@ class SAConnection:
 
         """
         if self._transaction is None:
-            self._transaction = RootTransaction(self)
-            yield from self._begin_impl()
+            try:
+                yield from self._begin_impl()
+                self._transaction = RootTransaction(self)
+            except asyncio.CancelledError as e:
+                import pdb
+                pdb.set_trace()
+                yield from self._rollback_impl()
+                yield from self._rollback_impl()
+                raise e
             return self._transaction
         else:
             return Transaction(self, self._transaction)
@@ -183,6 +190,7 @@ class SAConnection:
             yield from cur.execute('ROLLBACK')
         finally:
             yield from cur.close()
+            self._transaction = None
 
     @asyncio.coroutine
     def begin_nested(self):

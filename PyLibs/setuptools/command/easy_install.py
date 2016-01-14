@@ -20,6 +20,7 @@ from distutils.errors import DistutilsArgError, DistutilsOptionError, \
 from distutils.command.install import INSTALL_SCHEMES, SCHEME_KEYS
 from distutils import log, dir_util
 from distutils.command.build_scripts import first_line_re
+from distutils.spawn import find_executable
 import sys
 import os
 import zipimport
@@ -760,9 +761,10 @@ class easy_install(Command):
         return dst
 
     def install_wrapper_scripts(self, dist):
-        if not self.exclude_scripts:
-            for args in ScriptWriter.best().get_args(dist):
-                self.write_script(*args)
+        if self.exclude_scripts:
+            return
+        for args in ScriptWriter.best().get_args(dist):
+            self.write_script(*args)
 
     def install_script(self, dist, script_name, script_text, dev_path=None):
         """Generate a legacy script wrapper and install it"""
@@ -770,8 +772,8 @@ class easy_install(Command):
         is_script = is_python_script(script_text, script_name)
 
         if is_script:
-            script_text = (ScriptWriter.get_header(script_text) +
-                           self._load_template(dev_path) % locals())
+            body = self._load_template(dev_path) % locals()
+            script_text = ScriptWriter.get_header(script_text) + body
         self.write_script(script_name, _to_ascii(script_text), 'b')
 
     @staticmethod
@@ -803,9 +805,8 @@ class easy_install(Command):
             ensure_directory(target)
             if os.path.exists(target):
                 os.unlink(target)
-            f = open(target, "w" + mode)
-            f.write(contents)
-            f.close()
+            with open(target, "w" + mode) as f:
+                f.write(contents)
             chmod(target, 0o777 - mask)
 
     def install_eggs(self, spec, dist_filename, tmpdir):
@@ -1401,7 +1402,7 @@ def expand_paths(inputs):
 def extract_wininst_cfg(dist_filename):
     """Extract configuration data from a bdist_wininst .exe
 
-    Returns a ConfigParser.RawConfigParser, or None
+    Returns a configparser.RawConfigParser, or None
     """
     f = open(dist_filename, 'rb')
     try:
@@ -1414,7 +1415,7 @@ def extract_wininst_cfg(dist_filename):
             return None
         f.seek(prepended - 12)
 
-        from setuptools.compat import StringIO, ConfigParser
+        from setuptools.compat import StringIO, configparser
         import struct
 
         tag, cfglen, bmlen = struct.unpack("<iii", f.read(12))
@@ -1422,7 +1423,7 @@ def extract_wininst_cfg(dist_filename):
             return None  # not a valid tag
 
         f.seek(prepended - (12 + cfglen))
-        cfg = ConfigParser.RawConfigParser(
+        cfg = configparser.RawConfigParser(
             {'version': '', 'target_version': ''})
         try:
             part = f.read(cfglen)
@@ -1432,7 +1433,7 @@ def extract_wininst_cfg(dist_filename):
             #  be text, so decode it.
             config = config.decode(sys.getfilesystemencoding())
             cfg.readfp(StringIO(config))
-        except ConfigParser.Error:
+        except configparser.Error:
             return None
         if not cfg.has_section('metadata') or not cfg.has_section('Setup'):
             return None
@@ -2125,8 +2126,8 @@ class WindowsScriptWriter(ScriptWriter):
         blockers = [name + x for x in old]
         yield name + ext, header + script_text, 't', blockers
 
-    @staticmethod
-    def _adjust_header(type_, orig_header):
+    @classmethod
+    def _adjust_header(cls, type_, orig_header):
         """
         Make sure 'pythonw' is used for gui and and 'python' is used for
         console (regardless of what sys.executable is).
@@ -2137,11 +2138,19 @@ class WindowsScriptWriter(ScriptWriter):
             pattern, repl = repl, pattern
         pattern_ob = re.compile(re.escape(pattern), re.IGNORECASE)
         new_header = pattern_ob.sub(string=orig_header, repl=repl)
+        return new_header if cls._use_header(new_header) else orig_header
+
+    @staticmethod
+    def _use_header(new_header):
+        """
+        Should _adjust_header use the replaced header?
+
+        On non-windows systems, always use. On
+        Windows systems, only use the replaced header if it resolves
+        to an executable on the system.
+        """
         clean_header = new_header[2:-1].strip('"')
-        if sys.platform == 'win32' and not os.path.exists(clean_header):
-            # the adjusted version doesn't exist, so return the original
-            return orig_header
-        return new_header
+        return sys.platform != 'win32' or find_executable(clean_header)
 
 
 class WindowsExecutableLauncherWriter(WindowsScriptWriter):

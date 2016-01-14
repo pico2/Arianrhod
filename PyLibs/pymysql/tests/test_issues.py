@@ -1,6 +1,7 @@
 import datetime
 import time
 import warnings
+import sys
 
 import pymysql
 from pymysql.tests import base
@@ -76,7 +77,7 @@ class TestOldIssues(base.PyMySQLTestCase):
             warnings.filterwarnings("ignore")
             c.execute("drop table if exists test")
         c.execute("""CREATE TABLE `test` (`station` int(10) NOT NULL DEFAULT '0', `dh`
-datetime NOT NULL DEFAULT '0000-00-00 00:00:00', `echeance` int(1) NOT NULL
+datetime NOT NULL DEFAULT '2015-01-01 00:00:00', `echeance` int(1) NOT NULL
 DEFAULT '0', `me` double DEFAULT NULL, `mo` double DEFAULT NULL, PRIMARY
 KEY (`station`,`dh`,`echeance`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;""")
         try:
@@ -144,11 +145,12 @@ KEY (`station`,`dh`,`echeance`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;""")
 
     @unittest2.skip("test_issue_17() requires a custom, legacy MySQL configuration and will not be run.")
     def test_issue_17(self):
-        """ could not connect mysql use passwod """
+        """could not connect mysql use passwod"""
         conn = self.connections[0]
         host = self.databases[0]["host"]
         db = self.databases[0]["db"]
         c = conn.cursor()
+
         # grant access to a table to a user with a password
         try:
             with warnings.catch_warnings():
@@ -178,17 +180,12 @@ class TestNewIssues(base.PyMySQLTestCase):
 
     def test_issue_33(self):
         conn = pymysql.connect(charset="utf8", **self.databases[0])
+        self.safe_create_table(conn, u'hei\xdfe',
+                               u'create table hei\xdfe (name varchar(32))')
         c = conn.cursor()
-        try:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore")
-                c.execute(b"drop table if exists hei\xc3\x9fe".decode("utf8"))
-            c.execute(b"create table hei\xc3\x9fe (name varchar(32))".decode("utf8"))
-            c.execute(b"insert into hei\xc3\x9fe (name) values ('Pi\xc3\xb1ata')".decode("utf8"))
-            c.execute(b"select name from hei\xc3\x9fe".decode("utf8"))
-            self.assertEqual(b"Pi\xc3\xb1ata".decode("utf8"), c.fetchone()[0])
-        finally:
-            c.execute(b"drop table hei\xc3\x9fe".decode("utf8"))
+        c.execute(u"insert into hei\xdfe (name) values ('Pi\xdfata')")
+        c.execute(u"select name from hei\xdfe")
+        self.assertEqual(u"Pi\xdfata", c.fetchone()[0])
 
     @unittest2.skip("This test requires manual intervention")
     def test_issue_35(self):
@@ -202,9 +199,9 @@ class TestNewIssues(base.PyMySQLTestCase):
             self.assertEqual(2013, e.args[0])
 
     def test_issue_36(self):
-        conn = self.connections[0]
+        # connection 0 is super user, connection 1 isn't
+        conn = self.connections[1]
         c = conn.cursor()
-        # kill connections[0]
         c.execute("show processlist")
         kill_id = None
         for row in c.fetchall():
@@ -215,7 +212,7 @@ class TestNewIssues(base.PyMySQLTestCase):
                 break
         self.assertEqual(kill_id, conn.thread_id())
         # now nuke the connection
-        self.connections[1].kill(kill_id)
+        self.connections[0].kill(kill_id)
         # make sure this connection has broken
         try:
             c.execute("show tables")
@@ -230,12 +227,12 @@ class TestNewIssues(base.PyMySQLTestCase):
             # Wait since Travis-CI sometimes fail this test.
             time.sleep(0.1)
 
-            c = self.connections[1].cursor()
+            c = self.connections[0].cursor()
             c.execute("show processlist")
             ids = [row[0] for row in c.fetchall()]
             self.assertFalse(kill_id in ids)
         finally:
-            del self.connections[0]
+            del self.connections[1]
 
     def test_issue_37(self):
         conn = self.connections[0]
@@ -381,3 +378,111 @@ class TestGitHubIssues(base.PyMySQLTestCase):
                     warnings.filterwarnings("ignore")
                     cur.execute('drop table if exists test_field_count')
 
+    def test_issue_321(self):
+        """ Test iterable as query argument. """
+        conn = pymysql.connect(charset="utf8", **self.databases[0])
+        self.safe_create_table(
+            conn, "issue321",
+            "create table issue321 (value_1 varchar(1), value_2 varchar(1))")
+
+        sql_insert = "insert into issue321 (value_1, value_2) values (%s, %s)"
+        sql_dict_insert = ("insert into issue321 (value_1, value_2) "
+                           "values (%(value_1)s, %(value_2)s)")
+        sql_select = ("select * from issue321 where "
+                      "value_1 in %s and value_2=%s")
+        data = [
+            [(u"a", ), u"\u0430"],
+            [[u"b"], u"\u0430"],
+            {"value_1": [[u"c"]], "value_2": u"\u0430"}
+        ]
+        cur = conn.cursor()
+        self.assertEqual(cur.execute(sql_insert, data[0]), 1)
+        self.assertEqual(cur.execute(sql_insert, data[1]), 1)
+        self.assertEqual(cur.execute(sql_dict_insert, data[2]), 1)
+        self.assertEqual(
+            cur.execute(sql_select, [(u"a", u"b", u"c"), u"\u0430"]), 3)
+        self.assertEqual(cur.fetchone(), (u"a", u"\u0430"))
+        self.assertEqual(cur.fetchone(), (u"b", u"\u0430"))
+        self.assertEqual(cur.fetchone(), (u"c", u"\u0430"))
+
+    def test_issue_364(self):
+        """ Test mixed unicode/binary arguments in executemany. """
+        conn = pymysql.connect(charset="utf8", **self.databases[0])
+        self.safe_create_table(
+            conn, "issue364",
+            "create table issue364 (value_1 binary(3), value_2 varchar(3)) "
+            "engine=InnoDB default charset=utf8")
+
+        sql = "insert into issue364 (value_1, value_2) values (%s, %s)"
+        usql = u"insert into issue364 (value_1, value_2) values (%s, %s)"
+        values = [pymysql.Binary(b"\x00\xff\x00"), u"\xe4\xf6\xfc"]
+
+        # test single insert and select
+        cur = conn.cursor()
+        cur.execute(sql, args=values)
+        cur.execute("select * from issue364")
+        self.assertEqual(cur.fetchone(), tuple(values))
+
+        # test single insert unicode query
+        cur.execute(usql, args=values)
+
+        # test multi insert and select
+        cur.executemany(sql, args=(values, values, values))
+        cur.execute("select * from issue364")
+        for row in cur.fetchall():
+            self.assertEqual(row, tuple(values))
+
+        # test multi insert with unicode query
+        cur.executemany(usql, args=(values, values, values))
+
+    def test_issue_363(self):
+        """ Test binary / geometry types. """
+        conn = pymysql.connect(charset="utf8", **self.databases[0])
+        self.safe_create_table(
+            conn, "issue363",
+            "CREATE TABLE issue363 ( "
+            "id INTEGER PRIMARY KEY, geom LINESTRING NOT NULL, "
+            "SPATIAL KEY geom (geom)) "
+            "ENGINE=MyISAM default charset=utf8")
+
+        cur = conn.cursor()
+        query = ("INSERT INTO issue363 (id, geom) VALUES"
+                 "(1998, GeomFromText('LINESTRING(1.1 1.1,2.2 2.2)'))")
+        # From MySQL 5.7, ST_GeomFromText is added and GeomFromText is deprecated.
+        if self.mysql_server_is(conn, (5, 7, 0)):
+            with self.assertWarns(pymysql.err.Warning) as cm:
+                cur.execute(query)
+        else:
+            cur.execute(query)
+
+        # select WKT
+        query = "SELECT AsText(geom) FROM issue363"
+        if sys.version_info[0:2] >= (3,2) and self.mysql_server_is(conn, (5, 7, 0)):
+            with self.assertWarns(pymysql.err.Warning) as cm:
+                cur.execute(query)
+        else:
+            cur.execute(query)
+        row = cur.fetchone()
+        self.assertEqual(row, ("LINESTRING(1.1 1.1,2.2 2.2)", ))
+
+        # select WKB
+        query = "SELECT AsBinary(geom) FROM issue363"
+        if sys.version_info[0:2] >= (3,2) and self.mysql_server_is(conn, (5, 7, 0)):
+            with self.assertWarns(pymysql.err.Warning) as cm:
+                cur.execute(query)
+        else:
+            cur.execute(query)
+        row = cur.fetchone()
+        self.assertEqual(row,
+                         (b"\x01\x02\x00\x00\x00\x02\x00\x00\x00"
+                          b"\x9a\x99\x99\x99\x99\x99\xf1?"
+                          b"\x9a\x99\x99\x99\x99\x99\xf1?"
+                          b"\x9a\x99\x99\x99\x99\x99\x01@"
+                          b"\x9a\x99\x99\x99\x99\x99\x01@", ))
+
+        # select internal binary
+        cur.execute("SELECT geom FROM issue363")
+        row = cur.fetchone()
+        # don't assert the exact internal binary value, as it could
+        # vary across implementations
+        self.assertTrue(isinstance(row[0], bytes))

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, absolute_import
+from functools import partial
 import re
 import warnings
 
@@ -93,43 +94,54 @@ class Cursor(object):
     def nextset(self):
         return self._nextset(False)
 
+    def _ensure_bytes(self, x, encoding=None):
+        if isinstance(x, text_type):
+            x = x.encode(encoding)
+        elif isinstance(x, (tuple, list)):
+            x = type(x)(self._ensure_bytes(v, encoding=encoding) for v in x)
+        return x
+
     def _escape_args(self, args, conn):
+        ensure_bytes = partial(self._ensure_bytes, encoding=conn.encoding)
+
         if isinstance(args, (tuple, list)):
+            if PY2:
+                args = tuple(map(ensure_bytes, args))
             return tuple(conn.escape(arg) for arg in args)
         elif isinstance(args, dict):
+            if PY2:
+                args = dict((ensure_bytes(key), ensure_bytes(val)) for
+                            (key, val) in args.items())
             return dict((key, conn.escape(val)) for (key, val) in args.items())
         else:
-            #If it's not a dictionary let's try escaping it anyways.
-            #Worst case it will throw a Value error
+            # If it's not a dictionary let's try escaping it anyways.
+            # Worst case it will throw a Value error
+            if PY2:
+                args = ensure_bytes(args)
             return conn.escape(args)
 
-    def execute(self, query, args=None):
-        '''Execute a query'''
+    def mogrify(self, query, args=None):
+        """
+        Returns the exact string that is sent to the database by calling the
+        execute() method.
+
+        This method follows the extension to the DB API 2.0 followed by Psycopg.
+        """
         conn = self._get_db()
-
-        while self.nextset():
-            pass
-
         if PY2:  # Use bytes on Python 2 always
-            encoding = conn.encoding
-
-            def ensure_bytes(x):
-                if isinstance(x, unicode):
-                    x = x.encode(encoding)
-                return x
-
-            query = ensure_bytes(query)
-
-            if args is not None:
-                if isinstance(args, (tuple, list)):
-                    args = tuple(map(ensure_bytes, args))
-                elif isinstance(args, dict):
-                    args = dict((ensure_bytes(key), ensure_bytes(val)) for (key, val) in args.items())
-                else:
-                    args = ensure_bytes(args)
+            query = self._ensure_bytes(query, encoding=conn.encoding)
 
         if args is not None:
             query = query % self._escape_args(args, conn)
+
+        return query
+
+    def execute(self, query, args=None):
+        '''Execute a query'''
+        while self.nextset():
+            pass
+
+        query = self.mogrify(query, args)
 
         result = self._query(query)
         self._executed = query
@@ -162,6 +174,8 @@ class Cursor(object):
         escape = self._escape_args
         if isinstance(prefix, text_type):
             prefix = prefix.encode(encoding)
+        if PY2 and isinstance(values, text_type):
+            values = values.encode(encoding)
         if isinstance(postfix, text_type):
             postfix = postfix.encode(encoding)
         sql = bytearray(prefix)
@@ -298,9 +312,17 @@ class Cursor(object):
             self._show_warnings(conn)
 
     def _show_warnings(self, conn):
+        if self._result and self._result.has_next:
+            return
         ws = conn.show_warnings()
+        if ws is None:
+            return
         for w in ws:
-            warnings.warn(w[-1], err.Warning, 4)
+            msg = w[-1]
+            if PY2:
+                if isinstance(msg, unicode):
+                    msg = msg.encode('utf-8', 'replace')
+            warnings.warn(str(msg), err.Warning, 4)
 
     def __iter__(self):
         return iter(self.fetchone, None)

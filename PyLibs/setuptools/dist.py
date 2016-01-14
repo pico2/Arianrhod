@@ -160,7 +160,7 @@ def check_packages(dist, attr, value):
     for pkgname in value:
         if not re.match(r'\w+(\.\w+)*', pkgname):
             distutils.log.warn(
-                "WARNING: %r not a valid package name; please use only"
+                "WARNING: %r not a valid package name; please use only "
                 ".-separated package names in setup.py", pkgname
             )
 
@@ -267,8 +267,7 @@ class Distribution(_Distribution):
         if attrs and 'setup_requires' in attrs:
             self.fetch_build_eggs(attrs['setup_requires'])
         for ep in pkg_resources.iter_entry_points('distutils.setup_keywords'):
-            if not hasattr(self,ep.name):
-                setattr(self,ep.name,None)
+            vars(self).setdefault(ep.name, None)
         _Distribution.__init__(self,attrs)
         if isinstance(self.metadata.version, numbers.Number):
             # Some people apparently take "version number" too literally :)
@@ -439,6 +438,14 @@ class Distribution(_Distribution):
                 cmdclass = ep.resolve()
                 self.cmdclass[ep.name] = cmdclass
         return _Distribution.print_commands(self)
+
+    def get_command_list(self):
+        for ep in pkg_resources.iter_entry_points('distutils.commands'):
+            if ep.name not in self.cmdclass:
+                # don't require extras as the commands won't be invoked
+                cmdclass = ep.resolve()
+                self.cmdclass[ep.name] = cmdclass
+        return _Distribution.get_command_list(self)
 
     def _set_feature(self,name,status):
         """Set feature's inclusion status"""
@@ -818,7 +825,7 @@ class Feature:
 
         if not self.available:
             raise DistutilsPlatformError(
-                self.description+" is required,"
+                self.description+" is required, "
                 "but is not available on this platform"
             )
 

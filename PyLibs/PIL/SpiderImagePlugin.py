@@ -27,10 +27,10 @@
 # image data from electron microscopy and tomography.
 #
 # Spider home page:
-# http://www.wadsworth.org/spider_doc/spider/docs/spider.html
+# http://spider.wadsworth.org/spider_doc/spider/docs/spider.html
 #
 # Details about the Spider image format:
-# http://www.wadsworth.org/spider_doc/spider/docs/image_doc.html
+# http://spider.wadsworth.org/spider_doc/spider/docs/image_doc.html
 #
 
 from __future__ import print_function
@@ -49,6 +49,8 @@ def isInt(f):
         else:
             return 0
     except ValueError:
+        return 0
+    except OverflowError:
         return 0
 
 iforms = [1, 3, -11, -12, -21, -22]

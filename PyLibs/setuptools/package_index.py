@@ -6,6 +6,7 @@ import shutil
 import socket
 import base64
 import hashlib
+import itertools
 from functools import wraps
 
 from pkg_resources import (
@@ -16,11 +17,11 @@ from pkg_resources import (
 from setuptools import ssl_support
 from distutils import log
 from distutils.errors import DistutilsError
-from setuptools.compat import (urllib2, httplib, StringIO, HTTPError,
-                               urlparse, urlunparse, unquote, splituser,
-                               url2pathname, name2codepoint,
-                               unichr, urljoin, urlsplit, urlunsplit,
-                               ConfigParser)
+from setuptools.compat import (
+    urllib2, httplib, StringIO, HTTPError, urlparse, urlunparse, unquote,
+    splituser, url2pathname, name2codepoint, unichr, urljoin, urlsplit,
+    urlunsplit, configparser, filter, map,
+)
 from setuptools.compat import filterfalse
 from fnmatch import translate
 from setuptools.py26compat import strip_fragment
@@ -352,20 +353,30 @@ class PackageIndex(Environment):
             self.warn(msg, url)
 
     def scan_egg_links(self, search_path):
-        for item in search_path:
-            if os.path.isdir(item):
-                for entry in os.listdir(item):
-                    if entry.endswith('.egg-link'):
-                        self.scan_egg_link(item, entry)
+        dirs = filter(os.path.isdir, search_path)
+        egg_links = (
+            (path, entry)
+            for path in dirs
+            for entry in os.listdir(path)
+            if entry.endswith('.egg-link')
+        )
+        list(itertools.starmap(self.scan_egg_link, egg_links))
 
     def scan_egg_link(self, path, entry):
-        lines = [_f for _f in map(str.strip,
-                                  open(os.path.join(path, entry))) if _f]
-        if len(lines)==2:
-            for dist in find_distributions(os.path.join(path, lines[0])):
-                dist.location = os.path.join(path, *lines)
-                dist.precedence = SOURCE_DIST
-                self.add(dist)
+        with open(os.path.join(path, entry)) as raw_lines:
+            # filter non-empty lines
+            lines = list(filter(None, map(str.strip, raw_lines)))
+
+        if len(lines) != 2:
+            # format is not recognized; punt
+            return
+
+        egg_path, setup_path = lines
+
+        for dist in find_distributions(os.path.join(path, egg_path)):
+            dist.location = os.path.join(path, *lines)
+            dist.precedence = SOURCE_DIST
+            self.add(dist)
 
     def process_index(self,url,page):
         """Process the contents of a PyPI page"""
@@ -934,14 +945,14 @@ class Credential(object):
     def __str__(self):
         return '%(username)s:%(password)s' % vars(self)
 
-class PyPIConfig(ConfigParser.ConfigParser):
+class PyPIConfig(configparser.RawConfigParser):
 
     def __init__(self):
         """
         Load from ~/.pypirc
         """
         defaults = dict.fromkeys(['username', 'password', 'repository'], '')
-        ConfigParser.ConfigParser.__init__(self, defaults)
+        configparser.RawConfigParser.__init__(self, defaults)
 
         rc = os.path.join(os.path.expanduser('~'), '.pypirc')
         if os.path.exists(rc):
@@ -1031,16 +1042,18 @@ def local_open(url):
     elif path.endswith('/') and os.path.isdir(filename):
         files = []
         for f in os.listdir(filename):
-            if f=='index.html':
-                with open(os.path.join(filename,f),'r') as fp:
+            filepath = os.path.join(filename, f)
+            if f == 'index.html':
+                with open(filepath, 'r') as fp:
                     body = fp.read()
                 break
-            elif os.path.isdir(os.path.join(filename,f)):
-                f+='/'
-            files.append("<a href=%r>%s</a>" % (f,f))
+            elif os.path.isdir(filepath):
+                f += '/'
+            files.append('<a href="{name}">{name}</a>'.format(name=f))
         else:
-            body = ("<html><head><title>%s</title>" % url) + \
-                "</head><body>%s</body></html>" % '\n'.join(files)
+            tmpl = ("<html><head><title>{url}</title>"
+                "</head><body>{files}</body></html>")
+            body = tmpl.format(url=url, files='\n'.join(files))
         status, message = 200, "OK"
     else:
         status, message, body = 404, "Path not found", "Not found"

@@ -379,7 +379,7 @@ class JpegImageFile(ImageFile.ImageFile):
         finally:
             try:
                 os.unlink(path)
-            except:
+            except OSError:
                 pass
 
         self.mode = self.im.mode
@@ -392,6 +392,19 @@ class JpegImageFile(ImageFile.ImageFile):
 
     def _getmp(self):
         return _getmp(self)
+
+
+def _fixup_dict(src_dict):
+    # Helper function for _getexif()
+    # returns a dict with any single item tuples/lists as individual values
+    def _fixup(value):
+        try:
+            if len(value) == 1 and type(value) != type({}):
+                return value[0]
+        except: pass
+        return value
+
+    return dict([(k, _fixup(v)) for k, v in src_dict.items()])
 
 
 def _getexif(self):
@@ -408,9 +421,9 @@ def _getexif(self):
     file = io.BytesIO(data[6:])
     head = file.read(8)
     # process dictionary
-    info = TiffImagePlugin.ImageFileDirectory_v2(head)
+    info = TiffImagePlugin.ImageFileDirectory_v1(head)
     info.load(file)
-    exif = dict(info)
+    exif = dict(_fixup_dict(info))
     # get exif extension
     try:
         # exif field 0x8769 is an offset pointer to the location
@@ -420,9 +433,9 @@ def _getexif(self):
     except (KeyError, TypeError):
         pass
     else:
-        info = TiffImagePlugin.ImageFileDirectory_v2(head)
+        info = TiffImagePlugin.ImageFileDirectory_v1(head)
         info.load(file)
-        exif.update(info)
+        exif.update(_fixup_dict(info))
     # get gpsinfo extension
     try:
         # exif field 0x8825 is an offset pointer to the location
@@ -432,9 +445,10 @@ def _getexif(self):
     except (KeyError, TypeError):
         pass
     else:
-        info = TiffImagePlugin.ImageFileDirectory_v2(head)
+        info = TiffImagePlugin.ImageFileDirectory_v1(head)
         info.load(file)
-        exif[0x8825] = dict(info)
+        exif[0x8825] = _fixup_dict(info)
+    
     return exif
 
 
@@ -453,9 +467,12 @@ def _getmp(self):
     head = file_contents.read(8)
     endianness = '>' if head[:4] == b'\x4d\x4d\x00\x2a' else '<'
     # process dictionary
-    info = TiffImagePlugin.ImageFileDirectory_v2(head)
-    info.load(file_contents)
-    mp = dict(info)
+    try:
+        info = TiffImagePlugin.ImageFileDirectory_v2(head)
+        info.load(file_contents)
+        mp = dict(info)
+    except:
+        raise SyntaxError("malformed MP Index (unreadable directory)")
     # it's an error not to have a number of images
     try:
         quant = mp[0xB001]
@@ -699,7 +716,7 @@ def _save_cjpeg(im, fp, filename):
     subprocess.check_call(["cjpeg", "-outfile", filename, tempfile])
     try:
         os.unlink(tempfile)
-    except:
+    except OSError:
         pass
 
 
@@ -719,7 +736,6 @@ def jpeg_factory(fp=None, filename=None):
     except SyntaxError:
         warnings.warn("Image appears to be a malformed MPO file, it will be "
                       "interpreted as a base JPEG file")
-        pass
     return im
 
 

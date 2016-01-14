@@ -247,6 +247,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "string.h"
 #include "stdio.h"
 #include "pythread.h"
+#include "stdint.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -555,8 +556,6 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
 static CYTHON_INLINE int __Pyx_ArgTypeTest(PyObject *obj, PyTypeObject *type, int none_allowed,
     const char *name, int exact);
 
-static CYTHON_INLINE Py_ssize_t __Pyx_mod_Py_ssize_t(Py_ssize_t, Py_ssize_t);
-
 typedef struct {
     int code_line;
     PyCodeObject* code_object;
@@ -680,6 +679,8 @@ static PyTypeObject *__pyx_ptype_7cpython_7complex_complex = 0;
 
 /* Module declarations from 'cpython' */
 
+/* Module declarations from 'libc.stdint' */
+
 /* Module declarations from 'aiohttp._websocket' */
 #define __Pyx_MODULE_NAME "aiohttp._websocket"
 int __pyx_module_is_main_aiohttp___websocket = 0;
@@ -687,17 +688,16 @@ int __pyx_module_is_main_aiohttp___websocket = 0;
 /* Implementation of 'aiohttp._websocket' */
 static PyObject *__pyx_builtin_range;
 static char __pyx_k_i[] = "i";
-static char __pyx_k_ret[] = "ret";
 static char __pyx_k_data[] = "data";
 static char __pyx_k_main[] = "__main__";
 static char __pyx_k_mask[] = "mask";
 static char __pyx_k_test[] = "__test__";
 static char __pyx_k_range[] = "range";
 static char __pyx_k_in_buf[] = "in_buf";
-static char __pyx_k_out_buf[] = "out_buf";
 static char __pyx_k_data_len[] = "data_len";
 static char __pyx_k_mask_buf[] = "mask_buf";
-static char __pyx_k_mask_len[] = "mask_len";
+static char __pyx_k_uint32_msk[] = "uint32_msk";
+static char __pyx_k_uint64_msk[] = "uint64_msk";
 static char __pyx_k_aiohttp__websocket[] = "aiohttp._websocket";
 static char __pyx_k_websocket_mask_cython[] = "_websocket_mask_cython";
 static char __pyx_k_home_andrew_projects_aiohttp_ai[] = "/home/andrew/projects/aiohttp/aiohttp/_websocket.pyx";
@@ -710,27 +710,27 @@ static PyObject *__pyx_n_s_in_buf;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_mask;
 static PyObject *__pyx_n_s_mask_buf;
-static PyObject *__pyx_n_s_mask_len;
-static PyObject *__pyx_n_s_out_buf;
 static PyObject *__pyx_n_s_range;
-static PyObject *__pyx_n_s_ret;
 static PyObject *__pyx_n_s_test;
+static PyObject *__pyx_n_s_uint32_msk;
+static PyObject *__pyx_n_s_uint64_msk;
 static PyObject *__pyx_n_s_websocket_mask_cython;
 static PyObject *__pyx_pf_7aiohttp_10_websocket__websocket_mask_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_mask, PyObject *__pyx_v_data); /* proto */
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_codeobj__2;
 
-/* "aiohttp/_websocket.pyx":8
- * 
+/* "aiohttp/_websocket.pyx":9
+ * from libc.stdint cimport uint32_t, uint64_t, uintmax_t
  * 
  * def _websocket_mask_cython(bytes mask, bytearray data):             # <<<<<<<<<<<<<<
- *     cdef Py_ssize_t mask_len, data_len, i
- *     cdef char * in_buf
+ *     """Note, this function mutates it's `data` argument
+ *     """
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7aiohttp_10_websocket_1_websocket_mask_cython = {"_websocket_mask_cython", (PyCFunction)__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython, METH_VARARGS|METH_KEYWORDS, 0};
+static char __pyx_doc_7aiohttp_10_websocket__websocket_mask_cython[] = "Note, this function mutates it's `data` argument\n    ";
+static PyMethodDef __pyx_mdef_7aiohttp_10_websocket_1_websocket_mask_cython = {"_websocket_mask_cython", (PyCFunction)__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7aiohttp_10_websocket__websocket_mask_cython};
 static PyObject *__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_mask = 0;
   PyObject *__pyx_v_data = 0;
@@ -760,11 +760,11 @@ static PyObject *__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython(PyObject
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_data)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_websocket_mask_cython", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_websocket_mask_cython", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_websocket_mask_cython") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_websocket_mask_cython") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -777,14 +777,14 @@ static PyObject *__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython(PyObject
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_websocket_mask_cython", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_websocket_mask_cython", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("aiohttp._websocket._websocket_mask_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_mask), (&PyBytes_Type), 1, "mask", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyByteArray_Type), 1, "data", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_mask), (&PyBytes_Type), 1, "mask", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyByteArray_Type), 1, "data", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7aiohttp_10_websocket__websocket_mask_cython(__pyx_self, __pyx_v_mask, __pyx_v_data);
 
   /* function exit code */
@@ -797,88 +797,231 @@ static PyObject *__pyx_pw_7aiohttp_10_websocket_1_websocket_mask_cython(PyObject
 }
 
 static PyObject *__pyx_pf_7aiohttp_10_websocket__websocket_mask_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_mask, PyObject *__pyx_v_data) {
-  CYTHON_UNUSED Py_ssize_t __pyx_v_mask_len;
   Py_ssize_t __pyx_v_data_len;
   Py_ssize_t __pyx_v_i;
-  char *__pyx_v_in_buf;
-  char *__pyx_v_mask_buf;
+  unsigned char *__pyx_v_in_buf;
+  unsigned char const *__pyx_v_mask_buf;
+  uint32_t __pyx_v_uint32_msk;
+  uint64_t __pyx_v_uint64_msk;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   Py_ssize_t __pyx_t_1;
   char *__pyx_t_2;
-  Py_ssize_t __pyx_t_3;
+  int __pyx_t_3;
+  uint64_t *__pyx_t_4;
+  long __pyx_t_5;
+  uint32_t *__pyx_t_6;
+  Py_ssize_t __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_websocket_mask_cython", 0);
 
-  /* "aiohttp/_websocket.pyx":14
- *     cdef char * mask_buf
- *     cdef bytes ret
- *     mask_len = len(mask)             # <<<<<<<<<<<<<<
+  /* "aiohttp/_websocket.pyx":20
+ *         uint64_t uint64_msk
+ * 
+ *     assert len(mask) == 4             # <<<<<<<<<<<<<<
+ * 
  *     data_len = len(data)
- *     in_buf = PyByteArray_AsString(data)
  */
-  if (unlikely(__pyx_v_mask == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    if (unlikely(__pyx_v_mask == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+    __pyx_t_1 = PyBytes_GET_SIZE(__pyx_v_mask); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!((__pyx_t_1 == 4) != 0))) {
+      PyErr_SetNone(PyExc_AssertionError);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
   }
-  __pyx_t_1 = PyBytes_GET_SIZE(__pyx_v_mask); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_mask_len = __pyx_t_1;
+  #endif
 
-  /* "aiohttp/_websocket.pyx":15
- *     cdef bytes ret
- *     mask_len = len(mask)
+  /* "aiohttp/_websocket.pyx":22
+ *     assert len(mask) == 4
+ * 
  *     data_len = len(data)             # <<<<<<<<<<<<<<
- *     in_buf = PyByteArray_AsString(data)
- *     mask_buf = PyBytes_AsString(mask)
+ *     in_buf = <unsigned char*>PyByteArray_AsString(data)
+ *     mask_buf = <const unsigned char*>PyBytes_AsString(mask)
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_data); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_Length(__pyx_v_data); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 22; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_data_len = __pyx_t_1;
 
-  /* "aiohttp/_websocket.pyx":16
- *     mask_len = len(mask)
+  /* "aiohttp/_websocket.pyx":23
+ * 
  *     data_len = len(data)
- *     in_buf = PyByteArray_AsString(data)             # <<<<<<<<<<<<<<
- *     mask_buf = PyBytes_AsString(mask)
- *     for i in range(0, data_len):
+ *     in_buf = <unsigned char*>PyByteArray_AsString(data)             # <<<<<<<<<<<<<<
+ *     mask_buf = <const unsigned char*>PyBytes_AsString(mask)
+ *     uint32_msk = (<uint32_t*>mask_buf)[0]
  */
-  __pyx_t_2 = PyByteArray_AsString(__pyx_v_data); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_in_buf = __pyx_t_2;
+  __pyx_t_2 = PyByteArray_AsString(__pyx_v_data); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_in_buf = ((unsigned char *)__pyx_t_2);
 
-  /* "aiohttp/_websocket.pyx":17
+  /* "aiohttp/_websocket.pyx":24
  *     data_len = len(data)
- *     in_buf = PyByteArray_AsString(data)
- *     mask_buf = PyBytes_AsString(mask)             # <<<<<<<<<<<<<<
- *     for i in range(0, data_len):
- *         in_buf[i] = in_buf[i] ^ mask_buf[i % 4]
+ *     in_buf = <unsigned char*>PyByteArray_AsString(data)
+ *     mask_buf = <const unsigned char*>PyBytes_AsString(mask)             # <<<<<<<<<<<<<<
+ *     uint32_msk = (<uint32_t*>mask_buf)[0]
+ * 
  */
-  __pyx_t_2 = PyBytes_AsString(__pyx_v_mask); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_mask_buf = __pyx_t_2;
+  __pyx_t_2 = PyBytes_AsString(__pyx_v_mask); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_mask_buf = ((unsigned char const *)__pyx_t_2);
 
-  /* "aiohttp/_websocket.pyx":18
- *     in_buf = PyByteArray_AsString(data)
- *     mask_buf = PyBytes_AsString(mask)
- *     for i in range(0, data_len):             # <<<<<<<<<<<<<<
- *         in_buf[i] = in_buf[i] ^ mask_buf[i % 4]
- *     return data
+  /* "aiohttp/_websocket.pyx":25
+ *     in_buf = <unsigned char*>PyByteArray_AsString(data)
+ *     mask_buf = <const unsigned char*>PyBytes_AsString(mask)
+ *     uint32_msk = (<uint32_t*>mask_buf)[0]             # <<<<<<<<<<<<<<
+ * 
+ *     # TODO: align in_data ptr to achieve even faster speeds
  */
-  __pyx_t_1 = __pyx_v_data_len;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_1; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
+  __pyx_v_uint32_msk = (((uint32_t *)__pyx_v_mask_buf)[0]);
 
-    /* "aiohttp/_websocket.pyx":19
- *     mask_buf = PyBytes_AsString(mask)
- *     for i in range(0, data_len):
- *         in_buf[i] = in_buf[i] ^ mask_buf[i % 4]             # <<<<<<<<<<<<<<
- *     return data
+  /* "aiohttp/_websocket.pyx":30
+ *     # does it need in python ?! malloc() always aligns to sizeof(long) bytes
+ * 
+ *     if sizeof(size_t) >= 8:             # <<<<<<<<<<<<<<
+ *         uint64_msk = uint32_msk
+ *         uint64_msk = (uint64_msk << 32) | uint32_msk
  */
-    (__pyx_v_in_buf[__pyx_v_i]) = ((__pyx_v_in_buf[__pyx_v_i]) ^ (__pyx_v_mask_buf[__Pyx_mod_Py_ssize_t(__pyx_v_i, 4)]));
+  __pyx_t_3 = (((sizeof(size_t)) >= 8) != 0);
+  if (__pyx_t_3) {
+
+    /* "aiohttp/_websocket.pyx":31
+ * 
+ *     if sizeof(size_t) >= 8:
+ *         uint64_msk = uint32_msk             # <<<<<<<<<<<<<<
+ *         uint64_msk = (uint64_msk << 32) | uint32_msk
+ * 
+ */
+    __pyx_v_uint64_msk = __pyx_v_uint32_msk;
+
+    /* "aiohttp/_websocket.pyx":32
+ *     if sizeof(size_t) >= 8:
+ *         uint64_msk = uint32_msk
+ *         uint64_msk = (uint64_msk << 32) | uint32_msk             # <<<<<<<<<<<<<<
+ * 
+ *         while data_len >= 8:
+ */
+    __pyx_v_uint64_msk = ((__pyx_v_uint64_msk << 32) | __pyx_v_uint32_msk);
+
+    /* "aiohttp/_websocket.pyx":34
+ *         uint64_msk = (uint64_msk << 32) | uint32_msk
+ * 
+ *         while data_len >= 8:             # <<<<<<<<<<<<<<
+ *             (<uint64_t*>in_buf)[0] ^= uint64_msk
+ *             in_buf += 8
+ */
+    while (1) {
+      __pyx_t_3 = ((__pyx_v_data_len >= 8) != 0);
+      if (!__pyx_t_3) break;
+
+      /* "aiohttp/_websocket.pyx":35
+ * 
+ *         while data_len >= 8:
+ *             (<uint64_t*>in_buf)[0] ^= uint64_msk             # <<<<<<<<<<<<<<
+ *             in_buf += 8
+ *             data_len -= 8
+ */
+      __pyx_t_4 = ((uint64_t *)__pyx_v_in_buf);
+      __pyx_t_5 = 0;
+      (__pyx_t_4[__pyx_t_5]) = ((__pyx_t_4[__pyx_t_5]) ^ __pyx_v_uint64_msk);
+
+      /* "aiohttp/_websocket.pyx":36
+ *         while data_len >= 8:
+ *             (<uint64_t*>in_buf)[0] ^= uint64_msk
+ *             in_buf += 8             # <<<<<<<<<<<<<<
+ *             data_len -= 8
+ * 
+ */
+      __pyx_v_in_buf = (__pyx_v_in_buf + 8);
+
+      /* "aiohttp/_websocket.pyx":37
+ *             (<uint64_t*>in_buf)[0] ^= uint64_msk
+ *             in_buf += 8
+ *             data_len -= 8             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+      __pyx_v_data_len = (__pyx_v_data_len - 8);
+    }
+
+    /* "aiohttp/_websocket.pyx":30
+ *     # does it need in python ?! malloc() always aligns to sizeof(long) bytes
+ * 
+ *     if sizeof(size_t) >= 8:             # <<<<<<<<<<<<<<
+ *         uint64_msk = uint32_msk
+ *         uint64_msk = (uint64_msk << 32) | uint32_msk
+ */
   }
 
-  /* "aiohttp/_websocket.pyx":20
+  /* "aiohttp/_websocket.pyx":40
+ * 
+ * 
+ *     while data_len >= 4:             # <<<<<<<<<<<<<<
+ *         (<uint32_t*>in_buf)[0] ^= uint32_msk
+ *         in_buf += 4
+ */
+  while (1) {
+    __pyx_t_3 = ((__pyx_v_data_len >= 4) != 0);
+    if (!__pyx_t_3) break;
+
+    /* "aiohttp/_websocket.pyx":41
+ * 
+ *     while data_len >= 4:
+ *         (<uint32_t*>in_buf)[0] ^= uint32_msk             # <<<<<<<<<<<<<<
+ *         in_buf += 4
+ *         data_len -= 4
+ */
+    __pyx_t_6 = ((uint32_t *)__pyx_v_in_buf);
+    __pyx_t_5 = 0;
+    (__pyx_t_6[__pyx_t_5]) = ((__pyx_t_6[__pyx_t_5]) ^ __pyx_v_uint32_msk);
+
+    /* "aiohttp/_websocket.pyx":42
+ *     while data_len >= 4:
+ *         (<uint32_t*>in_buf)[0] ^= uint32_msk
+ *         in_buf += 4             # <<<<<<<<<<<<<<
+ *         data_len -= 4
+ * 
+ */
+    __pyx_v_in_buf = (__pyx_v_in_buf + 4);
+
+    /* "aiohttp/_websocket.pyx":43
+ *         (<uint32_t*>in_buf)[0] ^= uint32_msk
+ *         in_buf += 4
+ *         data_len -= 4             # <<<<<<<<<<<<<<
+ * 
  *     for i in range(0, data_len):
- *         in_buf[i] = in_buf[i] ^ mask_buf[i % 4]
+ */
+    __pyx_v_data_len = (__pyx_v_data_len - 4);
+  }
+
+  /* "aiohttp/_websocket.pyx":45
+ *         data_len -= 4
+ * 
+ *     for i in range(0, data_len):             # <<<<<<<<<<<<<<
+ *         in_buf[i] ^= mask_buf[i]
+ * 
+ */
+  __pyx_t_1 = __pyx_v_data_len;
+  for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_1; __pyx_t_7+=1) {
+    __pyx_v_i = __pyx_t_7;
+
+    /* "aiohttp/_websocket.pyx":46
+ * 
+ *     for i in range(0, data_len):
+ *         in_buf[i] ^= mask_buf[i]             # <<<<<<<<<<<<<<
+ * 
+ *     return data
+ */
+    __pyx_t_8 = __pyx_v_i;
+    (__pyx_v_in_buf[__pyx_t_8]) = ((__pyx_v_in_buf[__pyx_t_8]) ^ (__pyx_v_mask_buf[__pyx_v_i]));
+  }
+
+  /* "aiohttp/_websocket.pyx":48
+ *         in_buf[i] ^= mask_buf[i]
+ * 
  *     return data             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
@@ -886,12 +1029,12 @@ static PyObject *__pyx_pf_7aiohttp_10_websocket__websocket_mask_cython(CYTHON_UN
   __pyx_r = __pyx_v_data;
   goto __pyx_L0;
 
-  /* "aiohttp/_websocket.pyx":8
- * 
+  /* "aiohttp/_websocket.pyx":9
+ * from libc.stdint cimport uint32_t, uint64_t, uintmax_t
  * 
  * def _websocket_mask_cython(bytes mask, bytearray data):             # <<<<<<<<<<<<<<
- *     cdef Py_ssize_t mask_len, data_len, i
- *     cdef char * in_buf
+ *     """Note, this function mutates it's `data` argument
+ *     """
  */
 
   /* function exit code */
@@ -936,16 +1079,15 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_mask, __pyx_k_mask, sizeof(__pyx_k_mask), 0, 0, 1, 1},
   {&__pyx_n_s_mask_buf, __pyx_k_mask_buf, sizeof(__pyx_k_mask_buf), 0, 0, 1, 1},
-  {&__pyx_n_s_mask_len, __pyx_k_mask_len, sizeof(__pyx_k_mask_len), 0, 0, 1, 1},
-  {&__pyx_n_s_out_buf, __pyx_k_out_buf, sizeof(__pyx_k_out_buf), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
-  {&__pyx_n_s_ret, __pyx_k_ret, sizeof(__pyx_k_ret), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+  {&__pyx_n_s_uint32_msk, __pyx_k_uint32_msk, sizeof(__pyx_k_uint32_msk), 0, 0, 1, 1},
+  {&__pyx_n_s_uint64_msk, __pyx_k_uint64_msk, sizeof(__pyx_k_uint64_msk), 0, 0, 1, 1},
   {&__pyx_n_s_websocket_mask_cython, __pyx_k_websocket_mask_cython, sizeof(__pyx_k_websocket_mask_cython), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 45; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -955,17 +1097,17 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "aiohttp/_websocket.pyx":8
- * 
+  /* "aiohttp/_websocket.pyx":9
+ * from libc.stdint cimport uint32_t, uint64_t, uintmax_t
  * 
  * def _websocket_mask_cython(bytes mask, bytearray data):             # <<<<<<<<<<<<<<
- *     cdef Py_ssize_t mask_len, data_len, i
- *     cdef char * in_buf
+ *     """Note, this function mutates it's `data` argument
+ *     """
  */
-  __pyx_tuple_ = PyTuple_Pack(9, __pyx_n_s_mask, __pyx_n_s_data, __pyx_n_s_mask_len, __pyx_n_s_data_len, __pyx_n_s_i, __pyx_n_s_in_buf, __pyx_n_s_out_buf, __pyx_n_s_mask_buf, __pyx_n_s_ret); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple_ = PyTuple_Pack(8, __pyx_n_s_mask, __pyx_n_s_data, __pyx_n_s_data_len, __pyx_n_s_i, __pyx_n_s_in_buf, __pyx_n_s_mask_buf, __pyx_n_s_uint32_msk, __pyx_n_s_uint64_msk); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_andrew_projects_aiohttp_ai, __pyx_n_s_websocket_mask_cython, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_andrew_projects_aiohttp_ai, __pyx_n_s_websocket_mask_cython, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -1083,22 +1225,22 @@ PyMODINIT_FUNC PyInit__websocket(void)
   if (__Pyx_patch_abc() < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #endif
 
-  /* "aiohttp/_websocket.pyx":8
- * 
+  /* "aiohttp/_websocket.pyx":9
+ * from libc.stdint cimport uint32_t, uint64_t, uintmax_t
  * 
  * def _websocket_mask_cython(bytes mask, bytearray data):             # <<<<<<<<<<<<<<
- *     cdef Py_ssize_t mask_len, data_len, i
- *     cdef char * in_buf
+ *     """Note, this function mutates it's `data` argument
+ *     """
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7aiohttp_10_websocket_1_websocket_mask_cython, NULL, __pyx_n_s_aiohttp__websocket); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7aiohttp_10_websocket_1_websocket_mask_cython, NULL, __pyx_n_s_aiohttp__websocket); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_websocket_mask_cython, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_websocket_mask_cython, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "aiohttp/_websocket.pyx":1
- * from cpython cimport PyBytes_FromStringAndSize, PyBytes_AsString             # <<<<<<<<<<<<<<
- * from cpython.ref cimport PyObject
+ * from cpython cimport PyBytes_AsString             # <<<<<<<<<<<<<<
  * 
+ * #from cpython cimport PyByteArray_AsString # cython still not exports that
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -1320,12 +1462,6 @@ static CYTHON_INLINE int __Pyx_ArgTypeTest(PyObject *obj, PyTypeObject *type, in
     }
     __Pyx_RaiseArgumentTypeInvalid(name, obj, type);
     return 0;
-}
-
-static CYTHON_INLINE Py_ssize_t __Pyx_mod_Py_ssize_t(Py_ssize_t a, Py_ssize_t b) {
-    Py_ssize_t r = a % b;
-    r += ((r != 0) & ((r ^ b) < 0)) * b;
-    return r;
 }
 
 static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
