@@ -2,7 +2,6 @@ package base64
 
 import (
     . "ml/trace"
-    . "fmt"
 )
 
 type Base64Error struct {

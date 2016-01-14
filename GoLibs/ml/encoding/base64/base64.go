@@ -1,7 +1,6 @@
 package base64
 
 import (
-    . "ml/trace"
     . "ml/strings"
     "encoding/base64"
 )
