@@ -30,7 +30,7 @@ func raiseimpl(v interface{}) {
         default:
             exp = &Exception{
                         Traceback   : string(stack(3, depth)),
-                        Message     : Sprintf("[%s:%d] %v\n", name, line, v),
+                        Message     : Sprintf("[%s:%d] [%T] %v\n", name, line, v, v),
                         Value       : v,
                     }
     }

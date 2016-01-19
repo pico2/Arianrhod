@@ -75,7 +75,5 @@ func genacc() {
 }
 
 func main() {
-    json2.Marshal(JsonDict{
-        "claim-type"            : 2,
-    })
+    Raise(NewIndexError("fuck"))
 }
