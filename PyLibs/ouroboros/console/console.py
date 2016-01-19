@@ -2,6 +2,8 @@ from ..common import *
 
 if sys.platform == 'win32':
     getch = ctypes.CFUNCTYPE(ctypes.c_int32)(('_getch', windll.msvcrt))
+else:
+    getch = input
 
 def pause(text = None):
     if text is not None:
@@ -11,12 +13,14 @@ def pause(text = None):
 def setTitle(text):
     if sys.platform == 'win32':
         windll.kernel32.SetConsoleTitleW(str(text))
-
     else:
-        raise NotImplementedError
+        pass
 
 def clear():
-    os.system('cls')
+    if sys.platform == 'win32':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 if isinstance(sys.stdout, io.TextIOWrapper):
     class _flushstdout(type(sys.stdout)):

@@ -1,5 +1,31 @@
 import ctypes
-from ctypes.wintypes import *
+# from ctypes.wintypes import *
+
+BYTE = ctypes.c_byte
+WORD = ctypes.c_ushort
+DWORD = ctypes.c_ulong
+
+ULONG = ctypes.c_ulong
+LONG = ctypes.c_long
+
+USHORT = ctypes.c_ushort
+SHORT = ctypes.c_short
+
+LPCOLESTR = LPOLESTR = OLESTR = ctypes.c_wchar_p
+LPCWSTR = LPWSTR = ctypes.c_wchar_p
+LPCSTR = LPSTR = ctypes.c_char_p
+LPCVOID = LPVOID = ctypes.c_void_p
+
+CHAR = ctypes.c_char
+WCHAR = ctypes.c_wchar
+UINT = ctypes.c_uint
+INT = ctypes.c_int
+
+DOUBLE = ctypes.c_double
+FLOAT = ctypes.c_float
+
+BOOLEAN = BYTE
+BOOL = ctypes.c_long
 
 CHAR        = ctypes.c_char
 BYTE        = ctypes.c_ubyte      # fix bug: BYTE == CHAR

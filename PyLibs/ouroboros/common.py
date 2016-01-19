@@ -11,7 +11,11 @@ import configparser
 import xml.etree.ElementTree as ET
 import xmltodict
 
-from ctypes.wintypes import *
-from ctypes import windll, cdll, byref, wintypes
+from ctypes import cdll, byref
+
+if sys.platform == 'win32':
+    from ctypes import windll
+    from ctypes import wintypes
+    from ctypes.wintypes import *
 
 ANSI_CODE_PAGE = 'mbcs'
