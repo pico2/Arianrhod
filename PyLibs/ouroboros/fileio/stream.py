@@ -105,9 +105,9 @@ class FileStream(object):
 
     END_OF_FILE = None
 
-    def __init__(self, file = None, mode = 'rb'):
+    def __init__(self, file = None, mode = 'rb', *, endian = FileStream.LITTLE_ENDIAN):
         self._stream = None
-        self._endian = self.LITTLE_ENDIAN
+        self._endian = endian
         self._encoding = ANSI_CODE_PAGE
 
         if file is not None:
@@ -302,6 +302,10 @@ class FileStream(object):
 
     def Read(self, n = -1):
         return self._stream.read(n)
+
+    def ReadAll(self):
+        self.Position = 0
+        return self.Read()
 
     def Write(self, buf):
         if isinstance(buf, FileStream):
