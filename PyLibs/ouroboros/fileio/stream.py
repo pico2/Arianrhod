@@ -105,7 +105,7 @@ class FileStream(object):
 
     END_OF_FILE = None
 
-    def __init__(self, file = None, mode = 'rb', *, endian = FileStream.LITTLE_ENDIAN):
+    def __init__(self, file = None, mode = 'rb', *, endian = LITTLE_ENDIAN):
         self._stream = None
         self._endian = endian
         self._encoding = ANSI_CODE_PAGE
