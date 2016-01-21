@@ -308,6 +308,9 @@ class FileStream(object):
         return self.Read()
 
     def Write(self, buf):
+        if not buf:
+            return
+
         if isinstance(buf, FileStream):
             with FileStreamPositionHolder(buf) as fs:
                 fs.Position = 0

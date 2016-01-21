@@ -3,6 +3,7 @@ import os, io, sys
 import datetime
 import types
 import traceback
+import hexdump
 
 __FORMAT__ = '[%(asctime)s][%(thread)d][%(filename)s][%(funcName)s:%(lineno)d][%(levelname)s] %(message)s'
 
@@ -24,10 +25,10 @@ def getLogger(name, *, logPath = None):
         self.addHandler(fileHandler)
         self.setLevel(level)
 
-        self.funcNameFilter = ['log', 'info', 'warn', 'debug', 'error', 'logException']
+        self.funcNameFilter = ['log', 'info', 'warn', 'debug', 'error', 'logException', 'logHexdump']
 
     def attach(self, obj):
-        for func in ['log', 'info', 'warn', 'debug', 'error', 'logException']:
+        for func in self.funcNameFilter:
             setattr(obj, func, getattr(self, func))
 
     def getLogFileName(self):
@@ -71,11 +72,15 @@ def getLogger(name, *, logPath = None):
     def logException(self):
         self.debug('\r\n'.join(traceback.format_exception(*sys.exc_info())))
 
+    def logHexdump(self, data):
+        self.debug('\n' + hexdump.hexdump(data, result = 'return'))
+
     logger = logging.getLogger(name)
     logger.init           = types.MethodType(init, logger)
     logger.attach         = types.MethodType(attach, logger)
     logger.findCaller     = types.MethodType(findCaller, logger)
     logger.getLogFileName = types.MethodType(getLogFileName, logger)
     logger.logException   = types.MethodType(logException, logger)
+    logger.logHexdump     = types.MethodType(logHexdump, logger)
 
     return logger
