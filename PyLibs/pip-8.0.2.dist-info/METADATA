@@ -1,6 +1,6 @@
 Metadata-Version: 2.0
 Name: pip
-Version: 7.1.2
+Version: 8.0.2
 Summary: The PyPA recommended tool for installing Python packages.
 Home-page: https://pip.pypa.io/
 Author: The pip developers
@@ -16,21 +16,21 @@ Classifier: Programming Language :: Python :: 2
 Classifier: Programming Language :: Python :: 2.6
 Classifier: Programming Language :: Python :: 2.7
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.2
 Classifier: Programming Language :: Python :: 3.3
 Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
 Classifier: Programming Language :: Python :: Implementation :: PyPy
 Provides-Extra: testing
-Requires-Dist: pytest; extra == 'testing'
-Requires-Dist: virtualenv (>=1.10); extra == 'testing'
-Requires-Dist: scripttest (>=1.3); extra == 'testing'
 Requires-Dist: mock; extra == 'testing'
+Requires-Dist: pytest; extra == 'testing'
+Requires-Dist: scripttest (>=1.3); extra == 'testing'
+Requires-Dist: virtualenv (>=1.10); extra == 'testing'
 
 pip
 ===
 
 The `PyPA recommended
-<https://python-packaging-user-guide.readthedocs.org/en/latest/current.html>`_
+<https://packaging.python.org/en/latest/current/>`_
 tool for installing Python packages.
 
 * `Installation <https://pip.pypa.io/en/stable/installing.html>`_
@@ -44,10 +44,19 @@ tool for installing Python packages.
 * Dev IRC: #pypa-dev on Freenode.
 
 
-.. image:: https://pypip.in/v/pip/badge.png
+.. image:: https://img.shields.io/pypi/v/pip.svg
         :target: https://pypi.python.org/pypi/pip
 
-.. image:: https://secure.travis-ci.org/pypa/pip.png?branch=develop
+.. image:: https://img.shields.io/travis/pypa/pip/develop.svg
    :target: http://travis-ci.org/pypa/pip
+
+
+Code of Conduct
+---------------
+
+Everyone interacting in the pip project's codebases, issue trackers, chat
+rooms, and mailing lists is expected to follow the `PyPA Code of Conduct`_.
+
+.. _PyPA Code of Conduct: https://www.pypa.io/en/latest/code-of-conduct/
 
 
