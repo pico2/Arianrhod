@@ -301,6 +301,9 @@ class FileStream(object):
         return self._stream.seek(offset, method)
 
     def Read(self, n = -1):
+        if not n:
+            return b''
+
         return self._stream.read(n)
 
     def ReadAll(self):
@@ -415,5 +418,5 @@ class FileStream(object):
     def WriteUTF16(self, u16):
         return self.Write(u16.encode('U16')[2:])
 
-def MemoryStream(endian = FileStream.LITTLE_ENDIAN, **kwargs):
-    return FileStream(b'', endian = endian, **kwargs)
+def MemoryStream(endian = FileStream.LITTLE_ENDIAN, *, data = b'', **kwargs):
+    return FileStream(data, endian = endian, **kwargs)
