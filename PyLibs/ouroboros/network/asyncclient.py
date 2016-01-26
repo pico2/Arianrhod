@@ -11,7 +11,7 @@ class AsyncClient(asyncio.Protocol):
         self.recvBuffer.Endian = endian
 
     async def create_connection(self, address, port):
-        await self.loop.create_connection(lambda : self, address, port)
+        return await self.loop.create_connection(lambda : self, address, port)
 
     def print_exception(self):
         import traceback
