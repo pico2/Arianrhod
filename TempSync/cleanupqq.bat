@@ -4,7 +4,7 @@ if not exist "Files\" goto:eof
 
 cd/d "%~dp0\Files\Bin"
 
-copy ..\..\QQ\Bin\netapi32.dll .
+copy ..\..\QQ\Bin\wtsapi32.dll .
 
 set DEBUG=
 
