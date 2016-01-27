@@ -12,6 +12,7 @@ import java.util.Map;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import java.lang.reflect.Method;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
@@ -64,28 +65,28 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "gtR"), "gtK", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "gAq"), "gAj", 0);
             }
         });
 
         // "ERROR record duration, %dms !!!"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lj", new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lj", new XC_MethodReplacement() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gxR");
-                Object obj2 = XposedHelpers.getObjectField(obj1, "gxF");
+            protected Boolean replaceHookedMethod(MethodHookParam param) throws Throwable {
+                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gEp");
+                Object obj2 = XposedHelpers.getObjectField(obj1, "gEd");
 
-                float v2 = ((Long)XposedHelpers.callMethod(obj2, "avm")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(obj2, "awp")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
-                        XposedHelpers.callMethod(obj1, "A", v2);
+                        XposedHelpers.callMethod(obj1, "x", v2);
                     } else {
-                        XposedHelpers.callMethod(obj1, "A", 1f);
+                        XposedHelpers.callMethod(obj1, "x", 1f);
                     }
                 }
 
-                param.setResult(true);
+                return true;
             }
         });
 
@@ -108,6 +109,23 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
             if (type != null && type.equals("revokemsg"))
                 result.put(".sysmsg.$type",  "disabled_" + type);
+            }
+        });
+
+        // scheduleHideClip, alphaChangeStep: %s
+
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "getBlurBitmapFilePath", new XC_MethodReplacement() {
+            @Override
+            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                XposedHelpers.callMethod(param.thisObject, "setMaskColor", 0);
+                return XposedHelpers.callMethod(param.thisObject, "getOriginBitmapFilePath");
+            }
+        });
+
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "setMaskColor", int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                param.args[0] = 0;
             }
         });
     }
