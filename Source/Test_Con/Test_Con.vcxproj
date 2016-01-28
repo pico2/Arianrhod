@@ -45,8 +45,8 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Test_Con</TargetName>
     <TargetExt>.exe</TargetExt>
-    <IncludePath>C:\Program Files (x86)\Windows Kits\10\Include\10.0.10150.0\ucrt;$(VC_IncludePath);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10150.0\ucrt\x86;$(VC_LibraryPath_x86);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

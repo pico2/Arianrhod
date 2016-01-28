@@ -159,7 +159,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 
     for (int i = 1000000; i; --i)
     {
-        __halt();
+        //__halt();
         YieldProcessor();
     }
 
