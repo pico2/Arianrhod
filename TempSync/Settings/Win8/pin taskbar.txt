@@ -1,0 +1,9 @@
+http://superuser.com/questions/383102/google-chrome-pinned-to-windows-7-taskbar-not-opening-under-pinned-icon
+
+To solve this issue do the following:
+
+Start Google Chrome (this creates a new taskbar icon);
+Right click on the new icon and select "Pin this program to taskbar";
+Go to:
+%APPDATA%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
+You will see the two pinned Google Chrome.lnk here. Delete the Google Chrome.lnk and make Google Chrome (1).lnk readonly (Right Click -> Properties -> General tab -> tick Read-only -> Click OK);

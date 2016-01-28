@@ -1,0 +1,245 @@
+<UserSettings>
+	<ApplicationIdentity version="11.0"/>
+	<ToolsOptions>
+		<ToolsOptionsCategory name="Environment" RegisteredName="Environment">
+			<ToolsOptionsSubCategory name="Startup" RegisteredName="Startup" PackageName="Visual Studio Environment Package">
+				<PropertyValue name="OnStartUp">4</PropertyValue>
+				<PropertyValue name="StartPageRefreshDownloadedContent">false</PropertyValue>
+				<PropertyValue name="StartPageRSSUrl">http://go.microsoft.com/fwlink/?linkid=45332&amp;clcid=%VSSPV_LCID_HEX%</PropertyValue>
+				<PropertyValue name="StartPageRefreshInterval">60</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+		<ToolsOptionsCategory name="TextEditor" RegisteredName="TextEditor">
+			<ToolsOptionsSubCategory name="C/C++" RegisteredName="C/C++" PackageName="Text Management Package">
+				<PropertyValue name="TabSize">4</PropertyValue>
+				<PropertyValue name="AutoListMembers">true</PropertyValue>
+				<PropertyValue name="IndentStyle">2</PropertyValue>
+				<PropertyValue name="HideAdvancedMembers">true</PropertyValue>
+				<PropertyValue name="ShowNavigationBar">true</PropertyValue>
+				<PropertyValue name="VirtualSpace">false</PropertyValue>
+				<PropertyValue name="InsertTabs">false</PropertyValue>
+				<PropertyValue name="WordWrapGlyphs">true</PropertyValue>
+				<PropertyValue name="EnableLeftClickForURLs">true</PropertyValue>
+				<PropertyValue name="ShowLineNumbers">true</PropertyValue>
+				<PropertyValue name="WordWrap">false</PropertyValue>
+				<PropertyValue name="IndentSize">4</PropertyValue>
+				<PropertyValue name="CutCopyBlankLines">true</PropertyValue>
+				<PropertyValue name="AutoListParams">true</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="CSharp-Specific" RegisteredName="CSharp-Specific" PackageName="Visual C# Language Service Package">
+				<PropertyValue name="AutoComment">1</PropertyValue>
+				<PropertyValue name="BraceMatchingRectangle">1</PropertyValue>
+				<PropertyValue name="BringUpOnEventHookup">1</PropertyValue>
+				<PropertyValue name="BringUpOnIdentifier">1</PropertyValue>
+				<PropertyValue name="BringUpOnOverride">1</PropertyValue>
+				<PropertyValue name="BringUpOnPartial">1</PropertyValue>
+				<PropertyValue name="BringUpOnSpace">1</PropertyValue>
+				<PropertyValue name="CodeDefinitionWindow_DocumentationComment_IndentBase">1</PropertyValue>
+				<PropertyValue name="CodeDefinitionWindow_DocumentationComment_IndentOffset">2</PropertyValue>
+				<PropertyValue name="CodeDefinitionWindow_DocumentationComment_WrapLength">80</PropertyValue>
+				<PropertyValue name="CollapseInactiveBlocksOnOpen">1</PropertyValue>
+				<PropertyValue name="CollapseRegionBlocksOnOpen">1</PropertyValue>
+				<PropertyValue name="Colorize">1</PropertyValue>
+				<PropertyValue name="ColorizeBoundTypes">1</PropertyValue>
+				<PropertyValue name="CompleteOnNewline">1</PropertyValue>
+				<PropertyValue name="CompleteOnSpace">1</PropertyValue>
+				<PropertyValue name="CompletionCommitCharacters">{}[]().,:;+-*/%&amp;|^!~=&lt;&gt;?@#'"\</PropertyValue>
+				<PropertyValue name="DelayBeforeShowingErrors">1500</PropertyValue>
+				<PropertyValue name="EditAndContinueEnabled">1</PropertyValue>
+				<PropertyValue name="EditAndContinueReportEnterBreakStateFailure">1</PropertyValue>
+				<PropertyValue name="EditAndContinueReportOpenScopeFailure">0</PropertyValue>
+				<PropertyValue name="EnableProgressDialogOnWaitForBackground">1</PropertyValue>
+				<PropertyValue name="EncapsulateField_PreviewReferenceChanges">1</PropertyValue>
+				<PropertyValue name="EncapsulateField_SearchInComments">0</PropertyValue>
+				<PropertyValue name="EncapsulateField_SearchInStrings">0</PropertyValue>
+				<PropertyValue name="EncapsulateField_UpdateAllReferences">0</PropertyValue>
+				<PropertyValue name="EnterOutliningModeOnOpen">1</PropertyValue>
+				<PropertyValue name="ExtractInterface_SelectAll">0</PropertyValue>
+				<PropertyValue name="FilterKeywordsContextually">1</PropertyValue>
+				<PropertyValue name="FilterToAllowableTypes">1</PropertyValue>
+				<PropertyValue name="Formatting_TriggerOnBlockCompletion">1</PropertyValue>
+				<PropertyValue name="Formatting_TriggerOnPaste">1</PropertyValue>
+				<PropertyValue name="Formatting_TriggerOnStatementCompletion">1</PropertyValue>
+				<PropertyValue name="GenerateConstructorSmartTagEnabled">1</PropertyValue>
+				<PropertyValue name="GenerateStubSmartTagEnabled">1</PropertyValue>
+				<PropertyValue name="HighlightReferences">1</PropertyValue>
+				<PropertyValue name="ImplementInterfaceSmartTagEnabled">1</PropertyValue>
+				<PropertyValue name="ImplementInterface_InsertRegionTags">0</PropertyValue>
+				<PropertyValue name="Indent_BlockContents">1</PropertyValue>
+				<PropertyValue name="Indent_Braces">0</PropertyValue>
+				<PropertyValue name="Indent_CaseContents">1</PropertyValue>
+				<PropertyValue name="Indent_CaseLabels">1</PropertyValue>
+				<PropertyValue name="Indent_FlushLabelsLeft">0</PropertyValue>
+				<PropertyValue name="Indent_UnindentLabels">1</PropertyValue>
+				<PropertyValue name="InsertNewlineOnEnterWithWholeWord">0</PropertyValue>
+				<PropertyValue name="NewLines_AnonymousTypeInitializer_EachMember">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_AnonymousMethod">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_AnonymousTypeInitializer">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_ArrayInitializer">0</PropertyValue>
+				<PropertyValue name="NewLines_Braces_CollectionInitializer">0</PropertyValue>
+				<PropertyValue name="NewLines_Braces_ControlFlow">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_LambdaExpressionBody">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_Method">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_ObjectInitializer">1</PropertyValue>
+				<PropertyValue name="NewLines_Braces_Type">1</PropertyValue>
+				<PropertyValue name="NewLines_Keywords_Catch">1</PropertyValue>
+				<PropertyValue name="NewLines_Keywords_Else">1</PropertyValue>
+				<PropertyValue name="NewLines_Keywords_Finally">1</PropertyValue>
+				<PropertyValue name="NewLines_ObjectInitializer_EachMember">1</PropertyValue>
+				<PropertyValue name="NewLines_QueryExpression_EachClause">1</PropertyValue>
+				<PropertyValue name="OnlyScanFirstTypeInFileForDesignerAttribute">0</PropertyValue>
+				<PropertyValue name="ProgressDialogDelaySeconds">2</PropertyValue>
+				<PropertyValue name="RefactorNotifyRenameEnabled">1</PropertyValue>
+				<PropertyValue name="Refactoring_Verification_Enabled">0</PropertyValue>
+				<PropertyValue name="RemoveParameters_PreviewReferenceChanges">1</PropertyValue>
+				<PropertyValue name="RemoveUnusedUsings">1</PropertyValue>
+				<PropertyValue name="RenameSmartTagEnabled">1</PropertyValue>
+				<PropertyValue name="Rename_Comments">0</PropertyValue>
+				<PropertyValue name="Rename_Overloads">0</PropertyValue>
+				<PropertyValue name="Rename_Preview">1</PropertyValue>
+				<PropertyValue name="Rename_Strings">0</PropertyValue>
+				<PropertyValue name="ReorderParameters_PreviewReferenceChanges">1</PropertyValue>
+				<PropertyValue name="ShowHiddenItems">0</PropertyValue>
+				<PropertyValue name="ShowKeywords">1</PropertyValue>
+				<PropertyValue name="ShowSnippets">1</PropertyValue>
+				<PropertyValue name="SmartTagEnabled">1</PropertyValue>
+				<PropertyValue name="SortUsings">1</PropertyValue>
+				<PropertyValue name="SortUsings_PlaceSystemFirst">0</PropertyValue>
+				<PropertyValue name="Space_AfterBasesColon">1</PropertyValue>
+				<PropertyValue name="Space_AfterCast">0</PropertyValue>
+				<PropertyValue name="Space_AfterComma">1</PropertyValue>
+				<PropertyValue name="Space_AfterDot">0</PropertyValue>
+				<PropertyValue name="Space_AfterLambdaArrow">1</PropertyValue>
+				<PropertyValue name="Space_AfterMethodCallName">0</PropertyValue>
+				<PropertyValue name="Space_AfterMethodDeclarationName">0</PropertyValue>
+				<PropertyValue name="Space_AfterSemicolonsInForStatement">1</PropertyValue>
+				<PropertyValue name="Space_AroundBinaryOperator">1</PropertyValue>
+				<PropertyValue name="Space_BeforeBasesColon">1</PropertyValue>
+				<PropertyValue name="Space_BeforeComma">0</PropertyValue>
+				<PropertyValue name="Space_BeforeDot">0</PropertyValue>
+				<PropertyValue name="Space_BeforeLambdaArrow">1</PropertyValue>
+				<PropertyValue name="Space_BeforeOpenSquare">0</PropertyValue>
+				<PropertyValue name="Space_BeforeSemicolonsInForStatement">0</PropertyValue>
+				<PropertyValue name="Space_BetweenEmptyMethodCallParentheses">0</PropertyValue>
+				<PropertyValue name="Space_BetweenEmptyMethodDeclarationParentheses">0</PropertyValue>
+				<PropertyValue name="Space_BetweenEmptySquares">0</PropertyValue>
+				<PropertyValue name="Space_InControlFlowConstruct">1</PropertyValue>
+				<PropertyValue name="Space_Normalize">0</PropertyValue>
+				<PropertyValue name="Space_WithinCastParentheses">0</PropertyValue>
+				<PropertyValue name="Space_WithinExpressionParentheses">0</PropertyValue>
+				<PropertyValue name="Space_WithinMethodCallParentheses">0</PropertyValue>
+				<PropertyValue name="Space_WithinMethodDeclarationParentheses">0</PropertyValue>
+				<PropertyValue name="Space_WithinOtherParentheses">0</PropertyValue>
+				<PropertyValue name="Space_WithinSquares">0</PropertyValue>
+				<PropertyValue name="Squiggles">1</PropertyValue>
+				<PropertyValue name="Squiggles_SemanticAnalysis">1</PropertyValue>
+				<PropertyValue name="TrackMostRecentlyUsed">1</PropertyValue>
+				<PropertyValue name="UnboundItemSmartTagEnabled">1</PropertyValue>
+				<PropertyValue name="UnboundItem_ExactMatches">5</PropertyValue>
+				<PropertyValue name="WarnOnBuildErrors">1</PropertyValue>
+				<PropertyValue name="WarnWhenMembersCauseCompilerGeneratedReferences">1</PropertyValue>
+				<PropertyValue name="Watson_DeferSendingUntilLater">0</PropertyValue>
+				<PropertyValue name="Watson_MaxExceptionsToReport">1</PropertyValue>
+				<PropertyValue name="Watson_ReportExceptions">1</PropertyValue>
+				<PropertyValue name="Wrapping_IgnoreSpacesAroundBinaryOperators">0</PropertyValue>
+				<PropertyValue name="Wrapping_IgnoreSpacesAroundVariableDeclaration">0</PropertyValue>
+				<PropertyValue name="Wrapping_KeepStatementsOnSingleLine">1</PropertyValue>
+				<PropertyValue name="Wrapping_PreserveSingleLine">1</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+	</ToolsOptions>
+	<Category name="Environment_Group" RegisteredName="Environment_Group">
+		<Category name="Environment_FontsAndColors" Category="{1EDA5DD4-927A-43a7-810E-7FD247D0DA1D}" Package="{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}" RegisteredName="Environment_FontsAndColors" PackageName="Visual Studio Environment Package">
+			<PropertyValue name="Version">2</PropertyValue>
+			<FontsAndColors Version="2.0">
+				<Categories>
+					<Category GUID="{58E96763-1D3B-4E05-B6BA-FF7115FD0B7B}" FontName="Consolas" FontSize="11" CharSet="1" FontIsDefault="No">
+						<Items/>
+					</Category>
+					<Category GUID="{75A05685-00A8-4DED-BAE5-E7A50BFA929A}" FontName="Consolas" FontSize="11" CharSet="1" FontIsDefault="No">
+						<Items>
+							<Item Name="VA X Brace Error" Foreground="0x000000FF" Background="0x02000000" BoldFont="Yes"/>
+						</Items>
+					</Category>
+					<Category GUID="{B36B0228-DBAD-4DB0-B9C7-2AD3E572010F}" FontName="Segoe UI" FontSize="9" CharSet="1" FontIsDefault="No">
+						<Items>
+							<Item Name="Different content" Foreground="0x000014E5" Background="0x00FFFFFF" BoldFont="No"/>
+							<Item Name="Identical content" Foreground="0x00000000" Background="0x00FFFFFF" BoldFont="No"/>
+							<Item Name="Source Only" Foreground="0x00000000" Background="0x00FFFFFF" BoldFont="No"/>
+							<Item Name="Target Only" Foreground="0x00000000" Background="0x00FFFFFF" BoldFont="No"/>
+							<Item Name="Not Downloaded" Foreground="0x00999999" Background="0x00FFFFFF" BoldFont="No"/>
+							<Item Name="Even Row Items" Foreground="0x00000000" Background="0x00FFFFFF" BoldFont="No"/>
+							<Item Name="Odd Row Items" Foreground="0x00000000" Background="0x00FFFFFF" BoldFont="No"/>
+						</Items>
+					</Category>
+					<Category GUID="{E0187991-B458-4F7E-8CA9-42C9A573B56C}" FontName="Consolas" FontSize="11" CharSet="1" FontIsDefault="No">
+						<Items/>
+					</Category>
+					<Category GUID="{FF349800-EA43-46C1-8C98-878E78F46501}" FontName="Consolas" FontSize="11" CharSet="1" FontIsDefault="No">
+						<Items/>
+					</Category>
+				</Categories>
+			</FontsAndColors>
+		</Category>
+		<Category name="Environment_KeyBindings" Category="{F09035F1-80D2-4312-8EC4-4D354A4BCB4C}" Package="{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}" RegisteredName="Environment_KeyBindings" PackageName="Visual Studio Environment Package">
+			<Version>11.0.0.0</Version>
+			<KeyboardShortcuts>
+				<ScopeDefinitions>
+					<Scope Name="Team Explorer" ID="{7AA20502-9463-47B7-BF43-341BAF51157C}"/>
+					<Scope Name="VC Dialog Editor" ID="{543E0C02-8C85-4E43-933A-5EF320E3431F}"/>
+					<Scope Name="UML Class Diagram" ID="{FE170F05-DE3A-4067-A3ED-08AE56B31DB3}"/>
+					<Scope Name="UML Component Diagram" ID="{13C19B18-BD05-42F3-9D3A-2A55E6E9169F}"/>
+					<Scope Name="XML (Text) Editor" ID="{FA3CD31E-987B-443A-9B81-186104E8DAC1}"/>
+					<Scope Name="Text Editor" ID="{8B382828-6202-11D1-8870-0000F87579D2}"/>
+					<Scope Name="XAML UI Designer" ID="{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"/>
+					<Scope Name="Work Item Results View" ID="{7026002D-01F6-44E7-95CF-A896C00DA3F8}"/>
+					<Scope Name="Solution Explorer" ID="{3AE79031-E1BC-11D0-8F78-00A0C9110057}"/>
+					<Scope Name="Query Designer" ID="{B2C40B32-3A37-4CA9-97B9-FA44248B69FF}"/>
+					<Scope Name="WebBrowser" ID="{E8B06F41-6D01-11D2-AA7D-00C04F990343}"/>
+					<Scope Name="Graphics Designers" ID="{58961B49-13E0-48C0-9258-13CBC4D40279}"/>
+					<Scope Name="AppManifestDesigner" ID="{4D47164B-07B6-4A52-A855-728D6A2E2AA3}"/>
+					<Scope Name="DataSet Editor" ID="{B334A759-F450-40A5-BE2A-65937BCD5415}"/>
+					<Scope Name="Graph Document Editor" ID="{295A0962-5A59-4F4F-9E12-6BC670C15C3B}"/>
+					<Scope Name="F# Interactive" ID="{DEE22B65-9761-4A26-8FB2-759B971D6DFC}"/>
+					<Scope Name="View Designer" ID="{B968E165-98E0-41F0-8FBE-A8ED1D246A90}"/>
+					<Scope Name="Global" ID="{5EFC7975-14BC-11CF-9B2B-00AA00573819}"/>
+					<Scope Name="Class Diagram" ID="{59B0B277-7DDF-4E36-A3ED-02DAC5B9E2FA}"/>
+					<Scope Name="UML Activity Diagram" ID="{950C3878-B510-4BC5-9051-42798A870364}"/>
+					<Scope Name="UML Use Case Diagram" ID="{FCFECC7C-3151-4B48-A85A-909F50500A70}"/>
+					<Scope Name="Work Item Query View" ID="{B6303490-B828-410C-9216-AE727D0E282D}"/>
+					<Scope Name="Team Foundation Build Detail Editor" ID="{86306A97-84F2-4F5A-889B-1318501AEB5F}"/>
+					<Scope Name="CSS Source Editor" ID="{A764E89A-518D-11D2-9A89-00C04F79EFC3}"/>
+					<Scope Name="Database Designer" ID="{CFF78A9B-78A3-45A3-9142-0267AFC261FA}"/>
+					<Scope Name="Work Item Editor" ID="{40A91D9D-8076-4D28-87C5-5AF9F0ACFE0F}"/>
+					<Scope Name="Sequence Diagram" ID="{5028BC9F-844B-4C51-A624-0005945D14AE}"/>
+					<Scope Name="Graphics Debugger" ID="{D27456A1-9094-4CDE-BADA-82994ED560D8}"/>
+					<Scope Name="VC String Editor" ID="{58442DA9-10DA-4AA9-A2AF-96E4D481379B}"/>
+					<Scope Name="Merge Editor Window" ID="{9A9A8AAA-ACD2-4DB6-BD81-8D64176C52B6}"/>
+					<Scope Name="Settings Designer" ID="{515231AD-C9DC-4AA3-808F-E1B65E72081C}"/>
+					<Scope Name="VisualStudio" ID="{B465B5AD-8799-4507-B90A-EE29ACF36AF9}"/>
+					<Scope Name="Windows Forms Designer" ID="{BA09E2AF-9DF2-4068-B2F0-4C7E5CC19E2F}"/>
+					<Scope Name="VC Accelerator Editor" ID="{EB56D0B5-BEE7-4D0C-8BE6-88A8ED256695}"/>
+					<Scope Name="Report Designer" ID="{CB3675B8-701E-4F56-9167-2714E167FF3F}"/>
+					<Scope Name="Workflow Designer" ID="{D4D9FCBC-B26A-4C41-AB9F-11FD2466829A}"/>
+					<Scope Name="Managed Resources Editor" ID="{FEA4DCC9-3645-44CD-92E7-84B55A16465C}"/>
+					<Scope Name="Coded UI Test Editor" ID="{E91F82D5-B532-47E9-ADAD-72F96EF9D35F}"/>
+					<Scope Name="Concurrency Report" ID="{5FCCFCD6-6237-4D02-B1DC-B6321AF08CE5}"/>
+					<Scope Name="Difference Viewer" ID="{79D52DDF-52BC-43F1-9663-B3E85CDCA912}"/>
+					<Scope Name="Table Designer" ID="{4194FEE5-6777-419F-A5FC-47A536DF1BDB}"/>
+					<Scope Name="Layer Diagram" ID="{305563E9-FDF9-485B-B73E-D9FEDCC36F2E}"/>
+					<Scope Name="HTML Editor Design View" ID="{CB3FCFEA-03DF-11D1-81D2-00A0C91BBEE3}"/>
+					<Scope Name="HTML Editor Source View" ID="{CB3FCFEB-03DF-11D1-81D2-00A0C91BBEE3}"/>
+					<Scope Name="VC Image Editor" ID="{C0BA70ED-069E-412B-9C06-7442E28A11B9}"/>
+					<Scope Name="Test Explorer" ID="{E1B7D1F8-9B3C-49B1-8F4F-BFC63A88835D}"/>
+					<Scope Name="XML Schema Designer" ID="{DEE6CEF9-3BCA-449A-82A6-FC757D6956FB}"/>
+				</ScopeDefinitions>
+				<DefaultShortcuts/>
+				<ShortcutsScheme>Visual C++ 6</ShortcutsScheme>
+				<UserShortcuts>
+					<RemoveShortcut Command="Build.BuildSolution" Scope="Global">F7</RemoveShortcut>
+					<Shortcut Command="Build.BuildSelection" Scope="Global">F7</Shortcut>
+				</UserShortcuts>
+			</KeyboardShortcuts>
+		</Category>
+	</Category>
+</UserSettings>
