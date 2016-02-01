@@ -182,6 +182,9 @@ BOOL UnInitialize(PVOID BaseAddress)
     return FALSE;
 }
 
+#pragma comment(lib, "winmm.lib")
+#pragma comment(linker, "/EXPORT:timeGetTime=winmm.timeGetTime")
+
 BOOL Initialize(PVOID BaseAddress)
 {
     using namespace Mp;
@@ -199,6 +202,21 @@ BOOL Initialize(PVOID BaseAddress)
         LdrAddRefDll(LDR_ADDREF_DLL_PIN, msimg32);
         *(PVOID *)&StubAlphaBlend = GetRoutineAddress(msimg32, "AlphaBlend");
     }
+
+#if 0
+    {
+        BaseAddress = GetExeModuleHandle();
+
+        PATCH_MEMORY_DATA f[] = 
+        {
+            FunctionJumpVa(NtSetTimerResolution, [](ULONG,BOOLEAN,PULONG) -> NTSTATUS { return STATUS_SUCCESS;}),
+        };
+
+        PatchMemory(f, 1, BaseAddress);
+
+        return TRUE;
+    }
+#endif
 
     PVOID GetLicenseManagerAddress;
 

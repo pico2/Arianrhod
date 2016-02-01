@@ -459,6 +459,8 @@ BOOL Initialize(PVOID BaseAddress)
         Success = GameFontRender != nullptr;
     }
 
+    return TRUE;
+
     PATCH_MEMORY_DATA p[] =
     {
         MemoryPatchVa(

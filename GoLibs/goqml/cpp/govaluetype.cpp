@@ -100,8 +100,10 @@ int registerPaintedSingletonN(char *location, int major, int minor, char *name, 
 #define GOPAINTEDVALUETYPE_CASE_SINGLETON(N) \
         case N: return registerPaintedSingletonN<N>(location, major, minor, name, info, spec);
 
-int registerSingleton(char *location, int major, int minor, char *name, GoTypeInfo *info, GoTypeSpec_ *spec)
+int registerSingleton(char *location, int major, int minor, char *name, GoTypeInfo *info, uintptr_t specPtr)
 {
+    GoTypeSpec_* spec = (GoTypeSpec_ *)specPtr;
+
     if (!info->paint) {
         switch (++goValueTypeN) {
         GOVALUETYPE_CASE_SINGLETON(1)

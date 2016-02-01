@@ -418,5 +418,8 @@ class FileStream(object):
     def WriteUTF16(self, u16):
         return self.Write(u16.encode('U16')[2:])
 
+    def WriteUTF8(self, utf8):
+        return self.Write(utf8.encode('UTF8'))
+
 def MemoryStream(endian = FileStream.LITTLE_ENDIAN, *, data = b'', **kwargs):
     return FileStream(data, endian = endian, **kwargs)

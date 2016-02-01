@@ -178,7 +178,7 @@ QVariantList_ *newVariantList(DataValue *list, int len);
 QQmlListProperty_ *newListProperty(GoAddr *addr, intptr_t reflectIndex, intptr_t setIndex);
 
 int registerType(char *location, int major, int minor, char *name, GoTypeInfo *typeInfo, GoTypeSpec_ *spec);
-int registerSingleton(char *location, int major, int minor, char *name, GoTypeInfo *typeInfo, GoTypeSpec_ *spec);
+int registerSingleton(char *location, int major, int minor, char *name, GoTypeInfo *typeInfo, uintptr_t spec);
 
 void installLogHandler();
 

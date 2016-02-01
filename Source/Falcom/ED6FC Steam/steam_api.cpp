@@ -3,7 +3,7 @@
 #define S_API CDECL
 #define S_VIRTUAL THISCALL
 
-#define PrintConsole(...)
+//#define PrintConsole(...)
 
 enum AccountType
 {
@@ -799,7 +799,7 @@ struct ISteamRemoteStorage
     virtual LONG64 S_VIRTUAL GetFileTimestamp( PCSTR FileName )
     {
         PrintConsole(L"GetFileTimestamp: %S\n", FileName);
-        return 0;
+        return 1;
     }
 
     virtual LONG S_VIRTUAL GetSyncPlatforms( PCSTR FileName )

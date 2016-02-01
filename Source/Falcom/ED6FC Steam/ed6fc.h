@@ -3,7 +3,7 @@
 
 #include "ml.h"
 
-#define DBG 0
+#define DBG 1
 
 using ml::String;
 using ml::GrowableArray;

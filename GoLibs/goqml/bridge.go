@@ -251,7 +251,7 @@ func wrapGoValue(engine *Engine, gvalue interface{}, owner valueOwner) (cvalue u
         gvalue: gvalue,
         owner:  owner,
     }
-    fold.cvalue = C.newGoValue(unsafe.Pointer(fold), typeInfo(gvalue), parent)
+    fold.cvalue = C.newGoValue(C.uintptr_t(uintptr(unsafe.Pointer(fold))), typeInfo(gvalue), parent)
     if prev != nil {
         // Put new fold first so the single cppOwner, if any, is always the first entry.
         fold.next = prev

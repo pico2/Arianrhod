@@ -1114,8 +1114,9 @@ func registerType(location string, major, minor int, spec *TypeSpec) error {
         cloc := C.CString(location)
         cname := C.CString(localSpec.Name)
         cres := C.int(0)
+        specPtr := C.uintptr_t(uintptr(unsafe.Pointer(&localSpec)))
         if localSpec.Singleton {
-            cres = C.registerSingleton(cloc, C.int(major), C.int(minor), cname, customType, unsafe.Pointer(&localSpec))
+            cres = C.registerSingleton(cloc, C.int(major), C.int(minor), cname, customType, specPtr)
         } else {
             cres = C.registerType(cloc, C.int(major), C.int(minor), cname, customType, unsafe.Pointer(&localSpec))
         }

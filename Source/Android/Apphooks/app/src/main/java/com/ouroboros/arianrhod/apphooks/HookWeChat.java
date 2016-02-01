@@ -112,6 +112,8 @@ public class HookWeChat implements IXposedHookLoadPackage {
             }
         });
 
+        if (true) return;
+
         // scheduleHideClip, alphaChangeStep: %s
 
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "getBlurBitmapFilePath", new XC_MethodReplacement() {

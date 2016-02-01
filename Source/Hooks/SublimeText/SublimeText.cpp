@@ -143,7 +143,7 @@ NAKED ULONG NakedACPToUnicode_3()
 
 NTSTATUS CDECL StCalcRegKey(PVOID arg1, PVOID arg2, PVOID arg3, PVOID arg4)
 {
-    return arg2 == nullptr ? 1 : STATUS_SUCCESS;
+    return arg2 != nullptr ? 1 : STATUS_SUCCESS;
 }
 
 BOOL (CDECL *StubIsUnicodeEncoding)(ULONG CpIndex);
@@ -239,28 +239,50 @@ BOOL Initialize(PVOID BaseAddress)
 
     CalcRegKey = SearchStringAndReverseSearchHeader(module->DllBase, RegisterKey, sizeof(RegisterKey), 0xC0);
 
+#if 0
+
     {
         /*++
 
-          0028189F   |> /8B06               /mov     eax, dword ptr [esi]
-          002818A1   |. |8A08               |mov     cl, byte ptr [eax]
-          002818A3   |. |40                 |inc     eax
-          002818A4   |. |8906               |mov     dword ptr [esi], eax
-          002818A6   |. |8B02               |mov     eax, dword ptr [edx]
-          002818A8   |. |0FB6D1             |movzx   edx, cl
-          002818AB   |. |8B0485 00F45A00    |mov     eax, dword ptr [eax*4+0x5AF400]    ?? ?? ?? ?? ?? ?? ??
-          002818B2   |. |8B0F               |mov     ecx, dword ptr [edi]
-          002818B4   |. |66:8B0450          |mov     ax, word ptr [eax+edx*2]
-          002818B8   |. |8B55 08            |mov     edx, [arg.1]
-          002818BB   |. |66:8901            |mov     word ptr [ecx], ax
-          002818BE   |. |8307 02            |add     dword ptr [edi], 0x2
-          002818C1   |> |391E                cmp     dword ptr [esi], ebx
-          002818C3   |.^\72 DA              \jb      short 0x28189F
+            0028189F   |> /8B06               /mov     eax, dword ptr [esi]
+            002818A1   |. |8A08               |mov     cl, byte ptr [eax]
+            002818A3   |. |40                 |inc     eax
+            002818A4   |. |8906               |mov     dword ptr [esi], eax
+            002818A6   |. |8B02               |mov     eax, dword ptr [edx]
+            002818A8   |. |0FB6D1             |movzx   edx, cl
+            002818AB   |. |8B0485 00F45A00    |mov     eax, dword ptr [eax*4+0x5AF400]    ?? ?? ?? ?? ?? ?? ??
+            002818B2   |. |8B0F               |mov     ecx, dword ptr [edi]
+            002818B4   |. |66:8B0450          |mov     ax, word ptr [eax+edx*2]
+            002818B8   |. |8B55 08            |mov     edx, [arg.1]
+            002818BB   |. |66:8901            |mov     word ptr [ecx], ax
+            002818BE   |. |8307 02            |add     dword ptr [edi], 0x2
+            002818C1   |> |391E                cmp     dword ptr [esi], ebx
+            002818C3   |.^\72 DA              \jb      short 0x28189F
 
+            001C1DBB   |> /8B06                /mov     eax, dword ptr [esi]
+            001C1DBD   |. |8A08                |mov     cl, byte ptr [eax]
+            001C1DBF   |. |40                  |inc     eax
+            001C1DC0   |. |8906                |mov     dword ptr [esi], eax
+            001C1DC2   |. |8B02                |mov     eax, dword ptr [edx]
+            001C1DC4   |. |0FB6C9              |movzx   ecx, cl
+            001C1DC7   |. |8B0485 F8FD5100     |mov     eax, dword ptr [eax*4+0x51FDF8]
+            001C1DCE   |. |0FB70C48            |movzx   ecx, word ptr [eax+ecx*2]
+            001C1DD2   |. |8B07                |mov     eax, dword ptr [edi]
+            001C1DD4   |. |8908                |mov     dword ptr [eax], ecx
+            001C1DD6   |. |8307 04             |add     dword ptr [edi], 0x4
+            001C1DD9   |> |391E                 cmp     dword ptr [esi], ebx
+            001C1DDB   |.^\72 DE               \jb      short 0x1C1DBB
         --*/
 
         ACPToUnicodeStub = SearchPatternSafe(
                                 L"8B 06 8A 08 40 89 06 8B 02 0F B6 D1 ?? ?? ?? ?? ?? ?? ?? 8B 0F 66 8B 04 50 8B 55 08 66 89 01 83 07 02 39 1E 72 DA",
+                                module->DllBase,
+                                module->SizeOfImage
+                            );
+
+        if (ACPToUnicodeStub == nullptr)
+            ACPToUnicodeStub = SearchPatternSafe(
+                                L"8B 06 8A 08 40 89 06 8B 02 0F B6 C9 ?? ?? ?? ?? ?? ?? ?? 0F B7 0C 48 8B 07 89 08 83 07 04 39 1E 72 DE",
                                 module->DllBase,
                                 module->SizeOfImage
                             );
@@ -299,12 +321,14 @@ BOOL Initialize(PVOID BaseAddress)
             return FALSE;
     }
 
+#endif
+
     PATCH_MEMORY_DATA f[] =
     {
-        FunctionCallVa(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
-        FunctionJumpVa(UnicodeToACPStub, UnicodeToACP, &StubUnicodeToACP),
+        //FunctionCallVa(PtrAdd(ACPToUnicodeStub, 0x1C), NakedACPToUnicode_3),
+        //FunctionJumpVa(UnicodeToACPStub, UnicodeToACP, &StubUnicodeToACP),
         FunctionJumpVa(CalcRegKey, StCalcRegKey),
-        FunctionJumpVa(IsUnicodeEncodingAddress, IsUnicodeEncoding, &StubIsUnicodeEncoding)
+        //FunctionJumpVa(IsUnicodeEncodingAddress, IsUnicodeEncoding, &StubIsUnicodeEncoding)
     };
 
     PVOID addr = StReplaceFile;
