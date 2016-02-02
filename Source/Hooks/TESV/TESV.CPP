@@ -15,10 +15,12 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
+    Rtl::SetExeDirectoryAsCurrent();
+
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
 
-    return NT_SUCCESS((new Patcher())->Initialize());
+    return NT_SUCCESS((new Patcher())->Initialize()) && (Ldr::LoadDll(L"skse_steam_loader.dll"), TRUE);
 }
 
 BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)

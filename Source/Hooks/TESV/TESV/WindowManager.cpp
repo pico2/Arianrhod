@@ -27,7 +27,7 @@ NTSTATUS WindowManager::CenterSkyrimWindow(PVOID TESVBase)
     {
         MemoryPatchVa((ULONG64)TESVCreateWindowExA, sizeof(PVOID), LookupImportTable(TESVBase, "USER32.dll", USER32_CreateWindowExA)),
 
-        FunctionCallRva(0x86DB06, TESVSetWindowPos),
+        FunctionCallRva(0x86DD66, TESVSetWindowPos),
     };
 
     FAIL_RETURN(PatchMemory(p, countof(p), TESVBase));
