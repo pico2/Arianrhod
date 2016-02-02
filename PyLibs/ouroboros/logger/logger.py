@@ -70,7 +70,7 @@ def getLogger(name, *, logPath = None):
         return rv
 
     def logException(self):
-        self.debug('\r\n'.join(traceback.format_exception(*sys.exc_info())))
+        self.debug('\n' + '\r\n'.join(traceback.format_exception(*sys.exc_info())))
 
     def logHexdump(self, data):
         self.debug('\n\n' + hexdump.hexdump(data, result = 'return') + '\n')
