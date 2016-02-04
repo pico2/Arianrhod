@@ -366,7 +366,9 @@ BOOL UnInitialize(PVOID BaseAddress)
 
 BOOL Initialize(PVOID BaseAddress)
 {
-    PLDR_MODULE chrome;
+    using namespace Mp;
+
+    PLDR_MODULE module;
     SizeT       Length, Length2;
     LPWSTR      lpCmdLineW, pCmdLine;
     WChar       end, szCmdLine[MAX_PATH + 40];
@@ -429,6 +431,25 @@ BOOL Initialize(PVOID BaseAddress)
 #endif
 
     PVOID DllNotificationCookie;
+
+    module = FindLdrModuleByHandle(nullptr);
+
+    if (RtlEqualUnicodeString(&module->BaseDllName, PUSTR(L"360AP.exe"), TRUE))
+    {
+        auto nop = [](ULONG) -> ULONG
+        {
+            return 1;
+        };
+
+        PATCH_MEMORY_DATA p[] =
+        {
+            MemoryPatchVa((ULONG64)(API_POINTER(SetThreadExecutionState)(nop)), sizeof(PVOID), LookupImportTable(module->DllBase, "kernel32.dll", KERNEL32_SetThreadExecutionState)),
+        };
+
+        PatchMemory(p, countof(p), nullptr);
+
+        return TRUE;
+    }
 
     LdrRegisterDllNotification(0,
         [] (ULONG NotificationReason, PCLDR_DLL_NOTIFICATION_DATA NotificationData, PVOID Context)

@@ -4,6 +4,7 @@ import (
     . "fmt"
     "runtime"
     "bytes"
+    "strings"
     "io/ioutil"
 )
 
@@ -40,6 +41,7 @@ func stack(skip, depth int) []byte {
     buf := new(bytes.Buffer)
 
     var lines [][]byte
+    var traceback []string
     var lastFile string
 
     if false {
@@ -85,7 +87,9 @@ func stack(skip, depth int) []byte {
 
             funcName := function(runtime.FuncForPC(pc).Name())
 
-            Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
+            text := Sprintf("%s:%d (0x%x)\n", file, line, pc)
+
+            // Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 
             if Config.ReadSource {
                 if file != lastFile {
@@ -97,11 +101,16 @@ func stack(skip, depth int) []byte {
                     lastFile = file
                 }
 
-                Fprintf(buf, "\t%s: %s\n", funcName, source(lines, line - 1))
+                text += Sprintf("\t%s: %s", funcName, source(lines, line - 1))
+
+                // Fprintf(buf, "\t%s: %s\n", funcName, source(lines, line - 1))
 
             } else {
-                Fprintf(buf, "\t%s\n", funcName)
+                text += Sprintf("\t%s", funcName)
+                // Fprintf(buf, "\t%s\n", funcName)
             }
+
+            traceback = append(traceback, text)
 
             if bytes.Equal(funcName, mainFuncName) {
                 break
@@ -109,5 +118,13 @@ func stack(skip, depth int) []byte {
         }
     }
 
-    return buf.Bytes()
+    length := len(traceback)
+    for i := 0; i != length / 2; i++ {
+        traceback[i], traceback[length - i - 1] = traceback[length - i - 1], traceback[i]
+    }
+
+    traceback = append(traceback, "")
+
+    return []byte(strings.Join(traceback, "\n"))
+    // return buf.Bytes()
 }

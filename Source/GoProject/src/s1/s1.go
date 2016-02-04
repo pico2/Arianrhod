@@ -177,41 +177,45 @@ func readuser() []String {
 }
 
 func main() {
-    defer console.Pause("done")
-    // pprof.Start()
-    // defer pprof.Stop()
+    var exp *Exception
 
-    sigc := make(chan os.Signal, 10)
-
-    signal.Notify(sigc, os.Interrupt)
-
-    go func() {
-        for {
-            _, ok := <-sigc
-            if ok == false {
-                break
-            }
-
-            exiting = true
-        }
+    defer func() {
+        Println(exp)
+        console.Pause("done")
     }()
 
-    wg := sync.WaitGroup{}
+    exp = Try(func() {
+        users := readuser()
 
-    users := readuser()
+        sigc := make(chan os.Signal, 10)
+        signal.Notify(sigc, os.Interrupt)
 
-    for i := 0; i + 1 < len(users); i += 2 {
-        if users[i].Length() == 0 {
-            i--
-            continue
+        go func() {
+            for {
+                _, ok := <-sigc
+                if ok == false {
+                    break
+                }
+
+                exiting = true
+            }
+        }()
+
+        wg := sync.WaitGroup{}
+
+        for i := 0; i + 1 < len(users); i += 2 {
+            if users[i].Length() == 0 {
+                i--
+                continue
+            }
+
+            wg.Add(1)
+            go func(i int) {
+                do(users[i], users[i + 1])
+                wg.Done()
+            }(i)
         }
 
-        wg.Add(1)
-        go func(i int) {
-            do(users[i], users[i + 1])
-            wg.Done()
-        }(i)
-    }
-
-    wg.Wait()
+        wg.Wait()
+    })
 }

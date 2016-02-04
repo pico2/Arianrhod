@@ -310,16 +310,20 @@ class FileStream(object):
         self.Position = 0
         return self.Read()
 
-    def Write(self, buf):
-        if not buf:
-            return
+    def Write(self, *bufs):
+        written = 0
+        for buf in bufs:
+            if not buf:
+                return
 
-        if isinstance(buf, FileStream):
-            with FileStreamPositionHolder(buf) as fs:
-                fs.Position = 0
-                buf = fs.Read()
+            if isinstance(buf, FileStream):
+                with FileStreamPositionHolder(buf) as fs:
+                    fs.Position = 0
+                    buf = fs.Read()
 
-        return self._stream.write(buf)
+            written += self._stream.write(buf)
+
+        return written
 
     def GetPosition(self):
         return self._stream.tell()
@@ -379,47 +383,47 @@ class FileStream(object):
     def ReadUTF16(self):
         return _ReadWString(self._stream)
 
-    def WriteBoolean(self, boolean):
-        return self.WriteByte(bool(boolean))
+    def WriteBoolean(self, *values):
+        return sum([self.WriteByte(bool(b)) for b in values])
 
-    def WriteChar(self, b):
-        return _WriteChar(self._stream, b)
+    def WriteChar(self, *values):
+        return sum([_WriteChar(self._stream, b) for b in values])
 
-    def WriteByte(self, b):
-        return _WriteByte(self._stream, b)
+    def WriteByte(self, *values):
+        return sum([_WriteByte(self._stream, b) for b in values])
 
-    def WriteShort(self, short):
-        return _WriteShort(self._stream, short, self._endian)
+    def WriteShort(self, *values):
+        return sum([_WriteShort(self._stream, short, self._endian) for short in values])
 
-    def WriteUShort(self, ushort):
-        return _WriteUShort(self._stream, ushort, self._endian)
+    def WriteUShort(self, *values):
+        return sum([_WriteUShort(self._stream, ushort, self._endian) for ushort in values])
 
-    def WriteLong(self, l):
-        return _WriteLong(self._stream, l, self._endian)
+    def WriteLong(self, *values):
+        return sum([_WriteLong(self._stream, l, self._endian) for l in values])
 
-    def WriteULong(self, ul):
-        return _WriteULong(self._stream, ul, self._endian)
+    def WriteULong(self, *values):
+        return sum([_WriteULong(self._stream, ul, self._endian) for ul in values])
 
-    def WriteLong64(self, l64):
-        return _WriteLong64(self._stream, l64, self._endian)
+    def WriteLong64(self, *values):
+        return sum([_WriteLong64(self._stream, l64, self._endian) for l64 in values])
 
-    def WriteULong64(self, ul64):
-        return _WriteULong64(self._stream, ul64, self._endian)
+    def WriteULong64(self, *values):
+        return sum([_WriteULong64(self._stream, ul64, self._endian) for ul64 in values])
 
-    def WriteFloat(self, flt):
-        return _WriteFloat(self._stream, flt, self._endian)
+    def WriteFloat(self, *values):
+        return sum([_WriteFloat(self._stream, flt, self._endian) for flt in values])
 
-    def WriteDouble(self, db):
-        return _WriteDouble(self._stream, db, self._endian)
+    def WriteDouble(self, *values):
+        return sum([_WriteDouble(self._stream, db, self._endian) for db in values])
 
-    def WriteMultiByte(self, mb, cp = None):
-        return self.Write(mb.encode(cp or self._encoding))
+    def WriteMultiByte(self, mb, encoding = None):
+        return self.Write(mb.encode(encoding or self._encoding))
 
-    def WriteUTF16(self, u16):
-        return self.Write(u16.encode('U16')[2:])
+    def WriteUTF16(self, *values):
+        return sum([self.Write(s.encode('U16')[2:]) for s in values])
 
-    def WriteUTF8(self, utf8):
-        return self.Write(utf8.encode('UTF8'))
+    def WriteUTF8(self, *values):
+        return sum([self.Write(s.encode('UTF8')) for s in values])
 
 def MemoryStream(endian = FileStream.LITTLE_ENDIAN, *, data = b'', **kwargs):
     return FileStream(data, endian = endian, **kwargs)
