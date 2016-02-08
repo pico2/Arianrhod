@@ -1,493 +1,473 @@
 ﻿#include "ml.h"
 
-#define S_API CDECL
+#define STEAM_API_NODLL 1
+#pragma warning(disable:4819)
+
+#include "steam\steam_api.h"
+#include "steam\steam_gameserver.h"
+
+using ml::String;
+
+#if 0
+    #define STEAM_LOG(...) (PrintConsole(L"[%S] ", __FUNCTION__), PrintConsole(__VA_ARGS__), PrintConsole(L"\n"))
+#else
+    #define STEAM_LOG(...)
+#endif
+
 #define S_VIRTUAL THISCALL
 
-//#define PrintConsole(...)
-
-enum AccountType
-{
-    AccountTypeInvalid = 0,
-    AccountTypeIndividual = 1,
-    AccountTypeMultiseat = 2,
-    AccountTypeGameServer = 3,
-    AccountTypeAnonGameServer = 4,
-    AccountTypePending = 5,
-    AccountTypeContentServer = 6,
-    AccountTypeClan = 7,
-    AccountTypeChat = 8,
-    AccountTypeAnonUser = 10,
-    AccountTypeMax
-};
-
-enum ServerMode
-{
-    ServerModeInvalid = 0,
-    ServerModeNoAuthentication = 1,
-    ServerModeAuthentication = 2,
-    ServerModeAuthenticationAndSecure = 3
-};
-
-enum LeaderboardDataRequest
-{
-    LeaderboardDataRequestGlobal = 0,
-    LeaderboardDataRequestGlobalAroundUser = 1,
-    LeaderboardDataRequestFriends = 2
-};
-
-enum LeaderboardSortMethod
-{
-    LeaderboardSortMethodNone = 0,
-    LeaderboardSortMethodAscending = 1,
-    LeaderboardSortMethodDescending = 2
-};
-
-enum LeaderboardDisplayType
-{
-    LeaderboardDisplayTypeNone = 0,
-    LeaderboardDisplayTypeNumeric = 1,
-    LeaderboardDisplayTypeTimeSeconds = 2,
-    LeaderboardDisplayTypeTimeMilliSeconds = 3
-};
-
-enum LeaderboardUploadScoreMethod
-{
-    LeaderboardUploadScoreMethodNone = 0,
-    LeaderboardUploadScoreMethodKeepBest = 1,
-    LeaderboardUploadScoreMethodForceUpdate = 2
-};
-
-typedef ULONG64 SteamAPICall;
-typedef ULONG64 SteamLeaderboard;
-typedef ULONG64 SteamLeaderboardEntries;
-typedef ULONG SteamPipeId;
-typedef ULONG SteamUserId;
-typedef ULONG AppId, AppId_t;
-
-const SteamAPICall SteamAPICallInvalid = 0;
-const AppId AppIdInvalid = 0;
-
-struct ISteamApps;
-struct ISteamUser;
-struct ISteamGameServer;
-struct ISteamFriends;
-struct ISteamUtils;
-struct ISteamMatchmaking;
-struct ISteamMasterServerUpdater;
-struct ISteamMatchmakingServers;
-struct ISteamUserStats;
-struct ISteamGameServerStats;
-struct ISteamNetworking;
-struct ISteamRemoteStorage;
-
-typedef VOID (*SteamAPIWarningMessageHook)(ULONG, PCSTR);
-
-ISteamApps* S_API SteamApps();
-
-struct CSteamID
-{
-    ULONG64 steamid;
-};
-
-struct LeaderboardEntry
-{
-    CSteamID mSteamIDUser;
-    ULONG mGlobalRank;
-    ULONG mScore;
-    ULONG mDetails;
-};
-
-struct ISteamApps
+struct CSteamApps : public ISteamApps
 {
 public:
     virtual bool S_VIRTUAL BIsSubscribed()
     {
-        PrintConsole(L"BIsSubscribed\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL BIsLowViolence()
     {
-        PrintConsole(L"BIsLowViolence\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL BIsCybercafe()
     {
-        PrintConsole(L"BIsCybercafe\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL BIsVACBanned()
     {
-        PrintConsole(L"BIsVACBanned\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual PCSTR S_VIRTUAL GetCurrentGameLanguage()
     {
-        PrintConsole(L"GetCurrentGameLanguage\n");
+        STEAM_LOG(L"");
         return "japanese";
     }
 
     virtual PCSTR S_VIRTUAL GetAvailableGameLanguages()
     {
-        PrintConsole(L"GetAvailableGameLanguages\n");
+        STEAM_LOG(L"");
         return "japanese";
     }
 
-    virtual bool S_VIRTUAL BIsSubscribedApp(ULONG appID)
+    virtual bool S_VIRTUAL BIsSubscribedApp(AppId_t appID)
     {
-        PrintConsole(L"BIsSubscribedApp\n");
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual bool S_VIRTUAL BIsDlcInstalled(ULONG appID)
+    virtual bool S_VIRTUAL BIsDlcInstalled(AppId_t appID)
     {
-        PrintConsole(L"BIsDlcInstalled\n");
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual ULONG S_VIRTUAL GetEarliestPurchaseUnixTime(AppId nAppID)
+    virtual uint32 S_VIRTUAL GetEarliestPurchaseUnixTime(AppId_t nAppID)
     {
-        PrintConsole(L"GetEarliestPurchaseUnixTime\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
     virtual bool S_VIRTUAL BIsSubscribedFromFreeWeekend()
     {
-        PrintConsole(L"BIsSubscribedFromFreeWeekend\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual int S_VIRTUAL GetDLCCount()
     {
-        PrintConsole(L"GetDLCCount\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
     virtual bool S_VIRTUAL BGetDLCDataByIndex( int iDLC, AppId_t *pAppID, bool *pbAvailable, char *pchName, int cchNameBufferSize )
     {
-        PrintConsole(L"BGetDLCDataByIndex\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual void S_VIRTUAL InstallDLC( AppId_t nAppID )
     {
-        PrintConsole(L"InstallDLC\n");
+        STEAM_LOG(L"");
     }
 
     virtual void S_VIRTUAL UninstallDLC( AppId_t nAppID )
     {
-        PrintConsole(L"UninstallDLC\n");
+        STEAM_LOG(L"");
     }
 
     virtual void S_VIRTUAL RequestAppProofOfPurchaseKey(AppId_t nAppID)
     {
-        PrintConsole(L"RequestAppProofOfPurchaseKey\n");
+        STEAM_LOG(L"");
     }
 
     virtual bool S_VIRTUAL GetCurrentBetaName( char *pchName, int cchNameBufferSize )
     {
-        PrintConsole(L"GetCurrentBetaName\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL MarkContentCorrupt( bool bMissingFilesOnly )
     {
-        PrintConsole(L"MarkContentCorrupt\n");
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual ULONG S_VIRTUAL GetInstalledDepots( AppId_t appID, ULONG *pvecDepots, ULONG cMaxDepots )
+    virtual uint32 S_VIRTUAL GetInstalledDepots( AppId_t appID, DepotId_t *pvecDepots, uint32 cMaxDepots )
     {
-        PrintConsole(L"GetInstalledDepots\n");
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual ULONG S_VIRTUAL GetAppInstallDir( AppId_t appID, char *pchFolder, ULONG cchFolderBufferSize )
+    virtual uint32 S_VIRTUAL GetAppInstallDir( AppId_t appID, char *pchFolder, uint32 cchFolderBufferSize )
     {
-        PrintConsole(L"GetAppInstallDir\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
     virtual bool S_VIRTUAL BIsAppInstalled(AppId_t appID)
     {
-        PrintConsole(L"BIsAppInstalled\n");
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual PVOID S_VIRTUAL GetAppOwner()
+    virtual CSteamID S_VIRTUAL GetAppOwner()
     {
-        PrintConsole(L"GetAppOwner\n");
-        return nullptr;
+        STEAM_LOG(L"");
+        return CSteamID();
     }
 
     virtual PCSTR S_VIRTUAL GetLaunchQueryParam(PCSTR pchKey)
     {
-        PrintConsole(L"GetLaunchQueryParam\n");
+        STEAM_LOG(L"");
         return "";
     }
-};
 
-struct ISteamClient
-{
-public:
-    virtual SteamPipeId S_VIRTUAL CreateSteamPipe()
+    virtual bool GetDlcDownloadProgress(AppId_t nAppID, uint64 *punBytesDownloaded, uint64 *punBytesTotal)
     {
-        PrintConsole(L"CreateSteamPipe\n");
-        return 0;
-    }
+        if (punBytesDownloaded != nullptr)
+            *punBytesDownloaded = 1;
 
-    virtual bool S_VIRTUAL BReleaseSteamPipe(SteamPipeId steamPipe)
-    {
-        PrintConsole(L"BReleaseSteamPipe\n");
+        if (punBytesTotal != nullptr)
+            *punBytesTotal = 1;
+
         return true;
     }
 
-    virtual SteamUserId S_VIRTUAL ConnectToGlobalUser(SteamPipeId steamPipe)
+    virtual int GetAppBuildId()
     {
-        PrintConsole(L"ConnectToGlobalUser\n");
         return 0;
     }
 
-    virtual SteamUserId S_VIRTUAL CreateLocalUser(SteamPipeId *steamPipe, AccountType accountType)
+#ifdef _PS3
+    // Result returned in a RegisterActivationCodeResponse_t callresult
+    virtual SteamAPICall_t RegisterActivationCode(const char *pchActivationCode)
     {
-        PrintConsole(L"CreateLocalUser\n");
+        return k_uAPICallInvalid;
+    }
+#endif
+};
+
+struct CSteamClient : public ISteamClient
+{
+public:
+    virtual HSteamPipe S_VIRTUAL CreateSteamPipe()
+    {
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual void S_VIRTUAL ReleaseUser(SteamPipeId steamPipe, SteamUserId user)
+    virtual bool S_VIRTUAL BReleaseSteamPipe(HSteamPipe steamPipe)
     {
-        PrintConsole(L"ReleaseUser\n");
+        STEAM_LOG(L"");
+        return true;
     }
 
-    virtual ISteamUser* S_VIRTUAL GetISteamUser(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual HSteamUser S_VIRTUAL ConnectToGlobalUser(HSteamPipe steamPipe)
     {
-        PrintConsole(L"GetISteamUser\n");
+        STEAM_LOG(L"");
+        return 0;
+    }
+
+    virtual HSteamUser S_VIRTUAL CreateLocalUser(HSteamPipe *steamPipe, EAccountType accountType)
+    {
+        STEAM_LOG(L"");
+        return 0;
+    }
+
+    virtual void S_VIRTUAL ReleaseUser(HSteamPipe steamPipe, HSteamUser user)
+    {
+        STEAM_LOG(L"");
+    }
+
+    virtual ISteamUser* S_VIRTUAL GetISteamUser(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
+    {
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamGameServer *S_VIRTUAL GetISteamGameServer(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamGameServer *S_VIRTUAL GetISteamGameServer(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamGameServer\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual void S_VIRTUAL SetLocalIPBinding(ULONG ip, USHORT port)
+    virtual void S_VIRTUAL SetLocalIPBinding(uint32 ip, USHORT port)
     {
-        PrintConsole(L"SetLocalIPBinding\n");
+        STEAM_LOG(L"");
     }
 
-    virtual ISteamFriends *S_VIRTUAL GetISteamFriends(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamFriends *S_VIRTUAL GetISteamFriends(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamFriends\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamUtils *S_VIRTUAL GetISteamUtils(SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamUtils *S_VIRTUAL GetISteamUtils(HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamUtils\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamMatchmaking *S_VIRTUAL GetISteamMatchmaking(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamMatchmaking *S_VIRTUAL GetISteamMatchmaking(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamMatchmaking\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamMasterServerUpdater *S_VIRTUAL GetISteamMasterServerUpdater(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamMatchmakingServers *S_VIRTUAL GetISteamMatchmakingServers(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamMasterServerUpdater\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamMatchmakingServers *S_VIRTUAL GetISteamMatchmakingServers(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual void *S_VIRTUAL GetISteamGenericInterface(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamMatchmakingServers\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual void *S_VIRTUAL GetISteamGenericInterface(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamUserStats* S_VIRTUAL GetISteamUserStats(HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion)
     {
-        PrintConsole(L"GetISteamGenericInterface\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamUserStats *S_VIRTUAL GetISteamUserStats(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamGameServerStats *S_VIRTUAL GetISteamGameServerStats(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamUserStats\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamGameServerStats *S_VIRTUAL GetISteamGameServerStats(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamApps *S_VIRTUAL GetISteamApps(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamGameServerStats\n");
-        DebugBreakPoint();
-        return nullptr;
-    }
-
-    virtual ISteamApps *S_VIRTUAL GetISteamApps(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
-    {
-        PrintConsole(L"GetISteamApps\n");
+        STEAM_LOG(L"");
         return SteamApps();
     }
 
-    virtual ISteamNetworking *S_VIRTUAL GetISteamNetworking(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamNetworking *S_VIRTUAL GetISteamNetworking(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamNetworking\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual ISteamRemoteStorage *S_VIRTUAL GetISteamRemoteStorage(SteamUserId steamUser, SteamPipeId steamPipe, PCSTR version)
+    virtual ISteamRemoteStorage *S_VIRTUAL GetISteamRemoteStorage(HSteamUser steamUser, HSteamPipe steamPipe, PCSTR version)
     {
-        PrintConsole(L"GetISteamRemoteStorage\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
+        return nullptr;
+    }
+
+    virtual ISteamScreenshots *GetISteamScreenshots(HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion)
+    {
         return nullptr;
     }
 
     virtual void S_VIRTUAL RunFrame()
     {
-        PrintConsole(L"RunFrame\n");
+        STEAM_LOG(L"");
     }
 
-    virtual ULONG S_VIRTUAL GetIPCCallCount()
+    virtual uint32 S_VIRTUAL GetIPCCallCount()
     {
-        PrintConsole(L"GetIPCCallCount\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual void S_VIRTUAL SetWarningMessageHook(SteamAPIWarningMessageHook function)
+    virtual void S_VIRTUAL SetWarningMessageHook(SteamAPIWarningMessageHook_t function)
     {
-        PrintConsole(L"SetWarningMessageHook\n");
+        STEAM_LOG(L"");
     }
 
     virtual bool S_VIRTUAL BShutdownIfAllPipesClosed()
     {
-        PrintConsole(L"BShutdownIfAllPipesClosed\n");
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual class ISteamHTTP * S_VIRTUAL GetISteamHTTP( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    virtual class ISteamHTTP * S_VIRTUAL GetISteamHTTP( HSteamUser hSteamuser, HSteamPipe hSteamPipe, PCSTR pchVersion )
     {
-        PrintConsole(L"GetISteamHTTP\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual class ISteamUnifiedMessages * S_VIRTUAL GetISteamUnifiedMessages( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    virtual class ISteamUnifiedMessages * S_VIRTUAL GetISteamUnifiedMessages( HSteamUser hSteamuser, HSteamPipe hSteamPipe, PCSTR pchVersion )
     {
-        PrintConsole(L"GetISteamUnifiedMessages\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual class  ISteamController * S_VIRTUAL GetISteamController( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    virtual class  ISteamController * S_VIRTUAL GetISteamController( HSteamUser hSteamUser, HSteamPipe hSteamPipe, PCSTR pchVersion )
     {
-        PrintConsole(L"GetISteamController\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual class ISteamUGC * S_VIRTUAL GetISteamUGC( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    virtual class ISteamUGC * S_VIRTUAL GetISteamUGC( HSteamUser hSteamUser, HSteamPipe hSteamPipe, PCSTR pchVersion )
     {
-        PrintConsole(L"GetISteamUGC\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual class ISteamAppList * S_VIRTUAL GetISteamAppList( SteamUserId hSteamUser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    virtual class ISteamAppList * S_VIRTUAL GetISteamAppList( HSteamUser hSteamUser, HSteamPipe hSteamPipe, PCSTR pchVersion )
     {
-        PrintConsole(L"GetISteamAppList\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
         return nullptr;
     }
 
-    virtual class ISteamMusic * S_VIRTUAL GetISteamMusic( SteamUserId hSteamuser, SteamPipeId hSteamPipe, PCSTR pchVersion )
+    virtual class ISteamMusic * S_VIRTUAL GetISteamMusic( HSteamUser hSteamuser, HSteamPipe hSteamPipe, PCSTR pchVersion )
     {
-        PrintConsole(L"GetISteamMusic\n");
+        STEAM_LOG(L"");
         DebugBreakPoint();
+        return nullptr;
+    }
+
+    virtual ISteamMusicRemote *GetISteamMusicRemote(HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion)
+    {
+        STEAM_LOG(L"");
+        return nullptr;
+    }
+
+    virtual ISteamHTMLSurface *GetISteamHTMLSurface(HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion)
+    {
+        STEAM_LOG(L"");
+        return nullptr;
+    }
+
+    virtual void Set_SteamAPI_CPostAPIResultInProcess(SteamAPI_PostAPIResultInProcess_t func)
+    {
+        STEAM_LOG(L"");
+    }
+
+    virtual void Remove_SteamAPI_CPostAPIResultInProcess(SteamAPI_PostAPIResultInProcess_t func)
+    {
+        STEAM_LOG(L"");
+    }
+
+    virtual void Set_SteamAPI_CCheckCallbackRegisteredInProcess(SteamAPI_CheckCallbackRegistered_t func)
+    {
+        STEAM_LOG(L"");
+    }
+
+    virtual ISteamInventory *GetISteamInventory(HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion)
+    {
+        STEAM_LOG(L"");
+        return nullptr;
+    }
+
+    virtual ISteamVideo *GetISteamVideo(HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion)
+    {
+        STEAM_LOG(L"");
         return nullptr;
     }
 };
 
-struct ISteamUserStats
+struct CSteamUserStats : public ISteamUserStats
 {
-    SteamLeaderboard mLastLeaderboard = 0;
+    SteamLeaderboard_t mLastLeaderboard = 0;
 
     virtual bool S_VIRTUAL RequestCurrentStats()
     {
-        PrintConsole(L"RequestCurrentStats\n");
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual bool S_VIRTUAL GetStat(PCSTR name, LONG *data )
+    virtual bool S_VIRTUAL GetStat(PCSTR name, int32 *data )
     {
-        PrintConsole(L"GetStat\n");
+        STEAM_LOG(L"");
         *data = 0;
         return true;
     };
 
     virtual bool S_VIRTUAL GetStat(PCSTR name, FLOAT *data)
     {
-        PrintConsole(L"GetStat\n");
+        STEAM_LOG(L"");
         *data = 0;
         return true;
     }
 
-    virtual bool S_VIRTUAL SetStat(PCSTR name, LONG data)
+    virtual bool S_VIRTUAL SetStat(PCSTR name, int32 data)
     {
-        PrintConsole(L"SetStat\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL SetStat(PCSTR name, FLOAT data)
     {
-        PrintConsole(L"SetStat\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL UpdateAvgRateStat(PCSTR name, FLOAT countThisSession,  double sessionLength)
     {
-        PrintConsole(L"UpdateAvgRateStat\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL GetAchievement(PCSTR name, bool *achieved)
     {
-        PrintConsole(L"GetAchievement\n");
+        STEAM_LOG(L"");
         *achieved = true;
         return true;
     }
 
     virtual bool S_VIRTUAL SetAchievement(PCSTR name)
     {
-        PrintConsole(L"SetAchievement\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL ClearAchievement(PCSTR name)
     {
-        PrintConsole(L"ClearAchievement\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL GetAchievementAndUnlockTime(PCSTR name,
                               bool *achieved,
-                              ULONG *unlockTime)
+                              uint32 *unlockTime)
     {
-        PrintConsole(L"GetAchievementAndUnlockTime\n");
+        STEAM_LOG(L"");
         *achieved = true;
         *unlockTime = 0;
         return true;
@@ -495,68 +475,68 @@ struct ISteamUserStats
 
     virtual bool S_VIRTUAL StoreStats()
     {
-        PrintConsole(L"StoreStats\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual int S_VIRTUAL GetAchievementIcon(PCSTR name)
     {
-        PrintConsole(L"GetAchievementIcon\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
     virtual PCSTR S_VIRTUAL GetAchievementDisplayAttribute(PCSTR name, PCSTR key)
     {
-        PrintConsole(L"GetAchievementDisplayAttribute\n");
+        STEAM_LOG(L"");
         return "AchievementDisplayAttribute";
     }
 
-    virtual bool S_VIRTUAL IndicateAchievementProgress(PCSTR name, ULONG curProgress, ULONG maxProgress)
+    virtual bool S_VIRTUAL IndicateAchievementProgress(PCSTR name, uint32 curProgress, uint32 maxProgress)
     {
-        PrintConsole(L"IndicateAchievementProgress\n");
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual ULONG S_VIRTUAL GetNumAchievements()
+    virtual uint32 S_VIRTUAL GetNumAchievements()
     {
         return 0;
     }
 
-    virtual PCSTR S_VIRTUAL GetAchievementName( ULONG iAchievement )
+    virtual PCSTR S_VIRTUAL GetAchievementName( uint32 iAchievement )
     {
         return 0;
     }
 
-    virtual SteamAPICall S_VIRTUAL RequestUserStats(CSteamID steamIDUser)
+    virtual SteamAPICall_t S_VIRTUAL RequestUserStats(CSteamID steamIDUser)
     {
-        PrintConsole(L"RequestUserStats\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, LONG *data)
+    virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, int32 *data)
     {
-        PrintConsole(L"GetUserStat\n");
+        STEAM_LOG(L"");
         *data = 0;
         return true;
     }
 
     virtual bool S_VIRTUAL GetUserStat(CSteamID steamIDUser, PCSTR name, FLOAT *data)
     {
-        PrintConsole(L"GetUserStat\n");
+        STEAM_LOG(L"");
         *data = 0;
         return true;
     }
 
     virtual bool S_VIRTUAL GetUserAchievement(CSteamID steamIDUser, PCSTR name, bool *achieved)
     {
-        PrintConsole(L"GetUserAchievement\n");
+        STEAM_LOG(L"");
         *achieved = true;
         return true;
     }
 
-    virtual bool S_VIRTUAL GetUserAchievementAndUnlockTime(CSteamID steamIDUser, PCSTR name, bool *achieved, ULONG *unlockTime)
+    virtual bool S_VIRTUAL GetUserAchievementAndUnlockTime(CSteamID steamIDUser, PCSTR name, bool *achieved, uint32 *unlockTime)
     {
-        PrintConsole(L"GetUserAchievementAndUnlockTime\n");
+        STEAM_LOG(L"");
         *achieved = true;
         *unlockTime = 0;
         return true;
@@ -564,114 +544,114 @@ struct ISteamUserStats
 
     virtual bool S_VIRTUAL ResetAllStats(bool achievementsToo)
     {
-        PrintConsole(L"ResetAllStats\n");
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual SteamAPICall S_VIRTUAL FindOrCreateLeaderboard(
+    virtual SteamAPICall_t S_VIRTUAL FindOrCreateLeaderboard(
             PCSTR leaderboardName,
-            LeaderboardSortMethod leaderboardSortMethod,
-            LeaderboardDisplayType leaderboardDisplayType)
+            ELeaderboardSortMethod leaderboardSortMethod,
+            ELeaderboardDisplayType leaderboardDisplayType)
     {
-        PrintConsole(L"FindOrCreateLeaderboard\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual SteamAPICall S_VIRTUAL FindLeaderboard(PCSTR leaderboardName)
+    virtual SteamAPICall_t S_VIRTUAL FindLeaderboard(PCSTR leaderboardName)
     {
-        PrintConsole(L"FindLeaderboard\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual PCSTR S_VIRTUAL GetLeaderboardName(SteamLeaderboard steamLeaderboard)
+    virtual PCSTR S_VIRTUAL GetLeaderboardName(SteamLeaderboard_t steamLeaderboard)
     {
-        PrintConsole(L"GetLeaderboardName\n");
+        STEAM_LOG(L"");
         return "LeaderboardName";
     }
 
-    virtual int S_VIRTUAL GetLeaderboardEntryCount(SteamLeaderboard steamLeaderboard)
+    virtual int S_VIRTUAL GetLeaderboardEntryCount(SteamLeaderboard_t steamLeaderboard)
     {
-        PrintConsole(L"GetLeaderboardEntryCount\n");
+        STEAM_LOG(L"");
         mLastLeaderboard = steamLeaderboard;
         return 10;
     }
 
-    virtual LeaderboardSortMethod S_VIRTUAL GetLeaderboardSortMethod(SteamLeaderboard steamLeaderboard)
+    virtual ELeaderboardSortMethod S_VIRTUAL GetLeaderboardSortMethod(SteamLeaderboard_t steamLeaderboard)
     {
-        PrintConsole(L"GetLeaderboardSortMethod\n");
-        return LeaderboardSortMethodDescending;
+        STEAM_LOG(L"");
+        return k_ELeaderboardSortMethodDescending;
     }
 
-    virtual LeaderboardDisplayType S_VIRTUAL GetLeaderboardDisplayType(SteamLeaderboard steamLeaderboard)
+    virtual ELeaderboardDisplayType S_VIRTUAL GetLeaderboardDisplayType(SteamLeaderboard_t steamLeaderboard)
     {
-        PrintConsole(L"GetLeaderboardDisplayType\n");
-        return LeaderboardDisplayTypeNumeric;
+        STEAM_LOG(L"");
+        return k_ELeaderboardDisplayTypeNumeric;
     }
 
-    virtual SteamAPICall S_VIRTUAL DownloadLeaderboardEntries(SteamLeaderboard steamLeaderboard, LeaderboardDataRequest leaderboardDataRequest, int rangeStart, int rangeEnd)
+    virtual SteamAPICall_t S_VIRTUAL DownloadLeaderboardEntries(SteamLeaderboard_t steamLeaderboard, ELeaderboardDataRequest leaderboardDataRequest, int rangeStart, int rangeEnd)
     {
-        PrintConsole(L"DownloadLeaderboardEntries\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual SteamAPICall S_VIRTUAL DownloadLeaderboardEntriesForUsers(SteamLeaderboard hSteamLeaderboard, CSteamID *prgUsers, int cUsers )
+    virtual SteamAPICall_t S_VIRTUAL DownloadLeaderboardEntriesForUsers(SteamLeaderboard_t hSteamLeaderboard, CSteamID *prgUsers, int cUsers )
     {
-        PrintConsole(L"DownloadLeaderboardEntriesForUsers\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
     virtual bool S_VIRTUAL GetDownloadedLeaderboardEntry(
-            SteamLeaderboardEntries steamLeaderboardEntries,
+            SteamLeaderboardEntries_t steamLeaderboardEntries,
             int index,
-            LeaderboardEntry *leaderboardEntry,
-            LONG *details,
+            LeaderboardEntry_t *leaderboardEntry,
+            int32 *details,
             int detailsMax)
     {
-        PrintConsole(L"GetDownloadedLeaderboardEntry\n");
+        STEAM_LOG(L"");
         *details = 0;
         return false;
     }
 
-    virtual SteamAPICall S_VIRTUAL UploadLeaderboardScore(
-            SteamLeaderboard steamLeaderboard,
-            LeaderboardUploadScoreMethod leaderboardUploadScoreMethod,
-            LONG score,
-            const LONG *scoreDetails,
+    virtual SteamAPICall_t S_VIRTUAL UploadLeaderboardScore(
+            SteamLeaderboard_t steamLeaderboard,
+            ELeaderboardUploadScoreMethod leaderboardUploadScoreMethod,
+            int32 score,
+            const int32 *scoreDetails,
             int scoreDetailsCount)
     {
-        PrintConsole(L"UploadLeaderboardScore\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual SteamAPICall S_VIRTUAL AttachLeaderboardUGC( SteamLeaderboard hSteamLeaderboard, ULONG64 hUGC )
+    virtual SteamAPICall_t S_VIRTUAL AttachLeaderboardUGC( SteamLeaderboard_t hSteamLeaderboard, ULONG64 hUGC )
     {
-        PrintConsole(L"AttachLeaderboardUGC\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual SteamAPICall S_VIRTUAL GetNumberOfCurrentPlayers()
+    virtual SteamAPICall_t S_VIRTUAL GetNumberOfCurrentPlayers()
     {
-        PrintConsole(L"GetNumberOfCurrentPlayers\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual SteamAPICall S_VIRTUAL RequestGlobalAchievementPercentages()
+    virtual SteamAPICall_t S_VIRTUAL RequestGlobalAchievementPercentages()
     {
-        PrintConsole(L"RequestGlobalAchievementPercentages\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual int S_VIRTUAL GetMostAchievedAchievementInfo( char *pchName, ULONG unNameBufLen, FLOAT *pflPercent, bool *pbAchieved )
+    virtual int S_VIRTUAL GetMostAchievedAchievementInfo( char *pchName, uint32 unNameBufLen, FLOAT *pflPercent, bool *pbAchieved )
     {
-        PrintConsole(L"GetMostAchievedAchievementInfo\n");
+        STEAM_LOG(L"");
         *pflPercent = 100;
         *pbAchieved = true;
         return 0;
     }
 
-    virtual int S_VIRTUAL GetNextMostAchievedAchievementInfo( int iIteratorPrevious, char *pchName, ULONG unNameBufLen, FLOAT *pflPercent, bool *pbAchieved )
+    virtual int S_VIRTUAL GetNextMostAchievedAchievementInfo( int iIteratorPrevious, char *pchName, uint32 unNameBufLen, FLOAT *pflPercent, bool *pbAchieved )
     {
-        PrintConsole(L"GetNextMostAchievedAchievementInfo\n");
+        STEAM_LOG(L"");
         ZeroMemory(pchName, unNameBufLen);
         *pflPercent = 100;
         *pbAchieved = true;
@@ -680,150 +660,165 @@ struct ISteamUserStats
 
     virtual bool S_VIRTUAL GetAchievementAchievedPercent( PCSTR pchName, FLOAT *pflPercent )
     {
-        PrintConsole(L"GetAchievementAchievedPercent\n");
+        STEAM_LOG(L"");
         *pflPercent = 100;
         return false;
     }
 
-    virtual SteamAPICall S_VIRTUAL RequestGlobalStats( int nHistoryDays )
+    virtual SteamAPICall_t S_VIRTUAL RequestGlobalStats( int nHistoryDays )
     {
-        PrintConsole(L"RequestGlobalStats\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual bool S_VIRTUAL GetGlobalStat( PCSTR pchStatName, LONG64 *pData )
+    virtual bool S_VIRTUAL GetGlobalStat( PCSTR pchStatName, int64 *pData )
     {
-        PrintConsole(L"GetGlobalStat\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL GetGlobalStat( PCSTR pchStatName, double *pData )
     {
-        PrintConsole(L"GetGlobalStat\n");
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual LONG S_VIRTUAL GetGlobalStatHistory( PCSTR pchStatName, LONG64 *pData, ULONG cubData )
+    virtual int32 S_VIRTUAL GetGlobalStatHistory( PCSTR pchStatName, int64 *pData, uint32 cubData )
     {
-        PrintConsole(L"GetGlobalStatHistory\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual LONG S_VIRTUAL GetGlobalStatHistory( PCSTR pchStatName, double *pData, ULONG cubData )
+    virtual int32 S_VIRTUAL GetGlobalStatHistory( PCSTR pchStatName, double *pData, uint32 cubData )
     {
-        PrintConsole(L"GetGlobalStatHistory\n");
+        STEAM_LOG(L"");
         return 0;
     }
 };
 
-struct ISteamRemoteStorage
+struct CSteamRemoteStorage : public ISteamRemoteStorage
 {
-    virtual bool S_VIRTUAL FileWrite(PCSTR FileName, PVOID Data, LONG Size)
+    virtual bool S_VIRTUAL FileWrite(PCSTR FileName, const void* Data, int32 Size)
     {
-        PrintConsole(L"FileWrite: %S\n", FileName);
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual LONG S_VIRTUAL FileRead(PCSTR FileName, PVOID Data, LONG Size)
+    virtual int32 S_VIRTUAL FileRead(PCSTR FileName, PVOID Data, int32 Size)
     {
-        PrintConsole(L"FileRead: %S\n", FileName);
+        STEAM_LOG(L"");
         return 0;
+    }
+
+    virtual SteamAPICall_t FileWriteAsync(const char *pchFile, const void *pvData, uint32 cubData)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t FileReadAsync(const char *pchFile, uint32 nOffset, uint32 cubToRead)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual bool FileReadAsyncComplete(SteamAPICall_t hReadCall, void *pvBuffer, uint32 cubToRead)
+    {
+        return k_uAPICallInvalid;
     }
 
     virtual bool S_VIRTUAL FileForget(PCSTR FileName)
     {
-        PrintConsole(L"FileForget: %S\n", FileName);
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL FileDelete( PCSTR FileName )
     {
-        PrintConsole(L"FileDelete: %S\n", FileName);
+        STEAM_LOG(L"");
         return true;
     }
 
-    virtual SteamAPICall S_VIRTUAL FileShare( PCSTR FileName )
+    virtual SteamAPICall_t S_VIRTUAL FileShare( PCSTR FileName )
     {
-        PrintConsole(L"FileShare: %S\n", FileName);
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual bool S_VIRTUAL SetSyncPlatforms( PCSTR FileName, LONG eRemoteStoragePlatform )
+    virtual bool S_VIRTUAL SetSyncPlatforms( PCSTR FileName, ERemoteStoragePlatform eRemoteStoragePlatform )
     {
-        PrintConsole(L"SetSyncPlatforms: %S\n", FileName);
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual ULONG64 S_VIRTUAL FileWriteStreamOpen( PCSTR FileName )
     {
-        PrintConsole(L"FileWriteStreamOpen: %S\n", FileName);
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual bool S_VIRTUAL FileWriteStreamWriteChunk( ULONG64 writeHandle, const void *pvData, LONG cubData )
+    virtual bool S_VIRTUAL FileWriteStreamWriteChunk( ULONG64 writeHandle, const void *pvData, int32 cubData )
     {
-        PrintConsole(L"FileWriteStreamWriteChunk\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL FileWriteStreamClose( ULONG64 writeHandle )
     {
-        PrintConsole(L"FileWriteStreamClose\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL FileWriteStreamCancel( ULONG64 writeHandle )
     {
-        PrintConsole(L"FileWriteStreamCancel\n");
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL FileExists( PCSTR FileName )
     {
-        PrintConsole(L"FileExists: %S\n", FileName);
+        STEAM_LOG(L"");
         return false;
     }
 
     virtual bool S_VIRTUAL FilePersisted( PCSTR FileName )
     {
-        PrintConsole(L"FilePersisted: %S\n", FileName);
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual LONG S_VIRTUAL GetFileSize( PCSTR FileName )
+    virtual int32 S_VIRTUAL GetFileSize( PCSTR FileName )
     {
-        PrintConsole(L"GetFileSize: %S\n", FileName);
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual LONG64 S_VIRTUAL GetFileTimestamp( PCSTR FileName )
+    virtual int64 S_VIRTUAL GetFileTimestamp( PCSTR FileName )
     {
-        PrintConsole(L"GetFileTimestamp: %S\n", FileName);
+        STEAM_LOG(L"");
         return 1;
     }
 
-    virtual LONG S_VIRTUAL GetSyncPlatforms( PCSTR FileName )
+    virtual ERemoteStoragePlatform S_VIRTUAL GetSyncPlatforms( PCSTR FileName )
     {
-        PrintConsole(L"GetSyncPlatforms: %S\n", FileName);
+        STEAM_LOG(L"");
+        return k_ERemoteStoragePlatformWindows;
+    }
+
+    virtual int32 S_VIRTUAL GetFileCount()
+    {
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual LONG S_VIRTUAL GetFileCount()
+    virtual PCSTR S_VIRTUAL GetFileNameAndSize( int iFile, int32 *pnFileSizeInBytes )
     {
-        PrintConsole(L"GetFileCount\n");
-        return 0;
-    }
-
-    virtual PCSTR S_VIRTUAL GetFileNameAndSize( int iFile, LONG *pnFileSizeInBytes )
-    {
-        PrintConsole(L"GetFileNameAndSize\n");
+        STEAM_LOG(L"");
         *pnFileSizeInBytes = 0;
         return "";
     }
 
-    virtual bool S_VIRTUAL GetQuota( LONG *pnTotalBytes, LONG *puAvailableBytes )
+    virtual bool S_VIRTUAL GetQuota(int32 *pnTotalBytes, int32 *puAvailableBytes )
     {
-        PrintConsole(L"GetQuota\n");
+        STEAM_LOG(L"");
         *pnTotalBytes = 0x10000000;
         *puAvailableBytes = 0x10000000;
         return true;
@@ -831,55 +826,213 @@ struct ISteamRemoteStorage
 
     virtual bool S_VIRTUAL IsCloudEnabledForAccount()
     {
-        PrintConsole(L"IsCloudEnabledForAccount\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual bool S_VIRTUAL IsCloudEnabledForApp()
     {
-        PrintConsole(L"IsCloudEnabledForApp\n");
+        STEAM_LOG(L"");
         return true;
     }
 
     virtual void S_VIRTUAL SetCloudEnabledForApp( bool bEnabled )
     {
-        PrintConsole(L"SetCloudEnabledForApp\n");
+        STEAM_LOG(L"");
     }
 
-    virtual SteamAPICall S_VIRTUAL UGCDownload( ULONG64 hContent, ULONG unPriority )
+    virtual SteamAPICall_t S_VIRTUAL UGCDownload( ULONG64 hContent, uint32 unPriority )
     {
-        PrintConsole(L"UGCDownload\n");
-        return SteamAPICallInvalid;
+        STEAM_LOG(L"");
+        return k_uAPICallInvalid;
     }
 
-    virtual bool S_VIRTUAL GetUGCDownloadProgress( ULONG64 hContent, LONG *pnBytesDownloaded, LONG *pnBytesExpected )
+    virtual bool S_VIRTUAL GetUGCDownloadProgress( ULONG64 hContent, int32 *pnBytesDownloaded, int32 *pnBytesExpected )
     {
-        PrintConsole(L"GetUGCDownloadProgress\n");
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual bool S_VIRTUAL GetUGCDetails( ULONG64 hContent, AppId_t *pnAppID, char **ppchName, LONG *pnFileSizeInBytes, CSteamID *pSteamIDOwner )
+    virtual bool S_VIRTUAL GetUGCDetails( ULONG64 hContent, AppId_t *pnAppID, char **ppchName, int32 *pnFileSizeInBytes, CSteamID *pSteamIDOwner )
     {
-        PrintConsole(L"GetUGCDetails\n");
+        STEAM_LOG(L"");
         return false;
     }
 
-    virtual LONG S_VIRTUAL UGCRead( ULONG64 hContent, void *pvData, LONG cubDataToRead, ULONG cOffset, LONG eAction )
+    virtual int32 S_VIRTUAL UGCRead(UGCHandle_t hContent, void *pvData, int32 cubDataToRead, uint32 cOffset, EUGCReadAction eAction )
     {
-        PrintConsole(L"UGCRead\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual LONG S_VIRTUAL GetCachedUGCCount()
+    virtual int32 S_VIRTUAL GetCachedUGCCount()
     {
-        PrintConsole(L"GetCachedUGCCount\n");
+        STEAM_LOG(L"");
         return 0;
     }
 
-    virtual ULONG64 S_VIRTUAL GetCachedUGCHandle( LONG iCachedContent )
+    virtual ULONG64 S_VIRTUAL GetCachedUGCHandle( int32 iCachedContent )
     {
-        PrintConsole(L"GetCachedUGCHandle\n");
+        STEAM_LOG(L"");
         return 0;
+    }
+
+#if defined(_PS3) || defined(_SERVER)
+    virtual void GetFileListFromServer()
+    {
+    }
+
+    virtual bool FileFetch(const char *pchFile)
+    {
+        return true;
+    }
+
+    virtual bool FilePersist(const char *pchFile)
+    {
+        return true;
+    }
+
+    virtual bool SynchronizeToClient()
+    {
+        return true;
+    }
+
+    virtual bool SynchronizeToServer()
+    {
+        return true;
+    }
+
+    virtual bool ResetFileRequestState()
+    {
+        return true;
+    }
+
+#endif
+
+    // publishing UGC
+    virtual SteamAPICall_t PublishWorkshopFile(const char *pchFile, const char *pchPreviewFile, AppId_t nConsumerAppId, const char *pchTitle, const char *pchDescription, ERemoteStoragePublishedFileVisibility eVisibility, SteamParamStringArray_t *pTags, EWorkshopFileType eWorkshopFileType)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual PublishedFileUpdateHandle_t CreatePublishedFileUpdateRequest(PublishedFileId_t unPublishedFileId)
+    {
+        return k_PublishedFileUpdateHandleInvalid;
+    }
+
+    virtual bool UpdatePublishedFileFile(PublishedFileUpdateHandle_t updateHandle, const char *pchFile)
+    {
+        return true;
+    }
+
+    virtual bool UpdatePublishedFilePreviewFile(PublishedFileUpdateHandle_t updateHandle, const char *pchPreviewFile)
+    {
+        return true;
+    }
+
+    virtual bool UpdatePublishedFileTitle(PublishedFileUpdateHandle_t updateHandle, const char *pchTitle)
+    {
+        return true;
+    }
+
+    virtual bool UpdatePublishedFileDescription(PublishedFileUpdateHandle_t updateHandle, const char *pchDescription)
+    {
+        return true;
+    }
+
+    virtual bool UpdatePublishedFileVisibility(PublishedFileUpdateHandle_t updateHandle, ERemoteStoragePublishedFileVisibility eVisibility)
+    {
+        return true;
+    }
+
+    virtual bool UpdatePublishedFileTags(PublishedFileUpdateHandle_t updateHandle, SteamParamStringArray_t *pTags)
+    {
+        return true;
+    }
+
+    virtual SteamAPICall_t CommitPublishedFileUpdate(PublishedFileUpdateHandle_t updateHandle)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t GetPublishedFileDetails(PublishedFileId_t unPublishedFileId, uint32 unMaxSecondsOld)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t DeletePublishedFile(PublishedFileId_t unPublishedFileId)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t EnumerateUserPublishedFiles(uint32 unStartIndex)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t SubscribePublishedFile(PublishedFileId_t unPublishedFileId)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t EnumerateUserSubscribedFiles(uint32 unStartIndex)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t UnsubscribePublishedFile(PublishedFileId_t unPublishedFileId)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual bool UpdatePublishedFileSetChangeDescription(PublishedFileUpdateHandle_t updateHandle, const char *pchChangeDescription)
+    {
+        return true;
+    }
+
+    virtual SteamAPICall_t GetPublishedItemVoteDetails(PublishedFileId_t unPublishedFileId)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t UpdateUserPublishedItemVote(PublishedFileId_t unPublishedFileId, bool bVoteUp)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t GetUserPublishedItemVoteDetails(PublishedFileId_t unPublishedFileId)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t EnumerateUserSharedWorkshopFiles(CSteamID steamId, uint32 unStartIndex, SteamParamStringArray_t *pRequiredTags, SteamParamStringArray_t *pExcludedTags)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t PublishVideo(EWorkshopVideoProvider eVideoProvider, const char *pchVideoAccount, const char *pchVideoIdentifier, const char *pchPreviewFile, AppId_t nConsumerAppId, const char *pchTitle, const char *pchDescription, ERemoteStoragePublishedFileVisibility eVisibility, SteamParamStringArray_t *pTags)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t SetUserPublishedFileAction(PublishedFileId_t unPublishedFileId, EWorkshopFileAction eAction)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t EnumeratePublishedFilesByUserAction(EWorkshopFileAction eAction, uint32 unStartIndex)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t EnumeratePublishedWorkshopFiles(EWorkshopEnumerationType eEnumerationType, uint32 unStartIndex, uint32 unCount, uint32 unDays, SteamParamStringArray_t *pTags, SteamParamStringArray_t *pUserTags)
+    {
+        return k_uAPICallInvalid;
+    }
+
+    virtual SteamAPICall_t UGCDownloadToLocation(UGCHandle_t hContent, const char *pchLocation, uint32 unPriority)
+    {
+        return k_uAPICallInvalid;
     }
 
 };
@@ -888,164 +1041,165 @@ struct ISteamRemoteStorage
 // export
 //////////////////////////////////////////////////////////////////////////
 
-static ISteamApps apps;
-static ISteamUserStats stat;
-static ISteamClient client;
-static ISteamRemoteStorage storage;
+static CSteamApps apps;
+static CSteamUserStats stat;
+static CSteamClient client;
+static CSteamRemoteStorage storage;
 
-bool S_API SteamAPI_Init()
+bool S_CALLTYPE SteamAPI_Init()
 {
-    PrintConsole(L"SteamAPI_Init\n");
+    STEAM_LOG(L"");
     return true;
 }
 
-bool S_API SteamAPI_InitSafe()
+bool S_CALLTYPE SteamAPI_InitSafe()
 {
-    PrintConsole(L"SteamAPI_InitSafe\n");
+    STEAM_LOG(L"");
     return false;
 }
 
-bool S_API SteamAPI_IsSteamRunning()
+bool S_CALLTYPE SteamAPI_IsSteamRunning()
 {
-    PrintConsole(L"SteamAPI_IsSteamRunning\n");
+    STEAM_LOG(L"");
     return true;
 }
 
-void S_API SteamAPI_RegisterCallResult(struct CallbackBase *callback, SteamAPICall apiCall)
+void S_CALLTYPE SteamAPI_RegisterCallResult(struct CallbackBase *callback, SteamAPICall_t apiCall)
 {
-    PrintConsole(L"SteamAPI_RegisterCallResult\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamAPI_RegisterCallback(struct CallbackBase *callback, int iCallback)
+void S_CALLTYPE SteamAPI_RegisterCallback(struct CallbackBase *callback, int iCallback)
 {
-    PrintConsole(L"SteamAPI_RegisterCallback\n");
+    STEAM_LOG(L"");
 }
 
-bool S_API SteamAPI_RestartAppIfNecessary(ULONG appId)
+bool S_CALLTYPE SteamAPI_RestartAppIfNecessary(uint32 appId)
 {
-    PrintConsole(L"SteamAPI_RestartAppIfNecessary\n");
+    STEAM_LOG(L"");
     return false;
 }
 
-void S_API SteamAPI_RunCallbacks()
+void S_CALLTYPE SteamAPI_RunCallbacks()
 {
-    PrintConsole(L"SteamAPI_RunCallbacks\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamAPI_SetMiniDumpComment(PCSTR msg)
+void S_CALLTYPE SteamAPI_SetMiniDumpComment(PCSTR msg)
 {
-    PrintConsole(L"SteamAPI_SetMiniDumpComment\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamAPI_Shutdown()
+void S_CALLTYPE SteamAPI_Shutdown()
 {
-    PrintConsole(L"SteamAPI_Shutdown\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamAPI_UnregisterCallResult(struct CallbackBase *callback, SteamAPICall apiCall)
+void S_CALLTYPE SteamAPI_UnregisterCallResult(struct CallbackBase *callback, SteamAPICall_t apiCall)
 {
-    PrintConsole(L"SteamAPI_UnregisterCallResult\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamAPI_UnregisterCallback(struct CallbackBase *callback)
+void S_CALLTYPE SteamAPI_UnregisterCallback(struct CallbackBase *callback)
 {
-    PrintConsole(L"SteamAPI_UnregisterCallback\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamAPI_WriteMiniDump(ULONG exceptionCode, PVOID exceptionInfo, ULONG buildId)
+void S_CALLTYPE SteamAPI_WriteMiniDump(uint32 exceptionCode, PVOID exceptionInfo, uint32 buildId)
 {
-    PrintConsole(L"SteamAPI_WriteMiniDump\n");
+    STEAM_LOG(L"");
 }
 
-ISteamApps* S_API SteamApps()
+ISteamApps* S_CALLTYPE SteamApps()
 {
-    PrintConsole(L"SteamApps\n");
+    STEAM_LOG(L"");
     return &apps;
 }
 
-ISteamUserStats* S_API SteamUserStats()
+ISteamUserStats* S_CALLTYPE SteamUserStats()
 {
-    PrintConsole(L"SteamUserStats\n");
+    STEAM_LOG(L"");
     return &stat;
 }
 
-struct ISteamClient* S_API SteamClient()
+ISteamClient* S_CALLTYPE SteamClient()
 {
-    PrintConsole(L"SteamClient\n");
+    STEAM_LOG(L"");
     return &client;
 }
 
-ISteamFriends* S_API SteamFriends()
+ISteamFriends* S_CALLTYPE SteamFriends()
 {
-    PrintConsole(L"SteamFriends\n");
+    STEAM_LOG(L"");
     DebugBreakPoint();
     return nullptr;
 }
 
-ISteamGameServer* S_API SteamGameServer()
+ISteamGameServer* S_CALLTYPE SteamGameServer()
 {
-    PrintConsole(L"SteamGameServer\n");
+    STEAM_LOG(L"");
     DebugBreakPoint();
     return nullptr;
 }
 
-ISteamNetworking* S_API SteamGameServerNetworking()
+ISteamNetworking* S_CALLTYPE SteamGameServerNetworking()
 {
-    PrintConsole(L"SteamGameServerNetworking\n");
+    STEAM_LOG(L"");
     DebugBreakPoint();
     return nullptr;
 }
 
-ULONG64 S_API SteamGameServer_GetSteamID()
+ULONG64 S_CALLTYPE SteamGameServer_GetSteamID()
 {
-    PrintConsole(L"SteamGameServer_GetSteamID\n");
+    STEAM_LOG(L"");
     return 251150;
 }
 
-bool S_API SteamGameServer_Init(ULONG ip, USHORT port, USHORT gamePort, USHORT spectatorPort, USHORT queryPort, ServerMode serverMode, PCSTR gameDir, PCSTR versionString)
+bool S_CALLTYPE SteamGameServer_Init(uint32 ip, USHORT port, USHORT gamePort, USHORT spectatorPort, USHORT queryPort, EServerMode serverMode, PCSTR gameDir, PCSTR versionString)
 {
-    PrintConsole(L"SteamGameServer_Init\n");
+    STEAM_LOG(L"");
     return true;
 }
 
-void S_API SteamGameServer_RunCallbacks()
+void S_CALLTYPE SteamGameServer_RunCallbacks()
 {
-    PrintConsole(L"SteamGameServer_RunCallbacks\n");
+    STEAM_LOG(L"");
 }
 
-void S_API SteamGameServer_Shutdown()
+void S_CALLTYPE SteamGameServer_Shutdown()
 {
-    PrintConsole(L"SteamGameServer_Shutdown\n");
+    STEAM_LOG(L"");
 }
 
-ISteamMatchmaking* S_API SteamMatchmaking()
+ISteamMatchmaking* S_CALLTYPE SteamMatchmaking()
 {
-    PrintConsole(L"SteamMatchmaking\n");
+    STEAM_LOG(L"");
     DebugBreakPoint();
     return nullptr;
 }
 
-ISteamMatchmakingServers* S_API SteamMatchmakingServers()
+ISteamMatchmakingServers* S_CALLTYPE SteamMatchmakingServers()
 {
-    PrintConsole(L"SteamMatchmakingServers\n");
+    STEAM_LOG(L"");
     DebugBreakPoint();
     return nullptr;
 }
 
-ISteamNetworking* S_API SteamNetworking()
+ISteamNetworking* S_CALLTYPE SteamNetworking()
 {
-    PrintConsole(L"SteamNetworking\n");
+    STEAM_LOG(L"");
     DebugBreakPoint();
     return nullptr;
 }
 
-ISteamRemoteStorage* S_API SteamRemoteStorage()
+ISteamRemoteStorage* S_CALLTYPE SteamRemoteStorage()
 {
-    PrintConsole(L"SteamRemoteStorage\n");
+    STEAM_LOG(L"");
     return &storage;
 }
 
-VOID S_API SteamScreenshots()
+ISteamScreenshots* S_CALLTYPE SteamScreenshots()
 {
-    PrintConsole(L"SteamScreenshots\n");
+    STEAM_LOG(L"");
+    return nullptr;
 }

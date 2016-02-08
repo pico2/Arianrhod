@@ -414,7 +414,7 @@ NTSTATUS InitializeDWrite()
 BOOL UnInitialize(PVOID BaseAddress)
 {
 #if DBG
-    PauseConsole(L"any key");
+    //PauseConsole(L"any key");
 #endif
 
     return FALSE;
@@ -427,6 +427,7 @@ BOOL Initialize(PVOID BaseAddress)
     BOOL        Success;
     ULONG_PTR   SizeOfImage;
     PVOID       FaceBuffer;
+    PLDR_MODULE ExeModule;
 
     LdrDisableThreadCalloutsForDll(BaseAddress);
     ml::MlInitialize();
@@ -459,7 +460,23 @@ BOOL Initialize(PVOID BaseAddress)
         Success = GameFontRender != nullptr;
     }
 
-    return TRUE;
+    ExeModule = FindLdrModuleByHandle(nullptr);
+
+    SearchAllPatterns(
+        L"76 ?? ?? 80 72 ?? ?? A0 72 ?? ?? E0 73 ??",
+        ExeModule->DllBase,
+        ExeModule->SizeOfImage,
+        [](const ml::GrowableArray<PVOID>& references)
+        {
+            PVOID* addr;
+
+            FOR_EACH_VEC(addr, references)
+            {
+                BYTE data = 0xC;
+                Mm::WriteProtectMemory(CurrentProcess, PtrAdd(*addr, 1), &data, 1);
+            }
+        }
+    );
 
     PATCH_MEMORY_DATA p[] =
     {
@@ -494,22 +511,25 @@ BOOL Initialize(PVOID BaseAddress)
         ),
 
         // cmp r8, 80
-        MemoryPatchVa(0xEBull, 1, 0x485041),
-        MemoryPatchVa(0xEBull, 1, 0x469C52),
-        MemoryPatchVa(0xEBull, 1, 0x4794B7),
-        MemoryPatchVa(0xEBull, 1, 0x47B131),
-        MemoryPatchVa(0xEBull, 1, 0x484B0B),
-        MemoryPatchVa(0xEBull, 1, 0x488015),
-        MemoryPatchVa(0x00ull, 1, 0x48819D),
-        MemoryPatchVa(0xEBull, 1, 0x488567),
-        MemoryPatchVa(0xEBull, 1, 0x4B78D1),
-        MemoryPatchVa(0xEBull, 1, 0x4B7934),
-        MemoryPatchVa(0xEBull, 1, 0x4B79B5),
-        MemoryPatchVa(0xEBull, 1, 0x4B7A4D),
-        MemoryPatchVa(0xEBull, 1, 0x4B7BFC),
-        MemoryPatchVa(0xEBull, 1, 0x4B7C6C),
-        MemoryPatchVa(0xEBull, 1, 0x4B7D1B),
-        MemoryPatchVa(0xEBull, 1, 0x4D9F4D),
+        // 80 ?? 80 72 ?? 80 ?? A0 72 ?? 80 ?? E0 72 ??
+        // 3C 80 72 ?? 3C A0 72 ?? 3C E0 72 ??
+        // 3C 80 72 ?? 3C A0 72 ?? 3C E0 73 ??
+        MemoryPatchVa(0xEBull, 1, 0x46A2E2),
+        MemoryPatchVa(0xEBull, 1, 0x479C27),
+        MemoryPatchVa(0xEBull, 1, 0x47B8A1),
+        MemoryPatchVa(0xEBull, 1, 0x48540B),
+        MemoryPatchVa(0xEBull, 1, 0x485941),
+        MemoryPatchVa(0xEBull, 1, 0x4888E5),
+        MemoryPatchVa(0x00ull, 1, 0x488A6D),
+        MemoryPatchVa(0xEBull, 1, 0x488E37),
+        MemoryPatchVa(0xEBull, 1, 0x4B8FE1),
+        MemoryPatchVa(0xEBull, 1, 0x4B9044),
+        MemoryPatchVa(0xEBull, 1, 0x4B90C5),
+        MemoryPatchVa(0xEBull, 1, 0x4B915D),
+        MemoryPatchVa(0xEBull, 1, 0x4B930C),
+        MemoryPatchVa(0xEBull, 1, 0x4B937C),
+        MemoryPatchVa(0xEBull, 1, 0x4B942B),
+        MemoryPatchVa(0xEBull, 1, 0x4DB6CD),
 
         /************************************************************************
          calc ansi char width
@@ -523,30 +543,31 @@ BOOL Initialize(PVOID BaseAddress)
         004B7934    .  EB 23               jmp     short 0x4B7959                   <==
         004B7936    .  3C E0               cmp     al, 0xE0
         004B7938    .  73 1F               jnb     short 0x4B7959
+
+        76 ?? ?? 80 72 ?? ?? A0 72 ?? ?? E0 73 ??
         ************************************************************************/
-        MemoryPatchVa(0xCull, 1, 0x4B78CA),
-        MemoryPatchVa(0xCull, 1, 0x4B792D),
-        MemoryPatchVa(0xCull, 1, 0x4B79AE),
-        MemoryPatchVa(0xCull, 1, 0x4B7A46),
-        MemoryPatchVa(0xCull, 1, 0x4B7D14),
+        // MemoryPatchVa(0xCull, 1, 0x4B8FDA),
+        // MemoryPatchVa(0xCull, 1, 0x4B792D),
+        // MemoryPatchVa(0xCull, 1, 0x4B79AE),
+        // MemoryPatchVa(0xCull, 1, 0x4B7A46),
+        // MemoryPatchVa(0xCull, 1, 0x4B7D14),
 
         // 物品已有个数窗口位置
         // CWindow::CWindow(104, 14, ...)
-        MemoryPatchVa(0x104ull, 4, 0x4973BA),  // x
-        MemoryPatchVa(0x14ull,  4, 0x4973CE),  // width
-        MemoryPatchVa(0x104ull, 4, 0x49AADB),  // x
-        MemoryPatchVa(0x14ull,  4, 0x49AAEF),  // width
+        MemoryPatchVa(0x104ull, 4, 0x498B1A),  // x
+        MemoryPatchVa(0x14ull,  4, 0x498B2E),  // width
+        MemoryPatchVa(0x104ull, 4, 0x49C1BB),  // x
+        MemoryPatchVa(0x14ull,  4, 0x49C1CF),  // width
 
         // ctrl code
-        MemoryPatchVa(0x0404ull,    2, 0x4850FE),
+        MemoryPatchVa(0x0404ull,    2, 0x4859FE),
 
         // jp font size limit
-        MemoryPatchVa(0xEBull,      1, 0x4DC6A4),
+        MemoryPatchVa(0xEBull,      1, 0x4DDCF4),
 
         FunctionJumpVa(Success ? GET_GLYPHS_BITMAP_VA       : IMAGE_INVALID_VA, GetGlyphsBitmap, &StubGetGlyphsBitmap),
         FunctionJumpVa(Success ? DRAW_TALK_TEXT_VA          : IMAGE_INVALID_VA, DrawTalkText),
         FunctionJumpVa(Success ? DRAW_DIALOG_TEXT_VA        : IMAGE_INVALID_VA, NakedDrawDialogText),
-        //FunctionJumpVa(Success ? CACL_BOOK_TEXT_WIDTH_VA    : IMAGE_INVALID_VA, NakedCalcBookTextWidth),
 
         FunctionJumpVa(LOAD_FILE_FROM_DAT_VA,   NakedLoadFileFromDat),
         FunctionJumpVa(DECOMPRESS_DATA_VA,      NakedDecompressData, &StubNakedDecompressData),

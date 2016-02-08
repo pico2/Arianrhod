@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2008, Valve Corporation, All rights reserved. =======
+//====== Copyright ?1996-2008, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -54,20 +54,20 @@ S_API bool SteamGameServer_Init( const SteamPS3Params_t *ps3Params, uint32 unIP,
 #endif
 
 #ifndef VERSION_SAFE_STEAM_API_INTERFACES
-S_API ISteamGameServer *SteamGameServer();
-S_API ISteamUtils *SteamGameServerUtils();
-S_API ISteamNetworking *SteamGameServerNetworking();
-S_API ISteamGameServerStats *SteamGameServerStats();
-S_API ISteamHTTP *SteamGameServerHTTP();
-S_API ISteamInventory *SteamGameServerInventory();
-S_API ISteamUGC *SteamGameServerUGC();
+S_API ISteamGameServer* S_CALLTYPE SteamGameServer();
+S_API ISteamUtils * S_CALLTYPE SteamGameServerUtils();
+S_API ISteamNetworking * S_CALLTYPE SteamGameServerNetworking();
+S_API ISteamGameServerStats * S_CALLTYPE SteamGameServerStats();
+S_API ISteamHTTP * S_CALLTYPE SteamGameServerHTTP();
+S_API ISteamInventory * S_CALLTYPE SteamGameServerInventory();
+S_API ISteamUGC * S_CALLTYPE SteamGameServerUGC();
 #endif
 
-S_API void SteamGameServer_Shutdown();
-S_API void SteamGameServer_RunCallbacks();
+S_API void S_CALLTYPE SteamGameServer_Shutdown();
+S_API void S_CALLTYPE SteamGameServer_RunCallbacks();
 
-S_API bool SteamGameServer_BSecure();
-S_API uint64 SteamGameServer_GetSteamID();
+S_API bool S_CALLTYPE SteamGameServer_BSecure();
+S_API uint64 S_CALLTYPE SteamGameServer_GetSteamID();
 
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------//

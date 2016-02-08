@@ -3,7 +3,7 @@
 
 #include "ml.h"
 
-#define DBG 1
+#define DBG 0
 
 using ml::String;
 using ml::GrowableArray;
@@ -28,15 +28,16 @@ typedef struct
 
 NTSTATUS PatchExeText(PVOID BaseAddress);
 
-#define GET_GLYPHS_BITMAP_VA    (PVOID)0x4B7C30
-#define DRAW_TALK_TEXT_VA       (PVOID)0x484A40
-#define DRAW_DIALOG_TEXT_VA     (PVOID)0x484A90
-#define CACL_BOOK_TEXT_WIDTH_VA (PVOID)0x4B7920
-#define LOAD_FILE_FROM_DAT_VA   (PVOID)0x4651F0
-#define DECOMPRESS_DATA_VA      (PVOID)0x468120
+#define GET_GLYPHS_BITMAP_VA    (PVOID)0x4B9340
+#define DRAW_TALK_TEXT_VA       (PVOID)0x485340
+#define DRAW_DIALOG_TEXT_VA     (PVOID)0x485390
+#define LOAD_FILE_FROM_DAT_VA   (PVOID)0x465880
+#define DECOMPRESS_DATA_VA      (PVOID)0x4687B0
+
+// #define CACL_BOOK_TEXT_WIDTH_VA (PVOID)0x4B7920
 
 #define RAW_FILE_MAGIC  TAG4('EDFC')
 
-static const PED6_DIR_ENTRY *DirCacheTable = (PED6_DIR_ENTRY*)0x58D930;
+static const PED6_DIR_ENTRY *DirCacheTable = (PED6_DIR_ENTRY*)0x5909E0;
 
 #endif // _ED6FC_H_fa318148_52ea_4fd8_8eb7_2af9986ea179_

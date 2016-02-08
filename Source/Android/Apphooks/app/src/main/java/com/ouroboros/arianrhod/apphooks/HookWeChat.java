@@ -5,7 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Handler;
+import android.util.AttributeSet;
+import android.widget.ImageView;
 
 import java.util.Map;
 
@@ -112,9 +121,19 @@ public class HookWeChat implements IXposedHookLoadPackage {
             }
         });
 
-        if (true) return;
-
         // scheduleHideClip, alphaChangeStep: %s
+        // snsblurs_
+        // snsblurt_
+
+        /*
+
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.data.h", pkg.classLoader, "g", "com.tencent.mm.protocal.b.add", new XC_MethodReplacement() {
+            @Override
+            protected Object replaceHookedMethod(MethodHookParam args) throws Throwable {
+                HookLoadPackage.log("param1 = %s", args.args[0]);
+                return XposedHelpers.callMethod(args.thisObject, "h", args.args[0]);
+            }
+        });
 
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "getBlurBitmapFilePath", new XC_MethodReplacement() {
             @Override
@@ -127,7 +146,70 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "setMaskColor", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                HookLoadPackage.log("setMaskColor");
                 param.args[0] = 0;
+            }
+        });
+        */
+
+//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "b", "com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                HookLoadPackage.log("b");
+//                String inputStream = (String)XposedHelpers.callMethod(param.args[0], "bpg");
+//                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIX");
+//
+//                if (bitmap != null)
+//                    HookLoadPackage.log("blur w = %d, h = %d", bitmap.getWidth(), bitmap.getHeight());
+//
+////                param.setResult(null);
+//            }
+//        });
+
+//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "axY", new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                HookLoadPackage.log("axY called");
+//                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIY");
+//                if (bitmap != null)
+//                    HookLoadPackage.log("blur w = %d, h = %d", bitmap.getWidth(), bitmap.getHeight());
+//
+//                param.setResult(null);
+//            }
+//        });
+
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "onDraw", Canvas.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                HookLoadPackage.log("onDraw");
+//                XposedHelpers.setObjectField(param.thisObject, "gIX", XposedHelpers.getObjectField(param.thisObject, "gIW"));
+//                if (true) return;
+
+                Canvas canvas = (Canvas)param.args[0];
+                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIW");
+                Paint paint = (Paint)XposedHelpers.getObjectField(param.thisObject, "cIZ");
+
+//                HookLoadPackage.log("bitmap = %s", bitmap);
+
+                if (bitmap != null) {
+                    Point screenSize = (Point)XposedHelpers.callMethod(param.thisObject, "getScreenSize");
+                    int width, height;
+
+                    width = bitmap.getWidth();
+                    height = bitmap.getHeight();
+
+                    Matrix m = new Matrix();
+                    m.setRectToRect(new RectF(0, 0, width, height), new RectF(0, 0, screenSize.x, screenSize.y), Matrix.ScaleToFit.CENTER);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, m, true);
+
+                    canvas.save();
+                    width = bitmap.getWidth();
+                    height = bitmap.getHeight();
+                    canvas.drawBitmap(bitmap, null, new Rect(0, 0, width, height), paint);
+                    canvas.restore();
+                }
+
+                param.setResult(null);
             }
         });
     }
@@ -166,46 +248,46 @@ public class HookWeChat implements IXposedHookLoadPackage {
 //            }
 //        });
 
-//        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                IntentFilter filter = (IntentFilter)param.args[1];
-//                String action = filter.getAction(0);
-//
-//                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-//                    HookLoadPackage.log("fuck alarm 1 %s", action);
-//                    param.setResult(null);
-//                }
-//            }
-//        });
-//
-//        XposedHelpers.findAndHookMethod("android.app.AlarmManager", pkg.classLoader, "set", int.class, long.class, PendingIntent.class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                PendingIntent pendingIntent = (PendingIntent)param.args[2];
-//
-//                Method getIntent = PendingIntent.class.getDeclaredMethod("getIntent");
-//                Intent intent = (Intent)getIntent.invoke(pendingIntent);
-//                String action = intent.getAction();
-//
-//                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-//                    HookLoadPackage.log("fuck alarm 2 %s", action);
-//                    param.setResult(null);
-//                }
-//            }
-//        });
-//
-//        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, String.class, Handler.class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                IntentFilter filter = (IntentFilter)param.args[1];
-//                String action = filter.getAction(0);
-//
-//                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
-//                    HookLoadPackage.log("fuck alarm 3 %s", action);
-//                    param.setResult(null);
-//                }
-//            }
-//        });
+        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                IntentFilter filter = (IntentFilter)param.args[1];
+                String action = filter.getAction(0);
+
+                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                    HookLoadPackage.log("fuck alarm 1 %s", action);
+                    param.setResult(null);
+                }
+            }
+        });
+
+        XposedHelpers.findAndHookMethod("android.app.AlarmManager", pkg.classLoader, "set", int.class, long.class, PendingIntent.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                PendingIntent pendingIntent = (PendingIntent)param.args[2];
+
+                Method getIntent = PendingIntent.class.getDeclaredMethod("getIntent");
+                Intent intent = (Intent)getIntent.invoke(pendingIntent);
+                String action = intent.getAction();
+
+                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                    HookLoadPackage.log("fuck alarm 2 %s", action);
+                    param.setResult(null);
+                }
+            }
+        });
+
+        XposedHelpers.findAndHookMethod("android.content.ContextWrapper", pkg.classLoader, "registerReceiver", BroadcastReceiver.class, IntentFilter.class, String.class, Handler.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                IntentFilter filter = (IntentFilter)param.args[1];
+                String action = filter.getAction(0);
+
+                if (action.startsWith("ALARM_ACTION(") && action.endsWith(")")) {
+                    HookLoadPackage.log("fuck alarm 3 %s", action);
+                    param.setResult(null);
+                }
+            }
+        });
     }
 }
