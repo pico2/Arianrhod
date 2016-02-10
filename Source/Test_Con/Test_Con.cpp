@@ -128,8 +128,9 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    Rtl::EnvironmentAppend(PUSTR(L"PATH"), PUSTR(LR"(D:\Desktop\Source\GoProject\src\AppleIdAuthorizer\bin\iTunesDLL)"));
-    LoadDll(L"CoreFP.dll");
+    PrintConsole(L"%p\n", LookupImportTable(GetKernel32Handle(), "ntdll.dll", NTDLL_NtClose));
+    PauseConsole(L"done\n");
+    Ps::ExitProcess(0);
 
     return;
 
