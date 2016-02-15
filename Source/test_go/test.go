@@ -75,5 +75,5 @@ func genacc() {
 }
 
 func main() {
-    Raise(NewIndexError("fuck"))
+    genacc()
 }

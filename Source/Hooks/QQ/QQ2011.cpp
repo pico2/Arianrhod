@@ -38,7 +38,9 @@ BOOL InitializeNetapi32()
     PLDR_MODULE     Self, Netapi32;
     UNICODE_STRING  SystemRoot;
 
-    if (StubWTSFreeMemory != nullptr)
+    Self = FindLdrModuleByHandle(&__ImageBase);
+
+    if (Self == nullptr || Self->DllBase != &__ImageBase)
         return TRUE;
 
     Status = Rtl::GetSystemDirectory(&SystemRoot);
@@ -55,7 +57,6 @@ BOOL InitializeNetapi32()
     *(PVOID *)&StubWTSRegisterSessionNotification   = GetRoutineAddress(module, "WTSRegisterSessionNotification");
     *(PVOID *)&StubWTSUnRegisterSessionNotification = GetRoutineAddress(module, "WTSUnRegisterSessionNotification");
 
-    Self = FindLdrModuleByHandle(&__ImageBase);
     Netapi32 = FindLdrModuleByHandle(module);
 
     //RemoveEntryList(&Self->InLoadOrderLinks);
