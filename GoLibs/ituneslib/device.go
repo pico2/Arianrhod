@@ -3,7 +3,7 @@ package ituneslib
 import (
     . "fmt"
     "unsafe"
-    "syscall"
+    "ml/syscall"
 )
 
 type IosDevice struct {
@@ -61,7 +61,7 @@ func (self *IosDevice) Disconnect() {
     itunes.iOSDeviceDisconnect.Call(self.ptr)
 }
 
-func (self *IosDevice) getStringValue(proc *syscall.Proc) string {
+func (self *IosDevice) getStringValue(proc syscall.Proc) string {
     var buffer *byte
     var status int32
 
@@ -76,7 +76,7 @@ func (self *IosDevice) getStringValue(proc *syscall.Proc) string {
     return toString(buffer)
 }
 
-func (self *IosDevice) getBytesValue(proc *syscall.Proc) []byte {
+func (self *IosDevice) getBytesValue(proc syscall.Proc) []byte {
     var buffer *byte
     var size int
     var status int32
