@@ -75,5 +75,5 @@ func genacc() {
 }
 
 func main() {
-    genacc()
+    Println(Sprintf("%v", 123))
 }

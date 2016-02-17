@@ -139,7 +139,7 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
     Rtl::GetModuleDirectory(ExePath, nullptr);
 
-#if 1
+#if 0
 
     Rtl::EnvironmentAppend(PUSTR(L"Path"), PUSTR(L"C:\\Program Files (x86)\\iTunes"));
 
