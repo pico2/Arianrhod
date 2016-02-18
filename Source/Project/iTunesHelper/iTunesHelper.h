@@ -480,6 +480,7 @@ protected:
 
     iOSDeviceMonitor monitor;
     RTL_CRITICAL_SECTION DeviceCallbacksLock;
+    RTL_CRITICAL_SECTION SapLock;
     GrowableArray<CALLBACK_ENTRY> DeviceCallbacks;
 };
 

@@ -1,5 +1,7 @@
 #include "iTunesHelper.h"
 
+#pragma warning(disable:4715)
+
 #define ITUNES_DLL_PATH     L"iTunesDLL"
 
 /************************************************************************
@@ -116,6 +118,7 @@ iTunesHelper::iTunesHelper()
     this->Initialized = FALSE;
 
     RtlInitializeCriticalSectionAndSpinCount(&this->DeviceCallbacksLock, 4000);
+    RtlInitializeCriticalSectionAndSpinCount(&this->SapLock, 4000);
 }
 
 NTSTATUS iTunesHelper::iTunesInitialize()
@@ -327,37 +330,6 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
 
 --*/
 
-
-NTSTATUS
-iTunesHelper::
-SapExchangeData(
-    ULONG_PTR       certType,
-    PFAIR_PLAY_HW_INFO      deviceId,
-    HANDLE          sapSession,
-    PVOID           certData,
-    ULONG_PTR       certSize,
-    PVOID*          output,
-    PULONG_PTR      outputSize
-)
-{
-    BOOLEAN continueSync = TRUE;
-
-    return this->iTunes.sapExchangeData(certType, deviceId, sapSession, certData, certSize, output, outputSize, &continueSync);
-}
-
-NTSTATUS
-iTunesHelper::
-SapSignData(
-    HANDLE      sapSession,
-    PVOID       data,
-    ULONG_PTR   dataSize,
-    PVOID*      signature,
-    PULONG_PTR  signatureSize
-)
-{
-    return this->iTunes.sapSignData(sapSession, data, dataSize, signature, signatureSize);
-}
-
 NTSTATUS iTunesHelper::FreeSessionData(PVOID data)
 {
     return data != nullptr ? this->iTunes.freeSessionData(data) : STATUS_SUCCESS;
@@ -520,22 +492,69 @@ MachineDataGetData(
 
 NTSTATUS iTunesHelper::SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO deviceId)
 {
-    return this->iTunes.sapCreateSession(sapSession, deviceId);
+    PROTECT_SECTION(&this->SapLock)
+    {
+        return this->iTunes.sapCreateSession(sapSession, deviceId);
+    }
 }
 
 NTSTATUS iTunesHelper::SapCloseSession(HANDLE sapSession)
 {
-    return this->iTunes.sapCloseSession(sapSession);
+    PROTECT_SECTION(&this->SapLock)
+    {
+        return this->iTunes.sapCloseSession(sapSession);
+    }
 }
 
 NTSTATUS iTunesHelper::SapCreatePrimeSignature(HANDLE sapSession, PVOID* output, PULONG_PTR outputSize)
 {
-    return this->iTunes.sapCreatePrimeSignature(sapSession, 0x64, 0, output, outputSize);
+    PROTECT_SECTION(&this->SapLock)
+    {
+        return this->iTunes.sapCreatePrimeSignature(sapSession, 0x64, 0, output, outputSize);
+    }
 }
 
 NTSTATUS iTunesHelper::SapVerifyPrimeSignature(HANDLE sapSession, PVOID signature, ULONG_PTR signatureSize)
 {
-    return this->iTunes.sapVerifyPrimeSignature(sapSession, signature, signatureSize, nullptr, nullptr);
+    PROTECT_SECTION(&this->SapLock)
+    {
+        return this->iTunes.sapVerifyPrimeSignature(sapSession, signature, signatureSize, nullptr, nullptr);
+    }
+}
+
+NTSTATUS
+iTunesHelper::
+SapExchangeData(
+    ULONG_PTR           certType,
+    PFAIR_PLAY_HW_INFO  deviceId,
+    HANDLE              sapSession,
+    PVOID               certData,
+    ULONG_PTR           certSize,
+    PVOID*              output,
+    PULONG_PTR          outputSize
+)
+{
+    PROTECT_SECTION(&this->SapLock)
+    {
+        BOOLEAN continueSync = TRUE;
+        return this->iTunes.sapExchangeData(certType, deviceId, sapSession, certData, certSize, output, outputSize, &continueSync);
+    }
+}
+
+NTSTATUS
+iTunesHelper::
+SapSignData(
+    HANDLE      sapSession,
+    PVOID       data,
+    ULONG_PTR   dataSize,
+    PVOID*      signature,
+    PULONG_PTR  signatureSize
+)
+{
+    PROTECT_SECTION(&this->SapLock)
+    {
+        return this->iTunes.sapSignData(sapSession, data, dataSize, signature, signatureSize);
+    }
 }
 
 /************************************************************************

@@ -25,6 +25,8 @@ iLdrLoadDll(
 
 BOOL UnInitialize(PVOID BaseAddress)
 {
+    DebugLog(L"%S", __FUNCTION__);
+    PauseConsole(L"hit");
     return FALSE;
 }
 
