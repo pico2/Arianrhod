@@ -247,14 +247,13 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
     // request.Close = true
     resp, err := self.client.Do(request)
-
-    timeout := self.defaultTransport.canceledRequests[request]
-    delete(self.defaultTransport.canceledRequests, request)
+    timeout := self.defaultTransport.RemoveCancelledRequest(request)
 
     self.client.CheckRedirect = nil
 
     if err != nil {
         self.defaultTransport.CancelRequest(request)
+        self.defaultTransport.RemoveCancelledRequest(request)
 
         uerr := err.(*urllib.Error)
         herr := &HttpError{
