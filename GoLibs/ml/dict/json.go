@@ -4,18 +4,37 @@ type JsonDict map[string]interface{};
 type JsonArray []interface{};
 
 func (self JsonDict) Map(key string) JsonDict {
-    return self[key].(map[string]interface{})
+    i := self[key]
+    if i == nil {
+        return nil
+    }
+
+    return i.(map[string]interface{})
 }
 
 func (self JsonDict) Array(key string) JsonArray {
-    return self[key].([]interface{})
+    i := self[key]
+    if i == nil {
+        return nil
+    }
+
+    return i.([]interface{})
 }
 
 func (self JsonArray) Map(index int) JsonDict {
-    return self[index].(map[string]interface{})
+    v := self[index]
+    if v == nil {
+        return nil
+    }
+
+    return v.(map[string]interface{})
 }
 
 func (self JsonArray) Array(index int) JsonArray {
-    return self[index].([]interface{})
-}
+    v := self[index]
+    if v == nil {
+        return nil
+    }
 
+    return v.([]interface{})
+}
