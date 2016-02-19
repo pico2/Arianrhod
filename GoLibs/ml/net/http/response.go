@@ -29,7 +29,7 @@ type Response struct {
     resp        *httplib.Response
 }
 
-func NewResponse(resp *httplib.Response, options RequestOptions) (response *Response) {
+func NewResponse(resp *httplib.Response, options *RequestOptions) (response *Response) {
     var content []byte
 
     if options.DontReadResponseBody == false && resp.Body != nil {

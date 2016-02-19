@@ -140,7 +140,9 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
     String ExePath;
 
-    Rtl::GetModuleDirectory(ExePath, nullptr);
+    Rtl::GetModuleDirectory(ExePath, &__ImageBase);
+
+    ExePath += ITUNES_DLL_PATH;
 
 #if 0
 
@@ -151,9 +153,9 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
 #else
 
-    status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + ITUNES_DLL_PATH + L";");
-    status = Ldr::LoadPeImage(ExePath + ITUNES_DLL_PATH L"\\iTunesCore.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
-    DebugLog(L"load iTunesCore.dll: %p", status);
+    status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + L";");
+    status = Ldr::LoadPeImage(ExePath + L"\\iTunesCore.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
+    DebugLog(L"load %s\\iTunesCore.dll: %p", ExePath, status);
     FAIL_RETURN(status);
 
     ((PIMAGE_TLS_CALLBACK)PtrAdd(this->iTunesBase, ImageNtHeaders(this->iTunesBase)->OptionalHeader.AddressOfEntryPoint))(this->iTunesBase, DLL_PROCESS_ATTACH, nullptr);

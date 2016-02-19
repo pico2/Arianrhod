@@ -1,10 +1,7 @@
 package ituneslib
 
 import (
-    "syscall"
     "reflect"
-    "path/filepath"
-    "ml/os2"
 )
 
 func Initialize() {

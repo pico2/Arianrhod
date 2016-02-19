@@ -23,6 +23,7 @@ type Session struct {
     client             *httplib.Client
     headers             httplib.Header
     defaultTransport   *Transport
+    DefaultOptions      *RequestOptions
 }
 
 func NewSession() *Session {
@@ -54,6 +55,9 @@ func NewSession() *Session {
                 client              : client,
                 headers             : make(httplib.Header),
                 defaultTransport    : defaultTransport,
+                DefaultOptions      : &RequestOptions{
+                                            MaxTimeoutTimes: DefaultMaxTimeoutTimes,
+                                        },
             }
 }
 
@@ -76,6 +80,24 @@ func toString(value interface{}) String {
             fmt.Printf("unknown value type %v\n", value)
             return String(v.(string))
     }
+}
+
+func (self *Session) getRequestOptions(params ...Dict) *RequestOptions {
+    switch len(params) {
+        case 0:
+            return self.DefaultOptions
+
+        case 1:
+            switch opt := params[0]["options"].(type) {
+                case RequestOptions:
+                    return &opt
+
+                case *RequestOptions:
+                    return opt
+            }
+    }
+
+    return self.DefaultOptions
 }
 
 func dictToValues(d Dict, encoding Encoding) urllib.Values {
@@ -109,11 +131,12 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     var params          Dict
     var encoding        Encoding
     var err             error
-    var options         RequestOptions
 
     method := toString(methodi)
     url := toString(urli)
     requestParams := urllib.Values{}
+
+    options := self.getRequestOptions(params_...)
 
     {
         u, err := urllib.Parse(url.String())
@@ -146,14 +169,6 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
 
         default:
             encoding = CP_UTF8
-    }
-
-    switch opt := params["options"].(type) {
-        case RequestOptions:
-            options = opt
-
-        case *RequestOptions:
-            options = *opt
     }
 
     switch body := params["body"].(type) {
@@ -303,12 +318,71 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     return NewResponse(resp, options)
 }
 
+func (self *Session) RequestWithRetry(method, url interface{}, params ...Dict) (resp *Response) {
+    options := self.getRequestOptions(params...)
+
+    if options.AutoRetry == false {
+        return self.Request(method, url, params...)
+    }
+
+    maxTimeoutTimes := options.MaxTimeoutTimes
+    timeoutTimes := 0
+
+    for {
+        exp := Try(func() { resp = self.Request(method, url, params...) })
+
+        if exp != nil {
+            e := exp.Value.(*HttpError)
+
+            switch e.Type {
+                case HTTP_ERROR_TIMEOUT:
+                    timeoutTimes += 1
+                    if timeoutTimes > maxTimeoutTimes {
+                        e.Type = HTTP_ERROR_CONNECT_PROXY
+                        Raise(exp)
+                    }
+                    fallthrough
+
+                case HTTP_ERROR_INVALID_RESPONSE,
+                     HTTP_ERROR_BAD_GATE_WAY,
+                     HTTP_ERROR_GENERIC:
+                    time.Sleep(time.Second)
+                    continue
+
+                case HTTP_ERROR_CONNECT_PROXY:
+                    fallthrough
+                default:
+                    Raise(exp)
+            }
+        }
+
+        switch resp.StatusCode {
+            // case httplib.StatusOK:
+            // case httplib.StatusCreated:
+            // case httplib.StatusFound:
+            // case httplib.StatusNotModified:
+            //     break
+
+            case httplib.StatusBadGateway,
+                 httplib.StatusServiceUnavailable,
+                 httplib.StatusGatewayTimeout:
+                time.Sleep(time.Second)
+                continue
+        }
+
+        break
+    }
+
+    // time.Sleep(time.Second * 15)
+    return
+}
+
 func (self *Session) Get(url interface{}, params ...Dict) (resp *Response) {
-    return self.Request("GET", url, params...)
+    return self.RequestWithRetry("GET", url, params...)
 }
 
 func (self *Session) Post(url interface{}, params ...Dict) (resp *Response) {
-    return self.Request("POST", url, params...)
+    return self.RequestWithRetry("POST", url, params...)
 }
 
 func (self *Session) ClearHeaders() {

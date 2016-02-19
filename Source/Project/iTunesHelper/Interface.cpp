@@ -70,23 +70,11 @@ EXTC NTSTATUS NTAPI Initialize()
 
 EXTC VOID NTAPI FreeMemory2(PVOID p)
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     FreeMemoryP(p);
 }
 
 EXTC VOID NTAPI iTunesFreeMemory(PVOID p)
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     helper->FreeSessionData(p);
 }
 
@@ -246,45 +234,21 @@ EXTC NTSTATUS NTAPI iOSDeviceAuthorizeDsids(iOSDevice &Device, PCSTR SCInfoPath,
 
 EXTC NTSTATUS NTAPI SapCreateSession(PHANDLE SapSession, PFAIR_PLAY_HW_INFO DeviceId)
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     return helper->SapCreateSession(SapSession, DeviceId);
 }
 
 EXTC NTSTATUS NTAPI SapCloseSession(HANDLE SapSession)
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     return helper->SapCloseSession(SapSession);
 }
 
 EXTC NTSTATUS NTAPI SapCreatePrimeSignature(HANDLE SapSession, PVOID* Output, PULONG_PTR OutputSize)
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     return helper->SapCreatePrimeSignature(SapSession, Output, OutputSize);
 }
 
 EXTC NTSTATUS NTAPI SapVerifyPrimeSignature(HANDLE SapSession, PVOID Signature, ULONG_PTR SignatureSize)
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     return helper->SapVerifyPrimeSignature(SapSession, Signature, SignatureSize);
 }
 
@@ -301,12 +265,6 @@ SapExchangeData(
     PULONG_PTR          OutputSize
 )
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     return helper->SapExchangeData(CertType, DeviceId, SapSession, CertData, CertSize, Output, OutputSize);
 }
 
@@ -321,12 +279,6 @@ SapSignData(
     PULONG_PTR  SignatureSize
 )
 {
-    DebugLog(L"enter");
-    SCOPE_EXIT
-    {
-        DebugLog(L"leave");
-    }
-    SCOPE_EXIT_END;
     return helper->SapSignData(SapSession, Data, DataSize, Signature, SignatureSize);
 }
 
