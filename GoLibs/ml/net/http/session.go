@@ -16,6 +16,7 @@ import (
     "io"
     "time"
     "io/ioutil"
+    "ml/logging/logger"
 )
 
 type Session struct {
@@ -125,7 +126,7 @@ func applyHeadersToRequest(request *httplib.Request, defaultHeaders httplib.Head
     }
 }
 
-func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Response) {
+func (self *Session) requestImpl(methodi, urli interface{}, params_ ...Dict) (*Response) {
     var bodyReader      io.Reader
     var bodyData        []byte
     var params          Dict
@@ -311,25 +312,25 @@ func (self *Session) Request(methodi, urli interface{}, params_ ...Dict) (*Respo
     switch resp.StatusCode {
         case StatusTemporaryRedirect:
             if location := resp.Header.Get("Location"); location != "" {
-                return self.Request(method, location, params_...)
+                return self.requestImpl(method, location, params_...)
             }
     }
 
     return NewResponse(resp, options)
 }
 
-func (self *Session) RequestWithRetry(method, url interface{}, params ...Dict) (resp *Response) {
+func (self *Session) Request(method, url interface{}, params ...Dict) (resp *Response) {
     options := self.getRequestOptions(params...)
 
     if options.AutoRetry == false {
-        return self.Request(method, url, params...)
+        return self.requestImpl(method, url, params...)
     }
 
     maxTimeoutTimes := options.MaxTimeoutTimes
     timeoutTimes := 0
 
     for {
-        exp := Try(func() { resp = self.Request(method, url, params...) })
+        exp := Try(func() { resp = self.requestImpl(method, url, params...) })
 
         if exp != nil {
             e := exp.Value.(*HttpError)
@@ -357,17 +358,20 @@ func (self *Session) RequestWithRetry(method, url interface{}, params ...Dict) (
         }
 
         switch resp.StatusCode {
-            // case httplib.StatusOK:
-            // case httplib.StatusCreated:
-            // case httplib.StatusFound:
-            // case httplib.StatusNotModified:
-            //     break
+            case httplib.StatusOK:
+            case httplib.StatusCreated:
+            case httplib.StatusFound:
+            case httplib.StatusNotModified:
+                break
 
             case httplib.StatusBadGateway,
                  httplib.StatusServiceUnavailable,
                  httplib.StatusGatewayTimeout:
                 time.Sleep(time.Second)
                 continue
+
+            default:
+                logger.Debug("unknown StatusCode: %d", resp.StatusCode)
         }
 
         break
@@ -378,11 +382,11 @@ func (self *Session) RequestWithRetry(method, url interface{}, params ...Dict) (
 }
 
 func (self *Session) Get(url interface{}, params ...Dict) (resp *Response) {
-    return self.RequestWithRetry("GET", url, params...)
+    return self.Request("GET", url, params...)
 }
 
 func (self *Session) Post(url interface{}, params ...Dict) (resp *Response) {
-    return self.RequestWithRetry("POST", url, params...)
+    return self.Request("POST", url, params...)
 }
 
 func (self *Session) ClearHeaders() {

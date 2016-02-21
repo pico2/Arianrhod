@@ -21,7 +21,19 @@ type SapSession struct {
     UrlBag          Dict
 }
 
+var sapSessionPool = make(chan *SapSession, 1000)
+
+func sapInitialize() {
+    for i := cap(sapSessionPool); i != 0; i-- {
+        sapSessionPool <- createSapSession()
+    }
+}
+
 func NewSapSession() (session *SapSession) {
+    return <-sapSessionPool
+}
+
+func createSapSession() (session *SapSession) {
     var sapSession uintptr
 
     deviceId := NewRandomFairPlayHWInfo()
@@ -49,8 +61,11 @@ func (self *SapSession) Close() {
         return
     }
 
+    self.HttpSession.Close()
     itunes.SapCloseSession.Call(self.session)
     self.session = 0
+
+    sapSessionPool <- createSapSession()
 }
 
 func (self *SapSession) Initialize(userAgent string, country CountryID, sapType SapCertType) {

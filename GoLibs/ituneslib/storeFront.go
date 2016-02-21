@@ -16,15 +16,26 @@ var storeFront = map[CountryID]string{
     CountryID_Vietnam       : "143471-2,32",
 }
 
-var countryShortNames = []string{
-    "CN",           // China
-    "IN",           // India
-    "NZ",           // NewZealand
-    "VN",           // Vietnam
+var countryShortName = map[CountryID]string{
+    CountryID_China         : "CN",
+    CountryID_India         : "IN",
+    CountryID_NewZealand    : "NZ",
+    CountryID_Vietnam       : "VN",
+}
+
+var countryName = map[CountryID]string{
+    CountryID_China         : "China",
+    CountryID_India         : "India",
+    CountryID_NewZealand    : "NewZealand",
+    CountryID_Vietnam       : "Vietnam",
 }
 
 func (self CountryID) String() string {
-    return countryShortNames[self]
+    return countryName[self]
+}
+
+func (self CountryID) ShortName() string {
+    return countryShortName[self]
 }
 
 func (self CountryID) CountryCode() int {

@@ -2,10 +2,18 @@ package ituneslib
 
 import (
     "reflect"
+    "sync/atomic"
 )
 
+var itunesInitialized uintptr = 0
+
 func Initialize() {
+    if atomic.CompareAndSwapUintptr(&itunesInitialized, 0, 1) == false {
+        return
+    }
+
     itunes.Initialize.Call()
+    sapInitialize()
 }
 
 func FreeSessionData(ptr interface{}) {

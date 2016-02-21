@@ -13,5 +13,5 @@ type RequestOptions struct {
 }
 
 const (
-    DefaultMaxTimeoutTimes = 5
+    DefaultMaxTimeoutTimes = 3
 )

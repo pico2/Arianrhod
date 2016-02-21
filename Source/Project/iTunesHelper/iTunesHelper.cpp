@@ -497,6 +497,35 @@ NTSTATUS iTunesHelper::SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO d
     PROTECT_SECTION(&this->SapLock)
     {
         return this->iTunes.sapCreateSession(sapSession, deviceId);
+/*
+        NTSTATUS Status;
+        HANDLE Thread;
+
+        Thread = nullptr;
+
+        Ps::CreateThreadT(
+            [&](PVOID) -> ULONG
+            {
+                PrintConsole(L"new thread\n");
+                Status = this->iTunes.sapCreateSession(sapSession, deviceId);
+                return 0;
+            },
+            nullptr,
+            FALSE,
+            Ps::CurrentProcess,
+            &Thread
+        );
+
+        if (Thread == nullptr)
+        {
+            return STATUS_UNSUCCESSFUL;
+        }
+
+        NtWaitForSingleObject(Thread, FALSE, nullptr);
+        NtClose(Thread);
+
+        return Status;
+*/
     }
 }
 

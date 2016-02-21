@@ -3,6 +3,8 @@ package filestream
 import (
     . "ml"
     . "ml/strings"
+    . "ml/trace"
+
     "os"
     "io"
     "math"
@@ -22,6 +24,7 @@ var (
     READ            = 1 << 0
     WRITE           = 1 << 1
     READWRITE       = READ | WRITE
+    CREATE          = 1 << 2
 )
 
 const (
@@ -38,7 +41,7 @@ func Open(name string) *File {
 }
 
 func Create(name string) *File {
-    return CreateFile(name, READWRITE)
+    return CreateFile(name, READWRITE | CREATE)
 }
 
 func CreateMemory(buffer ...[]byte) *File {
@@ -66,8 +69,14 @@ func CreateFile(name string, mode int) *File {
             flag = os.O_WRONLY
     }
 
+    if (mode & CREATE) != 0 {
+        flag |= os.O_TRUNC | os.O_CREATE
+    }
+
     f, err := os.OpenFile(name, flag, 0666)
-    raiseFileError(err)
+    if err != nil {
+        Raise(NewFileNotFoundError(err.Error()))
+    }
 
     return &File{f, LittleEndian}
 }
@@ -81,7 +90,7 @@ func (self *File) Close() {
 
 func (self *File) Length() int64 {
     fi, err := self.file.Stat()
-    raiseFileError(err)
+    raiseGenericError(err)
     return fi.Size()
 }
 
@@ -93,7 +102,8 @@ func (self *File) SetLength(length int64) {
     }
 
     err := self.file.Truncate(length)
-    raiseFileError(err)
+    raiseGenericError(err)
+
     if length < pos {
         pos = length
     }
@@ -120,7 +130,7 @@ func (self *File) SetPosition(offset int64) {
 
 func (self *File) Seek(offset int64, whence int) int64 {
     pos, err := self.file.Seek(offset, whence)
-    raiseFileError(err)
+    raiseGenericError(err)
     return pos
 }
 
@@ -136,7 +146,7 @@ func (self *File) Read(n int) []byte {
             break
         }
 
-        raiseFileError(err)
+        raiseGenericError(err)
 
         data = append(data, buffer[:bytesRead]...)
         n -= bytesRead
@@ -204,7 +214,7 @@ func (self *File) Write(args ...interface{}) int {
     }
 
     n, err := self.file.Write(buffer)
-    raiseFileError(err)
+    raiseGenericError(err)
     return n
 }
 
@@ -230,7 +240,7 @@ func (self *File) ReadRemaining() (data []byte) {
 }
 
 func (self *File) Flush() {
-    raiseFileError(self.file.Sync())
+    raiseGenericError(self.file.Sync())
 }
 
 func (self *File) IsEndOfFile() bool {

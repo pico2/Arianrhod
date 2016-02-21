@@ -40,6 +40,14 @@ type NotImplementedError struct {
     *BaseException
 }
 
+type FileGenericError struct {
+    *BaseException
+}
+
+type FileNotFoundError struct {
+    *BaseException
+}
+
 func NewBaseException(msg string) *BaseException {
     return &BaseException{Message: msg}
 }
@@ -64,6 +72,18 @@ func NewKeyError(msg string) *KeyError {
 
 func NewNotImplementedError(msg string) *NotImplementedError {
     return &NotImplementedError{
+        BaseException: NewBaseException(msg),
+    }
+}
+
+func NewFileGenericError(msg string) *FileGenericError {
+    return &FileGenericError{
+        BaseException: NewBaseException(msg),
+    }
+}
+
+func NewFileNotFoundError(msg string) *FileNotFoundError {
+    return &FileNotFoundError{
         BaseException: NewBaseException(msg),
     }
 }
