@@ -74,11 +74,23 @@ func CreateFile(name string, mode int) *File {
     }
 
     f, err := os.OpenFile(name, flag, 0666)
-    if err != nil {
-        Raise(NewFileNotFoundError(err.Error()))
+
+    if err == nil {
+        return &File{f, LittleEndian}
     }
 
-    return &File{f, LittleEndian}
+    switch {
+        case os.IsNotExist(err):
+            Raise(NewFileNotFoundError(err.Error()))
+
+        case os.IsPermission(err):
+            Raise(NewPermissionError(err.Error()))
+
+        default:
+            Raise(NewFileGenericError(err.Error()))
+    }
+
+    return nil
 }
 
 func (self *File) Close() {

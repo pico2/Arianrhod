@@ -128,8 +128,18 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintConsole(L"%p\n", LookupImportTable(GetKernel32Handle(), "ntdll.dll", NTDLL_NtClose));
-    PauseConsole(L"done\n");
+    HANDLE explorer;
+    ULONG pid;
+
+    GetWindowThreadProcessId(GetShellWindow(), &pid);
+    explorer = PidToHandle(pid);
+
+    PROCESS_IMAGE_FILE_NAME2 name;
+
+    NtQueryInformationProcess(explorer, ProcessImageFileNameWin32, &name, sizeof(name), nullptr);
+
+    PrintConsole(L"%wZ\n", &name.ImageFileName);
+
     Ps::ExitProcess(0);
 
     return;

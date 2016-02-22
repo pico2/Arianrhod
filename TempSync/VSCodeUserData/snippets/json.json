@@ -1,0 +1,36 @@
+{
+	 // Place your snippets for JSON here. Each snippet is defined under a snippet name and has a prefix, body and
+	 // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	 // $1, $2 for tab stops, ${id} and ${id:label} and ${1:label} for variables. Variables with the same id are connected.
+	 // Example:
+	 "go tasks": {
+		"prefix": "gotask",
+		"body": [
+            "// Available variables which can be used inside of strings.",
+            "// $${{workspaceRoot}}: the root folder of the team",
+            "// $${{file}}: the current opened file",
+            "// $${{fileBasename}}: the current opened file's basename",
+            "// $${{fileDirname}}: the current opened file's dirname",
+            "// $${{fileExtname}}: the current opened file's extension",
+            "// $${{cwd}}: the current working directory of the spawned process",
+            "",
+            "{",
+            "    \"version\": \"0.1.0\",",
+            "    \"command\": \"cmd\",",
+            "    \"isShellCommand\": true,",
+            "    \"showOutput\": \"never\",",
+            "    \"args\": [\"/c\"],",
+            "    \"tasks\": [",
+            "        {",
+            "            \"showOutput\": \"never\",",
+            "            \"taskName\": \"build golang\",",
+            "            \"suppressTaskName\": true,",
+            "            \"isBuildCommand\": true,",
+            "            \"args\": [\"start \\\"\\\" \\\"$${{file}}\\\"\"]",
+            "        }",
+            "    ]",
+            "}"
+		],
+		"description": "go task template"
+	}
+}

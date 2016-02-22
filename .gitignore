@@ -136,3 +136,4 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /PyLibs/lldb/*.pyd
 /PyLibs/lldb/*.exe
 /TempSync/AtomConfig/.apm
+/TempSync/VSCodeUserData/extensions

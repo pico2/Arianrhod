@@ -115,13 +115,19 @@ VOID VaxInitialize2(PLDR_MODULE vax, BOOL Force)
     // 1F159678     66:3BC8              cmp     cx, ax
     // 1F15967B     76 0C                jbe     short 0x1F159689
     // 1F15967D     B9 DA070000          mov     ecx, 0x7DA
+    //
+    // mov     r32, const
+    // cmp     r16, r16
+    // jbe     short const
+    // mov     r32, const
+
 
     PVOID Target = nullptr;
 
     LOOP_ONCE
     {
         Target = SearchPatternSafe(
-                    L"B8 E0 07 00 00 66 3B C8 76 0C B9 DA 07 00 00",
+                    L"B8 ?? 07 00 00 66 3B C8 76 0C B9 DA 07 00 00",
                     vax->DllBase,
                     vax->SizeOfImage
                 );
@@ -142,7 +148,8 @@ VOID VaxInitialize2(PLDR_MODULE vax, BOOL Force)
 
     if (Target == nullptr)
     {
-        ExceptionBox(L"Can't find sig");
+        AllocConsole();
+        PrintConsole(L"Can't find sig\n");
         return;
     }
 }

@@ -7,7 +7,7 @@ import (
 
 var (
     getch           *syscall.Proc
-    SetConsoleTitle *syscall.Proc
+    setConsoleTitle *syscall.Proc
 )
 
 func pause() {
@@ -15,10 +15,10 @@ func pause() {
 }
 
 func setTitle(text string) {
-    SetConsoleTitle.Call(uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))))
+    setConsoleTitle.Call(uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))))
 }
 
 func init() {
     getch = syscall.MustLoadDLL("msvcrt.dll").MustFindProc("_getch")
-    SetConsoleTitle = syscall.MustLoadDLL("kernel32.dll").MustFindProc("SetConsoleTitleW")
+    setConsoleTitle = syscall.MustLoadDLL("kernel32.dll").MustFindProc("setConsoleTitleW")
 }

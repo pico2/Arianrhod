@@ -48,6 +48,10 @@ type FileNotFoundError struct {
     *BaseException
 }
 
+type PermissionError struct {
+    *BaseException
+}
+
 func NewBaseException(msg string) *BaseException {
     return &BaseException{Message: msg}
 }
@@ -84,6 +88,12 @@ func NewFileGenericError(msg string) *FileGenericError {
 
 func NewFileNotFoundError(msg string) *FileNotFoundError {
     return &FileNotFoundError{
+        BaseException: NewBaseException(msg),
+    }
+}
+
+func NewPermissionError(msg string) *PermissionError {
+    return &PermissionError{
         BaseException: NewBaseException(msg),
     }
 }
