@@ -1,0 +1,12 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+{ "key": "ctrl+f1",               "command": "workbench.action.showCommands" },
+{ "key": "f1",                    "command": "workbench.action.openPreviousEditor" },
+{ "key": "f1",                    "command": "workbench.action.quickOpenNavigatePrevious", "when": "inQuickOpen" },
+{ "key": "f2",                    "command": "workbench.action.openPreviousEditor" },
+{ "key": "f2",                    "command": "workbench.action.quickOpenNavigateNext",
+                                     "when": "inQuickOpen" },
+{ "key": "f4",                    "command": "workbench.action.closeActiveEditor" },
+{ "key": "ctrl+shift+r",          "command": "editor.action.rename",
+                                     "when": "editorTextFocus" }
+]

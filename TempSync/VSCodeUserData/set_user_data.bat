@@ -6,3 +6,5 @@ rd/s/q "%userprofile%\.vscode\extensions"
 
 mklink /j "%appdata%\Code\User" .
 mklink /j "%userprofile%\.vscode\extensions" .\extensions
+
+pause
