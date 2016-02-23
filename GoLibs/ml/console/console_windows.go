@@ -20,5 +20,5 @@ func setTitle(text string) {
 
 func init() {
     getch = syscall.MustLoadDLL("msvcrt.dll").MustFindProc("_getch")
-    setConsoleTitle = syscall.MustLoadDLL("kernel32.dll").MustFindProc("setConsoleTitleW")
+    setConsoleTitle = syscall.MustLoadDLL("kernel32.dll").MustFindProc("SetConsoleTitleW")
 }
