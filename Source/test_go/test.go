@@ -5,7 +5,6 @@ import (
     . "ml/strings"
     . "ml/trace"
     . "ml/dict"
-    "encoding/json"
     "./pinyin"
     "ml/random"
     "os"
@@ -14,7 +13,7 @@ import (
     "github.com/PuerkitoBio/goquery"
     "ml/uuid"
     "ml/encoding/binary"
-    json2 "ml/encoding/json"
+    "ml/encoding/json"
     "ml/net/socket"
 )
 
@@ -75,5 +74,12 @@ func genacc() {
 }
 
 func main() {
-    Println(Sprintf("%v", 123))
+    d := NewOrderedDict()
+
+    d.Set("fuck", "you")
+    d.Set("fuck2", "you2")
+    d.Set("fuck3", "you3")
+    d.Set("fuck4", "you4")
+
+    Println(d)
 }

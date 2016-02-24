@@ -1,3 +1,3 @@
-[submodule "GoLibs/goqt"]
-	path = GoLibs/goqt
-	url = git@github.com:visualfc/goqt.git
+[submodule "GoLibs"]
+	path = GoLibs
+	url = git@github.com:Ouroboros/GoLibs.git
