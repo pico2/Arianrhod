@@ -1,6 +1,6 @@
 set GOROOT=%~dp0
 set GOPATH=%~dp0pkgs;D:\Desktop\Source\GoProject;D:\Desktop\Source\Project\Private;D:\Desktop\Source\Falcom
-set PATH=%GOROOT%bin;D:\Dev\PortableGit\bin;D:\Desktop\Source\GoProject\src\AppleIdRegister;%PATH%
+set PATH=%GOROOT%bin;%GOROOT%pkgs\bin;D:\Dev\PortableGit\bin;D:\Desktop\Source\GoProject\src\AppleIdRegister;%PATH%
 set GOGCCFLAGS="-g -O3 -fPIC -m64 -pthread --gc-sections"
 set CGO_ENABLED="1"
 set CGO_ENABLED=1
@@ -9,11 +9,17 @@ set CGO_ENABLED=1
 
 if not exist "%~dp0bin32\" (
     set arch=x86
+    set GOARCH=386
+    set GO_PKG_ARCH=windows_386
     set "PATH=D:\Dev\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH%"
 ) else (
     set arch=amd64
+    set GOARCH=amd64
+    set GO_PKG_ARCH=windows_amd64
     set "PATH=D:\Dev\Library\Qt\mingw\mingw64\bin;%PATH%"
 )
+
+set "PATH=%GOROOT%pkgs\bin\%GO_PKG_ARCH%;%PATH%"
 
 set "QT_PATH=D:\Dev\Library\Qt\mingw\%arch%"
 
