@@ -1,0 +1,3 @@
+[submodule "GoLibs/goqt"]
+	path = GoLibs/goqt
+	url = git@github.com:visualfc/goqt.git

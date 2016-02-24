@@ -73,7 +73,8 @@ del "%~dpn1.exe" >NUL 2>NUL
 call:DELETE_ML_PKG >NUL 2>NUL
 
 :: -H windowsgui  -extldflags=--large-address-aware
-go.exe build -ldflags "-s" "%~f1"
+rem go.exe build -ldflags "-s" "%~f1"
+go.exe build "%~f1"
 ::go.exe build "%~f1"
 goto:eof
 

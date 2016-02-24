@@ -1,8 +1,9 @@
 set GOROOT=%~dp0
 set GOPATH=%~dp0pkgs;D:\Desktop\Source\GoProject;D:\Desktop\Source\Project\Private;D:\Desktop\Source\Falcom
-set PATH=%GOROOT%bin;D:\Dev\PortableGit\bin;%PATH%
+set PATH=%GOROOT%bin;D:\Dev\PortableGit\bin;D:\Desktop\Source\GoProject\src\AppleIdRegister;%PATH%
 set GOGCCFLAGS="-g -O3 -fPIC -m64 -pthread --gc-sections"
 set CGO_ENABLED="1"
+set CGO_ENABLED=1
 ::set CGO_CXXFLAGS="-O3"
 
 
