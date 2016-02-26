@@ -37,6 +37,14 @@ BOOL InitializeNetapi32()
     NTSTATUS        Status;
     PLDR_MODULE     Self, Netapi32;
     UNICODE_STRING  SystemRoot;
+    PVOID           LoaderLockCookie;
+
+    LdrLockLoaderLock(0, nullptr, &LoaderLockCookie);
+    SCOPE_EXIT
+    {
+        LdrUnlockLoaderLock(0, LoaderLockCookie);
+    }
+    SCOPE_EXIT_END;
 
     Self = FindLdrModuleByHandle(&__ImageBase);
 
