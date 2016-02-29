@@ -60,6 +60,8 @@ NTSTATUS HookAppMisc(PVOID BaseAddress)
         ShowPicInMultiPic begin
     ************************************************************************/
 
+    //Util::GF::DPI::SetDPIAdaptFlag(FALSE);
+
     Mp::PATCH_MEMORY_DATA Function_AppMisc[] =
     {
         Mp::FunctionJumpVa(SearchAppMisc_PluginListCheck(BaseAddress),    CheckPluginList), // addition SetTimeOut

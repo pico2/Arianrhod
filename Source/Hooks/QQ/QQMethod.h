@@ -172,6 +172,14 @@ struct Util
     {
         static BOOL (CDECL *CreateTXData)(PITXData *Data);
     };
+
+    struct GF
+    {
+        struct DPI
+        {
+            static VOID (CDECL *SetDPIAdaptFlag)(BOOL Flag);
+        };
+    };
 };
 
 INIT_STATIC_MEMBER(Util::ChatSession::OpenContactChatSession);
@@ -180,7 +188,14 @@ INIT_STATIC_MEMBER(Util::Contact::GetSelfUin);
 INIT_STATIC_MEMBER(Util::Contact::IsSuperVip);
 INIT_STATIC_MEMBER(Util::Group::CheckMsgImage);
 INIT_STATIC_MEMBER(Util::Data::CreateTXData);
+INIT_STATIC_MEMBER(Util::GF::DPI::SetDPIAdaptFlag);
 
+struct Version
+{
+    static BOOL (CDECL *Init)();
+};
+
+INIT_STATIC_MEMBER(Version::Init);
 
 typedef struct
 {
@@ -209,6 +224,9 @@ inline NTSTATUS InitializeQqFunctionTable()
         { L"KernelUtil.dll",    "?GetSelfUin@Contact@Util@@YAKXZ",                                      &Util::Contact::GetSelfUin },
         { L"KernelUtil.dll",    "?IsSuperVip@Contact@Util@@YAHKPAK@Z",                                  &Util::Contact::IsSuperVip },
         { L"KernelUtil.dll",    "?CheckMsgImage@Group@Util@@YAHPAUITXMsgPack@@AAVCTXStringW@@@Z",       &Util::Group::CheckMsgImage },
+        { L"KernelUtil.dll",    "?Init@Version@@YAHXZ",                                                 &Version::Init },
+
+        { L"GF.dll",            "?SetDPIAdaptFlag@DPI@GF@Util@@YAXH@Z",                                 &Util::GF::DPI::SetDPIAdaptFlag },
     };
 
 

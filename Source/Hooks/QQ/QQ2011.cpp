@@ -8,6 +8,7 @@
 #pragma comment(linker, "/EXPORT:WTSUnRegisterSessionNotification=_QqWTSUnRegisterSessionNotification@4")
 
 #include "QQ2011.h"
+#include "ZLibExport.h"
 #include "ml.cpp"
 #include <WtsApi32.h>
 #include "Hooks/Hooks.h"
@@ -154,6 +155,7 @@ static DLL_HOOK_ENTRY Hooks[] =
     { IUSTR(L"ntdll.dll"),      HookNtdll },
     { IUSTR(L"psapi.dll"),      HookPsapi },
     { IUSTR(L"user32.dll"),     HookUser32 },
+    //{ IUSTR(L"GDI32.dll"),      HookGdi32 },
 };
 
 BOOL Initialize2(PVOID BaseAddress)

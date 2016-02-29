@@ -12,6 +12,7 @@ NTSTATUS HookMainFrame(PVOID BaseAddress);
 NTSTATUS HookNtdll(PVOID BaseAddress);
 NTSTATUS HookPsapi(PVOID BaseAddress);
 NTSTATUS HookUser32(PVOID BaseAddress);
+NTSTATUS HookGdi32(PVOID BaseAddress);
 
 NTSTATUS CDECL CheckPluginList();
 
