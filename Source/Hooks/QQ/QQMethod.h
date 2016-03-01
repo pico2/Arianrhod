@@ -180,6 +180,11 @@ struct Util
             static VOID (CDECL *SetDPIAdaptFlag)(BOOL Flag);
         };
     };
+
+    struct Texture
+    {
+        static HANDLE (CDECL *HBitmapToTexture)(HDC dc);
+    };
 };
 
 INIT_STATIC_MEMBER(Util::ChatSession::OpenContactChatSession);
@@ -189,6 +194,7 @@ INIT_STATIC_MEMBER(Util::Contact::IsSuperVip);
 INIT_STATIC_MEMBER(Util::Group::CheckMsgImage);
 INIT_STATIC_MEMBER(Util::Data::CreateTXData);
 INIT_STATIC_MEMBER(Util::GF::DPI::SetDPIAdaptFlag);
+INIT_STATIC_MEMBER(Util::Texture::HBitmapToTexture);
 
 struct Version
 {
@@ -196,6 +202,15 @@ struct Version
 };
 
 INIT_STATIC_MEMBER(Version::Init);
+
+struct xGraphic32
+{
+    static BOOL (CDECL *CreateTexture)(LONG_PTR width, LONG_PTR height);
+    static BOOL (CDECL *CopyTexture)(HANDLE dest, const RECT& rc, HANDLE src);
+};
+
+INIT_STATIC_MEMBER(xGraphic32::CreateTexture);
+INIT_STATIC_MEMBER(xGraphic32::CopyTexture);
 
 typedef struct
 {
@@ -220,6 +235,7 @@ inline NTSTATUS InitializeQqFunctionTable()
 
         { L"AppUtil.dll",       "?OpenContactChatSession@ChatSession@Util@@YAXKPAUITXData@@@Z",         &Util::ChatSession::OpenContactChatSession },
         { L"AppUtil.dll",       "?GetContactChatSessionMainHWnd@ChatSession@Util@@YAPAUHWND__@@K@Z",    &Util::ChatSession::GetContactChatSessionMainHWND },
+        { L"AppUtil.dll",       "?HBitmapToTexture@Texture@Util@@YAPAUHGTEXTURE__@@PAUHBITMAP__@@@Z",   &Util::Texture::HBitmapToTexture },
 
         { L"KernelUtil.dll",    "?GetSelfUin@Contact@Util@@YAKXZ",                                      &Util::Contact::GetSelfUin },
         { L"KernelUtil.dll",    "?IsSuperVip@Contact@Util@@YAHKPAK@Z",                                  &Util::Contact::IsSuperVip },
@@ -227,6 +243,9 @@ inline NTSTATUS InitializeQqFunctionTable()
         { L"KernelUtil.dll",    "?Init@Version@@YAHXZ",                                                 &Version::Init },
 
         { L"GF.dll",            "?SetDPIAdaptFlag@DPI@GF@Util@@YAXH@Z",                                 &Util::GF::DPI::SetDPIAdaptFlag },
+
+        { L"xGraphic32.dll",    "CreateTexture",                                                        &xGraphic32::CreateTexture },
+        { L"xGraphic32.dll",    "CopyTexture",                                                          &xGraphic32::CopyTexture },
     };
 
 
