@@ -183,7 +183,7 @@ struct Util
 
     struct Texture
     {
-        static HANDLE (CDECL *HBitmapToTexture)(HDC dc);
+        static HANDLE (CDECL *HBitmapToTexture)(HBITMAP dc);
     };
 };
 
@@ -205,12 +205,20 @@ INIT_STATIC_MEMBER(Version::Init);
 
 struct xGraphic32
 {
-    static BOOL (CDECL *CreateTexture)(LONG_PTR width, LONG_PTR height);
-    static BOOL (CDECL *CopyTexture)(HANDLE dest, const RECT& rc, HANDLE src);
+    static HANDLE   (CDECL *CreateTexture)(LONG_PTR width, LONG_PTR height);
+    static BOOL     (CDECL *ReleaseTexture)(HANDLE texture);
+    static HANDLE   (CDECL *ResizeTexture)();
+    static BOOL     (CDECL *CopyTexture)(HANDLE dest, const RECT& dstrc, HANDLE src, const RECT& srcrc);
+    static HANDLE   (CDECL *RotateTexture)(HANDLE texture, LONG_PTR type);
+    static HANDLE   (CDECL *GetTextureSize)(HANDLE texture, PSIZE size);
 };
 
 INIT_STATIC_MEMBER(xGraphic32::CreateTexture);
+INIT_STATIC_MEMBER(xGraphic32::ResizeTexture);
+INIT_STATIC_MEMBER(xGraphic32::ReleaseTexture);
 INIT_STATIC_MEMBER(xGraphic32::CopyTexture);
+INIT_STATIC_MEMBER(xGraphic32::RotateTexture);
+INIT_STATIC_MEMBER(xGraphic32::GetTextureSize);
 
 typedef struct
 {
@@ -245,7 +253,10 @@ inline NTSTATUS InitializeQqFunctionTable()
         { L"GF.dll",            "?SetDPIAdaptFlag@DPI@GF@Util@@YAXH@Z",                                 &Util::GF::DPI::SetDPIAdaptFlag },
 
         { L"xGraphic32.dll",    "CreateTexture",                                                        &xGraphic32::CreateTexture },
+        { L"xGraphic32.dll",    "ReleaseTexture",                                                       &xGraphic32::ReleaseTexture },
         { L"xGraphic32.dll",    "CopyTexture",                                                          &xGraphic32::CopyTexture },
+        { L"xGraphic32.dll",    "RotateTexture",                                                        &xGraphic32::RotateTexture },
+        { L"xGraphic32.dll",    "GetTextureSize",                                                       &xGraphic32::GetTextureSize },
     };
 
 
