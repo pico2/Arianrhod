@@ -9,6 +9,8 @@ NTSTATUS HookKernelUtil(PVOID BaseAddress);
 NTSTATUS HookGroupApp(PVOID BaseAddress);
 NTSTATUS HookAppMisc(PVOID BaseAddress);
 NTSTATUS HookMainFrame(PVOID BaseAddress);
+NTSTATUS HookCamera(PVOID BaseAddress);
+
 NTSTATUS HookNtdll(PVOID BaseAddress);
 NTSTATUS HookPsapi(PVOID BaseAddress);
 NTSTATUS HookUser32(PVOID BaseAddress);

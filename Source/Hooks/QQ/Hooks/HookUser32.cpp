@@ -1,7 +1,4 @@
 #include "Hooks.h"
-#include <ShellScalingAPI.h>
-
-#pragma comment(lib, "shcore.lib")
 
 using namespace Mp;
 
@@ -236,8 +233,6 @@ NTSTATUS HookUser32(PVOID BaseAddress)
         RTL_CONSTANT_STRING(L"msvcr100.dll"),
         RTL_CONSTANT_STRING(L"msvcr110.dll"),
     };
-
-    SetProcessDpiAwareness(PROCESS_DPI_UNAWARE);
 
     FOR_EACH_ARRAY(crtname, msvcrt)
     {

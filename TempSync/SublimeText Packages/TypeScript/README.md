@@ -47,26 +47,36 @@ Features
 --------
 The below features are available via the keyboard shortcuts shown, or via the Command Palette (^ means the `ctrl` key):
 
-|Feature           | Shortcut        |
-|------------------|-----------------|
-|Rename            | `^T` `^M`       |
-|Find references   | `^T` `^R`       |
-|Next reference    | `^T` `^N`       |
-|Prev reference    | `^T` `^P`       |
-|Format document   | `^T` `^F`       |
-|Format selection  | `^T` `^F`       |
-|Format line       | `^;`            |
-|Format braces     | `^ Shift ]`     |
-|Navigate to symbol| `^ Alt R`       |
-|Go to definition  | `^T^D` or `F12` |
-|Paste and format  | `^V` or <code>&#8984;V</code> |
-|Quick info        | `^T` `^Q`       |
-|Build		   | (Win)`^B` or `F7`, (OSX) `⌘B` or `F7`   |
-|Error list        | (via Command Palette) |
+|Feature                | Shortcut        |
+|-----------------------|-----------------|
+|Rename                 | `^T` `^M`       |
+|Find references        | `^T` `^R`       |
+|Next reference         | `^T` `^N`       |
+|Prev reference         | `^T` `^P`       |
+|Format document        | `^T` `^F`       |
+|Format selection       | `^T` `^F`       |
+|Format line            | `^;`            |
+|Format braces          | `^ Shift ]`     |
+|Navigate to symbol     | `^ Alt R`       |
+|Go to definition       | `^T^D` or `F12` |
+|Trigger completion     | `^Space`        |
+|Trigger signature help | `Alt+,`         |
+|See previous signature in the tooltip | `Alt + up`   |
+|See next signature in the tooltip | `Alt + down` |
+|Paste and format       | `^V` or <code>&#8984;V</code> |
+|Quick info             | `^T` `^Q`       |
+|Build		        | (Win)`^B` or `F7`, (OSX) `⌘B` or `F7`   |
+|Error list             | (via Command Palette) |
 
 The "format on key" feature is on by default, which formats the current line after typing `;`, `}` or `enter`.
 To disable it, go to `Preferences` -> `Package Settings` -> `TypeScript` -> `Plugin Settings - User`, and add 
 `"typescript_auto_format": false` to the json file.
+
+For further information about the keyboard shortcuts, please refer to the [`Default.sublime-keymap`](https://github.com/Microsoft/TypeScript-Sublime-Plugin/blob/master/Default.sublime-keymap) file for common shortcuts and 
+[`Default (OSX).sublime-keymap`](https://github.com/Microsoft/TypeScript-Sublime-Plugin/blob/master/Default%20(OSX).sublime-keymap), 
+[`Default (Windows).sublime-keymap`](https://github.com/Microsoft/TypeScript-Sublime-Plugin/blob/master/Default%20(Windows).sublime-keymap), 
+[`Default (Linux).sublime-keymap`](https://github.com/Microsoft/TypeScript-Sublime-Plugin/blob/master/Default%20(Linux).sublime-keymap)
+for OS-specific shortcuts.
 
 Project System
 ------
@@ -83,30 +93,39 @@ The plugin also supports representing a TypeScript project via a [tsconfig.json]
 Screenshots
 ------
 - Project error list
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/errorlist.gif)
 
 - Signature popup (Requires [Sublime Text 3](http://www.sublimetext.com/3) build >= 3070)
+ 
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/signature.gif)
 
 - Navigate to symbol
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/navigateToSymbol.gif)
 
 - Format
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/format.gif)
 
 - Rename
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/build_tsconfig.gif)
 
 - Find all references
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/find_ref.gif)
 
 - Quick info
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/quickinfo.gif)
 
 - Build configured project
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/build_tsconfig.gif)
 
 - Build loose file
+
 ![](https://raw.githubusercontent.com/Microsoft/TypeScript-Sublime-Plugin/master/screenshots/build_loose_file.gif)
 
 Reporting Issues

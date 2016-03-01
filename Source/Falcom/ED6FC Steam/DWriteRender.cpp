@@ -25,7 +25,7 @@ VOID DWriteRender::SaveToBmpFile()
     HDC dc = this->renderTarget->GetMemoryDC();
 
     PBYTE buffer;
-    HBITMAP bitmap = (HBITMAP)(HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
+    HBITMAP bitmap = (HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
     BITMAP bmp;
     IMAGE_BITMAP_HEADER header;
     BITMAPINFO bmi;

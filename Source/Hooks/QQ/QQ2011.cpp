@@ -155,6 +155,7 @@ static DLL_HOOK_ENTRY Hooks[] =
     { IUSTR(L"ntdll.dll"),      HookNtdll },
     { IUSTR(L"psapi.dll"),      HookPsapi },
     { IUSTR(L"user32.dll"),     HookUser32 },
+    { IUSTR(L"Camera.dll"),     HookCamera },
     //{ IUSTR(L"GDI32.dll"),      HookGdi32 },
 };
 
@@ -171,8 +172,8 @@ BOOL Initialize2(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
 
     Self = FindLdrModuleByHandle(nullptr);
-    if (RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ.exe"), TRUE) == FALSE)
-        return TRUE;
+    //if (RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ.exe"), TRUE) == FALSE)
+    //    return TRUE;
 
     InitializeQqFunctionTable();
 

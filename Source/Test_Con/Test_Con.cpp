@@ -122,23 +122,145 @@ void quick_sort(int *array, int count)
 
 #include "iTunes/iTunes.h"
 
-using ml::HashTableT;
+VOID SaveToBmpFile(HDC dc)
+{
+    PBYTE buffer;
+    HBITMAP bitmap = (HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
+    BITMAP bmp;
+    IMAGE_BITMAP_HEADER header;
+    BITMAPINFO bmi;
+    LONG_PTR stride;
+
+    GetObjectW(bitmap, sizeof(bmp), &bmp);
+    InitBitmapHeader(&header, bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel, &stride);
+
+    bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+    bmi.bmiHeader.biWidth = bmp.bmWidth;
+    bmi.bmiHeader.biHeight = bmp.bmHeight;
+    bmi.bmiHeader.biPlanes = bmp.bmPlanes;
+    bmi.bmiHeader.biBitCount = bmp.bmBitsPixel;
+    bmi.bmiHeader.biClrUsed = 0;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    bmi.bmiHeader.biSizeImage = header.FileSize;
+    bmi.bmiHeader.biClrImportant = 0;
+
+    buffer = (PBYTE)AllocateMemory(header.FileSize);
+
+    GetDIBits(dc, bitmap, 0, bmp.bmHeight, buffer, &bmi, DIB_RGB_COLORS);
+
+    PBYTE b = buffer;
+
+    for (LONG h = bmp.bmHeight; h != 0; --h)
+    {
+        PBYTE p = b;
+        for (LONG w = bmp.bmWidth; w != 0; --w)
+        {
+            p[3] = 0;
+            p += 4;
+        }
+
+        b += stride;
+    }
+
+    NtFileDisk bin;
+    bin.Create(L"d:\\desktop\\picture.bmp");
+    bin.Write(&header, sizeof(header));
+    bin.Write(buffer, header.FileSize);
+    bin.Seek(header.FileSize);
+    bin.SetEndOfFile();
+}
+
+#include <gdiplus.h>
+#pragma comment(lib, "Gdiplus.lib")
+
+using namespace Gdiplus;
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
+
+    ImageCodecInfo* pImageCodecInfo = NULL;
+
+    GetImageEncodersSize(&num, &size);
+    if(size == 0)
+        return -1;  // Failure
+
+    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if(pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+    GetImageEncoders(num, size, pImageCodecInfo);
+
+    for(UINT j = 0; j < num; ++j)
+    {
+        if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            free(pImageCodecInfo);
+            return j;  // Success
+        }
+    }
+
+    free(pImageCodecInfo);
+    return -1;  // Failure
+}
 
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    HANDLE explorer;
-    ULONG pid;
+    HDC desktop, memdc;
+    INT cx, cy, cxScaled, cyScaled;
+    BITMAP bmp;
+    RECT rc;
 
-    GetWindowThreadProcessId(GetShellWindow(), &pid);
-    explorer = PidToHandle(pid);
+    GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-    PROCESS_IMAGE_FILE_NAME2 name;
+    SystemParametersInfoW(SPI_GETWORKAREA, 0, &rc, 0);
 
-    NtQueryInformationProcess(explorer, ProcessImageFileNameWin32, &name, sizeof(name), nullptr);
+    cx = rc.right - rc.left;
+    cy = rc.bottom - rc.top;
 
-    PrintConsole(L"%wZ\n", &name.ImageFileName);
+    cxScaled = cx;
+    cyScaled = cy;
+
+    memdc = CreateCompatibleDC(0);
+    desktop = GetDC(GetDesktopWindow());
+
+    GetObjectW(GetCurrentObject(desktop, OBJ_BITMAP), sizeof(bmp), &bmp);
+
+    cx = bmp.bmWidth;
+    cy = bmp.bmHeight;
+
+    HBITMAP hbitmap = CreateCompatibleBitmap(desktop, cx, cy);
+    SelectObject(memdc, hbitmap);
+
+    BitBlt(memdc, 0, 0, cx, cy, desktop, 0, 0, SRCCOPY | CAPTUREBLT);
+    //StretchBlt(memdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, desktop, 0, 0, cx, cy, SRCCOPY | CAPTUREBLT);
+
+    Bitmap *desktopb = Bitmap::FromHBITMAP(hbitmap, nullptr);
+
+    Bitmap img(cxScaled, cyScaled, desktopb->GetPixelFormat());
+    Graphics g(&img);
+
+    g.SetInterpolationMode(InterpolationModeHighQualityBicubic);
+    g.ScaleTransform((REAL)cxScaled / bmp.bmWidth, (REAL)cyScaled / bmp.bmHeight, MatrixOrderAppend);
+
+    g.DrawImage(desktopb, 0, 0);
+
+    CLSID pngClsid;
+
+    GetEncoderClsid(L"image/png", &pngClsid);
+    img.Save(L"D:\\Desktop\\picture.png", &pngClsid, nullptr);
+    desktopb->Save(L"D:\\Desktop\\desktop.png", &pngClsid, nullptr);
+
+    // SaveToBmpFile(memdc);
+
+    DeleteDC(memdc);
+    ReleaseDC(GetDesktopWindow(), desktop);
 
     Ps::ExitProcess(0);
 
