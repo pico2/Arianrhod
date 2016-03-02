@@ -74,12 +74,9 @@ func genacc() {
 }
 
 func main() {
-    d := NewOrderedDict()
+    tcp := socket.NewTcpSocket()
+    tcp.Connect("localhost", 1080, time.Second)
 
-    d.Set("fuck", "you")
-    d.Set("fuck2", "you2")
-    d.Set("fuck3", "you3")
-    d.Set("fuck4", "you4")
-
-    Println(d)
+    tcp.SetTimeout(time.Second * 5)
+    tcp.ReadAll(100)
 }

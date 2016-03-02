@@ -121,6 +121,8 @@ VOID FASTCALL CaptureWndController_EndCapture(PVOID thiz, PVOID, BOOLEAN success
     delete context;
 }
 
+#define ODS(...) OutputDebugStringW(ml::String::Format(L"[QQ] " __VA_ARGS__))
+
 HANDLE CDECL CameraCreateTexture(LONG_PTR width, LONG_PTR height)
 {
     ScreenShotContext* context = ScreenShotContext::Get();
@@ -129,6 +131,8 @@ HANDLE CDECL CameraCreateTexture(LONG_PTR width, LONG_PTR height)
     {
         width = ceil(context->sx * width);
         height = ceil(context->sy * height);
+
+        ODS(L"textureSize = %d %d", width, height);
     }
 
     return xGraphic32::CreateTexture(width, height);
@@ -165,6 +169,9 @@ BOOL CDECL CameraCopyTexture(HANDLE regionTexture, const RECT& regionRect, HANDL
         scaledScreenRect.right    *= context->sx;
         scaledScreenRect.top      *= context->sy;
         scaledScreenRect.bottom   *= context->sy;
+
+        ODS(L"scaledRegionRect = %d %d %d %d, %d %d", scaledRegionRect, scaledRegionRect.right - scaledRegionRect.left, scaledRegionRect.bottom - scaledRegionRect.top);
+        ODS(L"scaledScreenRect = %d %d %d %d, %d %d", scaledScreenRect, scaledScreenRect.right - scaledScreenRect.left, scaledScreenRect.bottom - scaledScreenRect.top);
 
         screenTexture = Util::Texture::HBitmapToTexture(bitmap);
 
