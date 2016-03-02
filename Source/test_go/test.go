@@ -77,6 +77,8 @@ func main() {
     tcp := socket.NewTcpSocket()
     tcp.Connect("localhost", 1080, time.Second)
 
-    tcp.SetTimeout(time.Second * 5)
+    Println("Connect done")
+
+    // tcp.SetTimeout(time.Second * 5)
     tcp.ReadAll(100)
 }
