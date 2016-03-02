@@ -86,14 +86,25 @@ QqCreateProcessInternalW(
         if (ApplicationName != nullptr)
         {
             appName = ApplicationName;
-            appName = appName.Replace(L"QQ.exe", L"QQ2.exe");
+            if (appName.IndexOf(L"QQ.exe") != appName.kInvalidIndex)
+                appName = appName.Replace(L"QQ.exe", L"QQ2.exe");
+
             ApplicationName = appName;
         }
-        
+
         if (CommandLine != nullptr)
         {
             cmdLine = CommandLine;
-            cmdLine = cmdLine.Replace(L"QQ.exe", L"QQ2.exe");
+
+            if (cmdLine.IndexOf(L"QQ.exe") != cmdLine.kInvalidIndex)
+            {
+                cmdLine = cmdLine.Replace(L"QQ.exe", L"QQ2.exe");
+            }
+            else if (cmdLine.IndexOf(L"QQExternal.exe") != cmdLine.kInvalidIndex)
+            {
+                cmdLine = cmdLine.Replace(L"--high-dpi-support=1", L"--high-dpi-support=0");
+            }
+
             CommandLine = cmdLine;
         }
     }

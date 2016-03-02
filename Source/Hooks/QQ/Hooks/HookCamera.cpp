@@ -8,7 +8,6 @@ struct ScreenShotContext : public TEB_ACTIVE_FRAME
     static const ULONG_PTR magic = TAG4('SSCT');
 
     Bitmap* screenshot;
-    HBITMAP memBmp;
     BOOL    endCapture;
     REAL    sx;
     REAL    sy;
@@ -18,10 +17,11 @@ struct ScreenShotContext : public TEB_ACTIVE_FRAME
         return (ScreenShotContext *)FindThreadFrame(magic);
     }
 
-    ScreenShotContext(Bitmap* screenshot, HBITMAP memBmp, REAL sx, REAL sy) : TEB_ACTIVE_FRAME(magic)
+    ScreenShotContext(Bitmap* screenshot, REAL sx, REAL sy) : TEB_ACTIVE_FRAME(magic)
     {
+        screenshot->RotateFlip(Rotate180FlipX);
+
         this->endCapture    = FALSE;
-        this->memBmp        = memBmp;
         this->screenshot    = screenshot;
         this->sx            = sx;
         this->sy            = sy;
@@ -30,7 +30,6 @@ struct ScreenShotContext : public TEB_ACTIVE_FRAME
 
     ~ScreenShotContext()
     {
-        DeleteObject(this->memBmp);
         delete this->screenshot;
         this->Pop();
     }
@@ -97,13 +96,10 @@ CameraBitBlt(
         sx = (REAL)desktopBmp.bmWidth / cx;
         sy = (REAL)desktopBmp.bmHeight / cy;
 
-        if (new ScreenShotContext(Bitmap::FromHBITMAP(memBmp, nullptr), memBmp, sx, sy) != nullptr)
-            memBmp = nullptr;
+        new ScreenShotContext(Bitmap::FromHBITMAP(memBmp, nullptr), sx, sy);
     }
 
-    if (memBmp != nullptr)
-        DeleteObject(memBmp);
-
+    DeleteObject(memBmp);
     DeleteDC(memDC);
 
     return success;
@@ -131,46 +127,52 @@ HANDLE CDECL CameraCreateTexture(LONG_PTR width, LONG_PTR height)
 
     if (context != nullptr && context->endCapture)
     {
-        width *= context->sx;
-        height *= context->sy;
+        width = ceil(context->sx * width);
+        height = ceil(context->sy * height);
     }
 
     return xGraphic32::CreateTexture(width, height);
 }
 
-BOOL CDECL CameraCopyTexture(HANDLE dest, const RECT& dstrc, HANDLE src, const RECT& srcrc)
+BOOL CDECL CameraCopyTexture(HANDLE regionTexture, const RECT& regionRect, HANDLE screenTexture, const RECT& screenRect)
 {
     ScreenShotContext* context = ScreenShotContext::Get();
 
     if (context == nullptr || context->endCapture == FALSE)
-        return xGraphic32::CopyTexture(dest, dstrc, src, srcrc);
+        return xGraphic32::CopyTexture(regionTexture, regionRect, screenTexture, screenRect);
 
-    BOOL success;
-    RECT dstrc1, srcrc1;
+    BOOL success = FALSE;
 
-    SIZE textureSize;
-    REAL screenWidth = context->screenshot->GetWidth();
-    REAL screenHeight = context->screenshot->GetHeight();
+    HBITMAP bitmap;
 
-    xGraphic32::GetTextureSize(src, &textureSize);
+    if (context->screenshot->GetHBITMAP(Color(0, 0, 0, 0), &bitmap) == Gdiplus::Ok)
+    {
+        RECT scaledRegionRect, scaledScreenRect;
 
-    dstrc1.left     = screenWidth * dstrc.left / textureSize.cx;
-    dstrc1.right    = screenWidth * dstrc.right / textureSize.cx;
-    dstrc1.top      = screenHeight * dstrc.top / textureSize.cy;
-    dstrc1.bottom   = screenHeight * dstrc.bottom / textureSize.cy;
+        SIZE textureSize;
 
-    srcrc1.left     = screenWidth * srcrc.left / textureSize.cx;
-    srcrc1.right    = screenWidth * srcrc.right / textureSize.cx;
-    srcrc1.top      = screenHeight * srcrc.top / textureSize.cy;
-    srcrc1.bottom   = screenHeight * srcrc.bottom / textureSize.cy;
+        xGraphic32::GetTextureSize(regionTexture, &textureSize);
 
-    src = Util::Texture::HBitmapToTexture(context->memBmp);
-    HANDLE rotated = xGraphic32::RotateTexture(src, 1);
+        scaledRegionRect = regionRect;
+        scaledScreenRect = screenRect;
 
-    success = xGraphic32::CopyTexture(dest, dstrc1, rotated, srcrc1);
+        scaledRegionRect.left     = 0;
+        scaledRegionRect.right    = textureSize.cx;
+        scaledRegionRect.top      = 0;
+        scaledRegionRect.bottom   = textureSize.cy;
 
-    xGraphic32::ReleaseTexture(src);
-    xGraphic32::ReleaseTexture(rotated);
+        scaledScreenRect.left     *= context->sx;
+        scaledScreenRect.right    *= context->sx;
+        scaledScreenRect.top      *= context->sy;
+        scaledScreenRect.bottom   *= context->sy;
+
+        screenTexture = Util::Texture::HBitmapToTexture(bitmap);
+
+        success = xGraphic32::CopyTexture(regionTexture, scaledRegionRect, screenTexture, scaledScreenRect);
+
+        DeleteObject(bitmap);
+        xGraphic32::ReleaseTexture(screenTexture);
+    }
 
     return success;
 }

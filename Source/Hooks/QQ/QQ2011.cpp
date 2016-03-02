@@ -2,10 +2,10 @@
 #pragma comment(linker, "/SECTION:.text,ERW /MERGE:.rdata=.text /MERGE:.data=.text")
 #pragma comment(linker, "/SECTION:.Asuna,ERW /MERGE:.text=.Asuna")
 
-#pragma comment(linker, "/EXPORT:WTSFreeMemory=_QqWTSFreeMemory@4")
-#pragma comment(linker, "/EXPORT:WTSQuerySessionInformationW=_QqWTSQuerySessionInformationW@0")
-#pragma comment(linker, "/EXPORT:WTSRegisterSessionNotification=_QqWTSRegisterSessionNotification@8")
-#pragma comment(linker, "/EXPORT:WTSUnRegisterSessionNotification=_QqWTSUnRegisterSessionNotification@4")
+// #pragma comment(linker, "/EXPORT:WTSFreeMemory=_QqWTSFreeMemory@4")
+// #pragma comment(linker, "/EXPORT:WTSQuerySessionInformationW=_QqWTSQuerySessionInformationW@0")
+// #pragma comment(linker, "/EXPORT:WTSRegisterSessionNotification=_QqWTSRegisterSessionNotification@8")
+// #pragma comment(linker, "/EXPORT:WTSUnRegisterSessionNotification=_QqWTSUnRegisterSessionNotification@4")
 
 #include "QQ2011.h"
 #include "ZLibExport.h"
@@ -26,6 +26,8 @@ AnonymousChat
 TXReloginMgr* ReloginMgr;
 
 PVOID AppUtilBase;
+
+#if 0
 
 API_POINTER(WTSFreeMemory)                      StubWTSFreeMemory;
 API_POINTER(WTSQuerySessionInformationW)        StubWTSQuerySessionInformationW;
@@ -104,6 +106,8 @@ EXTC LONG WINAPI QqWTSUnRegisterSessionNotification(HWND hWnd)
     InitializeNetapi32();
     return StubWTSUnRegisterSessionNotification(hWnd);
 }
+
+#endif
 
 /************************************************************************
   init functions

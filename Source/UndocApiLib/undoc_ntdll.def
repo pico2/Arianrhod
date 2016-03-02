@@ -40,6 +40,8 @@ EXPORTS
 	sprintf
 	wcsstr
 	strstr
+	floor = __floor
+	ceil = __ceil
 	_ftol
 	_stricmp
 	_strnicmp

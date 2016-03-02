@@ -10,6 +10,16 @@ long __cdecl _ftol(float)
     return 0;
 }
 
+float __cdecl __ceil(float)
+{
+    return 0;
+}
+
+float __cdecl __floor(float)
+{
+    return 0;
+}
+
 int __cdecl _strnicmp(const char*, const char *, size_t)
 {
     return 0;
