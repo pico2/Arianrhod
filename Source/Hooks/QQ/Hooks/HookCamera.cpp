@@ -121,8 +121,6 @@ VOID FASTCALL CaptureWndController_EndCapture(PVOID thiz, PVOID, BOOLEAN success
     delete context;
 }
 
-#define ODS(...) OutputDebugStringW(ml::String::Format(L"[QQ] " __VA_ARGS__))
-
 HANDLE CDECL CameraCreateTexture(LONG_PTR width, LONG_PTR height)
 {
     ScreenShotContext* context = ScreenShotContext::Get();

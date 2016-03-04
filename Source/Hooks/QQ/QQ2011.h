@@ -4,6 +4,8 @@
 #include "ml.h"
 #include "QQMethod.h"
 
+#define ODS(...) OutputDebugStringW(ml::String::Format(L"[QQ] " __VA_ARGS__))
+
 using ml::String;
 
 typedef struct

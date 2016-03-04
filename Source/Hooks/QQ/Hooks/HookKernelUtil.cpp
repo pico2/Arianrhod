@@ -135,8 +135,8 @@ NTSTATUS HookKernelUtil(PVOID BaseAddress)
 
     Mp::PATCH_MEMORY_DATA Function_KernelUtil[] =
     {
-        Mp::FunctionJumpVa(Util::Group::CheckMsgImage,  CheckMsgImage, &StubCheckMsgImage),
-        Mp::FunctionJumpVa(Util::Contact::IsSuperVip,   IsSuperVip,    &StubIsSuperVip),
+        //Mp::FunctionJumpVa(Util::Group::CheckMsgImage,  CheckMsgImage, &StubCheckMsgImage),
+        //Mp::FunctionJumpVa(Util::Contact::IsSuperVip,   IsSuperVip,    &StubIsSuperVip),
         Mp::FunctionJumpVa(Version::Init,               Version_Init,  &StubVersionInit),
         Mp::FunctionJumpVa(LookupExportTable(FindLdrModuleByName(PUSTR(L"KERNELBASE.dll"))->DllBase, KERNEL32_CreateProcessInternalW), QqCreateProcessInternalW,  &StubCreateProcessInternalW),
     };

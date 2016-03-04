@@ -8,6 +8,7 @@ HRESULT (NTAPI *StubGroupMgr_GetAdminFlags)(PVOID Object, ULONG_PTR Uin, PBOOL I
 
 BOOL CDECL IsTencentTrusted(PCWSTR FileName)
 {
+    ODS(L"%S", __FUNCTION__);
     return TRUE;
 }
 
@@ -19,6 +20,8 @@ BOOL CDECL InitPluginFileSystem(PCWSTR PluginName)
 
     static WCHAR PluginPath[] = L"..\\Plugin\\";
     static WCHAR Disabled[] = L"\\Disabled";
+
+    ODS(L"%S", __FUNCTION__);
 
     Module = FindLdrModuleByHandle(nullptr);
     Length = (StrLengthW(PluginName) + 1) * sizeof(WCHAR);
@@ -177,6 +180,9 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
                 continue;
 
             case GUID_PluginCenter:
+                ODS(L"GUID_PluginCenter");
+                continue;
+
                 AppUtil = FindLdrModuleByHandle(_ReturnAddress());
                 if (AppUtil != nullptr && AppUtil->DllBase == AppUtilBase)
                     continue;
@@ -187,6 +193,9 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
 
             case GUID_ReloginMgr:
             {
+                continue;
+/*
+
                 HRESULT hr = StubPlatformCore_QueryInterface(Object, Guid, Output);
 
                 if (ReloginMgr == nullptr && SUCCEEDED(hr))
@@ -196,6 +205,8 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
                 }
 
                 return hr;
+*/
+
             }
 
             //case GUID_GroupObject:

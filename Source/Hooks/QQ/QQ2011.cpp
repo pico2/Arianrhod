@@ -153,7 +153,7 @@ static DLL_HOOK_ENTRY Hooks[] =
     { IUSTR(L"AppUtil.dll"),    HookAppUtil },
     { IUSTR(L"Common.dll"),     HookCommon },
     { IUSTR(L"KernelUtil.dll"), HookKernelUtil },
-    { IUSTR(L"GroupApp.dll"),   HookGroupApp },
+    //{ IUSTR(L"GroupApp.dll"),   HookGroupApp },
     { IUSTR(L"AppMisc.dll"),    HookAppMisc },
     { IUSTR(L"MainFrame.dll"),  HookMainFrame },
     { IUSTR(L"ntdll.dll"),      HookNtdll },

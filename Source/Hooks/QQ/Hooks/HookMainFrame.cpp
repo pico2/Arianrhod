@@ -2,6 +2,7 @@
 
 BOOL NTAPI PopupSecurityFrame(PVOID, PVOID)
 {
+    ODS(L"%S", __FUNCTION__);
     return TRUE;
 }
 

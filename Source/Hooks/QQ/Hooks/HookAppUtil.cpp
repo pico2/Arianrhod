@@ -2,17 +2,20 @@
 
 VOID CDECL ReportScanResult()
 {
+    ODS(L"%S", __FUNCTION__);
     DebugBreakPoint();
     //return TRUE;
 }
 
 BOOL CDECL PluginSecurityCheck()
 {
+    ODS(L"%S", __FUNCTION__);
     return TRUE;
 }
 
 NTSTATUS CDECL CheckPluginList()
 {
+    ODS(L"%S", __FUNCTION__);
     return STATUS_SUCCESS;
 }
 
