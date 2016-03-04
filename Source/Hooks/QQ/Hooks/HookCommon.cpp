@@ -181,7 +181,7 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
 
             case GUID_PluginCenter:
                 ODS(L"GUID_PluginCenter");
-                continue;
+                //continue;
 
                 AppUtil = FindLdrModuleByHandle(_ReturnAddress());
                 if (AppUtil != nullptr && AppUtil->DllBase == AppUtilBase)
