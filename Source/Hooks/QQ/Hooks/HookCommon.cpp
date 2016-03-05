@@ -193,8 +193,9 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
 
             case GUID_ReloginMgr:
             {
+#if 1
                 continue;
-/*
+#else
 
                 HRESULT hr = StubPlatformCore_QueryInterface(Object, Guid, Output);
 
@@ -205,7 +206,7 @@ HRESULT NTAPI PlatformCore_QueryInterface(PVOID Object, REFGUID Guid, PVOID *Out
                 }
 
                 return hr;
-*/
+#endif
 
             }
 
