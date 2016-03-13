@@ -22,6 +22,7 @@
                 {"text": "interface", "title": "interface", "value": "interface"},
                 {"text": "struct", "title": "struct", "value": "struct"},
                 {"text": "default", "title": "default", "value": "default"},
+                {"text": "defer", "title": "defer", "value": "defer"},
                 {"text": "fallthrough", "title": "fallthrough", "value": "fallthrough"},
                 {"text": "recover", "title": "recover", "value": "recover"},
                 {"text": "append", "title": "append", "value": "append($1)"},
