@@ -210,59 +210,13 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    HDC desktop, memdc;
-    INT cx, cy, cxScaled, cyScaled;
-    BITMAP bmp;
-    RECT rc;
+    HANDLE event = CreateEventW(0, 0, 0, 0);
 
-    GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    SetEvent(event);
+    SetEvent(event);
 
-    SystemParametersInfoW(SPI_GETWORKAREA, 0, &rc, 0);
-
-    cx = rc.right - rc.left;
-    cy = rc.bottom - rc.top;
-
-    cxScaled = cx;
-    cyScaled = cy;
-
-    memdc = CreateCompatibleDC(0);
-    desktop = GetDC(GetDesktopWindow());
-
-    GetObjectW(GetCurrentObject(desktop, OBJ_BITMAP), sizeof(bmp), &bmp);
-
-    cx = bmp.bmWidth;
-    cy = bmp.bmHeight;
-
-    HBITMAP hbitmap = CreateCompatibleBitmap(desktop, cx, cy);
-    SelectObject(memdc, hbitmap);
-
-    BitBlt(memdc, 0, 0, cx, cy, desktop, 0, 0, SRCCOPY | CAPTUREBLT);
-    //StretchBlt(memdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, desktop, 0, 0, cx, cy, SRCCOPY | CAPTUREBLT);
-
-    Bitmap *desktopb = Bitmap::FromHBITMAP(hbitmap, nullptr);
-
-    Bitmap img(cxScaled, cyScaled, desktopb->GetPixelFormat());
-    Graphics g(&img);
-
-    g.SetInterpolationMode(InterpolationModeHighQualityBicubic);
-    g.ScaleTransform((REAL)cxScaled / bmp.bmWidth, (REAL)cyScaled / bmp.bmHeight, MatrixOrderAppend);
-
-    g.DrawImage(desktopb, 0, 0);
-
-    CLSID pngClsid;
-
-    GetEncoderClsid(L"image/png", &pngClsid);
-    img.Save(L"D:\\Desktop\\picture.png", &pngClsid, nullptr);
-    desktopb->Save(L"D:\\Desktop\\desktop.png", &pngClsid, nullptr);
-
-    // SaveToBmpFile(memdc);
-
-    DeleteDC(memdc);
-    ReleaseDC(GetDesktopWindow(), desktop);
-
-    Ps::ExitProcess(0);
+    WaitForSingleObject(event, INFINITE);
+    WaitForSingleObject(event, INFINITE);
 
     return;
 
