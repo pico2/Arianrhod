@@ -67,31 +67,31 @@ class WeChatWakerLock {
 public class HookWeChat implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(LoadPackageParam pkg) throws Throwable {
-        hookWakerLock(pkg);
+//        hookWakerLock(pkg);
 
         // "error pcm duration %d"
 
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "gAq"), "gAj", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "gpy"), "gpr", 0);
             }
         });
 
         // "ERROR record duration, %dms !!!"
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "lj", new XC_MethodReplacement() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "jQ", new XC_MethodReplacement() {
             @Override
             protected Boolean replaceHookedMethod(MethodHookParam param) throws Throwable {
-                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gEp");
-                Object obj2 = XposedHelpers.getObjectField(obj1, "gEd");
+                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gtw");
+                Object obj2 = XposedHelpers.getObjectField(obj1, "gtk");
 
-                float v2 = ((Long)XposedHelpers.callMethod(obj2, "awp")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(obj2, "avt")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
-                        XposedHelpers.callMethod(obj1, "x", v2);
+                        XposedHelpers.callMethod(obj1, "v", v2);
                     } else {
-                        XposedHelpers.callMethod(obj1, "x", 1f);
+                        XposedHelpers.callMethod(obj1, "v", 1f);
                     }
                 }
 
@@ -101,7 +101,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "J", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "L", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //            HookLoadPackage.log("what the fuck");
@@ -125,93 +125,34 @@ public class HookWeChat implements IXposedHookLoadPackage {
         // snsblurs_
         // snsblurt_
 
-        /*
-
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.data.h", pkg.classLoader, "g", "com.tencent.mm.protocal.b.add", new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam args) throws Throwable {
-                HookLoadPackage.log("param1 = %s", args.args[0]);
-                return XposedHelpers.callMethod(args.thisObject, "h", args.args[0]);
-            }
-        });
-
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "getBlurBitmapFilePath", new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.callMethod(param.thisObject, "setMaskColor", 0);
-                return XposedHelpers.callMethod(param.thisObject, "getOriginBitmapFilePath");
-            }
-        });
-
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "setMaskColor", int.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                HookLoadPackage.log("setMaskColor");
-                param.args[0] = 0;
-            }
-        });
-        */
-
-//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "b", "com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", new XC_MethodHook() {
+//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "onDraw", Canvas.class, new XC_MethodHook() {
 //            @Override
 //            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                HookLoadPackage.log("b");
-//                String inputStream = (String)XposedHelpers.callMethod(param.args[0], "bpg");
-//                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIX");
+//                Canvas canvas = (Canvas)param.args[0];
+//                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIW");
+//                Paint paint = (Paint)XposedHelpers.getObjectField(param.thisObject, "cIZ");
 //
-//                if (bitmap != null)
-//                    HookLoadPackage.log("blur w = %d, h = %d", bitmap.getWidth(), bitmap.getHeight());
+//                if (bitmap != null) {
+//                    Point screenSize = (Point)XposedHelpers.callMethod(param.thisObject, "getScreenSize");
+//                    int width, height;
 //
-////                param.setResult(null);
-//            }
-//        });
-
-//        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "axY", new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                HookLoadPackage.log("axY called");
-//                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIY");
-//                if (bitmap != null)
-//                    HookLoadPackage.log("blur w = %d, h = %d", bitmap.getWidth(), bitmap.getHeight());
+//                    width = bitmap.getWidth();
+//                    height = bitmap.getHeight();
+//
+//                    Matrix m = new Matrix();
+//                    m.setRectToRect(new RectF(0, 0, width, height), new RectF(0, 0, screenSize.x, screenSize.y), Matrix.ScaleToFit.CENTER);
+//                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, m, true);
+//
+//                    canvas.save();
+//                    width = bitmap.getWidth();
+//                    height = bitmap.getHeight();
+//                    canvas.drawBitmap(bitmap, null, new Rect(0, 0, width, height), paint);
+//                    canvas.restore();
+//                }
 //
 //                param.setResult(null);
 //            }
 //        });
-
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sns.lucky.ui.LuckyRevealImageView", pkg.classLoader, "onDraw", Canvas.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                HookLoadPackage.log("onDraw");
-//                XposedHelpers.setObjectField(param.thisObject, "gIX", XposedHelpers.getObjectField(param.thisObject, "gIW"));
-//                if (true) return;
-
-                Canvas canvas = (Canvas)param.args[0];
-                Bitmap bitmap = (Bitmap)XposedHelpers.getObjectField(param.thisObject, "gIW");
-                Paint paint = (Paint)XposedHelpers.getObjectField(param.thisObject, "cIZ");
-
-//                HookLoadPackage.log("bitmap = %s", bitmap);
-
-                if (bitmap != null) {
-                    Point screenSize = (Point)XposedHelpers.callMethod(param.thisObject, "getScreenSize");
-                    int width, height;
-
-                    width = bitmap.getWidth();
-                    height = bitmap.getHeight();
-
-                    Matrix m = new Matrix();
-                    m.setRectToRect(new RectF(0, 0, width, height), new RectF(0, 0, screenSize.x, screenSize.y), Matrix.ScaleToFit.CENTER);
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, m, true);
-
-                    canvas.save();
-                    width = bitmap.getWidth();
-                    height = bitmap.getHeight();
-                    canvas.drawBitmap(bitmap, null, new Rect(0, 0, width, height), paint);
-                    canvas.restore();
-                }
-
-                param.setResult(null);
-            }
-        });
     }
 
     private void hookWakerLock(LoadPackageParam pkg) {
