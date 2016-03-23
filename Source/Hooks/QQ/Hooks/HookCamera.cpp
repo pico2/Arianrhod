@@ -163,10 +163,10 @@ BOOL CDECL CameraCopyTexture(HANDLE regionTexture, const RECT& regionRect, HANDL
         scaledRegionRect.top      = 0;
         scaledRegionRect.bottom   = textureSize.cy;
 
-        scaledScreenRect.left     *= context->sx;
-        scaledScreenRect.right    *= context->sx;
-        scaledScreenRect.top      *= context->sy;
-        scaledScreenRect.bottom   *= context->sy;
+        scaledScreenRect.left     = floor(context->sx * scaledScreenRect.left);
+        scaledScreenRect.right    = floor(context->sx * scaledScreenRect.right);
+        scaledScreenRect.top      = floor(context->sy * scaledScreenRect.top);
+        scaledScreenRect.bottom   = floor(context->sy * scaledScreenRect.bottom);
 
         ODS(L"scaledRegionRect = %d %d %d %d, %d %d", scaledRegionRect, scaledRegionRect.right - scaledRegionRect.left, scaledRegionRect.bottom - scaledRegionRect.top);
         ODS(L"scaledScreenRect = %d %d %d %d, %d %d", scaledScreenRect, scaledScreenRect.right - scaledScreenRect.left, scaledScreenRect.bottom - scaledScreenRect.top);
