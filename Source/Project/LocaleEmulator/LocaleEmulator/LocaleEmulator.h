@@ -217,7 +217,7 @@ inline VOID InitDefaultLeb(PLEB Leb)
 
     ZeroMemory(Leb, sizeof(*Leb));
 
-#if 1
+#if 0
 
     static WCHAR FaceName[]     = L"MS Gothic";
 

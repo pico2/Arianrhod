@@ -67,7 +67,7 @@ class WeChatWakerLock {
 public class HookWeChat implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(LoadPackageParam pkg) throws Throwable {
-//        hookWakerLock(pkg);
+        hookWakerLock(pkg);
 
         // "error pcm duration %d"
 
@@ -157,7 +157,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
     private void hookWakerLock(LoadPackageParam pkg) {
 //        Class<?> WakerLock = XposedHelpers.findClass("com.tencent.mm.jni.platformcomm.WakerLock", pkg);
-        Class<?> WakeLock = XposedHelpers.findClass("android.os.PowerManager.WakeLock", pkg.classLoader);
+//        Class<?> WakeLock = XposedHelpers.findClass("android.os.PowerManager.WakeLock", pkg.classLoader);
 
         XposedHelpers.findAndHookMethod("android.os.PowerManager", pkg.classLoader, "newWakeLock", int.class, String.class, new XC_MethodHook() {
             @Override
@@ -169,12 +169,12 @@ public class HookWeChat implements IXposedHookLoadPackage {
             }
         });
 
-        XC_MethodHook nop = new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.setResult(null);
-            }
-        };
+//        XC_MethodHook nop = new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                param.setResult(null);
+//            }
+//        };
 
 //        XposedHelpers.findAndHookMethod(WakeLock, "acquire", nop);
 //        XposedHelpers.findAndHookMethod(WakeLock, "acquire", long.class, nop);

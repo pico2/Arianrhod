@@ -889,13 +889,13 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
 
     if (this->RegistryRedirectionEntry.GetSize() != 0)
     {
-        ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
+        //ADD_FILTER_(NtQueryValueKey, LeNtQueryValueKey, this);
     }
 
-    ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
-    ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
-    ADD_FILTER_(NtQueryDefaultLocale,       LeNtQueryDefaultLocale,     this);
-    ADD_FILTER_(NtQueryDefaultUILanguage,   LeNtQueryDefaultUILanguage, this);
+    //ADD_FILTER_(NtQuerySystemInformation,   LeNtQuerySystemInformation, this);
+    //ADD_FILTER_(NtInitializeNlsFiles,       LeNtInitializeNlsFiles,     this);
+    //ADD_FILTER_(NtQueryDefaultLocale,       LeNtQueryDefaultLocale,     this);
+    //ADD_FILTER_(NtQueryDefaultUILanguage,   LeNtQueryDefaultUILanguage, this);
     //ADD_FILTER_(NtQueryInstallUILanguage,   LeNtQueryInstallUILanguage, this);
     //ADD_FILTER_(NtQueryInformationThread,   LeNtQueryInformationThread, this);
     //ADD_FILTER_(NtTerminateThread,          LeNtTerminateThread,        this);
@@ -906,7 +906,7 @@ NTSTATUS LeGlobalData::HookNtdllRoutines(PVOID Ntdll)
         Mp::FunctionJumpVa(::RtlKnownExceptionFilter, LeKnownExceptionFilter, &HookStub.StubRtlKnownExceptionFilter),
     };
 
-    Mp::PatchMemory(p, countof(p));
+    //Mp::PatchMemory(p, countof(p));
 
     return STATUS_SUCCESS;
 }
