@@ -1,0 +1,1 @@
+{"sublime_text": ">=3000", "dependencies": [], "platforms": ["*"], "description": "A SublimeText binding for RACER (Rust auto completion tool)", "url": "https://github.com/defuz/RustAutoComplete", "version": "0.9.0"}
