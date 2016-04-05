@@ -53,7 +53,7 @@ func login(session *http.Session, user, pass String) {
             )
 
     if resp.StatusCode != http.StatusOK {
-        Raisef("login status: %s", http.StatusText(resp.StatusCode))
+        Raisef("login status: %v", resp.StatusCode)
     }
 }
 
@@ -167,7 +167,7 @@ func do(user, pass String) error {
 
 func readuser() []String {
     usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
-    acc := io2.ReadTextToLines(usertxt)
+    acc := io2.ReadLines(usertxt)
 
     if len(acc) < 2 {
         Raise("corrupt user.txt")

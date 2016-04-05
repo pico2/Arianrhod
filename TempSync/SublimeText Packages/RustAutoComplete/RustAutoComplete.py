@@ -192,6 +192,8 @@ class RustAutocomplete(sublime_plugin.EventListener):
                     if context.startswith(search_path):
                         context = context[len(search_path)+1:]
 
+                context = context.replace('\\', '/')
+
                 if result.middle.startswith('Module'):
                     fmt = '{completion} {middle} {context}'
                 else:

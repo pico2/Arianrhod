@@ -7,6 +7,7 @@ import (
     . "ml/dict"
     "./pinyin"
     "ml/random"
+    "ml/console"
     "os"
     "time"
     "syscall"
@@ -79,18 +80,8 @@ func genacc() {
 }
 
 func main() {
-    e := sync2.NewEvent()
-
-    for i := 0; i != 10; i++ {
-        go func(i int) {
-            Println(i, "Waiting")
-            e.Wait()
-            Println(i, "done")
-        }(i)
-    }
-
-    time.Sleep(time.Second)
-    e.Broadcast()
-    Println("Broadcast")
-    time.Sleep(time.Second)
+    defer console.Pause("done")
+    tcp := socket.NewTcpSocket()
+    tcp.Connect("40.83.120.76", 443, 10 * time.Second)
+    Println("connected")
 }
