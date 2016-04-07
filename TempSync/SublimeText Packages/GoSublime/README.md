@@ -6,7 +6,7 @@ GoSublime
 Intro
 -----
 
-GoSublime is a Golang plugin collection for the text editor [SublimeText](http://www.sublimetext.com/) providing code completion and other IDE-like features. Both Sublime Text versions 2 and 3 are supported.
+GoSublime is a Golang plugin collection for the text editor [SublimeText](http://www.sublimetext.com/) providing code completion and other IDE-like features. Only Sublime Text **3** is supported.
 
 Features
 --------
@@ -27,8 +27,6 @@ Features
 
 Demo
 ----
-
-* New demos will be uploaded to http://www.youtube.com/user/GoSublime/videos
 
 * Old demo http://vimeo.com/disposaboy/gosublime-demo2
 
