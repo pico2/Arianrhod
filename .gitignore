@@ -13,6 +13,7 @@ build/
 logs/
 iTunesDLL/
 local.properties
+Cargo.lock
 
 /TempSync/AtomConfig/compile-cache/
 /TempSync/AtomConfig/.node-gyp/
