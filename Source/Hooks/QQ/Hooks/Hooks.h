@@ -3,6 +3,8 @@
 
 #include "../QQ2011.h"
 
+// tencent.im.msgrevoke.UinTypeUserDef
+
 NTSTATUS HookAppUtil(PVOID BaseAddress);
 NTSTATUS HookCommon(PVOID BaseAddress);
 NTSTATUS HookKernelUtil(PVOID BaseAddress);
@@ -10,6 +12,9 @@ NTSTATUS HookGroupApp(PVOID BaseAddress);
 NTSTATUS HookAppMisc(PVOID BaseAddress);
 NTSTATUS HookMainFrame(PVOID BaseAddress);
 NTSTATUS HookCamera(PVOID BaseAddress);
+NTSTATUS HookAppFramework(PVOID BaseAddress);
+NTSTATUS HookMsgMgr(PVOID BaseAddress);
+NTSTATUS HookIM(PVOID BaseAddress);
 
 NTSTATUS HookNtdll(PVOID BaseAddress);
 NTSTATUS HookPsapi(PVOID BaseAddress);

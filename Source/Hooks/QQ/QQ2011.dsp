@@ -59,6 +59,10 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\Hooks\HookAppFramework.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Hooks\HookAppMisc.cpp
 # End Source File
 # Begin Source File
@@ -83,11 +87,19 @@ SOURCE=.\Hooks\HookGroupApp.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Hooks\HookIM.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Hooks\HookKernelUtil.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\Hooks\HookMainFrame.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Hooks\HookMsgMgr.cpp
 # End Source File
 # Begin Source File
 
