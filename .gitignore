@@ -14,6 +14,7 @@ logs/
 iTunesDLL/
 local.properties
 Cargo.lock
+!.cargo
 
 /TempSync/AtomConfig/compile-cache/
 /TempSync/AtomConfig/.node-gyp/
@@ -123,7 +124,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/SublimeText Packages/User/*.*-ca-bundle
 /Source/GoProject/src/AppleIdRegister
 /Source/GoProject/pkg
-/Source/Project/Private/
 /Source/sources/qt
 /Source/Project/AppleIdAuthorizer
 /Source/Project/WindStockProj
@@ -139,3 +139,11 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /TempSync/AtomConfig/.apm
 /TempSync/VSCodeUserData/extensions
 /TempSync/VSCodeUserData/settings.json
+
+/Source/Project/ClashOfKings/
+/Source/Project/WeChat/
+/Source/Project/bettor
+/Source/Project/netease.mailmaster
+/Source/Project/QQProtocol
+/Source/GoProject/src/inke_client
+/Source/Project/JDBClient
