@@ -11,6 +11,8 @@
 #include <windowsx.h>
 #include <WtsApi32.h>
 
+ML_OVERLOAD_NEW
+
 LPWSTR g_pCmdLineW;
 LPSTR  g_pCmdLineA;
 
@@ -154,15 +156,21 @@ BOOL TranslateKeyEvent(PMSG Msg, BOOL KeyDown)
 
     filter.Push();
 
+    BOOL CtrlPressed, AltPressed, ShiftPressed;
+
+    CtrlPressed = KeyPressed(VK_CONTROL);
+    AltPressed = KeyPressed(VK_MENU);
+    ShiftPressed = KeyPressed(VK_SHIFT);
+
     FOR_EACH_ARRAY(KeyMap, KeyMapTable)
     {
-        if (FLAG_ON(KeyMap->Original.Modifier, FCONTROL) != KeyPressed(VK_CONTROL))
+        if (FLAG_ON(KeyMap->Original.Modifier, FCONTROL) != CtrlPressed)
             continue;
 
-        if (FLAG_ON(KeyMap->Original.Modifier, FALT) != KeyPressed(VK_MENU))
+        if (FLAG_ON(KeyMap->Original.Modifier, FALT) != AltPressed)
             continue;
 
-        if (FLAG_ON(KeyMap->Original.Modifier, FSHIFT) != KeyPressed(VK_SHIFT))
+        if (FLAG_ON(KeyMap->Original.Modifier, FSHIFT) != ShiftPressed)
             continue;
 
         if ((BYTE)Msg->wParam != KeyMap->Original.VirtualKey)
@@ -212,7 +220,7 @@ BOOL NTAPI ChromePeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
     static LONG LastDelta;
 
     Success = StubPeekMessageW(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
-    if (Success == FALSE)
+    if (Success == FALSE || wRemoveMsg != PM_REMOVE)
         return Success;
 
     switch (lpMsg->message)
