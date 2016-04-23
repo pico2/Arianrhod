@@ -188,7 +188,7 @@ func abs_path_for_package(filename, p string, context *package_lookup_context) (
         bestPath := findBestPath(pkgpath, context)
         if len(bestPath) == 0 {
             return pkgpath + ".a", true
-	}
+		}
 
         p = pkgpath[len(bestPath):]
 	}
