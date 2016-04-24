@@ -284,6 +284,7 @@ func (c *auto_complete_context) apropos(file []byte, filename string, cursor int
 	if cc.decl == nil {
 		// In case if no declaraion is a subject of completion, propose all:
 		set := c.make_decl_set(c.current.scope)
+
 		c.get_candidates_from_set(set, cc.partial, class, b)
 		if cc.partial != "" && len(b.candidates) == 0 {
 			// as a fallback, try case insensitive approach

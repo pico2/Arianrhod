@@ -69,7 +69,7 @@
     ],
 
     "env": {
-        "GOPATH": "D:/Dev/go/pkgs;D:/Desktop/Source/GoProject;D:/Desktop/Source/Project/Private;D:/Desktop/Source/Falcom;D:/Desktop/Source/GoProject/src/inke_client",
+        "GOPATH": "D:/Dev/go/pkgs;D:/Desktop/Source/GoProject;D:/Desktop/Source/Project/Private;D:/Desktop/Source/Falcom",
         "GOROOT": "D:/Dev/go",
         "PATH": "$GOROOT/bin;$PATH"
     },

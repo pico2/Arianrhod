@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"fmt"
 )
 
 var (
@@ -62,12 +63,13 @@ func (a *AutoInstOptions) install() {
 	roots := []string{}
 	alwaysInstall := a.Env["ALWAYS_INSTALL"] == "1"
 	goSrc := a.Env["GOROOT"] + "/src/"
+	gopath := pathList(a.Env["GOPATH"])
 
 	if p := a.Env["GOROOT"]; p != "" {
 		roots = append(roots, filepath.Join(p, "pkg", osArchSfx))
 	}
 
-	for _, p := range pathList(a.Env["GOPATH"]) {
+	for _, p := range gopath {
 		roots = append(roots, filepath.Join(p, "pkg", osArchSfx))
 	}
 
@@ -88,68 +90,65 @@ func (a *AutoInstOptions) install() {
 	el := envSlice(a.Env)
 	installed := []string{}
 
-	normalizeSeparators := func (path string) string {
-		return strings.Replace(strings.Replace(path, "\\", "/", -1), "/", string(filepath.Separator), -1)
-	}
+	bestPath := findBestPath(gopath, a.Dir)
 
-	findBestPath := func (dir string) (found string) {
-		maxlen := 0
-		dir = normalizeSeparators(dir)
-		srcPath := "src" + string(filepath.Separator)
-
-		for _, root := range pathList(a.Env["GOPATH"]) {
-			root = normalizeSeparators(root)
-
-			if strings.HasPrefix(dir, root) && len(root) > maxlen {
-				maxlen = len(root)
-				found = root
-				switch (found[len(found) - 1]) {
-					case '\\':
-					case '/':
-
-					default:
-						found += string(filepath.Separator)
-				}
-
-				if dir[len(found):len(found) + 4] == srcPath {
-					found += srcPath
-				}
-			}
-		}
-		return
-	}
-
-	bestPath := findBestPath(a.Dir)
+	log, _ := os.Create("D:\\Desktop\\gs.log")
+	defer log.Close()
 
 	for path, fn := range a.imports() {
+		var vendor string
+
 		if path[0] == '.' && len(bestPath) != 0 {
 			// relative package path
 			path = filepath.Join(a.Dir, path)
 			fn = filepath.Join(a.Dir, fn)
 			path = path[len(bestPath):]
 			fn = fn[len(bestPath):]
+
+		} else if len(bestPath) != 0 && pathExists(filepath.Join(bestPath, path)) == false {
+			vendor = findVendor(bestPath, a.Dir, path)
 		}
 
-		if _, err := os.Stat(goSrc + path); err == nil {
-			continue
+		if pathExists(goSrc + path) {
+			// continue
 		}
 
-		if alwaysInstall || !archiveOk(fn) {
+		log.WriteString(fmt.Sprintf("fn: %v\n", fn))
+		log.WriteString(fmt.Sprintf("dir: %v\n", a.Dir))
+		log.WriteString(fmt.Sprintf("path: %v\n", path))
+		log.WriteString(fmt.Sprintf("vendor: %v\n", vendor))
+		log.WriteString(fmt.Sprintf("vendorArchiveOk: %v\n", vendorArchiveOk(roots, strings.Replace(vendor, bestPath, "", 1) + ".a")))
+
+		if alwaysInstall || !archiveOk(fn) || !vendorArchiveOk(roots, strings.Replace(vendor, bestPath, "", 1) + ".a") {
 			var cmd *exec.Cmd
-			if sfx == "" {
-				cmd = exec.Command("go", "install", path)
-			} else {
-				cmd = exec.Command("go", "install", "-installsuffix", sfx, path)
+			// cmd.Dir = a.Dir
+
+			switch {
+				case len(vendor) != 0:
+				// case pathExists(filepath.Join(a.Dir, "vendor", path)):
+					cmd = exec.Command("go", "install")
+					cmd.Dir = vendor
+
+				case sfx == "":
+					cmd = exec.Command("go", "install", path)
+
+				default:
+					cmd = exec.Command("go", "install", "-installsuffix", sfx, path)
 			}
+
 			cmd.Env = el
 			cmd.Stderr = ioutil.Discard
 			cmd.Stdout = ioutil.Discard
+			log.WriteString(fmt.Sprintf("args: %v\n", cmd.Args))
 			cmd.Run()
 
 			if alwaysInstall == false && archiveOk(fn) {
 				installed = append(installed, path)
 			}
+
 		}
+
+		log.WriteString(fmt.Sprintf("\n"))
 	}
 
 	if len(installed) > 0 {
