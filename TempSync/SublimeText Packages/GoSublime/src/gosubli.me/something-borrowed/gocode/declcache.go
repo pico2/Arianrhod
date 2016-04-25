@@ -33,7 +33,6 @@ func collect_package_imports(filename string, decls []ast.Decl, context *package
 				imp := spec.(*ast.ImportSpec)
 				path, alias := path_and_alias(imp)
 				path, ok := abs_path_for_package(filename, path, context)
-				acc_log.WriteString(fmt.Sprintf("path = %v, ok = %v, alias = %v\n", path, ok, alias))
 				if ok && alias != "_" {
 					pi = append(pi, package_import{alias, path})
 				}
@@ -301,9 +300,6 @@ func log_build_context(context *package_lookup_context) {
 	log.Printf(" lib-path: %q\n", g_config.LibPath)
 }
 
-
-var acc_log, _ = os.OpenFile(`D:\desktop\acc_log.log`, os.O_CREATE | os.O_APPEND, 0777)
-
 // find_global_file returns the file path of the compiled package corresponding to the specified
 // import, and a boolean stating whether such path is valid.
 // TODO: Return only one value, possibly empty string if not found.
@@ -316,10 +312,6 @@ func find_global_file(imp string, context *package_lookup_context) (string, bool
 	if imp == "unsafe" {
 		return "unsafe", true
 	}
-
-	defer acc_log.WriteString("\n")
-
-	acc_log.WriteString(fmt.Sprintf("import %v\n", imp))
 
 	pkgfile := fmt.Sprintf("%s.a", imp)
 
@@ -362,26 +354,20 @@ func find_global_file(imp string, context *package_lookup_context) (string, bool
 		// So, whatever, let's just pretend it's always on.
 		package_path := context.CurrentPackagePath
 		for i := 1; ; i++ {
-			// break
 			limp := filepath.Join(package_path, "vendor", imp)
-			acc_log.WriteString(fmt.Sprintf("%v\n", limp))
-
 			if p, err := context.Import(limp, "", build.AllowBinary|build.FindOnly); err == nil {
 				try_autobuild(p)
 				if file_exists(p.PkgObj) {
 					log_found_package_maybe(imp, p.PkgObj)
-					acc_log.WriteString(fmt.Sprintf("return %v\n", p.PkgObj))
 					return p.PkgObj, true
 				}
 			}
 			if package_path == "" {
-				acc_log.WriteString(fmt.Sprintf("%v\n", "package_path == ''"))
 				break
 			}
 			next_path := filepath.Dir(package_path)
 			// let's protect ourselves from inf recursion here
 			if next_path == package_path {
-				acc_log.WriteString(fmt.Sprintf("%v == %v\n", next_path, package_path))
 				break
 			}
 			package_path = next_path

@@ -118,6 +118,7 @@ func (this *token_iterator) skip_to_left_curly() bool {
 // can apply special filtering for autocompletion results.
 // Sadly, this doesn't cover anonymous structs.
 func (ti *token_iterator) extract_struct_type() string {
+	return ti.extract_struct_type2()
 	if !ti.skip_to_left_curly() {
 		return ""
 	}

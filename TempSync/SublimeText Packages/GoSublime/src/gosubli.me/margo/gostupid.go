@@ -61,14 +61,11 @@ func findVendor(gopath, path, pkg string) string {
 }
 
 func vendorArchiveOk(roots []string, fn string) bool {
-    if len(fn) == 0 {
-        return true
-    }
-
     for _, root := range roots {
         if pathExists(filepath.Join(root, fn)) {
             return true
         }
     }
+
     return false
 }

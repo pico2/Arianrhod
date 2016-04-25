@@ -92,11 +92,9 @@ func (a *AutoInstOptions) install() {
 
 	bestPath := findBestPath(gopath, a.Dir)
 
-	log, _ := os.Create("D:\\Desktop\\gs.log")
-	defer log.Close()
-
 	for path, fn := range a.imports() {
 		var vendor string
+		var vendorArchive string
 
 		if path[0] == '.' && len(bestPath) != 0 {
 			// relative package path
@@ -107,48 +105,41 @@ func (a *AutoInstOptions) install() {
 
 		} else if len(bestPath) != 0 && pathExists(filepath.Join(bestPath, path)) == false {
 			vendor = findVendor(bestPath, a.Dir, path)
+			vendorArchive = strings.Replace(vendor, bestPath, "", 1) + ".a"
 		}
 
 		if pathExists(goSrc + path) {
-			// continue
+			continue
 		}
 
-		log.WriteString(fmt.Sprintf("fn: %v\n", fn))
-		log.WriteString(fmt.Sprintf("dir: %v\n", a.Dir))
-		log.WriteString(fmt.Sprintf("path: %v\n", path))
-		log.WriteString(fmt.Sprintf("vendor: %v\n", vendor))
-		log.WriteString(fmt.Sprintf("vendorArchiveOk: %v\n", vendorArchiveOk(roots, strings.Replace(vendor, bestPath, "", 1) + ".a")))
+		switch {
+			case alwaysInstall,
+				 len(vendor) != 0 && vendorArchiveOk(roots, vendorArchive) == false,
+				 len(vendor) == 0 && archiveOk(fn) == false:
 
-		if alwaysInstall || !archiveOk(fn) || !vendorArchiveOk(roots, strings.Replace(vendor, bestPath, "", 1) + ".a") {
-			var cmd *exec.Cmd
-			// cmd.Dir = a.Dir
+				var cmd *exec.Cmd
 
-			switch {
-				case len(vendor) != 0:
-				// case pathExists(filepath.Join(a.Dir, "vendor", path)):
-					cmd = exec.Command("go", "install")
-					cmd.Dir = vendor
+				switch {
+					case len(vendor) != 0:
+						cmd = exec.Command("go", "install")
+						cmd.Dir = vendor
 
-				case sfx == "":
-					cmd = exec.Command("go", "install", path)
+					case sfx == "":
+						cmd = exec.Command("go", "install", path)
 
-				default:
-					cmd = exec.Command("go", "install", "-installsuffix", sfx, path)
-			}
+					default:
+						cmd = exec.Command("go", "install", "-installsuffix", sfx, path)
+				}
 
-			cmd.Env = el
-			cmd.Stderr = ioutil.Discard
-			cmd.Stdout = ioutil.Discard
-			log.WriteString(fmt.Sprintf("args: %v\n", cmd.Args))
-			cmd.Run()
+				cmd.Env = el
+				cmd.Stderr = ioutil.Discard
+				cmd.Stdout = ioutil.Discard
+				cmd.Run()
 
-			if alwaysInstall == false && archiveOk(fn) {
-				installed = append(installed, path)
-			}
-
+				if alwaysInstall == false && archiveOk(fn) {
+					installed = append(installed, path)
+				}
 		}
-
-		log.WriteString(fmt.Sprintf("\n"))
 	}
 
 	if len(installed) > 0 {

@@ -278,8 +278,8 @@ def calltip(fn, src, pos, quiet, f):
 
 	global lastInstallTime
 
-	alwaysInstall = not False
-	if time.time() - lastInstallTime > 30:
+	alwaysInstall = False
+	if time.time() - lastInstallTime > 60:
 		lastInstallTime = time.time()
 		alwaysInstall = True
 
