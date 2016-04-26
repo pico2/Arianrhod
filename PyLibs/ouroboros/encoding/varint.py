@@ -23,7 +23,6 @@ def decodeVarint(buffer, mask = (1 << 64) - 1):
         result |= ((b & 0x7f) << shift)
         pos += 1
         if not (b & 0x80):
-            buffer
             result &= mask
             return result, pos
 

@@ -20,7 +20,7 @@ class AnacondaSignaturesEventListener(sublime_plugin.EventListener):
     doc = None
     signature = None
     exclude = (
-        'None', 'str', 'int', 'float', 'True',
+        'None', 'NoneType', 'str', 'int', 'float', 'True',
         'False', 'in', 'or', 'and', 'bool'
     )
 
@@ -60,21 +60,24 @@ class AnacondaSignaturesEventListener(sublime_plugin.EventListener):
                 i = data['doc'].split('<br>').index("")
             except ValueError:
                 self.signature = data['doc']
+                self.doc = ''
+                if self._signature_excluded(self.signature):
+                    return
                 if show_tooltip and show_doc and st_version >= 3070:
                     return self._show_popup(view)
                 return self._show_status(view)
 
             if show_tooltip and show_doc and st_version >= 3070:
                 self.doc = '<br>'.join(data['doc'].split('<br>')[i:])
+                self.doc = self.doc.replace("  ", "&nbsp;&nbsp;")
 
             if not show_tooltip or st_version < 3070:
                 self.signature = data['doc'].splitlines()[2]
             else:
                 self.signature = '<br>&nbsp;&nbsp;&nbsp;&nbsp;'.join(
                     data['doc'].split('<br>')[0:i])
-            if ('(' in self.signature and
-                    self.signature.split('(')[0].strip() not in self.exclude):
-                if self.signature is not None and self.signature != '':
+            if self.signature is not None and self.signature != '':
+                if not self._signature_excluded(self.signature):
                     if show_tooltip:
                         return self._show_popup(view)
 
@@ -107,3 +110,13 @@ class AnacondaSignaturesEventListener(sublime_plugin.EventListener):
         view.set_status(
             'anaconda_doc', 'Anaconda: {}'.format(self.signature)
         )
+
+    def _signature_excluded(self, signature):
+        """Whether to supress displaying information for the given signature.
+        """
+
+        # Check for the empty string first so the indexing in the next tests
+        # can't hit an exception, and we don't want to show an empty signature.
+        return ((signature == "") or
+                (signature.split('(', 1)[0].strip() in self.exclude) or
+                (signature.lstrip().split(None, 1)[0] in self.exclude))

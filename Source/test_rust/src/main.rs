@@ -1,7 +1,5 @@
 fn main() {
-    (1..)
-        .filter(|&x| x % 2 == 0)
-        .filter(|&x| x % 3 == 0)
-        .take(5)
-        .collect::<Vec<i32>>();
+    let mut x = std::collections::HashMap::new();
+    x.insert("Foo".to_string(), 42);
+    println!("{:?}", x);
 }

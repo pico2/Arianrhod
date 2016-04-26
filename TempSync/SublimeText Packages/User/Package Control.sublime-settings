@@ -43,6 +43,7 @@
 		"https://github.com/aviaryan/AutoHotkey",
 		"https://github.com/jrk/protobuf.sublime-package",
 		"https://github.com/wuub/SublimeREPL",
-		"https://github.com/Colorsublime/Colorsublime-Themes"
+		"https://github.com/Colorsublime/Colorsublime-Themes",
+		"https://github.com/rust-lang/sublime-rust"
 	]
 }
