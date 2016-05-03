@@ -10,8 +10,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"sync"
+	"strings"
 )
 
 //-------------------------------------------------------------------------
@@ -109,6 +109,7 @@ func (f *decl_file_cache) process_data(data []byte) {
 		anonymify_ast(d, 0, f.filescope)
 	}
 	f.packages = collect_package_imports(f.name, file.Decls, f.context)
+
 	f.decls = make(map[string]*decl, len(file.Decls))
 	for _, decl := range file.Decls {
 		append_to_top_decls(f.decls, decl, f.filescope)
@@ -148,19 +149,49 @@ func append_to_top_decls(decls map[string]*decl, decl ast.Decl, scope *scope) {
 	})
 }
 
+func normalizeSeparators(path string) string {
+    return strings.Replace(strings.Replace(path, "\\", "/", -1), "/", string(filepath.Separator), -1)
+}
+
+func findBestPath(dir string, context *package_lookup_context) (found string) {
+    maxlen := 0
+    dir = normalizeSeparators(dir)
+    srcPath := "src" + string(filepath.Separator)
+
+    for _, root := range filepath.SplitList(context.GOPATH) {
+        root = normalizeSeparators(root)
+        if strings.HasPrefix(dir, root) && len(root) > maxlen {
+            maxlen = len(root)
+            found = root
+            switch (found[len(found) - 1]) {
+                case '\\':
+                case '/':
+
+                default:
+                    found += string(filepath.Separator)
+            }
+
+            if dir[len(found):len(found) + 4] == srcPath {
+                found += srcPath
+            }
+        }
+    }
+    return
+}
+
 func abs_path_for_package(filename, p string, context *package_lookup_context) (string, bool) {
 	dir, _ := filepath.Split(filename)
 	if len(p) == 0 {
 		return "", false
 	}
 	if p[0] == '.' {
-		pkgpath := filepath.Join(dir, p)
-		bestPath := findBestPath(filepath.SplitList(context.GOPATH), pkgpath)
-		if len(bestPath) == 0 {
-			return pkgpath + ".a", true
+        pkgpath := filepath.Join(dir, p)
+        bestPath := findBestPath(pkgpath, context)
+        if len(bestPath) == 0 {
+            return pkgpath + ".a", true
 		}
 
-		p = pkgpath[len(bestPath):]
+        p = pkgpath[len(bestPath):]
 	}
 	pkg, ok := find_go_dag_package(p, dir)
 	if ok {
@@ -171,7 +202,7 @@ func abs_path_for_package(filename, p string, context *package_lookup_context) (
 
 func path_and_alias(imp *ast.ImportSpec) (string, string) {
 	path := ""
-	if imp.Path != nil && len(imp.Path.Value) > 0 {
+	if imp.Path != nil {
 		path = string(imp.Path.Value)
 		path = path[1 : len(path)-1]
 	}
@@ -204,7 +235,7 @@ func autobuild(p *build.Package) error {
 		return build_package(p)
 	}
 	pt := ps.ModTime()
-	fs, err := readdir_lstat(p.Dir)
+	fs, err := readdir(p.Dir)
 	if err != nil {
 		return err
 	}
@@ -231,23 +262,9 @@ func build_package(p *build.Package) error {
 		log.Printf("package object: %s", p.PkgObj)
 		log.Printf("package source dir: %s", p.Dir)
 		log.Printf("package source files: %v", p.GoFiles)
-		log.Printf("GOPATH: %v", g_daemon.context.GOPATH)
-		log.Printf("GOROOT: %v", g_daemon.context.GOROOT)
 	}
-	env := os.Environ()
-	for i, v := range env {
-		if strings.HasPrefix(v, "GOPATH=") {
-			env[i] = "GOPATH=" + g_daemon.context.GOPATH
-		} else if strings.HasPrefix(v, "GOROOT=") {
-			env[i] = "GOROOT=" + g_daemon.context.GOROOT
-		}
-	}
-
-	cmd := exec.Command("go", "install", p.ImportPath)
-	cmd.Env = env
-
 	// TODO: Should read STDERR rather than STDOUT.
-	out, err := cmd.CombinedOutput()
+	out, err := exec.Command("go", "install", p.ImportPath).Output()
 	if err != nil {
 		return err
 	}
@@ -336,7 +353,7 @@ func find_global_file(imp string, context *package_lookup_context) (string, bool
 		// it from client to server, make sure their editors set it, etc.
 		// So, whatever, let's just pretend it's always on.
 		package_path := context.CurrentPackagePath
-		for {
+		for i := 1; ; i++ {
 			limp := filepath.Join(package_path, "vendor", imp)
 			if p, err := context.Import(limp, "", build.AllowBinary|build.FindOnly); err == nil {
 				try_autobuild(p)
