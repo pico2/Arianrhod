@@ -210,13 +210,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    HANDLE event = CreateEventW(0, 0, 0, 0);
-
-    SetEvent(event);
-    SetEvent(event);
-
-    WaitForSingleObject(event, INFINITE);
-    WaitForSingleObject(event, INFINITE);
+    PrintLocaleDefaultAnsiCodePage();
 
     return;
 

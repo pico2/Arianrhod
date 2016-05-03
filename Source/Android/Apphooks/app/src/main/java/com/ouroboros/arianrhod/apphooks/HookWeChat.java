@@ -74,7 +74,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.a.d$3", pkg.classLoader, "d", byte[].class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "gpy"), "gpr", 0);
+                XposedHelpers.setObjectField(XposedHelpers.getObjectField(param.thisObject, "gvz"), "gvs", 0);
             }
         });
 
@@ -83,10 +83,10 @@ public class HookWeChat implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.sight.encode.ui.SightCameraView$1", pkg.classLoader, "jQ", new XC_MethodReplacement() {
             @Override
             protected Boolean replaceHookedMethod(MethodHookParam param) throws Throwable {
-                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gtw");
-                Object obj2 = XposedHelpers.getObjectField(obj1, "gtk");
+                Object obj1 = XposedHelpers.getObjectField(param.thisObject, "gzy");
+                Object obj2 = XposedHelpers.getObjectField(obj1, "gzl");
 
-                float v2 = ((Long)XposedHelpers.callMethod(obj2, "avt")).floatValue() / 6500.f;
+                float v2 = ((Long)XposedHelpers.callMethod(obj2, "awm")).floatValue() / 6500.f;
                 if (Float.compare(v2, 0.f) > 0) {
                     if (Float.compare(v2, 1f) <= 0) {
                         XposedHelpers.callMethod(obj1, "v", v2);
@@ -101,7 +101,7 @@ public class HookWeChat implements IXposedHookLoadPackage {
 
         // mm hit MM_DATA_SYSCMD_NEWXML_SUBTYPE_REVOKE
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "L", String.class, String.class, String.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.tencent.mm.sdk.platformtools.q", pkg.classLoader, "N", String.class, String.class, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //            HookLoadPackage.log("what the fuck");
