@@ -1,10 +1,15 @@
 package main
 
 import (
-    . "fmt"
     . "ml/dict"
     . "ml/strings"
     . "ml/trace"
+
+    "fmt"
+    "os"
+    "time"
+    "sync"
+    "path/filepath"
 
     "ml/console"
     "ml/strings"
@@ -12,13 +17,9 @@ import (
     "ml/io2"
     "ml/os2"
     "ml/random"
-    // "ml/pprof"
+    "ml/encoding/json"
+    "ml/signal"
 
-    "os"
-    "os/signal"
-    "time"
-    "sync"
-    "path/filepath"
     "github.com/PuerkitoBio/goquery"
 )
 
@@ -26,6 +27,12 @@ const (
     BASE_URL    = "http://bbs.saraba1st.com/2b/"
     FORUM_URL   = "http://bbs.saraba1st.com/2b/forum-75-1.html"
 )
+
+type Account struct {
+    UserName    String              `json:"username,omitempty"`
+    Password    String              `json:"password,omitempty"`
+    Cookie      String              `json:"cookie,omitempty"`
+}
 
 var exiting bool = false
 
@@ -94,7 +101,7 @@ func openThread(session *http.Session, user String) {
     credit := String(doc.Find("#extcreditmenu").Text())
     console.SetTitle(credit.Split(":", 1)[1])
 
-    Printf("[%s][%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), user, credit, t.Text())
+    fmt.Printf("[%s][%s] %s @ %s\n", time.Now().Format("2006-01-02 15:04:05"), user, credit, t.Text())
 
     session.Get(BASE_URL + href)
 }
@@ -111,37 +118,43 @@ func logout(session *http.Session) {
     })
 }
 
-func do(user, pass String) error {
+func do(user Account) {
     // user, pass := acc[0], acc[1]
 
+    if user.Cookie.IsEmpty() {
+        fmt.Printf("[%v] cookie required\n", user.UserName)
+        return
+    }
+
+    session := http.NewSession()
+    // session.SetProxy("localhost", 6789)
+    session.SetHeaders(Dict{
+        "Accept"            : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding"   : "gzip, deflate",
+        "Accept-Language"   : "zh-CN,en-US;q=0.8,en;q=0.5,zh-HK;q=0.3",
+        "User-Agent"        : "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:39.0) Gecko/20100101 Firefox/39.0",
+        "Content-Type"      : "application/x-www-form-urlencoded",
+        "Connection"        : "keep-alive",
+        "Cookie"            : user.Cookie,
+    })
+
     for exiting == false {
-        session := http.NewSession()
-        // session.SetProxy("localhost", 6789)
-        session.SetHeaders(Dict{
-            "Accept"            : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Encoding"   : "gzip, deflate",
-            "Accept-Language"   : "zh-CN,en-US;q=0.8,en;q=0.5,zh-HK;q=0.3",
-            "User-Agent"        : "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:39.0) Gecko/20100101 Firefox/39.0",
-            "Content-Type"      : "application/x-www-form-urlencoded",
-            "Connection"        : "keep-alive",
-        })
+        // for exiting == false {
+        //     exp := Try(func() {
+        //         login(session, user, pass)
+        //     })
 
-        for exiting == false {
-            exp := Try(func() {
-                login(session, user, pass)
-            })
+        //     if exp == nil {
+        //         break
+        //     }
 
-            if exp == nil {
-                break
-            }
-
-            Println(exp)
-            time.Sleep(time.Second)
-        }
+        //     fmt.Println(exp)
+        //     time.Sleep(time.Second)
+        // }
 
         for i := 0; i != 6 && exiting == false; i++ {
             exp := Try(func() {
-                        openThread(session, user)
+                        openThread(session, user.UserName)
                     })
 
             switch exp {
@@ -151,69 +164,49 @@ func do(user, pass String) error {
                     }
 
                 default:
-                    Println(exp)
+                    fmt.Println(exp)
                     time.Sleep(2 * time.Second)
             }
         }
 
-        Try(func() {
-            Println("logout")
-            logout(session)
-        })
+        // Try(func() {
+        //     fmt.Println("logout")
+        //     logout(session)
+        // })
     }
-
-    return nil
 }
 
-func readuser() []String {
-    usertxt := String(filepath.Join(filepath.Dir(os2.Executable()), "user.txt"))
-    acc := io2.ReadLines(usertxt)
-
-    if len(acc) < 2 {
-        Raise("corrupt user.txt")
-    }
-
-    return acc
+func readuser() (accounts []Account) {
+    json.MustUnmarshal(io2.ReadContent(filepath.Join(filepath.Dir(os2.Executable()), "users.json")), &accounts)
+    return
 }
 
 func main() {
     var exp *Exception
 
     defer func() {
-        Println(exp)
+        fmt.Println(exp)
         console.Pause("done")
     }()
 
     exp = Try(func() {
         users := readuser()
 
-        sigc := make(chan os.Signal, 10)
-        signal.Notify(sigc, os.Interrupt)
-
-        go func() {
-            for {
-                _, ok := <-sigc
-                if ok == false {
-                    break
-                }
-
+        signal.Notify(
+            func() {
                 exiting = true
-            }
-        }()
+            },
+            os.Interrupt,
+        )
 
         wg := sync.WaitGroup{}
 
-        for i := 0; i + 1 < len(users); i += 2 {
-            if users[i].Length() == 0 {
-                i--
-                continue
-            }
-
+        for _, u := range users {
             wg.Add(1)
-            go func(i int) {
-                do(users[i], users[i + 1])
+            go func(u Account) {
+                do(u)
                 wg.Done()
-            }(i)
+            }(u)
         }
 
         wg.Wait()

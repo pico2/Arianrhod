@@ -12,6 +12,9 @@ pause
 takeown.exe /f locale.nls
 icacls.exe locale.nls /grant administrators:F
 
+takeown.exe /f locale2.nls
+icacls.exe locale2.nls /grant administrators:F
+
 move /y locale.nls locale2.nls
 copy "%~dp0\locale.nls" .
 

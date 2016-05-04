@@ -169,6 +169,8 @@ public class HookWeChat implements IXposedHookLoadPackage {
             }
         });
 
+        if (true) return;
+
 //        XC_MethodHook nop = new XC_MethodHook() {
 //            @Override
 //            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {

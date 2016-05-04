@@ -206,11 +206,19 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
     return -1;  // Failure
 }
 
+#include "HookPort.cpp"
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintLocaleDefaultAnsiCodePage();
+    InstallHookPort();
+
+    ADD_FILTER_
+
+    NtTestAlert();
+
+    UnInstallHookPort();
 
     return;
 
