@@ -5,6 +5,7 @@ from gosubl import gsq
 from gosubl import sh
 import atexit
 import base64
+import glob
 import hashlib
 import json
 import os
@@ -22,6 +23,18 @@ PROC_ATTR_NAME = 'mg9.proc'
 TAG = about.VERSION
 INSTALL_VERSION = about.VERSION
 INSTALL_EXE = about.MARGO_EXE
+DEFAULT_EXT_SRC = '''
+package gosublime
+
+import (
+	"disposa.blue/margo"
+)
+
+func init() {
+	margo.Configure(func(o *margo.Opts) {
+	})
+}
+'''.lstrip()
 
 def gs_init(m={}):
 	global INSTALL_VERSION
@@ -38,7 +51,7 @@ def gs_init(m={}):
 		INSTALL_EXE = margo_exe
 
 	aso_install_vesion = gs.aso().get('install_version', '')
-	f = lambda: install(aso_install_vesion, False)
+	f = lambda: install(aso_install_vesion, bool(ext_main_file()))
 	gsq.do('GoSublime', f, msg='Installing MarGo', set_status=False)
 
 class Request(object):
@@ -135,12 +148,12 @@ def maybe_install():
 	if _inst_state() == '' and not _bins_exist():
 		install('', True)
 
-def install(aso_install_vesion, force_install):
+def install(aso_install_vesion, force_install, _reinstall=False):
 	global INSTALL_EXE
 
-	if _inst_state() != "":
+	if not _reinstall and _inst_state() != "":
 		gs.notify(DOMAIN, 'Installation aborted. Install command already called for GoSublime %s.' % INSTALL_VERSION)
-		return
+		return ''
 
 	INSTALL_EXE = INSTALL_EXE.replace('_%s.exe' % about.DEFAULT_GO_VERSION, '_%s.exe' % sh.GO_VERSION)
 	about.MARGO_EXE = INSTALL_EXE
@@ -151,18 +164,24 @@ def install(aso_install_vesion, force_install):
 
 	init_start = time.time()
 
-	if not is_update and not force_install and _bins_exist() and aso_install_vesion == INSTALL_VERSION:
+	if not _reinstall and not is_update and not force_install and _bins_exist() and aso_install_vesion == INSTALL_VERSION:
 		m_out = 'no'
 	else:
 		gs.notify('GoSublime', 'Installing MarGo')
 		start = time.time()
 
-		cmd = sh.Command(['go', 'build', '-v', '-x', '-o', INSTALL_EXE, 'gosubli.me/margo'])
+		cmd = sh.Command([
+			'go', 'build',
+			'-tags', 'gosublime' if ext_main_file() else '',
+			'-v',
+			'-o', INSTALL_EXE,
+			'disposa.blue/cmd/margo',
+		])
 		cmd.wd = gs.home_dir_path('bin')
 		cmd.env = {
 			'CGO_ENABLED': '0',
 			'GOBIN': '',
-			'GOPATH': gs.dist_path(),
+			'GOPATH': install_gopath(),
 		}
 
 		ev.debug('%s.build' % DOMAIN, {
@@ -171,7 +190,7 @@ def install(aso_install_vesion, force_install):
 		})
 
 		cr = cmd.run()
-		m_out = 'cmd: `%s`\nstdout: `%s`\nstderr: `%s`\nexception: `%s`' % (
+		m_out = 'cmd: `%s`\nstdout: `\n%s\n`\nstderr: `\n%s\n`\nexception: `%s`' % (
 			cr.cmd_lst,
 			cr.out.strip(),
 			cr.err.strip(),
@@ -262,7 +281,35 @@ def install(aso_install_vesion, force_install):
 		except Exception:
 			report_x()
 
-lastInstallTime = time.time()
+	return m_out
+
+def ext_pkg_path(*a):
+	return gs.user_path('src', 'gosublime', *a)
+
+def install_gopath():
+	return gs.user_path() + os.pathsep + gs.dist_path()
+
+def ext_main_file(install=False):
+	src_dir = ext_pkg_path()
+
+	def ext_fn():
+		l = sorted(glob.glob('%s/*.go' % src_dir))
+		return l[0] if l else ''
+
+	fn = ext_fn()
+	if fn or not install:
+		return fn
+
+	try:
+		gs.mkdirp(src_dir)
+		with open('%s/gosublime.go' % src_dir, 'x') as f:
+			f.write(DEFAULT_EXT_SRC)
+	except FileExistsError:
+		pass
+	except Exception:
+		gs.error_traceback(DOMAIN, status_txt='Cannot create default extension package')
+
+	return ext_fn()
 
 def calltip(fn, src, pos, quiet, f):
 	tid = ''
@@ -276,14 +323,7 @@ def calltip(fn, src, pos, quiet, f):
 		res = gs.dval(res.get('Candidates'), [])
 		f(res, err)
 
-	global lastInstallTime
-
-	alwaysInstall = False
-	if time.time() - lastInstallTime > 60:
-		lastInstallTime = time.time()
-		alwaysInstall = True
-
-	return acall('gocode_calltip', _complete_opts(fn, src, pos, True, alwaysInstall = alwaysInstall), cb)
+	return acall('gocode_calltip', _complete_opts(fn, src, pos, True), cb)
 
 def complete(fn, src, pos):
 	builtins = (gs.setting('autocomplete_builtins') is True or gs.setting('complete_builtins') is True)
@@ -312,28 +352,43 @@ def _complete_opts(fn, src, pos, builtins, *, alwaysInstall = False):
 	}
 
 def fmt(fn, src):
-	st = gs.settings_dict()
-	x = st.get('fmt_cmd')
-	if x:
-		env = sh.env()
-		x = [string.Template(s).safe_substitute(env) for s in x]
-		res, err = bcall('sh', {
-			'Env': env,
-			'Cmd': {
-					'Name': x[0],
-					'Args': x[1:],
-					'Input': src or '',
-			},
-		})
-		return res.get('out', ''), (err or res.get('err', ''))
+	fn = fn or ''
+	src = src or ''
+	fmt_cmd = gs.settings_dict().get('fmt_cmd')
+	if not fmt_cmd:
+		return _mg_fmt(fn, src)
 
+	env = sh.env()
+	fmt_cmd = [string.Template(s).safe_substitute(env) for s in fmt_cmd]
+	cmd_name = fmt_cmd[0]
+	cmd_args = fmt_cmd[1:]
+	res, err = bcall('sh', {
+		'Env': env,
+		'Cmd': {
+			'Name': cmd_name,
+			'Args': cmd_args,
+			'Input': src,
+		},
+	}, err_title=cmd_name)
+	err = err or res.get('err') or ''
+	cmd_src = '' if err else (res.get('out') or '')
+	if err:
+		mg_src, mg_err = _mg_fmt(fn, src)
+		if mg_src and not mg_err:
+			err = 'Used MarGo fmt because %s failed:\n\n%s' % (cmd_name, err)
+			cmd_src = mg_src
+
+	return cmd_src, err
+
+def _mg_fmt(fn, src):
 	res, err = bcall('fmt', {
-		'Fn': fn or '',
-		'Src': src or '',
-		'TabIndent': st.get('fmt_tab_indent'),
-		'TabWidth': st.get('fmt_tab_width'),
+		'Fn': fn,
+		'Src': src,
 	})
-	return res.get('src', ''), err
+	if err:
+		return '', err
+
+	return (res.get('src') or ''), ''
 
 def import_paths(fn, src, f):
 	tid = gs.begin(DOMAIN, 'Fetching import paths')
@@ -430,9 +485,11 @@ def share(src, f):
 def acall(method, arg, cb):
 	gs.mg9_send_q.put((method, arg, cb))
 
-def bcall(method, arg):
+def bcall(method, arg, err_title=''):
+	err_title = err_title or method
+
 	if _inst_state() != "done":
-		return {}, 'Blocking call(%s) aborted: Install is not done' % method
+		return {}, 'Blocking call(%s) aborted: Install is not done' % err_title
 
 	q = gs.queue.Queue()
 	acall(method, arg, lambda r,e: q.put((r, e)))
@@ -441,7 +498,7 @@ def bcall(method, arg):
 		res, err = q.get(True, timeout)
 		return res, err
 	except:
-		return {}, 'Blocking Call(%s) Timed out after %0.3f second(s). You might need to increase the `ipc_timeout` setting' % (method, timeout)
+		return {}, 'Blocking Call(%s) timed out after %0.3f second(s). You might need to increase the `ipc_timeout` setting' % (err_title, timeout)
 
 def expand_jdata(v):
 	if gs.is_a(v, {}):
