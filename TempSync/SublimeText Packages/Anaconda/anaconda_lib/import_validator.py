@@ -41,13 +41,13 @@ class Validator:
             return True
 
         error = []
-        error_string = 'can\'t import {}'
+        error_string = 'can\'t import {0}'
         valid = True
         for word in module_line.split():
             if word in ('from', 'import', 'as'):
                 continue
 
-            offset = module_line.find(word) + len(word) / 2
+            offset = int(module_line.find(word) + len(word) / 2)
             if not Script(
                     module_line, 1, offset, self.filename).goto_assignments():
                 if valid is True:
