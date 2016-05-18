@@ -250,36 +250,6 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
     ULONG_PTR *p, rva[] =
     {
 /*
-        0x9D60,         // freeSessionData
-        0x3546A0,       // getDeviceId
-        0x354570,       // getDeviceId2
-
-        0x3555A0,       // loadCoreFP
-        0x355A20,       // initScInfo
-
-        // 0x2D890,        // kbsyncSetupSession
-        0x16880,        // kbsyncCreateSession
-        0x2D890,        // kbsyncInitSomething
-        0x197C0,        // KbsyncAuthorizeDsid
-        0x36020,        // KbsyncDsidBindMachine
-        0x17780,        // kbsyncCloseSession
-
-        0x7D80,         // sapCreateSession
-        0xC960,         // sapCloseSession
-        0x8CD0,         // sapExchangeData
-        0x2ACE0,        // sapCreatePrimeSignature
-        0x3B100,        // sapVerifyPrimeSignature
-        0x3A350,        // sapSignData
-
-        0x113C0,        // airFairVerifyRequest
-        0x33090,        // airFairSyncCreateSession
-        0x34460,        // airFairSyncSetRequest
-        0x35270,        // airFairSyncAddAccount
-        0x313B0,        // airFairSyncGetAuthorizedAccount
-        0x07DE0,        // airFairSyncGetResponse
-        0x10630,        // airFairSyncSignData
-*/
-
         0x000052E0,     // freeSessionData
         0x004B8DA0,     // getDeviceId
         0x004B8C70,     // getDeviceId2
@@ -315,13 +285,54 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x0000EE80,     // airFairSyncGetAuthorizedAccount
         0x00005350,     // airFairSyncGetResponse
         0x0000ACD0,     // airFairSyncSignData
+*/
+
+        0xFFFFFFFF,     // freeSessionData
+        0xFFFFFFFF,     // getDeviceId
+        0xFFFFFFFF,     // getDeviceId2
+
+        0xFFFFFFFF,     // kbsyncCreateSession
+        0xFFFFFFFF,     // kbsyncValidate
+        0xFFFFFFFF,     // kbsyncInitSomething
+        0xFFFFFFFF,     // kbsyncGetData
+        0xFFFFFFFF,     // kbsyncImport
+        0xFFFFFFFF,     // KbsyncAuthorizeDsid
+        0xFFFFFFFF,     // KbsyncDsidBindMachine
+        0xFFFFFFFF,     // kbsyncCloseSession
+        0xFFFFFFFF,     // kbsyncAuthorizeDsid2
+        0xFFFFFFFF,     // kbsyncAuthorizeDsid3
+
+        0xFFFFFFFF,     // machineDataStartProvisioning
+        0xFFFFFFFF,     // machineDataFinishProvisioning
+        0xFFFFFFFF,     // machineDataFree
+        0xFFFFFFFF,     // machineDataClose
+        0xFFFFFFFF,     // machineDataGetData
+
+        0xFFFFFFFF,     // sapCreateSession
+        0xFFFFFFFF,     // sapCloseSession
+        0xFFFFFFFF,     // sapExchangeData
+        0xFFFFFFFF,     // sapCreatePrimeSignature
+        0x00047600,     // sapVerifyPrimeSignature
+        0x000B0EF0,     // sapSignData
+
+        0xFFFFFFFF,     // airFairVerifyRequest
+        0xFFFFFFFF,     // airFairSyncCreateSession
+        0xFFFFFFFF,     // airFairSyncSetRequest
+        0xFFFFFFFF,     // airFairSyncAddAccount
+        0xFFFFFFFF,     // airFairSyncGetAuthorizedAccount
+        0xFFFFFFFF,     // airFairSyncGetResponse
+        0xFFFFFFFF,     // airFairSyncSignData
+
+        0x000E5AD0,     // encryptJsSpToken @ signStorePlatformRequestData
     };
 
     func = (PVOID *)&this->iTunes;
     FOR_EACH(p, rva, countof(rva))
     {
-        *func++ = PtrAdd(this->iTunesBase, *p);
+        *func++ = PtrAdd(*p == 0xFFFFFFFF ? nullptr : this->iTunesBase, *p);
     }
+
+    this->iTunes.searchRoutines(this->iTunesBase);
 
     return STATUS_SUCCESS;
 }
@@ -719,5 +730,18 @@ AirFairSyncSignData(
     PULONG      signatureLength
 )
 {
-    return iTunes.airFairSyncSignData(grappaSessionId, data, dataLength, signature, signatureLength);
+    return this->iTunes.airFairSyncSignData(grappaSessionId, data, dataLength, signature, signatureLength);
+}
+
+/************************************************************************
+  misc
+************************************************************************/
+NTSTATUS
+iTunesHelper::
+EncryptJsSpToken(
+    ULONG_PTR   method,
+    PVOID       sha1
+)
+{
+    return this->iTunes.encryptJsSpToken(method, sha1);
 }

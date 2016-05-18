@@ -230,6 +230,22 @@ typedef struct
         PULONG      signatureLength
     );
 
+
+    /*++
+
+        misc
+
+    --*/
+
+    NTSTATUS
+    (CDECL
+    *encryptJsSpToken)(
+        ULONG_PTR   method,
+        PVOID       sha1
+    );
+
+    NTSTATUS searchRoutines(PVOID itunes);
+
 } iTunesRoutines;
 
 class iTunesHelper
@@ -467,6 +483,19 @@ public:
         ULONG_PTR   dataLength,
         PVOID*      signature,
         PULONG      signatureLength
+    );
+
+
+    /*++
+
+        misc
+
+    --*/
+
+    NTSTATUS
+    EncryptJsSpToken(
+        ULONG_PTR   method,
+        PVOID       sha1
     );
 
 protected:

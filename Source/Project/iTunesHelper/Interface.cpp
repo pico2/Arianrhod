@@ -42,6 +42,8 @@
 #pragma comment(linker, "/EXPORT:MachineDataClose=_MachineDataClose@4")
 #pragma comment(linker, "/EXPORT:MachineDataGetData=_MachineDataGetData@24")
 
+#pragma comment(linker, "/EXPORT:EncryptJsSpToken=_EncryptJsSpToken@8")
+
 iTunesHelper *helper;
 
 EXTC NTSTATUS NTAPI Initialize()
@@ -426,4 +428,19 @@ MachineDataGetData(
 )
 {
     return helper->MachineDataGetData(dsid, data, dataSize, signature, signatureSize);
+}
+
+
+/************************************************************************
+  misc
+************************************************************************/
+EXTC
+NTSTATUS
+NTAPI
+EncryptJsSpToken(
+    ULONG_PTR   method,
+    PVOID       sha1
+)
+{
+    return helper->EncryptJsSpToken(method, sha1);
 }
