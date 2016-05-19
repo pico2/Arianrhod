@@ -212,13 +212,10 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    InstallHookPort();
+    PVOID d = LoadDll(L"D:\\Desktop\\Source\\GoProject\\src\\iTunesTool\\iTunesHelper.dll");
 
-    ADD_FILTER_
-
-    NtTestAlert();
-
-    UnInstallHookPort();
+    GetRoutineAddress(d, "test");
+    _asm call eax;
 
     return;
 
