@@ -263,7 +263,6 @@ protected:
 
 public:
     iTunesHelper();
-    ~iTunesHelper();
 
     NTSTATUS iTunesInitialize();
 

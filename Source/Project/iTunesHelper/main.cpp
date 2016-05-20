@@ -59,21 +59,3 @@ BOOL WINAPI DllMain(PVOID BaseAddress, ULONG Reason, PVOID Reserved)
 
     return TRUE;
 }
-
-EXTC_EXPORT VOID CDECL test()
-{
-    iTunesHelper hlp;
-
-    hlp.iTunesInitialize();
-
-    HANDLE sap;
-    FAIR_PLAY_HW_INFO hwinfo;
-
-    hwinfo.length = 6;
-    *(PULONG)&hwinfo.deviceId[0] = GetRandom32();
-    *(PUSHORT)&hwinfo.deviceId[4] = GetRandom32();
-
-    hlp.SapCreateSession(&sap, &hwinfo);
-
-    //hlp.SapExchangeData(0xD2, &hwinfo)
-}

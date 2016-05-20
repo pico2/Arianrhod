@@ -121,17 +121,6 @@ iTunesHelper::iTunesHelper()
     RtlInitializeCriticalSectionAndSpinCount(&this->SapLock, 4000);
 }
 
-iTunesHelper::~iTunesHelper()
-{
-    RtlDeleteCriticalSection(&this->DeviceCallbacksLock);
-    RtlDeleteCriticalSection(&this->SapLock);
-
-    if (this->Initialized)
-    {
-        Ldr::UnloadPeImage(this->iTunesBase);
-    }
-}
-
 NTSTATUS iTunesHelper::iTunesInitialize()
 {
     using namespace Mp;
@@ -185,24 +174,18 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     {
         using namespace Mp;
 
-        PBYTE ATAddAppleSearchPathsToEnvironmentFromReg;
-
-        ATAddAppleSearchPathsToEnvironmentFromReg = (PBYTE)GetRoutineAddress(AirTrafficHost->DllBase, "ATAddAppleSearchPathsToEnvironmentFromReg");
-        if (ATAddAppleSearchPathsToEnvironmentFromReg != nullptr && *ATAddAppleSearchPathsToEnvironmentFromReg != 0xE9)
+        PATCH_MEMORY_DATA p[] =
         {
-            PATCH_MEMORY_DATA p[] =
-            {
-                FunctionJumpVa(
-                    ATAddAppleSearchPathsToEnvironmentFromReg,
-                    (API_POINTER(NtTestAlert))[]() -> NTSTATUS { return 0; }
-                ),
+            FunctionJumpVa(
+                GetRoutineAddress(AirTrafficHost->DllBase, "ATAddAppleSearchPathsToEnvironmentFromReg"),
+                (API_POINTER(NtTestAlert))[]() -> NTSTATUS { return 0; }
+            ),
 
-                MemoryPatchVa((ULONG64)ItRegOpenKeyExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA)),
-                MemoryPatchVa((ULONG64)ItRegQueryValueExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA)),
-            };
+            MemoryPatchVa((ULONG64)ItRegOpenKeyExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA)),
+            MemoryPatchVa((ULONG64)ItRegQueryValueExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA)),
+        };
 
-            PatchMemory(p, countof(p), nullptr);
-        }
+        PatchMemory(p, countof(p), nullptr);
     }
 
     this->LoadiTunesRoutines();
@@ -266,7 +249,7 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
     PVOID *func;
     ULONG_PTR *p, rva[] =
     {
-#if 0
+/*
         0x000052E0,     // freeSessionData
         0x004B8DA0,     // getDeviceId
         0x004B8C70,     // getDeviceId2
@@ -302,7 +285,8 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x0000EE80,     // airFairSyncGetAuthorizedAccount
         0x00005350,     // airFairSyncGetResponse
         0x0000ACD0,     // airFairSyncSignData
-#else
+*/
+
         0xFFFFFFFF,     // freeSessionData
         0xFFFFFFFF,     // getDeviceId
         0xFFFFFFFF,     // getDeviceId2
@@ -340,8 +324,6 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0xFFFFFFFF,     // airFairSyncSignData
 
         0x000E5AD0,     // encryptJsSpToken @ signStorePlatformRequestData
-
-#endif
     };
 
     func = (PVOID *)&this->iTunes;

@@ -3,10 +3,6 @@
 #pragma comment(linker, "/EXPORT:Initialize=_Initialize@0")
 #pragma comment(linker, "/EXPORT:FreeMemory=_FreeMemory2@4")
 #pragma comment(linker, "/EXPORT:iTunesFreeMemory=_iTunesFreeMemory@4")
-#pragma comment(linker, "/EXPORT:iTunesHelperFreeMemory=_iTunesHelperFreeMemory@8")
-
-#pragma comment(linker, "/EXPORT:iTunesHelperCreate=_iTunesHelperCreate@0")
-#pragma comment(linker, "/EXPORT:iTunesHelperRelease=_iTunesHelperRelease@4")
 
 #pragma comment(linker, "/EXPORT:DeviceNotificationSubscribe=_DeviceNotificationSubscribe@8")
 #pragma comment(linker, "/EXPORT:DeviceWaitForDeviceConnectionChanged=_DeviceWaitForDeviceConnectionChanged@4")
@@ -26,12 +22,12 @@
 #pragma comment(linker, "/EXPORT:iOSDeviceIsJailBroken=_iOSDeviceIsJailBroken@4")
 #pragma comment(linker, "/EXPORT:iOSDeviceAuthorizeDsids=_iOSDeviceAuthorizeDsids@24")
 
-#pragma comment(linker, "/EXPORT:SapCreateSession=_SapCreateSession@12")
-#pragma comment(linker, "/EXPORT:SapCloseSession=_SapCloseSession@8")
-#pragma comment(linker, "/EXPORT:SapCreatePrimeSignature=_SapCreatePrimeSignature@16")
-#pragma comment(linker, "/EXPORT:SapVerifyPrimeSignature=_SapVerifyPrimeSignature@16")
-#pragma comment(linker, "/EXPORT:SapExchangeData=_SapExchangeData@32")
-#pragma comment(linker, "/EXPORT:SapSignData=_SapSignData@24")
+#pragma comment(linker, "/EXPORT:SapCreateSession=_SapCreateSession@8")
+#pragma comment(linker, "/EXPORT:SapCloseSession=_SapCloseSession@4")
+#pragma comment(linker, "/EXPORT:SapCreatePrimeSignature=_SapCreatePrimeSignature@12")
+#pragma comment(linker, "/EXPORT:SapVerifyPrimeSignature=_SapVerifyPrimeSignature@12")
+#pragma comment(linker, "/EXPORT:SapExchangeData=_SapExchangeData@28")
+#pragma comment(linker, "/EXPORT:SapSignData=_SapSignData@20")
 
 #pragma comment(linker, "/EXPORT:KbsyncCreateSession=_KbsyncCreateSession@16")
 #pragma comment(linker, "/EXPORT:KbsyncValidate=_KbsyncValidate@4")
@@ -74,35 +70,12 @@ EXTC NTSTATUS NTAPI Initialize()
     return status;
 }
 
-EXTC PVOID NTAPI iTunesHelperCreate()
-{
-    iTunesHelper *hlp = new iTunesHelper;
-
-    if (NT_FAILED(hlp->iTunesInitialize()))
-    {
-        delete hlp;
-        return nullptr;
-    }
-
-    return hlp;
-}
-
-EXTC VOID NTAPI iTunesHelperRelease(iTunesHelper *hlp)
-{
-    delete hlp;
-}
-
 EXTC VOID NTAPI FreeMemory2(PVOID p)
 {
     FreeMemoryP(p);
 }
 
 EXTC VOID NTAPI iTunesFreeMemory(PVOID p)
-{
-    helper->FreeSessionData(p);
-}
-
-EXTC VOID NTAPI iTunesHelperFreeMemory(iTunesHelper *helper, PVOID p)
 {
     helper->FreeSessionData(p);
 }
@@ -261,22 +234,22 @@ EXTC NTSTATUS NTAPI iOSDeviceAuthorizeDsids(iOSDevice &Device, PCSTR SCInfoPath,
   sap
 ************************************************************************/
 
-EXTC NTSTATUS NTAPI SapCreateSession(iTunesHelper *helper, PHANDLE SapSession, PFAIR_PLAY_HW_INFO DeviceId)
+EXTC NTSTATUS NTAPI SapCreateSession(PHANDLE SapSession, PFAIR_PLAY_HW_INFO DeviceId)
 {
     return helper->SapCreateSession(SapSession, DeviceId);
 }
 
-EXTC NTSTATUS NTAPI SapCloseSession(iTunesHelper *helper, HANDLE SapSession)
+EXTC NTSTATUS NTAPI SapCloseSession(HANDLE SapSession)
 {
     return helper->SapCloseSession(SapSession);
 }
 
-EXTC NTSTATUS NTAPI SapCreatePrimeSignature(iTunesHelper *helper, HANDLE SapSession, PVOID* Output, PULONG_PTR OutputSize)
+EXTC NTSTATUS NTAPI SapCreatePrimeSignature(HANDLE SapSession, PVOID* Output, PULONG_PTR OutputSize)
 {
     return helper->SapCreatePrimeSignature(SapSession, Output, OutputSize);
 }
 
-EXTC NTSTATUS NTAPI SapVerifyPrimeSignature(iTunesHelper *helper, HANDLE SapSession, PVOID Signature, ULONG_PTR SignatureSize)
+EXTC NTSTATUS NTAPI SapVerifyPrimeSignature(HANDLE SapSession, PVOID Signature, ULONG_PTR SignatureSize)
 {
     return helper->SapVerifyPrimeSignature(SapSession, Signature, SignatureSize);
 }
@@ -285,7 +258,6 @@ EXTC
 NTSTATUS
 NTAPI
 SapExchangeData(
-    iTunesHelper*       helper,
     HANDLE              SapSession,
     ULONG_PTR           CertType,
     PFAIR_PLAY_HW_INFO  DeviceId,
@@ -302,7 +274,6 @@ EXTC
 NTSTATUS
 NTAPI
 SapSignData(
-    iTunesHelper *helper,
     HANDLE      SapSession,
     PVOID       Data,
     ULONG_PTR   DataSize,
