@@ -1,12 +1,14 @@
 package main
 
 import (
+    "github.com/PuerkitoBio/goquery"
     . "ml/strings"
     . "ml/dict"
     "fmt"
     "os"
     "ml/io2"
     "ml/net/http"
+    "ml/html"
 )
 
 func checkDuplicate() {
@@ -35,19 +37,13 @@ func checkDuplicate() {
 }
 
 func main() {
-    s := http.NewSession()
-    s.SetSocks5Proxy("inke.norn7.com", 47777, nil)
-    // s.SetProxy("localhost", 6789)
+    doc := html.Parse(String(io2.ReadContent(`D:\Desktop\New Text Document.html`)))
+    // paymentName := doc.Find("span.payment-name").Parent()
+    // info := paymentName.Parent()
+    // action := info.Next()
+    // edit := action.Find("a.see-all")
 
-    s.SetHeaders(Dict{
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, sdch",
-        "Accept-Language": "en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
-        "Upgrade-Insecure-Requests": "1",
-    })
+    edit := doc.Find("a.see-all[href]").Eq(2)
 
-    // resp := s.Post("http://ip.taobao.com/service/getIpInfo2.php", Dict{"body": []byte("ip=myip")})
-    resp := s.Get("https://www.baidu.com/s?ie=UTF-8&wd=ip")
-    fmt.Printf("%s\n", resp.Content)
+    fmt.Println(edit.Attr2("href"), edit.Text())
 }
