@@ -1,49 +1,5 @@
 #include "stdafx.h"
 
-#pragma comment(linker, "/EXPORT:Initialize=_Initialize@0")
-#pragma comment(linker, "/EXPORT:FreeMemory=_FreeMemory2@4")
-#pragma comment(linker, "/EXPORT:iTunesFreeMemory=_iTunesFreeMemory@4")
-
-#pragma comment(linker, "/EXPORT:DeviceNotificationSubscribe=_DeviceNotificationSubscribe@8")
-#pragma comment(linker, "/EXPORT:DeviceWaitForDeviceConnectionChanged=_DeviceWaitForDeviceConnectionChanged@4")
-
-#pragma comment(linker, "/EXPORT:iOSDeviceCreate=_iOSDeviceCreate@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceClose=_iOSDeviceClose@4")
-#pragma comment(linker, "/EXPORT:iOSDeviceConnect=_iOSDeviceConnect@4")
-#pragma comment(linker, "/EXPORT:iOSDeviceDisconnect=_iOSDeviceDisconnect@4")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetProductType=_iOSDeviceGetProductType@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetDeviceName=_iOSDeviceGetDeviceName@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetDeviceClass=_iOSDeviceGetDeviceClass@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetProductVersion=_iOSDeviceGetProductVersion@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetCpuArchitecture=_iOSDeviceGetCpuArchitecture@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetActivationState=_iOSDeviceGetActivationState@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetUniqueDeviceID=_iOSDeviceGetUniqueDeviceID@8")
-#pragma comment(linker, "/EXPORT:iOSDeviceGetUniqueDeviceIDData=_iOSDeviceGetUniqueDeviceIDData@12")
-#pragma comment(linker, "/EXPORT:iOSDeviceIsJailBroken=_iOSDeviceIsJailBroken@4")
-#pragma comment(linker, "/EXPORT:iOSDeviceAuthorizeDsids=_iOSDeviceAuthorizeDsids@24")
-
-#pragma comment(linker, "/EXPORT:SapCreateSession=_SapCreateSession@8")
-#pragma comment(linker, "/EXPORT:SapCloseSession=_SapCloseSession@4")
-#pragma comment(linker, "/EXPORT:SapCreatePrimeSignature=_SapCreatePrimeSignature@12")
-#pragma comment(linker, "/EXPORT:SapVerifyPrimeSignature=_SapVerifyPrimeSignature@12")
-#pragma comment(linker, "/EXPORT:SapExchangeData=_SapExchangeData@28")
-#pragma comment(linker, "/EXPORT:SapSignData=_SapSignData@20")
-
-#pragma comment(linker, "/EXPORT:KbsyncCreateSession=_KbsyncCreateSession@16")
-#pragma comment(linker, "/EXPORT:KbsyncValidate=_KbsyncValidate@4")
-#pragma comment(linker, "/EXPORT:KbsyncGetData=_KbsyncGetData@28")
-#pragma comment(linker, "/EXPORT:KbsyncImport=_KbsyncImport@12")
-#pragma comment(linker, "/EXPORT:KbsyncCloseSession=_KbsyncCloseSession@4")
-#pragma comment(linker, "/EXPORT:KbsyncSaveDsid=_KbsyncSaveDsid@12")
-
-#pragma comment(linker, "/EXPORT:MachineDataStartProvisioning=_MachineDataStartProvisioning@28")
-#pragma comment(linker, "/EXPORT:MachineDataFinishProvisioning=_MachineDataFinishProvisioning@20")
-#pragma comment(linker, "/EXPORT:MachineDataFree=_MachineDataFree@4")
-#pragma comment(linker, "/EXPORT:MachineDataClose=_MachineDataClose@4")
-#pragma comment(linker, "/EXPORT:MachineDataGetData=_MachineDataGetData@24")
-
-#pragma comment(linker, "/EXPORT:EncryptJsSpToken=_EncryptJsSpToken@8")
-
 iTunesHelper *helper;
 
 EXTC NTSTATUS NTAPI Initialize()

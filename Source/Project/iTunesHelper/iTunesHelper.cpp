@@ -2,7 +2,11 @@
 
 #pragma warning(disable:4715)
 
-#define ITUNES_DLL_PATH     L"iTunesDLL"
+#if ML_X86
+    #define ITUNES_DLL_PATH     L"iTunesDLL"
+#else
+    #define ITUNES_DLL_PATH L"iTunesDLL64"
+#endif
 
 /************************************************************************
   init
@@ -146,19 +150,27 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 
 #if 0
 
+#if ML_X86
     Rtl::EnvironmentAppend(PUSTR(L"Path"), PUSTR(L"C:\\Program Files (x86)\\iTunes"));
+#else
+    Rtl::EnvironmentAppend(PUSTR(L"Path"), PUSTR(L"C:\\Program Files\\iTunes"));
+#endif
 
     this->iTunesBase = Ldr::LoadDll(L"iTunesCore.dll");
     LdrDisableThreadCalloutsForDll(this->iTunesBase);
+
+    DebugLog(L"load %s\\iTunesCore.dll at %p", ExePath, this->iTunesBase);
 
 #else
 
     status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + L";");
     status = Ldr::LoadPeImage(ExePath + L"\\iTunesCore.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
-    DebugLog(L"load %s\\iTunesCore.dll: %p", ExePath, status);
+    DebugLog(L"load %s\\iTunesCore.dll at %p: %p", ExePath, this->iTunesBase, status);
     FAIL_RETURN(status);
 
-    ((PIMAGE_TLS_CALLBACK)PtrAdd(this->iTunesBase, ImageNtHeaders(this->iTunesBase)->OptionalHeader.AddressOfEntryPoint))(this->iTunesBase, DLL_PROCESS_ATTACH, nullptr);
+    DebugLog(L"call entry point");
+    //((PIMAGE_TLS_CALLBACK)PtrAdd(this->iTunesBase, ImageNtHeaders(this->iTunesBase)->OptionalHeader.AddressOfEntryPoint))(this->iTunesBase, DLL_PROCESS_ATTACH, nullptr);
+    DebugLog(L"call entry point end");
 
     *(PVOID *)&StubRegOpenKeyExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA), ItRegOpenKeyExA);
     *(PVOID *)&StubRegQueryValueExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), ItRegQueryValueExA);
@@ -174,12 +186,28 @@ NTSTATUS iTunesHelper::iTunesInitialize()
     {
         using namespace Mp;
 
+        PVOID ATAddAppleSearchPathsToEnvironmentFromReg;
+
+        static BYTE ReturnStub[] =
+        {
+            // xor eax, eax
+            // ret
+            0x33, 0xC0, 0xC3,
+        };
+
+        ATAddAppleSearchPathsToEnvironmentFromReg = GetRoutineAddress(AirTrafficHost->DllBase, "ATAddAppleSearchPathsToEnvironmentFromReg");
+        Mm::WriteProtectMemory(CurrentProcess, ATAddAppleSearchPathsToEnvironmentFromReg, ReturnStub, sizeof(ReturnStub));
+
         PATCH_MEMORY_DATA p[] =
         {
+#if 0
+
             FunctionJumpVa(
                 GetRoutineAddress(AirTrafficHost->DllBase, "ATAddAppleSearchPathsToEnvironmentFromReg"),
                 (API_POINTER(NtTestAlert))[]() -> NTSTATUS { return 0; }
             ),
+
+#endif
 
             MemoryPatchVa((ULONG64)ItRegOpenKeyExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA)),
             MemoryPatchVa((ULONG64)ItRegQueryValueExA, sizeof(PVOID), LookupImportTable(AirTrafficHost->DllBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA)),
@@ -286,7 +314,7 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0x00005350,     // airFairSyncGetResponse
         0x0000ACD0,     // airFairSyncSignData
 */
-
+#if ML_X86
         0xFFFFFFFF,     // freeSessionData
         0xFFFFFFFF,     // getDeviceId
         0xFFFFFFFF,     // getDeviceId2
@@ -324,6 +352,45 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
         0xFFFFFFFF,     // airFairSyncSignData
 
         0x000E5AD0,     // encryptJsSpToken @ signStorePlatformRequestData
+#else
+        0xFFFFFFFF,     // freeSessionData
+        0xFFFFFFFF,     // getDeviceId
+        0xFFFFFFFF,     // getDeviceId2
+
+        0xFFFFFFFF,     // kbsyncCreateSession
+        0xFFFFFFFF,     // kbsyncValidate
+        0xFFFFFFFF,     // kbsyncInitSomething
+        0xFFFFFFFF,     // kbsyncGetData
+        0xFFFFFFFF,     // kbsyncImport
+        0xFFFFFFFF,     // KbsyncAuthorizeDsid
+        0xFFFFFFFF,     // KbsyncDsidBindMachine
+        0xFFFFFFFF,     // kbsyncCloseSession
+        0xFFFFFFFF,     // kbsyncAuthorizeDsid2
+        0xFFFFFFFF,     // kbsyncAuthorizeDsid3
+
+        0xFFFFFFFF,     // machineDataStartProvisioning
+        0xFFFFFFFF,     // machineDataFinishProvisioning
+        0xFFFFFFFF,     // machineDataFree
+        0xFFFFFFFF,     // machineDataClose
+        0xFFFFFFFF,     // machineDataGetData
+
+        0xFFFFFFFF,     // sapCreateSession
+        0xFFFFFFFF,     // sapCloseSession
+        0xFFFFFFFF,     // sapExchangeData
+        0xFFFFFFFF,     // sapCreatePrimeSignature
+        0x00047600,     // sapVerifyPrimeSignature
+        0x1800864C0,     // sapSignData
+
+        0xFFFFFFFF,     // airFairVerifyRequest
+        0xFFFFFFFF,     // airFairSyncCreateSession
+        0xFFFFFFFF,     // airFairSyncSetRequest
+        0xFFFFFFFF,     // airFairSyncAddAccount
+        0xFFFFFFFF,     // airFairSyncGetAuthorizedAccount
+        0xFFFFFFFF,     // airFairSyncGetResponse
+        0xFFFFFFFF,     // airFairSyncSignData
+
+        0x000E5AD0,     // encryptJsSpToken @ signStorePlatformRequestData
+#endif
     };
 
     func = (PVOID *)&this->iTunes;
