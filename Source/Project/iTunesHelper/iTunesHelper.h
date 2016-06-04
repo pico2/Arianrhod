@@ -124,8 +124,9 @@ typedef struct
     (CDECL*
     sapCreatePrimeSignature)(
         HANDLE      sapSession,
-        ULONG       _64,
-        ULONG64     zero,
+        ULONG_PTR   _64,
+        ULONG_PTR   zero1,
+        ULONG_PTR   zero2,
         PVOID*      output,
         PULONG_PTR  outputSize
     );

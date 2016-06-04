@@ -25,6 +25,7 @@ SearchSignatureAndReverseSearchHeader(
 
 PVOID search_freeSessionData(PVOID itunes)
 {
+    // under sapSignData
     static BYTE sig[] =
     {
         0x81, 0xF1, 0x11, 0x1B, 0xE4, 0x1C,  // xor     ecx, 1CE41B11h
@@ -163,6 +164,25 @@ NTSTATUS search_sapCreateSession_sapExchangeData_sapCloseSession_getDeviceId(PVO
         .text:10ED451D 8B F8                    mov     edi, eax
         .text:10ED451F 83 C4 08                 add     esp, 8
         .text:10ED4522 81 FF 58 5A FF FF        cmp     edi, 0FFFF5A58h
+
+        .text:10ED4516 50                                      push    eax
+        .text:10ED4517 53                                      push    ebx
+        .text:10ED4518 E8 83 1A 19 FF                          call    sapCreateSession
+        .text:10ED451D 8B F8                                   mov     edi, eax                 <-- edi
+        .text:10ED451F 83 C4 08                                add     esp, 8
+        .text:10ED4522 81 FF 58 5A FF FF                       cmp     edi, 0FFFF5A58h
+        .text:10ED4528 75 28                                   jnz     short loc_10ED4552
+        .text:10ED452A 80 3D A5 EC B7 11 00                    cmp     byte_11B7ECA5, 0
+        .text:10ED4531 0F 85 AD 01 00 00                       jnz     loc_10ED46E4
+        .text:10ED4537 E8 B4 58 5E FF                          call    sub_104B9DF0
+        .text:10ED453C 8D 45 C4                                lea     eax, [ebp+var_3C]
+        .text:10ED453F C6 05 A5 EC B7 11 01                    mov     byte_11B7ECA5, 1
+        .text:10ED4546 50                                      push    eax
+        .text:10ED4547 53                                      push    ebx
+        .text:10ED4548 E8 53 1A 19 FF                          call    sapCreateSession
+
+        "Content-Type", "application/octet-stream"
+
     */
 
     PVOID Found;

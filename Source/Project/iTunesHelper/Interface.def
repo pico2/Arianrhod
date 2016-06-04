@@ -1,4 +1,6 @@
 EXPORTS
+	test
+
 	Initialize
 	FreeMemory
 	iTunesFreeMemory

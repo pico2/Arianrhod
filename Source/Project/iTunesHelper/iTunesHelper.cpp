@@ -164,18 +164,41 @@ NTSTATUS iTunesHelper::iTunesInitialize()
 #else
 
     status = Rtl::EnvironmentAppend(PUSTR(L"Path"), ExePath + L";");
+
+#if ML_X86
     status = Ldr::LoadPeImage(ExePath + L"\\iTunesCore.dll", &this->iTunesBase, nullptr, LOAD_PE_DLL_NOT_FOUND_CONTINUE);
+#elif ML_AMD64
+    status = LdrLoadDll(nullptr, nullptr, ExePath + L"\\iTunesCore.dll", &this->iTunesBase);
+#endif
+
     DebugLog(L"load %s\\iTunesCore.dll at %p: %p", ExePath, this->iTunesBase, status);
     FAIL_RETURN(status);
 
-    DebugLog(L"call entry point");
-    //((PIMAGE_TLS_CALLBACK)PtrAdd(this->iTunesBase, ImageNtHeaders(this->iTunesBase)->OptionalHeader.AddressOfEntryPoint))(this->iTunesBase, DLL_PROCESS_ATTACH, nullptr);
-    DebugLog(L"call entry point end");
+#if ML_X86
+
+    ((PIMAGE_TLS_CALLBACK)PtrAdd(this->iTunesBase, ImageNtHeaders(this->iTunesBase)->OptionalHeader.AddressOfEntryPoint))(this->iTunesBase, DLL_PROCESS_ATTACH, nullptr);
 
     *(PVOID *)&StubRegOpenKeyExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA), ItRegOpenKeyExA);
     *(PVOID *)&StubRegQueryValueExA = _InterlockedExchangePointer((PVOID *)LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA), ItRegQueryValueExA);
 
-#endif
+#elif ML_AMD64
+    PVOID RegOpenKeyExA, RegQueryValueExA, ptr;
+
+    RegOpenKeyExA = LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegOpenKeyExA);
+    RegQueryValueExA = LookupImportTable(iTunesBase, "ADVAPI32.dll", KERNEL32_RegQueryValueExA);
+
+    *(PVOID *)&StubRegOpenKeyExA    = *(PVOID *)RegOpenKeyExA;
+    *(PVOID *)&StubRegQueryValueExA = *(PVOID *)RegQueryValueExA;
+
+    ptr = ItRegOpenKeyExA;
+    Mm::WriteProtectMemory(CurrentProcess, RegOpenKeyExA, &ptr, sizeof(ptr));
+
+    ptr = ItRegQueryValueExA;
+    Mm::WriteProtectMemory(CurrentProcess, RegQueryValueExA, &ptr, sizeof(ptr));
+
+#endif // arch
+
+#endif // load test
 
     PVOID Address;
     PLDR_MODULE AirTrafficHost = FindLdrModuleByName(PUSTR(L"AirTrafficHost.dll"));
@@ -353,53 +376,55 @@ NTSTATUS iTunesHelper::LoadiTunesRoutines()
 
         0x000E5AD0,     // encryptJsSpToken @ signStorePlatformRequestData
 #else
-        0xFFFFFFFF,     // freeSessionData
-        0xFFFFFFFF,     // getDeviceId
-        0xFFFFFFFF,     // getDeviceId2
+        0x64D00,    // freeSessionData
+        ~0u,        // getDeviceId
+        ~0u,        // getDeviceId2
 
-        0xFFFFFFFF,     // kbsyncCreateSession
-        0xFFFFFFFF,     // kbsyncValidate
-        0xFFFFFFFF,     // kbsyncInitSomething
-        0xFFFFFFFF,     // kbsyncGetData
-        0xFFFFFFFF,     // kbsyncImport
-        0xFFFFFFFF,     // KbsyncAuthorizeDsid
-        0xFFFFFFFF,     // KbsyncDsidBindMachine
-        0xFFFFFFFF,     // kbsyncCloseSession
-        0xFFFFFFFF,     // kbsyncAuthorizeDsid2
-        0xFFFFFFFF,     // kbsyncAuthorizeDsid3
+        ~0u,        // kbsyncCreateSession
+        ~0u,        // kbsyncValidate
+        ~0u,        // kbsyncInitSomething
+        ~0u,        // kbsyncGetData
+        ~0u,        // kbsyncImport
+        ~0u,        // KbsyncAuthorizeDsid
+        ~0u,        // KbsyncDsidBindMachine
+        ~0u,        // kbsyncCloseSession
+        ~0u,        // kbsyncAuthorizeDsid2
+        ~0u,        // kbsyncAuthorizeDsid3
 
-        0xFFFFFFFF,     // machineDataStartProvisioning
-        0xFFFFFFFF,     // machineDataFinishProvisioning
-        0xFFFFFFFF,     // machineDataFree
-        0xFFFFFFFF,     // machineDataClose
-        0xFFFFFFFF,     // machineDataGetData
+        ~0u,        // machineDataStartProvisioning
+        ~0u,        // machineDataFinishProvisioning
+        ~0u,        // machineDataFree
+        ~0u,        // machineDataClose
+        ~0u,        // machineDataGetData
 
-        0xFFFFFFFF,     // sapCreateSession
-        0xFFFFFFFF,     // sapCloseSession
-        0xFFFFFFFF,     // sapExchangeData
-        0xFFFFFFFF,     // sapCreatePrimeSignature
-        0x00047600,     // sapVerifyPrimeSignature
-        0x1800864C0,     // sapSignData
+        0x34800,    // sapCreateSession
+        0x32390,    // sapCloseSession
+        0x46D10,    // sapExchangeData
+        0x95930,    // sapCreatePrimeSignature
+        0x4B9D0,    // sapVerifyPrimeSignature  @ X_Apple_ActionSignature
+        0x864C0,    // sapSignData
 
-        0xFFFFFFFF,     // airFairVerifyRequest
-        0xFFFFFFFF,     // airFairSyncCreateSession
-        0xFFFFFFFF,     // airFairSyncSetRequest
-        0xFFFFFFFF,     // airFairSyncAddAccount
-        0xFFFFFFFF,     // airFairSyncGetAuthorizedAccount
-        0xFFFFFFFF,     // airFairSyncGetResponse
-        0xFFFFFFFF,     // airFairSyncSignData
+        ~0u,        // airFairVerifyRequest
+        ~0u,        // airFairSyncCreateSession
+        ~0u,        // airFairSyncSetRequest
+        ~0u,        // airFairSyncAddAccount
+        ~0u,        // airFairSyncGetAuthorizedAccount
+        ~0u,        // airFairSyncGetResponse
+        ~0u,        // airFairSyncSignData
 
-        0x000E5AD0,     // encryptJsSpToken @ signStorePlatformRequestData
+        0xD5DD0,    // encryptJsSpToken @ signStorePlatformRequestData
 #endif
     };
 
     func = (PVOID *)&this->iTunes;
     FOR_EACH(p, rva, countof(rva))
     {
-        *func++ = PtrAdd(*p == 0xFFFFFFFF ? nullptr : this->iTunesBase, *p);
+        *func++ = PtrAdd(*p == ~0u ? nullptr : this->iTunesBase, *p);
     }
 
+#if ML_X86
     this->iTunes.searchRoutines(this->iTunesBase);
+#endif
 
     return STATUS_SUCCESS;
 }
@@ -574,8 +599,10 @@ NTSTATUS iTunesHelper::SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO d
 {
     PROTECT_SECTION(&this->SapLock)
     {
+        DebugLog(L"create sap %p", this->iTunes.sapCreateSession);
+#if 1
         return this->iTunes.sapCreateSession(sapSession, deviceId);
-/*
+#else
         NTSTATUS Status;
         HANDLE Thread;
 
@@ -603,7 +630,7 @@ NTSTATUS iTunesHelper::SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO d
         NtClose(Thread);
 
         return Status;
-*/
+#endif
     }
 }
 
@@ -619,7 +646,7 @@ NTSTATUS iTunesHelper::SapCreatePrimeSignature(HANDLE sapSession, PVOID* output,
 {
     PROTECT_SECTION(&this->SapLock)
     {
-        return this->iTunes.sapCreatePrimeSignature(sapSession, 0x64, 0, output, outputSize);
+        return this->iTunes.sapCreatePrimeSignature(sapSession, 0x64, 0, 0, output, outputSize);
     }
 }
 

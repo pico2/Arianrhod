@@ -122,100 +122,19 @@ void quick_sort(int *array, int count)
 
 #include "iTunes/iTunes.h"
 
-VOID SaveToBmpFile(HDC dc)
-{
-    PBYTE buffer;
-    HBITMAP bitmap = (HBITMAP)GetCurrentObject(dc, OBJ_BITMAP);
-    BITMAP bmp;
-    IMAGE_BITMAP_HEADER header;
-    BITMAPINFO bmi;
-    LONG_PTR stride;
-
-    GetObjectW(bitmap, sizeof(bmp), &bmp);
-    InitBitmapHeader(&header, bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel, &stride);
-
-    bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-    bmi.bmiHeader.biWidth = bmp.bmWidth;
-    bmi.bmiHeader.biHeight = bmp.bmHeight;
-    bmi.bmiHeader.biPlanes = bmp.bmPlanes;
-    bmi.bmiHeader.biBitCount = bmp.bmBitsPixel;
-    bmi.bmiHeader.biClrUsed = 0;
-    bmi.bmiHeader.biCompression = BI_RGB;
-    bmi.bmiHeader.biSizeImage = header.FileSize;
-    bmi.bmiHeader.biClrImportant = 0;
-
-    buffer = (PBYTE)AllocateMemory(header.FileSize);
-
-    GetDIBits(dc, bitmap, 0, bmp.bmHeight, buffer, &bmi, DIB_RGB_COLORS);
-
-    PBYTE b = buffer;
-
-    for (LONG h = bmp.bmHeight; h != 0; --h)
-    {
-        PBYTE p = b;
-        for (LONG w = bmp.bmWidth; w != 0; --w)
-        {
-            p[3] = 0;
-            p += 4;
-        }
-
-        b += stride;
-    }
-
-    NtFileDisk bin;
-    bin.Create(L"d:\\desktop\\picture.bmp");
-    bin.Write(&header, sizeof(header));
-    bin.Write(buffer, header.FileSize);
-    bin.Seek(header.FileSize);
-    bin.SetEndOfFile();
-}
-
-#include <gdiplus.h>
-#pragma comment(lib, "Gdiplus.lib")
-
-using namespace Gdiplus;
-
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
-{
-    UINT  num = 0;          // number of image encoders
-    UINT  size = 0;         // size of the image encoder array in bytes
-
-    ImageCodecInfo* pImageCodecInfo = NULL;
-
-    GetImageEncodersSize(&num, &size);
-    if(size == 0)
-        return -1;  // Failure
-
-    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-    if(pImageCodecInfo == NULL)
-        return -1;  // Failure
-
-    GetImageEncoders(num, size, pImageCodecInfo);
-
-    for(UINT j = 0; j < num; ++j)
-    {
-        if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
-        {
-            *pClsid = pImageCodecInfo[j].Clsid;
-            free(pImageCodecInfo);
-            return j;  // Success
-        }
-    }
-
-    free(pImageCodecInfo);
-    return -1;  // Failure
-}
-
-#include "HookPort.cpp"
-
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PVOID d = LoadDll(L"D:\\Desktop\\Source\\GoProject\\src\\iTunesTool\\iTunesHelper.dll");
+    PVOID d = LoadDll(L"D:\\Desktop\\Source\\GoProject\\src\\iTunesTool\\iTunesHelper64.dll");
 
-    GetRoutineAddress(d, "test");
-    _asm call eax;
+    API_POINTER(NtTestAlert) test;
+    
+    *(PVOID *)&test = GetRoutineAddress(d, "test");
+    test();
+
+    PauseConsole(L"done");
+    Ps::ExitProcess(0);
 
     return;
 

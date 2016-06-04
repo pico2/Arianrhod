@@ -400,3 +400,29 @@ EncryptJsSpToken(
 {
     return helper->EncryptJsSpToken(method, sha1);
 }
+
+
+VOID test()
+{
+    ::Initialize();
+
+    FAIR_PLAY_HW_INFO hwinfo;
+    HANDLE sap;
+    NtFileMemory cert;
+    PVOID output;
+    ULONG_PTR outputSize;
+
+    hwinfo.length = 6;
+    *(PULONG)&hwinfo.deviceId[0] = 0x12345678;
+    *(PUSHORT)&hwinfo.deviceId[4] = 0xABCD;
+
+    SapCreateSession(&sap, &hwinfo);
+
+    cert.Open(L"D:\\Desktop\\cert.bin");
+
+    SapExchangeData(sap, 0xD2, &hwinfo, cert, cert, &output, &outputSize);
+
+    iTunesFreeMemory(output);
+
+    SapCloseSession(sap);
+}
