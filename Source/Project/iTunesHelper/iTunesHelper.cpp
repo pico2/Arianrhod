@@ -599,7 +599,6 @@ NTSTATUS iTunesHelper::SapCreateSession(PHANDLE sapSession, PFAIR_PLAY_HW_INFO d
 {
     PROTECT_SECTION(&this->SapLock)
     {
-        DebugLog(L"create sap %p", this->iTunes.sapCreateSession);
 #if 1
         return this->iTunes.sapCreateSession(sapSession, deviceId);
 #else
