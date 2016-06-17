@@ -2,7 +2,7 @@
 //
 // This file is part of the QtDesigner Python extension module.
 //
-// Copyright (c) 2015 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2016 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt5.
 // 
@@ -26,7 +26,7 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
 %Copying
-Copyright (c) 2015 Riverbank Computing Limited <info@riverbankcomputing.com>
+Copyright (c) 2016 Riverbank Computing Limited <info@riverbankcomputing.com>
 
 This file is part of PyQt5.
 
@@ -64,9 +64,9 @@ WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 %Include propertysheet.sip
 %Include qextensionmanager.sip
 %Include taskmenu.sip
+%Include qpydesignercontainerextension.sip
+%Include qpydesignercustomwidgetcollectionplugin.sip
+%Include qpydesignercustomwidgetplugin.sip
 %Include qpydesignermembersheetextension.sip
 %Include qpydesignerpropertysheetextension.sip
-%Include qpydesignercontainerextension.sip
-%Include qpydesignercustomwidgetplugin.sip
 %Include qpydesignertaskmenuextension.sip
-%Include qpydesignercustomwidgetcollectionplugin.sip

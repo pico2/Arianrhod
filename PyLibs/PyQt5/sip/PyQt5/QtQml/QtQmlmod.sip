@@ -2,7 +2,7 @@
 //
 // This file is part of the QtQml Python extension module.
 //
-// Copyright (c) 2015 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2016 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt5.
 // 
@@ -26,7 +26,7 @@
 %Import QtNetwork/QtNetworkmod.sip
 
 %Copying
-Copyright (c) 2015 Riverbank Computing Limited <info@riverbankcomputing.com>
+Copyright (c) 2016 Riverbank Computing Limited <info@riverbankcomputing.com>
 
 This file is part of PyQt5.
 
@@ -67,5 +67,5 @@ WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 %Include qqmlpropertyvaluesource.sip
 %Include qqmlscriptstring.sip
 %Include qmlattachedpropertiesobject.sip
-%Include qpyqmllistproperty.sip
 %Include qmlregistertype.sip
+%Include qpyqmllistproperty.sip
