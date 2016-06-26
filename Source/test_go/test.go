@@ -3,9 +3,11 @@ package main
 import (
     "github.com/PuerkitoBio/goquery"
     . "ml/strings"
+    . "ml/trace"
     . "ml/dict"
     "fmt"
     "os"
+    "time"
     "ml/io2"
     "ml/net/http"
     "ml/html"
@@ -37,13 +39,18 @@ func checkDuplicate() {
 }
 
 func main() {
-    doc := html.Parse(String(io2.ReadContent(`D:\Desktop\New Text Document.html`)))
-    // paymentName := doc.Find("span.payment-name").Parent()
-    // info := paymentName.Parent()
-    // action := info.Next()
-    // edit := action.Find("a.see-all")
+    for i := 0; i != 500; i++ {
+        go func() {
+            for {
+                Try(func() {
+                    h := http.NewSession()
+                    defer h.Close()
+                    h.SetProxy("localhost", 48888)
+                    h.Get("http://www.qq.com")
+                })
+            }
+        }()
+    }
 
-    edit := doc.Find("a.see-all[href]").Eq(2)
-
-    fmt.Println(edit.Attr2("href"), edit.Text())
+    time.Sleep(time.Hour)
 }
