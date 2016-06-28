@@ -1,0 +1,16 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Python.File\shellex\DropHandler]
+@="{60254CA5-953B-11CF-8C96-00AA00B8708C}"
+
+[HKEY_CLASSES_ROOT\Python.ArchiveFile\shellex\DropHandler]
+@="{60254CA5-953B-11CF-8C96-00AA00B8708C}"
+
+[HKEY_CLASSES_ROOT\Python.CompiledFile\shellex\DropHandler]
+@="{60254CA5-953B-11CF-8C96-00AA00B8708C}"
+
+[HKEY_CLASSES_ROOT\Python.NoConArchiveFile\shellex\DropHandler]
+@="{60254CA5-953B-11CF-8C96-00AA00B8708C}"
+
+[HKEY_CLASSES_ROOT\Python.NoConFile\shellex\DropHandler]
+@="{60254CA5-953B-11CF-8C96-00AA00B8708C}"
