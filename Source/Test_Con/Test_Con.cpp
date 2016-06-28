@@ -126,14 +126,12 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PVOID d = LoadDll(L"D:\\Desktop\\Source\\GoProject\\src\\iTunesTool\\iTunesHelper64.dll");
+    LOOP_FOREVER
+    {
+        AllocateMemory(1 * 1024 * 1024 * 1024);
+        PauseConsole(L"next");
+    }
 
-    API_POINTER(NtTestAlert) test;
-    
-    *(PVOID *)&test = GetRoutineAddress(d, "test");
-    test();
-
-    PauseConsole(L"done");
     Ps::ExitProcess(0);
 
     return;
