@@ -153,17 +153,24 @@ static DLL_HOOK_ENTRY Hooks[] =
     { IUSTR(L"AppUtil.dll"),        HookAppUtil },
     { IUSTR(L"Common.dll"),         HookCommon },
     { IUSTR(L"KernelUtil.dll"),     HookKernelUtil },
+
     //{ IUSTR(L"GroupApp.dll"),   HookGroupApp },
+
     { IUSTR(L"AppMisc.dll"),        HookAppMisc },
     { IUSTR(L"MainFrame.dll"),      HookMainFrame },
     { IUSTR(L"ntdll.dll"),          HookNtdll },
-    { IUSTR(L"psapi.dll"),          HookPsapi },
+
+    //{ IUSTR(L"psapi.dll"),          HookPsapi },
+
     { IUSTR(L"user32.dll"),         HookUser32 },
     { IUSTR(L"Camera.dll"),         HookCamera },
     { IUSTR(L"IM.dll"),             HookIM },
+
     //{ IUSTR(L"AppFramework.dll"),   HookAppFramework },
     //{ IUSTR(L"MsgMgr.dll"),         HookMsgMgr },
     //{ IUSTR(L"GDI32.dll"),      HookGdi32 },
+
+    {},
 };
 
 BOOL Initialize2(PVOID BaseAddress)
@@ -179,8 +186,11 @@ BOOL Initialize2(PVOID BaseAddress)
     LdrDisableThreadCalloutsForDll(BaseAddress);
 
     Self = FindLdrModuleByHandle(nullptr);
-    //if (RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ.exe"), TRUE) == FALSE)
-    //    return TRUE;
+    if (RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ.exe"), TRUE) == FALSE &&
+        RtlEqualUnicodeString(&Self->BaseDllName, &USTR(L"QQ2.exe"), TRUE) == FALSE)
+    {
+        return TRUE;
+    }
 
     InitializeQqFunctionTable();
 

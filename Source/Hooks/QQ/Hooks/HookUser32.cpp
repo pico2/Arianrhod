@@ -247,7 +247,7 @@ NTSTATUS HookUser32(PVOID BaseAddress)
     PATCH_MEMORY_DATA Function_user32[] =
     {
         FunctionJumpVa(LookupExportTable(BaseAddress, USER32_SetWindowPos), QqSetWindowPos, &StubSetWindowPos),
-        FunctionJumpVa(LookupExportTable(BaseAddress, USER32_PostMessageW), QqPostMessageW, &StubPostMessageW)
+        //FunctionJumpVa(LookupExportTable(BaseAddress, USER32_PostMessageW), QqPostMessageW, &StubPostMessageW)
     };
 
     return PatchMemory(Function_user32, countof(Function_user32), BaseAddress);
