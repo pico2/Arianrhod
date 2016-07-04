@@ -126,13 +126,7 @@ ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    LOOP_FOREVER
-    {
-        AllocateMemory(1 * 1024 * 1024 * 1024);
-        PauseConsole(L"next");
-    }
-
-    Ps::ExitProcess(0);
+    PrintLocaleDefaultAnsiCodePage();
 
     return;
 
