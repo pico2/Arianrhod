@@ -60,7 +60,7 @@ func (a *AutoInstOptions) install() {
 	}
 
 	roots := []string{}
-	alwaysInstall := a.Env["ALWAYS_INSTALL"] == "1"
+	forceInstall := a.Env["FORCE_INSTALL"] == "1"
 	goSrc := a.Env["GOROOT"] + "/src/"
 	gopath := pathList(a.Env["GOPATH"])
 
@@ -112,11 +112,11 @@ func (a *AutoInstOptions) install() {
 		}
 
 		switch {
-			case alwaysInstall,
+			case forceInstall,
 				 len(vendor) != 0 && vendorArchiveOk(roots, vendorArchive) == false,
 				 len(vendor) == 0 && archiveOk(fn) == false:
 
-				var cmd *exec.Cmd
+			var cmd *exec.Cmd
 
 				switch {
 					case len(vendor) != 0:
@@ -124,20 +124,20 @@ func (a *AutoInstOptions) install() {
 						cmd.Dir = vendor
 
 					case sfx == "":
-						cmd = exec.Command("go", "install", path)
+				cmd = exec.Command("go", "install", path)
 
 					default:
-						cmd = exec.Command("go", "install", "-installsuffix", sfx, path)
-				}
+				cmd = exec.Command("go", "install", "-installsuffix", sfx, path)
+			}
 
-				cmd.Env = el
-				cmd.Stderr = ioutil.Discard
-				cmd.Stdout = ioutil.Discard
-				cmd.Run()
+			cmd.Env = el
+			cmd.Stderr = ioutil.Discard
+			cmd.Stdout = ioutil.Discard
+			cmd.Run()
 
-				if alwaysInstall == false && archiveOk(fn) {
-					installed = append(installed, path)
-				}
+				if forceInstall == false && archiveOk(fn) {
+				installed = append(installed, path)
+			}
 		}
 	}
 

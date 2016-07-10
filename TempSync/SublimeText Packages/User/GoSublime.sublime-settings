@@ -69,7 +69,7 @@
     ],
 
     "env": {
-        "GOPATH": "D:/Dev/go/pkgs;D:/Desktop/Source/GoProject;D:/Desktop/Source/Project/Private;D:/Desktop/Source/Falcom",
+        "GOPATH": "D:/Dev/go/pkgs;D:/Dev/Source/GoProject;D:/Dev/Source/Project/Private;D:/Dev/Source/Falcom",
         "GOROOT": "D:/Dev/go",
         "PATH": "$GOROOT/bin;$PATH"
     },

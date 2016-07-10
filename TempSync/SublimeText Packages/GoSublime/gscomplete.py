@@ -277,7 +277,7 @@ def _ct_poller():
 	except Exception:
 		pass
 
-	sublime.set_timeout(_ct_poller, 2000)
+	sublime.set_timeout(_ct_poller, 1000)
 
 class GsShowCallTip(sublime_plugin.TextCommand):
 	def is_enabled(self):
