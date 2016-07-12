@@ -1,9 +1,9 @@
 """Implementation of basic magic functions."""
 
 from __future__ import print_function
+from __future__ import absolute_import
 
 import io
-import json
 import sys
 from pprint import pformat
 
@@ -13,9 +13,9 @@ from IPython.core.magic import Magics, magics_class, line_magic, magic_escapes
 from IPython.utils.text import format_screen, dedent, indent
 from IPython.testing.skipdoctest import skip_doctest
 from IPython.utils.ipstruct import Struct
-from IPython.utils.path import unquote_filename
 from IPython.utils.py3compat import unicode_type
-from IPython.utils.warn import warn, error
+from warnings import warn
+from logging import error
 
 
 class MagicsDisplay(object):
@@ -194,8 +194,6 @@ class BasicMagics(Magics):
         mode = ''
         try:
             mode = parameter_s.split()[0][1:]
-            if mode == 'rest':
-                rest_docs = []
         except IndexError:
             pass
 
@@ -247,7 +245,7 @@ NOTE: If you have 'automagic' enabled (via the command line option or with the
 magics; cell magics always require an explicit '%%' escape.  By default,
 IPython ships with automagic on, so you should only rarely need the % escape.
 
-Example: typing '%cd mydir' (without the quotes) changes you working directory
+Example: typing '%cd mydir' (without the quotes) changes your working directory
 to 'mydir', if it exists.
 
 For a list of the available magic functions, use %lsmagic. For a description
@@ -327,7 +325,7 @@ Currently the magic system has the following functions:""",
         """
         def color_switch_err(name):
             warn('Error changing %s color schemes.\n%s' %
-                 (name, sys.exc_info()[1]))
+                 (name, sys.exc_info()[1]), stacklevel=2)
 
 
         new_scheme = parameter_s.strip()
@@ -337,32 +335,13 @@ Currently the magic system has the following functions:""",
         # local shortcut
         shell = self.shell
 
-        import IPython.utils.rlineimpl as readline
-
-        if not shell.colors_force and \
-                not readline.have_readline and \
-                (sys.platform == "win32" or sys.platform == "cli"):
-            msg = """\
-Proper color support under MS Windows requires the pyreadline library.
-You can find it at:
-http://ipython.org/pyreadline.html
-
-Defaulting color scheme to 'NoColor'"""
-            new_scheme = 'NoColor'
-            warn(msg)
-
-        # readline option is 0
-        if not shell.colors_force and not shell.has_readline:
-            new_scheme = 'NoColor'
-
-        # Set prompt colors
+        # Set shell colour scheme
         try:
-            shell.prompt_manager.color_scheme = new_scheme
+            shell.colors = new_scheme
+            shell.refresh_style()
         except:
-            color_switch_err('prompt')
-        else:
-            shell.colors = \
-                   shell.prompt_manager.color_scheme_table.active_scheme_name
+            color_switch_err('shell')
+
         # Set exception colors
         try:
             shell.InteractiveTB.set_colors(scheme = new_scheme)
@@ -434,7 +413,6 @@ Defaulting color scheme to 'NoColor'"""
 
         # Shorthands
         shell = self.shell
-        pm = shell.prompt_manager
         meta = shell.meta
         disp_formatter = self.shell.display_formatter
         ptformatter = disp_formatter.formatters['text/plain']
@@ -449,23 +427,17 @@ Defaulting color scheme to 'NoColor'"""
         save_dstore('xmode',shell.InteractiveTB.mode)
         save_dstore('rc_separate_out',shell.separate_out)
         save_dstore('rc_separate_out2',shell.separate_out2)
-        save_dstore('rc_prompts_pad_left',pm.justify)
         save_dstore('rc_separate_in',shell.separate_in)
         save_dstore('rc_active_types',disp_formatter.active_types)
-        save_dstore('prompt_templates',(pm.in_template, pm.in2_template, pm.out_template))
 
-        if mode == False:
+        if not mode:
             # turn on
-            pm.in_template = '>>> '
-            pm.in2_template = '... '
-            pm.out_template = ''
 
             # Prompt separators like plain python
             shell.separate_in = ''
             shell.separate_out = ''
             shell.separate_out2 = ''
 
-            pm.justify = False
 
             ptformatter.pprint = False
             disp_formatter.active_types = ['text/plain']
@@ -473,22 +445,22 @@ Defaulting color scheme to 'NoColor'"""
             shell.magic('xmode Plain')
         else:
             # turn off
-            pm.in_template, pm.in2_template, pm.out_template = dstore.prompt_templates
-
             shell.separate_in = dstore.rc_separate_in
 
             shell.separate_out = dstore.rc_separate_out
             shell.separate_out2 = dstore.rc_separate_out2
-
-            pm.justify = dstore.rc_prompts_pad_left
 
             ptformatter.pprint = dstore.rc_pprint
             disp_formatter.active_types = dstore.rc_active_types
 
             shell.magic('xmode ' + dstore.xmode)
 
+        # mode here is the state before we switch; switch_doctest_mode takes
+        # the mode we're switching to.
+        shell.switch_doctest_mode(not mode)
+
         # Store new mode and inform
-        dstore.mode = bool(1-int(mode))
+        dstore.mode = bool(not mode)
         mode_label = ['OFF','ON'][dstore.mode]
         print('Doctest mode is:', mode_label)
 
@@ -597,7 +569,6 @@ Defaulting color scheme to 'NoColor'"""
         args = magic_arguments.parse_argstring(self.notebook, s)
 
         from nbformat import write, v4
-        args.filename = unquote_filename(args.filename)
         if args.export:
             cells = []
             hist = list(self.shell.history_manager.get_range())

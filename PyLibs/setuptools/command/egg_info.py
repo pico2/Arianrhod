@@ -13,6 +13,7 @@ import sys
 import io
 import warnings
 import time
+import collections
 
 from setuptools.extern import six
 from setuptools.extern.six.moves import map
@@ -51,8 +52,10 @@ class egg_info(Command):
     ]
 
     boolean_options = ['tag-date', 'tag-svn-revision']
-    negative_opt = {'no-svn-revision': 'tag-svn-revision',
-                    'no-date': 'tag-date'}
+    negative_opt = {
+        'no-svn-revision': 'tag-svn-revision',
+        'no-date': 'tag-date',
+    }
 
     def initialize_options(self):
         self.egg_name = None
@@ -66,14 +69,20 @@ class egg_info(Command):
         self.vtags = None
 
     def save_version_info(self, filename):
-        values = dict(
-            egg_info=dict(
-                tag_svn_revision=0,
-                tag_date=0,
-                tag_build=self.tags(),
-            )
-        )
-        edit_config(filename, values)
+        """
+        Materialize the values of svn_revision and date into the
+        build tag. Install these keys in a deterministic order
+        to avoid arbitrary reordering on subsequent builds.
+        """
+        # python 2.6 compatibility
+        odict = getattr(collections, 'OrderedDict', dict)
+        egg_info = odict()
+        # follow the order these keys would have been added
+        # when PYTHONHASHSEED=0
+        egg_info['tag_build'] = self.tags()
+        egg_info['tag_date'] = 0
+        egg_info['tag_svn_revision'] = 0
+        edit_config(filename, dict(egg_info=egg_info))
 
     def finalize_options(self):
         self.egg_name = safe_name(self.distribution.get_name())
@@ -190,6 +199,10 @@ class egg_info(Command):
         if self.tag_build:
             version += self.tag_build
         if self.tag_svn_revision:
+            warnings.warn(
+                "tag_svn_revision is deprecated and will not be honored "
+                "in a future release"
+            )
             version += '-r%s' % self.get_svn_revision()
         if self.tag_date:
             version += time.strftime("-%Y%m%d")

@@ -1,27 +1,17 @@
 """Tests for the object inspection functionality.
 """
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2010-2011 The IPython Development Team.
-#
-#  Distributed under the terms of the BSD License.
-#
-#  The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 from __future__ import print_function
 
-# Stdlib imports
 import os
 import re
 import sys
 
-# Third-party imports
 import nose.tools as nt
 
-# Our own imports
 from .. import oinspect
 from IPython.core.magic import (Magics, magics_class, line_magic,
                                 cell_magic, line_cell_magic,
@@ -32,6 +22,7 @@ from IPython.testing.decorators import skipif
 from IPython.testing.tools import AssertPrints
 from IPython.utils.path import compress_user
 from IPython.utils import py3compat
+from IPython.utils.signatures import Signature, Parameter
 
 
 #-----------------------------------------------------------------------------
@@ -49,7 +40,7 @@ ip = get_ipython()
 # defined, if any code is inserted above, the following line will need to be
 # updated.  Do NOT insert any whitespace between the next line and the function
 # definition below.
-THIS_LINE_NUMBER = 52  # Put here the actual number of this line
+THIS_LINE_NUMBER = 43  # Put here the actual number of this line
 def test_find_source_lines():
     nt.assert_equal(oinspect.find_source_lines(test_find_source_lines), 
                     THIS_LINE_NUMBER+1)
@@ -120,6 +111,14 @@ class Call(object):
     def method(self, x, z=2):
         """Some method's docstring"""
 
+class HasSignature(object):
+    """This is the class docstring."""
+    __signature__ = Signature([Parameter('test', Parameter.POSITIONAL_OR_KEYWORD)])
+
+    def __init__(self, *args):
+        """This is the init docstring"""
+
+
 class SimpleClass(object):
     def method(self, x, z=2):
         """Some method's docstring"""
@@ -171,6 +170,36 @@ class SimpleMagics(Magics):
 class Awkward(object):
     def __getattr__(self, name):
         raise Exception(name)
+
+class NoBoolCall:
+    """
+    callable with `__bool__` raising should still be inspect-able.
+    """
+
+    def __call__(self):
+        """does nothing"""
+        pass
+
+    def __bool__(self):
+        """just raise NotImplemented"""
+        raise NotImplementedError('Must be implemented')
+
+
+class SerialLiar(object):
+    """Attribute accesses always get another copy of the same class.
+
+    unittest.mock.call does something similar, but it's not ideal for testing
+    as the failure mode is to eat all your RAM. This gives up after 10k levels.
+    """
+    def __init__(self, max_fibbing_twig, lies_told=0):
+        if lies_told > 10000:
+            raise RuntimeError('Nose too long, honesty is the best policy')
+        self.max_fibbing_twig = max_fibbing_twig
+        self.lies_told = lies_told
+        max_fibbing_twig[0] = max(max_fibbing_twig[0], lies_told)
+
+    def __getattr__(self, item):
+        return SerialLiar(self.max_fibbing_twig, self.lies_told + 1)
 
 
 def check_calltip(obj, name, call, docstring):
@@ -241,7 +270,8 @@ def test_info():
     nt.assert_equal(i['type_name'], 'type')
     expted_class = str(type(type))  # <class 'type'> (Python 3) or <type 'type'>
     nt.assert_equal(i['base_class'], expted_class)
-    nt.assert_equal(i['string_form'], "<class 'IPython.core.tests.test_oinspect.Call'>")
+    if sys.version_info > (3,):
+        nt.assert_regex(i['string_form'], "<class 'IPython.core.tests.test_oinspect.Call'( at 0x[0-9a-f]{1,9})?>")
     fname = __file__
     if fname.endswith(".pyc"):
         fname = fname[:-1]
@@ -252,7 +282,8 @@ def test_info():
     nt.assert_equal(i['docstring'], Call.__doc__)
     nt.assert_equal(i['source'], None)
     nt.assert_true(i['isclass'])
-    nt.assert_equal(i['init_definition'], "Call(self, x, y=1)\n")
+    _self_py2 = '' if py3compat.PY3 else 'self, '
+    nt.assert_equal(i['init_definition'], "Call(%sx, y=1)" % _self_py2)
     nt.assert_equal(i['init_docstring'], Call.__init__.__doc__)
 
     i = inspector.info(Call, detail_level=1)
@@ -277,9 +308,25 @@ def test_info():
         nt.assert_equal(i['type_name'], 'instance')
         nt.assert_equal(i['docstring'], OldStyle.__doc__)
 
+def test_class_signature():
+    info = inspector.info(HasSignature, 'HasSignature')
+    nt.assert_equal(info['init_definition'], "HasSignature(test)")
+    nt.assert_equal(info['init_docstring'], HasSignature.__init__.__doc__)
+
 def test_info_awkward():
     # Just test that this doesn't throw an error.
-    i = inspector.info(Awkward())
+    inspector.info(Awkward())
+
+def test_bool_raise():
+    inspector.info(NoBoolCall())
+
+def test_info_serialliar():
+    fib_tracker = [0]
+    i = inspector.info(SerialLiar(fib_tracker))
+
+    # Nested attribute access should be cut off at 100 levels deep to avoid
+    # infinite loops: https://github.com/ipython/ipython/issues/9122
+    nt.assert_less(fib_tracker[0], 9000)
 
 def test_calldef_none():
     # We should ignore __call__ for all of these.
@@ -294,13 +341,13 @@ if py3compat.PY3:
 @skipif(not py3compat.PY3)
 def test_definition_kwonlyargs():
     i = inspector.info(f_kwarg, oname='f_kwarg')  # analysis:ignore
-    nt.assert_equal(i['definition'], "f_kwarg(pos, *, kwonly)\n")
+    nt.assert_equal(i['definition'], "f_kwarg(pos, *, kwonly)")
 
 def test_getdoc():
     class A(object):
         """standard docstring"""
         pass
-    
+
     class B(object):
         """standard docstring"""
         def getdoc(self):
@@ -352,7 +399,7 @@ def test_property_sources():
 def test_property_docstring_is_in_info_for_detail_level_0():
     class A(object):
         @property
-        def foobar():
+        def foobar(self):
             """This is `foobar` property."""
             pass
 
@@ -372,11 +419,13 @@ def test_pdef():
     def foo(): pass
     inspector.pdef(foo, 'foo')
 
+
 def test_pinfo_nonascii():
     # See gh-1177
     from . import nonascii2
     ip.user_ns['nonascii2'] = nonascii2
     ip._inspect('pinfo', 'nonascii2', detail_level=1)
+
 
 def test_pinfo_magic():
     with AssertPrints('Docstring:'):
@@ -384,3 +433,20 @@ def test_pinfo_magic():
 
     with AssertPrints('Source:'):
         ip._inspect('pinfo', 'lsmagic', detail_level=1)
+
+
+def test_init_colors():
+    # ensure colors are not present in signature info
+    info = inspector.info(HasSignature)
+    init_def = info['init_definition']
+    nt.assert_not_in('[0m', init_def)
+
+
+def test_builtin_init():
+    info = inspector.info(list)
+    init_def = info['init_definition']
+    # Python < 3.4 can't get init definition from builtins,
+    # but still exercise the inspection in case of error-raising bugs.
+    if sys.version_info >= (3,4):
+        nt.assert_is_not_none(init_def)
+

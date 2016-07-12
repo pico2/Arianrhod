@@ -13,12 +13,10 @@ import sys
 import io as _io
 import tokenize
 
-from IPython.core.formatters import _safe_get_formatter_method
 from traitlets.config.configurable import Configurable
-from IPython.utils import io
 from IPython.utils.py3compat import builtin_mod, cast_unicode_py2
 from traitlets import Instance, Float
-from IPython.utils.warn import warn
+from warnings import warn
 
 # TODO: Move the various attributes (cache_size, [others now moved]). Some
 # of these are also attributes of InteractiveShell. They should be on ONE object
@@ -96,7 +94,7 @@ class DisplayHook(Configurable):
         tokens = list(tokenize.generate_tokens(sio.readline))
 
         for token in reversed(tokens):
-            if token[0] in (tokenize.ENDMARKER, tokenize.COMMENT):
+            if token[0] in (tokenize.ENDMARKER, tokenize.NL, tokenize.NEWLINE, tokenize.COMMENT):
                 continue
             if (token[0] == tokenize.OP) and (token[1] == ';'):
                 return True
@@ -114,10 +112,10 @@ class DisplayHook(Configurable):
         ``io.stdout``.
         """
         # Use write, not print which adds an extra space.
-        io.stdout.write(self.shell.separate_out)
-        outprompt = self.shell.prompt_manager.render('out')
+        sys.stdout.write(self.shell.separate_out)
+        outprompt = 'Out[{}]: '.format(self.shell.execution_count)
         if self.do_full_cache:
-            io.stdout.write(outprompt)
+            sys.stdout.write(outprompt)
 
     def compute_format_data(self, result):
         """Compute format data of the object to be displayed.
@@ -151,6 +149,9 @@ class DisplayHook(Configurable):
         """
         return self.shell.display_formatter.format(result)
 
+    # This can be set to True by the write_output_prompt method in a subclass
+    prompt_end_newline = False
+
     def write_format_data(self, format_dict, md_dict=None):
         """Write the format data dict to the frontend.
 
@@ -181,12 +182,11 @@ class DisplayHook(Configurable):
             # because the expansion may add ANSI escapes that will interfere
             # with our ability to determine whether or not we should add
             # a newline.
-            prompt_template = self.shell.prompt_manager.out_template
-            if prompt_template and not prompt_template.endswith('\n'):
+            if not self.prompt_end_newline:
                 # But avoid extraneous empty lines.
                 result_repr = '\n' + result_repr
 
-        print(result_repr, file=io.stdout)
+        print(result_repr)
 
     def update_user_ns(self, result):
         """Update user_ns with various things like _, __, _1, etc."""
@@ -230,8 +230,8 @@ class DisplayHook(Configurable):
 
     def finish_displayhook(self):
         """Finish up all displayhook activities."""
-        io.stdout.write(self.shell.separate_out2)
-        io.stdout.flush()
+        sys.stdout.write(self.shell.separate_out2)
+        sys.stdout.flush()
 
     def __call__(self, result=None):
         """Printing with history cache management.
@@ -293,4 +293,3 @@ class DisplayHook(Configurable):
         # IronPython blocks here forever
         if sys.platform != "cli":
             gc.collect()
-

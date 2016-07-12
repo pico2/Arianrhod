@@ -202,13 +202,7 @@ def ipexec(fname, options=None, commands=()):
     """
     if options is None: options = []
 
-    # For these subprocess calls, eliminate all prompt printing so we only see
-    # output from script execution
-    prompt_opts = [ '--PromptManager.in_template=""',
-                    '--PromptManager.in2_template=""',
-                    '--PromptManager.out_template=""'
-    ]
-    cmdargs = default_argv() + prompt_opts + options
+    cmdargs = default_argv() + options
 
     test_dir = os.path.dirname(__file__)
 
@@ -302,6 +296,13 @@ class TempFileMixin(object):
                 # On Windows, even though we close the file, we still can't
                 # delete it.  I have no clue why
                 pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.tearDown()
+
 
 pair_fail_msg = ("Testing {0}\n\n"
                 "In:\n"

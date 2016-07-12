@@ -98,6 +98,8 @@ def print_figure(fig, fmt='png', bbox_inches='tight', **kwargs):
         return
 
     dpi = rcParams['savefig.dpi']
+    if dpi == 'figure':
+        dpi = fig.dpi
     if fmt == 'retina':
         dpi = dpi * 2
         fmt = 'png'
@@ -123,6 +125,10 @@ def print_figure(fig, fmt='png', bbox_inches='tight', **kwargs):
 def retina_figure(fig, **kwargs):
     """format a figure as a pixel-doubled (retina) PNG"""
     pngdata = print_figure(fig, fmt='retina', **kwargs)
+    # Make sure that retina_figure acts just like print_figure and returns
+    # None when the figure is empty.
+    if pngdata is None:
+        return
     w, h = _pngxy(pngdata)
     metadata = dict(width=w//2, height=h//2)
     return pngdata, metadata
@@ -169,6 +175,16 @@ def mpl_runner(safe_execfile):
     return mpl_execfile
 
 
+def _reshow_nbagg_figure(fig):
+    """reshow an nbagg figure"""
+    try:
+        reshow = fig.canvas.manager.reshow
+    except AttributeError:
+        raise NotImplementedError()
+    else:
+        reshow()
+
+
 def select_figure_formats(shell, formats, **kwargs):
     """Select figure formats for the inline backend.
 
@@ -181,6 +197,7 @@ def select_figure_formats(shell, formats, **kwargs):
     **kwargs : any
         Extra keyword arguments to be passed to fig.canvas.print_figure.
     """
+    import matplotlib
     from matplotlib.figure import Figure
     from ipykernel.pylab import backend_inline
 
@@ -195,7 +212,11 @@ def select_figure_formats(shell, formats, **kwargs):
     formats = set(formats)
 
     [ f.pop(Figure, None) for f in shell.display_formatter.formatters.values() ]
-    
+
+    if matplotlib.get_backend().lower() == 'nbagg':
+        formatter = shell.display_formatter.ipython_display_formatter
+        formatter.for_type(Figure, _reshow_nbagg_figure)
+
     supported = {'png', 'png2x', 'retina', 'jpg', 'jpeg', 'svg', 'pdf'}
     bad = formats.difference(supported)
     if bad:
@@ -354,6 +375,7 @@ def configure_inline_support(shell, backend):
             shell._saved_rcParams[k] = pyplot.rcParams[k]
         # load inline_rc
         pyplot.rcParams.update(cfg.rc)
+        new_backend_name = "inline"
     else:
         from ipykernel.pylab.backend_inline import flush_figures
         try:
@@ -363,7 +385,13 @@ def configure_inline_support(shell, backend):
         if hasattr(shell, '_saved_rcParams'):
             pyplot.rcParams.update(shell._saved_rcParams)
             del shell._saved_rcParams
+        new_backend_name = "other"
 
-    # Setup the default figure format
-    select_figure_formats(shell, cfg.figure_formats, **cfg.print_figure_kwargs)
-
+    # only enable the formats once -> don't change the enabled formats (which the user may
+    # has changed) when getting another "%matplotlib inline" call.
+    # See https://github.com/ipython/ipykernel/issues/29
+    cur_backend = getattr(configure_inline_support, "current_backend", "unset")
+    if new_backend_name != cur_backend:
+        # Setup the default figure format
+        select_figure_formats(shell, cfg.figure_formats, **cfg.print_figure_kwargs)
+        configure_inline_support.current_backend = new_backend_name

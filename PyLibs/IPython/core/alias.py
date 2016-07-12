@@ -29,7 +29,7 @@ from IPython.core.error import UsageError
 
 from IPython.utils.py3compat import string_types
 from traitlets import List, Instance
-from IPython.utils.warn import error
+from logging import error
 
 #-----------------------------------------------------------------------------
 # Utilities
@@ -131,6 +131,7 @@ class Alias(object):
         self.shell = shell
         self.name = name
         self.cmd = cmd
+        self.__doc__ = "Alias for `!{}`".format(cmd)
         self.nargs = self.validate()
 
     def validate(self):
@@ -191,8 +192,8 @@ class Alias(object):
 
 class AliasManager(Configurable):
 
-    default_aliases = List(default_aliases(), config=True)
-    user_aliases = List(default_value=[], config=True)
+    default_aliases = List(default_aliases()).tag(config=True)
+    user_aliases = List(default_value=[]).tag(config=True)
     shell = Instance('IPython.core.interactiveshell.InteractiveShellABC', allow_none=True)
 
     def __init__(self, shell=None, **kwargs):

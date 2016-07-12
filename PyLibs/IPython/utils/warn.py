@@ -9,12 +9,14 @@ Utilities for warnings.  Shoudn't we just use the built in warnings module.
 from __future__ import print_function
 
 import sys
+import warnings
 
-from IPython.utils import io
-
+warnings.warn("The module IPython.utils.warn is deprecated since IPython 4.0, use the standard warnings module instead", DeprecationWarning)
 
 def warn(msg,level=2,exit_val=1):
-    """Standard warning printer. Gives formatting consistency.
+    """Deprecated
+
+    Standard warning printer. Gives formatting consistency.
 
     Output is sent to io.stderr (sys.stderr by default).
 
@@ -29,29 +31,35 @@ def warn(msg,level=2,exit_val=1):
 
     -exit_val (1): exit value returned by sys.exit() for a level 4
     warning. Ignored for all other levels."""
-
+    
+    warnings.warn("The module IPython.utils.warn is deprecated since IPython 4.0, use the standard warnings module instead", DeprecationWarning)
     if level>0:
         header = ['','','WARNING: ','ERROR: ','FATAL ERROR: ']
-        print(header[level], msg, sep='', file=io.stderr)
+        print(header[level], msg, sep='', file=sys.stderr)
         if level == 4:
-            print('Exiting.\n', file=io.stderr)
+            print('Exiting.\n', file=sys.stderr)
             sys.exit(exit_val)
 
             
 def info(msg):
-    """Equivalent to warn(msg,level=1)."""
+    """Deprecated 
+    
+    Equivalent to warn(msg,level=1)."""
 
     warn(msg,level=1)
 
     
 def error(msg):
-    """Equivalent to warn(msg,level=3)."""
+    """Deprecated 
+    
+    Equivalent to warn(msg,level=3)."""
 
     warn(msg,level=3)
 
     
 def fatal(msg,exit_val=1):
-    """Equivalent to warn(msg,exit_val=exit_val,level=4)."""
+    """Deprecated 
+    
+    Equivalent to warn(msg,exit_val=exit_val,level=4)."""
 
     warn(msg,exit_val=exit_val,level=4)
-

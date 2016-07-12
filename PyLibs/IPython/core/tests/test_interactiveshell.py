@@ -30,7 +30,6 @@ from IPython.testing.decorators import (
     skipif, skip_win32, onlyif_unicode_paths, onlyif_cmds_exist,
 )
 from IPython.testing import tools as tt
-from IPython.utils import io
 from IPython.utils.process import find_cmd
 from IPython.utils import py3compat
 from IPython.utils.py3compat import unicode_type, PY3
@@ -197,33 +196,19 @@ class InteractiveShellTestCase(unittest.TestCase):
 
     def test_bad_custom_tb(self):
         """Check that InteractiveShell is protected from bad custom exception handlers"""
-        from IPython.utils import io
-        save_stderr = io.stderr
-        try:
-            # capture stderr
-            io.stderr = StringIO()
-            ip.set_custom_exc((IOError,), lambda etype,value,tb: 1/0)
-            self.assertEqual(ip.custom_exceptions, (IOError,))
+        ip.set_custom_exc((IOError,), lambda etype,value,tb: 1/0)
+        self.assertEqual(ip.custom_exceptions, (IOError,))
+        with tt.AssertPrints("Custom TB Handler failed", channel='stderr'):
             ip.run_cell(u'raise IOError("foo")')
-            self.assertEqual(ip.custom_exceptions, ())
-            self.assertTrue("Custom TB Handler failed" in io.stderr.getvalue())
-        finally:
-            io.stderr = save_stderr
+        self.assertEqual(ip.custom_exceptions, ())
 
     def test_bad_custom_tb_return(self):
         """Check that InteractiveShell is protected from bad return types in custom exception handlers"""
-        from IPython.utils import io
-        save_stderr = io.stderr
-        try:
-            # capture stderr
-            io.stderr = StringIO()
-            ip.set_custom_exc((NameError,),lambda etype,value,tb, tb_offset=None: 1)
-            self.assertEqual(ip.custom_exceptions, (NameError,))
+        ip.set_custom_exc((NameError,),lambda etype,value,tb, tb_offset=None: 1)
+        self.assertEqual(ip.custom_exceptions, (NameError,))
+        with tt.AssertPrints("Custom TB Handler failed", channel='stderr'):
             ip.run_cell(u'a=abracadabra')
-            self.assertEqual(ip.custom_exceptions, ())
-            self.assertTrue("Custom TB Handler failed" in io.stderr.getvalue())
-        finally:
-            io.stderr = save_stderr
+        self.assertEqual(ip.custom_exceptions, ())
 
     def test_drop_by_id(self):
         myvars = {"a":object(), "b":object(), "c": object()}
@@ -449,6 +434,21 @@ class InteractiveShellTestCase(unittest.TestCase):
         found = ip._ofind('a.foo', [('locals', locals())])
         nt.assert_is(found['obj'], A.foo)
 
+    def test_custom_syntaxerror_exception(self):
+        called = []
+        def my_handler(shell, etype, value, tb, tb_offset=None):
+            called.append(etype)
+            shell.showtraceback((etype, value, tb), tb_offset=tb_offset)
+
+        ip.set_custom_exc((SyntaxError,), my_handler)
+        try:
+            ip.run_cell("1f")
+            # Check that this was called, and only once.
+            self.assertEqual(called, [SyntaxError])
+        finally:
+            # Reset the custom exception hook
+            ip.set_custom_exc((), None)
+
     def test_custom_exception(self):
         called = []
         def my_handler(shell, etype, value, tb, tb_offset=None):
@@ -513,6 +513,12 @@ class InteractiveShellTestCase(unittest.TestCase):
             self.assertEqual(msg, 'DerivedInterrupt: foo\n')
         else:
             self.assertEqual(msg, 'IPython.core.tests.test_interactiveshell.DerivedInterrupt: foo\n')
+
+    def test_inspect_text(self):
+        ip.run_cell('a = 5')
+        text = ip.object_inspect_text('a')
+        self.assertIsInstance(text, unicode_type)
+
 
 class TestSafeExecfileNonAsciiPath(unittest.TestCase):
 
@@ -645,12 +651,12 @@ class TestAstTransform(unittest.TestCase):
         
         with tt.AssertPrints("best of "):
             ip.run_line_magic("timeit", "-n1 f(1)")
-        self.assertEqual(called, set([-1]))
+        self.assertEqual(called, {-1})
         called.clear()
         
         with tt.AssertPrints("best of "):
             ip.run_cell_magic("timeit", "-n1 f(2)", "f(3)")
-        self.assertEqual(called, set([-2, -3]))
+        self.assertEqual(called, {-2, -3})
     
     def test_time(self):
         called = []
@@ -718,12 +724,12 @@ class TestAstTransform2(unittest.TestCase):
         
         with tt.AssertPrints("best of "):
             ip.run_line_magic("timeit", "-n1 f(1)")
-        self.assertEqual(called, set([(1,)]))
+        self.assertEqual(called, {(1,)})
         called.clear()
         
         with tt.AssertPrints("best of "):
             ip.run_cell_magic("timeit", "-n1 f(2)", "f(3)")
-        self.assertEqual(called, set([(2,), (3,)]))
+        self.assertEqual(called, {(2,), (3,)})
 
 class ErrorTransformer(ast.NodeTransformer):
     """Throws an error when it sees a number."""
@@ -799,12 +805,12 @@ def test_user_variables():
     ip.display_formatter.active_types = ip.display_formatter.format_types
     
     ip.user_ns['dummy'] = d = DummyRepr()
-    keys = set(['dummy', 'doesnotexist'])
+    keys = {'dummy', 'doesnotexist'}
     r = ip.user_expressions({ key:key for key in keys})
 
     nt.assert_equal(keys, set(r.keys()))
     dummy = r['dummy']
-    nt.assert_equal(set(['status', 'data', 'metadata']), set(dummy.keys()))
+    nt.assert_equal({'status', 'data', 'metadata'}, set(dummy.keys()))
     nt.assert_equal(dummy['status'], 'ok')
     data = dummy['data']
     metadata = dummy['metadata']
@@ -832,7 +838,7 @@ def test_user_expression():
     pprint.pprint(r)
     nt.assert_equal(set(r.keys()), set(query.keys()))
     a = r['a']
-    nt.assert_equal(set(['status', 'data', 'metadata']), set(a.keys()))
+    nt.assert_equal({'status', 'data', 'metadata'}, set(a.keys()))
     nt.assert_equal(a['status'], 'ok')
     data = a['data']
     metadata = a['metadata']

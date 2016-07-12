@@ -69,7 +69,7 @@ def test_longer_repr():
     nt.assert_equal(trepr(a), a_trunc)
     # The creation of our tracer modifies the repr module's repr function
     # in-place, since that global is used directly by the stdlib's pdb module.
-    t = debugger.Tracer()
+    debugger.Tracer()
     nt.assert_equal(trepr(a), ar)
 
 def test_ipdb_magics():
@@ -100,7 +100,11 @@ def test_ipdb_magics():
     >>> with PdbTestInput([
     ...    'pdef example_function',
     ...    'pdoc ExampleClass',
+    ...    'up',
+    ...    'down',
+    ...    'list',
     ...    'pinfo a',
+    ...    'll',
     ...    'continue',
     ... ]):
     ...     trigger_ipdb()
@@ -118,12 +122,37 @@ def test_ipdb_magics():
         Docstring for ExampleClass.
     Init docstring:
         Docstring for ExampleClass.__init__
+    ipdb> up
+    > <doctest ...>(11)<module>()
+          7    'pinfo a',
+          8    'll',
+          9    'continue',
+         10 ]):
+    ---> 11     trigger_ipdb()
+    <BLANKLINE>
+    ipdb> down
+    None
+    > <doctest ...>(3)trigger_ipdb()
+          1 def trigger_ipdb():
+          2    a = ExampleClass()
+    ----> 3    debugger.Pdb().set_trace()
+    <BLANKLINE>
+    ipdb> list
+          1 def trigger_ipdb():
+          2    a = ExampleClass()
+    ----> 3    debugger.Pdb().set_trace()
+    <BLANKLINE>
     ipdb> pinfo a
     Type:           ExampleClass
     String form:    ExampleClass()
     Namespace:      Local...
     Docstring:      Docstring for ExampleClass.
     Init docstring: Docstring for ExampleClass.__init__
+    ipdb> ll
+          1 def trigger_ipdb():
+          2    a = ExampleClass()
+    ----> 3    debugger.Pdb().set_trace()
+    <BLANKLINE>
     ipdb> continue
     
     Restore previous trace function, e.g. for coverage.py    
@@ -153,5 +182,52 @@ def test_ipdb_magics2():
     
     Restore previous trace function, e.g. for coverage.py    
     
+    >>> sys.settrace(old_trace)
+    '''
+
+def can_quit():
+    '''Test that quit work in ipydb
+
+    >>> old_trace = sys.gettrace()
+
+    >>> def bar():
+    ...     pass
+
+    >>> with PdbTestInput([
+    ...    'quit',
+    ... ]):
+    ...     debugger.Pdb().runcall(bar)
+    > <doctest ...>(2)bar()
+            1 def bar():
+    ----> 2    pass
+    <BLANKLINE>
+    ipdb> quit
+
+    Restore previous trace function, e.g. for coverage.py
+
+    >>> sys.settrace(old_trace)
+    '''
+
+
+def can_exit():
+    '''Test that quit work in ipydb
+
+    >>> old_trace = sys.gettrace()
+
+    >>> def bar():
+    ...     pass
+
+    >>> with PdbTestInput([
+    ...    'exit',
+    ... ]):
+    ...     debugger.Pdb().runcall(bar)
+    > <doctest ...>(2)bar()
+            1 def bar():
+    ----> 2    pass
+    <BLANKLINE>
+    ipdb> exit
+
+    Restore previous trace function, e.g. for coverage.py
+
     >>> sys.settrace(old_trace)
     '''

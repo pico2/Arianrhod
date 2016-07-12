@@ -63,7 +63,7 @@ class Test_magic_run_completer(unittest.TestCase):
         event = MockEvent(u"%run aa")
         mockself = None
         match = set(magic_run_completer(mockself, event))
-        self.assertEqual(match, set([u"aao.py"]))
+        self.assertEqual(match, {u"aao.py"})
 
     def test_3(self):
         """Test magic_run_completer with unterminated " """
@@ -109,7 +109,7 @@ class Test_magic_run_completer_nonascii(unittest.TestCase):
         event = MockEvent(u"%run a")
         mockself = None
         match = set(magic_run_completer(mockself, event))
-        self.assertEqual(match, set([u"a.py", u"aaø.py"]))
+        self.assertEqual(match, {u"a.py", u"aaø.py"})
 
     @onlyif_unicode_paths
     def test_2(self):
@@ -118,7 +118,7 @@ class Test_magic_run_completer_nonascii(unittest.TestCase):
         event = MockEvent(u"%run aa")
         mockself = None
         match = set(magic_run_completer(mockself, event))
-        self.assertEqual(match, set([u"aaø.py"]))
+        self.assertEqual(match, {u"aaø.py"})
 
     @onlyif_unicode_paths
     def test_3(self):
@@ -126,14 +126,14 @@ class Test_magic_run_completer_nonascii(unittest.TestCase):
         event = MockEvent(u'%run "a')
         mockself = None
         match = set(magic_run_completer(mockself, event))
-        self.assertEqual(match, set([u"a.py", u"aaø.py"]))
+        self.assertEqual(match, {u"a.py", u"aaø.py"})
 
 # module_completer:
 
 def test_import_invalid_module():
     """Testing of issue https://github.com/ipython/ipython/issues/1107"""
-    invalid_module_names = set(['foo-bar', 'foo:bar', '10foo'])
-    valid_module_names = set(['foobar'])
+    invalid_module_names = {'foo-bar', 'foo:bar', '10foo'}
+    valid_module_names = {'foobar'}
     with TemporaryDirectory() as tmpdir:
         sys.path.insert( 0, tmpdir )
         for name in invalid_module_names | valid_module_names:
@@ -145,3 +145,19 @@ def test_import_invalid_module():
         nt.assert_equal(intersection, set())
 
         assert valid_module_names.issubset(s), valid_module_names.intersection(s)
+
+
+def test_bad_module_all():
+    """Test module with invalid __all__
+
+    https://github.com/ipython/ipython/issues/9678
+    """
+    testsdir = os.path.dirname(__file__)
+    sys.path.insert(0, testsdir)
+    try:
+        results = module_completion('from bad_all import ')
+        nt.assert_in('puppies', results)
+        for r in results:
+            nt.assert_is_instance(r, py3compat.string_types)
+    finally:
+        sys.path.remove(testsdir)

@@ -135,16 +135,9 @@ import ast
 import warnings
 import shutil
 
-# To keep compatibility with various python versions
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
 
 # Third-party
-import sphinx
 from docutils.parsers.rst import directives
-from docutils import nodes
 from sphinx.util.compat import Directive
 
 # Our own
@@ -285,6 +278,7 @@ class EmbeddedSphinxShell(object):
 
         # Create config object for IPython
         config = Config()
+        config.HistoryManager.hist_file = ':memory:'
         config.InteractiveShell.autocall = False
         config.InteractiveShell.autoindent = False
         config.InteractiveShell.colors = 'NoColor'
@@ -856,14 +850,14 @@ class IPythonDirective(Directive):
         config = self.state.document.settings.env.config
 
         # get config variables to set figure output directory
-        confdir = self.state.document.settings.env.app.confdir
+        outdir = self.state.document.settings.env.app.outdir
         savefig_dir = config.ipython_savefig_dir
         source_dir = os.path.dirname(self.state.document.current_source)
         if savefig_dir is None:
-            savefig_dir = config.html_static_path
+            savefig_dir = config.html_static_path or '_static'
         if isinstance(savefig_dir, list):
-            savefig_dir = savefig_dir[0] # safe to assume only one path?
-        savefig_dir = os.path.join(confdir, savefig_dir)
+            savefig_dir = os.path.join(*savefig_dir)
+        savefig_dir = os.path.join(outdir, savefig_dir)
 
         # get regex and prompt stuff
         rgxin      = config.ipython_rgxin
@@ -887,10 +881,8 @@ class IPythonDirective(Directive):
             # EmbeddedSphinxShell is created, its interactive shell member
             # is the same for each instance.
 
-            if mplbackend:
+            if mplbackend and 'matplotlib.backends' not in sys.modules:
                 import matplotlib
-                # Repeated calls to use() will not hurt us since `mplbackend`
-                # is the same each time.
                 matplotlib.use(mplbackend)
 
             # Must be called after (potentially) importing matplotlib and
@@ -906,7 +898,6 @@ class IPythonDirective(Directive):
         if not self.state.document.current_source in self.seen_docs:
             self.shell.IP.history_manager.reset()
             self.shell.IP.execution_count = 1
-            self.shell.IP.prompt_manager.width = 0
             self.seen_docs.add(self.state.document.current_source)
 
         # and attach to shell so we don't have to pass them around
@@ -1013,6 +1004,9 @@ def setup(app):
     app.add_config_value('ipython_execlines', execlines, 'env')
 
     app.add_config_value('ipython_holdcount', True, 'env')
+
+    metadata = {'parallel_read_safe': True, 'parallel_write_safe': True}
+    return metadata
 
 # Simple smoke test, needs to be converted to a proper automatic test.
 def test():

@@ -1,6 +1,6 @@
 # #########################     LICENSE     ############################ #
 
-# Copyright (c) 2005-2015, Michele Simionato
+# Copyright (c) 2005-2016, Michele Simionato
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ import operator
 import itertools
 import collections
 
-__version__ = '4.0.6'
+__version__ = '4.0.10'
 
 if sys.version >= '3':
     from inspect import getfullargspec
@@ -178,6 +178,9 @@ class FunctionMaker(object):
         for n in names:
             if n in ('_func_', '_call_'):
                 raise NameError('%s is overridden in\n%s' % (n, src))
+
+        if not src.endswith('\n'):  # add a newline for old Pythons
+            src += '\n'
 
         # Ensure each generated function has a unique filename for profilers
         # (such as cProfile) that depend on the tuple of (<filename>,
@@ -369,6 +372,7 @@ def dispatch_on(*dispatch_args):
             Decorator to register an implementation for the given types
             """
             check(types)
+
             def dec(f):
                 check(getfullargspec(f).args, operator.lt, ' in ' + f.__name__)
                 typemap[types] = f

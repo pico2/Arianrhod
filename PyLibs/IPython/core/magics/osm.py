@@ -34,7 +34,6 @@ from IPython.core.magic import  (
 )
 from IPython.testing.skipdoctest import skip_doctest
 from IPython.utils.openpy import source_to_unicode
-from IPython.utils.path import unquote_filename
 from IPython.utils.process import abbrev_cwd
 from IPython.utils import py3compat
 from IPython.utils.py3compat import unicode_type
@@ -97,9 +96,9 @@ class OSMagics(Magics):
           In [9]: show $$PATH
           /usr/local/lf9560/bin:/usr/local/intel/compiler70/ia32/bin:...
 
-        You can use the alias facility to acess all of $PATH.  See the %rehash
-        and %rehashx functions, which automatically create aliases for the
-        contents of your $PATH.
+        You can use the alias facility to acess all of $PATH.  See the %rehashx
+        function, which automatically creates aliases for the contents of your
+        $PATH.
 
         If called with no parameters, %alias prints the current alias table."""
 
@@ -148,8 +147,8 @@ class OSMagics(Magics):
     def rehashx(self, parameter_s=''):
         """Update the alias table with all executable files in $PATH.
 
-        This version explicitly checks that every entry in $PATH is a file
-        with execute access (os.X_OK), so it is much slower than %rehash.
+        rehashx explicitly checks that every entry in $PATH is a file
+        with execute access (os.X_OK).
 
         Under Windows, it checks executability as a match against a
         '|'-separated string of extensions, stored in the IPython config
@@ -324,10 +323,7 @@ class OSMagics(Magics):
 
 
         else:
-            #turn all non-space-escaping backslashes to slashes,
-            # for c:\windows\directory\names\
-            parameter_s = re.sub(r'\\(?! )','/', parameter_s)
-            opts,ps = self.parse_options(parameter_s,'qb',mode='string')
+            opts, ps = self.parse_options(parameter_s, 'qb', mode='string')
         # jump to previous
         if ps == '-':
             try:
@@ -348,8 +344,6 @@ class OSMagics(Magics):
                         raise UsageError("Bookmark '%s' not found.  "
                               "Use '%%bookmark -l' to see your bookmarks." % ps)
 
-        # strip extra quotes on Windows, because os.chdir doesn't like them
-        ps = unquote_filename(ps)
         # at this point ps should point to the target dir
         if ps:
             try:
@@ -443,7 +437,7 @@ class OSMagics(Magics):
         """
 
         dir_s = self.shell.dir_stack
-        tgt = os.path.expanduser(unquote_filename(parameter_s))
+        tgt = os.path.expanduser(parameter_s)
         cwd = py3compat.getcwd().replace(self.shell.home_dir,'~')
         if tgt:
             self.cd(parameter_s)
@@ -781,8 +775,8 @@ class OSMagics(Magics):
         The file will be overwritten unless the -a (--append) flag is specified.
         """
         args = magic_arguments.parse_argstring(self.writefile, line)
-        filename = os.path.expanduser(unquote_filename(args.filename))
-        
+        filename = os.path.expanduser(args.filename)
+
         if os.path.exists(filename):
             if args.append:
                 print("Appending to %s" % filename)

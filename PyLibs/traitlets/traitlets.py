@@ -107,7 +107,7 @@ def _deprecated_method(method, cls, method_name, msg):
     try:
         fname = inspect.getsourcefile(method) or "<unknown>"
         lineno = inspect.getsourcelines(method)[1] or 0
-    except TypeError as e:
+    except (IOError, TypeError) as e:
         # Failed to inspect for some reason
         warn(warn_msg + ('\n(inspection failed) %s' % e), DeprecationWarning)
     else:
@@ -460,6 +460,7 @@ class TraitType(BaseDescriptor):
 
         This looks for:
 
+        * default generators registered with the @default descriptor.
         * obj._{name}_default() on the class with the traitlet, or a subclass
           that obj belongs to.
         * trait.make_dynamic_default, which is defined by Instance
@@ -486,17 +487,16 @@ class TraitType(BaseDescriptor):
         return getattr(self, 'make_dynamic_default', None)
 
     def instance_init(self, obj):
-        obj._cross_validation_lock = True
         # If no dynamic initialiser is present, and the trait implementation or
         # use provides a static default, transfer that to obj._trait_values.
-        if (self._dynamic_default_callable(obj) is None) \
-                and (self.default_value is not Undefined):
-            v = self._validate(obj, self.default_value)
-            if self.name is not None:
-                obj._trait_values[self.name] = v
-        obj._cross_validation_lock = False
+        with obj.cross_validation_lock:
+            if (self._dynamic_default_callable(obj) is None) \
+                    and (self.default_value is not Undefined):
+                v = self._validate(obj, self.default_value)
+                if self.name is not None:
+                    obj._trait_values[self.name] = v
 
-    def get(self, obj, cls):
+    def get(self, obj, cls=None):
         try:
             value = obj._trait_values[self.name]
         except KeyError:
@@ -800,7 +800,7 @@ def validate(*names):
     the registered cross validator could potentially make changes to attributes
     of the ``HasTraits`` instance. However, we recommend not to do so. The reason
     is that the cross-validation of attributes may run in arbitrary order when
-    exitting the ``hold_trait_modification` context, and such changes may not
+    exiting the ``hold_trait_notifications` context, and such changes may not
     commute.
     """
     return ValidateHandler(names)
@@ -899,18 +899,22 @@ class HasDescriptors(py3compat.with_metaclass(MetaHasDescriptors, object)):
     """The base class for all classes that have descriptors.
     """
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, *args, **kwargs):
         # This is needed because object.__new__ only accepts
         # the cls argument.
         new_meth = super(HasDescriptors, cls).__new__
         if new_meth is object.__new__:
             inst = new_meth(cls)
         else:
-            inst = new_meth(cls, **kw)
-        inst.setup_instance()
+            inst = new_meth(cls, *args, **kwargs)
+        inst.setup_instance(*args, **kwargs)
         return inst
 
-    def setup_instance(self):
+    def setup_instance(self, *args, **kwargs):
+        """
+        This is called **before** self.__init__ is called.
+        """
+        self._cross_validation_lock = False
         cls = self.__class__
         for key in dir(cls):
             # Some descriptors raise AttributeError like zope.interface's
@@ -927,20 +931,43 @@ class HasDescriptors(py3compat.with_metaclass(MetaHasDescriptors, object)):
 
 class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
 
-    def setup_instance(self):
+    def setup_instance(self, *args, **kwargs):
         self._trait_values = {}
         self._trait_notifiers = {}
         self._trait_validators = {}
-        super(HasTraits, self).setup_instance()
+        super(HasTraits, self).setup_instance(*args, **kwargs)
 
-    def __init__(self, *args, **kw):
+    def __init__(self, *args, **kwargs):
         # Allow trait values to be set using keyword arguments.
         # We need to use setattr for this to trigger validation and
         # notifications.
-        self._cross_validation_lock = False
+        super_args = args
+        super_kwargs = {}
         with self.hold_trait_notifications():
-            for key, value in iteritems(kw):
-                setattr(self, key, value)
+            for key, value in iteritems(kwargs):
+                if self.has_trait(key):
+                    setattr(self, key, value)
+                else:
+                    # passthrough args that don't set traits to super
+                    super_kwargs[key] = value
+        try:
+            super(HasTraits, self).__init__(*super_args, **super_kwargs)
+        except TypeError as e:
+            arg_s_list = [ repr(arg) for arg in super_args ]
+            for k, v in super_kwargs.items():
+                arg_s_list.append("%s=%r" % (k, v))
+            arg_s = ', '.join(arg_s_list)
+            warn(
+                "Passing unrecoginized arguments to super({classname}).__init__({arg_s}).\n"
+                "{error}\n"
+                "This error will be raised in a future release of traitlets."
+                .format(
+                    arg_s=arg_s, classname=self.__class__.__name__,
+                    error=e,
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
     def __getstate__(self):
         d = self.__dict__.copy()
@@ -967,6 +994,23 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
             else:
                 if isinstance(value, EventHandler):
                     value.instance_init(self)
+
+    @property
+    @contextlib.contextmanager
+    def cross_validation_lock(self):
+        """
+        A contextmanager for running a block with our cross validation lock set
+        to True.
+
+        At the end of the block, the lock's value is restored to its value
+        prior to entering the block.
+        """
+        original_value = self._cross_validation_lock
+        try:
+            self._cross_validation_lock = True
+            yield
+        finally:
+            self._cross_validation_lock = original_value
 
     @contextlib.contextmanager
     def hold_trait_notifications(self):
@@ -1010,7 +1054,7 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
                 for name in list(cache.keys()):
                     trait = getattr(self.__class__, name)
                     value = trait._cross_validate(self, getattr(self, name))
-                    setattr(self, name, value)
+                    self.set_trait(name, value)
             except TraitError as e:
                 # Roll back in case of TraitError during final cross validation.
                 self.notify_change = lambda x: None
@@ -1019,7 +1063,7 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
                         # TODO: Separate in a rollback function per notification type.
                         if change['type'] == 'change':
                             if change['old'] is not Undefined:
-                                setattr(self, name, change['old'])
+                                self.set_trait(name, change['old'])
                             else:
                                 self._trait_values.pop(name)
                 cache = {}
@@ -1077,7 +1121,7 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
 
             if isinstance(c, _CallbackWrapper):
                 c = c.__call__
-            elif isinstance(c, EventHandler):
+            elif isinstance(c, EventHandler) and c.name is not None:
                 c = getattr(self, c.name)
             
             c(change)
@@ -1150,8 +1194,8 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
         ----------
         handler : callable
             A callable that is called when a trait changes. Its
-            signature can be ``handler()`` or ``handler(change)``, where change
-            is a dictionary. The change dictionary at least holds a 'type' key.
+            signature should be ``handler(change)``, where ``change```is a
+            dictionary. The change dictionary at least holds a 'type' key.
             * ``type``: the type of notification.
             Other keys may be passed depending on the value of 'type'. In the
             case where type is 'change', we also have the following keys:
@@ -1224,10 +1268,6 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
             The names of the traits that should be cross-validated
         """
         for name in names:
-            if name in self._trait_validators:
-                raise TraitError("A cross-validator for the trait"
-                                 " '%s' already exists" % name)
-
             magic_name = '_%s_validate' % name
             if hasattr(self, magic_name):
                 class_value = getattr(self.__class__, magic_name)
@@ -1350,11 +1390,12 @@ class HasTraits(py3compat.with_metaclass(MetaHasTraits, HasDescriptors)):
 
     def set_trait(self, name, value):
         """Forcibly sets trait attribute, including read-only attributes."""
+        cls = self.__class__
         if not self.has_trait(name):
-            raise TraitError("Class %s does not have a trait named %s" %
-                                (self.__class__.__name__, name))
+            raise TraitError("Class %s does not have a trait"
+                             "named %s" % (cls.__name__, name))
         else:
-            self.traits()[name].set(self, value)
+            getattr(cls, name).set(self, value)
 
 #-----------------------------------------------------------------------------
 # Actual TraitTypes implementations/subclasses
@@ -1662,8 +1703,7 @@ class Union(TraitType):
         super(Union, self).instance_init(obj)
 
     def validate(self, obj, value):
-        obj._cross_validation_lock = True
-        try:
+        with obj.cross_validation_lock:
             for trait_type in self.trait_types:
                 try:
                     v = trait_type._validate(obj, value)
@@ -1671,16 +1711,21 @@ class Union(TraitType):
                     return v
                 except TraitError:
                     continue
-        finally:
-            obj._cross_validation_lock = False
         self.error(obj, value)
-
 
     def __or__(self, other):
         if isinstance(other, Union):
             return Union(self.trait_types + other.trait_types)
         else:
             return Union(self.trait_types + [other])
+
+    def make_dynamic_default(self):
+        for trait_type in self.trait_types:
+            if trait_type.default_value != Undefined:
+                return trait_type.default_value
+            elif hasattr(trait_type, 'make_dynamic_default'):
+                return trait_type.make_dynamic_default()
+
 
 #-----------------------------------------------------------------------------
 # Basic TraitTypes implementations/subclasses

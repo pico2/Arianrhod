@@ -39,7 +39,7 @@ from pygments.lexer import (
     Lexer, DelegatingLexer, RegexLexer, do_insertions, bygroups, using,
 )
 from pygments.token import (
-    Comment, Generic, Keyword, Literal, Name, Operator, Other, Text, Error,
+    Generic, Keyword, Literal, Name, Operator, Other, Text, Error,
 )
 from pygments.util import get_bool_opt
 
@@ -62,6 +62,7 @@ ipython_tokens = [
   (r'^(!!)(.+)(\n)', bygroups(Operator, using(BashLexer), Text)),
   (r'(!)(?!=)(.+)(\n)', bygroups(Operator, using(BashLexer), Text)),
   (r'^(\s*)(\?\??)(\s*%{0,2}[\w\.\*]*)', bygroups(Text, Operator, Text)),
+  (r'(\s*%{0,2}[\w\.\*]*)(\?\??)(\s*)$', bygroups(Text, Operator, Text)),
 ]
 
 def build_ipy_lexer(python3):
@@ -82,13 +83,11 @@ def build_ipy_lexer(python3):
     # we will also have two IPython lexer classes.
     if python3:
         PyLexer = Python3Lexer
-        clsname = 'IPython3Lexer'
         name = 'IPython3'
         aliases = ['ipython3']
         doc = """IPython3 Lexer"""
     else:
         PyLexer = PythonLexer
-        clsname = 'IPythonLexer'
         name = 'IPython'
         aliases = ['ipython2', 'ipython']
         doc = """IPython Lexer"""
@@ -231,9 +230,12 @@ class IPythonConsoleLexer(Lexer):
     # The regexps used to determine what is input and what is output.
     # The default prompts for IPython are:
     #
-    #     c.PromptManager.in_template  = 'In [\#]: '
-    #     c.PromptManager.in2_template = '   .\D.: '
-    #     c.PromptManager.out_template = 'Out[\#]: '
+    #    in           = 'In [#]: '
+    #    continuation = '   .D.: '
+    #    template     = 'Out[#]: '
+    #
+    # Where '#' is the 'prompt number' or 'execution count' and 'D' 
+    # D is a number of dots  matching the width of the execution count 
     #
     in1_regex = r'In \[[0-9]+\]: '
     in2_regex = r'   \.\.+\.: '
@@ -467,9 +469,9 @@ class IPythonConsoleLexer(Lexer):
             if insertion:
                 self.insertions.append((len(self.buffer), [insertion]))
             self.buffer += code
-        else:
-            for token in self.buffered_tokens():
-                yield token
+
+        for token in self.buffered_tokens():
+            yield token
 
 class IPyLexer(Lexer):
     """

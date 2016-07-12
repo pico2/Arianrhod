@@ -34,6 +34,7 @@ from nose.core import TestProgram
 from nose.plugins import Plugin
 from nose.util import safe_str
 
+from IPython import version_info
 from IPython.utils.py3compat import bytes_to_str
 from IPython.utils.importstring import import_item
 from IPython.testing.plugin.ipdoctest import IPythonDoctest
@@ -41,22 +42,20 @@ from IPython.external.decorators import KnownFailure, knownfailureif
 
 pjoin = path.join
 
-#-----------------------------------------------------------------------------
-# Warnings control
-#-----------------------------------------------------------------------------
 
-# Twisted generates annoying warnings with Python 2.6, as will do other code
-# that imports 'sets' as of today
-warnings.filterwarnings('ignore', 'the sets module is deprecated',
-                        DeprecationWarning )
+# Enable printing all warnings raise by IPython's modules
+warnings.filterwarnings('ignore', message='.*Matplotlib is building the font cache.*', category=UserWarning, module='.*')
+if sys.version_info > (3,0):
+    warnings.filterwarnings('error', message='.*', category=ResourceWarning, module='.*')
+warnings.filterwarnings('error', message=".*{'config': True}.*", category=DeprecationWarning, module='IPy.*')
+warnings.filterwarnings('default', message='.*', category=Warning, module='IPy.*')
 
-# This one also comes from Twisted
-warnings.filterwarnings('ignore', 'the sha module is deprecated',
-                        DeprecationWarning)
+if version_info < (6,):
+    # nose.tools renames all things from `camelCase` to `snake_case` which raise an
+    # warning with the runner they also import from standard import library. (as of Dec 2015)
+    # Ignore, let's revisit that in a couple of years for IPython 6.
+    warnings.filterwarnings('ignore', message='.*Please use assertEqual instead', category=Warning, module='IPython.*')
 
-# Wx on Fedora11 spits these out
-warnings.filterwarnings('ignore', 'wxPython/wxWidgets release number mismatch',
-                        UserWarning)
 
 # ------------------------------------------------------------------------------
 # Monkeypatch Xunit to count known failures as skipped.
@@ -115,11 +114,9 @@ def test_for(item, min_version=None, callback=extract_version):
 
 # Global dict where we can store information on what we have and what we don't
 # have available at test run time
-have = {}
-
-have['matplotlib'] = test_for('matplotlib')
-have['pygments'] = test_for('pygments')
-have['sqlite3'] = test_for('sqlite3')
+have = {'matplotlib': test_for('matplotlib'),
+        'pygments': test_for('pygments'),
+        'sqlite3': test_for('sqlite3')}
 
 #-----------------------------------------------------------------------------
 # Test suite definitions
@@ -210,7 +207,7 @@ test_group_names.append('autoreload')
 
 def check_exclusions_exist():
     from IPython.paths import get_ipython_package_dir
-    from IPython.utils.warn import warn
+    from warnings import warn
     parent = os.path.dirname(get_ipython_package_dir())
     for sec in test_sections:
         for pattern in sec.exclusions:
@@ -367,9 +364,6 @@ def run_iptest():
     if '--with-xunit' in sys.argv and not hasattr(Xunit, 'orig_addError'):
         monkeypatch_xunit()
 
-    warnings.filterwarnings('ignore',
-        'This will be removed soon.  Use IPython.testing.util instead')
-    
     arg1 = sys.argv[1]
     if arg1 in test_sections:
         section = test_sections[arg1]
@@ -437,4 +431,3 @@ def run_iptest():
 
 if __name__ == '__main__':
     run_iptest()
-

@@ -9,6 +9,7 @@ import nose.tools as nt
 
 from IPython.core import display
 from IPython.core.getipython import get_ipython
+from IPython.utils.tempdir import NamedFileInTemporaryDirectory
 from IPython import paths as ipath
 
 import IPython.testing.decorators as dec
@@ -42,6 +43,9 @@ def test_retina_jpeg():
     data, md = img._repr_jpeg_()
     nt.assert_equal(md['width'], 1)
     nt.assert_equal(md['height'], 1)
+
+def test_base64image():
+    display.Image("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB94BCRQnOqNu0b4AAAAKSURBVAjXY2AAAAACAAHiIbwzAAAAAElFTkSuQmCC")
 
 def test_image_filename_defaults():
     '''test format constraint, and validity of jpeg and png'''
@@ -149,4 +153,39 @@ def test_json():
         nt.assert_equal(len(w), 1)
         nt.assert_equal(j._repr_json_(), lis)
     
-    
+def test_video_embedding():
+    """use a tempfile, with dummy-data, to ensure that video embedding doesn't crash"""
+    v = display.Video("http://ignored")
+    assert not v.embed
+    html = v._repr_html_()
+    nt.assert_not_in('src="data:', html)
+    nt.assert_in('src="http://ignored"', html)
+
+    with nt.assert_raises(ValueError):
+        v = display.Video(b'abc')
+
+    with NamedFileInTemporaryDirectory('test.mp4') as f:
+        f.write(b'abc')
+        f.close()
+
+        v = display.Video(f.name)
+        assert not v.embed
+        html = v._repr_html_()
+        nt.assert_not_in('src="data:', html)
+        
+        v = display.Video(f.name, embed=True)
+        html = v._repr_html_()
+        nt.assert_in('src="data:video/mp4;base64,YWJj"',html)
+        
+        v = display.Video(f.name, embed=True, mimetype='video/other')
+        html = v._repr_html_()
+        nt.assert_in('src="data:video/other;base64,YWJj"',html)
+        
+        v = display.Video(b'abc', embed=True, mimetype='video/mp4')
+        html = v._repr_html_()
+        nt.assert_in('src="data:video/mp4;base64,YWJj"',html)
+
+        v = display.Video(u'YWJj', embed=True, mimetype='video/xyz')
+        html = v._repr_html_()
+        nt.assert_in('src="data:video/xyz;base64,YWJj"',html)
+

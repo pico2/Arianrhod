@@ -9,7 +9,7 @@ import io
 import os
 import sys
 import warnings
-from unittest import TestCase, skipIf
+from unittest import TestCase
 
 try:
     from importlib import invalidate_caches   # Required from Python 3.3
@@ -23,9 +23,8 @@ from IPython import get_ipython
 from IPython.core import magic
 from IPython.core.error import UsageError
 from IPython.core.magic import (Magics, magics_class, line_magic,
-                                cell_magic, line_cell_magic,
-                                register_line_magic, register_cell_magic,
-                                register_line_cell_magic)
+                                cell_magic,
+                                register_line_magic, register_cell_magic)
 from IPython.core.magics import execution, script, code
 from IPython.testing import decorators as dec
 from IPython.testing import tools as tt
@@ -39,6 +38,8 @@ if py3compat.PY3:
 else:
     from StringIO import StringIO
 
+
+_ip = get_ipython()
 
 @magic.magics_class
 class DummyMagics(magic.Magics): pass
@@ -90,7 +91,6 @@ def test_config():
 
 def test_rehashx():
     # clear up everything
-    _ip = get_ipython()
     _ip.alias_manager.clear_aliases()
     del _ip.db['syscmdlist']
     
@@ -568,6 +568,11 @@ def test_timeit_quiet():
     with tt.AssertNotPrints("loops"):
         _ip.run_cell("%timeit -n1 -r1 -q 1")
 
+def test_timeit_return_quiet():
+    with tt.AssertNotPrints("loops"):
+        res = _ip.run_line_magic('timeit', '-n1 -r1 -q -o 1')
+    assert (res is not None)
+
 @dec.skipif(sys.version_info[0] >= 3, "no differences with __future__ in py3")
 def test_timeit_futures():
     "Test %timeit with __future__ environments"
@@ -601,13 +606,16 @@ def test_prun_quotes():
     nt.assert_equal(_ip.user_ns['x'], '\t')
 
 def test_extension():
-    tmpdir = TemporaryDirectory()
-    orig_ipython_dir = _ip.ipython_dir
+    # Debugging information for failures of this test
+    print('sys.path:')
+    for p in sys.path:
+        print(' ', p)
+    print('CWD', os.getcwd())
+
+    nt.assert_raises(ImportError, _ip.magic, "load_ext daft_extension")
+    daft_path = os.path.join(os.path.dirname(__file__), "daft_extension")
+    sys.path.insert(0, daft_path)
     try:
-        _ip.ipython_dir = tmpdir.name
-        nt.assert_raises(ImportError, _ip.magic, "load_ext daft_extension")
-        url = os.path.join(os.path.dirname(__file__), "daft_extension.py")
-        _ip.magic("install_ext %s" % url)
         _ip.user_ns.pop('arq', None)
         invalidate_caches()   # Clear import caches
         _ip.magic("load_ext daft_extension")
@@ -615,11 +623,9 @@ def test_extension():
         _ip.magic("unload_ext daft_extension")
         assert 'arq' not in _ip.user_ns
     finally:
-        _ip.ipython_dir = orig_ipython_dir
-        tmpdir.cleanup()
+        sys.path.remove(daft_path)
 
 
-@dec.skip_without('nbformat')
 def test_notebook_export_json():
     _ip = get_ipython()
     _ip.history_manager.reset()   # Clear any existing history.

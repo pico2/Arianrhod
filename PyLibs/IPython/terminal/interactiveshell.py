@@ -1,46 +1,64 @@
-# -*- coding: utf-8 -*-
-"""Subclass of InteractiveShell for terminal based frontends."""
-
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2001 Janko Hauser <jhauser@zscout.de>
-#  Copyright (C) 2001-2007 Fernando Perez. <fperez@colorado.edu>
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+"""IPython terminal interface using prompt_toolkit"""
 from __future__ import print_function
 
-import bdb
 import os
 import sys
+from warnings import warn
 
-from IPython.core.error import TryNext, UsageError
-from IPython.core.usage import interactive_usage
-from IPython.core.inputsplitter import IPythonInputSplitter
 from IPython.core.interactiveshell import InteractiveShell, InteractiveShellABC
-from IPython.core.magic import Magics, magics_class, line_magic
-from IPython.lib.clipboard import ClipboardEmpty
-from IPython.utils.encoding import get_stream_enc
-from IPython.utils import py3compat
+from IPython.utils.py3compat import PY3, cast_unicode_py2, input
 from IPython.utils.terminal import toggle_set_term_title, set_term_title
 from IPython.utils.process import abbrev_cwd
-from IPython.utils.warn import warn, error
-from IPython.utils.text import num_ini_spaces, SList, strip_email_quotes
-from traitlets import Integer, CBool, Unicode
+from traitlets import Bool, Unicode, Dict, Integer, observe, Instance, Type, default, Enum
 
-#-----------------------------------------------------------------------------
-# Utilities
-#-----------------------------------------------------------------------------
+from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
+from prompt_toolkit.filters import (HasFocus, Condition, IsDone)
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.shortcuts import create_prompt_application, create_eventloop, create_prompt_layout
+from prompt_toolkit.interface import CommandLineInterface
+from prompt_toolkit.key_binding.manager import KeyBindingManager
+from prompt_toolkit.layout.processors import ConditionalProcessor, HighlightMatchingBracketProcessor
+from prompt_toolkit.styles import PygmentsStyle, DynamicStyle
+
+from pygments.styles import get_style_by_name, get_all_styles
+from pygments.token import Token
+
+from .debugger import TerminalPdb, Pdb
+from .magics import TerminalMagics
+from .pt_inputhooks import get_inputhook_func
+from .prompts import Prompts, ClassicPrompts, RichPromptDisplayHook
+from .ptutils import IPythonPTCompleter, IPythonPTLexer
+from .shortcuts import register_ipython_shortcuts
+
+DISPLAY_BANNER_DEPRECATED = object()
+
+
+from pygments.style import Style
+
+class _NoStyle(Style): pass
+
+
+
+_style_overrides_light_bg = {
+            Token.Prompt: '#0000ff',
+            Token.PromptNum: '#0000ee bold',
+            Token.OutPrompt: '#cc0000',
+            Token.OutPromptNum: '#bb0000 bold',
+}
+
+_style_overrides_linux = {
+            Token.Prompt: '#00cc00',
+            Token.PromptNum: '#00bb00 bold',
+            Token.OutPrompt: '#cc0000',
+            Token.OutPromptNum: '#bb0000 bold',
+}
+
+
 
 def get_default_editor():
     try:
         ed = os.environ['EDITOR']
-        if not py3compat.PY3:
+        if not PY3:
             ed = ed.decode()
         return ed
     except KeyError:
@@ -54,287 +72,118 @@ def get_default_editor():
     else:
         return 'notepad' # same in Windows!
 
-def get_pasted_lines(sentinel, l_input=py3compat.input, quiet=False):
-    """ Yield pasted lines until the user enters the given sentinel value.
-    """
-    if not quiet:
-        print("Pasting code; enter '%s' alone on the line to stop or use Ctrl-D." \
-              % sentinel)
-        prompt = ":"
-    else:
-        prompt = ""
-    while True:
-        try:
-            l = py3compat.str_to_unicode(l_input(prompt))
-            if l == sentinel:
-                return
-            else:
-                yield l
-        except EOFError:
-            print('<EOF>')
-            return
+
+if sys.stdin and sys.stdout and sys.stderr:
+    _is_tty = (sys.stdin.isatty()) and (sys.stdout.isatty()) and  (sys.stderr.isatty())
+else:
+    _is_tty = False
 
 
-#------------------------------------------------------------------------
-# Terminal-specific magics
-#------------------------------------------------------------------------
-
-@magics_class
-class TerminalMagics(Magics):
-    def __init__(self, shell):
-        super(TerminalMagics, self).__init__(shell)
-        self.input_splitter = IPythonInputSplitter()
-        
-    def store_or_execute(self, block, name):
-        """ Execute a block, or store it in a variable, per the user's request.
-        """
-        if name:
-            # If storing it for further editing
-            self.shell.user_ns[name] = SList(block.splitlines())
-            print("Block assigned to '%s'" % name)
-        else:
-            b = self.preclean_input(block)
-            self.shell.user_ns['pasted_block'] = b
-            self.shell.using_paste_magics = True
-            try:
-                self.shell.run_cell(b)
-            finally:
-                self.shell.using_paste_magics = False
-    
-    def preclean_input(self, block):
-        lines = block.splitlines()
-        while lines and not lines[0].strip():
-            lines = lines[1:]
-        return strip_email_quotes('\n'.join(lines))
-
-    def rerun_pasted(self, name='pasted_block'):
-        """ Rerun a previously pasted command.
-        """
-        b = self.shell.user_ns.get(name)
-
-        # Sanity checks
-        if b is None:
-            raise UsageError('No previous pasted block available')
-        if not isinstance(b, py3compat.string_types):
-            raise UsageError(
-                "Variable 'pasted_block' is not a string, can't execute")
-
-        print("Re-executing '%s...' (%d chars)"% (b.split('\n',1)[0], len(b)))
-        self.shell.run_cell(b)
-
-    @line_magic
-    def autoindent(self, parameter_s = ''):
-        """Toggle autoindent on/off (if available)."""
-
-        self.shell.set_autoindent()
-        print("Automatic indentation is:",['OFF','ON'][self.shell.autoindent])
-
-    @line_magic
-    def cpaste(self, parameter_s=''):
-        """Paste & execute a pre-formatted code block from clipboard.
-
-        You must terminate the block with '--' (two minus-signs) or Ctrl-D
-        alone on the line. You can also provide your own sentinel with '%paste
-        -s %%' ('%%' is the new sentinel for this operation).
-
-        The block is dedented prior to execution to enable execution of method
-        definitions. '>' and '+' characters at the beginning of a line are
-        ignored, to allow pasting directly from e-mails, diff files and
-        doctests (the '...' continuation prompt is also stripped).  The
-        executed block is also assigned to variable named 'pasted_block' for
-        later editing with '%edit pasted_block'.
-
-        You can also pass a variable name as an argument, e.g. '%cpaste foo'.
-        This assigns the pasted block to variable 'foo' as string, without
-        dedenting or executing it (preceding >>> and + is still stripped)
-
-        '%cpaste -r' re-executes the block previously entered by cpaste.
-        '%cpaste -q' suppresses any additional output messages.
-
-        Do not be alarmed by garbled output on Windows (it's a readline bug).
-        Just press enter and type -- (and press enter again) and the block
-        will be what was just pasted.
-
-        IPython statements (magics, shell escapes) are not supported (yet).
-
-        See also
-        --------
-        paste: automatically pull code from clipboard.
-
-        Examples
-        --------
-        ::
-
-          In [8]: %cpaste
-          Pasting code; enter '--' alone on the line to stop.
-          :>>> a = ["world!", "Hello"]
-          :>>> print " ".join(sorted(a))
-          :--
-          Hello world!
-        """
-        opts, name = self.parse_options(parameter_s, 'rqs:', mode='string')
-        if 'r' in opts:
-            self.rerun_pasted()
-            return
-
-        quiet = ('q' in opts)
-
-        sentinel = opts.get('s', u'--')
-        block = '\n'.join(get_pasted_lines(sentinel, quiet=quiet))
-        self.store_or_execute(block, name)
-
-    @line_magic
-    def paste(self, parameter_s=''):
-        """Paste & execute a pre-formatted code block from clipboard.
-
-        The text is pulled directly from the clipboard without user
-        intervention and printed back on the screen before execution (unless
-        the -q flag is given to force quiet mode).
-
-        The block is dedented prior to execution to enable execution of method
-        definitions. '>' and '+' characters at the beginning of a line are
-        ignored, to allow pasting directly from e-mails, diff files and
-        doctests (the '...' continuation prompt is also stripped).  The
-        executed block is also assigned to variable named 'pasted_block' for
-        later editing with '%edit pasted_block'.
-
-        You can also pass a variable name as an argument, e.g. '%paste foo'.
-        This assigns the pasted block to variable 'foo' as string, without
-        executing it (preceding >>> and + is still stripped).
-
-        Options:
-
-          -r: re-executes the block previously entered by cpaste.
-
-          -q: quiet mode: do not echo the pasted text back to the terminal.
-
-        IPython statements (magics, shell escapes) are not supported (yet).
-
-        See also
-        --------
-        cpaste: manually paste code into terminal until you mark its end.
-        """
-        opts, name = self.parse_options(parameter_s, 'rq', mode='string')
-        if 'r' in opts:
-            self.rerun_pasted()
-            return
-        try:
-            block = self.shell.hooks.clipboard_get()
-        except TryNext as clipboard_exc:
-            message = getattr(clipboard_exc, 'args')
-            if message:
-                error(message[0])
-            else:
-                error('Could not get text from the clipboard.')
-            return
-        except ClipboardEmpty:
-            raise UsageError("The clipboard appears to be empty")
-
-        # By default, echo back to terminal unless quiet mode is requested
-        if 'q' not in opts:
-            write = self.shell.write
-            write(self.shell.pycolorize(block))
-            if not block.endswith('\n'):
-                write('\n')
-            write("## -- End pasted text --\n")
-
-        self.store_or_execute(block, name)
-
-    # Class-level: add a '%cls' magic only on Windows
-    if sys.platform == 'win32':
-        @line_magic
-        def cls(self, s):
-            """Clear screen.
-            """
-            os.system("cls")
-
-#-----------------------------------------------------------------------------
-# Main class
-#-----------------------------------------------------------------------------
+_use_simple_prompt = ('IPY_TEST_SIMPLE_PROMPT' in os.environ) or (not _is_tty)
 
 class TerminalInteractiveShell(InteractiveShell):
+    space_for_menu = Integer(6, help='Number of line at the bottom of the screen '
+                                                  'to reserve for the completion menu'
+                            ).tag(config=True)
 
-    autoedit_syntax = CBool(False, config=True,
-        help="auto editing of files with syntax errors.")
-    confirm_exit = CBool(True, config=True,
+    def _space_for_menu_changed(self, old, new):
+        self._update_layout()
+
+    pt_cli = None
+    debugger_history = None
+    _pt_app = None
+
+    simple_prompt = Bool(_use_simple_prompt,
+        help="""Use `raw_input` for the REPL, without completion, multiline input, and prompt colors.
+
+            Useful when controlling IPython as a subprocess, and piping STDIN/OUT/ERR. Known usage are:
+            IPython own testing machinery, and emacs inferior-shell integration through elpy.
+
+            This mode default to `True` if the `IPY_TEST_SIMPLE_PROMPT`
+            environment variable is set, or the current terminal is not a tty.
+
+            """
+            ).tag(config=True)
+
+    @property
+    def debugger_cls(self):
+        return Pdb if self.simple_prompt else TerminalPdb
+
+    confirm_exit = Bool(True,
         help="""
         Set to confirm when you try to exit IPython with an EOF (Control-D
         in Unix, Control-Z/Enter in Windows). By typing 'exit' or 'quit',
         you can force a direct exit without any confirmation.""",
-    )
-    # This display_banner only controls whether or not self.show_banner()
-    # is called when mainloop/interact are called.  The default is False
-    # because for the terminal based application, the banner behavior
-    # is controlled by the application.
-    display_banner = CBool(False) # This isn't configurable!
-    embedded = CBool(False)
-    embedded_active = CBool(False)
-    editor = Unicode(get_default_editor(), config=True,
+    ).tag(config=True)
+
+    editing_mode = Unicode('emacs',
+        help="Shortcut style to use at the prompt. 'vi' or 'emacs'.",
+    ).tag(config=True)
+
+    mouse_support = Bool(False,
+        help="Enable mouse support in the prompt"
+    ).tag(config=True)
+
+    highlighting_style = Unicode('legacy',
+            help="The name of a Pygments style to use for syntax highlighting: \n %s" % ', '.join(get_all_styles())
+    ).tag(config=True)
+
+    
+    @observe('highlighting_style')
+    @observe('colors')
+    def _highlighting_style_changed(self, change):
+        self.refresh_style()
+
+    def refresh_style(self):
+        self._style = self._make_style_from_name(self.highlighting_style)
+
+
+    highlighting_style_overrides = Dict(
+        help="Override highlighting format for specific tokens"
+    ).tag(config=True)
+
+    editor = Unicode(get_default_editor(),
         help="Set the editor used by IPython (default to $EDITOR/vi/notepad)."
-    )
-    pager = Unicode('less', config=True,
-        help="The shell program to be used for paging.")
+    ).tag(config=True)
 
-    screen_length = Integer(0, config=True,
-        help=
-        """Number of lines of your screen, used to control printing of very
-        long strings.  Strings longer than this number of lines will be sent
-        through a pager instead of directly printed.  The default value for
-        this is 0, which means IPython will auto-detect your screen size every
-        time it needs to print certain potentially long strings (this doesn't
-        change the behavior of the 'print' keyword, it's only triggered
-        internally). If for some reason this isn't working well (it needs
-        curses support), specify it yourself. Otherwise don't change the
-        default.""",
-    )
-    term_title = CBool(False, config=True,
-        help="Enable auto setting the terminal title."
-    )
-    usage = Unicode(interactive_usage)
-    
-    # This `using_paste_magics` is used to detect whether the code is being
-    # executed via paste magics functions
-    using_paste_magics = CBool(False)
+    prompts_class = Type(Prompts, help='Class used to generate Prompt token for prompt_toolkit').tag(config=True)
 
-    # In the terminal, GUI control is done via PyOS_InputHook
-    @staticmethod
-    def enable_gui(gui=None, app=None):
-        """Switch amongst GUI input hooks by name.
-        """
-        # Deferred import
-        from IPython.lib.inputhook import enable_gui as real_enable_gui
-        try:
-            return real_enable_gui(gui, app)
-        except ValueError as e:
-            raise UsageError("%s" % e)
-    
-    system = InteractiveShell.system_raw
+    prompts = Instance(Prompts)
 
-    #-------------------------------------------------------------------------
-    # Overrides of init stages
-    #-------------------------------------------------------------------------
+    @default('prompts')
+    def _prompts_default(self):
+        return self.prompts_class(self)
 
-    def init_display_formatter(self):
-        super(TerminalInteractiveShell, self).init_display_formatter()
-        # terminal only supports plaintext
-        self.display_formatter.active_types = ['text/plain']
+    @observe('prompts')
+    def _(self, change):
+        self._update_layout()
 
-    #-------------------------------------------------------------------------
-    # Things related to the terminal
-    #-------------------------------------------------------------------------
+    @default('displayhook_class')
+    def _displayhook_class_default(self):
+        return RichPromptDisplayHook
 
-    @property
-    def usable_screen_length(self):
-        if self.screen_length == 0:
-            return 0
-        else:
-            num_lines_bot = self.separate_in.count('\n')+1
-            return self.screen_length - num_lines_bot
+    term_title = Bool(True,
+        help="Automatically set the terminal title"
+    ).tag(config=True)
 
-    def _term_title_changed(self, name, new_value):
-        self.init_term_title()
+    # Leaving that for beta/rc tester, shoudl remove for 5.0.0 final. 
+    display_completions_in_columns = Bool(None,
+        help="DEPRECATED", allow_none=True
+    ).tag(config=True)
 
-    def init_term_title(self):
+    @observe('display_completions_in_columns')
+    def _display_completions_in_columns_changed(self, new):
+        raise DeprecationWarning("The `display_completions_in_columns` Boolean has been replaced by the enum `display_completions`"
+                                 "with the following acceptable value: 'column', 'multicolumn','readlinelike'. ")
+
+    display_completions = Enum(('column', 'multicolumn','readlinelike'), default_value='multicolumn').tag(config=True)
+
+    highlight_matching_brackets = Bool(True,
+        help="Highlight matching brackets .",
+    ).tag(config=True)
+
+    @observe('term_title')
+    def init_term_title(self, change=None):
         # Enable or disable the terminal title.
         if self.term_title:
             toggle_set_term_title(True)
@@ -342,9 +191,156 @@ class TerminalInteractiveShell(InteractiveShell):
         else:
             toggle_set_term_title(False)
 
-    #-------------------------------------------------------------------------
-    # Things related to aliases
-    #-------------------------------------------------------------------------
+    def init_display_formatter(self):
+        super(TerminalInteractiveShell, self).init_display_formatter()
+        # terminal only supports plain text
+        self.display_formatter.active_types = ['text/plain']
+
+    def init_prompt_toolkit_cli(self):
+        if self.simple_prompt:
+            # Fall back to plain non-interactive output for tests.
+            # This is very limited, and only accepts a single line.
+            def prompt():
+                return cast_unicode_py2(input('In [%d]: ' % self.execution_count))
+            self.prompt_for_code = prompt
+            return
+
+        # Set up keyboard shortcuts
+        kbmanager = KeyBindingManager.for_prompt()
+        register_ipython_shortcuts(kbmanager.registry, self)
+
+        # Pre-populate history from IPython's history database
+        history = InMemoryHistory()
+        last_cell = u""
+        for __, ___, cell in self.history_manager.get_tail(self.history_load_length,
+                                                        include_latest=True):
+            # Ignore blank lines and consecutive duplicates
+            cell = cell.rstrip()
+            if cell and (cell != last_cell):
+                history.append(cell)
+
+        self._style = self._make_style_from_name(self.highlighting_style)
+        style = DynamicStyle(lambda: self._style)
+
+        editing_mode = getattr(EditingMode, self.editing_mode.upper())
+
+        self._pt_app = create_prompt_application(
+                            editing_mode=editing_mode,
+                            key_bindings_registry=kbmanager.registry,
+                            history=history,
+                            completer=IPythonPTCompleter(self.Completer),
+                            enable_history_search=True,
+                            style=style,
+                            mouse_support=self.mouse_support,
+                            **self._layout_options()
+        )
+        self._eventloop = create_eventloop(self.inputhook)
+        self.pt_cli = CommandLineInterface(self._pt_app, eventloop=self._eventloop)
+
+    def _make_style_from_name(self, name):
+        """
+        Small wrapper that make an IPython compatible style from a style name
+
+        We need that to add style for prompt ... etc. 
+        """
+        style_overrides = {}
+        if name == 'legacy':
+            legacy = self.colors.lower()
+            if legacy == 'linux':
+                style_cls = get_style_by_name('monokai')
+                style_overrides = _style_overrides_linux
+            elif legacy == 'lightbg':
+                style_overrides = _style_overrides_light_bg
+                style_cls = get_style_by_name('pastie')
+            elif legacy == 'neutral':
+                # The default theme needs to be visible on both a dark background
+                # and a light background, because we can't tell what the terminal
+                # looks like. These tweaks to the default theme help with that.
+                style_cls = get_style_by_name('default')
+                style_overrides.update({
+                    Token.Number: '#007700',
+                    Token.Operator: 'noinherit',
+                    Token.String: '#BB6622',
+                    Token.Name.Function: '#2080D0',
+                    Token.Name.Class: 'bold #2080D0',
+                    Token.Name.Namespace: 'bold #2080D0',
+                    Token.Prompt: '#009900',
+                    Token.PromptNum: '#00ff00 bold',
+                    Token.OutPrompt: '#990000',
+                    Token.OutPromptNum: '#ff0000 bold',
+                })
+            elif legacy =='nocolor':
+                style_cls=_NoStyle
+                style_overrides = {}
+            else :
+                raise ValueError('Got unknown colors: ', legacy)
+        else :
+            style_cls = get_style_by_name(name)
+            style_overrides = {
+                Token.Prompt: '#009900',
+                Token.PromptNum: '#00ff00 bold',
+                Token.OutPrompt: '#990000',
+                Token.OutPromptNum: '#ff0000 bold',
+            }
+        style_overrides.update(self.highlighting_style_overrides)
+        style = PygmentsStyle.from_defaults(pygments_style_cls=style_cls,
+                                            style_dict=style_overrides)
+
+        return style
+
+    def _layout_options(self):
+        """
+        Return the current layout option for the current Terminal InteractiveShell
+        """
+        return {
+                'lexer':IPythonPTLexer(),
+                'reserve_space_for_menu':self.space_for_menu,
+                'get_prompt_tokens':self.prompts.in_prompt_tokens,
+                'get_continuation_tokens':self.prompts.continuation_prompt_tokens,
+                'multiline':True,
+                'display_completions_in_columns': (self.display_completions == 'multicolumn'),
+
+                # Highlight matching brackets, but only when this setting is
+                # enabled, and only when the DEFAULT_BUFFER has the focus.
+                'extra_input_processors': [ConditionalProcessor(
+                        processor=HighlightMatchingBracketProcessor(chars='[](){}'),
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone() &
+                            Condition(lambda cli: self.highlight_matching_brackets))],
+                }
+
+    def _update_layout(self):
+        """
+        Ask for a re computation of the application layout, if for example ,
+        some configuration options have changed.
+        """
+        if self._pt_app:
+            self._pt_app.layout = create_prompt_layout(**self._layout_options())
+
+    def prompt_for_code(self):
+        document = self.pt_cli.run(
+            pre_run=self.pre_prompt, reset_current_buffer=True)
+        return document.text
+
+    def init_io(self):
+        if sys.platform not in {'win32', 'cli'}:
+            return
+
+        import win_unicode_console
+        import colorama
+
+        win_unicode_console.enable()
+        colorama.init()
+
+        # For some reason we make these wrappers around stdout/stderr.
+        # For now, we need to reset them so all output gets coloured.
+        # https://github.com/ipython/ipython/issues/8669
+        from IPython.utils import io
+        io.stdout = io.IOStream(sys.stdout)
+        io.stderr = io.IOStream(sys.stderr)
+
+    def init_magics(self):
+        super(TerminalInteractiveShell, self).init_magics()
+        self.register_magics(TerminalMagics)
 
     def init_alias(self):
         # The parent class defines aliases that can be safely used with any
@@ -355,286 +351,103 @@ class TerminalInteractiveShell(InteractiveShell):
         # need direct access to the console in a way that we can't emulate in
         # GUI or web frontend
         if os.name == 'posix':
-            aliases = [('clear', 'clear'), ('more', 'more'), ('less', 'less'),
-                       ('man', 'man')]
-        else :
-            aliases = []
+            for cmd in ['clear', 'more', 'less', 'man']:
+                self.alias_manager.soft_define_alias(cmd, cmd)
 
-        for name, cmd in aliases:
-            self.alias_manager.soft_define_alias(name, cmd)
 
-    #-------------------------------------------------------------------------
-    # Mainloop and code execution logic
-    #-------------------------------------------------------------------------
+    def __init__(self, *args, **kwargs):
+        super(TerminalInteractiveShell, self).__init__(*args, **kwargs)
+        self.init_prompt_toolkit_cli()
+        self.init_term_title()
+        self.keep_running = True
 
-    def mainloop(self, display_banner=None):
-        """Start the mainloop.
-
-        If an optional banner argument is given, it will override the
-        internally created default banner.
-        """
-
-        with self.builtin_trap, self.display_trap:
-
-            while 1:
-                try:
-                    self.interact(display_banner=display_banner)
-                    #self.interact_with_readline()
-                    # XXX for testing of a readline-decoupled repl loop, call
-                    # interact_with_readline above
-                    break
-                except KeyboardInterrupt:
-                    # this should not be necessary, but KeyboardInterrupt
-                    # handling seems rather unpredictable...
-                    self.write("\nKeyboardInterrupt in interact()\n")
-
-    def _replace_rlhist_multiline(self, source_raw, hlen_before_cell):
-        """Store multiple lines as a single entry in history"""
-
-        # do nothing without readline or disabled multiline
-        if not self.has_readline or not self.multiline_history:
-            return hlen_before_cell
-
-        # windows rl has no remove_history_item
-        if not hasattr(self.readline, "remove_history_item"):
-            return hlen_before_cell
-
-        # skip empty cells
-        if not source_raw.rstrip():
-            return hlen_before_cell
-
-        # nothing changed do nothing, e.g. when rl removes consecutive dups
-        hlen = self.readline.get_current_history_length()
-        if hlen == hlen_before_cell:
-            return hlen_before_cell
-
-        for i in range(hlen - hlen_before_cell):
-            self.readline.remove_history_item(hlen - i - 1)
-        stdin_encoding = get_stream_enc(sys.stdin, 'utf-8')
-        self.readline.add_history(py3compat.unicode_to_str(source_raw.rstrip(),
-                                    stdin_encoding))
-        return self.readline.get_current_history_length()
-
-    def interact(self, display_banner=None):
-        """Closely emulate the interactive Python console."""
-
-        # batch run -> do not interact
-        if self.exit_now:
-            return
-
-        if display_banner is None:
-            display_banner = self.display_banner
-
-        if isinstance(display_banner, py3compat.string_types):
-            self.show_banner(display_banner)
-        elif display_banner:
-            self.show_banner()
-
-        more = False
-
-        if self.has_readline:
-            self.readline_startup_hook(self.pre_readline)
-            hlen_b4_cell = self.readline.get_current_history_length()
-        else:
-            hlen_b4_cell = 0
-        # exit_now is set by a call to %Exit or %Quit, through the
-        # ask_exit callback.
-
-        while not self.exit_now:
-            self.hooks.pre_prompt_hook()
-            if more:
-                try:
-                    prompt = self.prompt_manager.render('in2')
-                except:
-                    self.showtraceback()
-                if self.autoindent:
-                    self.rl_do_indent = True
-
-            else:
-                try:
-                    prompt = self.separate_in + self.prompt_manager.render('in')
-                except:
-                    self.showtraceback()
-            try:
-                line = self.raw_input(prompt)
-                if self.exit_now:
-                    # quick exit on sys.std[in|out] close
-                    break
-                if self.autoindent:
-                    self.rl_do_indent = False
-
-            except KeyboardInterrupt:
-                #double-guard against keyboardinterrupts during kbdint handling
-                try:
-                    self.write('\n' + self.get_exception_only())
-                    source_raw = self.input_splitter.raw_reset()
-                    hlen_b4_cell = \
-                        self._replace_rlhist_multiline(source_raw, hlen_b4_cell)
-                    more = False
-                except KeyboardInterrupt:
-                    pass
-            except EOFError:
-                if self.autoindent:
-                    self.rl_do_indent = False
-                    if self.has_readline:
-                        self.readline_startup_hook(None)
-                self.write('\n')
-                self.exit()
-            except bdb.BdbQuit:
-                warn('The Python debugger has exited with a BdbQuit exception.\n'
-                     'Because of how pdb handles the stack, it is impossible\n'
-                     'for IPython to properly format this particular exception.\n'
-                     'IPython will resume normal operation.')
-            except:
-                # exceptions here are VERY RARE, but they can be triggered
-                # asynchronously by signal handlers, for example.
-                self.showtraceback()
-            else:
-                try:
-                    self.input_splitter.push(line)
-                    more = self.input_splitter.push_accepts_more()
-                except SyntaxError:
-                    # Run the code directly - run_cell takes care of displaying
-                    # the exception.
-                    more = False
-                if (self.SyntaxTB.last_syntax_error and
-                    self.autoedit_syntax):
-                    self.edit_syntax_error()
-                if not more:
-                    source_raw = self.input_splitter.raw_reset()
-                    self.run_cell(source_raw, store_history=True)
-                    hlen_b4_cell = \
-                        self._replace_rlhist_multiline(source_raw, hlen_b4_cell)
-
-        # Turn off the exit flag, so the mainloop can be restarted if desired
-        self.exit_now = False
-
-    def raw_input(self, prompt=''):
-        """Write a prompt and read a line.
-
-        The returned line does not include the trailing newline.
-        When the user enters the EOF key sequence, EOFError is raised.
-
-        Parameters
-        ----------
-
-        prompt : str, optional
-          A string to be printed to prompt the user.
-        """
-        # raw_input expects str, but we pass it unicode sometimes
-        prompt = py3compat.cast_bytes_py2(prompt)
-
-        try:
-            line = py3compat.cast_unicode_py2(self.raw_input_original(prompt))
-        except ValueError:
-            warn("\n********\nYou or a %run:ed script called sys.stdin.close()"
-                 " or sys.stdout.close()!\nExiting IPython!\n")
-            self.ask_exit()
-            return ""
-
-        # Try to be reasonably smart about not re-indenting pasted input more
-        # than necessary.  We do this by trimming out the auto-indent initial
-        # spaces, if the user's actual input started itself with whitespace.
-        if self.autoindent:
-            if num_ini_spaces(line) > self.indent_current_nsp:
-                line = line[self.indent_current_nsp:]
-                self.indent_current_nsp = 0
-
-        return line
-
-    #-------------------------------------------------------------------------
-    # Methods to support auto-editing of SyntaxErrors.
-    #-------------------------------------------------------------------------
-
-    def edit_syntax_error(self):
-        """The bottom half of the syntax error handler called in the main loop.
-
-        Loop until syntax error is fixed or user cancels.
-        """
-
-        while self.SyntaxTB.last_syntax_error:
-            # copy and clear last_syntax_error
-            err = self.SyntaxTB.clear_err_state()
-            if not self._should_recompile(err):
-                return
-            try:
-                # may set last_syntax_error again if a SyntaxError is raised
-                self.safe_execfile(err.filename,self.user_ns)
-            except:
-                self.showtraceback()
-            else:
-                try:
-                    f = open(err.filename)
-                    try:
-                        # This should be inside a display_trap block and I
-                        # think it is.
-                        sys.displayhook(f.read())
-                    finally:
-                        f.close()
-                except:
-                    self.showtraceback()
-
-    def _should_recompile(self,e):
-        """Utility routine for edit_syntax_error"""
-
-        if e.filename in ('<ipython console>','<input>','<string>',
-                          '<console>','<BackgroundJob compilation>',
-                          None):
-
-            return False
-        try:
-            if (self.autoedit_syntax and
-                not self.ask_yes_no('Return to editor to correct syntax error? '
-                              '[Y/n] ','y')):
-                return False
-        except EOFError:
-            return False
-
-        def int0(x):
-            try:
-                return int(x)
-            except TypeError:
-                return 0
-        # always pass integer line and offset values to editor hook
-        try:
-            self.hooks.fix_error_editor(e.filename,
-                int0(e.lineno),int0(e.offset),e.msg)
-        except TryNext:
-            warn('Could not open editor')
-            return False
-        return True
-
-    #-------------------------------------------------------------------------
-    # Things related to exiting
-    #-------------------------------------------------------------------------
+        self.debugger_history = InMemoryHistory()
 
     def ask_exit(self):
-        """ Ask the shell to exit. Can be overiden and used as a callback. """
-        self.exit_now = True
+        self.keep_running = False
 
-    def exit(self):
-        """Handle interactive exit.
+    rl_next_input = None
 
-        This method calls the ask_exit callback."""
-        if self.confirm_exit:
-            if self.ask_yes_no('Do you really want to exit ([y]/n)?','y'):
-                self.ask_exit()
+    def pre_prompt(self):
+        if self.rl_next_input:
+            self.pt_cli.application.buffer.text = cast_unicode_py2(self.rl_next_input)
+            self.rl_next_input = None
+
+    def interact(self, display_banner=DISPLAY_BANNER_DEPRECATED):
+
+        if display_banner is not DISPLAY_BANNER_DEPRECATED:
+            warn('interact `display_banner` argument is deprecated since IPython 5.0. Call `show_banner()` if needed.', DeprecationWarning, stacklevel=2)
+
+        while self.keep_running:
+            print(self.separate_in, end='')
+
+            try:
+                code = self.prompt_for_code()
+            except EOFError:
+                if (not self.confirm_exit) \
+                        or self.ask_yes_no('Do you really want to exit ([y]/n)?','y','n'):
+                    self.ask_exit()
+
+            else:
+                if code:
+                    self.run_cell(code, store_history=True)
+
+    def mainloop(self, display_banner=DISPLAY_BANNER_DEPRECATED):
+        # An extra layer of protection in case someone mashing Ctrl-C breaks
+        # out of our internal code.
+        if display_banner is not DISPLAY_BANNER_DEPRECATED:
+            warn('mainloop `display_banner` argument is deprecated since IPython 5.0. Call `show_banner()` if needed.', DeprecationWarning, stacklevel=2)
+        while True:
+            try:
+                self.interact()
+                break
+            except KeyboardInterrupt:
+                print("\nKeyboardInterrupt escaped interact()\n")
+        
+        if hasattr(self, '_eventloop'):
+            self._eventloop.close()
+
+    _inputhook = None
+    def inputhook(self, context):
+        if self._inputhook is not None:
+            self._inputhook(context)
+
+    def enable_gui(self, gui=None):
+        if gui:
+            self._inputhook = get_inputhook_func(gui)
         else:
-            self.ask_exit()
+            self._inputhook = None
 
-    #-------------------------------------------------------------------------
-    # Things related to magics
-    #-------------------------------------------------------------------------
+    # Run !system commands directly, not through pipes, so terminal programs
+    # work correctly.
+    system = InteractiveShell.system_raw
 
-    def init_magics(self):
-        super(TerminalInteractiveShell, self).init_magics()
-        self.register_magics(TerminalMagics)
+    def auto_rewrite_input(self, cmd):
+        """Overridden from the parent class to use fancy rewriting prompt"""
+        if not self.show_rewritten_input:
+            return
 
-    def showindentationerror(self):
-        super(TerminalInteractiveShell, self).showindentationerror()
-        if not self.using_paste_magics:
-            print("If you want to paste code into IPython, try the "
-                "%paste and %cpaste magic functions.")
+        tokens = self.prompts.rewrite_prompt_tokens()
+        if self.pt_cli:
+            self.pt_cli.print_tokens(tokens)
+            print(cmd)
+        else:
+            prompt = ''.join(s for t, s in tokens)
+            print(prompt, cmd, sep='')
+
+    _prompts_before = None
+    def switch_doctest_mode(self, mode):
+        """Switch prompts to classic for %doctest_mode"""
+        if mode:
+            self._prompts_before = self.prompts
+            self.prompts = ClassicPrompts(self)
+        elif self._prompts_before:
+            self.prompts = self._prompts_before
+            self._prompts_before = None
+        self._update_layout()
 
 
 InteractiveShellABC.register(TerminalInteractiveShell)
+
+if __name__ == '__main__':
+    TerminalInteractiveShell.instance().interact()

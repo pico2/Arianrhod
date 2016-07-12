@@ -9,21 +9,17 @@ Authors:
 * Alexander Belchenko (e-mail: bialix AT ukr.net)
 """
 
-#-----------------------------------------------------------------------------
-#  Copyright (C) 2008-2011  The IPython Development Team
-#
-#  Distributed under the terms of the BSD License.  The full license is in
-#  the file COPYING, distributed as part of this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import os
-import struct
 import sys
 import warnings
+try:
+    from shutil import get_terminal_size as _get_terminal_size
+except ImportError:
+    # use backport on Python 2
+    from backports.shutil_get_terminal_size import get_terminal_size as _get_terminal_size
 
 from . import py3compat
 
@@ -120,37 +116,5 @@ def freeze_term_title():
     ignore_termtitle = True
 
 
-if sys.platform == 'win32':
-    def get_terminal_size(defaultx=80, defaulty=25):
-        """Return size of current terminal console.
-
-        This function try to determine actual size of current working
-        console window and return tuple (sizex, sizey) if success,
-        or default size (defaultx, defaulty) otherwise.
-
-        Dependencies: ctypes should be installed.
-
-        Author: Alexander Belchenko (e-mail: bialix AT ukr.net)
-        """
-        try:
-            import ctypes
-        except ImportError:
-            return defaultx, defaulty
-
-        h = ctypes.windll.kernel32.GetStdHandle(-11)
-        csbi = ctypes.create_string_buffer(22)
-        res = ctypes.windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
-
-        if res:
-            (bufx, bufy, curx, cury, wattr,
-             left, top, right, bottom, maxx, maxy) = struct.unpack(
-                "hhhhHhhhhhh", csbi.raw)
-            sizex = right - left + 1
-            sizey = bottom - top + 1
-            return (sizex, sizey)
-        else:
-            return (defaultx, defaulty)
-else:
-    def get_terminal_size(defaultx=80, defaulty=25):
-        return defaultx, defaulty
-
+def get_terminal_size(defaultx=80, defaulty=25):
+    return _get_terminal_size((defaultx, defaulty))

@@ -14,6 +14,7 @@ from __future__ import print_function
 import logging
 import os
 import sys
+import warnings
 
 from traitlets.config.loader import Config
 from traitlets.config.application import boolean_flag, catch_config_error, Application
@@ -23,7 +24,6 @@ from IPython.core.completer import IPCompleter
 from IPython.core.crashhandler import CrashHandler
 from IPython.core.formatters import PlainTextFormatter
 from IPython.core.history import HistoryManager
-from IPython.core.prompts import PromptManager
 from IPython.core.application import (
     ProfileDir, BaseIPythonApplication, base_flags, base_aliases
 )
@@ -32,11 +32,10 @@ from IPython.core.shellapp import (
     InteractiveShellApp, shell_flags, shell_aliases
 )
 from IPython.extensions.storemagic import StoreMagics
-from IPython.terminal.interactiveshell import TerminalInteractiveShell
-from IPython.utils import warn
+from .interactiveshell import TerminalInteractiveShell
 from IPython.paths import get_ipython_dir
 from traitlets import (
-    Bool, List, Dict,
+    Bool, List, Dict, default, observe,
 )
 
 #-----------------------------------------------------------------------------
@@ -50,22 +49,11 @@ ipython --matplotlib=qt    # enable matplotlib integration with qt4 backend
 ipython --log-level=DEBUG  # set logging to DEBUG
 ipython --profile=foo      # start with profile foo
 
-ipython qtconsole          # start the qtconsole GUI application
-ipython help qtconsole     # show the help for the qtconsole subcmd
-
-ipython console            # start the terminal-based console application
-ipython help console       # show the help for the console subcmd
-
-ipython notebook           # start the IPython notebook
-ipython help notebook      # show the help for the notebook subcmd
-
 ipython profile create foo # create profile foo w/ default config files
 ipython help profile       # show the help for the profile subcmd
 
 ipython locate             # print the path to the IPython directory
 ipython locate profile foo # print the path to the directory for profile `foo`
-
-ipython nbconvert           # convert notebooks to/from other formats
 """
 
 #-----------------------------------------------------------------------------
@@ -113,6 +101,11 @@ addflag('autoedit-syntax', 'TerminalInteractiveShell.autoedit_syntax',
         'Turn on auto editing of files with syntax errors.',
         'Turn off auto editing of files with syntax errors.'
 )
+addflag('simple-prompt', 'TerminalInteractiveShell.simple_prompt',
+        "Force simple minimal prompt using `raw_input`",
+        "Use a rich interactive prompt with prompt_toolkit",
+)
+
 addflag('banner', 'TerminalIPythonApp.display_banner',
         "Display a banner upon starting IPython.",
         "Don't display a banner upon starting IPython."
@@ -130,9 +123,7 @@ addflag('term-title', 'TerminalInteractiveShell.term_title',
 classic_config = Config()
 classic_config.InteractiveShell.cache_size = 0
 classic_config.PlainTextFormatter.pprint = False
-classic_config.PromptManager.in_template = '>>> '
-classic_config.PromptManager.in2_template = '... '
-classic_config.PromptManager.out_template = ''
+classic_config.TerminalInteractiveShell.prompts_class='IPython.terminal.prompts.ClassicPrompts'
 classic_config.InteractiveShell.separate_in = ''
 classic_config.InteractiveShell.separate_out = ''
 classic_config.InteractiveShell.separate_out2 = ''
@@ -194,13 +185,13 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
     flags = Dict(flags)
     aliases = Dict(aliases)
     classes = List()
+    @default('classes')
     def _classes_default(self):
         """This has to be in a method, for TerminalIPythonApp to be available."""
         return [
             InteractiveShellApp, # ShellApp comes before TerminalApp, because
             self.__class__,      # it will also affect subclasses (e.g. QtConsole)
             TerminalInteractiveShell,
-            PromptManager,
             HistoryManager,
             ProfileDir,
             PlainTextFormatter,
@@ -209,21 +200,32 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
             StoreMagics,
         ]
 
-    subcommands = dict(
+    deprecated_subcommands = dict(
         qtconsole=('qtconsole.qtconsoleapp.JupyterQtConsoleApp',
-            """DEPRECATD: Launch the Jupyter Qt Console."""
+            """DEPRECATED, Will be removed in IPython 6.0 : Launch the Jupyter Qt Console."""
         ),
         notebook=('notebook.notebookapp.NotebookApp',
-            """DEPRECATED: Launch the Jupyter HTML Notebook Server."""
+            """DEPRECATED, Will be removed in IPython 6.0 : Launch the Jupyter HTML Notebook Server."""
         ),
+        console=('jupyter_console.app.ZMQTerminalIPythonApp',
+            """DEPRECATED, Will be removed in IPython 6.0 : Launch the Jupyter terminal-based Console."""
+        ),
+        nbconvert=('nbconvert.nbconvertapp.NbConvertApp',
+            "DEPRECATED, Will be removed in IPython 6.0 : Convert notebooks to/from other formats."
+        ),
+        trust=('nbformat.sign.TrustNotebookApp',
+            "DEPRECATED, Will be removed in IPython 6.0 : Sign notebooks to trust their potentially unsafe contents at load."
+        ),
+        kernelspec=('jupyter_client.kernelspecapp.KernelSpecApp',
+            "DEPRECATED, Will be removed in IPython 6.0 : Manage Jupyter kernel specifications."
+        ),
+    )
+    subcommands = dict(
         profile = ("IPython.core.profileapp.ProfileApp",
             "Create and manage IPython profiles."
         ),
         kernel = ("ipykernel.kernelapp.IPKernelApp",
             "Start a kernel without an attached frontend."
-        ),
-        console=('jupyter_console.app.ZMQTerminalIPythonApp',
-            """DEPRECATED: Launch the Jupyter terminal-based Console."""
         ),
         locate=('IPython.terminal.ipapp.LocateIPythonApp',
             LocateIPythonApp.description
@@ -231,56 +233,49 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         history=('IPython.core.historyapp.HistoryApp',
             "Manage the IPython history database."
         ),
-        nbconvert=('nbconvert.nbconvertapp.NbConvertApp',
-            "DEPRECATED: Convert notebooks to/from other formats."
-        ),
-        trust=('nbformat.sign.TrustNotebookApp',
-            "DEPRECATED: Sign notebooks to trust their potentially unsafe contents at load."
-        ),
-        kernelspec=('jupyter_client.kernelspecapp.KernelSpecApp',
-            "DEPRECATED: Manage Jupyter kernel specifications."
-        ),
     )
-    subcommands['install-nbextension'] = (
+    deprecated_subcommands['install-nbextension'] = (
         "notebook.nbextensions.InstallNBExtensionApp",
-        "DEPRECATED: Install Jupyter notebook extension files"
+        "DEPRECATED, Will be removed in IPython 6.0 : Install Jupyter notebook extension files"
     )
+    subcommands.update(deprecated_subcommands)
 
     # *do* autocreate requested profile, but don't create the config file.
     auto_create=Bool(True)
     # configurables
-    quick = Bool(False, config=True,
+    quick = Bool(False,
         help="""Start IPython quickly by skipping the loading of config files."""
-    )
-    def _quick_changed(self, name, old, new):
-        if new:
+    ).tag(config=True)
+    @observe('quick')
+    def _quick_changed(self, change):
+        if change['new']:
             self.load_config_file = lambda *a, **kw: None
 
-    display_banner = Bool(True, config=True,
+    display_banner = Bool(True,
         help="Whether to display a banner upon starting IPython."
-    )
+    ).tag(config=True)
 
     # if there is code of files to run from the cmd line, don't interact
     # unless the --i flag (App.force_interact) is true.
-    force_interact = Bool(False, config=True,
+    force_interact = Bool(False,
         help="""If a command or file is given via the command-line,
         e.g. 'ipython foo.py', start an interactive shell after executing the
         file or command."""
-    )
-    def _force_interact_changed(self, name, old, new):
-        if new:
+    ).tag(config=True)
+    @observe('force_interact')
+    def _force_interact_changed(self, change):
+        if change['new']:
             self.interact = True
 
-    def _file_to_run_changed(self, name, old, new):
+    @observe('file_to_run', 'code_to_run', 'module_to_run')
+    def _file_to_run_changed(self, change):
+        new = change['new']
         if new:
             self.something_to_run = True
         if new and not self.force_interact:
                 self.interact = False
-    _code_to_run_changed = _file_to_run_changed
-    _module_to_run_changed = _file_to_run_changed
 
     # internal, not-configurable
-    interact=Bool(True)
     something_to_run=Bool(False)
 
     def parse_command_line(self, argv=None):
@@ -293,7 +288,7 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
             # warn and transform into current syntax
             argv = argv[:] # copy, don't clobber
             idx = argv.index('-pylab')
-            warn.warn("`-pylab` flag has been deprecated.\n"
+            warnings.warn("`-pylab` flag has been deprecated.\n"
             "    Use `--matplotlib <backend>` and import pylab manually.")
             argv[idx] = '--pylab'
 
@@ -326,7 +321,7 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         # based app, because we call shell.show_banner() by hand below
         # so the banner shows *before* all extension loading stuff.
         self.shell = TerminalInteractiveShell.instance(parent=self,
-                        display_banner=False, profile_dir=self.profile_dir,
+                        profile_dir=self.profile_dir,
                         ipython_dir=self.ipython_dir, user_ns=self.user_ns)
         self.shell.configurables.append(self)
 
@@ -340,7 +335,7 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
     def _pylab_changed(self, name, old, new):
         """Replace --pylab='inline' with --pylab='auto'"""
         if new == 'inline':
-            warn.warn("'inline' not available as pylab backend, "
+            warnings.warn("'inline' not available as pylab backend, "
                       "using 'auto' instead.")
             self.pylab = 'auto'
 

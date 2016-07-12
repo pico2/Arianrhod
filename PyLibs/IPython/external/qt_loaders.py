@@ -15,10 +15,10 @@ from functools import partial
 from IPython.utils.version import check_version
 
 # Available APIs.
-QT_API_PYQT = 'pyqt'
+QT_API_PYQT = 'pyqt' # Force version 2
 QT_API_PYQT5 = 'pyqt5'
-QT_API_PYQTv1 = 'pyqtv1'
-QT_API_PYQT_DEFAULT = 'pyqtdefault' # don't set SIP explicitly
+QT_API_PYQTv1 = 'pyqtv1' # Force version 2
+QT_API_PYQT_DEFAULT = 'pyqtdefault' # use system default for version 1 vs. 2
 QT_API_PYSIDE = 'pyside'
 
 
@@ -73,7 +73,7 @@ def loaded_api():
 
     Returns
     -------
-    None, 'pyside', 'pyqt', or 'pyqtv1'
+    None, 'pyside', 'pyqt', 'pyqt5', or 'pyqtv1'
     """
     if 'PyQt4.QtCore' in sys.modules:
         if qtapi_version() == 2:
@@ -284,11 +284,11 @@ def load_qt(api_options):
     PyQt4 >= 4.7, PyQt5 or PySide >= 1.0.3 is available,
     and only one is imported per session.
 
-    Currently-imported Qt library:   %r
-    PyQt4 installed:                 %s
-    PyQt5 installed:                 %s
-    PySide >= 1.0.3 installed:       %s
-    Tried to load:                   %r
+    Currently-imported Qt library:                              %r
+    PyQt4 available (requires QtCore, QtGui, QtSvg):            %s
+    PyQt5 available (requires QtCore, QtGui, QtSvg, QtWidgets): %s
+    PySide >= 1.0.3 installed:                                  %s
+    Tried to load:                                              %r
     """ % (loaded_api(),
            has_binding(QT_API_PYQT),
            has_binding(QT_API_PYQT5),

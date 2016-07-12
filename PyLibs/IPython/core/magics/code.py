@@ -1,6 +1,7 @@
 """Implementation of code management magic functions.
 """
 from __future__ import print_function
+from __future__ import absolute_import
 #-----------------------------------------------------------------------------
 #  Copyright (c) 2012 The IPython Development Team.
 #
@@ -31,8 +32,9 @@ from IPython.testing.skipdoctest import skip_doctest
 from IPython.utils import py3compat
 from IPython.utils.py3compat import string_types
 from IPython.utils.contexts import preserve_keys
-from IPython.utils.path import get_py_filename, unquote_filename
-from IPython.utils.warn import warn, error
+from IPython.utils.path import get_py_filename
+from warnings import warn
+from logging import error
 from IPython.utils.text import get_text_list
 
 #-----------------------------------------------------------------------------
@@ -147,6 +149,10 @@ class InteractivelyDefined(Exception):
 class CodeMagics(Magics):
     """Magics related to code management (loading, saving, editing, ...)."""
 
+    def __init__(self, *args, **kwargs):
+        self._knowntemps = set()
+        super(CodeMagics, self).__init__(*args, **kwargs)
+
     @line_magic
     def save(self, parameter_s=''):
         """Save a set of lines or a macro to a given filename.
@@ -183,7 +189,7 @@ class CodeMagics(Magics):
         append = 'a' in opts
         mode = 'a' if append else 'w'
         ext = u'.ipy' if raw else u'.py'
-        fname, codefrom = unquote_filename(args[0]), " ".join(args[1:])
+        fname, codefrom = args[0], " ".join(args[1:])
         if not fname.endswith((u'.py',u'.ipy')):
             fname += ext
         file_exists = os.path.isfile(fname)
@@ -363,7 +369,6 @@ class CodeMagics(Magics):
 
         def make_filename(arg):
             "Make a filename from the given args"
-            arg = unquote_filename(arg)
             try:
                 filename = get_py_filename(arg)
             except IOError:
@@ -660,6 +665,12 @@ class CodeMagics(Magics):
             # nothing was found, warnings have already been issued,
             # just give up.
             return
+
+        if is_temp:
+            self._knowntemps.add(filename)
+        elif (filename in self._knowntemps):
+            is_temp = True
+
 
         # do actual editing here
         print('Editing...', end=' ')

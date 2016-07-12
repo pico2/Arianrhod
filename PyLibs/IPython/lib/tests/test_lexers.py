@@ -5,6 +5,7 @@
 
 from unittest import TestCase
 from pygments.token import Token
+from pygments.lexers import BashLexer
 
 from .. import lexers
 
@@ -13,16 +14,14 @@ class TestLexers(TestCase):
     """Collection of lexers tests"""
     def setUp(self):
         self.lexer = lexers.IPythonLexer()
+        self.bash_lexer = BashLexer()
 
     def testIPythonLexer(self):
         fragment = '!echo $HOME\n'
         tokens = [
             (Token.Operator, '!'),
-            (Token.Name.Builtin, 'echo'),
-            (Token.Text, ' '),
-            (Token.Name.Variable, '$HOME'),
-            (Token.Text, '\n'),
         ]
+        tokens.extend(self.bash_lexer.get_tokens(fragment[1:]))
         self.assertEqual(tokens, list(self.lexer.get_tokens(fragment)))
 
         fragment_2 = '!' + fragment
@@ -120,3 +119,11 @@ class TestLexers(TestCase):
             (Token.Text, '\n'),
         ]
         self.assertEqual(tokens_2, list(self.lexer.get_tokens(fragment_2)))
+
+        fragment = ' *int*?\n'
+        tokens = [
+            (Token.Text, ' *int*'),
+            (Token.Operator, '?'),
+            (Token.Text, '\n'),
+        ]
+        self.assertEqual(tokens, list(self.lexer.get_tokens(fragment)))

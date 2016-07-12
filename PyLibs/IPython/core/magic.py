@@ -12,17 +12,12 @@ from __future__ import print_function
 #  the file COPYING, distributed as part of this software.
 #-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-# Stdlib
 import os
 import re
 import sys
 import types
 from getopt import getopt, GetoptError
 
-# Our own
 from traitlets.config.configurable import Configurable
 from IPython.core import oinspect
 from IPython.core.error import UsageError
@@ -32,8 +27,8 @@ from IPython.utils.ipstruct import Struct
 from IPython.utils.process import arg_split
 from IPython.utils.py3compat import string_types, iteritems
 from IPython.utils.text import dedent
-from traitlets import Bool, Dict, Instance, MetaHasTraits
-from IPython.utils.warn import error
+from traitlets import Bool, Dict, Instance, observe
+from logging import error
 
 #-----------------------------------------------------------------------------
 # Globals
@@ -303,11 +298,12 @@ class MagicsManager(Configurable):
 
     shell = Instance('IPython.core.interactiveshell.InteractiveShellABC', allow_none=True)
 
-    auto_magic = Bool(True, config=True, help=
-        "Automatically call line magics without requiring explicit % prefix")
-
-    def _auto_magic_changed(self, name, value):
-        self.shell.automagic = value
+    auto_magic = Bool(True, help=
+        "Automatically call line magics without requiring explicit % prefix"
+    ).tag(config=True)
+    @observe('auto_magic')
+    def _auto_magic_changed(self, change):
+        self.shell.automagic = change['new']
     
     _auto_status = [
         'Automagic is OFF, % prefix IS needed for line magics.',
@@ -386,7 +382,7 @@ class MagicsManager(Configurable):
             if not m.registered:
                 raise ValueError("Class of magics %r was constructed without "
                                  "the @register_magics class decorator")
-            if type(m) in (type, MetaHasTraits):
+            if isinstance(m, type):
                 # If we're given an uninstantiated class
                 m = m(shell=self.shell)
 
@@ -429,23 +425,6 @@ class MagicsManager(Configurable):
         magic_name = func.__name__ if magic_name is None else magic_name
         setattr(self.user_magics, magic_name, func)
         record_magic(self.magics, magic_kind, magic_name, func)
-
-    def define_magic(self, name, func):
-        """[Deprecated] Expose own function as magic function for IPython.
-
-        Example::
-
-            def foo_impl(self, parameter_s=''):
-                'My very own magic!. (Use docstrings, IPython reads them).'
-                print 'Magic function. Passed parameter is between < >:'
-                print '<%s>' % parameter_s
-                print 'The self object is:', self
-
-            ip.define_magic('foo',foo_impl)
-        """
-        meth = types.MethodType(func, self.user_magics)
-        setattr(self.user_magics, name, meth)
-        record_magic(self.magics, 'line', name, meth)
 
     def register_alias(self, alias_name, magic_name, magic_kind='line'):
         """Register an alias to a magic function.
@@ -518,7 +497,6 @@ class Magics(Configurable):
                 shell.configurables.append(self)
             if hasattr(shell, 'config'):
                 kwargs.setdefault('parent', shell)
-            kwargs['shell'] = shell
 
         self.shell = shell
         self.options_table = {}

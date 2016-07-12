@@ -25,8 +25,8 @@ import logging
 import os
 import re
 import sys
-import traceback
-import unittest
+
+from testpath import modified_env
 
 from inspect import getmodule
 
@@ -39,10 +39,9 @@ from doctest import (REPORTING_FLAGS, REPORT_ONLY_FIRST_FAILURE,
                      linecache)
 
 # Third-party modules
-import nose.core
 
 from nose.plugins import doctests, Plugin
-from nose.util import anyp, getpackage, test_address, resolve_name, tolist
+from nose.util import anyp, tolist
 
 # Our own imports
 from IPython.utils.py3compat import builtin_mod, PY3, getcwd
@@ -128,11 +127,11 @@ class DocTestFinder(doctest.DocTestFinder):
         Find tests for the given object and any contained objects, and
         add them to `tests`.
         """
-        #print '_find for:', obj, name, module  # dbg
+        print('_find for:', obj, name, module)  # dbg
         if hasattr(obj,"skip_doctest"):
             #print 'SKIPPING DOCTEST FOR:',obj  # dbg
             obj = DocTestSkip(obj)
-
+        
         doctest.DocTestFinder._find(self,tests, obj, name, module,
                                     source_lines, globs, seen)
 
@@ -141,7 +140,7 @@ class DocTestFinder(doctest.DocTestFinder):
         # doctests in extension modules.
 
         # Local shorthands
-        from inspect import isroutine, isclass, ismodule
+        from inspect import isroutine, isclass
 
         # Look for tests in a module's contained objects.
         if inspect.ismodule(obj) and self._recurse:
@@ -587,8 +586,10 @@ class IPDocTestRunner(doctest.DocTestRunner,object):
 
         test.globs.update(_ip.user_ns)
 
-        return super(IPDocTestRunner,self).run(test,
-                                               compileflags,out,clear_globs)
+        # Override terminal size to standardise traceback format
+        with modified_env({'COLUMNS': '80', 'LINES': '24'}):
+            return super(IPDocTestRunner,self).run(test,
+                                                   compileflags,out,clear_globs)
 
 
 class DocFileCase(doctest.DocFileCase):

@@ -1,6 +1,7 @@
 """Implementation of configuration-related magic functions.
 """
 from __future__ import print_function
+from __future__ import absolute_import
 #-----------------------------------------------------------------------------
 #  Copyright (c) 2012 The IPython Development Team.
 #
@@ -19,7 +20,7 @@ import re
 # Our own packages
 from IPython.core.error import UsageError
 from IPython.core.magic import Magics, magics_class, line_magic
-from IPython.utils.warn import error
+from logging import error
 
 #-----------------------------------------------------------------------------
 # Magic implementation classes
@@ -60,7 +61,6 @@ class ConfigMagics(Magics):
                 PrefilterManager
                 AliasManager
                 IPCompleter
-                PromptManager
                 DisplayFormatter
 
         To view what is configurable on a given class, just pass the class

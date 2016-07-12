@@ -5,7 +5,6 @@
 # Distributed under the terms of the Modified BSD License.
 
 from io import BytesIO, open
-from base64 import encodestring
 import os
 import tempfile
 import shutil
@@ -15,7 +14,12 @@ from IPython.utils.process import find_cmd, FindCmdError
 from traitlets.config import get_config
 from traitlets.config.configurable import SingletonConfigurable
 from traitlets import List, Bool, Unicode
-from IPython.utils.py3compat import cast_unicode, cast_unicode_py2 as u
+from IPython.utils.py3compat import cast_unicode, cast_unicode_py2 as u, PY3
+
+try: # Py3
+    from base64 import encodebytes
+except ImportError: # Py2
+    from base64 import encodestring as encodebytes
 
 
 class LaTeXTool(SingletonConfigurable):
@@ -35,24 +39,24 @@ class LaTeXTool(SingletonConfigurable):
         # for display style, the default ["matplotlib", "dvipng"] can
         # be used.  To NOT use dvipng so that other repr such as
         # unicode pretty printing is used, you can use ["matplotlib"].
-        config=True)
+        ).tag(config=True)
 
     use_breqn = Bool(
         True,
         help="Use breqn.sty to automatically break long equations. "
         "This configuration takes effect only for dvipng backend.",
-        config=True)
+        ).tag(config=True)
 
     packages = List(
         ['amsmath', 'amsthm', 'amssymb', 'bm'],
         help="A list of packages to use for dvipng backend. "
         "'breqn' will be automatically appended when use_breqn=True.",
-        config=True)
+        ).tag(config=True)
 
     preamble = Unicode(
         help="Additional preamble to use when generating LaTeX source "
         "for dvipng backend.",
-        config=True)
+        ).tag(config=True)
 
 
 def latex_to_png(s, encode=False, backend=None, wrap=False):
@@ -60,7 +64,7 @@ def latex_to_png(s, encode=False, backend=None, wrap=False):
 
     Parameters
     ----------
-    s : text
+    s : str
         The raw string containing valid inline LaTeX.
     encode : bool, optional
         Should the PNG data base64 encoded to make it JSON'able.
@@ -86,25 +90,29 @@ def latex_to_png(s, encode=False, backend=None, wrap=False):
         raise ValueError('No such backend {0}'.format(backend))
     bin_data = f(s, wrap)
     if encode and bin_data:
-        bin_data = encodestring(bin_data)
+        bin_data = encodebytes(bin_data)
     return bin_data
 
 
 def latex_to_png_mpl(s, wrap):
     try:
         from matplotlib import mathtext
+        from pyparsing import ParseFatalException
     except ImportError:
         return None
-    
+
     # mpl mathtext doesn't support display math, force inline
     s = s.replace('$$', '$')
     if wrap:
         s = u'${0}$'.format(s)
-    
-    mt = mathtext.MathTextParser('bitmap')
-    f = BytesIO()
-    mt.to_png(f, s, fontsize=12)
-    return f.getvalue()
+
+    try:
+        mt = mathtext.MathTextParser('bitmap')
+        f = BytesIO()
+        mt.to_png(f, s, fontsize=12)
+        return f.getvalue()
+    except (ValueError, RuntimeError, ParseFatalException):
+        return None
 
 
 def latex_to_png_dvipng(s, wrap):
@@ -134,6 +142,8 @@ def latex_to_png_dvipng(s, wrap):
 
         with open(outfile, "rb") as f:
             return f.read()
+    except subprocess.CalledProcessError:
+        return None
     finally:
         shutil.rmtree(workdir)
 
