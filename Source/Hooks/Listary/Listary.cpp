@@ -7,6 +7,8 @@
 
 #include "MyLibrary.cpp"
 
+ML_OVERLOAD_NEW
+
 API_POINTER(AlphaBlend)         StubAlphaBlend;
 API_POINTER(ShellExecuteExW)    StubShellExecuteExW;
 
