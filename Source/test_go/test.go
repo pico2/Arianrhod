@@ -13,6 +13,7 @@ import (
     "ml/io2"
     "ml/net/http"
     "ml/html"
+    "ml/logging/logger"
 )
 
 func checkDuplicate() {
@@ -48,7 +49,22 @@ func fn2() {
 }
 
 func main() {
-    // (&goquery.Selection{}).Attr2("fuck")
-    e := Try(fn2)
-    fmt.Println(e)
+    // var log = logging.NewLogger("example")
+
+    // log.SetFileBackend("")
+    // log.UnsetConsoleBackend()
+
+    logger.SetFileBackend("")
+
+    logger.Debug("debug %s", "secret")
+    logger.Info("info")
+    logger.Notice("notice")
+    logger.Warning("warning")
+    logger.Error("err")
+
+    Raise(NewWrapper(nil, "fuck"))
+
+    logger.Critical("crit")
+    logger.Fatal("fuck")
+
 }
