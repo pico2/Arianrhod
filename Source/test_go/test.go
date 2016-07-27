@@ -42,29 +42,22 @@ func checkDuplicate() {
 }
 
 func fn2() {
-    e := NewBaseException("test")
-    fmt.Println(e)
-    fmt.Println()
-    Raise(e)
+    go func() {
+        e := Try(func() {
+            (&goquery.Selection{}).Attr2("attrName")
+        })
+        fmt.Println(e)
+    }()
 }
 
 func main() {
-    // var log = logging.NewLogger("example")
+    e := Try(func() {
+        (&goquery.Selection{}).Attr2("attrName")
+    })
+    fmt.Println(e)
+    fmt.Println()
 
-    // log.SetFileBackend("")
-    // log.UnsetConsoleBackend()
+    fn2()
 
-    logger.SetFileBackend("")
-
-    logger.Debug("debug %s", "secret")
-    logger.Info("info")
-    logger.Notice("notice")
-    logger.Warning("warning")
-    logger.Error("err")
-
-    Raise(NewWrapper(nil, "fuck"))
-
-    logger.Critical("crit")
-    logger.Fatal("fuck")
-
+    time.Sleep(time.Hour)
 }
