@@ -11,35 +11,10 @@ import (
     "os"
     "time"
     "ml/io2"
-    "ml/net/http"
+    "ml/net/http2"
     "ml/html"
     "ml/logging/logger"
 )
-
-func checkDuplicate() {
-    for _, arg_ := range os.Args[1:] {
-        arg := String(arg_)
-
-        exists := map[String]bool{}
-        accounts := []String{}
-        for _, line := range io2.ReadLines(arg) {
-            if line.Count("----") != 1 {
-                continue
-            }
-
-            u := line.Split("----", 1)
-            if exists[u[0]] {
-                continue
-            }
-
-            exists[u[0]] = true
-
-            accounts = append(accounts, line)
-        }
-
-        io2.WriteContent(arg.RSplit(".", 1)[0].String() + ".unique.txt", []byte(String("\r\n").Join(accounts)))
-    }
-}
 
 func fn2() {
     go func() {
@@ -51,13 +26,10 @@ func fn2() {
 }
 
 func main() {
-    e := Try(func() {
-        (&goquery.Selection{}).Attr2("attrName")
-    })
-    fmt.Println(e)
-    fmt.Println()
+    s := http.NewSession(
+        http.Timeout(time.Second * 30),
+        http.TLSHandshakeTimeout(10 * time.Second),
+    )
 
-    fn2()
-
-    time.Sleep(time.Hour)
+    fmt.Println(s.Get("http://www.qq.com?test=fuck&haha=hehe"))
 }
