@@ -314,6 +314,27 @@ class AsyncHttp(object):
         self.connector = self.TCPConnector
         self.SetCookies(self.ProxyConnector.cookies)
 
+    async def get(self, url, **kwargs):
+        return await self.request('get', url, **kwargs)
+
+    async def post(self, url, **kwargs):
+        allow_redirects = kwargs.setdefault('allow_redirects', False)
+
+        while True:
+            resp = await self.request('post', url, **kwargs)
+            if resp.status in [
+                    aiohttp.HTTPFound.status_code,
+                    aiohttp.HTTPMovedPermanently.status_code,
+                    aiohttp.HTTPSeeOther.status_code,
+                    aiohttp.HTTPTemporaryRedirect.status_code,
+                ]:
+                url = resp.response.headers.get(aiohttp.hdrs.LOCATION)
+                continue
+
+            break
+
+        return resp
+
     async def request(self, method, url, **kwargs):
         params = {}
 
