@@ -1,6 +1,7 @@
 from ..common import *
 from ..otypes import *
 import aiohttp
+import aiohttp.web_exceptions
 import asyncio
 import http.cookies
 import urllib
@@ -323,10 +324,10 @@ class AsyncHttp(object):
         while True:
             resp = await self.request('post', url, **kwargs)
             if resp.status in [
-                    aiohttp.HTTPFound.status_code,
-                    aiohttp.HTTPMovedPermanently.status_code,
-                    aiohttp.HTTPSeeOther.status_code,
-                    aiohttp.HTTPTemporaryRedirect.status_code,
+                    aiohttp.web_exceptions.HTTPFound.status_code,
+                    aiohttp.web_exceptions.HTTPMovedPermanently.status_code,
+                    aiohttp.web_exceptions.HTTPSeeOther.status_code,
+                    aiohttp.web_exceptions.HTTPTemporaryRedirect.status_code,
                 ]:
                 url = resp.response.headers.get(aiohttp.hdrs.LOCATION)
                 continue
