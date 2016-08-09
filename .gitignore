@@ -41,6 +41,7 @@ Source/MyLibrary
 Source/ShimEngine
 Source/Falcom/src/
 Source/Falcom/pkg/
+/Source/Falcom/ZWEI2Plus/zw
 Source/sources/ReactOS*
 Source/sources/loki-lib
 Source/sources/AvalonDock
@@ -76,8 +77,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/sources/v8
 /Library/.Net/FluorineFx/
 
-/Source/Hooks/ZWEI2Plus/zw/
-
 /Source/Hooks/KrKr2Protect
 
 /TempSync/SublimeText Packages/User/Package Control.last-run
@@ -94,7 +93,6 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/Android/.metadata/*/.log
 /Source/Android/.metadata/.plugins/
 /Source/Android/*/.settings/
-/Source/Hooks/Falcom/ZWEI2Plus/zw
 /Source/sources/Python-*
 /Source/Android/hookTaobao
 /Source/Project/PythonProtector
