@@ -295,6 +295,9 @@ class AsyncHttp(object):
     def SetHeaders(self, headers):
         self.headers = headers
 
+    def AddHeaders(self, headers):
+        self.headers.update(headers)
+
     def SetCookies(self, cookies):
         if not cookies:
             self.connector.cookies.clear()
@@ -348,14 +351,9 @@ class AsyncHttp(object):
         kwargs['connector'] = self.connector
         kwargs['request_class'] = _ClientRequest.factory(**params)
 
-        if 'headers' not in kwargs:
-            kwargs['headers'] = self.headers
-        else:
-            hdr = self.headers.copy()
-            for k, v in kwargs['headers'].items():
-                hdr[k] = v
-
-            kwargs['headers'] = hdr
+        hdr = kwargs.get('headers', {})
+        hdr.update(self.headers)
+        kwargs['headers'] = hdr
 
         try:
             response = await asyncio.wait_for(aiohttp.request(method, url, **kwargs), self.timeout)
