@@ -122,11 +122,83 @@ void quick_sort(int *array, int count)
 
 #include "iTunes/iTunes.h"
 
+typedef struct GRAPPA_INIT_DATA
+{
+    BOOL UnknownTrue1;
+    BOOL UnknownFalse1;
+    BOOL UnknownTrue2;
+
+    ULONG GrappaKey;
+
+    CHAR Udid[0x40];
+    CHAR LibraryID[0x40];
+
+    GRAPPA_INIT_DATA()
+    {
+        ZeroMemory(this, sizeof(*this));
+        UnknownTrue1 = TRUE;
+        UnknownTrue2 = TRUE;
+
+        strcpy(Udid, "399d532098b76b9100a1e5612ac6016889131799");
+        strcpy(LibraryID, "5B2D82310D4DC29E");
+    }
+
+} GRAPPA_INIT_DATA, *PGRAPPA_INIT_DATA;
+
+NTSTATUS (CDECL *GrappaHostInitialize)(PGRAPPA_INIT_DATA InitData, PULONG GrappaKey, PVOID* Grappa, PULONG Length);
+NTSTATUS (CDECL *GrappaEstablishSession)(ULONG GrappaKey, PVOID Grappa, ULONG Length);
+NTSTATUS (CDECL *GrappaFree)(PVOID Data);
+
+String GetLibraryID()
+{
+    NtFileMemory iTunesPrefs;
+    
+    iTunesPrefs.Open(L"iTunesPrefs");
+
+    ULONG v1, v2;
+    PULONG buffer;
+
+    buffer = (PULONG)iTunesPrefs.GetBuffer();
+
+    v1 = buffer[5] ^ buffer[0x18];
+    v2 = buffer[6] ^ buffer[0x19];
+
+    return String::Format(L"%08X%08X", v2, v1);
+}
+
 ForceInline VOID main2(LONG_PTR argc, PWSTR *argv)
 {
     NTSTATUS Status;
 
-    PrintLocaleDefaultAnsiCodePage();
+    ml::MlInitialize();
+    iTunesApi::Initialize();
+
+    PLDR_MODULE AirTrafficHost;
+
+    AirTrafficHost = Ldr::FindLdrModuleByName(PUSTR(L"AirTrafficHost.dll"));
+
+    *(PVOID *)&GrappaHostInitialize     = PtrAdd(AirTrafficHost->DllBase, 0xF636560 - 0xF630000);
+    *(PVOID *)&GrappaEstablishSession   = PtrAdd(AirTrafficHost->DllBase, 0xF638650 - 0xF630000);
+    *(PVOID *)&GrappaFree               = PtrAdd(AirTrafficHost->DllBase, 0xF63D4E0 - 0xF630000);
+
+    ULONG grappaKey, length;
+    PVOID requestData;
+    GRAPPA_INIT_DATA init;
+    NtFileDisk grappaRequest;
+
+    strcpy(init.LibraryID, GetLibraryID().Encode(CP_UTF8));
+
+    GrappaHostInitialize(&init, &grappaKey, &requestData, &length);
+
+    grappaRequest.Create(L"grappa.bin");
+    grappaRequest.Write(requestData, length);
+
+    GrappaFree(requestData);
+
+    PrintConsole(L"grappaKey = %08X\n", grappaKey);
+    PauseConsole(L"done");
+
+    Ps::ExitProcess(0);
 
     return;
 
