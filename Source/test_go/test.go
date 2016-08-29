@@ -10,26 +10,33 @@ import (
     "fmt"
     "os"
     "time"
+    "context"
     "ml/io2"
-    "ml/net/http2"
+    "net/http"
+    // "ml/net/http2"
     "ml/html"
     "ml/logging/logger"
 )
 
-func fn2() {
-    go func() {
-        e := Try(func() {
-            (&goquery.Selection{}).Attr2("attrName")
-        })
-        fmt.Println(e)
-    }()
-}
-
 func main() {
-    s := http.NewSession(
-        http.Timeout(time.Second * 30),
-        http.TLSHandshakeTimeout(10 * time.Second),
-    )
+    req, _ := http.NewRequest("GET", "http://fuck.norn7.com/", nil)
 
-    fmt.Println(s.Get("http://www.qq.com?test=fuck&haha=hehe"))
+    parent := context.Background()
+    ctx, cancel := context.WithTimeout(parent, time.Microsecond * 2000)
+    req = req.WithContext(ctx)
+
+    t := time.Now()
+    resp, err := http.DefaultClient.Do(req)
+    fmt.Println(time.Now().Sub(t))
+
+    fmt.Println(err, resp)
+    // fmt.Println(<-ctx.Done(), "done")
+    fmt.Println(ctx.Err())
+    cancel()
+    fmt.Println(ctx.Err() == context.DeadlineExceeded)
+    fmt.Println(ctx.Err() == context.Canceled)
+
+    fmt.Println(time.ParseDuration("1000s"))
+
+    _ = cancel
 }
