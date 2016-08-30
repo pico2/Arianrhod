@@ -128,7 +128,8 @@ Source/LocaleEmulator/LocaleEmulator/LoaderDll.dll
 /Source/sources/xposed/
 /Source/GoProject/src/AppleIdAuthorizer
 /Source/GoProject/src/AppleIdRegister2
-/Source/GoProject/src/iTunesTool
+/Source/GoProject/src/iTunesTool/
+/Source/GoProject/src/mail_ru_register/
 
 /TempSync/AtomConfig/.apm/_git-remotes/
 /Source/sources
