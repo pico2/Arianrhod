@@ -537,7 +537,7 @@ class Buffer(object):
         # Remember the original column for the next up/down movement.
         self.preferred_column = original_column
 
-    def auto_up(self, count=1):
+    def auto_up(self, count=1, go_to_start_of_line_if_history_changes=False):
         """
         If we're not on the first line (of a multiline input) go a line up,
         otherwise go back in history. (If nothing is selected.)
@@ -549,7 +549,11 @@ class Buffer(object):
         elif not self.selection_state:
             self.history_backward(count=count)
 
-    def auto_down(self, count=1):
+            # Go to the start of the line?
+            if go_to_start_of_line_if_history_changes:
+                self.cursor_position += self.document.get_start_of_line_position()
+
+    def auto_down(self, count=1, go_to_start_of_line_if_history_changes=False):
         """
         If we're not on the last line (of a multiline input) go a line down,
         otherwise go forward in history. (If nothing is selected.)
@@ -561,9 +565,14 @@ class Buffer(object):
         elif not self.selection_state:
             self.history_forward(count=count)
 
+            # Go to the start of the line?
+            if go_to_start_of_line_if_history_changes:
+                self.cursor_position += self.document.get_start_of_line_position()
+
     def delete_before_cursor(self, count=1):
         """
-        Delete character before cursor, return deleted character.
+        Delete specified number of characters before cursor and return the
+        deleted text.
         """
         assert count >= 0
         deleted = ''
@@ -581,7 +590,7 @@ class Buffer(object):
 
     def delete(self, count=1):
         """
-        Delete one character. Return deleted character.
+        Delete specified number of characters and Return the deleted text.
         """
         if self.cursor_position < len(self.text):
             deleted = self.document.text_after_cursor[:count]

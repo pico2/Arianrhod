@@ -66,7 +66,7 @@ class CommandLineInterface(object):
     """
     def __init__(self, application, eventloop=None, input=None, output=None):
         assert isinstance(application, Application)
-        assert isinstance(eventloop, EventLoop)
+        assert isinstance(eventloop, EventLoop), 'Passing an eventloop is required.'
         assert output is None or isinstance(output, Output)
         assert input is None or isinstance(input, Input)
 
@@ -416,41 +416,42 @@ class CommandLineInterface(object):
 
             This is only available on Python >3.3, with asyncio.
             """
-            assert pre_run is None or callable(pre_run)
-
-            try:
-                self._is_running = True
-
-                self.on_start.fire()
-                self.reset(reset_current_buffer=reset_current_buffer)
-
-                # Call pre_run.
-                if pre_run:
-                    pre_run()
-
-                with self.input.raw_mode():
-                    self.renderer.request_absolute_cursor_position()
-                    self._redraw()
-
-                    yield from self.eventloop.run_as_coroutine(
-                            self.input, self.create_eventloop_callbacks())
-
-                return self.return_value()
-            finally:
-                if not self.is_done:
-                    self._exit_flag = True
-                    self._redraw()
-
-                self.renderer.reset()
-                self.on_stop.fire()
-                self._is_running = False
-
-        try:
+            # Inline import, because it slows down startup when asyncio is not
+            # needed.
             import asyncio
-        except ImportError:
-            pass
-        else:
-            run_async = asyncio.coroutine(run_async)
+
+            @asyncio.coroutine
+            def run():
+                assert pre_run is None or callable(pre_run)
+
+                try:
+                    self._is_running = True
+
+                    self.on_start.fire()
+                    self.reset(reset_current_buffer=reset_current_buffer)
+
+                    # Call pre_run.
+                    if pre_run:
+                        pre_run()
+
+                    with self.input.raw_mode():
+                        self.renderer.request_absolute_cursor_position()
+                        self._redraw()
+
+                        yield from self.eventloop.run_as_coroutine(
+                                self.input, self.create_eventloop_callbacks())
+
+                    return self.return_value()
+                finally:
+                    if not self.is_done:
+                        self._exit_flag = True
+                        self._redraw()
+
+                    self.renderer.reset()
+                    self.on_stop.fire()
+                    self._is_running = False
+
+            return run()
         '''))
     except SyntaxError:
         # Python2, or early versions of Python 3.
@@ -856,21 +857,28 @@ class CommandLineInterface(object):
                         set_completions = True
                         select_first_anyway = False
 
-                        # When the commond part has to be inserted, and there
+                        # When the common part has to be inserted, and there
                         # is a common part.
                         if insert_common_part:
                             common_part = get_common_complete_suffix(document, completions)
                             if common_part:
-                                # Insert + run completer again.
+                                # Insert the common part, update completions.
                                 buffer.insert_text(common_part)
-                                async_completer()
-                                set_completions = False
+                                if len(completions) > 1:
+                                    # (Don't call `async_completer` again, but
+                                    # recalculate completions. See:
+                                    # https://github.com/ipython/ipython/issues/9658)
+                                    completions[:] = [
+                                        c.new_completion_from_position(len(common_part))
+                                        for c in completions]
+                                else:
+                                    set_completions = False
                             else:
                                 # When we were asked to insert the "common"
                                 # prefix, but there was no common suffix but
                                 # still exactly one match, then select the
                                 # first. (It could be that we have a completion
-                                # which does * expension, like '*.py', with
+                                # which does * expansion, like '*.py', with
                                 # exactly one match.)
                                 if len(completions) == 1:
                                     select_first_anyway = True
@@ -947,13 +955,18 @@ class CommandLineInterface(object):
         """
         return _StdoutProxy(self, raw=raw)
 
-    def patch_stdout_context(self, raw=False):
+    def patch_stdout_context(self, raw=False, patch_stdout=True, patch_stderr=True):
         """
         Return a context manager that will replace ``sys.stdout`` with a proxy
         that makes sure that all printed text will appear above the prompt, and
         that it doesn't destroy the output from the renderer.
+
+        :param patch_stdout: Replace `sys.stdout`.
+        :param patch_stderr: Replace `sys.stderr`.
         """
-        return _PatchStdoutContext(self.stdout_proxy(raw=raw))
+        return _PatchStdoutContext(
+            self.stdout_proxy(raw=raw),
+            patch_stdout=patch_stdout, patch_stderr=patch_stderr)
 
     def create_eventloop_callbacks(self):
         return _InterfaceEventLoopCallbacks(self)
@@ -1007,15 +1020,26 @@ class _InterfaceEventLoopCallbacks(EventLoopCallbacks):
 
 
 class _PatchStdoutContext(object):
-    def __init__(self, new_stdout):
+    def __init__(self, new_stdout, patch_stdout=True, patch_stderr=True):
         self.new_stdout = new_stdout
+        self.patch_stdout = patch_stdout
+        self.patch_stderr = patch_stderr
 
     def __enter__(self):
         self.original_stdout = sys.stdout
-        sys.stdout = self.new_stdout
+        self.original_stderr = sys.stderr
+
+        if self.patch_stdout:
+            sys.stdout = self.new_stdout
+        if self.patch_stderr:
+            sys.stderr = self.new_stdout
 
     def __exit__(self, *a, **kw):
-        sys.stdout = self.original_stdout
+        if self.patch_stdout:
+            sys.stdout = self.original_stdout
+
+        if self.patch_stderr:
+            sys.stderr = self.original_stderr
 
 
 class _StdoutProxy(object):

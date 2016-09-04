@@ -211,26 +211,40 @@ def load_vi_bindings(registry, enable_visual_key=Always(),
         """
         event.current_buffer.cursor_down(count=event.arg)
 
-    @handle('k', filter=navigation_mode)
     @handle(Keys.Up, filter=navigation_mode)
     @handle(Keys.ControlP, filter=navigation_mode)
     def _(event):
         """
         Arrow up and ControlP in navigation mode go up.
         """
-        b = event.current_buffer
-        b.auto_up(count=event.arg)
+        event.current_buffer.auto_up(count=event.arg)
 
-    @handle('j', filter=navigation_mode)
+    @handle('k', filter=navigation_mode)
+    def _(event):
+        """
+        Go up, but if we enter a new history entry, move to the start of the
+        line.
+        """
+        event.current_buffer.auto_up(
+            count=event.arg, go_to_start_of_line_if_history_changes=True)
+
     @handle(Keys.Down, filter=navigation_mode)
     @handle(Keys.ControlN, filter=navigation_mode)
     def _(event):
         """
         Arrow down and Control-N in navigation mode.
         """
-        b = event.current_buffer
-        b.auto_down(count=event.arg)
+        event.current_buffer.auto_down(count=event.arg)
 
+    @handle('j', filter=navigation_mode)
+    def _(event):
+        """
+        Go down, but if we enter a new history entry, go to the start of the line.
+        """
+        event.current_buffer.auto_down(
+            count=event.arg, go_to_start_of_line_if_history_changes=True)
+
+    @handle(Keys.ControlH, filter=navigation_mode)
     @handle(Keys.Backspace, filter=navigation_mode)
     def _(event):
         """
@@ -1485,6 +1499,8 @@ def load_vi_bindings(registry, enable_visual_key=Always(),
         try:
             # Lookup.
             code = (event.cli.vi_state.digraph_symbol1, event.data)
+            if code not in DIGRAPHS:
+                code = code[::-1]  # Try reversing.
             symbol = DIGRAPHS[code]
         except KeyError:
             # Unkown digraph.
@@ -1640,6 +1656,7 @@ def load_vi_search_bindings(registry, get_search_state=None,
 
     @handle(Keys.Escape, filter=has_focus)
     @handle(Keys.ControlC, filter=has_focus)
+    @handle(Keys.ControlH, filter=has_focus & Condition(search_buffer_is_empty))
     @handle(Keys.Backspace, filter=has_focus & Condition(search_buffer_is_empty))
     def _(event):
         """

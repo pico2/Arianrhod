@@ -36,7 +36,7 @@ License: MIT open source license.
 from __future__ import print_function
 
 
-__version__ = "0.7.2"
+__version__ = "0.7.4"
 
 try:
     from pathlib import Path
@@ -50,8 +50,13 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
-import glob
 import errno
+import sys
+
+if sys.version_info[0] >= 3:
+    string_types = (str,)
+else:
+    string_types = (str, unicode)
 
 def gethashfile(key):
     return ("%02x" % abs(hash(key) % 256))[-2:]
@@ -62,10 +67,18 @@ class PickleShareDB(collections.MutableMapping):
     """ The main 'connection' object for PickleShare database """
     def __init__(self,root):
         """ Return a db object that will manage the specied directory"""
-        root = os.path.abspath(os.path.expanduser(str(root)))
+        if not isinstance(root, string_types):
+            root = str(root)
+        root = os.path.abspath(os.path.expanduser(root))
         self.root = Path(root)
         if not self.root.is_dir():
-            self.root.mkdir(parents=True)
+            # catching the exception is necessary if multiple processes are concurrently trying to create a folder
+            # exists_ok keyword argument of mkdir does the same but only from Python 3.5
+            try:
+                self.root.mkdir(parents=True)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
         # cache has { 'key' : (obj, orig_mod_time) }
         self.cache = {}
 

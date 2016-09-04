@@ -2,9 +2,12 @@
 This module adds improved support for Microsoft Visual C++ compilers.
 """
 import os
+import sys
 import platform
 import itertools
 import distutils.errors
+from distutils.version import StrictVersion
+
 from setuptools.extern.six.moves import filterfalse
 
 if platform.system() == 'Windows':
@@ -74,14 +77,21 @@ def patch_for_specialized_compiler():
         msvc9compiler.find_vcvarsall = msvc9_find_vcvarsall
         unpatched['msvc9_query_vcvarsall'] = msvc9compiler.query_vcvarsall
         msvc9compiler.query_vcvarsall = msvc9_query_vcvarsall
-    except Exception:
+    except NameError:
         pass
 
     try:
         # Patch distutils._msvccompiler._get_vc_env
         unpatched['msvc14_get_vc_env'] = msvc14compiler._get_vc_env
         msvc14compiler._get_vc_env = msvc14_get_vc_env
-    except Exception:
+    except NameError:
+        pass
+
+    try:
+        # Patch distutils._msvccompiler.gen_lib_options for Numpy
+        unpatched['msvc14_gen_lib_options'] = msvc14compiler.gen_lib_options
+        msvc14compiler.gen_lib_options = msvc14_gen_lib_options
+    except NameError:
         pass
 
 
@@ -211,6 +221,19 @@ def msvc14_get_vc_env(plat_spec):
         raise
 
 
+def msvc14_gen_lib_options(*args, **kwargs):
+    """
+    Patched "distutils._msvccompiler.gen_lib_options" for fix
+    compatibility between "numpy.distutils" and "distutils._msvccompiler"
+    (for Numpy < 1.11.2)
+    """
+    if "numpy.distutils" in sys.modules:
+        import numpy as np
+        if StrictVersion(np.__version__) < StrictVersion('1.11.2'):
+            return np.distutils.ccompiler.gen_lib_options(*args, **kwargs)
+    return unpatched['msvc14_gen_lib_options'](*args, **kwargs)
+
+
 def _augment_exception(exc, version, arch=''):
     """
     Add details to the exception message to help guide the user
@@ -242,7 +265,8 @@ def _augment_exception(exc, version, arch=''):
         elif version >= 14.0:
             # For VC++ 14.0 Redirect user to Visual C++ Build Tools
             message += (' Get it with "Microsoft Visual C++ Build Tools": '
-                r'http://landinghub.visualstudio.com/visual-cpp-build-tools')
+                        r'http://landinghub.visualstudio.com/'
+                        'visual-cpp-build-tools')
 
     exc.args = (message, )
 
@@ -356,22 +380,11 @@ class RegistryInfo:
         self.pi = platform_info
 
     @property
-    def microsoft(self):
-        """
-        Microsoft software registry key.
-        """
-        return os.path.join(
-            'Software',
-            '' if self.pi.current_is_x86() else 'Wow6432Node',
-            'Microsoft',
-        )
-
-    @property
     def visualstudio(self):
         """
         Microsoft Visual Studio root registry key.
         """
-        return os.path.join(self.microsoft, 'VisualStudio')
+        return 'VisualStudio'
 
     @property
     def sxs(self):
@@ -399,15 +412,14 @@ class RegistryInfo:
         """
         Microsoft Visual C++ for Python registry key.
         """
-        path = r'DevDiv\VCForPython'
-        return os.path.join(self.microsoft, path)
+        return r'DevDiv\VCForPython'
 
     @property
     def microsoft_sdk(self):
         """
         Microsoft SDK registry key.
         """
-        return os.path.join(self.microsoft, 'Microsoft SDKs')
+        return 'Microsoft SDKs'
 
     @property
     def windows_sdk(self):
@@ -428,11 +440,29 @@ class RegistryInfo:
         """
         Microsoft Windows Kits Roots registry key.
         """
-        return os.path.join(self.microsoft, r'Windows Kits\Installed Roots')
+        return r'Windows Kits\Installed Roots'
+
+    def microsoft(self, key, x86=False):
+        """
+        Return key in Microsoft software registry.
+
+        Parameters
+        ----------
+        key: str
+            Registry key path where look.
+        x86: str
+            Force x86 software registry.
+
+        Return
+        ------
+        str: value
+        """
+        node64 = '' if self.pi.current_is_x86() or x86 else r'\Wow6432Node'
+        return os.path.join('Software', node64, 'Microsoft', key)
 
     def lookup(self, key, name):
         """
-        Look for values in registry.
+        Look for values in registry in Microsoft software registry.
 
         Parameters
         ----------
@@ -445,14 +475,23 @@ class RegistryInfo:
         ------
         str: value
         """
+        KEY_READ = winreg.KEY_READ
+        openkey = winreg.OpenKey
+        ms = self.microsoft
         for hkey in self.HKEYS:
             try:
-                bkey = winreg.OpenKey(hkey, key, 0, winreg.KEY_READ)
-            except IOError:
-                continue
+                bkey = openkey(hkey, ms(key), 0, KEY_READ)
+            except (OSError, IOError):
+                if not self.pi.current_is_x86():
+                    try:
+                        bkey = openkey(hkey, ms(key, True), 0, KEY_READ)
+                    except (OSError, IOError):
+                        continue
+                else:
+                    continue
             try:
                 return winreg.QueryValueEx(bkey, name)[0]
-            except IOError:
+            except (OSError, IOError):
                 pass
 
 
@@ -495,7 +534,7 @@ class SystemInfo:
             for key in vckeys:
                 try:
                     bkey = winreg.OpenKey(hkey, key, 0, winreg.KEY_READ)
-                except IOError:
+                except (OSError, IOError):
                     continue
                 subkeys, values, _ = winreg.QueryInfoKey(bkey)
                 for i in range(values):
@@ -769,6 +808,7 @@ class EnvironmentInfo:
     """
     # Variables and properties in this class use originals CamelCase variables
     # names from Microsoft source files for more easy comparaison.
+
     def __init__(self, arch, vc_ver=None, vc_min_ver=None):
         self.pi = PlatformInfo(arch)
         self.ri = RegistryInfo(self.pi)
@@ -807,7 +847,7 @@ class EnvironmentInfo:
         Microsoft Visual C++ & Microsoft Foundation Class Includes
         """
         return [os.path.join(self.si.VCInstallDir, 'Include'),
-                os.path.join(self.si.VCInstallDir, 'ATLMFC\Include')]
+                os.path.join(self.si.VCInstallDir, r'ATLMFC\Include')]
 
     @property
     def VCLibraries(self):
@@ -907,7 +947,7 @@ class EnvironmentInfo:
                 os.path.join(self.si.WindowsSdkDir, 'UnionMetadata'),
                 os.path.join(
                     ref,
-                    'Windows.Foundation.UniversalApiContract'
+                    'Windows.Foundation.UniversalApiContract',
                     '1.0.0.0',
                 ),
                 os.path.join(
@@ -917,7 +957,7 @@ class EnvironmentInfo:
                 ),
                 os.path.join(
                     ref,
-                    'Windows.Networking.Connectivity.WwanContract'
+                    'Windows.Networking.Connectivity.WwanContract',
                     '1.0.0.0',
                 ),
                 os.path.join(
@@ -1193,5 +1233,5 @@ class EnvironmentInfo:
             if name:
                 return '%s\\' % name[0]
             return ''
-        except IOError:
+        except (OSError, IOError):
             return ''

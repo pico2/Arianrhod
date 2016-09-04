@@ -1,87 +1,81 @@
-# Copyright (c) 2011, 2012 Godefroid Chapelle
+# Copyright (c) 2011-2016 Godefroid Chapelle and ipdb development team
 #
 # This file is part of ipdb.
-# GNU package is free software: you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free
-# Software Foundation, either version 2 of the License, or (at your option)
-# any later version.
-#
-# GNU package is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-# for more details.
+# Redistributable under the revised BSD license
+# https://opensource.org/licenses/BSD-3-Clause
 
 
-import sys
+from inspect import getargspec
 import os
-import traceback
+import sys
 
 from contextlib import contextmanager
 
+
+def import_module(possible_modules, needed_module):
+    """Make it more resilient to different versions of IPython and try to
+    find a module."""
+    count = len(possible_modules)
+    for module in possible_modules:
+        try:
+            return __import__(module, fromlist=[needed_module])
+        except ImportError:
+            count -= 1
+            if count == 0:
+                raise
 try:
-    from pdb import Restart
+    # IPython 5.0 and newer
+    from IPython.terminal.debugger import TerminalPdb as Pdb
+    from IPython.core.debugger import BdbQuit_excepthook
 except ImportError:
-    class Restart(Exception):
-        pass
-
-import IPython
-
-if IPython.__version__ > '0.10.2':
     from IPython.core.debugger import Pdb, BdbQuit_excepthook
-    try:
-        get_ipython
-    except NameError:
-        # Make it more resilient to different versions of IPython and try to
-        # find a module.
-        possible_modules = ['IPython.terminal.embed',           # Newer IPython
-                            'IPython.frontend.terminal.embed']  # Older IPython
 
-        count = len(possible_modules)
-        for module in possible_modules:
-            try:
-                embed = __import__(module, fromlist=["InteractiveShellEmbed"])
-                InteractiveShellEmbed = embed.InteractiveShellEmbed
-            except ImportError:
-                count -= 1
-                if count == 0:
-                    raise
-            else:
-                break
+possible_modules = ['IPython.terminal.ipapp',           # Newer IPython
+                    'IPython.frontend.terminal.ipapp']  # Older IPython
 
-        ipshell = InteractiveShellEmbed()
-        def_colors = ipshell.colors
-    else:
-        def_colors = get_ipython.__self__.colors
+app = import_module(possible_modules, "TerminalIPythonApp")
+TerminalIPythonApp = app.TerminalIPythonApp
 
-    from IPython.utils import io
-
-    if 'nose' in list(sys.modules.keys()):
-        def update_stdout():
-            # setup stdout to ensure output is available with nose
-            io.stdout = sys.stdout = sys.__stdout__
-    else:
-        def update_stdout():
-            pass
+possible_modules = ['IPython.terminal.embed',           # Newer IPython
+                    'IPython.frontend.terminal.embed']  # Older IPython
+embed = import_module(possible_modules, "InteractiveShellEmbed")
+InteractiveShellEmbed = embed.InteractiveShellEmbed
+try:
+    get_ipython
+except NameError:
+    # Build a terminal app in order to force ipython to load the
+    # configuration
+    ipapp = TerminalIPythonApp()
+    # Avoid output (banner, prints)
+    ipapp.interact = False
+    ipapp.initialize([])
+    def_colors = ipapp.shell.colors
 else:
-    from IPython.Debugger import Pdb, BdbQuit_excepthook
-    from IPython.Shell import IPShell
-    from IPython import ipapi
+    # If an instance of IPython is already running try to get an instance
+    # of the application. If there is no TerminalIPythonApp instanciated
+    # the instance method will create a new one without loading the config.
+    # i.e: if we are in an embed instance we do not want to load the config.
+    ipapp = TerminalIPythonApp.instance()
+    shell = get_ipython()
+    def_colors = shell.colors
 
-    ip = ipapi.get()
-    if ip is None:
-        IPShell(argv=[''])
-        ip = ipapi.get()
-    def_colors = ip.options.colors
+    # Detect if embed shell or not and display a message
+    if isinstance(shell, InteractiveShellEmbed):
+        shell.write_err(
+            "\nYou are currently into an embedded ipython shell,\n"
+            "the configuration will not be loaded.\n\n"
+        )
 
-    from IPython.Shell import Term
+def_exec_lines = [line + '\n' for line in ipapp.exec_lines]
 
-    if 'nose' in list(sys.modules.keys()):
-        def update_stdout():
-            # setup stdout to ensure output is available with nose
-            Term.cout = sys.stdout = sys.__stdout__
+
+def _init_pdb(context=3):
+    if 'context' in getargspec(Pdb.__init__)[0]:
+        p = Pdb(def_colors, context=context)
     else:
-        def update_stdout():
-            pass
+        p = Pdb(def_colors)
+    p.rcLines += def_exec_lines
+    return p
 
 
 def wrap_sys_excepthook():
@@ -92,22 +86,25 @@ def wrap_sys_excepthook():
         sys.excepthook = BdbQuit_excepthook
 
 
-def set_trace(frame=None):
-    update_stdout()
+def set_trace(frame=None, context=3):
     wrap_sys_excepthook()
     if frame is None:
         frame = sys._getframe().f_back
-    Pdb(def_colors).set_trace(frame)
+    p = _init_pdb(context).set_trace(frame)
+    if p and hasattr(p, 'shell'):
+        p.shell.restore_sys_module_state()
 
 
-def post_mortem(tb):
-    update_stdout()
+def post_mortem(tb=None):
     wrap_sys_excepthook()
-    p = Pdb(def_colors)
+    p = _init_pdb()
     p.reset()
     if tb is None:
-        return
-    p.interaction(None, tb)
+        # sys.exc_info() returns (type, value, traceback) if an exception is
+        # being handled, otherwise it returns None
+        tb = sys.exc_info()[2]
+    if tb:
+        p.interaction(None, tb)
 
 
 def pm():
@@ -115,15 +112,15 @@ def pm():
 
 
 def run(statement, globals=None, locals=None):
-    Pdb(def_colors).run(statement, globals, locals)
+    _init_pdb().run(statement, globals, locals)
 
 
 def runcall(*args, **kwargs):
-    return Pdb(def_colors).runcall(*args, **kwargs)
+    return _init_pdb().runcall(*args, **kwargs)
 
 
 def runeval(expression, globals=None, locals=None):
-    return Pdb(def_colors).runeval(expression, globals, locals)
+    return _init_pdb().runeval(expression, globals, locals)
 
 
 @contextmanager
@@ -139,6 +136,14 @@ def launch_ipdb_on_exception():
 
 
 def main():
+    import traceback
+    import sys
+    try:
+        from pdb import Restart
+    except ImportError:
+        class Restart(Exception):
+            pass
+
     if not sys.argv[1:] or sys.argv[1] in ("--help", "-h"):
         print("usage: ipdb.py scriptfile [arg] ...")
         sys.exit(2)
@@ -157,7 +162,7 @@ def main():
     # modified by the script being debugged. It's a bad idea when it was
     # changed by the user from the command line. There is a "restart" command
     # which allows explicit specification of command line arguments.
-    pdb = Pdb(def_colors)
+    pdb = _init_pdb()
     while 1:
         try:
             pdb._runscript(mainpyfile)

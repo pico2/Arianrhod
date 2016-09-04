@@ -82,6 +82,10 @@ from warnings import warn
 from logging import error
 import IPython.core.hooks
 
+# NoOpContext is deprecated, but ipykernel imports it from here.
+# See https://github.com/ipython/ipykernel/issues/157
+from IPython.utils.contexts import NoOpContext
+
 try:
     import docrepr.sphinxify as sphx
 
@@ -183,8 +187,12 @@ class ExecutionResult(object):
             raise self.error_in_exec
 
     def __repr__(self):
+        if sys.version_info > (3,):
+            name = self.__class__.__qualname__
+        else:
+            name = self.__class__.__name__
         return '<%s object at %x, execution_count=%s error_before_exec=%s error_in_exec=%s result=%s>' %\
-                (self.__class__.__qualname__, id(self), self.execution_count, self.error_before_exec, self.error_in_exec, repr(self.result))
+                (name, id(self), self.execution_count, self.error_before_exec, self.error_in_exec, repr(self.result))
 
 
 class InteractiveShell(SingletonConfigurable):
@@ -643,8 +651,12 @@ class InteractiveShell(SingletonConfigurable):
         # override sys.stdout and sys.stderr themselves, you need to do that
         # *before* instantiating this class, because io holds onto
         # references to the underlying streams.
-        io.stdout = io.IOStream(sys.stdout)
-        io.stderr = io.IOStream(sys.stderr)
+        # io.std* are deprecated, but don't show our own deprecation warnings
+        # during initialization of the deprecated API.
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            io.stdout = io.IOStream(sys.stdout)
+            io.stderr = io.IOStream(sys.stderr)
 
     def init_prompts(self):
         # Set system prompts, so that scripts can decide if they are running
@@ -2461,7 +2473,7 @@ class InteractiveShell(SingletonConfigurable):
         # Python inserts the script's directory into sys.path
         dname = os.path.dirname(fname)
 
-        with prepended_to_syspath(dname):
+        with prepended_to_syspath(dname), self.builtin_trap:
             try:
                 glob, loc = (where + (None, ))[:2]
                 py3compat.execfile(
@@ -2874,7 +2886,7 @@ class InteractiveShell(SingletonConfigurable):
             if result is not None:
                 result.error_in_exec = e
             self.showtraceback(exception_only=True)
-            warn("To exit: use 'exit', 'quit', or Ctrl-D.", level=1)
+            warn("To exit: use 'exit', 'quit', or Ctrl-D.", stacklevel=1)
         except self.custom_exceptions:
             etype, value, tb = sys.exc_info()
             if result is not None:

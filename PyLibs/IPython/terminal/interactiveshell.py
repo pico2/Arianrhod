@@ -3,9 +3,11 @@ from __future__ import print_function
 
 import os
 import sys
+import warnings
 from warnings import warn
 
 from IPython.core.interactiveshell import InteractiveShell, InteractiveShellABC
+from IPython.utils import io
 from IPython.utils.py3compat import PY3, cast_unicode_py2, input
 from IPython.utils.terminal import toggle_set_term_title, set_term_title
 from IPython.utils.process import abbrev_cwd
@@ -14,7 +16,7 @@ from traitlets import Bool, Unicode, Dict, Integer, observe, Instance, Type, def
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
 from prompt_toolkit.filters import (HasFocus, Condition, IsDone)
 from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.shortcuts import create_prompt_application, create_eventloop, create_prompt_layout
+from prompt_toolkit.shortcuts import create_prompt_application, create_eventloop, create_prompt_layout, create_output
 from prompt_toolkit.interface import CommandLineInterface
 from prompt_toolkit.key_binding.manager import KeyBindingManager
 from prompt_toolkit.layout.processors import ConditionalProcessor, HighlightMatchingBracketProcessor
@@ -72,11 +74,17 @@ def get_default_editor():
     else:
         return 'notepad' # same in Windows!
 
-
-if sys.stdin and sys.stdout and sys.stderr:
-    _is_tty = (sys.stdin.isatty()) and (sys.stdout.isatty()) and  (sys.stderr.isatty())
+# conservatively check for tty
+# overridden streams can result in things like:
+# - sys.stdin = None
+# - no isatty method
+for _name in ('stdin', 'stdout', 'stderr'):
+    _stream = getattr(sys, _name)
+    if not _stream or not hasattr(_stream, 'isatty') or not _stream.isatty():
+        _is_tty = False
+        break
 else:
-    _is_tty = False
+    _is_tty = True
 
 
 _use_simple_prompt = ('IPY_TEST_SIMPLE_PROMPT' in os.environ) or (not _is_tty)
@@ -142,6 +150,13 @@ class TerminalInteractiveShell(InteractiveShell):
         help="Override highlighting format for specific tokens"
     ).tag(config=True)
 
+    true_color = Bool(False,
+        help=("Use 24bit colors instead of 256 colors in prompt highlighting. "
+              "If your terminal supports true color, the following command "
+              "should print 'TRUECOLOR' in orange: "
+              "printf \"\\x1b[38;2;255;100;0mTRUECOLOR\\x1b[0m\\n\"")
+    ).tag(config=True)
+
     editor = Unicode(get_default_editor(),
         help="Set the editor used by IPython (default to $EDITOR/vi/notepad)."
     ).tag(config=True)
@@ -166,17 +181,12 @@ class TerminalInteractiveShell(InteractiveShell):
         help="Automatically set the terminal title"
     ).tag(config=True)
 
-    # Leaving that for beta/rc tester, shoudl remove for 5.0.0 final. 
-    display_completions_in_columns = Bool(None,
-        help="DEPRECATED", allow_none=True
-    ).tag(config=True)
-
-    @observe('display_completions_in_columns')
-    def _display_completions_in_columns_changed(self, new):
-        raise DeprecationWarning("The `display_completions_in_columns` Boolean has been replaced by the enum `display_completions`"
-                                 "with the following acceptable value: 'column', 'multicolumn','readlinelike'. ")
-
-    display_completions = Enum(('column', 'multicolumn','readlinelike'), default_value='multicolumn').tag(config=True)
+    display_completions = Enum(('column', 'multicolumn','readlinelike'), 
+        help= ( "Options for displaying tab completions, 'column', 'multicolumn', and "
+                "'readlinelike'. These options are for `prompt_toolkit`, see "
+                "`prompt_toolkit` documentation for more information."
+                ),
+        default_value='multicolumn').tag(config=True)
 
     highlight_matching_brackets = Bool(True,
         help="Highlight matching brackets .",
@@ -228,14 +238,16 @@ class TerminalInteractiveShell(InteractiveShell):
                             editing_mode=editing_mode,
                             key_bindings_registry=kbmanager.registry,
                             history=history,
-                            completer=IPythonPTCompleter(self.Completer),
+                            completer=IPythonPTCompleter(shell=self),
                             enable_history_search=True,
                             style=style,
                             mouse_support=self.mouse_support,
                             **self._layout_options()
         )
         self._eventloop = create_eventloop(self.inputhook)
-        self.pt_cli = CommandLineInterface(self._pt_app, eventloop=self._eventloop)
+        self.pt_cli = CommandLineInterface(
+            self._pt_app, eventloop=self._eventloop,
+            output=create_output(true_color=self.true_color))
 
     def _make_style_from_name(self, name):
         """
@@ -321,22 +333,47 @@ class TerminalInteractiveShell(InteractiveShell):
             pre_run=self.pre_prompt, reset_current_buffer=True)
         return document.text
 
+    def enable_win_unicode_console(self):
+        import win_unicode_console
+
+        if PY3:
+            win_unicode_console.enable()
+        else:
+            # https://github.com/ipython/ipython/issues/9768
+            from win_unicode_console.streams import (TextStreamWrapper,
+                                 stdout_text_transcoded, stderr_text_transcoded)
+
+            class LenientStrStreamWrapper(TextStreamWrapper):
+                def write(self, s):
+                    if isinstance(s, bytes):
+                        s = s.decode(self.encoding, 'replace')
+
+                    self.base.write(s)
+
+            stdout_text_str = LenientStrStreamWrapper(stdout_text_transcoded)
+            stderr_text_str = LenientStrStreamWrapper(stderr_text_transcoded)
+
+            win_unicode_console.enable(stdout=stdout_text_str,
+                                       stderr=stderr_text_str)
+
     def init_io(self):
         if sys.platform not in {'win32', 'cli'}:
             return
 
-        import win_unicode_console
-        import colorama
+        self.enable_win_unicode_console()
 
-        win_unicode_console.enable()
+        import colorama
         colorama.init()
 
         # For some reason we make these wrappers around stdout/stderr.
         # For now, we need to reset them so all output gets coloured.
         # https://github.com/ipython/ipython/issues/8669
-        from IPython.utils import io
-        io.stdout = io.IOStream(sys.stdout)
-        io.stderr = io.IOStream(sys.stderr)
+        # io.std* are deprecated, but don't show our own deprecation warnings
+        # during initialization of the deprecated API.
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            io.stdout = io.IOStream(sys.stdout)
+            io.stderr = io.IOStream(sys.stderr)
 
     def init_magics(self):
         super(TerminalInteractiveShell, self).init_magics()
@@ -378,6 +415,7 @@ class TerminalInteractiveShell(InteractiveShell):
         if display_banner is not DISPLAY_BANNER_DEPRECATED:
             warn('interact `display_banner` argument is deprecated since IPython 5.0. Call `show_banner()` if needed.', DeprecationWarning, stacklevel=2)
 
+        self.keep_running = True
         while self.keep_running:
             print(self.separate_in, end='')
 
@@ -403,9 +441,6 @@ class TerminalInteractiveShell(InteractiveShell):
                 break
             except KeyboardInterrupt:
                 print("\nKeyboardInterrupt escaped interact()\n")
-        
-        if hasattr(self, '_eventloop'):
-            self._eventloop.close()
 
     _inputhook = None
     def inputhook(self, context):
