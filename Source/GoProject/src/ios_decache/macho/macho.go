@@ -20,7 +20,7 @@ func NewMachOFile(file *filestream.File) *MachOFile {
     }
 
     cmds := file.Read(int(hdr.SizeofCmds))
-    Println(cmds)
+    // Println(cmds)
 
     for i := uint32(0); i != hdr.NumberOfCmds; i++ {
         cmd, size := newLoadCommand(cmds)
@@ -46,6 +46,6 @@ func newLoadCommand(buffer []byte) (LoadCommand, int) {
 
 func newTypeFromBytes(t interface{}, buffer []byte) interface{} {
     typ := reflect.TypeOf(t)
-    Println(buffer[:typ.Size()])
+    // Println(buffer[:typ.Size()])
     return reflect.NewAt(typ, unsafe.Pointer(&buffer[0])).Interface()
 }

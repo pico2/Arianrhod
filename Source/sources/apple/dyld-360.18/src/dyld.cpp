@@ -1190,7 +1190,8 @@ static void checkDylibOverridesInDir(const char* dirPath)
 {
 	//dyld::log("checkDylibOverridesInDir('%s')\n", dirPath);
 	char dylibPath[PATH_MAX];
-	if ( strlcpy(dylibPath, dirPath, PATH_MAX) >= PATH_MAX )
+	int dirPathLen = strlcpy(dylibPath, dirPath, PATH_MAX-1);
+	if ( dirPathLen >= PATH_MAX )
 		return;
 	DIR* dirp = opendir(dirPath);
 	if ( dirp != NULL) {
@@ -1201,8 +1202,8 @@ static void checkDylibOverridesInDir(const char* dirPath)
 				break;
 			if ( entp->d_type != DT_REG ) 
 				continue;
-			if ( strlcat(dylibPath, "/", PATH_MAX) >= PATH_MAX )
-				continue;
+			dylibPath[dirPathLen] = '/';
+			dylibPath[dirPathLen+1] = '\0';
 			if ( strlcat(dylibPath, entp->d_name, PATH_MAX) >= PATH_MAX )
 				continue;
 			checkDylibOverride(dylibPath);
@@ -1216,7 +1217,8 @@ static void checkFrameworkOverridesInDir(const char* dirPath)
 {
 	//dyld::log("checkFrameworkOverridesInDir('%s')\n", dirPath);
 	char frameworkPath[PATH_MAX];
-	if ( strlcpy(frameworkPath, dirPath, PATH_MAX) >= PATH_MAX )
+	int dirPathLen = strlcpy(frameworkPath, dirPath, PATH_MAX-1);
+	if ( dirPathLen >= PATH_MAX )
 		return;
 	DIR* dirp = opendir(dirPath);
 	if ( dirp != NULL) {
@@ -1227,9 +1229,9 @@ static void checkFrameworkOverridesInDir(const char* dirPath)
 				break;
 			if ( entp->d_type != DT_DIR ) 
 				continue;
-			if ( strlcat(frameworkPath, "/", PATH_MAX) >= PATH_MAX )
-				continue;
-			int dirNameLen = strlen(entp->d_name);
+			frameworkPath[dirPathLen] = '/';
+			frameworkPath[dirPathLen+1] = '\0';
+			int dirNameLen = (int)strlen(entp->d_name);
 			if ( dirNameLen < 11 )
 				continue;
 			if ( strcmp(&entp->d_name[dirNameLen-10], ".framework") != 0 )
@@ -4411,7 +4413,10 @@ static void loadInsertedDylib(const char* path)
 #if TARGET_IPHONE_SIMULATOR
 		dyld::log("dyld: warning: could not load inserted library '%s' because %s\n", path, msg);
 #else
-		halt(dyld::mkstringf("could not load inserted library '%s' because %s\n", path, msg));
+		if ( sProcessRequiresLibraryValidation )
+			dyld::log("dyld: warning: could not load inserted library '%s' into library validated process because %s\n", path, msg);
+		else
+			halt(dyld::mkstringf("could not load inserted library '%s' because %s\n", path, msg));
 #endif
 	}
 	catch (...) {
@@ -4544,7 +4549,18 @@ static uintptr_t useSimulatorDyld(int fd, const macho_header* mainExecutableMH, 
 								int argc, const char* argv[], const char* envp[], const char* apple[], uintptr_t* startGlue)
 {
 	*startGlue = 0;
-	
+
+	// <rdar://problem/25311921> simulator does not support restricted processes
+	uint32_t flags;
+	if ( csops(0, CS_OPS_STATUS, &flags, sizeof(flags)) == -1 )
+		return 0;
+	if ( (flags & CS_RESTRICT) == CS_RESTRICT )
+		return 0;
+	if ( issetugid() )
+		return 0;
+	if ( hasRestrictedSegment(mainExecutableMH) )
+		return 0;
+
 	// verify simulator dyld file is owned by root
 	struct stat sb;
 	if ( fstat(fd, &sb) == -1 )
@@ -4648,6 +4664,8 @@ static uintptr_t useSimulatorDyld(int fd, const macho_header* mainExecutableMH, 
 					void* segAddress = ::mmap((void*)requestedLoadAddress, seg->filesize, seg->initprot, MAP_FIXED | MAP_PRIVATE, fd, fileOffset + seg->fileoff);
 					//dyld::log("dyld_sim %s mapped at %p\n", seg->segname, segAddress);
 					if ( segAddress == (void*)(-1) )
+						return 0;
+					if ( ((uintptr_t)segAddress < loadAddress) || ((uintptr_t)segAddress+seg->filesize > loadAddress+mappingSize) )
 						return 0;
 				}
 				break;

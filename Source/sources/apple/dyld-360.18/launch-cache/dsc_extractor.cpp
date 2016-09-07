@@ -1,16 +1,16 @@
-/* -*- mode: C++; c-basic-offset: 4; tab-width: 4 -*-
+/* -*- mode: C++; c-basic-offset: 4; tab-width: 4 -*- 
  *
  * Copyright (c) 2011 Apple Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- *
+ * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
  * Version 2.0 (the 'License'). You may not use this file except in
  * compliance with the License. Please obtain a copy of the License at
  * http://www.opensource.apple.com/apsl/ and read it before using this
  * file.
- *
+ * 
  * The Original Code and all software distributed under the License are
  * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -18,7 +18,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
  * Please see the License for the specific language governing rights and
  * limitations under the License.
- *
+ * 
  * @APPLE_LICENSE_HEADER_END@
  */
 
@@ -38,7 +38,7 @@
 #include <mach-o/loader.h>
 #include <Availability.h>
 
-#define NO_ULEB
+#define NO_ULEB 
 #include "Architectures.hpp"
 #include "MachOFileAbstraction.hpp"
 #include "CacheFileAbstraction.hpp"
@@ -56,7 +56,7 @@
 
 struct seg_info
 {
-				seg_info(const char* n, uint64_t o, uint64_t s)
+				seg_info(const char* n, uint64_t o, uint64_t s) 
 					: segName(n), offset(o), sizem(s) { }
 	const char* segName;
 	uint64_t	offset;
@@ -107,7 +107,7 @@ private:
 
 
 template <typename A>
-int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCache, const void* mapped_cache, uint64_t* newSize)
+int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCache, const void* mapped_cache, uint64_t* newSize) 
 {
 	typedef typename A::P P;
 	typedef typename A::P::E E;
@@ -115,7 +115,7 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 
 	// update header flags
 	mh->set_flags(mh->flags() & 0x7FFFFFFF); // remove in-cache bit
-
+	
 	// update load commands
 	uint64_t cumulativeFileSize = 0;
 	const macho_load_command<P>* const cmds = (macho_load_command<P>*)((uint8_t*)mh + sizeof(macho_header<P>));
@@ -191,7 +191,7 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 		}
 		cmd = (const macho_load_command<P>*)(((uint8_t*)cmd)+cmd->cmdsize());
 	}
-
+	
 	// rebuild symbol table
 	if ( linkEditSegCmd == NULL ) {
 		fprintf(stderr, "__LINKEDIT not found\n");
@@ -223,7 +223,7 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 
 	std::vector<mach_o::trie::Entry> exports;
 	if ( exportsTrieSize != 0 ) {
-		const uint8_t* exportsStart = ((uint8_t*)mapped_cache) + exportsTrieOffset;
+		const uint8_t* exportsStart = ((uint8_t*)mapped_cache) + exportsTrieOffset; 
 		const uint8_t* exportsEnd = &exportsStart[exportsTrieSize];
 		mach_o::trie::parseTrie(exportsStart, exportsEnd, exports);
 		exports.erase(std::remove_if(exports.begin(), exports.end(), NotReExportSymbol(reexportDeps)), exports.end());
@@ -259,12 +259,12 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 		newSymCount = localNlistCount;
 		for (const macho_nlist<P>* s = mergedSymTabStart; s != mergedSymTabend; ++s) {
 			// skip any locals in cache
-			if ( (s->n_type() & (N_TYPE|N_EXT)) == N_SECT )
+			if ( (s->n_type() & (N_TYPE|N_EXT)) == N_SECT ) 
 				continue;
 			++newSymCount;
 		}
 	}
-
+	
 	// add room for N_INDR symbols for re-exported symbols
 	newSymCount += exports.size();
 
@@ -283,7 +283,7 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 	newStringPoolStart[poolOffset++] = '\0'; // first pool entry is always empty string
 	for (const macho_nlist<P>* s = mergedSymTabStart; s != mergedSymTabend; ++s) {
 		// if we have better local symbol info, skip any locals here
-		if ( (localNlists != NULL) && ((s->n_type() & (N_TYPE|N_EXT)) == N_SECT) )
+		if ( (localNlists != NULL) && ((s->n_type() & (N_TYPE|N_EXT)) == N_SECT) ) 
 			continue;
 		*t = *s;
 		t->set_n_strx(poolOffset);
@@ -329,19 +329,19 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 			++symbolsCopied;
 		}
 	}
-
+	
 	if ( newSymCount != symbolsCopied ) {
 		fprintf(stderr, "symbol count miscalculation\n");
 		return -1;
 	}
-
+	
 	// pointer align string pool size
 	while ( (poolOffset % sizeof(pint_t)) != 0 )
-		++poolOffset;
+		++poolOffset; 
 	// copy indirect symbol table
 	uint32_t* newIndSymTab = (uint32_t*)((char*)mh + newIndSymTabOffset);
 	memcpy(newIndSymTab, mergedIndSymTab, dynamicSymTab->nindirectsyms()*sizeof(uint32_t));
-
+	
 	// update load commands
 	if ( functionStarts != NULL ) {
 		functionStarts->set_dataoff((uint32_t)newFunctionStartsOffset);
@@ -362,22 +362,22 @@ int optimize_linkedit(macho_header<typename A::P>* mh, uint64_t textOffsetInCach
 	dynamicSymTab->set_indirectsymoff((uint32_t)newIndSymTabOffset);
 	linkEditSegCmd->set_filesize(symtab->stroff()+symtab->strsize() - linkEditSegCmd->fileoff());
 	linkEditSegCmd->set_vmsize( (linkEditSegCmd->filesize()+4095) & (-4096) );
-
+	
 	// return new size
 	*newSize = (symtab->stroff()+symtab->strsize()+4095) & (-4096);
-
+	
 	// <rdar://problem/17671438> Xcode 6 leaks in dyld_shared_cache_extract_dylibs
 	for (std::vector<mach_o::trie::Entry>::iterator it = exports.begin(); it != exports.end(); ++it) {
 		::free((void*)(it->name));
 	}
-
-
+	
+	
 	return 0;
 }
 
 
 
-static void make_dirs(const char* file_path)
+static void make_dirs(const char* file_path) 
 {
 	//printf("make_dirs(%s)\n", file_path);
 	char dirs[strlen(file_path)+1];
@@ -403,56 +403,56 @@ static void make_dirs(const char* file_path)
 
 
 template <typename A>
-size_t dylib_maker(const void* mapped_cache, std::vector<uint8_t> &dylib_data, const std::vector<seg_info>& segments) {
+size_t dylib_maker(const void* mapped_cache, std::vector<uint8_t> &dylib_data, const std::vector<seg_info>& segments) {		
 	typedef typename A::P P;
-
+    
     size_t  additionalSize  = 0;
 	for(std::vector<seg_info>::const_iterator it=segments.begin(); it != segments.end(); ++it) {
 		additionalSize                          += it->sizem;
 	}
-
+    
     dylib_data.reserve(dylib_data.size() + additionalSize);
-
+    
     uint32_t                nfat_archs          = 0;
 	uint32_t                offsetInFatFile     = 4096;
     uint8_t                 *base_ptr           = &dylib_data.front();
-
+	    
 #define FH reinterpret_cast<fat_header*>(base_ptr)
 #define FA reinterpret_cast<fat_arch*>(base_ptr + (8 + (nfat_archs - 1) * sizeof(fat_arch)))
-
+    
     if(dylib_data.size() >= 4096 && OSSwapBigToHostInt32(FH->magic) == FAT_MAGIC) {
 		// have fat header, append new arch to end
         nfat_archs                              = OSSwapBigToHostInt32(FH->nfat_arch);
 		offsetInFatFile                         = OSSwapBigToHostInt32(FA->offset) + OSSwapBigToHostInt32(FA->size);
     }
-
+    
     dylib_data.resize(offsetInFatFile);
     base_ptr                                    = &dylib_data.front();
-
+    
     FH->magic                                   = OSSwapHostToBigInt32(FAT_MAGIC);
     FH->nfat_arch                               = OSSwapHostToBigInt32(++nfat_archs);
-
+    
     FA->cputype                                 = 0; // filled in later
     FA->cpusubtype                              = 0; // filled in later
     FA->offset                                  = OSSwapHostToBigInt32(offsetInFatFile);
     FA->size                                    = 0; // filled in later
     FA->align                                   = OSSwapHostToBigInt32(12);
-
+    
 	// Write regular segments into the buffer
 	uint64_t                totalSize           = 0;
     uint64_t				textOffsetInCache	= 0;
 	for( std::vector<seg_info>::const_iterator it=segments.begin(); it != segments.end(); ++it) {
-
+        
         if(strcmp(it->segName, "__TEXT") == 0 ) {
 			textOffsetInCache					= it->offset;
             const macho_header<P>   *textMH     = reinterpret_cast<macho_header<P>*>((uint8_t*)mapped_cache+textOffsetInCache);
-            FA->cputype                         = OSSwapHostToBigInt32(textMH->cputype());
+            FA->cputype                         = OSSwapHostToBigInt32(textMH->cputype()); 
             FA->cpusubtype                      = OSSwapHostToBigInt32(textMH->cpusubtype());
-
+            
             // if this cputype/subtype already exist in fat header, then return immediately
             for(uint32_t i=0; i < nfat_archs-1; ++i) {
                 fat_arch            *afa        = reinterpret_cast<fat_arch*>(base_ptr+8)+i;
-
+                
                 if(   afa->cputype == FA->cputype
                    && afa->cpusubtype == FA->cpusubtype) {
                     //fprintf(stderr, "arch already exists in fat dylib\n");
@@ -461,19 +461,19 @@ size_t dylib_maker(const void* mapped_cache, std::vector<uint8_t> &dylib_data, c
                 }
             }
 		}
-
+        
 		//printf("segName=%s, offset=0x%llX, size=0x%0llX\n", it->segName, it->offset, it->sizem);
         std::copy(((uint8_t*)mapped_cache)+it->offset, ((uint8_t*)mapped_cache)+it->offset+it->sizem, std::back_inserter(dylib_data));
         base_ptr                                = &dylib_data.front();
         totalSize                               += it->sizem;
 	}
-
-	FA->size                                    = OSSwapHostToBigInt32(totalSize);
-
+    
+	FA->size                                    = OSSwapHostToBigInt32(totalSize); 
+    
 	// optimize linkedit
 	uint64_t                newSize             = dylib_data.size();
 	optimize_linkedit<A>(((macho_header<P>*)(base_ptr+offsetInFatFile)), textOffsetInCache, mapped_cache, &newSize);
-
+	
 	// update fat header with new file size
     dylib_data.resize(offsetInFatFile+newSize);
     base_ptr                                    = &dylib_data.front();
@@ -481,7 +481,7 @@ size_t dylib_maker(const void* mapped_cache, std::vector<uint8_t> &dylib_data, c
 #undef FH
 #undef FA
 	return offsetInFatFile;
-}
+} 
 
 
 int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path, const char* extraction_root_path,
@@ -492,38 +492,38 @@ int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path
 		fprintf(stderr, "Error: stat failed for dyld shared cache at %s\n", shared_cache_file_path);
 		return -1;
 	}
-
+		
 	int cache_fd = open(shared_cache_file_path, O_RDONLY);
 	if (cache_fd < 0) {
 		fprintf(stderr, "Error: failed to open shared cache file at %s\n", shared_cache_file_path);
 		return -1;
 	}
-
+	
 	void* mapped_cache = mmap(NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, cache_fd, 0);
 	if (mapped_cache == MAP_FAILED) {
 		fprintf(stderr, "Error: mmap() for shared cache at %s failed, errno=%d\n", shared_cache_file_path, errno);
 		return -1;
 	}
-
+    
     close(cache_fd);
 
 	// instantiate arch specific dylib maker
     size_t (*dylib_create_func)(const void*, std::vector<uint8_t>&, const std::vector<seg_info>&) = NULL;
-	     if ( strcmp((char*)mapped_cache, "dyld_v1    i386") == 0 )
+	     if ( strcmp((char*)mapped_cache, "dyld_v1    i386") == 0 ) 
 		dylib_create_func = dylib_maker<x86>;
-	else if ( strcmp((char*)mapped_cache, "dyld_v1  x86_64") == 0 )
+	else if ( strcmp((char*)mapped_cache, "dyld_v1  x86_64") == 0 ) 
 		dylib_create_func = dylib_maker<x86_64>;
-	else if ( strcmp((char*)mapped_cache, "dyld_v1 x86_64h") == 0 )
+	else if ( strcmp((char*)mapped_cache, "dyld_v1 x86_64h") == 0 ) 
 		dylib_create_func = dylib_maker<x86_64>;
-	else if ( strcmp((char*)mapped_cache, "dyld_v1   armv5") == 0 )
+	else if ( strcmp((char*)mapped_cache, "dyld_v1   armv5") == 0 ) 
 		dylib_create_func = dylib_maker<arm>;
-	else if ( strcmp((char*)mapped_cache, "dyld_v1   armv6") == 0 )
+	else if ( strcmp((char*)mapped_cache, "dyld_v1   armv6") == 0 ) 
 		dylib_create_func = dylib_maker<arm>;
-	else if ( strcmp((char*)mapped_cache, "dyld_v1   armv7") == 0 )
+	else if ( strcmp((char*)mapped_cache, "dyld_v1   armv7") == 0 ) 
 		dylib_create_func = dylib_maker<arm>;
-	else if ( strncmp((char*)mapped_cache, "dyld_v1  armv7", 14) == 0 )
+	else if ( strncmp((char*)mapped_cache, "dyld_v1  armv7", 14) == 0 ) 
 		dylib_create_func = dylib_maker<arm>;
-	else if ( strcmp((char*)mapped_cache, "dyld_v1   arm64") == 0 )
+	else if ( strcmp((char*)mapped_cache, "dyld_v1   arm64") == 0 ) 
 		dylib_create_func = dylib_maker<arm64>;
 	else {
 		fprintf(stderr, "Error: unrecognized dyld shared cache magic.\n");
@@ -548,22 +548,22 @@ int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path
     dispatch_semaphore_t    sema                = dispatch_semaphore_create(2);
     dispatch_queue_t        process_queue       = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
     dispatch_queue_t        writer_queue        = dispatch_queue_create("dyld writer queue", 0);
-
+    
 	__block unsigned        count               = 0;
-
+    
 	for ( NameToSegments::iterator it = map.begin(); it != map.end(); ++it) {
 		dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
         dispatch_group_async(group, process_queue, ^{
-
+            
             char    dylib_path[PATH_MAX];
             strcpy(dylib_path, extraction_root_path);
             strcat(dylib_path, "/");
             strcat(dylib_path, it->first);
-
+            
             //printf("%s with %lu segments\n", dylib_path, it->second.size());
             // make sure all directories in this path exist
             make_dirs(dylib_path);
-
+            
             // open file, create if does not already exist
             int fd = ::open(dylib_path, O_CREAT | O_EXLOCK | O_RDWR, 0644);
             if ( fd == -1 ) {
@@ -571,7 +571,7 @@ int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path
                 result    = -1;
                 return;
             }
-
+            
             struct stat statbuf;
             if (fstat(fd, &statbuf)) {
                 fprintf(stderr, "Error: stat failed for dyld file %s, errnor=%d\n", dylib_path, errno);
@@ -579,7 +579,7 @@ int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path
                 result    = -1;
                 return;
             }
-
+            
             std::vector<uint8_t> *vec   = new std::vector<uint8_t>(statbuf.st_size);
             if(pread(fd, &vec->front(), vec->size(), 0) != (long)vec->size()) {
                 fprintf(stderr, "can't read dylib file %s, errnor=%d\n", dylib_path, errno);
@@ -587,32 +587,32 @@ int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path
                 result    = -1;
                 return;
             }
-
+            
             const size_t    offset  = dylib_create_func(mapped_cache, *vec, it->second);
-
+            
             dispatch_group_async(group, writer_queue, ^{
                 progress(count++, (unsigned)map.size());
-
+                
                 if(offset != vec->size()) {
                     //Write out the first page, and everything after offset
-                    if(   pwrite(fd, &vec->front(), 4096, 0) == -1
+                    if(   pwrite(fd, &vec->front(), 4096, 0) == -1 
                        || pwrite(fd, &vec->front() + offset, vec->size() - offset, offset) == -1) {
                         fprintf(stderr, "error writing, errnor=%d\n", errno);
                         result    = -1;
                     }
                 }
-
+                
                 delete vec;
                 close(fd);
                 dispatch_semaphore_signal(sema);
             });
         });
 	}
-
+    
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     dispatch_release(group);
     dispatch_release(writer_queue);
-
+    
     munmap(mapped_cache, statbuf.st_size);
 	return result;
 }
@@ -621,12 +621,12 @@ int dyld_shared_cache_extract_dylibs_progress(const char* shared_cache_file_path
 
 int dyld_shared_cache_extract_dylibs(const char* shared_cache_file_path, const char* extraction_root_path)
 {
-	return dyld_shared_cache_extract_dylibs_progress(shared_cache_file_path, extraction_root_path,
+	return dyld_shared_cache_extract_dylibs_progress(shared_cache_file_path, extraction_root_path, 
 													^(unsigned , unsigned) {} );
 }
 
 
-#if 1
+#if 0 
 // test program
 #include <stdio.h>
 #include <stddef.h>
@@ -642,20 +642,20 @@ int main(int argc, const char* argv[])
 		fprintf(stderr, "usage: dsc_extractor <path-to-cache-file> <path-to-device-dir>\n");
 		return 1;
 	}
-
+	
 	//void* handle = dlopen("/Volumes/my/src/dyld/build/Debug/dsc_extractor.bundle", RTLD_LAZY);
 	void* handle = dlopen("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/usr/lib/dsc_extractor.bundle", RTLD_LAZY);
 	if ( handle == NULL ) {
 		fprintf(stderr, "dsc_extractor.bundle could not be loaded\n");
 		return 1;
 	}
-
+	
 	extractor_proc proc = (extractor_proc)dlsym(handle, "dyld_shared_cache_extract_dylibs_progress");
 	if ( proc == NULL ) {
 		fprintf(stderr, "dsc_extractor.bundle did not have dyld_shared_cache_extract_dylibs_progress symbol\n");
 		return 1;
 	}
-
+	
 	int result = (*proc)(argv[1], argv[2], ^(unsigned c, unsigned total) { printf("%d/%d\n", c, total); } );
 	fprintf(stderr, "dyld_shared_cache_extract_dylibs_progress() => %d\n", result);
 	return 0;
@@ -664,6 +664,6 @@ int main(int argc, const char* argv[])
 
 #endif
 
-
-
+ 
+ 
 

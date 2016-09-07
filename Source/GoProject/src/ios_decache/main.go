@@ -1,10 +1,10 @@
 package main
 
 import (
-    . "fmt"
     . "ml/strings"
 
     "os"
+    "fmt"
     "path/filepath"
     "ml/os2"
     "ml/io2/filestream"
@@ -15,7 +15,7 @@ import (
 type DyldCacheExtractor struct {
     file        *filestream.File
     header      cache.CacheHeader
-    mappings    []cache.SharedFileMappingNp
+    mappings    []cache.DyldCacheMappingInfo
     images      []cache.CacheImageInfo
 }
 
@@ -24,7 +24,7 @@ func NewDyldCacheExtractor(path string) *DyldCacheExtractor {
 
     return &DyldCacheExtractor{
         file    : file,
-        mappings: []cache.SharedFileMappingNp{},
+        mappings: []cache.DyldCacheMappingInfo{},
         images  : []cache.CacheImageInfo{},
     }
 }
@@ -37,10 +37,12 @@ func (self *DyldCacheExtractor) Close() {
 
 func (self *DyldCacheExtractor) Open() {
     self.header = self.file.ReadType(cache.CacheHeader{}).(cache.CacheHeader)
+    fmt.Println(self.header)
 
     self.file.Seek(int64(self.header.MappingOffset), filestream.SEEK_SET)
     for i := uint32(0); i != self.header.MappingCount; i++ {
-        self.mappings = append(self.mappings, self.file.ReadType(cache.SharedFileMappingNp{}).(cache.SharedFileMappingNp))
+        self.mappings = append(self.mappings, self.file.ReadType(cache.DyldCacheMappingInfo{}).(cache.DyldCacheMappingInfo))
+        fmt.Println(self.mappings[len(self.mappings) - 1])
     }
 
     self.file.Seek(int64(self.header.ImagesOffset), filestream.SEEK_SET)
@@ -52,6 +54,7 @@ func (self *DyldCacheExtractor) Open() {
 func (self *DyldCacheExtractor) SaveAllImages(path string) {
     os.MkdirAll(path, 0755)
     for _, image := range self.images {
+        fmt.Println(image)
         self.SaveImage(image, filepath.Join(path, self.GetImagePath(image).String()))
     }
 }
@@ -62,20 +65,19 @@ func (self *DyldCacheExtractor) SaveImage(image cache.CacheImageInfo, path strin
     offset := self.OffsetFromVa(image.Address)
     self.file.SetPosition(int64(offset))
 
-    mach := macho.NewMachOFile(self.file)
-
-    Printf("%X\n", mach.Header.Magic)
+    // mach := macho.NewMachOFile(self.file)
+    // fmt.Printf("%X\n", mach.Header.Magic)
 }
 
 func (self *DyldCacheExtractor) GetImagePath(image cache.CacheImageInfo) String {
-    self.file.SetPosition(int64(image.PathOffset))
+    self.file.SetPosition(int64(image.PathFileOffset))
     return self.file.ReadMultiByte(CP_UTF8)
 }
 
 func (self *DyldCacheExtractor) OffsetFromVa(address uint64) uint64 {
     for _, mapping := range self.mappings {
         if mapping.Address <= address && address < mapping.Address + mapping.Size {
-            return address - mapping.Address + mapping.Offset
+            return address - mapping.Address + mapping.FileOffset
         }
     }
 
