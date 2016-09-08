@@ -12,31 +12,14 @@ import (
     "time"
     "context"
     "ml/io2"
-    "net/http"
-    // "ml/net/http2"
+    "ml/net/http2"
     "ml/html"
     "ml/logging/logger"
 )
 
 func main() {
-    req, _ := http.NewRequest("GET", "http://fuck.norn7.com/", nil)
-
-    parent := context.Background()
-    ctx, cancel := context.WithTimeout(parent, time.Microsecond * 2000)
-    req = req.WithContext(ctx)
-
-    t := time.Now()
-    resp, err := http.DefaultClient.Do(req)
-    fmt.Println(time.Now().Sub(t))
-
-    fmt.Println(err, resp)
-    // fmt.Println(<-ctx.Done(), "done")
-    fmt.Println(ctx.Err())
-    cancel()
-    fmt.Println(ctx.Err() == context.DeadlineExceeded)
-    fmt.Println(ctx.Err() == context.Canceled)
-
-    fmt.Println(time.ParseDuration("1000s"))
-
-    _ = cancel
+    s := http.NewSession(http.DefaultTimeout(1 * time.Second))
+    s.SetHTTPProxy("localhost", 6789)
+    ret := s.Get("https://storage.googleapis.com/golang/go1.7.1.windows-amd64.zip")
+    fmt.Println(ret.Err())
 }
