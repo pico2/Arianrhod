@@ -10,12 +10,12 @@ from ..anaconda_lib.helpers import valid_languages
 from ..anaconda_lib.linting.sublime import ANACONDA, update_statusbar
 
 
-class AnacondaNextLintError(sublime_plugin.WindowCommand):
-    """Jump to the next lint error on the page
+class AnacondaPrevLintError(sublime_plugin.WindowCommand):
+    """Jump to the previous lint error on the page
     """
 
     def run(self) -> None:
-        self.jump(self._harvest_next())
+        self.jump(self._harvest_prev())
         update_statusbar(self.window.active_view())
 
     def is_enabled(self) -> bool:
@@ -49,8 +49,8 @@ class AnacondaNextLintError(sublime_plugin.WindowCommand):
 
         self.window.active_view().show_at_center(pt)
 
-    def _harvest_next(self) -> int:
-        """Harvest the next error that we find and return it back
+    def _harvest_prev(self) -> int:
+        """Harvest the prev error that we find and return it back
         """
 
         (cur_line, cur_col) = self.window.active_view().rowcol(
@@ -66,7 +66,7 @@ class AnacondaNextLintError(sublime_plugin.WindowCommand):
         if not len(lines):
             return None
 
-        if cur_line is not None and lines[-1] > cur_line:
-            lines = [l for l in lines if l > cur_line]
+        if cur_line is not None and lines[0] < cur_line:
+            lines = [l for l in lines if l < cur_line]
 
-        return lines[0] if len(lines) > 0 else None
+        return lines[-1] if len(lines) > 0 else None
