@@ -3,9 +3,15 @@ package downloader
 import (
     . "ml/strings"
     . "ml/dict"
+
+    "fmt"
+    "os/exec"
+
     "ml/net/http2"
     "ml/trace"
 )
+
+var mkvmerge = `D:\Software\mkvtoolnix\mkvmerge.exe`
 
 type baseDownloader struct {
     url     String
@@ -47,4 +53,43 @@ func (self *baseDownloader) Analysis() AnalysisResult {
 func (self *baseDownloader) Download(path String) DownloadResult {
     trace.Raise(trace.NewNotImplementedError("Download not implemented"))
     return DownloadFailed
+}
+
+//
+// mkvmerge.exe
+// --output 东方卫视笑傲江湖总决赛崔大笨二人转.mkv
+// ( D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\东方卫视笑傲江湖总决赛崔大笨二人转_part01.flv ) + ( D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\东方卫视笑傲江湖总决赛崔大笨二人转_part02.flv ) + ( D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\东方卫视笑傲江湖总决赛崔大笨二人转_part03.flv ) + ( D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\东方卫视笑傲江湖总决赛崔大笨二人转_part04.flv )
+// --track-order 0:0,0:1
+// --append-to 1:0:0:0,2:0:1:0,3:0:2:0,1:1:0:1,2:1:1:1,3:1:2:1
+//
+
+//
+// D:/Software/mkvtoolnix\mkvmerge.exe
+// --output D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\看一颗松子如何引发星际碰撞\part1.mkv
+// ( D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\看一颗松子如何引发星际碰撞\part1.flv ) + ( D:\Dev\Source\GoProject\src\video_downloader\src\downloaded\看一颗松子如何引发星际碰撞\part2.flv )
+// --track-order 0:0,0:1 --append-to 1:0:0:0,1:1:0:1
+//
+
+func (self *baseDownloader) merge(output string, files []string) {
+    cmd := exec.Command(
+                mkvmerge,
+                "--output",
+                output,
+            )
+
+    for i, f := range files {
+        if i != 0 {
+            cmd.Args = append(cmd.Args, "+")
+        }
+
+        cmd.Args = append(cmd.Args, "(")
+        cmd.Args = append(cmd.Args, f)
+        cmd.Args = append(cmd.Args, ")")
+    }
+
+    fmt.Println(cmd.Args)
+
+    o, err := cmd.Output()
+    fmt.Println(string(o))
+    fmt.Println(err)
 }

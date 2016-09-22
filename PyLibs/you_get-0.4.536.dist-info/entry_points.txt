@@ -1,0 +1,3 @@
+[console_scripts]
+you-get = you_get.__main__:main
+

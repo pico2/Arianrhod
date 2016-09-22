@@ -64,11 +64,6 @@ func (self *Ku6Downloader) Analysis() AnalysisResult {
         data := json.MustLoadDataDict([]byte(videoInfoData))
         self.links = data.Map("data").Str("f").Split(",")
 
-        fmt.Println(self.title)
-        for _, u := range self.links {
-            fmt.Println(u)
-        }
-
         return nil, nil
 
     }).MapErr(func(err error) error {
@@ -85,18 +80,31 @@ func (self *Ku6Downloader) Analysis() AnalysisResult {
 }
 
 func (self *Ku6Downloader) Download(path String) DownloadResult {
+    path = String(filepath.Join(path.String(), self.title.String()))
+
     os.MkdirAll(path.String(), os.ModeDir)
+
+    fmt.Printf("%s\n\n", self.title)
+
+    var files []string
 
     for index, link := range self.links {
         var f string
 
         if len(self.links) == 1 {
             f = filepath.Join(path.String(), fmt.Sprintf("%s.flv", self.title))
+            fmt.Println("downloading")
         } else {
-            f = filepath.Join(path.String(), fmt.Sprintf("%s_part%02d.flv", self.title, index + 1))
+            f = filepath.Join(path.String(), fmt.Sprintf("%s.part%02d.flv", self.title, index + 1))
+            files = append(files, f)
+
+            fmt.Printf("downloading part %d / %d\n", index + 1, len(self.links))
         }
 
-        fmt.Printf("downloading part %d\n", index + 1)
+        fmt.Println(link)
+
+        // continue
+
         self.session.Get(
             link,
             http.ReadBlock(true),
@@ -123,6 +131,12 @@ func (self *Ku6Downloader) Download(path String) DownloadResult {
             fmt.Println(err)
             return err
         })
+
+        fmt.Println()
+    }
+
+    if len(files) != 0 {
+        self.merge(filepath.Join(path.String(), self.title.String() + ".mkv"), files)
     }
 
     return DownloadSuccess

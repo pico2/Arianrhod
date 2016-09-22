@@ -8,6 +8,7 @@ import (
 
     "ml/os2"
     "ml/trace"
+    "ml/console"
 
     "downloader"
     "path/filepath"
@@ -29,6 +30,9 @@ func getDownloaderFromUrl(url String) downloader.Downloader {
         case "v.ku6.com", "baidu.ku6.com":
             return downloader.NewKu6(url)
 
+        case "v.youku.com":
+            return downloader.NewYouku(url)
+
         default:
             trace.Raise(trace.NewNotImplementedError("unimplemented for %v", url))
             return nil
@@ -36,7 +40,15 @@ func getDownloaderFromUrl(url String) downloader.Downloader {
 }
 
 func main() {
-    var url String = "http://baidu.ku6.com/watch/9161687529597316875.html?page=videoMultiNeed"
+    var url String
+
+    fmt.Printf("url = ")
+    fmt.Scanf("%s\n", &url)
+
+    if url.IsEmpty() {
+        url = "http://v.youku.com/v_show/id_XMTczMTUxMzg4OA==.html"
+    }
+
     //url = "http://v.ku6.com/show/voWYIqc6BWBfzK_gzdLRXw...html"
     d := getDownloaderFromUrl(url)
     defer d.Close()
@@ -47,4 +59,6 @@ func main() {
         case downloader.AnalysisSuccess:
             d.Download(path)
     }
+
+    console.Pause("done")
 }
