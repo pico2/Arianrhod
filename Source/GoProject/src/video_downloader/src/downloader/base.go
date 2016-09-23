@@ -33,7 +33,7 @@ func newBase(url String) *baseDownloader {
         ),
     )
 
-    // s.SetHTTPProxy("localhost", 6789)
+    s.SetHTTPProxy("localhost", 6789)
 
     return &baseDownloader{
         url     : url,

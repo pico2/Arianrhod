@@ -10,6 +10,8 @@ import (
     "regexp"
     "path/filepath"
 
+    "spew"
+
     "ml/net/http2"
     "ml/html"
     "ml/random"
@@ -17,6 +19,24 @@ import (
 )
 
 var youkuVideoIdPattern = regexp.MustCompile(`(?U)currentEncodeVid\s*:\s*"(.*)"`)
+
+
+type YoukuVideoInfoSeg struct {
+    totalMillisecondsAudio      int64
+    totalMillisecondsVideo      int64
+    size                        int64
+    fileid                      String
+    key                         String
+}
+
+type YoukuVideoInfo struct {
+    segs    []YoukuVideoInfoSeg
+
+    security struct {
+        encryptString  String
+        ip              int64
+    }
+}
 
 type YoukuDownloader struct {
     *baseDownloader
@@ -37,9 +57,9 @@ func (self *YoukuDownloader) Analysis() AnalysisResult {
         resp := value.(*http.Response)
 
         content := resp.Text()
-        doc := html.Parse(content)
+        // doc := html.Parse(content)
 
-        self.title = String(doc.Find("div[id=sMain]").Find("span[id=subtitle]").MustAttr("title"))
+        // self.title = String(doc.Find("div[id=sMain]").Find("h1.title").MustAttr("title"))
 
         vid := String(youkuVideoIdPattern.FindStringSubmatch(content.String())[1])
 
@@ -128,23 +148,6 @@ func (self *YoukuDownloader) Download(path String) DownloadResult {
     return DownloadSuccess
 }
 
-type YoukuVideoInfoSeg struct {
-    totalMillisecondsAudio      int64
-    totalMillisecondsVideo      int64
-    size                        int64
-    fileid                      String
-    key                         String
-}
-
-type YoukuVideoInfo struct {
-    segs    []YoukuVideoInfoSeg
-
-    security struct {
-        encryptString  String
-        ip              int64
-    }
-}
-
 //
 // http://k.youku.com/player/getFlvPath/sid/1474526152477 10f8 1137_00/st/mp4/fileid/030008010057E0B89D83C2019C3C1CAEE308CE-FEF5-6CE1-579C-51C872568410
 // start=0
@@ -185,6 +188,9 @@ func (self *YoukuDownloader) getVideoInfo(vid String) (videoInfo YoukuVideoInfo)
     }
 
     data := info.Map("data")
+
+    self.title = data.Map("video").Str("title")
+
     security := data.Map("security")
 
     videoInfo.security.encryptString = security.Str("encrypt_string")
@@ -211,7 +217,7 @@ func (self *YoukuDownloader) getVideoInfo(vid String) (videoInfo YoukuVideoInfo)
         }
     }
 
-    fmt.Printf("%+v\n", videoInfo)
+    fmt.Printf("%+v\n", spew.Sdump(videoInfo))
 
     return
 }
