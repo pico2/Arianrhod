@@ -62,8 +62,11 @@ class JediUsages(object):
 
                 return
 
-            filename, lineno, columno = self.options[filename]
+        opts = self.options[filename]
+        if len(self.options[filename]) == 4:
+            opts = opts[1:]
 
+        filename, lineno, columno = opts
         flags = sublime.ENCODED_POSITION
         if transient:
             flags |= sublime.TRANSIENT
@@ -81,9 +84,14 @@ class JediUsages(object):
 
         view = self.text.view
         if usages or (not usages and type(defs) is not str):
-            options = [
-                [o[0], 'line: {} column: {}'.format(o[1], o[2])] for o in defs
-            ]
+            if len(defs) == 4:
+                options = [[
+                    o[0], o[1], 'line: {} column: {}'.format(o[2], o[3])
+                ] for o in defs]
+            else:
+                options = [[
+                    o[0], 'line: {} column: {}'.format(o[1], o[2])
+                ] for o in defs]
         else:
             if len(defs):
                 options = defs[0]
