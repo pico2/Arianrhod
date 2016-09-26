@@ -21,7 +21,7 @@ def ku6_download_by_id(id, title = None, output_dir = '.', merge = True, info_on
     for url in urls:
         _, _, temp = url_info(url)
         size += temp
-
+    
     print_info(site_info, title, ext, size)
     if not info_only:
         download_urls(urls, title, ext, size, output_dir, merge = merge)
@@ -33,7 +33,7 @@ def ku6_download(url, output_dir = '.', merge = True, info_only = False, **kwarg
         id = baidu_ku6(url)
     else:
         patterns = [r'http://v.ku6.com/special/show_\d+/(.*)\.\.\.html',
-                r'http://v.ku6.com/show/(.*)(\.\.\.)?html',
+                r'http://v.ku6.com/show/(.*)\.\.\.html',
                 r'http://my.ku6.com/watch\?.*v=(.*)\.\..*']
         id = r1_of(patterns, url)
 
