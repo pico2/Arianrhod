@@ -21,6 +21,6 @@ import (
 
 
 func main() {
-    var sum time.Duration
+    var sum time.Duration = time.Now()
     fmt.Println(sum / 100)
 }
