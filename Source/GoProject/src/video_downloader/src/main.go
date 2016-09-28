@@ -34,7 +34,7 @@ func getDownloaderFromUrl(url String) downloader.Downloader {
             return downloader.NewYouku(url)
 
         default:
-            trace.Raise(trace.NewNotImplementedError("unimplemented for %v", url))
+            trace.Raise(trace.NewNotImplementedError("%v unimplemented", url))
             return nil
     }
 }

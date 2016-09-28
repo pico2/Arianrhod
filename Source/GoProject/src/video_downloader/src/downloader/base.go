@@ -11,14 +11,21 @@ import (
     "ml/trace"
     "ml/os2"
     "ml/net/http2"
+    "time"
+    "os"
 )
 
 var mkvmerge = filepath.Join(os2.ExecutablePath(), "mkvmerge.exe")
 
+type DownloadLink struct {
+    url     String
+    name    String
+}
+
 type baseDownloader struct {
     url     String
     title   String
-    links   []String
+    links   []DownloadLink
     session *http.Session
 }
 
@@ -53,8 +60,61 @@ func (self *baseDownloader) Analysis() AnalysisResult {
 }
 
 func (self *baseDownloader) Download(path String) DownloadResult {
-    trace.Raise(trace.NewNotImplementedError("Download not implemented"))
-    return DownloadFailed
+    path = String(filepath.Join(path.String(), self.title.String()))
+
+    os.MkdirAll(path.String(), os.ModeDir)
+
+    fmt.Printf("%s\n\n", self.title)
+
+    var files []string
+
+    for index, link := range self.links {
+        f := filepath.Join(path.String(), link.name.String())
+
+        if len(self.links) == 1 {
+            fmt.Println("downloading")
+        } else {
+            files = append(files, f)
+            fmt.Printf("downloading part %d / %d\n", index + 1, len(self.links))
+        }
+
+        fmt.Println(link.url)
+
+        self.session.Get(
+            link.url,
+            http.ReadBlock(true),
+            http.Timeout(time.Second * 10),
+            http.MaxTimeoutTimes(100),
+            http.Ignore404(false),
+        ).Map(func(value interface{}) (interface{}, error) {
+            fd, err := os.Create(f)
+            if err != nil {
+                fmt.Println(err)
+                return nil, err
+            }
+
+            content := value.(*http.Response).Content
+
+            fmt.Println("length", len(content))
+
+            fd.Write(content)
+            fd.Close()
+
+            return nil, nil
+
+        }).MapErr(func(err error) error {
+            fmt.Println(err)
+            return err
+        })
+
+        fmt.Println()
+    }
+
+    if len(files) != 0 {
+        self.merge(filepath.Join(path.String(), self.title.String() + ".mkv"), files)
+    }
+
+    return DownloadSuccess
 }
 
 //
