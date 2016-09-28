@@ -46,7 +46,7 @@ func main() {
     fmt.Scanf("%s\n", &url)
 
     if url.IsEmpty() {
-        url = "http://v.youku.com/v_show/id_XMTczMTg2ODIxMg==.html"
+        url = "http://v.youku.com/v_show/id_XMTc0MDM4NjA2NA==.html"
     }
 
     //url = "http://v.ku6.com/show/voWYIqc6BWBfzK_gzdLRXw...html"

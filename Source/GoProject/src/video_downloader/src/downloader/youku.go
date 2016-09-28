@@ -9,6 +9,7 @@ import (
     "time"
     "regexp"
     "path/filepath"
+    "crypto/des"
 
     "spew"
 
@@ -16,6 +17,7 @@ import (
     "ml/html"
     "ml/random"
     "ml/encoding/json"
+    "ml/encoding/base64"
 )
 
 var youkuVideoIdPattern = regexp.MustCompile(`(?U)currentEncodeVid\s*:\s*"(.*)"`)
@@ -33,7 +35,9 @@ type YoukuVideoInfo struct {
     segs    []YoukuVideoInfoSeg
 
     security struct {
-        encryptString  String
+        sid             String
+        token           String
+        encryptString   String
         ip              int64
     }
 }
@@ -217,7 +221,31 @@ func (self *YoukuDownloader) getVideoInfo(vid String) (videoInfo YoukuVideoInfo)
         }
     }
 
+    videoInfo.security.sid, videoInfo.security.token = self.decryptSidAndToken(videoInfo.security.encryptString)
+
     fmt.Printf("%+v\n", spew.Sdump(videoInfo))
 
     return
+}
+
+func (self *YoukuDownloader) decryptSidAndToken(encryptString String) (sid, token String) {
+    cipher, _ := des.NewCipher([]byte("00149ad5"))
+
+    fmt.Println(encryptString)
+
+    data := base64.DecodeString(encryptString.String())
+
+    for i := 0; i < len(data); i += cipher.BlockSize() {
+        cipher.Decrypt(data[i:], data[i:])
+    }
+
+    decrypted := String(data).Split("\x00", 1)[0].Split("_", 1)
+
+    sid = decrypted[0]
+    token = decrypted[1]
+    return
+}
+
+func (self *YoukuDownloader) encryptEp() {
+    key := "21dd8110"
 }
