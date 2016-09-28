@@ -10,6 +10,7 @@ import (
     "regexp"
     "path/filepath"
     "crypto/des"
+    "crypto/md5"
 
     "spew"
 
@@ -229,12 +230,12 @@ func (self *YoukuDownloader) getVideoInfo(vid String) (videoInfo YoukuVideoInfo)
 }
 
 func (self *YoukuDownloader) decryptSidAndToken(encryptString String) (sid, token String) {
-    cipher, _ := des.NewCipher([]byte("00149ad5"))
 
     fmt.Println(encryptString)
 
     data := base64.DecodeString(encryptString.String())
 
+    cipher, _ := des.NewCipher([]byte("00149ad5"))
     for i := 0; i < len(data); i += cipher.BlockSize() {
         cipher.Decrypt(data[i:], data[i:])
     }
@@ -246,6 +247,19 @@ func (self *YoukuDownloader) decryptSidAndToken(encryptString String) (sid, toke
     return
 }
 
-func (self *YoukuDownloader) encryptEp() {
-    key := "21dd8110"
+func (self *YoukuDownloader) encryptEp(info YoukuVideoInfo, fileId String) String {
+    bctime := 0
+    ep := fmt.Sprintf("%v_%v_%v_%v", info.security.sid, fileId, info.security.token, bctime)
+    sum := md5.Sum([]byte(ep))
+
+    ep = ep + "_" + fmt.Sprintf("%x", sum[:])[:4]
+
+    fmt.Println("ep", ep)
+
+    data := []byte(ep)
+
+    cipher, _ := des.NewCipher([]byte("21dd8110"))
+    for i := 0; i < len(data); i += cipher.BlockSize() {
+        cipher.Encrypt(data[i:], data[i:])
+    }
 }
