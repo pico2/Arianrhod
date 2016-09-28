@@ -264,8 +264,6 @@ func (self *YoukuDownloader) getVideoInfo(vid String) {
 }
 
 func (self *YoukuDownloader) decryptSidAndToken(encryptString String) (sid, token String) {
-    fmt.Println(encryptString)
-
     data := base64.DecodeString(encryptString.String())
 
     cipher, _ := des.NewCipher([]byte("00149ad5"))
