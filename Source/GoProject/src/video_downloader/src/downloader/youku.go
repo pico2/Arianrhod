@@ -238,49 +238,25 @@ func (self *YoukuDownloader) getVideoInfo(vid String) {
         var st StreamType
 
         switch t := stream.Str("stream_type"); t {
-            case "mp4hd3":
+            case "mp4hd3", "hd3":
                 st.priority = 6
                 st.profile = "1080P"
                 st.container = "flv"
                 st.hd = 3
 
-            case "hd3":
-                st.priority = 6
-                st.profile = "1080P"
-                st.container = "flv"
-                st.hd = 3
-
-            case "mp4hd2":
+            case "mp4hd2", "hd2":
                 st.priority = 5
                 st.profile = "超清"
                 st.container = "flv"
                 st.hd = 2
 
-            case "hd2":
-                st.priority = 5
-                st.profile = "超清"
-                st.container = "flv"
-                st.hd = 2
-
-            case "mp4hd":
+            case "mp4hd", "mp4":
                 st.priority = 4
                 st.profile = "高清"
                 st.container = "mp4"
                 st.hd = 1
 
-            case "mp4":
-                st.priority = 4
-                st.profile = "高清"
-                st.container = "mp4"
-                st.hd = 1
-
-            case "flvhd":
-                st.priority = 3
-                st.profile = "标清"
-                st.container = "flv"
-                st.hd = 0
-
-            case "flv":
+            case "flvhd", "flv":
                 st.priority = 2
                 st.profile = "标清"
                 st.container = "flv"
