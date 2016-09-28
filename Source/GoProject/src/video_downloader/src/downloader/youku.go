@@ -15,14 +15,12 @@ import (
     "spew"
 
     "ml/net/http2"
-    "ml/html"
     "ml/random"
-    "ml/encoding/json"
     "ml/encoding/base64"
+    "ml/logging/logger"
 )
 
 var youkuVideoIdPattern = regexp.MustCompile(`(?U)currentEncodeVid\s*:\s*"(.*)"`)
-
 
 type YoukuVideoInfoSeg struct {
     totalMillisecondsAudio      int64
@@ -30,6 +28,8 @@ type YoukuVideoInfoSeg struct {
     size                        int64
     fileid                      String
     key                         String
+    hd                          int
+    container                   String
 }
 
 type YoukuVideoInfo struct {
@@ -45,8 +45,8 @@ type YoukuVideoInfo struct {
 
 type YoukuDownloader struct {
     *baseDownloader
-
-    vid     String
+    vid         String
+    videoInfo   YoukuVideoInfo
 }
 
 func NewYouku(url String) Downloader {
@@ -62,20 +62,43 @@ func (self *YoukuDownloader) Analysis() AnalysisResult {
         resp := value.(*http.Response)
 
         content := resp.Text()
-        // doc := html.Parse(content)
-
-        // self.title = String(doc.Find("div[id=sMain]").Find("h1.title").MustAttr("title"))
-
         vid := String(youkuVideoIdPattern.FindStringSubmatch(content.String())[1])
 
         self.getVideoInfo(vid)
 
-        fmt.Println(self.title)
+        for index, seg := range self.videoInfo.segs {
+            // com\youku\utils\GetUrl.as
 
-        // videoInfoData := videoInfoPattern.FindStringSubmatch(content.String())[1]
+            url := fmt.Sprintf("http://k.youku.com/player/getFlvPath/sid/%s_00/st/flv/fileid/%s", self.videoInfo.security.sid, seg.fileid)
+            result := self.session.Get(
+                            url,
+                            http.Params(Dict{
+                                "start"     : "0",
+                                "K"         : seg.key,
+                                "hd"        : seg.hd,
+                                "myp"       : "0",
+                                "ts"        : "64",
+                                "ypp"       : "0",      // P2PConfig.ypp @ com\youku\P2PConfig.as
+                                "ctype"     : "10",     // PlayerConstant.CTYPE @ com\youku\data\PlayerConstant.as
+                                "ev"        : "1",      // PlayerConstant.EV @ com\youku\data\PlayerConstant.as
+                                "token"     : self.videoInfo.security.token,
+                                "oip"       : self.videoInfo.security.ip,
+                                "ep"        : self.encryptEp(self.videoInfo, seg.fileid),
+                                "yxon"      : "1",
+                                "special"   : "true",
+                            }),
+                        )
 
-        // data := json.MustLoadDataDict([]byte(videoInfoData))
-        // self.links = data.Map("data").Str("f").Split(",")
+            if err := result.Err(); err != nil {
+                logger.Critical("get seg %d failed: %v", index, err)
+                panic(nil)
+            }
+
+            var r JsonArray
+
+            result.Result().(*http.Response).Json(&r)
+            self.links = append(self.links, r.Map(0).Str("server"))
+        }
 
         return nil, nil
 
@@ -172,7 +195,7 @@ func (self *YoukuDownloader) Download(path String) DownloadResult {
 // special=true
 //
 
-func (self *YoukuDownloader) getVideoInfo(vid String) (videoInfo YoukuVideoInfo) {
+func (self *YoukuDownloader) getVideoInfo(vid String) {
     var info JsonDict
 
     result := self.session.Get(
@@ -198,33 +221,121 @@ func (self *YoukuDownloader) getVideoInfo(vid String) (videoInfo YoukuVideoInfo)
 
     security := data.Map("security")
 
-    videoInfo.security.encryptString = security.Str("encrypt_string")
-    videoInfo.security.ip = int64(security.Int("ip"))
+    self.videoInfo.security.encryptString = security.Str("encrypt_string")
+    self.videoInfo.security.ip = int64(security.Int("ip"))
 
     stream := data.Array("stream")
 
+    type StreamType struct {
+        name        String
+        profile     String
+        container   String
+        priority    int
+        hd          int
+    }
+
+    getStreamType := func (stream JsonDict) StreamType {
+        var st StreamType
+
+        switch t := stream.Str("stream_type"); t {
+            case "mp4hd3":
+                st.priority = 6
+                st.profile = "1080P"
+                st.container = "flv"
+                st.hd = 3
+
+            case "hd3":
+                st.priority = 6
+                st.profile = "1080P"
+                st.container = "flv"
+                st.hd = 3
+
+            case "mp4hd2":
+                st.priority = 5
+                st.profile = "超清"
+                st.container = "flv"
+                st.hd = 2
+
+            case "hd2":
+                st.priority = 5
+                st.profile = "超清"
+                st.container = "flv"
+                st.hd = 2
+
+            case "mp4hd":
+                st.priority = 4
+                st.profile = "高清"
+                st.container = "mp4"
+                st.hd = 1
+
+            case "mp4":
+                st.priority = 4
+                st.profile = "高清"
+                st.container = "mp4"
+                st.hd = 1
+
+            case "flvhd":
+                st.priority = 3
+                st.profile = "标清"
+                st.container = "flv"
+                st.hd = 0
+
+            case "flv":
+                st.priority = 2
+                st.profile = "标清"
+                st.container = "flv"
+                st.hd = 0
+
+            case "3gphd":
+                st.priority = 1
+                st.profile = "标清（3GP）"
+                st.container = "3gp"
+                st.hd = 0
+
+            default:
+                logger.Critical("unsupported stream type: %v", t)
+                panic(nil)
+        }
+
+        return st
+    }
+
+    var streamType StreamType
+
     for index := range stream {
         s := stream.Map(index)
+
+        st := getStreamType(s)
+        if st.priority < streamType.priority {
+            continue
+        }
+
+        streamType = st
+
         segs := s.Array("segs")
 
-        fmt.Println("stream_type", s.Str("stream_type"))
+        fmt.Printf("stream_type: %+v\n", streamType)
+
+        self.videoInfo.segs = nil
 
         for index := range segs {
             seg := segs.Map(index)
 
-            videoInfo.segs = append(videoInfo.segs, YoukuVideoInfoSeg{
+            self.videoInfo.segs = append(self.videoInfo.segs, YoukuVideoInfoSeg{
                 totalMillisecondsAudio  : seg.Str("total_milliseconds_audio").ToInt64(),
                 totalMillisecondsVideo  : seg.Str("total_milliseconds_video").ToInt64(),
                 size                    : seg.Str("size").ToInt64(),
                 fileid                  : seg.Str("fileid"),
                 key                     : seg.Str("key"),
+                hd                      : streamType.hd,
+                container               : streamType.container,
             })
         }
     }
 
-    videoInfo.security.sid, videoInfo.security.token = self.decryptSidAndToken(videoInfo.security.encryptString)
+    self.videoInfo.security.sid, self.videoInfo.security.token = self.decryptSidAndToken(self.videoInfo.security.encryptString)
 
-    fmt.Printf("%+v\n", spew.Sdump(videoInfo))
+    fmt.Printf("%+v\n", spew.Sdump(self.videoInfo))
 
     return
 }
@@ -250,16 +361,21 @@ func (self *YoukuDownloader) decryptSidAndToken(encryptString String) (sid, toke
 func (self *YoukuDownloader) encryptEp(info YoukuVideoInfo, fileId String) String {
     bctime := 0
     ep := fmt.Sprintf("%v_%v_%v_%v", info.security.sid, fileId, info.security.token, bctime)
-    sum := md5.Sum([]byte(ep))
+    sum := md5.Sum([]byte(ep + "_kservice"))
 
     ep = ep + "_" + fmt.Sprintf("%x", sum[:])[:4]
-
-    fmt.Println("ep", ep)
 
     data := []byte(ep)
 
     cipher, _ := des.NewCipher([]byte("21dd8110"))
+
+    for len(data) % cipher.BlockSize() != 0 {
+        data = append(data, 0)
+    }
+
     for i := 0; i < len(data); i += cipher.BlockSize() {
         cipher.Encrypt(data[i:], data[i:])
     }
+
+    return base64.EncodeToString(data)
 }

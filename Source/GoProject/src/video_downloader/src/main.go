@@ -40,16 +40,17 @@ func getDownloaderFromUrl(url String) downloader.Downloader {
 }
 
 func main() {
+    defer console.Pause("done")
+
     var url String
 
     fmt.Printf("url = ")
     fmt.Scanf("%s\n", &url)
 
     if url.IsEmpty() {
-        url = "http://v.youku.com/v_show/id_XMTc0MDM4NjA2NA==.html"
+        url = "http://v.youku.com/v_show/id_XMTc0MDIzMjY0OA==.html?from=y1.3-idx-beta-1519-23042.223465.2-1"
     }
 
-    //url = "http://v.ku6.com/show/voWYIqc6BWBfzK_gzdLRXw...html"
     d := getDownloaderFromUrl(url)
     defer d.Close()
 
@@ -60,5 +61,4 @@ func main() {
             d.Download(path)
     }
 
-    console.Pause("done")
 }

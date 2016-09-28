@@ -6,12 +6,14 @@ import (
 
     "fmt"
     "os/exec"
+    "path/filepath"
 
-    "ml/net/http2"
     "ml/trace"
+    "ml/os2"
+    "ml/net/http2"
 )
 
-var mkvmerge = `D:\Software\mkvtoolnix\mkvmerge.exe`
+var mkvmerge = filepath.Join(os2.ExecutablePath(), "mkvmerge.exe")
 
 type baseDownloader struct {
     url     String
@@ -33,7 +35,7 @@ func newBase(url String) *baseDownloader {
         ),
     )
 
-    s.SetHTTPProxy("localhost", 6789)
+    //s.SetHTTPProxy("localhost", 6789)
 
     return &baseDownloader{
         url     : url,
