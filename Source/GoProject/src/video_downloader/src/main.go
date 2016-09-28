@@ -39,9 +39,7 @@ func getDownloaderFromUrl(url String) downloader.Downloader {
     }
 }
 
-func main() {
-    defer console.Pause("done")
-
+func run() {
     var url String
 
     fmt.Printf("url = ")
@@ -60,5 +58,12 @@ func main() {
         case downloader.AnalysisSuccess:
             d.Download(path)
     }
+}
 
+func main() {
+    if e := trace.Try(run); e != nil {
+        fmt.Println(e)
+    }
+
+    console.Pause("done")
 }
