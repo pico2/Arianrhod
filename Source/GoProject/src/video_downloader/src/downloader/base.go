@@ -42,7 +42,7 @@ func newBase(url String) *baseDownloader {
         ),
     )
 
-    //s.SetHTTPProxy("localhost", 6789)
+    // s.SetHTTPProxy("localhost", 6789)
 
     return &baseDownloader{
         url     : url,
@@ -59,9 +59,14 @@ func (self *baseDownloader) Analysis() AnalysisResult {
     return AnalysisFailed
 }
 
+func (self *baseDownloader) makeFullPath(name string, path ...string) String {
+    p := filepath.Join(path...)
+    os.MkdirAll(p, os.ModeDir)
+    return String(filepath.Join(p, name))
+}
+
 func (self *baseDownloader) Download(path String) DownloadResult {
     path = String(filepath.Join(path.String(), self.title.String()))
-
     os.MkdirAll(path.String(), os.ModeDir)
 
     fmt.Printf("%s\n\n", self.title)
@@ -86,7 +91,12 @@ func (self *baseDownloader) Download(path String) DownloadResult {
             http.Timeout(time.Second * 10),
             http.MaxTimeoutTimes(100),
             http.Ignore404(false),
+            http.Headers(Dict{
+                "X-Requested-With" : "ShockwaveFlash/23.0.0.166",
+            }),
         ).Map(func(value interface{}) (interface{}, error) {
+            os.MkdirAll(path.String(), os.ModeDir)
+
             fd, err := os.Create(f)
             if err != nil {
                 fmt.Println(err)

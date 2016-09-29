@@ -33,6 +33,9 @@ func getDownloaderFromUrl(url String) downloader.Downloader {
         case "v.youku.com":
             return downloader.NewYouku(url)
 
+        case "open.163.com":
+            return downloader.NewNetEase(url)
+
         default:
             trace.Raise(trace.NewNotImplementedError("%v unimplemented", url))
             return nil
@@ -46,7 +49,7 @@ func run() {
     fmt.Scanf("%s\n", &url)
 
     if url.IsEmpty() {
-        url = "http://v.youku.com/v_show/id_XMTc0MDIzMjY0OA==.html?from=y1.3-idx-beta-1519-23042.223465.2-1"
+        url = "http://open.163.com/movie/2011/9/E/4/M8DOH67K8_M8DQVB8E4.html"
     }
 
     d := getDownloaderFromUrl(url)
