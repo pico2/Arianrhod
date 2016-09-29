@@ -91,6 +91,10 @@ func (self *NetEaseDownloader) Analysis() AnalysisResult {
 
             content := resp.Content
             e := xml.Unmarshal([]byte(content), &info)
+            if e != nil {
+                fmt.Println(e)
+                return nil, e
+            }
 
             links := []String{}
 
@@ -153,8 +157,7 @@ func (self *NetEaseDownloader) Analysis() AnalysisResult {
 
 func (self *NetEaseDownloader) Download(path String) DownloadResult {
     if self.subtitle.IsEmpty() == false {
-
-        fmt.Println("download subtitle")
+        fmt.Println("\ndownload subtitle")
 
         self.session.Get(
             self.subtitle,
@@ -165,7 +168,6 @@ func (self *NetEaseDownloader) Download(path String) DownloadResult {
             resp := value.(*http.Response)
 
             p := self.makeFullPath(self.title.String() + ".srt", path.String(), self.title.String())
-            fmt.Println(p)
             fd, err := os.Create(p.String())
             if err != nil {
                 fmt.Println(err)
