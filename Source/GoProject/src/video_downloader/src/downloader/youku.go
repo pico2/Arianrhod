@@ -18,6 +18,7 @@ import (
 )
 
 var youkuVideoIdPattern = regexp.MustCompile(`(?U)currentEncodeVid\s*:\s*"(.*)"`)
+var youkuVideoIdPattern2 = regexp.MustCompile(`(?U)var videoId2\s*=\s*'(.*)';`)
 
 type YoukuVideoInfoSeg struct {
     totalMillisecondsAudio      int64
@@ -59,7 +60,12 @@ func (self *YoukuDownloader) Analysis() AnalysisResult {
         resp := value.(*http.Response)
 
         content := resp.Text()
-        vid := String(youkuVideoIdPattern.FindStringSubmatch(content.String())[1])
+        m := youkuVideoIdPattern.FindStringSubmatch(content.String())
+        if len(m) == 0 {
+            m = youkuVideoIdPattern2.FindStringSubmatch(content.String())
+        }
+
+        vid := String(m[1])
 
         self.getVideoInfo(vid)
 
