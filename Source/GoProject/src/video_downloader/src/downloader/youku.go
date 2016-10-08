@@ -18,7 +18,7 @@ import (
 )
 
 var youkuVideoIdPattern = regexp.MustCompile(`(?U)currentEncodeVid\s*:\s*"(.*)"`)
-var youkuVideoIdPattern2 = regexp.MustCompile(`(?U)var videoId2\s*=\s*'(.*)';`)
+var youkuVideoIdPattern2 = regexp.MustCompile(`(?U)videoId2\s*=\s*'(.*)';`)
 
 type YoukuVideoInfoSeg struct {
     totalMillisecondsAudio      int64
@@ -67,12 +67,14 @@ func (self *YoukuDownloader) Analysis() AnalysisResult {
 
         vid := String(m[1])
 
+        fmt.Println("vid", vid)
+
         self.getVideoInfo(vid)
 
         for index, seg := range self.videoInfo.segs {
             // com\youku\utils\GetUrl.as
 
-            url := fmt.Sprintf("http://k.youku.com/player/getFlvPath/sid/%s_00/st/flv/fileid/%s", self.videoInfo.security.sid, seg.fileid)
+            url := fmt.Sprintf("http://k.youku.com/player/getFlvPath/sid/%s_00/st/%s/fileid/%s", self.videoInfo.security.sid, seg.container, seg.fileid)
             result := self.session.Get(
                             url,
                             http.Params(Dict{
@@ -90,6 +92,12 @@ func (self *YoukuDownloader) Analysis() AnalysisResult {
                                 "yxon"      : "1",
                                 "special"   : "true",
                             }),
+                            http.Headers(Dict{
+                                "X-Requested-With"  : "ShockwaveFlash/23.0.0.166",
+                                "Accept"            : "*/*",
+                                "Referer"           : self.url,
+                            }),
+                            http.Ignore404(false),
                         )
 
             if err := result.Err(); err != nil {
@@ -192,7 +200,7 @@ func (self *YoukuDownloader) getVideoInfo(vid String) {
 
         switch t := stream.Str("stream_type"); t {
             case "mp4hd3", "hd3":
-                st.priority = 6
+                st.priority = -6
                 st.profile = "1080P"
                 st.container = "flv"
                 st.hd = 3

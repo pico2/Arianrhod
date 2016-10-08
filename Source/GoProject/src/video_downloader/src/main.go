@@ -49,7 +49,7 @@ func run() {
     fmt.Scanf("%s\n", &url)
 
     if url.IsEmpty() {
-        url = "http://open.163.com/movie/2011/9/E/4/M8DOH67K8_M8DQVB8E4.html"
+        url = "http://v.youku.com/v_show/id_XMTc1MTEwOTk4OA==.html?from=y1.3-idx-beta-1519-23042.223465.10-1"
     }
 
     d := getDownloaderFromUrl(url)

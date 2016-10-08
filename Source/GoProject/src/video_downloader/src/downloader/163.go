@@ -11,8 +11,6 @@ import (
     "encoding/hex"
     xmllib "encoding/xml"
 
-    "spew"
-
     "ml/net/http2"
     "ml/crypto/cipher"
     "ml/encoding/xml"

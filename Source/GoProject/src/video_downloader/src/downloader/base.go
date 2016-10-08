@@ -4,6 +4,8 @@ import (
     . "ml/strings"
     . "ml/dict"
 
+    "os"
+    "time"
     "fmt"
     "os/exec"
     "path/filepath"
@@ -11,8 +13,6 @@ import (
     "ml/trace"
     "ml/os2"
     "ml/net/http2"
-    "time"
-    "os"
 )
 
 var mkvmerge = filepath.Join(os2.ExecutablePath(), "mkvmerge.exe")
@@ -37,6 +37,7 @@ func newBase(url String) *baseDownloader {
             "Accept-Encoding"   : "gzip, deflate, sdch",
             "Accept-Language"   : "en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2",
         }),
+        http.DefaultTimeout(10 * time.Second),
         http.DefaultOption(
             http.ReadBlock(true),
         ),
