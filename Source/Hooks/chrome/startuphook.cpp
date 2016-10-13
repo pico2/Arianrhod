@@ -342,9 +342,21 @@ VOID FuckExtensionDeveloperModeWarning(PLDR_MODULE chrome)
 {
     using namespace Mp;
 
-    static CHAR text[] = "ExtensionDeveloperModeWarning";
-
     PBYTE push;
+
+    push = (PBYTE)SearchPatternSafe(L"84 C0 74 04 B0 01 ?? C3 E8 ?? ?? ?? ?? 83 F8 03 7D", chrome->DllBase, chrome->SizeOfImage);
+    if (push == nullptr)
+        return;
+
+    PATCH_MEMORY_DATA p[] =
+    {
+        MemoryPatchVa(0ull, 1, push + 5),
+    };
+
+    PatchMemory(p, countof(p), chrome->DllBase);
+
+/*
+    static CHAR text[] = "ExtensionDeveloperModeWarning";
 
     push = (PBYTE)SearchStringReference(chrome, text, sizeof(text));
     if (push == IMAGE_INVALID_VA)
@@ -365,6 +377,7 @@ VOID FuckExtensionDeveloperModeWarning(PLDR_MODULE chrome)
         PatchMemory(p, countof(p), chrome->DllBase);
         break;
     }
+*/
 }
 
 BOOL UnInitialize(PVOID BaseAddress)
